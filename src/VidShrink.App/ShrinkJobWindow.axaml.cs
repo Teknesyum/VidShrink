@@ -78,14 +78,17 @@ public partial class ShrinkJobWindow : Window
     private readonly ShrinkRequestQueue? _queue;
     private readonly string _language;
     private readonly AppSettings _appSettings = LoadAppSettings();
-    private readonly List<ShrinkRequest> _pending = new();
+    private readonly JobPump<ShrinkRequest> _pump;
+    private readonly List<AktifIs> _aktif = new();
+    private readonly SemaphoreSlim _overshootGate = new(1, 1);
     private readonly List<string> _outputs = new();
-    private CancellationTokenSource? _cts;
     private DispatcherTimer? _closeTimer;
-    private bool _busy;
     private bool _started;
+    private bool _closed;
     private int _accepted;
     private int _finished;
+    private int _baslayan;
+    private int? _parallelLimit;
     private PlanOptions? _template;
     private bool _ceilingTarget;
     private string? _extension;
@@ -113,6 +116,39 @@ public partial class ShrinkJobWindow : Window
         set => _pencereEtkin = value;
     }
 
+    /// <summary>
+    /// K6: aynı anda koşan iş sınırı. Ayardan okunur ve makinenin üst sınırına çekilir;
+    /// testler kendi değerini verir.
+    /// </summary>
+    internal int ParallelLimit
+    {
+        get => _parallelLimit ?? ParallelJobs.Clamp(_appSettings.ParallelJobs, Environment.ProcessorCount);
+        set => _parallelLimit = Math.Max(ParallelJobs.Default, value);
+    }
+
+    /// <summary>Bir isteği koşturan iş; testler sahtesini verir, gerçek ffmpeg çağrılmaz.</summary>
+    internal Func<ShrinkRequest, CancellationToken, Task>? Kosturucu { get; set; }
+
+    /// <summary>Şu an koşan istekler, başlama sırasıyla.</summary>
+    internal IReadOnlyList<ShrinkRequest> RunningJobs => _pump.Running;
+
+    /// <summary>K6: koşan tek işi iptal eder; ötekiler ve sıra sürer.</summary>
+    internal bool CancelJob(ShrinkRequest request) => _pump.Cancel(request);
+
+    /// <summary>Koşan bir işin ekrandaki durumu; satırı bir kez kurulur, ilerleme yerinde yazılır.</summary>
+    private sealed class AktifIs
+    {
+        public AktifIs(ShrinkRequest request) => Request = request;
+        public ShrinkRequest Request { get; }
+        public string Target { get; set; } = "";
+        public double Fraction { get; set; }
+        public string Stage { get; set; } = "-";
+        public string Remaining { get; set; } = "-";
+        public Grid? Row { get; set; }
+        public ProgressBar? Bar { get; set; }
+        public TextBlock? Kalan { get; set; }
+    }
+
     /// <summary>Bir işin sonucunu sıra sonundaki habere yazar.</summary>
     internal void IsBitti(string yol, IsSonucu sonuc) => _bitenler.Add(new BitenIs(yol, sonuc));
 
@@ -136,6 +172,8 @@ public partial class ShrinkJobWindow : Window
     {
         _startup = startup;
         _queue = queue;
+        _pump = new JobPump<ShrinkRequest>((request, ct) => (Kosturucu ?? RunOneAsync)(request, ct), () => ParallelLimit);
+        _pump.Drained += OnDrained;
 
         var language = MainWindow.ResolveLanguage(null, CultureInfo.CurrentUICulture.Name);
         try
@@ -259,7 +297,7 @@ public partial class ShrinkJobWindow : Window
     internal string MessageText => TxtMessage.Text ?? "";
 
     /// <summary>Henüz başlamamış istekler, koşacakları sırayla. Koşan dosya burada değil.</summary>
-    internal IReadOnlyList<ShrinkRequest> Pending => _pending;
+    internal IReadOnlyList<ShrinkRequest> Pending => _pump.Pending;
 
     internal bool Paused => _paused;
 
@@ -329,16 +367,14 @@ public partial class ShrinkJobWindow : Window
     private void Accept(ShrinkRequest request)
     {
         _accepted++;
-        _pending.Add(request);
+        _pump.Enqueue(request);
         RefreshPending();
-        _ = PumpAsync();
     }
 
     /// <summary>C1-2: bekleyen isteği sıradan çıkarır. Koşan dosyaya dokunmaz.</summary>
     internal void RemovePending(int index)
     {
-        if (index < 0 || index >= _pending.Count) return;
-        _pending.RemoveAt(index);
+        if (!_pump.RemovePending(index)) return;
         _accepted--;
         RefreshPending();
     }
@@ -346,47 +382,47 @@ public partial class ShrinkJobWindow : Window
     /// <summary>C1-2: bekleyen isteği <paramref name="delta"/> kadar kaydırır; sınırın dışına taşımaz.</summary>
     internal void MovePending(int index, int delta)
     {
-        var target = index + delta;
-        if (index < 0 || index >= _pending.Count || target < 0 || target >= _pending.Count) return;
-        (_pending[index], _pending[target]) = (_pending[target], _pending[index]);
+        if (!_pump.MovePending(index, delta)) return;
         RefreshPending();
     }
 
     /// <summary>
-    /// C1-2: duraklatılan kuyrukta koşan dosya biter, sıradaki başlamaz. Sürdürünce pompa yeniden açılır.
+    /// C1-2: duraklatılan kuyrukta koşan dosyalar biter, sıradaki başlamaz. Sürdürünce pompa yeniden açılır.
     /// </summary>
     internal void SetPaused(bool paused)
     {
         _paused = paused;
         BtnPause.Content = Say(paused ? "main.shrink-job.resume" : "main.shrink-job.pause");
         TxtPaused.IsVisible = paused;
-        if (!paused) _ = PumpAsync();
+        _pump.Paused = paused;
+        RefreshPending();
     }
 
     private void RefreshPending()
     {
-        PendingPanel.IsVisible = _pending.Count > 0;
-        TxtPending.Text = Say("main.shrink-job.pending", _pending.Count);
+        var pending = _pump.Pending;
+        PendingPanel.IsVisible = pending.Count > 0;
+        TxtPending.Text = Say("main.shrink-job.pending", pending.Count);
         PendingList.Children.Clear();
-        for (var i = 0; i < _pending.Count; i++) PendingList.Children.Add(PendingRow(i));
+        for (var i = 0; i < pending.Count; i++) PendingList.Children.Add(PendingRow(pending, i));
     }
 
-    private Grid PendingRow(int index)
+    private Grid PendingRow(IReadOnlyList<ShrinkRequest> pending, int index)
     {
         var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto,Auto,Auto"), ColumnSpacing = Token("SpaceXs") };
         var name = new TextBlock
         {
-            Text = Path.GetFileName(_pending[index].Path),
+            Text = Path.GetFileName(pending[index].Path),
             FontSize = Token("FontSizeSm"),
             TextTrimming = TextTrimming.CharacterEllipsis,
             FlowDirection = FlowDirection.LeftToRight,
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Center
         };
-        ToolTip.SetTip(name, _pending[index].Path);
+        ToolTip.SetTip(name, pending[index].Path);
         row.Children.Add(name);
         AddRowButton(row, 1, "IconChevronUp", "main.shrink-job.move-up", index > 0, () => MovePending(index, -1));
-        AddRowButton(row, 2, "IconChevronDown", "main.shrink-job.move-down", index < _pending.Count - 1, () => MovePending(index, 1));
+        AddRowButton(row, 2, "IconChevronDown", "main.shrink-job.move-down", index < pending.Count - 1, () => MovePending(index, 1));
         AddRowButton(row, 3, "IconClose", "main.shrink-job.remove", true, () => RemovePending(index));
         return row;
     }
@@ -423,30 +459,94 @@ public partial class ShrinkJobWindow : Window
         BtnOpenInApp.IsVisible = true;
     }
 
-    private async Task PumpAsync()
+    /// <summary>
+    /// K6: pompanın "boşaldı" olayı. Kaç iş aynı anda koşmuş olursa olsun haber ve kuyruk sonu
+    /// eylemi bütün işler bitince bir kez gelir. Kapanan pencere eylem başlatmaz.
+    /// </summary>
+    private void OnDrained()
     {
-        if (_busy) return;
-        _busy = true;
-        try
+        if (!Dispatcher.UIThread.CheckAccess())
         {
-            while (_pending.Count > 0 && !_paused)
-            {
-                var request = _pending[0];
-                _pending.RemoveAt(0);
-                RefreshPending();
-                await RunOneAsync(request);
-            }
+            Dispatcher.UIThread.Post(OnDrained);
+            return;
         }
-        finally
+        if (_closed) return;
+        HaberVer();
+        QueueDrained();
+    }
+
+    /// <summary>K6: koşan işin satırı — ad, kalan süre, iptal düğmesi ve altında kendi çubuğu.</summary>
+    private Grid ActiveRow(AktifIs job)
+    {
+        var row = new Grid
         {
-            _busy = false;
+            ColumnDefinitions = new ColumnDefinitions("*,Auto,Auto"),
+            RowDefinitions = new RowDefinitions("Auto,Auto"),
+            ColumnSpacing = Token("SpaceXs"),
+            RowSpacing = Token("SpaceXs")
+        };
+        var name = new TextBlock
+        {
+            Text = Path.GetFileName(job.Request.Path),
+            FontSize = Token("FontSizeSm"),
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            FlowDirection = FlowDirection.LeftToRight,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        ToolTip.SetTip(name, job.Request.Path);
+        row.Children.Add(name);
+        job.Kalan = new TextBlock { Text = job.Remaining, FontSize = Token("FontSizeSm"), VerticalAlignment = VerticalAlignment.Center };
+        Grid.SetColumn(job.Kalan, 1);
+        row.Children.Add(job.Kalan);
+        AddRowButton(row, 2, "IconClose", "main.action.cancel", true, () => CancelJob(job.Request));
+        job.Bar = new ProgressBar { Minimum = 0, Maximum = 1, Value = job.Fraction, Height = Token("ProgressBarHeight") };
+        Grid.SetRow(job.Bar, 1);
+        Grid.SetColumnSpan(job.Bar, 3);
+        row.Children.Add(job.Bar);
+        return row;
+    }
+
+    /// <summary>
+    /// Koşan işleri ekrana yazar. Tek iş koşarken pencere bugünkü gibidir; birden çoğunda başlık
+    /// sayıyı, çubuk ortalamayı gösterir ve her işin kendi satırı olur. Satırlar yalnız sınır
+    /// 1'den büyükken görünür.
+    /// </summary>
+    private void RefreshActive(bool rebuild)
+    {
+        var rows = ParallelLimit > ParallelJobs.Default && _aktif.Count > 0;
+        ActivePanel.IsVisible = rows;
+        if (rebuild)
+        {
+            ActiveList.Children.Clear();
+            if (rows)
+                foreach (var job in _aktif) ActiveList.Children.Add(job.Row ??= ActiveRow(job));
+        }
+        if (_aktif.Count == 0) return;
+
+        foreach (var job in _aktif)
+        {
+            if (job.Bar is { } bar) bar.Value = job.Fraction;
+            if (job.Kalan is { } kalan) kalan.Text = job.Remaining;
         }
 
-        if (_pending.Count == 0 && !_paused && _finished > 0)
+        var many = _aktif.Count > 1;
+        Progress.IsVisible = true;
+        RowFacts.IsVisible = !many;
+        if (many)
         {
-            HaberVer();
-            QueueDrained();
+            TxtHeadline.Text = Say("main.shrink-job.running", _aktif.Count);
+            TxtTarget.Text = _aktif[^1].Target;
+            Progress.Value = _aktif.Average(job => job.Fraction);
+            return;
         }
+
+        var tek = _aktif[0];
+        TxtHeadline.Text = Path.GetFileName(tek.Request.Path);
+        TxtTarget.Text = tek.Target;
+        Progress.Value = tek.Fraction;
+        TxtStage.Text = tek.Stage;
+        TxtRemaining.Text = tek.Remaining;
     }
 
     /// <summary>
@@ -455,7 +555,7 @@ public partial class ShrinkJobWindow : Window
     /// </summary>
     internal void QueueDrained()
     {
-        if (_pending.Count > 0 || _paused || _busy) return;
+        if (_pump.PendingCount > 0 || _paused || _pump.RunningCount > 0) return;
         switch (_whenDone)
         {
             case QueueEndChoice.Sleep:
@@ -511,76 +611,94 @@ public partial class ShrinkJobWindow : Window
         TxtCountdown.Text = Core.Bicim.Satir.Bagla(Say(_whenDone == QueueEndChoice.Sleep ? "main.shrink-job.countdown.sleep" : "main.shrink-job.countdown.power-off", _countdownLeft));
     }
 
-    private async Task RunOneAsync(ShrinkRequest request)
+    private async Task RunOneAsync(ShrinkRequest request, CancellationToken ct)
     {
+        var job = new AktifIs(request);
+        var sira = ++_baslayan;
+        _aktif.Add(job);
         State = ShrinkJobState.Kosuyor;
-        Progress.IsVisible = true;
-        RowFacts.IsVisible = true;
         BtnReveal.IsVisible = false;
         ResetShare(false);
-        Progress.Value = 0;
-        TxtHeadline.Text = Path.GetFileName(request.Path);
-        TxtTarget.Text = "";
         TxtMessage.Text = "";
+        RefreshPending();
+        RefreshActive(true);
 
-        var cts = new CancellationTokenSource();
-        _cts = cts;
-        _running = request.Path;
         var sonuc = IsSonucu.Hatali;
+        var son = ShrinkJobState.Hata;
+        string? teslim = null;
+        string? ayrilan = null;
+        string? mesaj = null;
+        var uygulamadaAc = false;
+        IDisposable? yuva = null;
         try
         {
-            var info = await FfprobeClient.ProbeAsync(request.Path, cts.Token);
+            var info = await FfprobeClient.ProbeAsync(request.Path, ct);
             var (options, targetMb) = OptionsFor(request, info);
-            options = await KirpmaylaAsync(options, info, cts.Token);
-            TxtTarget.Text = Say("main.shrink-job.target", TargetLabel(targetMb), _finished + 1, _accepted);
+            options = await KirpmaylaAsync(options, info, ct);
+            job.Target = Say("main.shrink-job.target", TargetLabel(targetMb), sira, _accepted);
+            RefreshActive(false);
             var plan = PlanCalculator.Build(info, options);
-            var output = UniqueOutputPath(request.Path, _appSettings, plan, targetMb, ExtensionFor(plan));
+            var output = OutputReservations.Shared.Reserve(taken =>
+                UniqueOutputPath(request.Path, _appSettings, plan, targetMb, ExtensionFor(plan), taken));
+            ayrilan = output;
             QueueWatch.MarkOwn(output);
+            yuva = await EncoderSlots.Shared.EnterAsync(plan.Codec, ct);
 
-            var progress = new Progress<EncodeProgress>(ShowProgress);
+            var progress = new Progress<EncodeProgress>(step => ShowProgress(job, step));
+            var soruAdi = ParallelLimit > ParallelJobs.Default ? Path.GetFileName(request.Path) : null;
 
             var result = await new EncodeRunner().RunAsync(
-                info, plan, output, targetMb, progress, cts.Token, options.FillPolicy, askBeforeRetry: AskOvershootAsync);
+                info, plan, output, targetMb, progress, ct, options.FillPolicy,
+                askBeforeRetry: (prompt, token) => AskOvershootAsync(soruAdi, prompt, token));
 
             if (result.Success)
             {
                 QueueWatch.MarkOwn(result.OutputPath);
                 _outputs.Add(result.OutputPath);
-                State = ShrinkJobState.Bitti;
+                teslim = result.OutputPath;
+                son = ShrinkJobState.Bitti;
                 sonuc = IsSonucu.Basarili;
-                Progress.Value = 1;
-                TxtMessage.Text = BittiSatiri(result, targetMb, plan);
-                BtnReveal.IsVisible = true;
-                ResetShare(true);
+                mesaj = BittiSatiri(result, targetMb, plan);
             }
             else
             {
-                State = ShrinkJobState.Hata;
-                TxtMessage.Text = HataSatiri(result, targetMb, plan);
-                BtnOpenInApp.IsVisible = true;
+                mesaj = HataSatiri(result, targetMb, plan);
+                uygulamadaAc = true;
             }
         }
         catch (OperationCanceledException)
         {
-            State = ShrinkJobState.Hata;
             sonuc = IsSonucu.Iptal;
-            TxtMessage.Text = Say("main.run.cancelled");
+            mesaj = Say("main.run.cancelled");
         }
         catch (Exception ex)
         {
-            State = ShrinkJobState.Hata;
-            TxtMessage.Text = ex.Message;
-            BtnOpenInApp.IsVisible = true;
+            mesaj = ex.Message;
+            uygulamadaAc = true;
         }
         finally
         {
+            yuva?.Dispose();
+            if (ayrilan is not null) OutputReservations.Shared.Release(ayrilan);
             _finished++;
             IsBitti(request.Path, sonuc);
-            _running = null;
-            _cts = null;
-            cts.Dispose();
-            HideOvershoot();
-            JobFinished?.Invoke(request.Path, State == ShrinkJobState.Bitti && _outputs.Count > 0 ? _outputs[^1] : null);
+            _aktif.Remove(job);
+            RefreshActive(true);
+            if (_aktif.Count == 0)
+            {
+                RowFacts.IsVisible = true;
+                TxtHeadline.Text = Path.GetFileName(request.Path);
+                if (teslim is not null) Progress.Value = 1;
+            }
+            State = _aktif.Count > 0 ? ShrinkJobState.Kosuyor : son;
+            TxtMessage.Text = mesaj ?? "";
+            if (uygulamadaAc) BtnOpenInApp.IsVisible = true;
+            if (teslim is not null)
+            {
+                BtnReveal.IsVisible = true;
+                ResetShare(true);
+            }
+            JobFinished?.Invoke(request.Path, teslim);
         }
     }
 
@@ -593,6 +711,16 @@ public partial class ShrinkJobWindow : Window
         Progress.Value = step.Fraction;
         TxtStage.Text = MainWindow.LocalizeStageIn(step.Stage, _language);
         TxtRemaining.Text = Saat.Kalan(step.Remaining);
+    }
+
+    /// <summary>K6: ilerleme işin kendi kaydına yazılır; biten işin geç gelen satırı ekrana dokunmaz.</summary>
+    private void ShowProgress(AktifIs job, EncodeProgress step)
+    {
+        if (!_aktif.Contains(job)) return;
+        job.Fraction = step.Fraction;
+        job.Stage = MainWindow.LocalizeStageIn(step.Stage, _language);
+        job.Remaining = Saat.Kalan(step.Remaining);
+        RefreshActive(false);
     }
 
     internal string StageText => TxtStage.Text ?? "";
@@ -616,29 +744,44 @@ public partial class ShrinkJobWindow : Window
     /// koşuyordu ve hedefi aşan en küçük dosyayı teslim ediyordu; "hedeften büyük dosya asla
     /// verilmez" diyen satırla çelişiyordu.
     /// </summary>
-    internal async Task<OvershootChoice> AskOvershootAsync(RetryPrompt prompt, CancellationToken ct)
+    internal Task<OvershootChoice> AskOvershootAsync(RetryPrompt prompt, CancellationToken ct)
+        => AskOvershootAsync(null, prompt, ct);
+
+    /// <summary>
+    /// K6: aynı anda iki iş sorabilir; panel tek, bu yüzden sorular sıraya girer ve her biri
+    /// <paramref name="dosya"/> verilmişse hangi dosyayı sorduğunu ilk satırda söyler.
+    /// </summary>
+    internal async Task<OvershootChoice> AskOvershootAsync(string? dosya, RetryPrompt prompt, CancellationToken ct)
     {
         if (UnaskedChoice(prompt) is { } unasked) return unasked;
 
-        var decision = new TaskCompletionSource<OvershootChoice>(TaskCreationOptions.RunContinuationsAsynchronously);
-        _overshootDecision = decision;
-        await Dispatcher.UIThread.InvokeAsync(() => ShowOvershoot(prompt));
-        using var cancellation = ct.Register(() => decision.TrySetCanceled(ct));
+        await _overshootGate.WaitAsync(ct);
         try
         {
-            return await decision.Task;
+            var decision = new TaskCompletionSource<OvershootChoice>(TaskCreationOptions.RunContinuationsAsynchronously);
+            _overshootDecision = decision;
+            await Dispatcher.UIThread.InvokeAsync(() => ShowOvershoot(prompt, dosya));
+            using var cancellation = ct.Register(() => decision.TrySetCanceled(ct));
+            try
+            {
+                return await decision.Task;
+            }
+            finally
+            {
+                _overshootDecision = null;
+                await Dispatcher.UIThread.InvokeAsync(HideOvershoot);
+            }
         }
         finally
         {
-            _overshootDecision = null;
-            await Dispatcher.UIThread.InvokeAsync(HideOvershoot);
+            _overshootGate.Release();
         }
     }
 
-    private void ShowOvershoot(RetryPrompt prompt)
+    private void ShowOvershoot(RetryPrompt prompt, string? dosya)
     {
         var kultur = Strings.CultureOf(_language);
-        TxtOvershoot.Text = Say("main.retry.outcome",
+        TxtOvershoot.Text = (dosya is null ? "" : dosya + Environment.NewLine) + Say("main.retry.outcome",
             prompt.Attempt,
             prompt.MaxAttempts,
             Bicim.Boyut.Mb(prompt.ActualMb, kultur),
@@ -667,7 +810,7 @@ public partial class ShrinkJobWindow : Window
         {
             if ((_shareFlow?.Running ?? false) || _countdownLeft is not null || Watching) return;
             _closeTimer?.Stop();
-            if (_pending.Count == 0 && !_busy) Close();
+            if (_pump.PendingCount == 0 && _pump.RunningCount == 0) Close();
         };
         _closeTimer.Start();
     }
@@ -701,7 +844,8 @@ public partial class ShrinkJobWindow : Window
         _closeTimer?.Stop();
         _countdown?.Stop();
         StopWatch();
-        _cts?.Cancel();
+        _closed = true;
+        _pump.CancelAll();
         _shareFlow?.Cancel();
         _queue?.Dispose();
         base.OnClosing(e);
@@ -718,7 +862,8 @@ public partial class ShrinkJobWindow : Window
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return new AppSettings(); }
     }
 
-    internal static string UniqueOutputPath(string inputPath, AppSettings settings, EncodePlan? plan, double targetMb, string extension = "mp4")
+    internal static string UniqueOutputPath(string inputPath, AppSettings settings, EncodePlan? plan, double targetMb, string extension = "mp4",
+        Func<string, bool>? taken = null)
         => ShrinkEngine.UniqueOutputPath(
             inputPath,
             "shrunk",
@@ -731,7 +876,8 @@ public partial class ShrinkJobWindow : Window
                 VideoBitrateK = plan?.VideoBitrateK,
                 Yukseklik = plan?.Height,
                 Kodek = plan?.Codec
-            }));
+            }),
+            taken);
 
     /// <summary>
     /// İş bittiğinde yazılan satır. Arayüzden ayrı duruyor ki ölçülebilsin: hedefi aşan

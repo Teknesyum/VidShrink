@@ -10,7 +10,6 @@ public partial class ShrinkJobWindow
 {
     private QueueWatch? _watch;
     private bool _watchSyncing;
-    private string? _running;
 
     /// <summary>Klasör seçicinin yerine geçen iş; testler sahtesini verir.</summary>
     internal Func<Task<string?>>? PickWatchFolder { get; set; }
@@ -121,8 +120,8 @@ public partial class ShrinkJobWindow
 
     private void AcceptWatched(string path)
     {
-        if (string.Equals(_running, path, WatchFolder.PathComparison)) return;
-        if (_pending.Any(request => string.Equals(request.Path, path, WatchFolder.PathComparison))) return;
+        if (_pump.Running.Any(request => string.Equals(request.Path, path, WatchFolder.PathComparison))) return;
+        if (_pump.Pending.Any(request => string.Equals(request.Path, path, WatchFolder.PathComparison))) return;
         CancelCountdown();
         Accept(new ShrinkRequest(0, path));
     }

@@ -1615,6 +1615,18 @@
                     <TextBlock x:Name="LblOutputNamePreview" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.output-name.hint}"/>
                   </StackPanel>
+
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                      <TextBlock Text="{loc:Text settings-tab.parallel-jobs.label}" Theme="{StaticResource Label}"/>
+                      <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.parallel-jobs.label}">
+                        <ToolTip.Tip>
+                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.parallel-jobs.hint}"/>
+                        </ToolTip.Tip>
+                      </Button>
+                    </Grid>
+                    <ComboBox x:Name="CmbParallelJobs" HorizontalAlignment="Left" MinWidth="{StaticResource FieldWidthSm}"/>
+                  </StackPanel>
                 </StackPanel>
               </Border>
 
@@ -1634,8 +1646,6 @@
                   </StackPanel>
                 </StackPanel>
               </Border>
-
-              <playback:PlayerAdvancedPanel x:Name="PlayerAdvancedPanel" izi:KartDuvari.Sutun="1"/>
 
               <Border x:Name="SubtitleSettingsPanel" izi:KartDuvari.Sutun="2" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
@@ -1697,6 +1707,8 @@
                              Text="{loc:Text settings.update.auto-effect}"/>
                 </StackPanel>
               </Border>
+
+              <playback:PlayerAdvancedPanel x:Name="PlayerAdvancedPanel" izi:KartDuvari.Sutun="2"/>
 
               <editing:EditorShortcutsPanel x:Name="EditorShortcutsPanel" izi:KartDuvari.Sutun="2" IsOpen="False"/>
 

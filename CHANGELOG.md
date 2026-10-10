@@ -7,6 +7,19 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Added
+
+- The Shrink queue can encode several files at the same time. Settings has a new "Jobs Encoded
+  at the Same Time" choice in the Output card; the default is 1, which is the behaviour until
+  now. The list always shows 1 to 4; the choices above this machine's limit are disabled.
+  The upper limit is half the logical processors and never more than 4, and hardware
+  encoders (NVENC, Quick Sync, AMF, Media Foundation) run at most two jobs at once whatever the
+  setting. Each running job has its own row with its own progress and cancel button; a job that
+  fails does not stop the others; pause lets the running jobs finish and starts no new one; the
+  "job finished" notice and the end-of-queue action fire once, after the last job. Two jobs
+  never pick the same output name. The limit of 4 and the two hardware slots were not measured
+  under load. The CLI has no `--jobs`: `izle` still encodes one file at a time.
+
 ## [1.2.11] - 2026-10-10
 
 ### Added

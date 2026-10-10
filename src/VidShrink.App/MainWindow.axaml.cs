@@ -303,6 +303,9 @@ public partial class MainWindow : Window
         Watch(ChkAdvancedDefaultOpen, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkFollowRecording, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkNotifyWhenDone, ToggleButton.IsCheckedProperty, SaveAppSettings);
+        CmbParallelJobs.ItemsSource = ParallelJobChoices(Environment.ProcessorCount);
+        CmbParallelJobs.SelectedIndex = 0;
+        Watch(CmbParallelJobs, SelectingItemsControl.SelectedIndexProperty, SaveAppSettings);
         Player.Opened += OnPlayerOpened;
         Watch(ChkAdvKeepTracks, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkAdvDropMetadata, ToggleButton.IsCheckedProperty, SaveAppSettings);
@@ -1619,6 +1622,7 @@ public partial class MainWindow : Window
             AdvancedDefaultOpen = ChkAdvancedDefaultOpen.IsChecked == true,
             FollowRecording = ChkFollowRecording.IsChecked == true,
             NotifyWhenDone = ChkNotifyWhenDone.IsChecked == true,
+            ParallelJobs = Math.Max(0, CmbParallelJobs.SelectedIndex) + 1,
             FfmpegPathMode = FfmpegPathModeIndex,
             FfmpegPath = TxtFfmpegPath.Text ?? "",
             OpenSubtitlesApiKey = (TxtOpenSubtitlesKey.Text ?? "").Trim(),
@@ -1671,6 +1675,7 @@ public partial class MainWindow : Window
             if (settings.AdvancedDefaultOpen) ExpandAdvanced();
             ChkFollowRecording.IsChecked = settings.FollowRecording;
             ChkNotifyWhenDone.IsChecked = settings.NotifyWhenDone;
+            CmbParallelJobs.SelectedIndex = ParallelJobs.Clamp(settings.ParallelJobs, Environment.ProcessorCount) - 1;
 
             FfmpegPathModeIndex = Math.Clamp(settings.FfmpegPathMode, 0, 1);
             TxtFfmpegPath.Text = settings.FfmpegPath;

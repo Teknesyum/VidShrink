@@ -56,6 +56,12 @@ public sealed class AppSettings
     public bool NotifyWhenDone { get; set; } = true;
 
     /// <summary>
+    /// K6: kuyrukta aynı anda kodlanan iş sayısı. Alanı olmayan eski dosya 1 okunur; makinenin
+    /// üst sınırına <see cref="VidShrink.Core.ParallelJobs.Clamp"/> kullanılırken çekilir.
+    /// </summary>
+    public int ParallelJobs { get; set; } = VidShrink.Core.ParallelJobs.Default;
+
+    /// <summary>
     /// Kuyruk penceresinin izleme klasörü. İkisini <see cref="Save"/> yazmaz: ana pencere
     /// ayarı denetimlerinden yeniden kurup kaydettiği için orada bu alanlar hep boş gelir ve
     /// kullanıcının seçimini silerdi. Yazan tek yer <see cref="SaveWatch"/>.
@@ -139,6 +145,7 @@ public sealed class AppSettings
             ReadBool(root, "advancedDefaultOpen", value => settings.AdvancedDefaultOpen = value);
             ReadBool(root, "followRecording", value => settings.FollowRecording = value);
             ReadBool(root, "notifyWhenDone", value => settings.NotifyWhenDone = value);
+            ReadInt(root, "parallelJobs", value => settings.ParallelJobs = Math.Max(VidShrink.Core.ParallelJobs.Default, value));
             ReadBool(root, "watchEnabled", value => settings.WatchEnabled = value);
             ReadString(root, "watchFolder", value => settings.WatchDirectory = value);
             ReadInt(root, "ffmpegPathMode", value => settings.FfmpegPathMode = value);
@@ -225,6 +232,7 @@ public sealed class AppSettings
         root["advancedDefaultOpen"] = AdvancedDefaultOpen;
         root["followRecording"] = FollowRecording;
         root["notifyWhenDone"] = NotifyWhenDone;
+        root["parallelJobs"] = ParallelJobs;
         root["ffmpegPathMode"] = FfmpegPathMode;
         root["ffmpegPath"] = FfmpegPath;
         root["openSubtitlesApiKey"] = OpenSubtitlesApiKey;
