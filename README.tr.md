@@ -4,10 +4,11 @@
 
 # VidShrink
 
-**Videoyu hedef dosya boyutuna küçülten, biçim dönüştüren, ekranı kaydeden, video oynatan
-ve kesen ücretsiz, açık kaynak uygulama — çevrimdışı; Windows, macOS ve Linux'ta.**
+**libmpv üzerine kurulu ücretsiz, açık kaynak video oynatıcı; aynı pencerede hedef boyuta
+sıkıştırıcı, biçim dönüştürücü, ekran kaydedici ve zaman çizelgeli düzenleyici var —
+çevrimdışı; Windows, macOS ve Linux'ta.**
 
-**Ölçülen 36 durumun 0'ında hedef boyut aşıldı · 42 dil · 36 tema · Reklam yok · Filigran
+**42 dil · 36 tema · Ölçülen 36 durumun 0'ında hedef boyut aşıldı · Reklam yok · Filigran
 yok · Hesap yok · Abonelik yok · Telemetri yok**
 
 [![Son sürüm](https://img.shields.io/github/v/release/Teknesyum/VidShrink?label=s%C3%BCr%C3%BCm)](https://github.com/Teknesyum/VidShrink/releases/latest)
@@ -16,10 +17,13 @@ yok · Hesap yok · Abonelik yok · Telemetri yok**
 
 <a href="docs/gorseller/T201-oynatici-tr.png"><img src="docs/gorseller/T201-oynatici-tr.png" alt="VidShrink Oynatıcı sekmesi Türkçe: pencereyi dolduran bir video, üstte Oynatıcı, Düzenleyici, Küçült, Dönüştür, Kaydedici ve Ayarlar sekmeleri, altta süre, ses, on saniyelik atlamalar, oynat-duraklat, hız, klip ve tam ekran düğmelerini taşıyan kontrol şeridi" width="800"></a>
 
-Bir videoyu yükleme sınırının altına indirmek zorunda olan — Discord, WhatsApp, Gmail — ve
-yanında ayrıca oynatıcı, kaydedici, kesici ve dönüştürücü kurulu tutmak istemeyen herkes
-için. Hepsini tek pencere yapıyor ve siz istemedikçe makinenizden hiçbir şey çıkmıyor — bkz.
-[Gizlilik](#kod-imzalama-politikasi).
+Bir videoyu hedef dosya boyutuna sıkıştıran araç olarak başladı. Bugün önce bir medya
+oynatıcı: altyazı, çalma listesi ve ağ akışlarıyla mpv motoru, fareyle kullanılan bir
+pencerenin arkasında.
+
+Öteki sekmeler videoyla iş yapılacağında devreye giriyor. Yükleme sınırının altına
+küçültün, dönüştürün, ekranı kaydedin ya da zaman çizelgesinde kesin. Siz istemedikçe
+makinenizden hiçbir şey çıkmıyor — bkz. [Gizlilik](#kod-imzalama-politikasi).
 
 ## Kurulum
 
@@ -86,7 +90,43 @@ Sağlama doğrulaması, sağ tık girdisi, kendi kendini güncelleme akışı ve
 
 </details>
 
-## Videoyu Tam İstenen Dosya Boyutuna Küçültme
+## Altyazılı, Çalma Listeli Ve Ağ Akışlı Video Oynatıcı
+
+Oynatıcı sekmesi, mpv'nin içindeki motor olan **libmpv** üzerine kurulu. MKV, MP4, WebM,
+AVI, MOV, TS ve gerisini açıyor; müzik dosyalarını kapak kartıyla çalıyor.
+
+Dosyayı sürükleyerek, Windows'ta Explorer sağ tık menüsünden ya da komut satırından açın.
+İzlediğiniz son beş videoda oynatma kaldığı yerden sürüyor.
+
+- **Altyazı** — yan dosyalar kendiliğinden yükleniyor, sürüklenen altyazı dosyası doğrudan
+  çalışıyor. Zamanlamayı adım adım kaydırın, ilkinin yanında ikinci bir altyazı gösterin;
+  yazı tipini, rengi, anahattı, gölgeyi ve zemini ayarlayın. **OpenSubtitles araması ve
+  indirmesi** pencerenin içinde, kendi hesabınızla.
+- **Ses** — ses izi ve ses gecikmesi, hazır ayarlı 10 bantlı ekolayzer, ses düzeyi
+  dengeleme ve izin verdiğinizde %200'e kadar ses.
+- **Görüntü** — parlaklık, karşıtlık, doygunluk, gama, renk tonu, keskinlik, taramayı
+  giderme, kırpma, döndürme, aynalama, en-boy oranı ve yakınlaştırma. Donanım çözme bir
+  anahtar.
+- **Gezinme** — 1, 10, 60 ve 300 saniyelik atlamalar, kare kare ilerleme, bölümler, yer
+  imleri, A-B tekrarı ve süre çubuğunda işaretçiyi izleyen küçük resim.
+- **Hız** — 0,05'lik adımlarla 0,25× ile 4× arası, ve belirlediğiniz iki hız arasında tek
+  tuşla geçiş.
+- **Çalma listeleri** — M3U, PLS, WPL ve ASX açıyor, kuyruğu M3U8 olarak kaydediyor,
+  karıştırıyor ve tekrarlıyor. Klasördeki sonraki ve önceki dosya, son dosyalar ve
+  klavyenin medya tuşları.
+- **Ağ akışları** — adresi yapıştırın, sürükleyin ya da yazın: http, https, rtsp, rtmp, srt
+  ya da udp. Doğrudan medya adresini oynatıyor; YouTube adresi gibi bir sayfa bağlantısını
+  çözmüyor.
+- **Yakalama** — PNG ya da JPG ekran görüntüsü, o anki kareyi panoya kopyalama ve oynayan
+  videodan doğrudan kesilen klip ya da GIF.
+- **Bilgi** — kodeği, bit derinliğini ve SDR, HDR10, HLG ya da Dolby Vision'ı gösteren bir
+  panel; yanında düşen kare gibi canlı sayılar.
+- **Pencere** — tam ekran, mini kip, her zaman üstte ve kendiliğinden gizlenen bir kontrol
+  şeridi. Klavye kısayolları yeniden atanabiliyor.
+
+Tek tuş, oynayan dosyayı aynı konumda Düzenleyici'ye gönderiyor.
+
+## Videoyu Hedef Dosya Boyutuna Sıkıştırma
 
 <table>
 <tr>
@@ -104,8 +144,8 @@ Videoyu sürükleyin, bir boyuta dokunun, başlat deyin. Otomatik kip kodeki, ka
   "VidShrink ile Küçült" altı boyutla duruyor: 8, 16, 20, 25, 50 ve 100 MB.
 - **Öncesi ve sonrası** — bölmeli panel, kodlamaya başlamadan önce kaynağı planlanan
   çıktının yanında, yakınlaştırmayla gösteriyor.
-- **Kodlayıcılar** — on iki tane; yazılım ile NVENC, Quick Sync ve AMF, her biri önce
-  [kendi makinenizde yoklanıyor](docs/olcumler/kodek-matris.md).
+- **Kodlayıcılar** — yazılım ile NVENC, Quick Sync ve AMF; her biri önce kendi makinenizde
+  yoklanıyor.
 - **Kalite puanı** — sonuç **VMAF-NEG** ile puanlanıyor: ortalama, harmonik ortalama, 10.
   yüzdelik ve en kötü kare.
 - **Toplu iş** — bir klasörün tamamı kuyruktan geçiyor; kuyruk bitince klasörü açıyor,
@@ -139,30 +179,14 @@ de ekranda.
 - **Kamera** — kendi boyutu ve köşesi olan bir kamera katmanı, yeşil perde seçeneğiyle.
 - **Anlatım videoları için** — imleç, tıklama halkaları ve tıklama sesi, bastığınız tuşlar
   ekranda, büyüteç ve canlı önizleme.
-- **Denetim** — Windows'ta F7-F11 genel kısayolları, geri sayım, süre sınırı, süreye ya da
-  boyuta göre bölme, son anları tutan tekrar arabelleği, tepsi ve mini kaydedici kipleri.
+- **Denetim** — Windows'ta F7-F11 genel kısayolları, F6 ile bölüm işareti; geri sayım, süre
+  sınırı, süreye ya da boyuta göre bölme, son anları tutan tekrar arabelleği, tepsi ve mini
+  kaydedici kipleri.
 - **Kodlayıcılar** — x264, x265, SVT-AV1 ve VP9, artı NVIDIA NVENC, Intel Quick Sync ve AMD
   AMF. **Otomatik kip** makinenizde her aday için üç gerçek saniye kaydediyor, ffmpeg'in
   düşen kare sayacını okuyor ve kare düşürmeyeni tutuyor.
 - **Çıktı** — MP4, MKV, MOV ya da GIF; isterseniz hedef boyut ya da süre bütçesi; durdurunca
   düzgün kapanan bir dosya. Tek tıkla Düzenleyici'ye, Oynatıcı'ya ya da Paylaş'a gidiyor.
-
-## Altyazılı Video Oynatma
-
-mpv'nin içindeki motor olan **libmpv** üzerine kurulu; MKV, MP4, WebM, AVI, MOV, TS ve
-gerisini açıyor, istediğinizde donanım çözmeyle.
-
-- **Altyazı** — yan dosyalar kendiliğinden yükleniyor, sürüklenen altyazı dosyası doğrudan
-  çalışıyor, zamanlama adım adım kaydırılıyor ve **OpenSubtitles araması ve indirmesi**
-  pencerenin içinde.
-- **Ses ve görüntü** — ses izi, ses gecikmesi, 10 bantlı ekolayzer; parlaklık, karşıtlık,
-  doygunluk, gama, renk tonu, keskinlik, kırpma, döndürme, aynalama, en-boy oranı ve
-  yakınlaştırma.
-- **Denetim** — oynatma hızı, kare kare ilerleme, A-B tekrarı, yer imleri, ekran görüntüsü,
-  zaman çizelgesinden doğrudan klip ya da GIF çıkarma.
-- **Kitaplık ve pencere** — karıştırma ve tekrarlı çalma listesi, klasördeki sonraki ve
-  önceki dosya, son dosyalar, URL açma, mini oynatıcı, her zaman üstte ve öncesi-sonrası
-  için yan yana karşılaştırma paneli.
 
 ## Video Kesme Ve Düzenleme
 
@@ -177,14 +201,6 @@ tersine oynatın, geri alın ve yineleyin. Sonra üç dışa aktarma kipinden bi
   yok.
 - **Akıllı** — kopyalayabildiğini kopyalar, yalnız kesimlerin gerektirdiğini yeniden kodlar.
 - **Tam** — sonucun tamamını yeniden kodlar.
-
-## Büyük Dosyayı Bağlantı Olarak Paylaşma
-
-Küçült'te, Kaydedici'de ya da Düzenleyici'de **Paylaş**'a basın, dosya bağlantı olarak
-yüklensin: 25 GB'a kadar dosyalar için bir ile yedi gün tutan **storage.to**, ya da 128 MB'a
-kadar dosyalar için üç saat tutan **uguu.se**. Bağlantı telefonunuz için bir QR koduyla
-geliyor, yarıda kopan yükleme yeniden denenebiliyor. Paylaşım hedefleri ve ölçülmüş boyut
-tavanları [`paylasim-hedefleri.json`](paylasim-hedefleri.json) içinde.
 
 ## Komut satırı
 
@@ -214,13 +230,22 @@ vidshrink izle ~/Gelen --cikti ~/Giden --hedef 25MB --bir-kez   # klasörü boş
 izlenen klasörün kendisi olamaz. Dosyanın ne zaman alındığı, ilerlemenin nerede tutulduğu,
 harf büyüklüğü ve çıkış kodları: [`docs/cli.tr.md`](docs/cli.tr.md).
 
-## HandBrake, OBS, LosslessCut Ve mpv İle Karşılaştırma
+## Büyük Dosyayı Bağlantı Olarak Paylaşma
+
+Küçült'te, Kaydedici'de ya da Düzenleyici'de **Paylaş**'a basın, dosya bağlantı olarak
+yüklensin: 25 GB'a kadar dosyalar için bir ile yedi gün tutan **storage.to**, ya da 128 MB'a
+kadar dosyalar için üç saat tutan **uguu.se**. Bağlantı telefonunuz için bir QR koduyla
+geliyor, yarıda kopan yükleme yeniden denenebiliyor. Paylaşım hedefleri ve ölçülmüş boyut
+tavanları [`paylasim-hedefleri.json`](paylasim-hedefleri.json) içinde.
+
+## mpv, HandBrake, OBS Ve LosslessCut İle Karşılaştırma
 
 Bunların her biri kendi tek işini bu uygulamadan daha derin yapıyor. Satırlar, adı geçen
 sürümlerin yazılı bir taramasından ([`tarama-2026-10-05.md`](docs/piyasa/tarama-2026-10-05.md)).
 
 | İş | Burada | Başka yerde |
 |---|---|---|
+| Oynatma | Yukarıdaki denetimlerle libmpv | mpv 0.41.0'da HDR ton eşleme, gölgelendiriciler, ara kare üretimi, betikler ve yt-dlp de var |
 | MB olarak hedef boyut | Var; ölçülen 36 durumda hiç aşılmadı | HandBrake 1.11.2'de hedef boyut alanı yok. Shutter Encoder 20.4 ve FFmpeg Batch'te var; Shutter boyutu garanti etmediğini söylüyor |
 | Kodlamadan önce önizleme | Bölmeli öncesi/sonrası paneli | HandBrake önizleme için bir örnek kodluyor |
 | Eş boyutta kalite | 8 SDR satırının 8'inde ve 4 HDR10 satırının 3'ünde HandBrake x265 `slow`'un önünde | HandBrake karanlık sahnede daha az bantlaşıyor |
@@ -229,18 +254,20 @@ sürümlerin yazılı bir taramasından ([`tarama-2026-10-05.md`](docs/piyasa/ta
 | Aynı anda birkaç kodlama | Yok, tek iş | HandBrake, FFmpeg Batch |
 | Ekran kaydı | Ekran, pencere, bölge, kamera | OBS 32.2.2'de oyun yakalama, gerçek masaüstü sesi yakalama, sahneler ve yayın da var |
 | Yeniden kodlamadan kesme | Hızlı ve Akıllı dışa aktarma | LosslessCut 3.69.0'da birleştirme, iz yönetimi ve EDL/CSV de var; kendi akıllı kesimine deneysel diyor |
-| Oynatma | Yukarıdaki denetimlerle libmpv | mpv 0.41.0'da HDR ton eşleme, gölgelendiriciler, ara kare üretimi, betikler ve yt-dlp de var |
 
 <sub>Ürün adları sahiplerine aittir; VidShrink'in hiçbiriyle bağı yoktur.</sub>
 
 ## Yapmadıkları
 
+- Oynatıcıda HDR ton eşleme denetimi, gölgelendirici, ara kare üretimi ya da betik yok.
+- URL'den indirme yok. Oynatıcı doğrudan medya adresini açıyor, sayfa bağlantılarını
+  çözmüyor; yt-dlp yok.
+- Oynatıcıdan Chromecast'e gönderme yok, otomatik altyazı üretimi yok.
 - Sabitleme, LUT ya da filigran yok; ProRes, DNxHR ya da FFV1 çıktısı yok.
-- Dosya birleştirme, resim dizisi ya da URL'den indirme yok.
+- Dosya birleştirme ya da resim dizisi yok.
 - Canlı yayın, sahne ya da oyun yakalama yok. Pencere yakalama pencerenin dikdörtgenini
   ekrandan kırpıyor; sistem sesi gerçek bir geri döngüyle değil aygıt adıyla bulunuyor.
 - Ekran görüntüsü aracı, kaydırmalı yakalama, OCR ya da açıklama ekleme yok.
-- Oynatıcıdan Chromecast'e gönderme yok, otomatik altyazı üretimi yok.
 - macOS ve Linux'ta kaydedici yakalıyor, ama kamera katmanı, genel kısayollar ve tıklama ile
   tuş gösterimi yok.
 
@@ -326,8 +353,20 @@ masaüstüne kısayol, Explorer sağ tık menüsüne "Bu videoyu VidShrink ile a
 11'de birincil menüde) ve video dosyalarının **Birlikte aç** listesine VidShrink ekliyor —
 [kullanıcı başına yazılıyor](docs/olcumler/kabuk-menusu.md), yönetici hakkı istemiyor ve
 varsayılan oynatıcınız varsayılan kalıyor. Uygulama yeni sürüm için GitHub'a bakıp
-güncellemeyi öneriyor; bu denetim Windows'ta varsayılan açık, Ayarlar'dan kapatılıyor.
-Hepsi tek komutla geri alınıyor — bkz. [Kurulum](#kurulum).
+güncellemeyi iki düğmeyle öneriyor: Güncelle ve Sonra. Bu denetim Windows'ta varsayılan
+açık, Ayarlar'dan kapatılıyor. Hepsi tek komutla geri alınıyor — bkz. [Kurulum](#kurulum).
+
+## Kaynaktan Derleme
+
+Depoyu derlemek için .NET 8 SDK gerekiyor; derlediğinizi çalıştırmak için makinede `ffmpeg`,
+`ffprobe` ve libmpv de olmalı.
+
+```bash
+dotnet build VidShrink.sln -c Release
+dotnet test VidShrink.sln
+```
+
+Proje yerleşimi ve tasarım kuralları [`CONTRIBUTING.md`](CONTRIBUTING.md) içinde.
 
 ## Belgeler
 
@@ -395,6 +434,7 @@ geçerli olduğu:
   [storage.to gizlilik](https://storage.to/privacy) · [uguu.se SSS](https://uguu.se/faq)
 - **OpenSubtitles** — yalnız siz kullandığınızda oturum açar ve arar.
   [OpenSubtitles gizlilik politikası](https://www.opensubtitles.com/en/privacy/)
+- **Ağ akışları** — oynatıcı bir adrese yalnız siz açtığınızda bağlanır.
 
 </details>
 

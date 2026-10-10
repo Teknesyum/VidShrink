@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.11] - 2026-10-10
+
 ### Added
 
 - The Shrink queue can encode several files at the same time. Settings has a new "Jobs Encoded
