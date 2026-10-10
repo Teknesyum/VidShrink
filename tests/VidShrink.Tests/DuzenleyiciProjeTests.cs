@@ -91,7 +91,7 @@ public sealed class DuzenleyiciProjeTests
         Assert.Contains(okunan.Clips, k => k.Reversed && k.Speed == 1.5m);
         Assert.Contains(okunan.Clips, k => k.Effects.Rotation == 90 && k.Effects.FlipH);
         Assert.Equal(2, okunan.Texts[0].Keyframes.Count);
-        Assert.Equal(EditProject.CurrentVersion, JsonDocument.Parse(json).RootElement.GetProperty("version").GetInt32());
+        Assert.Equal(1, JsonDocument.Parse(json).RootElement.GetProperty("version").GetInt32());
 
         var bos = EditTimeline.FromSource(S(600));
         Assert.NotEqual(model.Clips, bos.Clips);
@@ -118,7 +118,7 @@ public sealed class DuzenleyiciProjeTests
         yield return new object[] { "json degil", "bu bir proje degil" };
         yield return new object[] { "yarim", saglam[..(saglam.Length / 2)] };
         yield return new object[] { "dizi", "[1,2,3]" };
-        yield return new object[] { "gelecek surum", Degis("\"version\": 1", "\"version\": 2") };
+        yield return new object[] { "gelecek surum", Degis("\"version\": 1", "\"version\": 3") };
         yield return new object[] { "sifir surum", Degis("\"version\": 1", "\"version\": 0") };
         yield return new object[] { "surum metin", Degis("\"version\": 1", "\"version\": \"1\"") };
         yield return new object[] { "surum yok", Degis("\"version\": 1,", "") };

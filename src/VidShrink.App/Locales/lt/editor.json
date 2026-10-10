@@ -95,5 +95,8 @@
   "editor.silence.cut": "Iškirpta intervalų: {0}.",
   "editor.scene.split": "Skaidyti ties scenų pasikeitimais",
   "editor.scene.none": "Scenų pasikeitimų nerasta.",
-  "editor.scene.done": "Suskaidyta ties scenų pasikeitimais: {0}."
+  "editor.scene.done": "Suskaidyta ties scenų pasikeitimais: {0}.",
+  "editor.source.add": "Pridėti šaltinį",
+  "editor.source.failed": "Nepavyko pridėti {0}: nėra vaizdo arba failo negalima perskaityti.",
+  "editor.export.merge-full": "Sujungiami keli šaltiniai, todėl visas vaizdo įrašas koduojamas iš naujo."
 }

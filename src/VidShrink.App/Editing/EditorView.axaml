@@ -60,6 +60,7 @@
                 <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconFullScreen}" Fill="{Binding $parent[Button].Foreground}"/>
               </Button>
               <ToggleButton x:Name="BtnSnap" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.snap}" AutomationProperties.Name="{loc:Text editor.snap}"/>
+              <Button x:Name="BtnAddSource" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.source.add}"/>
               <Button x:Name="BtnAddText" Theme="{StaticResource GhostButton}" MinWidth="{StaticResource EditorToolButtonSize}" Content="T" AutomationProperties.Name="{loc:Text editor.text.add}"/>
               <ToggleButton x:Name="BtnSilence" Theme="{StaticResource EditorToolButton}" AutomationProperties.Name="{loc:Text editor.silence.open}" ToolTip.Tip="{loc:Text editor.silence.open}">
                 <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconVolumeMute}" Fill="{Binding $parent[ToggleButton].Foreground}"/>
@@ -199,6 +200,7 @@
                   <MenuItem x:Name="MnuSpeed" Header="{loc:Text editor.speed}"/>
                   <MenuItem x:Name="MnuReverse" Header="{loc:Text editor.reverse}"/>
                   <Separator/>
+                  <MenuItem x:Name="MnuAddSource" Header="{loc:Text editor.source.add}"/>
                   <MenuItem x:Name="MnuProjectSave" Header="{loc:Text editor.project.save}"/>
                   <MenuItem x:Name="MnuProjectOpen" Header="{loc:Text editor.project.open}"/>
                 </ContextMenu>

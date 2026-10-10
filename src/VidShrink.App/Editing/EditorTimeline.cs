@@ -56,6 +56,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
 
     private IReadOnlyList<(long Start, long End)> _cuts = Array.Empty<(long Start, long End)>();
     private AudioPeaks? _peaks;
+    private readonly Dictionary<int, AudioPeaks> _extraPeaks = new();
     private readonly Dictionary<int, WaveSlice> _wave = new();
     private (double Ppt, double Width) _waveState;
     private int _rulerDivisions;
@@ -96,6 +97,37 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
             _wave.Clear();
             _canvas.InvalidateVisual();
         }
+    }
+
+    /// <summary>Kaynagin ses dalgasi; sira 0 ilk kaynaktir (<see cref="Peaks"/>).</summary>
+    internal void SetPeaks(int source, AudioPeaks? peaks)
+    {
+        if (source == 0)
+        {
+            Peaks = peaks;
+            return;
+        }
+
+        if (peaks is null) _extraPeaks.Remove(source);
+        else _extraPeaks[source] = peaks;
+        _wave.Clear();
+        _canvas.InvalidateVisual();
+    }
+
+    internal AudioPeaks? PeaksOf(int source) => source == 0 ? _peaks : _extraPeaks.GetValueOrDefault(source);
+
+    /// <summary>Ek kaynaklarin dalgasini, centiklerini ve kucuk resim kuyruklarini birakir; ilk kaynaga dokunmaz.</summary>
+    internal void ForgetSources()
+    {
+        _extraPeaks.Clear();
+        _extraKeyframes.Clear();
+        foreach (var queue in _extraThumbnails.Values) queue.Ready -= ThumbnailReady;
+        _extraThumbnails.Clear();
+        ForgetTiles();
+        _wave.Clear();
+        _keyframeXs = null;
+        _canvas.InvalidateVisual();
+        _overlay.InvalidateVisual();
     }
 
     internal EditTimeline? Model => _model;
@@ -514,7 +546,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         DrawStrip(context);
         DrawRuler(context);
         DrawTexts(context);
-        if (_peaks is { IsEmpty: false } peaks) DrawWaveform(context, peaks);
+        if (_peaks is { IsEmpty: false } || _extraPeaks.Values.Any(p => !p.IsEmpty)) DrawWaveform(context);
         else DrawAudioMirror(context);
     }
 
@@ -1063,7 +1095,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         }
     }
 
-    private void DrawWaveform(DrawingContext context, AudioPeaks peaks)
+    private void DrawWaveform(DrawingContext context)
     {
         if (_model is not { } model) return;
         var state = (_ppt, Bounds.Width);
@@ -1082,7 +1114,6 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         var right = Bounds.Width;
         var middle = AudioTop + AudioHeight / 2;
         var half = Math.Max(0, AudioHeight / 2 - border);
-        var loudest = peaks.Loudest;
         var drawn = 0;
         foreach (var live in _live)
         {
@@ -1095,7 +1126,8 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
 
             var from = Math.Max(x, left);
             var to = Math.Min(x + w, right);
-            if (to - from < 1 || half <= 0) continue;
+            if (to - from < 1 || half <= 0 || PeaksOf(clip.Source) is not { IsEmpty: false } peaks) continue;
+            var loudest = peaks.Loudest;
             var whole = w <= TrackWidth * WaveWholeClipLimit;
             var sliceFrom = whole ? x : from;
             var sliceTo = whole ? x + w : to;

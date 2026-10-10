@@ -95,5 +95,8 @@
   "editor.silence.cut": "구간 {0}개를 잘랐습니다.",
   "editor.scene.split": "장면 전환에서 분할",
   "editor.scene.none": "장면 전환을 찾지 못했습니다.",
-  "editor.scene.done": "장면 전환 {0}곳에서 분할했습니다."
+  "editor.scene.done": "장면 전환 {0}곳에서 분할했습니다.",
+  "editor.source.add": "소스 추가",
+  "editor.source.failed": "{0}을(를) 추가할 수 없습니다. 영상이 없거나 읽을 수 없습니다.",
+  "editor.export.merge-full": "여러 소스를 합치므로 영상 전체를 다시 인코딩합니다."
 }

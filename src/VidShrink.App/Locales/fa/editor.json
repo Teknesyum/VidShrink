@@ -95,5 +95,8 @@
   "editor.silence.cut": "{0} بازه بریده شد.",
   "editor.scene.split": "تقسیم در تغییر صحنه‌ها",
   "editor.scene.none": "تغییر صحنه‌ای پیدا نشد.",
-  "editor.scene.done": "در {0} تغییر صحنه تقسیم شد."
+  "editor.scene.done": "در {0} تغییر صحنه تقسیم شد.",
+  "editor.source.add": "افزودن منبع",
+  "editor.source.failed": "{0} افزوده نشد: ویدیو ندارد یا خوانده نمی‌شود.",
+  "editor.export.merge-full": "چند منبع ادغام می‌شود، بنابراین کل ویدیو دوباره کدگذاری می‌شود."
 }

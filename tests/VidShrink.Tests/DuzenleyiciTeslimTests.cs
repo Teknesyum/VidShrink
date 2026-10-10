@@ -319,7 +319,7 @@ public sealed class DuzenleyiciTeslimTests
         foreach (var (kip, ad) in new[] { (ExportMode.Fast, "hizli.mp4"), (ExportMode.Smart, "akilli.mp4"), (ExportMode.Full, "tam.mp4") })
         {
             var cikti = Path.Combine(Kanit, ad);
-            var plan = await EditExportRunner.PrepareAsync(kaynak, UcKlip(), kip, cikti, 8 * Gb);
+            var plan = await EditExportRunner.PrepareAsync(new[] { kaynak }, UcKlip(), kip, cikti, 8 * Gb);
             var son = 0.0;
             await EditExportRunner.RunAsync(plan, new AnindaIlerleme(p => son = p.Fraction));
             var sure = Sure(cikti);
@@ -351,7 +351,7 @@ public sealed class DuzenleyiciTeslimTests
         Ffmpeg("-hide_banner", "-y", "-f", "lavfi", "-i", "testsrc2=s=320x240:r=30:d=6",
             "-c:v", "libx264", "-preset", "ultrafast", "-threads", "1", kaynak);
         var cikti = Path.Combine(Kanit, "iptal.mp4");
-        var plan = await EditExportRunner.PrepareAsync(kaynak, UcKlip(), ExportMode.Full, cikti, 8 * Gb);
+        var plan = await EditExportRunner.PrepareAsync(new[] { kaynak }, UcKlip(), ExportMode.Full, cikti, 8 * Gb);
 
         using var cts = new CancellationTokenSource();
         var gorulen = 0.0;

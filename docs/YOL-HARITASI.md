@@ -143,7 +143,10 @@ VAAPI ve VideoToolbox plan yolu.
   "Aynı anda kodlanan iş sayısı". Üst sınır `ParallelJobs.Max`: mantıksal çekirdek / 2, en
   çok 4; donanım kodlayıcısında aynı anda 2 iş (`src/VidShrink.Core/ParallelJobs.cs`).
   Tavan 4 ve iki donanım yuvası yük altında ölçülmedi: kullanıcının makinesinde yük testi yok.
-- [ ] K7
+- [x] K7 — düzenleyicide çok kaynak ve birleştirme. "Kaynak ekle" ve sürükle-bırak dosyayı çizelgenin
+  sonuna ekler; birden çok kaynak kullanan çizelge tek adımda ilk kaynağın ölçüsüne ve kare hızına
+  yeniden kodlanır (`EditExport.Merge`), tek kaynak eski yolu koşar. Geçiş, çok izli çizelge, ses
+  karıştırma kapsam dışı. Plan `docs/plan-k7-cok-kaynak.md`.
 - [ ] K2
 - [ ] K12
 

@@ -16,11 +16,12 @@ internal sealed partial class EditorTimeline
 {
     private const int ThumbnailBitmapLimit = 128;
 
-    private readonly Dictionary<long, (byte[] Bytes, Bitmap? Picture)> _tiles = new();
+    private readonly Dictionary<(int Source, long Tick), (byte[] Bytes, Bitmap? Picture)> _tiles = new();
+    private readonly Dictionary<int, long[]> _extraKeyframes = new();
+    private readonly Dictionary<int, ThumbnailQueue> _extraThumbnails = new();
     private long[] _keyframes = Array.Empty<long>();
     private double[]? _keyframeXs;
     private ThumbnailQueue? _thumbnails;
-    private Action<long>? _thumbnailReady;
     private double _thumbnailAspect;
     private bool _stripPaused;
 
@@ -49,20 +50,49 @@ internal sealed partial class EditorTimeline
         get => _thumbnails;
         set
         {
-            if (_thumbnails is { } old && _thumbnailReady is { } handler) old.Ready -= handler;
+            if (_thumbnails is { } old) old.Ready -= ThumbnailReady;
             ForgetTiles();
             _thumbnails = value;
-            _thumbnailReady = null;
-            if (value is not null)
-            {
-                _thumbnailReady = _ => Dispatcher.UIThread.Post(_canvas.InvalidateVisual);
-                value.Ready += _thumbnailReady;
-            }
+            if (value is not null) value.Ready += ThumbnailReady;
 
             RefreshStrip();
             _canvas.InvalidateVisual();
         }
     }
+
+    /// <summary>Ek kaynagin anahtar kare anlari; sira 0 ilk kaynaktir (<see cref="Keyframes"/>).</summary>
+    internal void SetKeyframes(int source, IReadOnlyList<long> ticks)
+    {
+        if (source == 0)
+        {
+            Keyframes = ticks;
+            return;
+        }
+
+        _extraKeyframes[source] = ticks.ToArray();
+        _keyframeXs = null;
+        _overlay.InvalidateVisual();
+    }
+
+    /// <summary>Ek kaynagin kucuk resim kuyrugu; sira 0 ilk kaynaktir (<see cref="Thumbnails"/>).</summary>
+    internal void SetThumbnails(int source, ThumbnailQueue queue)
+    {
+        if (source == 0)
+        {
+            Thumbnails = queue;
+            return;
+        }
+
+        if (_extraThumbnails.TryGetValue(source, out var old)) old.Ready -= ThumbnailReady;
+        _extraThumbnails[source] = queue;
+        queue.Ready += ThumbnailReady;
+        RefreshStrip();
+        _canvas.InvalidateVisual();
+    }
+
+    private void ThumbnailReady(long tick) => Dispatcher.UIThread.Post(_canvas.InvalidateVisual);
+
+    private ThumbnailQueue? QueueOf(int source) => source == 0 ? _thumbnails : _extraThumbnails.GetValueOrDefault(source);
 
     /// <summary>Kaynak karesinin en/boy orani; bilinmiyorsa oynaticinin kucuk resim orani.</summary>
     internal double ThumbnailAspect
@@ -84,8 +114,17 @@ internal sealed partial class EditorTimeline
     internal IReadOnlyList<double> KeyframeXs()
     {
         if (_keyframeXs is { } cached) return cached;
-        if (_model is not { } model || _ppt <= 0 || _keyframes.Length == 0) return _keyframeXs = Array.Empty<double>();
-        var times = TimelineStrip.Thin(TimelineStrip.Keyframes(model, _keyframes, _viewStart, ViewEnd), _ppt, Metric("EditorKeyframeMinSpacing"));
+        if (_model is not { } model || _ppt <= 0 || (_keyframes.Length == 0 && _extraKeyframes.Count == 0)) return _keyframeXs = Array.Empty<double>();
+        IReadOnlyList<long> seen = TimelineStrip.Keyframes(model, _keyframes, _viewStart, ViewEnd);
+        if (_extraKeyframes.Count > 0)
+        {
+            var all = new List<long>(seen);
+            foreach (var (source, ticks) in _extraKeyframes) all.AddRange(TimelineStrip.Keyframes(model, ticks, _viewStart, ViewEnd, source));
+            all.Sort();
+            seen = all;
+        }
+
+        var times = TimelineStrip.Thin(seen, _ppt, Metric("EditorKeyframeMinSpacing"));
         var xs = new double[times.Count];
         for (var i = 0; i < xs.Length; i++) xs[i] = TimeToX(times[i]);
         return _keyframeXs = xs;
@@ -97,7 +136,7 @@ internal sealed partial class EditorTimeline
         var boxes = new StripTileBox[tiles.Count];
         var width = TileWidth;
         for (var i = 0; i < boxes.Length; i++)
-            boxes[i] = new StripTileBox(TimeToX(tiles[i].Time), width, tiles[i].SourceTime, _thumbnails is { } queue && queue.TryGet(tiles[i].SourceTime, out _));
+            boxes[i] = new StripTileBox(TimeToX(tiles[i].Time), width, tiles[i].SourceTime, QueueOf(tiles[i].Source) is { } queue && queue.TryGet(tiles[i].SourceTime, out _));
         return boxes;
     }
 
@@ -105,6 +144,7 @@ internal sealed partial class EditorTimeline
     {
         _stripPaused = true;
         _thumbnails?.Request(Array.Empty<long>());
+        foreach (var queue in _extraThumbnails.Values) queue.Request(Array.Empty<long>());
     }
 
     internal void ResumeStrip()
@@ -128,17 +168,24 @@ internal sealed partial class EditorTimeline
     private void RefreshStrip()
     {
         _keyframeXs = null;
-        if (_thumbnails is not { } queue || _stripPaused) return;
+        if ((_thumbnails is null && _extraThumbnails.Count == 0) || _stripPaused) return;
         var tiles = VisibleTiles();
-        var ticks = new long[tiles.Count];
-        for (var i = 0; i < ticks.Length; i++) ticks[i] = tiles[i].SourceTime;
-        queue.Request(ticks);
+        _thumbnails?.Request(TicksOf(tiles, 0));
+        foreach (var (source, queue) in _extraThumbnails) queue.Request(TicksOf(tiles, source));
+    }
+
+    private static long[] TicksOf(IReadOnlyList<StripTile> tiles, int source)
+    {
+        var ticks = new List<long>(tiles.Count);
+        foreach (var tile in tiles)
+            if (tile.Source == source) ticks.Add(tile.SourceTime);
+        return ticks.ToArray();
     }
 
     private void DrawStrip(DrawingContext context)
     {
         StripTilesDrawn = 0;
-        if (_thumbnails is not { } queue || _model is not { } model) return;
+        if ((_thumbnails is null && _extraThumbnails.Count == 0) || _model is not { } model) return;
         var tiles = VisibleTiles();
         if (tiles.Count == 0) return;
         var top = StripTop;
@@ -149,15 +196,26 @@ internal sealed partial class EditorTimeline
         using var clip = context.PushClip(new Rect(left, top, Math.Max(0, right - left), height));
         foreach (var tile in tiles)
         {
-            if (Decode(queue, tile.SourceTime) is not { } image) continue;
-            context.DrawImage(image, new Rect(TimeToX(tile.Time), top, width, height));
+            if (QueueOf(tile.Source) is not { } queue || Decode(queue, tile.Source, tile.SourceTime) is not { } image) continue;
+            var box = new Rect(TimeToX(tile.Time), top, width, height);
+            if (tile.Source == 0) context.DrawImage(image, box);
+            else context.DrawImage(image, Filling(image.Size, width / Math.Max(1, height)), box);
             StripTilesDrawn++;
         }
     }
 
-    private Bitmap? Decode(ThumbnailQueue queue, long tick)
+    /// <summary>Ek kaynagin karesi ilk kaynagin oranindaki kutuyu doldurur: ortadan, orani bozmadan kirpilir.</summary>
+    internal static Rect Filling(Size image, double aspect)
     {
-        if (!queue.TryGet(tick, out var data)) return null;
+        var width = Math.Min(image.Width, image.Height * aspect);
+        var height = Math.Min(image.Height, image.Width / Math.Max(double.Epsilon, aspect));
+        return new Rect((image.Width - width) / 2, (image.Height - height) / 2, width, height);
+    }
+
+    private Bitmap? Decode(ThumbnailQueue queue, int source, long time)
+    {
+        var tick = (source, time);
+        if (!queue.TryGet(time, out var data)) return null;
         if (_tiles.TryGetValue(tick, out var held))
         {
             if (ReferenceEquals(held.Bytes, data)) return held.Picture;

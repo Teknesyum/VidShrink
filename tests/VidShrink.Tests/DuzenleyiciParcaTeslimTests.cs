@@ -189,7 +189,7 @@ public sealed class DuzenleyiciParcaTeslimTests
             var model = new EditTimeline(new[] { new EditClip(S(0.5), S(2)), new EditClip(S(2.5), S(3.5)) });
             var cikti = Path.Combine(kok, "cikti.mp4");
 
-            var planlar = await EditExportRunner.PrepareSegmentsAsync(kaynak, model, ExportMode.Full, cikti, 8 * Gb);
+            var planlar = await EditExportRunner.PrepareSegmentsAsync(new[] { kaynak }, model, ExportMode.Full, cikti, 8 * Gb);
             var kesirler = new List<double>();
             await EditExportRunner.RunSegmentsAsync(planlar, new AnindaIlerleme(p => kesirler.Add(p.Fraction)));
 
@@ -206,7 +206,7 @@ public sealed class DuzenleyiciParcaTeslimTests
             Assert.Contains(kesirler, k => k > 0 && k <= 0.6 + 1e-9);
             Assert.Empty(Directory.GetFileSystemEntries(kok, "vidshrink_partial_*"));
 
-            var yeniden = await EditExportRunner.PrepareSegmentsAsync(kaynak, model, ExportMode.Full, cikti, 8 * Gb);
+            var yeniden = await EditExportRunner.PrepareSegmentsAsync(new[] { kaynak }, model, ExportMode.Full, cikti, 8 * Gb);
             Assert.Equal(new[] { "cikti-2-01.mp4", "cikti-2-02.mp4" }, yeniden.Select(p => Path.GetFileName(p.OutputPath)));
         }
         finally
@@ -223,7 +223,7 @@ public sealed class DuzenleyiciParcaTeslimTests
         {
             var kaynak = Kaynak(kok);
             var model = new EditTimeline(new[] { new EditClip(S(0.5), S(1.5)), new EditClip(S(1.5), S(2.5)), new EditClip(S(2.5), S(3.5)) });
-            var planlar = (await EditExportRunner.PrepareSegmentsAsync(kaynak, model, ExportMode.Full, Path.Combine(kok, "cikti.mp4"), 8 * Gb)).ToArray();
+            var planlar = (await EditExportRunner.PrepareSegmentsAsync(new[] { kaynak }, model, ExportMode.Full, Path.Combine(kok, "cikti.mp4"), 8 * Gb)).ToArray();
             var saglam = planlar.ToArray();
 
             var adim = planlar[1].Steps[0];
@@ -259,7 +259,7 @@ public sealed class DuzenleyiciParcaTeslimTests
         {
             var kaynak = Kaynak(kok);
             var model = new EditTimeline(new[] { new EditClip(S(0), S(2)), new EditClip(S(2), S(4)) });
-            var planlar = await EditExportRunner.PrepareSegmentsAsync(kaynak, model, ExportMode.Full, Path.Combine(kok, "cikti.mp4"), 8 * Gb);
+            var planlar = await EditExportRunner.PrepareSegmentsAsync(new[] { kaynak }, model, ExportMode.Full, Path.Combine(kok, "cikti.mp4"), 8 * Gb);
 
             using var cts = new CancellationTokenSource();
             var gorulen = 0.0;

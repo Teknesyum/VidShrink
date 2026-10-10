@@ -95,5 +95,8 @@
   "editor.silence.cut": "{0} szakasz kivágva.",
   "editor.scene.split": "Felosztás jelenetváltásoknál",
   "editor.scene.none": "Nem található jelenetváltás.",
-  "editor.scene.done": "Felosztva {0} jelenetváltásnál."
+  "editor.scene.done": "Felosztva {0} jelenetváltásnál.",
+  "editor.source.add": "Forrás hozzáadása",
+  "editor.source.failed": "{0} nem adható hozzá: nincs benne videó, vagy nem olvasható.",
+  "editor.export.merge-full": "Több forrás kerül összefűzésre, ezért a teljes videó újrakódolódik."
 }

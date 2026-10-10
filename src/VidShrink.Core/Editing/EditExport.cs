@@ -18,6 +18,9 @@ public sealed record ExportStep(IReadOnlyList<string> Args, double DurationSecon
     public string? AudioListContent { get; init; }
 }
 
+/// <summary>Bir kaynagin teslim icin okunmus hali: akis bilgisi, anahtar kareler ve akilli kesim sinirlari.</summary>
+public sealed record ExportSource(MediaInfo Info, IReadOnlyList<double> Keyframes, double StartTime, IReadOnlyList<SmartCutPoint>? Cuts = null);
+
 public sealed record ExportPlan(
     ExportMode Requested,
     ExportMode Effective,
@@ -37,6 +40,9 @@ public sealed record ExportPlan(
 
     /// <summary>Goruntu Akilli kipe uyuyordu, ses izi aynen kopyalanamadigi icin Tam'a gecildi.</summary>
     public bool AudioForcedFull { get; init; }
+
+    /// <summary>Cizelge birden cok kaynaktan parca tasidigi icin kopyalama yolu birakilip Tam'a gecildi.</summary>
+    public bool MergeForcedFull { get; init; }
 
     /// <summary>Metin varsa <c>ass=</c> suzgecinin okudugu belge; kosucu calismadan once BOM'lu yazar.</summary>
     public string? SubtitlePath { get; init; }
@@ -62,6 +68,11 @@ public static class EditExport
     public const string FullVideoCodec = "libx264";
     public const string FullCrf = "18";
     public const string AudioCodec = "aac";
+
+    /// <summary>Birlestirmede butun parcalarin sesinin getirildigi ortak bicim.</summary>
+    public const string MergeAudioFormat = "aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo";
+
+    public const string MergeSilence = "anullsrc=r=48000:cl=stereo";
 
     /// <summary>
     /// Akilli kesimde yalniz aynen kopyalanan ses kodegi (<c>docs/olcumler/akilli-kesme-opus.md</c>):
@@ -219,6 +230,154 @@ public static class EditExport
             TextForcedFull = textForced,
             EffectsForcedFull = effectsForced,
             AudioForcedFull = audioForced
+        };
+    }
+
+    /// <summary>Cizelgedeki parcalarin geldigi kaynaklarin siralari, kucukten buyuge.</summary>
+    public static IReadOnlyList<int> UsedSources(EditTimeline timeline)
+        => timeline.Clips.Select(c => c.Source).Distinct().OrderBy(s => s).ToArray();
+
+    /// <summary>
+    /// Cok kaynakli proje icin plan. Parcalarin hepsi tek kaynaktansa o kaynagin bilgisiyle tek kaynakli
+    /// yol aynen kosar. Birden cok kaynak varsa kip ne olursa olsun tek adimda yeniden kodlanir: her parca
+    /// ilk kaynagin gorunen boyutuna sigdirilir, onun kare hizina ve ortak ses bicimine getirilir.
+    /// </summary>
+    public static ExportPlan Build(
+        EditTimeline timeline, IReadOnlyDictionary<int, ExportSource> sources, ExportMode mode,
+        string outputPath, string workDirectory, long memoryBudgetBytes,
+        Func<string, bool>? hasEncoder = null, bool dropMetadata = false)
+    {
+        if (timeline.Clips.Count == 0) throw new ArgumentException("Cizelge bos", nameof(timeline));
+        var used = UsedSources(timeline);
+        if (used.Count > 1) return Merge(timeline, sources, used, mode, outputPath, workDirectory, memoryBudgetBytes, dropMetadata);
+
+        var only = SourceOf(sources, used[0]);
+        return Build(timeline, only.Info, only.Keyframes, only.StartTime, mode, outputPath, workDirectory, memoryBudgetBytes,
+            only.Cuts, hasEncoder, dropMetadata);
+    }
+
+    /// <summary>
+    /// Cok kaynakli projede parcalari ayri yazan planlar. Her parca tek kaynaklidir; kendi kaynaginin
+    /// bilgisiyle ve istenen kiple planlanir.
+    /// </summary>
+    public static IReadOnlyList<ExportPlan> BuildSegments(
+        EditTimeline timeline, IReadOnlyDictionary<int, ExportSource> sources, ExportMode mode,
+        IReadOnlyList<string> outputPaths, IReadOnlyList<string> workDirectories, long memoryBudgetBytes,
+        Func<string, bool>? hasEncoder = null, bool dropMetadata = false)
+    {
+        if (timeline.Clips.Count == 0) throw new ArgumentException("Cizelge bos", nameof(timeline));
+        var used = UsedSources(timeline);
+        if (used.Count == 1)
+        {
+            var only = SourceOf(sources, used[0]);
+            return BuildSegments(timeline, only.Info, only.Keyframes, only.StartTime, mode, outputPaths, workDirectories, memoryBudgetBytes,
+                only.Cuts, hasEncoder, dropMetadata);
+        }
+
+        if (outputPaths.Count != timeline.Clips.Count)
+            throw new ArgumentException("Her parcaya bir cikti yolu gerekir", nameof(outputPaths));
+        if (workDirectories.Count != timeline.Clips.Count)
+            throw new ArgumentException("Her parcaya bir is klasoru gerekir", nameof(workDirectories));
+
+        var plans = new List<ExportPlan>(timeline.Clips.Count);
+        for (var i = 0; i < timeline.Clips.Count; i++)
+        {
+            var index = i;
+            var source = SourceOf(sources, timeline.Clips[i].Source);
+            var piece = new EditTimeline(new[] { timeline.Clips[i] }, texts: SegmentTexts(timeline, i));
+            var plan = Build(piece, source.Info, source.Keyframes, source.StartTime, mode, outputPaths[i], workDirectories[i], memoryBudgetBytes,
+                source.Cuts, hasEncoder, dropMetadata);
+            plans.Add(plan with
+            {
+                MotionClips = plan.MotionClips.Select(_ => index).ToArray(),
+                ReverseOverLimit = plan.ReverseOverLimit.Select(_ => index).ToArray()
+            });
+        }
+
+        return plans;
+    }
+
+    private static ExportSource SourceOf(IReadOnlyDictionary<int, ExportSource> sources, int index)
+        => sources.TryGetValue(index, out var source)
+            ? source
+            : throw new ArgumentException("Parcanin kaynagi okunmamis: " + index.ToString(CultureInfo.InvariantCulture), nameof(sources));
+
+    private static ExportPlan Merge(
+        EditTimeline timeline, IReadOnlyDictionary<int, ExportSource> sources, IReadOnlyList<int> used, ExportMode requested,
+        string output, string work, long memoryBudgetBytes, bool dropMetadata)
+    {
+        var target = SourceOf(sources, sources.ContainsKey(0) ? 0 : used[0]).Info;
+        var canvas = (
+            Width: Math.Max(2, ClipFilters.DisplayWidth(target.Width, target.ParNum, target.ParDen) / 2 * 2),
+            Height: Math.Max(2, target.Height / 2 * 2));
+        var fps = Number(target.Fps > 0 ? target.Fps : 30);
+        var audio = used.Any(s => SourceOf(sources, s).Info.HasAudio);
+        var inputs = new Dictionary<int, int>();
+        foreach (var s in used) inputs[s] = inputs.Count;
+
+        var graph = new StringBuilder();
+        var joins = new StringBuilder();
+        var over = new List<int>();
+        var limit = used.Min(s => ReverseLimitSeconds(SourceOf(sources, s).Info, memoryBudgetBytes));
+        for (var i = 0; i < timeline.Clips.Count; i++)
+        {
+            var clip = timeline.Clips[i];
+            var info = SourceOf(sources, clip.Source).Info;
+            var input = inputs[clip.Source].ToString(CultureInfo.InvariantCulture);
+            var start = Number(EditTime.ToSeconds(clip.SourceStart));
+            var end = Number(EditTime.ToSeconds(clip.SourceEnd));
+            if (clip.Reversed && EditTime.ToSeconds(clip.SourceLength) > ReverseLimitSeconds(info, memoryBudgetBytes)) over.Add(i);
+
+            graph.Append('[').Append(input).Append(":v]trim=start=").Append(start).Append(":end=").Append(end).Append(",setpts=PTS-STARTPTS")
+                .Append(VideoMotion(clip, info))
+                .Append(Link(ClipFilters.Geometry(clip.Effects, info.Width, info.Height, info.ParNum, info.ParDen, canvas)))
+                .Append(",fps=").Append(fps).Append(",format=yuv420p")
+                .Append(Link(ClipFilters.VideoFades(clip.Effects, clip.TimelineLength)))
+                .Append("[v").Append(i).Append("];");
+            joins.Append("[v").Append(i).Append(']');
+            if (!audio) continue;
+
+            if (info.HasAudio)
+                graph.Append('[').Append(input).Append(":a]atrim=start=").Append(start).Append(":end=").Append(end).Append(",asetpts=PTS-STARTPTS")
+                    .Append(AudioMotion(clip)).Append(Link(ClipFilters.Audio(clip.Effects, clip.TimelineLength)))
+                    .Append(',').Append(MergeAudioFormat);
+            else
+                graph.Append(MergeSilence).Append(",atrim=duration=").Append(Number(EditTime.ToSeconds(clip.TimelineLength)));
+            graph.Append("[a").Append(i).Append("];");
+            joins.Append("[a").Append(i).Append(']');
+        }
+
+        graph.Append(joins).Append("concat=n=").Append(timeline.Clips.Count).Append(":v=1:a=").Append(audio ? 1 : 0)
+            .Append(timeline.HasText ? "[vcat]" : "[vout]").Append(audio ? "[aout]" : string.Empty);
+
+        string? subtitle = null;
+        string? fonts = null;
+        if (timeline.HasText)
+        {
+            subtitle = Path.Combine(work, SubtitleFileName);
+            fonts = Path.Combine(work, TextFonts.FolderName);
+            graph.Append(";[vcat]").Append(AssFilter(subtitle, fonts)).Append("[vout]");
+        }
+
+        var args = new List<string> { "-hide_banner", "-nostdin", "-y" };
+        foreach (var s in used) args.AddRange(new[] { "-i", SourceOf(sources, s).Info.FilePath });
+        args.AddRange(new[] { "-filter_complex", graph.ToString(), "-map", "[vout]" });
+        if (audio) args.AddRange(new[] { "-map", "[aout]" });
+        args.AddRange(new[] { "-c:v", FullVideoCodec, "-preset", "medium", "-crf", FullCrf, "-pix_fmt", "yuv420p" });
+        if (audio) args.AddRange(new[] { "-c:a", AudioCodec, "-b:a", "192k" });
+        args.AddRange(Faststart(output));
+        if (dropMetadata) args.AddRange(StreamMapping.MetadataArguments(true, Array.Empty<string?>(), Array.Empty<string?>()));
+        args.Add(output);
+
+        return new ExportPlan(requested, ExportMode.Full, new[] { new ExportStep(args, EditTime.ToSeconds(timeline.Duration)) },
+            over, limit, output, work)
+        {
+            MotionClips = Enumerable.Range(0, timeline.Clips.Count).Where(i => NeedsReencode(timeline.Clips[i])).ToArray(),
+            MergeForcedFull = requested != ExportMode.Full,
+            SubtitlePath = subtitle,
+            SubtitleContent = subtitle is null ? null : AssWriter.Write(timeline.Texts, canvas.Width, canvas.Height),
+            FontsDirectory = fonts,
+            FontFamilies = timeline.Texts.Select(t => t.FontName).Distinct(StringComparer.OrdinalIgnoreCase).ToArray()
         };
     }
 

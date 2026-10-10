@@ -567,7 +567,7 @@ public sealed class DuzenleyiciAkilliKodekTests
             var cikti = Path.Combine(klasor, "cikti." + kol.CiktiUzanti);
             var cizelge = new EditTimeline(new[] { new EditClip(S(0.5), S(4.5)) });
 
-            var plan = IkiIzlekli(await EditExportRunner.PrepareAsync(kaynak, cizelge, ExportMode.Smart, cikti, 8 * Gb));
+            var plan = IkiIzlekli(await EditExportRunner.PrepareAsync(new[] { kaynak }, cizelge, ExportMode.Smart, cikti, 8 * Gb));
             Assert.Equal(ExportMode.Smart, plan.Effective);
             var kopya = plan.Steps.Where(s => s.Args.Contains("-frames:v")).ToArray();
             if (kol.Govde) Assert.Equal("72", Deger(Assert.Single(kopya).Args, "-frames:v"));
@@ -676,7 +676,7 @@ public sealed class DuzenleyiciAkilliKodekTests
             var cikti = Path.Combine(klasor, "cikti.mp4");
             var cizelge = new EditTimeline(new[] { new EditClip(S(0.5), S(2.5)), new EditClip(S(3), S(4), 2m) });
 
-            var plan = IkiIzlekli(await EditExportRunner.PrepareAsync(kaynak, cizelge, ExportMode.Smart, cikti, 8 * Gb));
+            var plan = IkiIzlekli(await EditExportRunner.PrepareAsync(new[] { kaynak }, cizelge, ExportMode.Smart, cikti, 8 * Gb));
             Assert.Equal(ExportMode.Smart, plan.Effective);
             Assert.Equal("24", Deger(Assert.Single(plan.Steps, s => s.Args.Contains("-frames:v")).Args, "-frames:v"));
             await EditExportRunner.RunAsync(plan, null);
@@ -711,7 +711,7 @@ public sealed class DuzenleyiciAkilliKodekTests
         {
             var kaynak = Kaynak(klasor, "mp4", "-c:v", "mpeg4", "-q:v", "4", "-pix_fmt", "yuv420p");
             var cizelge = new EditTimeline(new[] { new EditClip(S(0.5), S(4.5)) });
-            var plan = await EditExportRunner.PrepareAsync(kaynak, cizelge, ExportMode.Smart, Path.Combine(klasor, "cikti.mp4"), 8 * Gb);
+            var plan = await EditExportRunner.PrepareAsync(new[] { kaynak }, cizelge, ExportMode.Smart, Path.Combine(klasor, "cikti.mp4"), 8 * Gb);
             _cikti.WriteLine($"akilli kesme kolu kostu: mpeg4 etkin={plan.Effective}");
 
             Assert.Equal(ExportMode.Full, plan.Effective);

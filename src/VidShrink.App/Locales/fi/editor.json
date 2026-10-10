@@ -95,5 +95,8 @@
   "editor.silence.cut": "{0} jaksoa leikattu.",
   "editor.scene.split": "Jaa kohtausvaihdoksista",
   "editor.scene.none": "Kohtausvaihdoksia ei löytynyt.",
-  "editor.scene.done": "Jaettu {0} kohtausvaihdoksen kohdalta."
+  "editor.scene.done": "Jaettu {0} kohtausvaihdoksen kohdalta.",
+  "editor.source.add": "Lisää lähde",
+  "editor.source.failed": "Kohdetta {0} ei voitu lisätä: siinä ei ole videota tai sitä ei voi lukea.",
+  "editor.export.merge-full": "Useita lähteitä yhdistetään, joten koko video koodataan uudelleen."
 }

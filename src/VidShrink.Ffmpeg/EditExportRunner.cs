@@ -19,14 +19,18 @@ public static class EditExportRunner
 {
     public const string Stage = "export";
 
+    /// <summary>
+    /// <paramref name="sources"/> kaynak sirasiyla yollardir; ilki projenin ilk kaynagidir. Yalniz
+    /// cizelgede parcasi olan kaynaklar ve birlestirmenin hedefini veren ilk kaynak okunur.
+    /// </summary>
     public static async Task<ExportPlan> PrepareAsync(
-        string source, EditTimeline timeline, ExportMode mode, string outputPath, long memoryBudgetBytes,
+        IReadOnlyList<string> sources, EditTimeline timeline, ExportMode mode, string outputPath, long memoryBudgetBytes,
         bool dropMetadata = false, CancellationToken ct = default)
     {
-        var (info, keyframes, startTime, cuts) = await ProbeAsync(source, mode, ct).ConfigureAwait(false);
+        var probed = await ProbeSourcesAsync(sources, timeline, mode, false, ct).ConfigureAwait(false);
         var work = WorkDirectoryFor(outputPath);
-        return EditExport.Build(timeline, info, keyframes, startTime, mode, EncodeRunner.PartialPathFor(outputPath), work, memoryBudgetBytes,
-                cuts, EncoderCapabilities.Instance.HasEncoder, dropMetadata)
+        return EditExport.Build(timeline, probed, mode, EncodeRunner.PartialPathFor(outputPath), work, memoryBudgetBytes,
+                EncoderCapabilities.Instance.HasEncoder, dropMetadata)
             with { OutputPath = outputPath };
     }
 
@@ -35,15 +39,15 @@ public static class EditExportRunner
     /// <paramref name="outputPath"/>'ten turer; her parcanin kendi yarim dosyasi ve is klasoru olur.
     /// </summary>
     public static async Task<IReadOnlyList<ExportPlan>> PrepareSegmentsAsync(
-        string source, EditTimeline timeline, ExportMode mode, string outputPath, long memoryBudgetBytes,
+        IReadOnlyList<string> sources, EditTimeline timeline, ExportMode mode, string outputPath, long memoryBudgetBytes,
         Func<string, bool>? exists = null, bool dropMetadata = false, CancellationToken ct = default)
     {
-        var (info, keyframes, startTime, cuts) = await ProbeAsync(source, mode, ct).ConfigureAwait(false);
+        var probed = await ProbeSourcesAsync(sources, timeline, mode, true, ct).ConfigureAwait(false);
         var outputs = EditOutputName.Segments(outputPath, timeline.Clips.Count, exists);
         var partials = outputs.Select(EncodeRunner.PartialPathFor).ToArray();
         var works = outputs.Select(WorkDirectoryFor).ToArray();
-        return EditExport.BuildSegments(timeline, info, keyframes, startTime, mode, partials, works, memoryBudgetBytes,
-                cuts, EncoderCapabilities.Instance.HasEncoder, dropMetadata)
+        return EditExport.BuildSegments(timeline, probed, mode, partials, works, memoryBudgetBytes,
+                EncoderCapabilities.Instance.HasEncoder, dropMetadata)
             .Select((plan, i) => plan with { OutputPath = outputs[i] })
             .ToArray();
     }
@@ -74,6 +78,26 @@ public static class EditExportRunner
 
             done += share;
         }
+    }
+
+    /// <summary>
+    /// Anahtar kareler yalniz kopyalama yolunun kosabilecegi yerde okunur: tek kaynakli cizelgede ve
+    /// parcalari ayri yazan teslimde. Birlestirme hep yeniden kodladigi icin yalniz akis bilgisi okunur.
+    /// </summary>
+    private static async Task<IReadOnlyDictionary<int, ExportSource>> ProbeSourcesAsync(
+        IReadOnlyList<string> sources, EditTimeline timeline, ExportMode mode, bool segments, CancellationToken ct)
+    {
+        var used = EditExport.UsedSources(timeline);
+        var deep = segments || used.Count == 1 ? mode : ExportMode.Full;
+        var probed = new Dictionary<int, ExportSource>();
+        foreach (var index in used.Count > 1 ? used.Prepend(0).Distinct() : used)
+        {
+            if (index >= sources.Count) throw new InvalidOperationException("Parcanin kaynagi yol listesinde yok");
+            var (info, keyframes, startTime, cuts) = await ProbeAsync(sources[index], used.Contains(index) ? deep : ExportMode.Full, ct).ConfigureAwait(false);
+            probed[index] = new ExportSource(info, keyframes, startTime, cuts);
+        }
+
+        return probed;
     }
 
     private static async Task<(MediaInfo Info, IReadOnlyList<double> Keyframes, double StartTime, IReadOnlyList<SmartCutPoint> Cuts)> ProbeAsync(

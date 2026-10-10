@@ -95,5 +95,8 @@
   "editor.silence.cut": "Izgriezti {0} intervāli.",
   "editor.scene.split": "Sadalīt pie ainu maiņām",
   "editor.scene.none": "Ainu maiņas nav atrastas.",
-  "editor.scene.done": "Sadalīts pie {0} ainu maiņām."
+  "editor.scene.done": "Sadalīts pie {0} ainu maiņām.",
+  "editor.source.add": "Pievienot avotu",
+  "editor.source.failed": "Neizdevās pievienot {0}: tajā nav video vai to nevar nolasīt.",
+  "editor.export.merge-full": "Tiek apvienoti vairāki avoti, tāpēc viss video tiek kodēts no jauna."
 }

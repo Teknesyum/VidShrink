@@ -95,5 +95,8 @@
   "editor.silence.cut": "{0} aralık kesildi.",
   "editor.scene.split": "Sahne değişimlerinden böl",
   "editor.scene.none": "Sahne değişimi bulunamadı.",
-  "editor.scene.done": "{0} sahne sınırında bölündü."
+  "editor.scene.done": "{0} sahne sınırında bölündü.",
+  "editor.source.add": "Kaynak ekle",
+  "editor.source.failed": "{0} eklenemedi: görüntü yok ya da dosya okunamıyor.",
+  "editor.export.merge-full": "Birden çok kaynak birleştiriliyor, bu yüzden videonun tamamı yeniden kodlanır."
 }

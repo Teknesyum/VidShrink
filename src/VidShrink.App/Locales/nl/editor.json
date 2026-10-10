@@ -95,5 +95,8 @@
   "editor.silence.cut": "{0} bereiken geknipt.",
   "editor.scene.split": "Splitsen bij scènewissels",
   "editor.scene.none": "Geen scènewissels gevonden.",
-  "editor.scene.done": "Gesplitst bij {0} scènewissels."
+  "editor.scene.done": "Gesplitst bij {0} scènewissels.",
+  "editor.source.add": "Bron toevoegen",
+  "editor.source.failed": "{0} kon niet worden toegevoegd: geen video of niet leesbaar.",
+  "editor.export.merge-full": "Meerdere bronnen worden samengevoegd, dus de hele video wordt opnieuw gecodeerd."
 }

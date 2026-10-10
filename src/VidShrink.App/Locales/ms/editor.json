@@ -95,5 +95,8 @@
   "editor.silence.cut": "{0} julat dipotong.",
   "editor.scene.split": "Pisahkan pada pertukaran babak",
   "editor.scene.none": "Tiada pertukaran babak ditemui.",
-  "editor.scene.done": "Dipisahkan pada {0} pertukaran babak."
+  "editor.scene.done": "Dipisahkan pada {0} pertukaran babak.",
+  "editor.source.add": "Tambah sumber",
+  "editor.source.failed": "{0} tidak dapat ditambah: tiada video atau tidak dapat dibaca.",
+  "editor.export.merge-full": "Beberapa sumber digabungkan, jadi seluruh video dikod semula."
 }

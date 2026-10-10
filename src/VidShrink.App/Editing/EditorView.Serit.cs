@@ -32,11 +32,11 @@ internal partial class EditorView
         _keyframes?.Dispose();
         _keyframes = new CancellationTokenSource();
         Timeline.Keyframes = Array.Empty<long>();
-        KeyframeLoad = LoadKeyframesAsync(path, _keyframes.Token);
+        KeyframeLoad = LoadKeyframesAsync(path, 0, _keyframes.Token);
         OpenThumbnails(path);
     }
 
-    private async Task LoadKeyframesAsync(string path, CancellationToken ct)
+    private async Task LoadKeyframesAsync(string path, int index, CancellationToken ct)
     {
         var reader = KeyframeReader;
         if (reader is null)
@@ -56,8 +56,8 @@ internal partial class EditorView
             return;
         }
 
-        if (ct.IsCancellationRequested || !CurrentMedia.SamePath(path, _source)) return;
-        Timeline.Keyframes = ticks;
+        if (ct.IsCancellationRequested || !IsSource(index, path)) return;
+        Timeline.SetKeyframes(index, ticks);
     }
 
     private void OpenThumbnails(string path)
@@ -76,10 +76,23 @@ internal partial class EditorView
             Timeline.Thumbnails = _thumbnails;
         }
 
-        var scale = TopLevel.GetTopLevel(this)?.RenderScaling ?? 1;
         Timeline.ForgetTiles();
         _thumbnails.Open(null, 0);
-        _thumbnails.Open(path, Math.Max(1, (int)Math.Ceiling(Timeline.StripHeight * scale)));
+        _thumbnails.Open(path, ThumbnailHeight());
         Timeline.ThumbnailAspect = KnownInfo?.Invoke(path) is { Width: > 0, Height: > 0 } info ? (double)info.Width / info.Height : 0;
+    }
+
+    private int ThumbnailHeight()
+        => Math.Max(1, (int)Math.Ceiling(Timeline.StripHeight * (TopLevel.GetTopLevel(this)?.RenderScaling ?? 1)));
+
+    /// <summary>Ek kaynagin kendi kuyrugu; ilk kaynagin kuyruguyla ayni okuyucuyu ve yuksekligi kullanir.</summary>
+    private void OpenExtraThumbnails(int index, string path)
+    {
+        var source = ThumbnailSource;
+        if (source is null && (StripDisabled || !File.Exists(path) || !ToolLocator.IsAvailable(out _))) return;
+        var queue = new ThumbnailQueue(source ?? new FfmpegThumbnailSource(() => ToolLocator.Ffmpeg));
+        _extraThumbnails.Add(queue);
+        queue.Open(path, ThumbnailHeight());
+        Timeline.SetThumbnails(index, queue);
     }
 }

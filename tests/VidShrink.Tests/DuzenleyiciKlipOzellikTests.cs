@@ -383,7 +383,7 @@ public sealed class DuzenleyiciKlipOzellikTests
             var c = EditTimeline.FromSource(S(2));
             c.SetEffects(new[] { 0 }, ayar);
             var cikti = Path.Combine(klasor, ad);
-            var plan = await EditExportRunner.PrepareAsync(kaynak, c, kip, cikti, 8 * Gb);
+            var plan = await EditExportRunner.PrepareAsync(new[] { kaynak }, c, kip, cikti, 8 * Gb);
             Assert.Equal(ExportMode.Full, plan.Effective);
             await EditExportRunner.RunAsync(IkiIsParcacigi(plan), null);
             return cikti;

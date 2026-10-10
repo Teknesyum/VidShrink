@@ -95,5 +95,8 @@
   "editor.silence.cut": "{0} områder klippet.",
   "editor.scene.split": "Del ved sceneskift",
   "editor.scene.none": "Fant ingen sceneskift.",
-  "editor.scene.done": "Delt ved {0} sceneskift."
+  "editor.scene.done": "Delt ved {0} sceneskift.",
+  "editor.source.add": "Legg til kilde",
+  "editor.source.failed": "Kunne ikke legge til {0}: den har ingen video eller kan ikke leses.",
+  "editor.export.merge-full": "Flere kilder slås sammen, så hele videoen omkodes."
 }
