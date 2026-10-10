@@ -24,6 +24,7 @@ public partial class MainWindow
 
     private readonly List<ExternalSubtitle> _externalSubtitles = new();
     private readonly List<int> _burnChoices = new();
+    private bool _textBurnOffered = true;
 
     internal IReadOnlyList<ExternalSubtitle> ExternalSubtitles => _externalSubtitles;
 
@@ -41,7 +42,8 @@ public partial class MainWindow
     /// <summary>
     /// Kaynağın metin ve görüntü altyazıları (PGS, VOBSUB, DVB) yakma listesine girer. Metin izi
     /// <c>subtitles</c> süzgeciyle, görüntü izi <see cref="VideoFilterChain.OverlayGraph"/> ile yakılır;
-    /// yolu plan seçer, liste yalnız izi söyler.
+    /// yolu plan seçer, liste yalnız izi söyler. ffmpeg derlemesinde <c>subtitles</c> süzgeci yoksa
+    /// (libass'sız) metin izi listeye girmez; yoklama okunamadıysa girer, CLI'daki kuralla aynı.
     /// </summary>
     private void RefreshBurnChoices()
     {
@@ -50,10 +52,12 @@ public partial class MainWindow
         var items = new List<string> { Say("main.subtitles.burn.off") };
         if (_info is { } info)
         {
+            var textBurn = TextBurnAvailable;
             var subtitles = info.Streams.Where(stream => stream.Kind == StreamKind.Subtitle).ToList();
             for (var i = 0; i < subtitles.Count; i++)
             {
-                if (!StreamMapping.IsTextSubtitle(subtitles[i].Codec) && !StreamMapping.IsImageSubtitle(subtitles[i].Codec)) continue;
+                var text = StreamMapping.IsTextSubtitle(subtitles[i].Codec);
+                if (text ? !textBurn : !StreamMapping.IsImageSubtitle(subtitles[i].Codec)) continue;
                 _burnChoices.Add(i);
                 var label = subtitles[i].Title ?? subtitles[i].Language;
                 items.Add(label is null ? $"#{i + 1}" : $"#{i + 1} {label}");
@@ -65,6 +69,9 @@ public partial class MainWindow
         CmbBurnSubtitle.IsEnabled = _burnChoices.Count > 0;
         TaramayiSifirla();
     }
+
+    internal bool TextBurnAvailable
+        => _encoders is not VidShrink.Ffmpeg.EncoderCapabilities { Loaded: true } loaded || loaded.HasFilter(VideoFilterChain.BurnFilterName);
 
     /// <summary>Seçilen yakma izi, kaynağın altyazıları içinde 0 tabanlı sıra; seçim yoksa <c>null</c>.</summary>
     internal int? BurnChoice
