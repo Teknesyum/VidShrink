@@ -174,6 +174,7 @@ internal static class Keymap
         new(PlayerInput.OnKey(Key.G, KeyModifiers.Control | KeyModifiers.Shift), ToolsOptions.Gif),
         new(PlayerInput.OnKey(Key.M, KeyModifiers.Control), ToolsOptions.MiniMode),
         new(PlayerInput.OnKey(Key.U, KeyModifiers.Control), ToolsOptions.OpenUrl),
+        new(PlayerInput.OnKey(Key.V, KeyModifiers.Control), ToolsOptions.PasteUrl),
         new(PlayerInput.OnKey(Key.MediaPlayPause), PlayPause),
         new(PlayerInput.OnKey(Key.MediaStop), Stop),
         new(PlayerInput.OnKey(Key.MediaNextTrack), NextFile),

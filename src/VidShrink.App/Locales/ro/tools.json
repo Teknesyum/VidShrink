@@ -10,5 +10,8 @@
   "player.tools.cancel": "Anulează",
   "player.tools.saved": "Salvat: {0}",
   "player.tools.failed": "Fișierul nu a putut fi creat",
-  "player.tools.novideo": "Deschide mai întâi un videoclip"
+  "player.tools.novideo": "Deschide mai întâi un videoclip",
+  "player.tools.paste": "Lipește adresa",
+  "player.tools.paste-none": "Nu există nicio adresă în clipboard",
+  "player.address.unsupported": "Indisponibil pentru un videoclip deschis de la o adresă"
 }

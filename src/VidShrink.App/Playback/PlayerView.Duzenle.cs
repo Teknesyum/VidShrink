@@ -25,6 +25,13 @@ internal partial class PlayerView
     private bool ApplyEdit(PlayerCommand command)
     {
         if (command.Kind != PlayerCommandKind.Edit) return false;
+        if (EditRequested is not null && OnAddress)
+        {
+            Notice(AddressUnsupportedKey);
+            _trace.Add("edit -> address");
+            return true;
+        }
+
         if (EditRequested is not { } edit || EditTarget is not { } path)
         {
             _trace.Add("edit -> none");
@@ -42,12 +49,13 @@ internal partial class PlayerView
         if (EditRequested is null) return;
         var row = ActionRow(Keymap.Edit);
         row.IsEnabled = EditTarget is not null;
+        if (OnAddress) ExplainAddress(row);
         flyout.Items.Add(row);
     }
 
     private void RefreshEditButton()
     {
         BtnSeritEdit.IsVisible = EditRequested is not null;
-        BtnSeritEdit.IsEnabled = _path is not null;
+        BtnSeritEdit.IsEnabled = _path is not null && !OnAddress;
     }
 }

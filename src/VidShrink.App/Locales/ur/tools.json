@@ -10,5 +10,8 @@
   "player.tools.cancel": "منسوخ",
   "player.tools.saved": "محفوظ ہوگیا: {0}",
   "player.tools.failed": "فائل نہیں بن سکی",
-  "player.tools.novideo": "پہلے ایک ویڈیو کھولیں"
+  "player.tools.novideo": "پہلے ایک ویڈیو کھولیں",
+  "player.tools.paste": "پتہ چسپاں کریں",
+  "player.tools.paste-none": "کلپ بورڈ میں کوئی پتہ نہیں",
+  "player.address.unsupported": "پتے سے کھولی گئی ویڈیو کے لیے دستیاب نہیں"
 }

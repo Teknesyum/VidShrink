@@ -10,5 +10,8 @@
   "player.tools.cancel": "Annuller",
   "player.tools.saved": "Gemt: {0}",
   "player.tools.failed": "Filen kunne ikke oprettes",
-  "player.tools.novideo": "Åbn en video først"
+  "player.tools.novideo": "Åbn en video først",
+  "player.tools.paste": "Indsæt adresse",
+  "player.tools.paste-none": "Der er ingen adresse i udklipsholderen",
+  "player.address.unsupported": "Ikke tilgængelig for en video åbnet fra en adresse"
 }

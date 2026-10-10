@@ -10,5 +10,8 @@
   "player.tools.cancel": "Otkaži",
   "player.tools.saved": "Sačuvano: {0}",
   "player.tools.failed": "Datoteka nije mogla da se napravi",
-  "player.tools.novideo": "Prvo otvorite video"
+  "player.tools.novideo": "Prvo otvorite video",
+  "player.tools.paste": "Nalepi adresu",
+  "player.tools.paste-none": "U ostavi nema adrese",
+  "player.address.unsupported": "Nije dostupno za video otvoren sa adrese"
 }

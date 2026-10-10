@@ -10,5 +10,8 @@
   "player.tools.cancel": "ביטול",
   "player.tools.saved": "נשמר: {0}",
   "player.tools.failed": "לא ניתן היה ליצור את הקובץ",
-  "player.tools.novideo": "פתחו סרטון תחילה"
+  "player.tools.novideo": "פתחו סרטון תחילה",
+  "player.tools.paste": "הדבקת כתובת",
+  "player.tools.paste-none": "אין כתובת בלוח",
+  "player.address.unsupported": "לא זמין בסרטון שנפתח מכתובת"
 }

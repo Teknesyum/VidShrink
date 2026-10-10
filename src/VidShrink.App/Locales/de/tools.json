@@ -10,5 +10,8 @@
   "player.tools.cancel": "Abbrechen",
   "player.tools.saved": "Gespeichert: {0}",
   "player.tools.failed": "Die Datei konnte nicht erstellt werden",
-  "player.tools.novideo": "Zuerst ein Video öffnen"
+  "player.tools.novideo": "Zuerst ein Video öffnen",
+  "player.tools.paste": "Adresse einfügen",
+  "player.tools.paste-none": "Keine Adresse in der Zwischenablage",
+  "player.address.unsupported": "Nicht verfügbar für ein Video, das von einer Adresse geöffnet wurde"
 }

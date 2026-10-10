@@ -664,7 +664,7 @@ public static class CliParser
         }
     }
 
-    /// <summary>Kirpma kipinin HandBrake yazimi; hata iletisi ve README ayni adlari kullanir.</summary>
+    /// <summary>Kirpma kipinin HandBrake yazimi; hata iletisi ayni adlari kullanir; secenek <c>docs/cli.md</c> tablosunda.</summary>
     public static readonly IReadOnlyList<string> CropModes = new[] { "auto", "conservative", "none", "custom" };
 
     public static string CropModeText(CropMode mode) => CropModes[(int)mode];

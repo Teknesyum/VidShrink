@@ -99,7 +99,7 @@ internal partial class PlayerView
 
         foreach (var file in files)
         {
-            var name = Path.GetFileName(file);
+            var name = MediaName(file);
             var item = new ListBoxItem
             {
                 Tag = file,

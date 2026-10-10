@@ -438,7 +438,7 @@ internal partial class PlayerView
 
     private void OnFileDragOver(object? sender, DragEventArgs e)
     {
-        e.DragEffects = DroppedFile(e) is not null ? DragDropEffects.Copy : DragDropEffects.None;
+        e.DragEffects = DroppedFile(e) is not null || DroppedAddress(e) is not null ? DragDropEffects.Copy : DragDropEffects.None;
         e.Handled = true;
     }
 
@@ -448,10 +448,24 @@ internal partial class PlayerView
     {
         var file = DroppedFile(e);
         e.Handled = true;
-        if (file is null) return;
+        if (file is null)
+        {
+            if (DroppedAddress(e) is { } address) OpenDroppedAddress(address);
+            return;
+        }
+
         if (FileDropped is { } hook) hook(file);
         else OpenDropped(file);
     }
+
+    internal bool OpenDroppedAddress(string? text)
+    {
+        if (MediaAddress.FromText(text) is not { } address) return false;
+        _trace.Add("drop -> address");
+        return OpenAddress(address);
+    }
+
+    private static string? DroppedAddress(DragEventArgs e) => MediaAddress.FromText(e.DataTransfer.TryGetText());
 
     private static string? DroppedFile(DragEventArgs e)
     {

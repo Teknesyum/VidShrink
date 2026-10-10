@@ -19,6 +19,7 @@ internal static class FolderNavigator
 
     internal static IReadOnlyList<string> Siblings(string path)
     {
+        if (MediaAddress.IsAddress(path)) return Array.Empty<string>();
         var folder = Path.GetDirectoryName(Path.GetFullPath(path));
         if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder)) return Array.Empty<string>();
         var kind = ShellIntegration.IsAudio(path) ? AudioExtensions : VideoExtensions;

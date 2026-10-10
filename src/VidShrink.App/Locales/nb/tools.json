@@ -10,5 +10,8 @@
   "player.tools.cancel": "Avbryt",
   "player.tools.saved": "Lagret: {0}",
   "player.tools.failed": "Filen kunne ikke opprettes",
-  "player.tools.novideo": "Åpne en video først"
+  "player.tools.novideo": "Åpne en video først",
+  "player.tools.paste": "Lim inn adresse",
+  "player.tools.paste-none": "Ingen adresse på utklippstavlen",
+  "player.address.unsupported": "Ikke tilgjengelig for en video åpnet fra en adresse"
 }

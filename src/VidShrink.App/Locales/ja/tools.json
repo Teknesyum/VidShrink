@@ -10,5 +10,8 @@
   "player.tools.cancel": "キャンセル",
   "player.tools.saved": "保存しました: {0}",
   "player.tools.failed": "ファイルを作成できませんでした",
-  "player.tools.novideo": "先に動画を開いてください"
+  "player.tools.novideo": "先に動画を開いてください",
+  "player.tools.paste": "アドレスを貼り付け",
+  "player.tools.paste-none": "クリップボードにアドレスがありません",
+  "player.address.unsupported": "アドレスから開いた動画では使用できません"
 }

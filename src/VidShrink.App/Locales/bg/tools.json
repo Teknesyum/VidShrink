@@ -10,5 +10,8 @@
   "player.tools.cancel": "Отказ",
   "player.tools.saved": "Запазено: {0}",
   "player.tools.failed": "Файлът не можа да бъде създаден",
-  "player.tools.novideo": "Отвори видео първо"
+  "player.tools.novideo": "Отвори видео първо",
+  "player.tools.paste": "Поставяне на адрес",
+  "player.tools.paste-none": "В клипборда няма адрес",
+  "player.address.unsupported": "Не е налично за видео, отворено от адрес"
 }

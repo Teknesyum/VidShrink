@@ -10,5 +10,8 @@
   "player.tools.cancel": "إلغاء",
   "player.tools.saved": "تم الحفظ: {0}",
   "player.tools.failed": "تعذّر إنشاء الملف",
-  "player.tools.novideo": "افتح فيديو أولاً"
+  "player.tools.novideo": "افتح فيديو أولاً",
+  "player.tools.paste": "لصق العنوان",
+  "player.tools.paste-none": "لا يوجد عنوان في الحافظة",
+  "player.address.unsupported": "غير متاح لفيديو مفتوح من عنوان"
 }

@@ -51,7 +51,7 @@ internal partial class PlayerView
     /// </summary>
     private void LoadSidecarSubtitles(IPlaybackEngine engine)
     {
-        if (_path is not { } path) return;
+        if (_path is not { } path || IsAddress(path)) return;
         var loaded = 0;
         foreach (var sidecar in SubtitleOptions.Sidecars(path))
             if (engine.AddSubtitle(sidecar)) loaded++;

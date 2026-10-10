@@ -10,5 +10,8 @@
   "player.tools.cancel": "Prekliči",
   "player.tools.saved": "Shranjeno: {0}",
   "player.tools.failed": "Datoteke ni bilo mogoče ustvariti",
-  "player.tools.novideo": "Najprej odprite videoposnetek"
+  "player.tools.novideo": "Najprej odprite videoposnetek",
+  "player.tools.paste": "Prilepi naslov",
+  "player.tools.paste-none": "V odložišču ni naslova",
+  "player.address.unsupported": "Ni na voljo za videoposnetek, odprt z naslova"
 }

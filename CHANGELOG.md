@@ -15,6 +15,21 @@ ship as part of it.
   the audio still forces Full mode (other codecs, Opus with a speed or reverse clip, Opus into
   `.mov`/`.m4v`), the export notes now say that the audio track is the reason. Measured on short
   VP9 + Opus clips; AV1 + Opus was not run live.
+- The player opens a network address from more places. "Open address… (Ctrl+U)" was already
+  there; now Ctrl+V (and "Paste address" in the Tools menu) opens the address on the clipboard,
+  an address dragged from a browser onto the player opens, and `VidShrink <address>` on the
+  command line starts in the player with it. The accepted schemes are unchanged (http, https,
+  rtsp, rtmp, srt, udp), and site links are still not resolved: the engine now sets `ytdl=no`
+  explicitly, so a `yt-dlp` on PATH is never called.
+- The query string, fragment and `user:password@` part of an address are no longer written to
+  disk or shown: the remembered address, the playback history, the title tooltip, the playlist
+  row and screenshot file names use the address without them. The engine still receives the
+  address exactly as typed. A playlist you save yourself keeps the full address.
+- While an address is playing, the features that need a file on disk say so instead of failing
+  quietly: Save clip, Save GIF, Edit, Open file location and subtitle download are disabled with
+  the reason in their tooltip (or as a notice when reached by shortcut), and the seek-bar preview
+  shows only the time instead of opening a second connection. Measured against a local test
+  server only; https, HLS and slow or stalled servers were not measured.
 
 ### Changed
 

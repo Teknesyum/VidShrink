@@ -146,6 +146,7 @@ public sealed class KeymapTests
         [PlayerCommandKind.GifExport] = "gif -> ",
         [PlayerCommandKind.MiniMode] = "mini -> ",
         [PlayerCommandKind.OpenUrl] = "url -> ",
+        [PlayerCommandKind.PasteUrl] = "paste -> ",
         [PlayerCommandKind.Stop] = "stop -> ",
         [PlayerCommandKind.GoToStart] = "tostart",
         [PlayerCommandKind.Edit] = "edit -> "
@@ -254,6 +255,7 @@ public sealed class KeymapTests
             PlayerCommandKind.GifExport when yeni[0] != "gif -> no" => $"kaynaksiz gif izi '{yeni[0]}'",
             PlayerCommandKind.MiniMode when view.IsMiniMode == mini => "mini mod degismedi",
             PlayerCommandKind.OpenUrl when yeni[0] != "url -> no" => $"gorunmez pencerede adres izi '{yeni[0]}'",
+            PlayerCommandKind.PasteUrl when yeni[0] != "paste -> clipboard" => $"pano izi '{yeni[0]}'",
             PlayerCommandKind.Stop when !oynatma || view.IsPlaying || view.PositionSeconds != 0 => $"oynatma {oynatma} -> {view.IsPlaying}, konum {konum} -> {view.PositionSeconds}",
             PlayerCommandKind.GoToStart when konum == 0 || view.PositionSeconds != 0 => $"konum {konum} -> {view.PositionSeconds}",
             _ => null

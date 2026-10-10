@@ -10,5 +10,8 @@
   "player.tools.cancel": "ยกเลิก",
   "player.tools.saved": "บันทึกแล้ว: {0}",
   "player.tools.failed": "ไม่สามารถสร้างไฟล์ได้",
-  "player.tools.novideo": "เปิดวิดีโอก่อน"
+  "player.tools.novideo": "เปิดวิดีโอก่อน",
+  "player.tools.paste": "วางที่อยู่",
+  "player.tools.paste-none": "ไม่มีที่อยู่ในคลิปบอร์ด",
+  "player.address.unsupported": "ใช้ไม่ได้กับวิดีโอที่เปิดจากที่อยู่"
 }

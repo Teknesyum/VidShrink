@@ -10,5 +10,8 @@
   "player.tools.cancel": "Anuluj",
   "player.tools.saved": "Zapisano: {0}",
   "player.tools.failed": "Nie udało się utworzyć pliku",
-  "player.tools.novideo": "Najpierw otwórz film"
+  "player.tools.novideo": "Najpierw otwórz film",
+  "player.tools.paste": "Wklej adres",
+  "player.tools.paste-none": "Brak adresu w schowku",
+  "player.address.unsupported": "Niedostępne dla wideo otwartego z adresu"
 }

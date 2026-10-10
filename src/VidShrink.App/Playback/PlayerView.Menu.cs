@@ -72,6 +72,7 @@ internal partial class PlayerView
     {
         var item = new MenuItem { Header = Strings.Get("player.menu.reveal"), IsEnabled = RevealTarget() is not null };
         item.Click += (_, _) => RevealFile();
+        if (OnAddress) ExplainAddress(item);
         return item;
     }
 

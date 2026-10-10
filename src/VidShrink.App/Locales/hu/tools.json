@@ -10,5 +10,8 @@
   "player.tools.cancel": "Mégse",
   "player.tools.saved": "Mentve: {0}",
   "player.tools.failed": "A fájlt nem sikerült létrehozni",
-  "player.tools.novideo": "Először nyisson meg egy videót"
+  "player.tools.novideo": "Először nyisson meg egy videót",
+  "player.tools.paste": "Cím beillesztése",
+  "player.tools.paste-none": "Nincs cím a vágólapon",
+  "player.address.unsupported": "Címről megnyitott videónál nem érhető el"
 }

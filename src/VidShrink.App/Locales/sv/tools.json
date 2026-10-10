@@ -10,5 +10,8 @@
   "player.tools.cancel": "Avbryt",
   "player.tools.saved": "Sparad: {0}",
   "player.tools.failed": "Filen kunde inte skapas",
-  "player.tools.novideo": "Öppna en video först"
+  "player.tools.novideo": "Öppna en video först",
+  "player.tools.paste": "Klistra in adress",
+  "player.tools.paste-none": "Ingen adress i urklipp",
+  "player.address.unsupported": "Inte tillgängligt för en video som öppnats från en adress"
 }

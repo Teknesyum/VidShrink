@@ -10,5 +10,8 @@
   "player.tools.cancel": "取消",
   "player.tools.saved": "已保存：{0}",
   "player.tools.failed": "无法创建文件",
-  "player.tools.novideo": "请先打开视频"
+  "player.tools.novideo": "请先打开视频",
+  "player.tools.paste": "粘贴地址",
+  "player.tools.paste-none": "剪贴板中没有地址",
+  "player.address.unsupported": "从地址打开的视频无法使用"
 }

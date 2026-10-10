@@ -10,5 +10,8 @@
   "player.tools.cancel": "Ghairi",
   "player.tools.saved": "Imehifadhiwa: {0}",
   "player.tools.failed": "Faili halikuweza kutengenezwa",
-  "player.tools.novideo": "Fungua video kwanza"
+  "player.tools.novideo": "Fungua video kwanza",
+  "player.tools.paste": "Bandika anwani",
+  "player.tools.paste-none": "Hakuna anwani kwenye ubao wa kunakili",
+  "player.address.unsupported": "Haipatikani kwa video iliyofunguliwa kutoka kwa anwani"
 }

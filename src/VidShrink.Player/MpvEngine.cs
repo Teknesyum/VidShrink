@@ -159,6 +159,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
         ("input-default-bindings", "no"),
         ("input-vo-keyboard", "no"),
         ("load-scripts", "no"),
+        ("ytdl", "no"),
         ("osd-level", "0"),
         ("osd-bar", "no"),
         ("sub-auto", "no"),

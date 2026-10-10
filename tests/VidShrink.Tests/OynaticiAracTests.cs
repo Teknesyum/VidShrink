@@ -153,9 +153,11 @@ internal sealed class MiniSunucu : IDisposable
     private readonly TcpListener _yuva;
     private readonly byte[] _govde;
     private readonly CancellationTokenSource _iptal = new();
+    private readonly bool _bulunamadi;
 
-    internal MiniSunucu(string dosya)
+    internal MiniSunucu(string dosya, bool bulunamadi = false)
     {
+        _bulunamadi = bulunamadi;
         _govde = File.ReadAllBytes(dosya);
         _yuva = new TcpListener(IPAddress.Loopback, 0);
         _yuva.Start();
@@ -163,6 +165,8 @@ internal sealed class MiniSunucu : IDisposable
     }
 
     internal int Istekler;
+
+    internal System.Collections.Concurrent.ConcurrentQueue<string> Satirlar { get; } = new();
 
     internal string Adres => FormattableString.Invariant(
         $"http://127.0.0.1:{((IPEndPoint)_yuva.LocalEndpoint).Port}/klip.mp4");
@@ -198,6 +202,14 @@ internal sealed class MiniSunucu : IDisposable
                 Interlocked.Increment(ref Istekler);
 
                 var istek = Encoding.ASCII.GetString(tampon, 0, okunan);
+                Satirlar.Enqueue(istek.Split('\r')[0]);
+                if (_bulunamadi)
+                {
+                    await akis.WriteAsync(Encoding.ASCII.GetBytes("HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"), _iptal.Token);
+                    await akis.FlushAsync(_iptal.Token);
+                    return;
+                }
+
                 var (bas, son) = Aralik(istek);
                 var uzunluk = son - bas + 1;
                 var basliklar = new StringBuilder();
@@ -852,7 +864,7 @@ public sealed class OynaticiAracTests
     }
 
     [Fact]
-    public void AraclarAltMenusuBesSatirTasirVeDilDegisincePesindenGelir()
+    public void AraclarAltMenusuAltiSatirTasirVeDilDegisincePesindenGelir()
     {
         var rapor = AppHost.Run(() =>
         {
@@ -868,8 +880,8 @@ public sealed class OynaticiAracTests
                 var satirlar = araclar.Items.OfType<MenuItem>().ToList();
                 basliklar.Add((string)araclar.Header!);
                 body.AppendLine($"[{dil}] {araclar.Header}: {string.Join(" | ", satirlar.Select(s => s.Header))}");
-                Assert.Equal(5, satirlar.Count);
-                Assert.Equal(new object?[] { ToolsOptions.Clip, ToolsOptions.Gif, ToolsOptions.OpenUrl, Keymap.Info, ToolsOptions.MiniMode }, satirlar.Select(s => s.Tag));
+                Assert.Equal(6, satirlar.Count);
+                Assert.Equal(new object?[] { ToolsOptions.Clip, ToolsOptions.Gif, ToolsOptions.OpenUrl, ToolsOptions.PasteUrl, Keymap.Info, ToolsOptions.MiniMode }, satirlar.Select(s => s.Tag));
                 Assert.Equal(menu.Count - 3, menu.IndexOf(araclar));
                 Assert.All(satirlar, satir => Assert.NotNull(satir.Tag));
             }

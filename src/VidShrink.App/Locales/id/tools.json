@@ -10,5 +10,8 @@
   "player.tools.cancel": "Batal",
   "player.tools.saved": "Disimpan: {0}",
   "player.tools.failed": "File tidak dapat dibuat",
-  "player.tools.novideo": "Buka video terlebih dahulu"
+  "player.tools.novideo": "Buka video terlebih dahulu",
+  "player.tools.paste": "Tempel alamat",
+  "player.tools.paste-none": "Tidak ada alamat di papan klip",
+  "player.address.unsupported": "Tidak tersedia untuk video yang dibuka dari alamat"
 }

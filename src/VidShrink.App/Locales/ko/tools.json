@@ -10,5 +10,8 @@
   "player.tools.cancel": "취소",
   "player.tools.saved": "저장됨: {0}",
   "player.tools.failed": "파일을 만들 수 없습니다",
-  "player.tools.novideo": "먼저 동영상을 여세요"
+  "player.tools.novideo": "먼저 동영상을 여세요",
+  "player.tools.paste": "주소 붙여넣기",
+  "player.tools.paste-none": "클립보드에 주소가 없습니다",
+  "player.address.unsupported": "주소에서 연 동영상에서는 사용할 수 없습니다"
 }
