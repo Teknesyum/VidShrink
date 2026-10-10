@@ -1236,6 +1236,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-10, oynaticida adres: uc yeni anahtardan (<c>player.tools.paste</c>, <c>player.tools.paste-none</c>, <c>player.address.unsupported</c>) 13 kol 10 dilde (paste: sv; paste-none: cs, de, en, hu, pt; unsupported: da, en, it, nb, nl, pt, ro), KOL dokumunden sayildi, tr girmiyor: 3067 + 13 = 3080, en 298 + 2 = 300, tr 104.</para>
     /// <para>2026-10-10, iki dugmeli guncelleme paneli (teknesyum-ui 0.35.0): <c>main.action.download</c> ve <c>main.action.downloadinstall</c> kalkti, yerlerine <c>main.action.update</c> ve <c>main.action.later</c> geldi. Kalkan <c>downloadinstall</c> 5 dilde koldaydi (cs en sk sl tr); yeni iki anahtar hicbir dilde kola girmiyor, KOL dokumunden sayildi: 3067 - 5 = 3062, en 298 - 1 = 297, tr 104 - 1 = 103.</para>
     /// <para>2026-10-10, K6 eszamanli kodlama: uc yeni anahtardan (<c>main.shrink-job.running</c>, <c>settings-tab.parallel-jobs.label</c>, <c>settings-tab.parallel-jobs.hint</c>) 3 kol 3 dilde (running: pt; label: en, es), KOL dokumunden sayildi, tr girmiyor: 3075 + 3 = 3078, en 299 + 1 = 300, tr 103.</para>
+    /// <para>2026-10-10, K2 sistem sesi yakalama: uc yeni anahtardan (<c>recorder.audio.loopback</c>, <c>.switched</c>, <c>.lost</c>) yalniz <c>recorder.audio.loopback</c> 5 dilde kola giriyor (en, hu, it, sl, tr), KOL dokumunden sayildi. Onceki pim 3081 idi: 3081 + 5 = 3086, en 300 + 1 = 301, tr 103 + 1 = 104.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1261,9 +1262,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3081, toplam);
-        Assert.Equal(300, dilBasina["en"]);
-        Assert.Equal(103, dilBasina["tr"]);
+        Assert.Equal(3086, toplam);
+        Assert.Equal(301, dilBasina["en"]);
+        Assert.Equal(104, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1477,6 +1478,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-07, akilli kesimde ses nedeni: tek yeni anahtar (<c>editor.export.audio-full</c>), dusen yok: 1349 + 1 = 1350, 43 x 1350 = 58050. <c>kayip</c> 0.</para>
     /// <para>2026-10-10, oynaticida adres: uc yeni anahtar (<c>player.tools.paste</c>, <c>player.tools.paste-none</c>, <c>player.address.unsupported</c>), dusen yok: 1350 + 3 = 1353, 43 x 1353 = 58179. <c>kayip</c> 0.</para>
     /// <para>2026-10-10, K6 eszamanli kodlama: uc yeni anahtar (<c>main.shrink-job.running</c>, <c>settings-tab.parallel-jobs.label</c>, <c>settings-tab.parallel-jobs.hint</c>), dusen yok: 1353 + 3 = 1356, 43 x 1356 = 58308. <c>kayip</c> 0.</para>
+    /// <para>2026-10-10, K2 sistem sesi yakalama: uc yeni anahtar (<c>recorder.audio.loopback</c>, <c>.switched</c>, <c>.lost</c>), dusen yok. Onceki pim 58437 = 43 x 1359 idi: 1359 + 3 = 1362, 43 x 1362 = 58566. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1504,7 +1506,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(58437, gezilen);
+        Assert.Equal(58566, gezilen);
         Assert.Empty(kayip);
     }
 

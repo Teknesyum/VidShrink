@@ -30,6 +30,7 @@ public sealed class AudioLevelSource : IAudioLevelSource
     internal static bool Disabled { get; set; }
 
     private readonly Process _process;
+    private readonly LoopbackFeed? _feed;
     private readonly Task _pump;
     private int _disposed;
 
@@ -47,31 +48,39 @@ public sealed class AudioLevelSource : IAudioLevelSource
     {
         if (Disabled) return null;
 
-        try { return Start(ToolLocator.Ffmpeg, AudioLevel.Arguments(device)); }
-        catch (Exception ex) when (ex is FileNotFoundException or Win32Exception or InvalidOperationException or UnknownCaptureDeviceException)
+        try { return Start(ToolLocator.Ffmpeg, AudioLevel.Arguments(device), SystemAudioCapture.Open); }
+        catch (Exception ex) when (ex is FileNotFoundException or Win32Exception or InvalidOperationException or UnknownCaptureDeviceException or IOException)
         {
             return null;
         }
     }
 
     internal static AudioLevelSource Start(string ffmpegPath, IReadOnlyList<string> arguments)
+        => Start(ffmpegPath, arguments, SystemAudioCapture.Open);
+
+    internal static AudioLevelSource Start(
+        string ffmpegPath, IReadOnlyList<string> arguments, Func<ISystemAudioCapture?> systemAudio)
     {
-        var process = new Process { StartInfo = ToolLocator.StartInfo(ffmpegPath, arguments) };
+        var list = arguments.ToList();
+        var feed = LoopbackFeed.Bind(list, systemAudio);
+        var process = new Process { StartInfo = ToolLocator.StartInfo(ffmpegPath, list) };
         try
         {
             process.Start();
         }
         catch
         {
+            feed?.Dispose();
             process.Dispose();
             throw;
         }
 
-        return new AudioLevelSource(process);
+        return new AudioLevelSource(process, feed);
     }
 
-    private AudioLevelSource(Process process)
+    private AudioLevelSource(Process process, LoopbackFeed? feed)
     {
+        _feed = feed;
         _process = process;
         ProcessId = process.Id;
         try
@@ -124,6 +133,8 @@ public sealed class AudioLevelSource : IAudioLevelSource
     public void Dispose()
     {
         if (Interlocked.Exchange(ref _disposed, 1) != 0) return;
+
+        _feed?.Dispose();
 
         try { if (!_process.HasExited) _process.Kill(entireProcessTree: true); }
         catch (InvalidOperationException) { }

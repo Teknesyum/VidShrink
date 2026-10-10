@@ -113,7 +113,7 @@ public sealed class CaptureDevices
         try
         {
             if (OperatingSystem.IsWindows())
-                return ParseDirectShow(RunCapture(ToolLocator.Ffmpeg, DirectShowArguments));
+                return WithLoopback(ParseDirectShow(RunCapture(ToolLocator.Ffmpeg, DirectShowArguments)));
             if (OperatingSystem.IsMacOS())
                 return ParseAvFoundation(RunCapture(ToolLocator.Ffmpeg, AvFoundationArguments));
             return ParsePulse(RunCapture("pactl", PulseArguments, wantStandardOutput: true));
@@ -123,6 +123,14 @@ public sealed class CaptureDevices
             return Unloaded();
         }
     }
+
+    /// <summary>
+    /// Windows listesinin sonuna uygulamanin kendi yakaladigi sistem sesini ekler. dshow'un
+    /// "Stereo Mix" gibi cihazlari varsa onlar once gelir; secenek her Windows makinesinde
+    /// ayni yerde ve ayni adla durur, makinedeki cihazlara bagli degildir.
+    /// </summary>
+    internal static CaptureDeviceList WithLoopback(CaptureDeviceList list)
+        => list with { Audio = list.Audio.Append(LoopbackAudio.Device).ToList() };
 
     internal static CaptureDeviceList Unloaded() => new(
         Array.Empty<AudioCaptureDevice>(),

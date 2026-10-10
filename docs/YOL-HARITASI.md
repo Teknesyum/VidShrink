@@ -147,7 +147,11 @@ VAAPI ve VideoToolbox plan yolu.
   sonuna ekler; birden çok kaynak kullanan çizelge tek adımda ilk kaynağın ölçüsüne ve kare hızına
   yeniden kodlanır (`EditExport.Merge`), tek kaynak eski yolu koşar. Geçiş, çok izli çizelge, ses
   karıştırma kapsam dışı. Plan `docs/plan-k7-cok-kaynak.md`.
-- [ ] K2
+- [x] K2 — kaydedicide gerçek sistem sesi (Windows, WASAPI loopback). "Sistem sesi" listesinin son
+  öğesi; uygulama sesi kendisi yakalar, ffmpeg'e adlandırılmış borudan verir, yeni bağımlılık yok.
+  Sessizlikte iz sessizlikle dolar, cihaz değişince kayıt sürer ve durum satırı söyler. Gerçek cihazla
+  yalnız yakalama bir kez denendi; durdurmada son ~0,3 sn ses eksik. Plan `docs/plan-k2-sistem-sesi.md`,
+  ölçüm `docs/olcumler/sistem-sesi-loopback.md`.
 - [ ] K12
 
 Rafa kalkanlar (karar geri açılana dek iş açılmaz): **K3** pencereyi WGC ile yakalama,

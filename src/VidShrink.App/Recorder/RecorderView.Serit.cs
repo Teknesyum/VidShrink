@@ -141,6 +141,7 @@ internal partial class RecorderView
         {
             Directory.CreateDirectory(Path.GetDirectoryName(path) ?? _settings.ResolveFolder());
             PreparePreview(request.PreviewPath);
+            _audioShown = null;
             _session = await RecorderSession.StartAsync(
                 request, path, new Progress<RecordProgress>(ShowProgress));
             _session.TitleChapters(LanguageCatalog.Display(Strings.Get("recorder.chapter.title")));
@@ -308,6 +309,7 @@ internal partial class RecorderView
         TxtElapsed.Text = Clock(progress.Elapsed);
         TxtFrames.Text = progress.Frames.ToString("N0", Strings.Culture);
         TxtDropped.Text = progress.DroppedFrames.ToString("N0", Strings.Culture);
+        ShowSystemAudio(_session?.SystemAudio);
         RefreshMini();
         SyncTray();
     }

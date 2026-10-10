@@ -20,6 +20,18 @@ ship as part of it.
   written as version 1 and old project files open unchanged. Not in this change: transitions,
   more than one track, audio mixing. Silence and scene detection still scan only the first
   source, and preview playback across sources of different codecs was not measured.
+- The recorder can capture the sound playing on the PC without a "Stereo Mix" device (Windows
+  only). The "System audio" list gains a last entry, "Sound playing on this PC", which reads the
+  default output device through WASAPI loopback; the app captures the samples itself and hands
+  them to ffmpeg over a named pipe, with no new dependency. The default selection is unchanged,
+  and with a microphone the existing mixing path is used. While nothing is playing the audio
+  track is filled with silence so it stays in step with the picture, and the start of the track
+  is aligned to the first captured video frame. If the output device changes during a recording
+  the capture moves to the new device, and if no device is left the recording continues with
+  silence; the status line says which happened. Known gaps: the last ~0.3 s of audio is missing
+  when a recording is stopped, start alignment is not applied on the ddagrab capture path or in
+  the replay buffer, and the full path was measured with a fake source only — a real device was
+  tried once for capture alone, and a device switch on real hardware was not tried.
 
 ## [1.2.12] - 2026-10-10
 
