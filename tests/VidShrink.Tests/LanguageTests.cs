@@ -93,8 +93,10 @@ public sealed class LanguageTests : IDisposable
     {
         "Vid", "Shrink",
         "MB", "CRF", "1280x720",
-        "MP4", "MKV", "WebM", "MOV", "AVI", "GIF", "MP3", "M4A", "WAV", "FLAC", "WebP", "AVIF",
+        "MP4", "MKV", "WebM", "MOV", "AVI", "GIF", "MP3", "M4A", "WAV", "FLAC", "WebP", "AVIF", "MXF",
         "H.264", "H.265", "VP9", "AV1", "AAC", "Opus", "PCM",
+        "ProRes 422 Proxy", "ProRes 422 LT", "ProRes 422", "ProRes 422 HQ", "ProRes 4444",
+        "DNxHR LB", "DNxHR SQ", "DNxHR HQ", "DNxHR HQX", "DNxHR 444",
         "T"
     };
 

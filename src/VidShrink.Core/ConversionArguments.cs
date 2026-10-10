@@ -71,7 +71,11 @@ public static class ConversionArguments
     {
         var errors = Validate(info, plan);
         if (errors.Count > 0) throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
+        if (WritesIntermediate(plan) && IntermediateCodecs.Find(plan.VideoCodec, plan.VideoProfile) is null)
+            throw new ArgumentException($"Unsupported {plan.VideoCodec} profile: {plan.VideoProfile ?? "none"}", nameof(plan));
         var a = new List<string> { "-hide_banner", "-y" };
+        var encodesVideo = !plan.AudioOnly && !plan.Gif && !plan.AnimatedImage && plan.VideoCodec != "copy";
+        if (encodesVideo) a.AddRange(CodecModel.DeviceArgs(plan.VideoCodec));
         if (plan.Start is { } start) a.AddRange(new[] { "-ss", FormatTime(start) });
         a.AddRange(new[] { "-i", info.FilePath });
         if (plan.End is { } end)
@@ -126,14 +130,22 @@ public static class ConversionArguments
                 dolbyVisionCarriable: FfmpegArguments.SupportsRateLimits(plan.VideoCodec) is false);
             dolbyVision = hdr.DolbyVisionCarried;
             if (!string.IsNullOrEmpty(hdr.VideoFilter)) filters.Add(hdr.VideoFilter);
+            var pixelFormat = CodecModel.OutputPixelFormat(plan.VideoCodec, hdr.PixelFormat);
+            filters.AddRange(CodecModel.UploadFilters(plan.VideoCodec, pixelFormat));
             if (filters.Count > 0) a.AddRange(new[] { "-vf", string.Join(',', filters) });
 
             a.AddRange(new[] { "-c:v", plan.VideoCodec });
-            a.AddRange(FfmpegArguments.SpeedArgs(plan.VideoCodec, FfmpegArguments.DefaultPreset(plan.VideoCodec)));
-            a.AddRange(plan.QualityMode == ConversionQualityMode.Crf
-                ? CodecModel.QualityArgs(plan.VideoCodec, plan.Crf)
-                : new[] { "-b:v", $"{plan.VideoBitrateK}k" });
-            a.AddRange(new[] { "-pix_fmt", hdr.PixelFormat });
+            if (IntermediateCodecs.Find(plan.VideoCodec, plan.VideoProfile) is { } intermediate)
+                a.AddRange(new[] { "-profile:v", intermediate.Profile, "-pix_fmt", intermediate.PixelFormat });
+            else
+            {
+                a.AddRange(FfmpegArguments.SpeedArgs(plan.VideoCodec, FfmpegArguments.DefaultPreset(plan.VideoCodec)));
+                a.AddRange(plan.QualityMode == ConversionQualityMode.Crf
+                    ? CodecModel.QualityArgs(plan.VideoCodec, plan.Crf)
+                    : new[] { "-b:v", $"{plan.VideoBitrateK}k" });
+                if (CodecModel.TakesPixelFormatFlag(plan.VideoCodec))
+                    a.AddRange(new[] { "-pix_fmt", pixelFormat });
+            }
             if (hdr.ColorArgs.Count > 0) a.AddRange(hdr.ColorArgs);
             if (dolbyVision) a.AddRange(HdrResolver.DolbyVisionArgs);
         }
@@ -231,12 +243,24 @@ public static class ConversionArguments
         if (plan.AudioCodec is null) args.Add("-an");
         else if (plan.AudioCodec == "copy") args.AddRange(new[] { "-c:a", "copy" });
         else args.AddRange(new[] { "-c:a", plan.AudioCodec, "-b:a", $"{plan.AudioBitrateK}k" });
+        if (plan.Container == "mxf" && plan.AudioCodec is not null) args.AddRange(MxfAudioArgs);
     }
+
+    /// <summary>
+    /// MXF yazicisi yalniz 48 kHz ses kabul eder: 44,1 kHz kaynakta "only 48khz is implemented"
+    /// diyerek basligi yazamiyor (olcum <c>docs/olcumler/k12-ara-kodekler.md</c>).
+    /// </summary>
+    public static readonly IReadOnlyList<string> MxfAudioArgs = new[] { "-ar", "48000" };
+
+    /// <summary>Plan bir ara kodekle video yaziyor mu; ses, GIF ve hareketli gorsel kaplarinda kodek okunmaz.</summary>
+    private static bool WritesIntermediate(ConversionPlan plan)
+        => !plan.AudioOnly && !plan.Gif && !plan.AnimatedImage && IntermediateCodecs.IsIntermediate(plan.VideoCodec);
 
     private static bool VideoCopyCompatible(string container, string codec) => container switch
     {
         "mp4" => codec is "h264" or "hevc" or "mpeg4" or "av1",
-        "mov" => codec is "h264" or "hevc" or "mpeg4",
+        "mov" => codec is "h264" or "hevc" or "mpeg4" or "prores" or "dnxhd",
+        "mxf" => codec is "dnxhd",
         "webm" => codec is "vp8" or "vp9" or "av1",
         "avi" => codec is "h264" or "mpeg4" or "mpeg2video" or "mjpeg",
         "mkv" => true,
@@ -256,13 +280,20 @@ public static class ConversionArguments
         _ => false
     };
 
+    /// <summary>
+    /// Kap ile video kodlayicisinin uyumu. Ara kodekler yalniz kurgu kaplarina yazilir: ProRes
+    /// <c>mov</c>'a, DNxHR <c>mov</c> ve <c>mxf</c>'e. ffmpeg ProRes'i <c>mxf</c>'e ve
+    /// <c>mkv</c>'ye de yaziyor (olcum <c>docs/olcumler/k12-ara-kodekler.md</c>), ama kurgu
+    /// yazilimlarinin bekledigi eslesme bu; <c>mkv</c>'nin "her sey olur" satiri onlari kapsamaz.
+    /// </summary>
     private static bool VideoEncodeCompatible(string container, string codec) => container switch
     {
         "mp4" => codec is "libx264" or "libx265" or "libsvtav1" or "libvpx-vp9" or "h264_nvenc" or "hevc_nvenc" or "h264_qsv" or "hevc_qsv" or "av1_nvenc" or "av1_qsv" or "h264_amf" or "hevc_amf" or "av1_amf",
-        "mov" => codec is "libx264" or "libx265" or "libvpx-vp9" or "h264_nvenc" or "hevc_nvenc" or "h264_qsv" or "hevc_qsv" or "h264_amf" or "hevc_amf",
+        "mov" => codec is "libx264" or "libx265" or "libvpx-vp9" or "h264_nvenc" or "hevc_nvenc" or "h264_qsv" or "hevc_qsv" or "h264_amf" or "hevc_amf" or IntermediateCodecs.ProRes or IntermediateCodecs.DnxHr,
+        "mxf" => codec is IntermediateCodecs.DnxHr,
         "webm" => codec is "libvpx-vp9" or "libsvtav1",
         "avi" => codec is "libx264",
-        "mkv" => true,
+        "mkv" => !IntermediateCodecs.IsIntermediate(codec),
         _ => false
     };
 
@@ -271,6 +302,7 @@ public static class ConversionArguments
         "mp4" => codec is "aac" or "libmp3lame" or "flac",
         "m4a" => codec is "aac" or "libmp3lame",
         "mov" => codec is "aac" or "libmp3lame" or "pcm_s16le",
+        "mxf" => codec is "pcm_s16le",
         "webm" => codec is "libopus",
         "mp3" => codec is "libmp3lame",
         "wav" => codec is "pcm_s16le",

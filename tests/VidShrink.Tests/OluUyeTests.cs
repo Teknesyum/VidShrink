@@ -974,18 +974,31 @@ public sealed class OluUyeTests
     }
 
     /// <summary>
-    /// K5'in siniri: kol yazildi, kapi acilmadi. Kapinin kendi olcusu
-    /// <c>PlanParserTests.ParserStillRejectsVideoToolboxEncoders</c>; burada yalniz kapinin
-    /// listesi okunuyor, cunku K5'in gerekcesi "buraya uretimden ulasan yok" cumlesine dayaniyor.
+    /// K5'in siniri K12'de tasindi: kapi bit hizi kipine acildi, kalite kipine acilmadi.
+    /// VideoToolbox ve VAAPI plani <c>crf</c> kipiyle gelirse cozumleyici reddeder; boylece
+    /// <c>QualityArgs</c>'in patlayan koluna uretimden ulasan yine yok. Onizleme bu aileleri
+    /// modellemiyor, o dosya hala adlarini tasimiyor.
     /// </summary>
-    [Fact]
-    public void TheGateStaysClosed()
+    [Theory]
+    [InlineData("h264_videotoolbox", HostPlatform.MacOS)]
+    [InlineData("hevc_videotoolbox", HostPlatform.MacOS)]
+    [InlineData("h264_vaapi", HostPlatform.Linux)]
+    [InlineData("av1_vaapi", HostPlatform.Linux)]
+    public void TheGateOpensForBitrateOnly(string codec, HostPlatform platform)
     {
-        var parser = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.Core", "PlanParser.cs"));
+        var info = new MediaInfo { FilePath = "in.mp4", FileSizeBytes = 40_000_000, DurationSeconds = 60, Width = 1920, Height = 1080, Fps = 30, VideoCodec = "h264", TotalBitrateBps = 5_000_000 };
+        var bitrate = $$"""{"codec":"{{codec}}","mode":"2pass","videoBitrateK":1500,"preset":"default","width":1920,"height":1080,"fps":30}""";
+        var crf = $$"""{"codec":"{{codec}}","mode":"crf","crf":24,"preset":"default","width":1920,"height":1080,"fps":30}""";
         var preview = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.Core", "PreviewSegment.cs"));
 
-        Assert.DoesNotContain("videotoolbox", parser, StringComparison.OrdinalIgnoreCase);
+        var open = PlanParser.Parse(bitrate, info, new PlanOptions { TargetMb = 200 }, platform);
+        var closed = PlanParser.Parse(crf, info, new PlanOptions { TargetMb = 200 }, platform);
+
+        Assert.True(open.Ok, string.Join("; ", open.Errors));
+        Assert.False(closed.Ok);
+        Assert.Contains(closed.Errors, e => e.Contains("2pass mode only", StringComparison.Ordinal));
         Assert.DoesNotContain("videotoolbox", preview, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("vaapi", preview, StringComparison.OrdinalIgnoreCase);
     }
 
     private sealed class FakeAvailability : IEncoderAvailability

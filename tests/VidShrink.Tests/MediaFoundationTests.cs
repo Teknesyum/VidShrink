@@ -240,21 +240,21 @@ public sealed class MediaFoundationTests
     {
         foreach (var codec in MfKodlayicilar)
         {
-            Assert.False(CodecModel.IsOfferedOn(codec, windows: false));
-            Assert.True(CodecModel.IsOfferedOn(codec, windows: true));
-            Assert.False(PlanCalculator.IsLockableCodecOn(codec, windows: false));
-            Assert.True(PlanCalculator.IsLockableCodecOn(codec, windows: true));
+            Assert.False(CodecModel.IsOfferedOn(codec, HostPlatform.Linux));
+            Assert.True(CodecModel.IsOfferedOn(codec, HostPlatform.Windows));
+            Assert.False(PlanCalculator.IsLockableCodecOn(codec, HostPlatform.Linux));
+            Assert.True(PlanCalculator.IsLockableCodecOn(codec, HostPlatform.Windows));
         }
 
-        var disarida = FfmpegArguments.OfferedCodecs(windows: false);
-        var icerde = FfmpegArguments.OfferedCodecs(windows: true);
+        var disarida = FfmpegArguments.OfferedCodecs(HostPlatform.Linux);
+        var icerde = FfmpegArguments.OfferedCodecs(HostPlatform.Windows);
         Assert.DoesNotContain(disarida, c => c.EndsWith("_mf", StringComparison.Ordinal));
         Assert.Contains("libx264", disarida);
         Assert.Contains("h264_nvenc", disarida);
         foreach (var codec in MfKodlayicilar) Assert.Contains(codec, icerde);
-        Assert.Equal(FfmpegArguments.KnownCodecs.Count, icerde.Count);
-        Assert.Equal(FfmpegArguments.KnownCodecs.Count - MfKodlayicilar.Length, disarida.Count);
-        Assert.True(PlanCalculator.IsLockableCodecOn("libx264", windows: false));
+        Assert.Equal(icerde.Count - MfKodlayicilar.Length, disarida.Count(c => !c.EndsWith("_vaapi", StringComparison.Ordinal)));
+        Assert.Empty(icerde.Except(FfmpegArguments.KnownCodecs));
+        Assert.True(PlanCalculator.IsLockableCodecOn("libx264", HostPlatform.Linux));
     }
 
     [Fact]
@@ -264,9 +264,9 @@ public sealed class MediaFoundationTests
         const string crf = """{"codec":"h264_mf","mode":"crf","crf":24,"preset":"default","width":1920,"height":1080,"fps":30}""";
         var options = new PlanOptions { TargetMb = 200 };
 
-        var windows = PlanParser.Parse(mf, Kaynak(), options, windows: true);
-        var disarida = PlanParser.Parse(mf, Kaynak(), options, windows: false);
-        var crfli = PlanParser.Parse(crf, Kaynak(), options, windows: true);
+        var windows = PlanParser.Parse(mf, Kaynak(), options, HostPlatform.Windows);
+        var disarida = PlanParser.Parse(mf, Kaynak(), options, HostPlatform.Linux);
+        var crfli = PlanParser.Parse(crf, Kaynak(), options, HostPlatform.Windows);
 
         Assert.True(windows.Ok, string.Join("; ", windows.Errors));
         Assert.Equal("nv12", windows.Plan!.PixelFormat);

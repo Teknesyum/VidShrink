@@ -10,7 +10,7 @@ public sealed record PlanParseResult(EncodePlan? Plan, IReadOnlyList<string> Err
 
 public static class PlanParser
 {
-    private static readonly string[] AllowedCodecs = { "libx264", "libx265", "libsvtav1", "h264_nvenc", "hevc_nvenc", "h264_qsv", "hevc_qsv", "av1_nvenc", "av1_qsv", "h264_amf", "hevc_amf", "av1_amf", "h264_mf", "hevc_mf", "av1_mf", "libvpx-vp9" };
+    private static readonly string[] AllowedCodecs = { "libx264", "libx265", "libsvtav1", "h264_nvenc", "hevc_nvenc", "h264_qsv", "hevc_qsv", "av1_nvenc", "av1_qsv", "h264_amf", "hevc_amf", "av1_amf", "h264_mf", "hevc_mf", "av1_mf", "h264_videotoolbox", "hevc_videotoolbox", "h264_vaapi", "hevc_vaapi", "av1_vaapi", "libvpx-vp9" };
     private static readonly string[] AllowedAudioCodecs = { "aac", "libopus", "libmp3lame", "ac3", "eac3", "flac", "copy" };
 
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -20,10 +20,18 @@ public static class PlanParser
         AllowTrailingCommas = true
     };
 
-    public static PlanParseResult Parse(string raw, MediaInfo info, PlanOptions options)
-        => Parse(raw, info, options, OperatingSystem.IsWindows());
+    private static string PlatformName(HostPlatform? platform) => platform switch
+    {
+        HostPlatform.MacOS => "macOS",
+        HostPlatform.Linux => "Linux",
+        HostPlatform.Windows => "Windows",
+        _ => "another system"
+    };
 
-    internal static PlanParseResult Parse(string raw, MediaInfo info, PlanOptions options, bool windows)
+    public static PlanParseResult Parse(string raw, MediaInfo info, PlanOptions options)
+        => Parse(raw, info, options, CodecModel.CurrentPlatform);
+
+    internal static PlanParseResult Parse(string raw, MediaInfo info, PlanOptions options, HostPlatform platform)
     {
         var errors = new List<string>();
         var warnings = new List<string>();
@@ -45,10 +53,12 @@ public static class PlanParser
         if (plan is null)
             return new PlanParseResult(null, new[] { "JSON parsed to nothing." }, warnings);
 
-        if (!AllowedCodecs.Contains(plan.Codec, StringComparer.OrdinalIgnoreCase))
+        if (IntermediateCodecs.IsIntermediate(plan.Codec))
+            errors.Add($"Codec {plan.Codec} is an intermediate codec with a fixed bitrate per profile and cannot aim at a target size; use the Convert tab for it.");
+        else if (!AllowedCodecs.Contains(plan.Codec, StringComparer.OrdinalIgnoreCase))
             errors.Add($"Unsupported codec: {plan.Codec}");
-        else if (!CodecModel.IsOfferedOn(plan.Codec, windows))
-            errors.Add($"Codec {plan.Codec} is only available on Windows.");
+        else if (!CodecModel.IsOfferedOn(plan.Codec, platform))
+            errors.Add($"Codec {plan.Codec} is only available on {PlatformName(CodecModel.OnlyPlatform(plan.Codec))}.");
 
         if (!CodecModel.HasQualityScale(plan.Codec) && plan.Mode.Equals("crf", StringComparison.OrdinalIgnoreCase))
             errors.Add($"Codec {plan.Codec} has no measured quality scale, so it runs in 2pass mode only.");

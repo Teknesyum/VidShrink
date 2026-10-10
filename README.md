@@ -143,7 +143,8 @@ before anything runs. Over 36 measured cases the target was crossed **zero** tim
 - **Before and after** — a split panel shows the source beside the planned output, with
   zoom, before you commit to the encode.
 - **Encoders** — software, plus NVENC, Quick Sync and AMF, each probed on your own machine
-  first.
+  first. VideoToolbox on macOS and VAAPI on Linux can be chosen with the codec lock; they
+  are not in the automatic order.
 - **Quality score** — the result is scored with **VMAF-NEG**: mean, harmonic mean, 10th
   percentile and worst frame.
 - **Batch** — a whole folder goes through the queue, which opens the folder, sleeps or
@@ -158,9 +159,11 @@ before anything runs. Over 36 measured cases the target was crossed **zero** tim
 </tr>
 </table>
 
-MP4, MKV, WebM, MOV, AVI, GIF, animated WebP and animated AVIF; MP3, M4A, WAV and FLAC for
-sound alone. H.264, H.265, VP9, AV1 or a straight stream copy, trimming, and audio
-extraction. **Eighteen ready-made targets** — WhatsApp, Discord, Telegram, Gmail, Outlook,
+MP4, MKV, WebM, MOV, MXF, AVI, GIF, animated WebP and animated AVIF; MP3, M4A, WAV and FLAC
+for sound alone. H.264, H.265, VP9, AV1 or a straight stream copy, trimming, and audio
+extraction. For editing there are the intermediate codecs: ProRes (Proxy, LT, 422, HQ, 4444)
+into MOV, and DNxHR (LB, SQ, HQ, HQX, 444) into MOV or MXF
+([`k12-ara-kodekler.md`](docs/olcumler/k12-ara-kodekler.md)). **Eighteen ready-made targets** — WhatsApp, Discord, Telegram, Gmail, Outlook,
 Chromecast, Nest Hub, Apple TV and more — set every field for you, and the exact FFmpeg
 command that will run is on screen.
 
@@ -246,9 +249,9 @@ written survey of the versions named ([`tarama-2026-10-05.md`](docs/piyasa/taram
 | Preview before encoding | Split before/after panel | HandBrake encodes a sample to preview |
 | Quality at equal bytes | Ahead of HandBrake x265 `slow` on 8 of 8 SDR rows and 3 of 4 HDR10 rows | HandBrake bands less in dark scenes |
 | Encoding speed | Slower on 8 of 8 rows; total time 1.64 to 3.73 times HandBrake's | HandBrake |
-| Hardware encoders | NVENC, Quick Sync, AMF; no VAAPI | HandBrake adds VideoToolbox and VAAPI |
-| Several encodes at once | No, one job at a time | HandBrake, FFmpeg Batch |
-| Screen recording | Screen, window, region, webcam | OBS 32.2.2 adds game capture, real desktop-audio capture, scenes and streaming |
+| Hardware encoders | NVENC, Quick Sync, AMF; VideoToolbox (macOS) and VAAPI (Linux) by codec lock only, and VAAPI has not yet encoded on real hardware here | HandBrake offers VideoToolbox and VAAPI in its normal encoder list |
+| Several encodes at once | Up to 4, off by default (one job at a time); at most 2 on hardware encoders | HandBrake, FFmpeg Batch |
+| Screen recording | Screen, window, region, webcam; system audio on Windows | OBS 32.2.2 adds game capture, scenes and streaming |
 | Cutting without re-encoding | Fast and Smart export | LosslessCut 3.69.0 adds merge, track management and EDL/CSV; it calls its own smart cut experimental |
 
 <sub>Product names belong to their owners; VidShrink is not affiliated with any of them.</sub>
@@ -259,7 +262,8 @@ written survey of the versions named ([`tarama-2026-10-05.md`](docs/piyasa/taram
 - No downloading from a URL. The player opens a direct media address, and does not resolve
   page links; there is no yt-dlp.
 - No casting to Chromecast from the player, and no automatic captions.
-- No stabilisation, LUTs or watermarking, and no ProRes, DNxHR or FFV1 output.
+- No stabilisation, LUTs or watermarking, and no FFV1 output. ProRes and DNxHR are in the
+  Convert tab only; they cannot be driven to a target size.
 - No file merging or image sequences.
 - No live streaming, scenes or game capture. Window capture crops the window's rectangle
   out of the screen, and system sound is found by device name, not by a real loopback.

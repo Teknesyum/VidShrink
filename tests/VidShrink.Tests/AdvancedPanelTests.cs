@@ -118,7 +118,7 @@ public sealed class AdvancedPanelTests
         FindCombo(window, "CmbAdvMinResolution").SelectedIndex = 1 + Array.IndexOf(MainWindow.AdvancedMinResolutionCandidates, 1080); // MinResolutionOverride
         FindCombo(window, "CmbAdvMinFps").SelectedIndex = 1 + Array.IndexOf(MainWindow.AdvancedMinFpsCandidates, 48.0); // MinFpsOverride
         window.AdvEncoderPathIndex = 2; // Donanım — kodek kilidiyle çakışıp SupersededByCodec üretir
-        FindCombo(window, "CmbAdvCodecLock").SelectedIndex = 1 + FfmpegArguments.KnownCodecs
+        FindCombo(window, "CmbAdvCodecLock").SelectedIndex = 1 + FfmpegArguments.OfferedCodecs(CodecModel.CurrentPlatform)
             .OrderBy(c => c, StringComparer.OrdinalIgnoreCase).ToList().IndexOf("libx264");
     }
 
@@ -639,7 +639,7 @@ public sealed class AdvancedPanelTests
             window.SettleFades();
 
             // p1 NVENC'in on ayaridir, libx264 icin gecersizdir.
-            FindCombo(window, "CmbAdvCodecLock").SelectedIndex = 1 + FfmpegArguments.KnownCodecs
+            FindCombo(window, "CmbAdvCodecLock").SelectedIndex = 1 + FfmpegArguments.OfferedCodecs(CodecModel.CurrentPlatform)
                 .OrderBy(c => c, StringComparer.OrdinalIgnoreCase).ToList().IndexOf("libx264");
             FindCombo(window, "CmbAdvPreset").SelectedIndex = 1 + Array.IndexOf(MainWindow.AdvancedPresetCandidates, "p1");
             window.RecalculateForTest();

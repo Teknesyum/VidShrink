@@ -38,7 +38,7 @@ public sealed class CliTests
         window.RbCodecCompatible.IsChecked = codec == CliCodec.H264;
         window.RbCodecSmallest.IsChecked = codec == CliCodec.Av1;
         window.CmbAdvCodecLock.SelectedIndex = codec == CliCodec.Hevc
-            ? 1 + FfmpegArguments.KnownCodecs.OrderBy(c => c, StringComparer.OrdinalIgnoreCase).ToList().IndexOf("libx265")
+            ? 1 + FfmpegArguments.OfferedCodecs(CodecModel.CurrentPlatform).OrderBy(c => c, StringComparer.OrdinalIgnoreCase).ToList().IndexOf("libx265")
             : 0;
     }
 

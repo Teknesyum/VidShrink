@@ -39,15 +39,28 @@ public static class FfmpegArguments
         ["av1_amf"] = new[] { "speed", "balanced", "quality", "high_quality" },
         ["h264_mf"] = new[] { MediaFoundationPreset },
         ["hevc_mf"] = new[] { MediaFoundationPreset },
-        ["av1_mf"] = new[] { MediaFoundationPreset }
+        ["av1_mf"] = new[] { MediaFoundationPreset },
+        ["h264_videotoolbox"] = new[] { SingleStepPreset },
+        ["hevc_videotoolbox"] = new[] { SingleStepPreset },
+        ["h264_vaapi"] = new[] { SingleStepPreset },
+        ["hevc_vaapi"] = new[] { SingleStepPreset },
+        ["av1_vaapi"] = new[] { SingleStepPreset }
     };
+
+    /// <summary>
+    /// Hiz anahtari almayan kodlayicinin tek basamakli merdiveni. VideoToolbox ve VAAPI de
+    /// <c>-preset</c> almaz (<c>ffmpeg -h encoder=h264_vaapi</c>: <c>rc_mode</c>, <c>qp</c>,
+    /// <c>quality</c>, <c>profile</c>); basamak planin on ayar alanini gecerli tutar,
+    /// <see cref="SpeedArgs"/> onu yazmaz.
+    /// </summary>
+    public const string SingleStepPreset = "default";
 
     /// <summary>
     /// Media Foundation'in hiz anahtari yok (<c>ffmpeg -h encoder=h264_mf</c>: yalniz
     /// <c>rate_control</c>, <c>scenario</c>, <c>quality</c>, <c>hw_encoding</c>). Tek basamakli
     /// merdiven planin on ayar alanini gecerli tutar; <see cref="SpeedArgs"/> onu yazmaz.
     /// </summary>
-    public const string MediaFoundationPreset = "default";
+    public const string MediaFoundationPreset = SingleStepPreset;
 
     /// <summary>Media Foundation'i donanim MFT'sine yollayan anahtar; yoklama da ayni anahtarla kosar.</summary>
     public static readonly IReadOnlyList<string> MediaFoundationDeviceArgs = new[] { "-hw_encoding", "1" };
@@ -62,8 +75,8 @@ public static class FfmpegArguments
     /// Arayuzun kodlayici listesine giren kume: <see cref="KnownCodecs"/>'tan platformun
     /// onermedigi kodlayicilar (<see cref="CodecModel.IsOfferedOn"/>) cikar.
     /// </summary>
-    public static IReadOnlyList<string> OfferedCodecs(bool windows)
-        => KnownCodecs.Where(c => CodecModel.IsOfferedOn(c, windows)).ToList();
+    public static IReadOnlyList<string> OfferedCodecs(HostPlatform platform)
+        => KnownCodecs.Where(c => CodecModel.IsOfferedOn(c, platform)).ToList();
 
     /// <summary>
     /// libvpx-vp9 icin <c>1</c>: olcum <c>docs/olcumler/vp9-cpu-used-crf.md</c> (kosum
@@ -81,6 +94,7 @@ public static class FfmpegArguments
         "h264_qsv" or "hevc_qsv" or "av1_qsv" => "medium",
         "h264_amf" or "hevc_amf" or "av1_amf" => "quality",
         "h264_mf" or "hevc_mf" or "av1_mf" => MediaFoundationPreset,
+        "h264_videotoolbox" or "hevc_videotoolbox" or "h264_vaapi" or "hevc_vaapi" or "av1_vaapi" => SingleStepPreset,
         _ => "slow"
     };
 
@@ -509,7 +523,7 @@ public static class FfmpegArguments
     /// <summary>
     /// Kodegin hiz anahtari. Cogu yazilim ve donanim kodlayicisi <c>-preset</c> alir;
     /// libvpx-vp9 ayni 0-8 olcegini <c>-cpu-used</c> olarak <c>-deadline good</c> ve
-    /// <c>-row-mt 1</c> ile alir; VideoToolbox hic almaz. Media Foundation hiz anahtari almaz
+    /// <c>-row-mt 1</c> ile alir; VideoToolbox ve VAAPI hic almaz. Media Foundation hiz anahtari almaz
     /// ama kodlayicinin secildigi yerde <c>-hw_encoding 1</c> ister: verilmezse ffmpeg yazilim
     /// MFT'sine duser, o da bu makinede yalniz h264'u acar (<c>docs/olcumler/hb15-media-foundation.md</c>).
     /// </summary>
@@ -525,6 +539,7 @@ public static class FfmpegArguments
     public static IReadOnlyList<string> Build(MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix, IEncoderAvailability? availability = null, SceneMap? scenes = null)
     {
         var a = new List<string> { "-hide_banner", "-y" };
+        a.AddRange(CodecModel.DeviceArgs(plan.Codec));
         a.AddRange(HardwareDecodeArgs(info.VideoCodec));
         var streams = StreamMapping.ForOutput(info, plan, outputPath);
         var extraInputs = pass == 1 ? Array.Empty<string>() : streams.ExtraInputs;
@@ -553,9 +568,10 @@ public static class FfmpegArguments
 
         var overlay = VideoFilterChain.OverlayGraph(info, plan, streams.VideoMap);
         if (overlay is not null) streams = streams with { VideoMap = VideoFilterChain.OverlayOutput };
-        var filters = VideoFilterChain.Filters(info, plan);
+        var upload = CodecModel.UploadFilters(plan.Codec, plan.PixelFormat);
+        var filters = VideoFilterChain.Filters(info, plan).Concat(upload).ToList();
         if (overlay is not null)
-            a.AddRange(new[] { "-filter_complex", overlay });
+            a.AddRange(new[] { "-filter_complex", WithUpload(overlay, upload) });
         else if (filters.Count > 0)
             a.AddRange(new[] { cover ? "-filter:v:0" : "-vf", string.Join(',', filters) });
         a.AddRange(VideoFilterChain.FrameRateArgs(info, plan, cover ? ":v:0" : ""));
@@ -593,7 +609,8 @@ public static class FfmpegArguments
         }
 
         a.AddRange(KeyframeArgs(plan.Codec, plan.Fps, scenes));
-        a.AddRange(new[] { cover ? "-pix_fmt:v:0" : "-pix_fmt", plan.PixelFormat });
+        if (CodecModel.TakesPixelFormatFlag(plan.Codec))
+            a.AddRange(new[] { cover ? "-pix_fmt:v:0" : "-pix_fmt", plan.PixelFormat });
         if (CodecModel.OutputProfile(plan.Codec, plan.PixelFormat) is string profile)
             a.AddRange(new[] { cover ? "-profile:v:0" : "-profile:v", profile });
         a.AddRange(psychovisualArgs);
@@ -624,6 +641,15 @@ public static class FfmpegArguments
         a.Add(outputPath);
         return MergeEncoderParams(a);
     }
+
+    /// <summary>
+    /// Yuzeye yukleme adimlari bindirme grafiginin de sonuna, cikis etiketinden once girer;
+    /// grafik <c>-vf</c> zincirinin yerine gectigi icin adimlar baska yerden eklenemez.
+    /// </summary>
+    private static string WithUpload(string overlay, IReadOnlyList<string> upload)
+        => upload.Count == 0
+            ? overlay
+            : overlay[..^VideoFilterChain.OverlayOutput.Length] + "," + string.Join(',', upload) + VideoFilterChain.OverlayOutput;
 
     /// <summary>
     /// ffmpeg bu bayrakların ikincisini görünce birincisini sessizce atar: son yazan kazanır.

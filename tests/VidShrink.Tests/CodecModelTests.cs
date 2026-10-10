@@ -15,24 +15,21 @@ public sealed class CodecModelTests
     [Theory]
     [InlineData("hevc_videotoolbox", "libx265", "hevc_nvenc")]
     [InlineData("h264_videotoolbox", "libx264", "h264_nvenc")]
-    public void VideoToolboxStaysOffTheHardwarePath(string codec, string softwareTwin, string hardwareTwin)
+    public void VideoToolboxRidesTheHardwarePath(string codec, string softwareTwin, string hardwareTwin)
     {
-        Assert.False(CodecModel.IsHardware(codec));
+        Assert.True(CodecModel.IsHardware(codec));
 
-        Assert.Equal(CodecModel.FloorBppf(softwareTwin), CodecModel.FloorBppf(codec));
-        Assert.NotEqual(CodecModel.FloorBppf(hardwareTwin), CodecModel.FloorBppf(codec));
+        Assert.Equal(CodecModel.FloorBppf(hardwareTwin), CodecModel.FloorBppf(codec));
+        Assert.NotEqual(CodecModel.FloorBppf(softwareTwin), CodecModel.FloorBppf(codec));
 
-        Assert.Equal(CodecModel.QualityLimit(softwareTwin), CodecModel.QualityLimit(codec));
-        Assert.NotEqual(CodecModel.QualityLimit(hardwareTwin), CodecModel.QualityLimit(codec));
-
-        Assert.Equal(CodecModel.MinBitrateK(softwareTwin, 1920, 1080, 60), CodecModel.MinBitrateK(codec, 1920, 1080, 60));
-        Assert.NotEqual(CodecModel.MinBitrateK(hardwareTwin, 1920, 1080, 60), CodecModel.MinBitrateK(codec, 1920, 1080, 60));
+        Assert.Equal(CodecModel.MinBitrateK(hardwareTwin, 1920, 1080, 60), CodecModel.MinBitrateK(codec, 1920, 1080, 60));
+        Assert.NotEqual(CodecModel.MinBitrateK(softwareTwin, 1920, 1080, 60), CodecModel.MinBitrateK(codec, 1920, 1080, 60));
 
         Assert.NotEqual(FfmpegArguments.NeedsTwoPasses(softwareTwin), FfmpegArguments.NeedsTwoPasses(codec));
         Assert.Equal(FfmpegArguments.NeedsTwoPasses(hardwareTwin), FfmpegArguments.NeedsTwoPasses(codec));
 
-        Assert.Equal(CodecModel.CostsQualityInHardware(softwareTwin), CodecModel.CostsQualityInHardware(codec));
-        Assert.NotEqual(CodecModel.CostsQualityInHardware(hardwareTwin), CodecModel.CostsQualityInHardware(codec));
+        Assert.Equal(CodecModel.CostsQualityInHardware(hardwareTwin), CodecModel.CostsQualityInHardware(codec));
+        Assert.NotEqual(CodecModel.CostsQualityInHardware(softwareTwin), CodecModel.CostsQualityInHardware(codec));
     }
 
     private static MediaInfo Source() => new()
@@ -77,7 +74,7 @@ public sealed class CodecModelTests
         Assert.Equal(!videoToolbox, single.Contains("-preset"));
         Assert.DoesNotContain("-pass", single);
         Assert.Contains("-b:v", single);
-        Assert.False(CodecModel.IsHardware(codec));
+        Assert.Equal(videoToolbox, CodecModel.IsHardware(codec));
     }
 
     [Theory]
