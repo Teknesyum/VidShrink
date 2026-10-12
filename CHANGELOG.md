@@ -9,6 +9,9 @@ ship as part of it.
 
 ### Fixed
 
+- Linux, Thai: the collapsed plan summary on the Shrink tab no longer scrolls. The Thai fallback
+  font's taller lines pushed the summary 3 px past the plan panel's ceiling; the ceiling now
+  never sits below the summary and still stops the expanded reasons list.
 - Three buttons that start disabled now say why when hovered: "Cut ranges" and "Split at scene
   changes" in the editor's silence panel, and "Find foreign-language subtitle" in the Shrink tab.
   The recorder wizard's four answer buttons, its "same as last time" button and the region

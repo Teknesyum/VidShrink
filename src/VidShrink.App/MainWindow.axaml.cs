@@ -261,6 +261,7 @@ public partial class MainWindow : Window
             FixedResolutionRadios()[i].Content = FixedResolutionCandidates[i].ToString(CultureInfo.InvariantCulture) + "p";
 
         Watch(PlanPanelRow, RowDefinition.HeightProperty, OnSplitterMoved);
+        WatchPlanCeiling();
 
         InitializeAdvancedUi();
         foreach (var box in AdvBoxes())
