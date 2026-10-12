@@ -367,3 +367,13 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   `AppHost` de kurar): Tay kesikleri 33 → 0. Noto Sans Arabic satırı 33,8 px'e çıkarıp kusuru çoğalttı, eklenmedi. Açık kalanlar (Linux yazı tipi
   ölçüsü): ar/fa/ur `Farklı Kaydet` düğmesi DejaVu'da iki satıra sarılıyor, uk/el kısayol tablosunda uzun sözcük satır ortasında bölünüyor.
   `OynaticiKarsilastirmaTests.OnizlemeSesi…` kök kullanıcıyla başlatılmış PulseAudio boş çıkışında saat ilerlemiyor (ortam; ses sunucusu yokken yeşil).
+  Üçüncü tur (canlı, `:1` Xvfb + openbox, iki RandR monitörü, PulseAudio): kayıt çerçevesi X Shape ile kenar şeridine iner ve
+  girdiyi geçirir (`KaydediciPencereTests.CerceveX11deKenarSeridine…`, `[X11KayitFact]`, XShapeGetRectangles 4/0, biçimsiz pencere 1/1 olumsuz
+  kontrol), bölgenin içine düşen ya da biçim verilemeyen çerçeve gösterilmez (`RecorderFrameHost.Showable`); bölge seçici masaüstünün
+  dondurulmuş karesini zemine alır (`BolgeSecici…DondurulmusKaresini…`, x11grab tek kare; karesiz zemin saydam); `~/Videos` yokken kayıt
+  `~/Videos/VidShrink`'e gider (`VideoKlasoruYoksa…`, sahte `KullaniciKlasoru.Bul`). Dördünün mutasyonu birlikte 4/4 kırmızı.
+  Ses sunucusu olmayan oturumda eş zamanlı iki dosya iletimi süreci düşürüyordu (gdb: libmpv `core` → libSDL2 → 0x0); `ao` Linux'ta
+  SDL'siz sıra (`OynaticiKurulumTests.LinuxSesCikisiSdleInmez`); canlı 10 turda düzeltmesiz 3 çöküş, düzeltmeyle 0.
+  Kuyruk penceresinin "dosya N / toplam" satırı koşarken gelen istekle güncellenir (`KuyrukDuzenlemeTests.KosarkenGelenIstekToplamiGunceller`,
+  gerçek kuyruk borusu; `Accept`'teki yenilemeyi kaldırmak kırmızı). `OynaticiListeMenusuTests.AcikMenudeSagTik…` kardeşleri gibi `[WindowsFact]`
+  (başsız Linux'ta 1/3 kararsız). Kök olmayan kullanıcıyla 13 parçada yalnız ortam kolları düştü; P26 ve karşılaştırma kare farkı yükte düşer, tek başına yeşil.

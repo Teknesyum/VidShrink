@@ -134,7 +134,7 @@ public sealed class OynaticiListeMenusuTests
         }
     }
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void AcikMenudeSagTikKapatirYenidenAcmaz()
     {
         Kosum(new[] { "a1.mp4", "a2.mp4" }, "a1.mp4", (view, window, _) =>

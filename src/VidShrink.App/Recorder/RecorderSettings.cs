@@ -408,14 +408,12 @@ internal sealed class RecorderSettings
 
     /// <summary>
     /// Kaydın yazılacağı klasör. Ayarda bir klasör yoksa işletim sisteminin video klasörü,
-    /// o da yoksa çalışma klasörü.
+    /// o yoksa <c>~/Videos/VidShrink</c> (<see cref="KullaniciKlasoru"/>).
     /// </summary>
     internal string ResolveFolder()
     {
         if (!string.IsNullOrWhiteSpace(OutputFolder)) return OutputFolder!;
-        var videos = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
-        if (!string.IsNullOrEmpty(videos)) return Path.Combine(videos, "VidShrink");
-        return Environment.CurrentDirectory;
+        return KullaniciKlasoru.Video();
     }
 
     /// <summary>

@@ -332,6 +332,30 @@ public sealed class OynaticiKurulumTests
         foreach (var dir in LibMpvLocator.MacLibraryDirectories)
             Assert.Contains(dir, kurulum, StringComparison.Ordinal);
     }
+
+    /// <summary>
+    /// Linux'ta ses çıkışı SDL'e inmez: ses sunucusu olmayan oturumda oynatıcı ile karşılaştırma
+    /// motorları aynı anda açılınca SDL'in ses açılışı süreci düşürüyordu (gdb: libmpv `core` →
+    /// libSDL2 → 0x0; iki eş zamanlı iletimde 3/5). Sıra yalnız Linux'ta yazılır, ses sunucusu
+    /// olan oturumda varsayılanla aynı sürücü (pulse) seçilir.
+    /// </summary>
+    [Fact]
+    public void LinuxSesCikisiSdleInmez()
+    {
+        var secenekler = MpvEngine.OptionsFor(new PlaybackOptions());
+        var ao = secenekler.Where(o => o.Name == "ao").Select(o => o.Value).ToArray();
+        if (!OperatingSystem.IsLinux())
+        {
+            Assert.Empty(ao);
+            return;
+        }
+
+        var surucu = Assert.Single(ao).Split(',');
+        Assert.DoesNotContain("sdl", surucu);
+        Assert.DoesNotContain("", surucu);
+        Assert.Equal("pulse", surucu[0]);
+        Assert.Contains(("audio-fallback-to-null", "yes"), secenekler);
+    }
 }
 
 public sealed class OynaticiGorunumuFabrikaTests

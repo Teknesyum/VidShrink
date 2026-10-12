@@ -37,6 +37,21 @@ ship as part of it.
   Noto Sans Thai is preferred when installed.
 - Linux and macOS: the recorder's click rings, click sound, key display and cursor magnifier only
   work on Windows, but their boxes were shown and silently did nothing; they are now hidden there.
+- Linux: the recording frame covered the whole recorded area with a black window on desktops
+  without a compositor, so the recorded monitor went dark and the video turned black after the
+  first seconds. The frame is now cut down to its edge strip with the X Shape extension and lets
+  clicks through; when the strip would fall inside the recording it is not shown.
+- Linux: drawing a region showed a black screen on desktops without a compositor. The desktop is
+  now frozen into the picker's background while you draw.
+- Linux: with no `~/Videos` or `~/Pictures` folder, recordings and stream screenshots went to the
+  folder the app was started from (often `/`). They now go to `~/Videos/VidShrink` and
+  `~/Pictures/VidShrink`.
+- Linux: VidShrink could crash when several files were opened at once on a system without a
+  sound server. libmpv fell back to SDL audio, whose start-up is not safe when the player and the
+  compare panel open together. SDL is no longer in the audio output list; with no sound server
+  playback continues silently.
+- The shrink queue window said "file 1 of 1" while more requests from "Shrink with VidShrink"
+  were already waiting below it; the total now follows the queue.
 
 ## [1.2.15] - 2026-10-10
 

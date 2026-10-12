@@ -140,7 +140,9 @@ public partial class ShrinkJobWindow : Window
     {
         public AktifIs(ShrinkRequest request) => Request = request;
         public ShrinkRequest Request { get; }
-        public string Target { get; set; } = "";
+        /// <summary>Hedef etiketi ve iş sırası; toplam gösterirken o anki kabul sayısından okunur.</summary>
+        public string? TargetLabel { get; set; }
+        public int Order { get; set; }
         public double Fraction { get; set; }
         public string Stage { get; set; } = "-";
         public string Remaining { get; set; } = "-";
@@ -294,6 +296,15 @@ public partial class ShrinkJobWindow : Window
     /// <summary>Kuyruga girmis istek sayisi; ikinci surecin boruyla verdikleri dahil.</summary>
     internal int AcceptedCount => _accepted;
 
+    /// <summary>Kodlamasız koşan iş: başlık ve "dosya N / toplam" satırı <c>RunOneAsync</c>'teki gibi kurulur.</summary>
+    internal void ShowActiveForTest(ShrinkRequest request, double targetMb)
+    {
+        _aktif.Add(new AktifIs(request) { TargetLabel = TargetLabel(targetMb), Order = ++_baslayan });
+        RefreshActive(true);
+    }
+
+    internal string TargetLineForTest => TxtTarget.Text ?? "";
+
     internal string MessageText => TxtMessage.Text ?? "";
 
     /// <summary>Henüz başlamamış istekler, koşacakları sırayla. Koşan dosya burada değil.</summary>
@@ -369,6 +380,7 @@ public partial class ShrinkJobWindow : Window
         _accepted++;
         _pump.Enqueue(request);
         RefreshPending();
+        RefreshActive(false);
     }
 
     /// <summary>C1-2: bekleyen isteği sıradan çıkarır. Koşan dosyaya dokunmaz.</summary>
@@ -377,6 +389,7 @@ public partial class ShrinkJobWindow : Window
         if (!_pump.RemovePending(index)) return;
         _accepted--;
         RefreshPending();
+        RefreshActive(false);
     }
 
     /// <summary>C1-2: bekleyen isteği <paramref name="delta"/> kadar kaydırır; sınırın dışına taşımaz.</summary>
@@ -536,18 +549,25 @@ public partial class ShrinkJobWindow : Window
         if (many)
         {
             TxtHeadline.Text = Say("main.shrink-job.running", _aktif.Count);
-            TxtTarget.Text = _aktif[^1].Target;
+            TxtTarget.Text = TargetText(_aktif[^1]);
             Progress.Value = _aktif.Average(job => job.Fraction);
             return;
         }
 
         var tek = _aktif[0];
         TxtHeadline.Text = Path.GetFileName(tek.Request.Path);
-        TxtTarget.Text = tek.Target;
+        TxtTarget.Text = TargetText(tek);
         Progress.Value = tek.Fraction;
         TxtStage.Text = tek.Stage;
         TxtRemaining.Text = tek.Remaining;
     }
+
+    /// <summary>
+    /// "Dosya N / toplam". Toplam iş başlarken dondurulmuyor: kabuktan gelen istekler ilk iş
+    /// koşarken sıraya düşüyor ve dondurulan başlık "1 / 1" derken altında "Bekleyen: 2" yazıyordu.
+    /// </summary>
+    private string TargetText(AktifIs job)
+        => job.TargetLabel is null ? "" : Say("main.shrink-job.target", job.TargetLabel, job.Order, _accepted);
 
     /// <summary>
     /// C1-4: sıra boşaldığında seçilen eylem. Uyut ve kapat geri sayımla gelir ve pencere bu
@@ -635,7 +655,8 @@ public partial class ShrinkJobWindow : Window
             var info = await FfprobeClient.ProbeAsync(request.Path, ct);
             var (options, targetMb) = OptionsFor(request, info);
             options = await KirpmaylaAsync(options, info, ct);
-            job.Target = Say("main.shrink-job.target", TargetLabel(targetMb), sira, _accepted);
+            job.TargetLabel = TargetLabel(targetMb);
+            job.Order = sira;
             RefreshActive(false);
             var plan = PlanCalculator.Build(info, options);
             var output = OutputReservations.Shared.Reserve(taken =>

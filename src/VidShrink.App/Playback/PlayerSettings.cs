@@ -122,7 +122,8 @@ internal sealed class PlayerSettings
         if (!string.IsNullOrWhiteSpace(ScreenshotFolder)) return ScreenshotFolder!;
         var pictures = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
         if (!string.IsNullOrEmpty(pictures)) return Path.Combine(pictures, "VidShrink");
-        if (MediaAddress.IsAddress(media)) return Environment.CurrentDirectory;
+        // Adreste yanına yazılacak bir klasör yok; çalışma klasörü masaüstünden açılınca "/" olabiliyor.
+        if (MediaAddress.IsAddress(media)) return KullaniciKlasoru.Resim();
         return Path.GetDirectoryName(Path.GetFullPath(media)) ?? Environment.CurrentDirectory;
     }
 

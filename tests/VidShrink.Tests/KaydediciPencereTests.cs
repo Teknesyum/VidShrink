@@ -375,4 +375,136 @@ public sealed class KaydediciPencereTests
             RecorderView.InputEffectsAvailable = onceki;
         }
     }
+
+    /// <summary>
+    /// Linux turu 2, canlı X11: kayıt çerçevesi X Shape ile dört şeride iner ve girdiyi geçirir.
+    /// Önceden pencere bölgenin tamamını kaplıyordu; birleştiricisiz masaüstünde kaydedilen
+    /// monitör siyah kalıyor, video da ilk saniyelerden sonra siyah çıkıyordu (elle ölçüldü:
+    /// ortalama parlaklık 90'dan 1,6'ya). Olumsuz kontrol: biçim verilmeyen pencere tek dikdörtgen.
+    /// </summary>
+    [X11KayitFact]
+    public void CerceveX11deKenarSeridineInerVeTiklamayiGecirir()
+    {
+        var ekran = X11.XOpenDisplay(IntPtr.Zero);
+        Assert.NotEqual(IntPtr.Zero, ekran);
+        try
+        {
+            var kok = X11.XDefaultRootWindow(ekran);
+            var bicimli = X11.XCreateSimpleWindow(ekran, kok, 0, 0, 644, 484, 0, 0, 0);
+            var bicimsiz = X11.XCreateSimpleWindow(ekran, kok, 0, 0, 644, 484, 0, 0, 0);
+            X11.XSync(ekran, false);
+
+            Assert.True(RecorderFrame.ShapeX11(bicimli, RecorderFrame.Ring(new Avalonia.PixelSize(644, 484), 2)));
+            X11.XSync(ekran, false);
+
+            Assert.Equal(4, X11.Dikdortgenler(ekran, bicimli, 0));
+            Assert.Equal(0, X11.Dikdortgenler(ekran, bicimli, 2));
+            Assert.Equal(1, X11.Dikdortgenler(ekran, bicimsiz, 0));
+            Assert.Equal(1, X11.Dikdortgenler(ekran, bicimsiz, 2));
+
+            X11.XDestroyWindow(ekran, bicimli);
+            X11.XDestroyWindow(ekran, bicimsiz);
+        }
+        finally
+        {
+            X11.XCloseDisplay(ekran);
+        }
+    }
+
+    /// <summary>
+    /// Bölge çizerken masaüstü dondurulur: seçici birleştiricisiz X11'de saydam değil siyah
+    /// çiziliyordu. Canlı kol gerçek ekranın karesini alır (ekran boyunda), sahte kare zemine
+    /// fırça olarak gider; kare yoksa zemin saydam kalır (olumsuz kontrol).
+    /// </summary>
+    [X11KayitFact]
+    public void BolgeSeciciMasaustununDondurulmusKaresiniGosterir()
+    {
+        var olcu = AppHost.Run(() =>
+        {
+            var kare = RecorderRegionPicker.FreezeX11Async(System.Threading.CancellationToken.None).GetAwaiter().GetResult();
+            var boyut = kare?.PixelSize;
+            var dolu = new RecorderRegionPicker { Frozen = kare };
+            dolu.ApplyFrozen();
+            var bos = new RecorderRegionPicker();
+            bos.ApplyFrozen();
+            var zemin = dolu.FindControl<Canvas>("Surface")!.Background;
+            var bosZemin = bos.FindControl<Canvas>("Surface")!.Background;
+            kare?.Dispose();
+            return (boyut, dolu: zemin is Avalonia.Media.ImageBrush, bos: bosZemin is Avalonia.Media.ImageBrush);
+        });
+
+        Assert.NotNull(olcu.boyut);
+        Assert.True(olcu.boyut!.Value.Width > 0 && olcu.boyut.Value.Height > 0);
+        Assert.True(olcu.dolu);
+        Assert.False(olcu.bos);
+    }
+
+    /// <summary>Çerçeve Windows'ta her zaman; X11'de yalnız biçim verildiyse ve şerit bölgenin dışındaysa (içteki şerit kayda girer).</summary>
+    [Fact]
+    public void CerceveYalnizKaydaGirmeyecekVeBicimliyseGosterilir()
+    {
+        Assert.True(RecorderFrameHost.Showable(windows: true, inside: true, shaped: false));
+        Assert.True(RecorderFrameHost.Showable(windows: false, inside: false, shaped: true));
+        Assert.False(RecorderFrameHost.Showable(windows: false, inside: true, shaped: true));
+        Assert.False(RecorderFrameHost.Showable(windows: false, inside: false, shaped: false));
+    }
+
+    /// <summary>
+    /// Video klasörü yoksa (.NET Linux'ta <c>~/Videos</c> yoksa MyVideos için boş dönüyor) kayıt
+    /// çalışma klasörüne değil <c>~/Videos/VidShrink</c>'e gider; masaüstünden açılınca çalışma
+    /// klasörü <c>/</c> olabiliyor. Sistem klasörü varsa o kullanılır (olumlu kontrol).
+    /// </summary>
+    [Fact]
+    public void VideoKlasoruYoksaEvKlasorununAltinaDuser()
+    {
+        var onceki = KullaniciKlasoru.Bul;
+        try
+        {
+            KullaniciKlasoru.Bul = k => k == Environment.SpecialFolder.UserProfile ? "/home/ali" : "";
+            Assert.Equal(Path.Combine("/home/ali", "Videos", "VidShrink"), new RecorderSettings().ResolveFolder());
+            Assert.Equal(Path.Combine("/home/ali", "Pictures", "VidShrink"), KullaniciKlasoru.Resim());
+
+            KullaniciKlasoru.Bul = k => k == Environment.SpecialFolder.MyVideos ? "/home/ali/Filmler" : "/home/ali";
+            Assert.Equal(Path.Combine("/home/ali/Filmler", "VidShrink"), new RecorderSettings().ResolveFolder());
+            Assert.Equal("/elle", new RecorderSettings { OutputFolder = "/elle" }.ResolveFolder());
+        }
+        finally
+        {
+            KullaniciKlasoru.Bul = onceki;
+        }
+    }
+
+    private static class X11
+    {
+        [System.Runtime.InteropServices.DllImport("libX11.so.6")]
+        internal static extern IntPtr XOpenDisplay(IntPtr name);
+
+        [System.Runtime.InteropServices.DllImport("libX11.so.6")]
+        internal static extern int XCloseDisplay(IntPtr display);
+
+        [System.Runtime.InteropServices.DllImport("libX11.so.6")]
+        internal static extern IntPtr XDefaultRootWindow(IntPtr display);
+
+        [System.Runtime.InteropServices.DllImport("libX11.so.6")]
+        internal static extern IntPtr XCreateSimpleWindow(IntPtr display, IntPtr parent, int x, int y, uint width, uint height, uint border, ulong borderColor, ulong background);
+
+        [System.Runtime.InteropServices.DllImport("libX11.so.6")]
+        internal static extern int XDestroyWindow(IntPtr display, IntPtr window);
+
+        [System.Runtime.InteropServices.DllImport("libX11.so.6")]
+        internal static extern int XSync(IntPtr display, bool discard);
+
+        [System.Runtime.InteropServices.DllImport("libX11.so.6")]
+        private static extern int XFree(IntPtr data);
+
+        [System.Runtime.InteropServices.DllImport("libXext.so.6")]
+        private static extern IntPtr XShapeGetRectangles(IntPtr display, IntPtr window, int kind, out int count, out int ordering);
+
+        internal static int Dikdortgenler(IntPtr display, IntPtr window, int kind)
+        {
+            var veri = XShapeGetRectangles(display, window, kind, out var sayi, out _);
+            if (veri != IntPtr.Zero) XFree(veri);
+            return sayi;
+        }
+    }
 }

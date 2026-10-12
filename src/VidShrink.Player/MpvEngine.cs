@@ -136,11 +136,21 @@ public sealed partial class MpvEngine : IPlaybackEngine
     public static IReadOnlyList<(string Name, string Value)> OptionsFor(PlaybackOptions options)
     {
         var list = new List<(string Name, string Value)>(BaseOptions(options));
+        if (OperatingSystem.IsLinux()) list.Add(("ao", LinuxAudioOutputs));
         if (!options.Audio) list.Add(("aid", "no"));
         if (!options.Video) list.Add(("vid", "no"));
         if (options.Loop) list.Add(("loop-file", "inf"));
         return list;
     }
+
+    /// <summary>
+    /// Linux'ta ses cikisi sirasi SDL'siz. Ses sunucusu yokken (kok kullanici, masaustu oturumu
+    /// disi) libmpv'nin varsayilan sirasi SDL'e iner; SDL'in ses acilisi is parcacigi guvenli
+    /// degil ve oynatici ile karsilastirma motorlari ayni anda acilinca SDL icinde bos isaretciye
+    /// atlayip sureci dusuruyordu (iki dosya ayni anda iletilince 2 kosumdan 1'i). Listede
+    /// olmayan surucu atlanir, hicbiri acilmazsa <c>audio-fallback-to-null</c> sessiz surer.
+    /// </summary>
+    public const string LinuxAudioOutputs = "pulse,pipewire,alsa,jack";
 
     /// <summary>
     /// <c>hwdec</c> degeri. Cizim yazilimda (<c>vo=libmpv</c>, SW render) oldugu icin donanim
