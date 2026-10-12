@@ -66,6 +66,10 @@ ship as part of it.
 - The player did not start at all with a libmpv built without Lua ("option ytdl=no failed: option
   not found"). An option that only switches off a feature the build does not have is now skipped;
   every other option still fails loudly.
+- Linux: starting VidShrink without a usable X display (no `DISPLAY`, an ssh shell, Wayland without
+  Xwayland) crashed with a .NET stack trace and exit code 134. It now prints a short, localized
+  message saying a desktop session is needed and exits with code 1; a second launch still hands its
+  file to a running window without needing a display.
 
 ## [1.2.15] - 2026-10-10
 
