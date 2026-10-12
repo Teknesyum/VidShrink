@@ -9,9 +9,11 @@ namespace VidShrink.Tests;
 
 public sealed class WatchFolderTests
 {
-    private const string Root = @"C:\izle\gelen";
-    private const string Out = @"C:\izle\giden";
-    private const string Settings = @"C:\izle\ayar";
+    // Sahte dosya sistemi kökü. CLI yolu tam yola çeviriyor: Linux'ta "C:\izle" göreli bir ad sayılıp
+    // çalışma klasörünün altına iniyor, sahte sistem onu bulamıyordu. Her sistemde mutlak bir yol.
+    private static readonly string Root = OperatingSystem.IsWindows() ? @"C:\izle\gelen" : "/izle/gelen";
+    private static readonly string Out = OperatingSystem.IsWindows() ? @"C:\izle\giden" : "/izle/giden";
+    private static readonly string Settings = OperatingSystem.IsWindows() ? @"C:\izle\ayar" : "/izle/ayar";
     private static readonly DateTime T0 = new(2026, 9, 17, 10, 0, 0, DateTimeKind.Utc);
 
     private sealed class FakeFile
@@ -199,7 +201,7 @@ public sealed class WatchFolderTests
         Assert.Single(watcher.Poll());
     }
 
-    [Fact]
+    [WindowsFact("Unix'te yazma kilidi zorunlu değil; orada boyut/zaman kararlılığı yeter")]
     public void GercekDosyaSistemindeYazmaIcinAcikDosyaKilitliSayiliyor()
     {
         var dir = Path.Combine(TestPaths.OutputRoot, "hb-a3-izle", $"{Guid.NewGuid():N}");
@@ -237,8 +239,8 @@ public sealed class WatchFolderTests
         Assert.Equal(new[] { Path.Combine(Root, "b.mp4"), Path.Combine(Root, "x_shrunk.mp4") }, watcher.Poll(events.Add));
         var skipped = Assert.Single(events, e => e.Kind == WatchEventKind.Skipped);
         Assert.Equal(Path.Combine(Root, "a_shrunk.mp4"), skipped.Path);
-        Assert.False(WatchFolder.IsCandidate(@"C:\x\.gizli.mp4"));
-        Assert.True(WatchFolder.IsCandidate(@"C:\x\a_shrunk.mp4"));
+        Assert.False(WatchFolder.IsCandidate(Path.Combine(Root, ".gizli.mp4")));
+        Assert.True(WatchFolder.IsCandidate(Path.Combine(Root, "a_shrunk.mp4")));
     }
 
     [Fact]
@@ -260,7 +262,7 @@ public sealed class WatchFolderTests
         Assert.Equal(new[] { "a.mp4" }, calls);
     }
 
-    [Theory]
+    [WindowsTheory("Windows yolu: sürücü harfi, ters bölü ve harf duyarsızlığı; üç sistemin kolu ValidateFolders(comparison) testinde")]
     [InlineData(@"C:\izle\gelen", @"C:\izle\gelen", true)]
     [InlineData(@"C:\izle\gelen", @"C:\izle\gelen\", true)]
     [InlineData(@"C:\izle\gelen", @"c:\IZLE\gelen", true)]

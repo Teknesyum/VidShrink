@@ -609,7 +609,7 @@ public sealed class OynaticiYolHaritasiTests
         YolKanit.Kapat("p18-hiz-simgesi.txt");
     }
 
-    [Fact]
+    [WindowsFact("süreleri duvar saatiyle ölçer; yalnız Win32 çizim saati gerçek zamanlı, başsız saat ilerlemez")]
     public void P19DuraklatmaSimgesiYarimSaniyedeGirerVeCikar()
     {
         var body = new StringBuilder();

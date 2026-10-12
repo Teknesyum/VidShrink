@@ -5009,8 +5009,12 @@ public partial class MainWindow : Window
         BtnStart.IsEnabled = !running && _info is not null;
         BtnConvert.IsEnabled = !running && _info is not null;
         // Pasif dugmenin ipucu sebebi soyler: is surerken "once video yukleyin" yanlisti.
-        BtnStart.Classes.Set("busy", running);
-        BtnConvert.Classes.Set("busy", running);
+        // Yerel deger is boyunca stilin ipucunu ezer, temizlenince :disabled stili geri gelir.
+        foreach (var button in new[] { BtnStart, BtnConvert })
+        {
+            if (running) ToolTip.SetTip(button, Say("main.action.busy-tip"));
+            else button.ClearValue(ToolTip.TipProperty);
+        }
         BtnCancel.IsEnabled = BtnConvertCancel.IsEnabled = running;
         if (running) return;
         Preview.Controls.ClearEncode();

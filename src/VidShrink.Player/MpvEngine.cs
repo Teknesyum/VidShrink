@@ -616,7 +616,11 @@ public sealed partial class MpvEngine : IPlaybackEngine
         var open = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         Volatile.Write(ref _open, open);
         var start = "start=" + Number(Math.Max(0, double.IsFinite(atSeconds) ? atSeconds : 0));
-        if (CommandRc(OpenTag, "loadfile", source, "replace", "-1", start) < 0)
+        // mpv 0.38 loadfile'a <index> argumanini ekledi; 0.37 (Ubuntu 24.04, Debian 12'nin
+        // sistem libmpv'si) ucuncu argumani secenek sayip "-1"i reddediyor ve takilma kurtarmasinin
+        // yeniden acmasi Linux'ta hic calismiyordu. Ret eszamanli doner; eski bicimle bir kez daha denenir.
+        if (CommandRc(OpenTag, "loadfile", source, "replace", "-1", start) < 0
+            && CommandRc(OpenTag, "loadfile", source, "replace", start) < 0)
         {
             Interlocked.CompareExchange(ref _open, null, open);
             return false;

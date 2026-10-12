@@ -30,6 +30,11 @@ ship as part of it.
   now say a job is already running.
 - Linux: screenshot names kept `:`, `?` and other characters that exFAT, NTFS and Windows shares
   reject; they are replaced with `_` on every system, as the output-name pattern already required.
+- Linux: the player's stall recovery could not reopen the file with the system libmpv 0.37
+  (Ubuntu 24.04, Debian 12); `loadfile` gained an index argument in mpv 0.38 and the older
+  library rejected the call. The older form is tried when the newer one is refused.
+- Linux: Thai text fell back to a taller system font and was cut off in the recorder's buttons;
+  Noto Sans Thai is preferred when installed.
 - Linux and macOS: the recorder's click rings, click sound, key display and cursor magnifier only
   work on Windows, but their boxes were shown and silently did nothing; they are now hidden there.
 

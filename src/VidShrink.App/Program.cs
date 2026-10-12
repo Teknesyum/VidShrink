@@ -313,6 +313,9 @@ internal static class Program
     internal const string CizimDegiskeni = "VIDSHRINK_CIZIM";
 
     internal static AppBuilder Cizim(AppBuilder builder)
+        => YaziTipiYedegi.Uygula(Yazilim(builder));
+
+    private static AppBuilder Yazilim(AppBuilder builder)
         => string.Equals(Environment.GetEnvironmentVariable(CizimDegiskeni), "yazilim", StringComparison.Ordinal)
             ? builder.With(new Win32PlatformOptions { RenderingMode = new[] { Win32RenderingMode.Software } })
             : builder;

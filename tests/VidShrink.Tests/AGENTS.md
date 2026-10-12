@@ -359,4 +359,11 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   İkinci tur: ekran görüntüsü adı her sistemde taşınabilir kümeyi `_` yapar (`OynaticiGorunumTests.OynaticiAyarlari…`, Linux'ta `:` kalıyordu),
   girdi etkileri (halka, ses, tuş, büyüteç) Windows dışında gizli (`KaydediciPencereTests.GirdiEtkileriDesteklenmeyenSistemdeGizlenir`,
   `RecorderView.InputEffectsAvailable`), `AcilirBolumCanlandirmaTests` duvar saati yerine `KareSayaci` ile sayar (başsız saatte de oynar),
-  `OynaticiKurtarmaMotorTests` `ao-reload`'ı yalnız libmpv ≥ 0.38'de ister (Ubuntu 24.04: 0.37), `KaydediciAyarTests` tablosu gdigrab'a sabitlendi.
+  `KaydediciAyarTests` tablosu gdigrab'a sabitlendi. `OynaticiKurtarmaMotorTests` Ubuntu 24.04'ün libmpv 0.37'sinde gerçek hatayı buldu:
+  `ReopenAsync`'in `loadfile … replace -1 start=` biçimi 0.38'in `<index>` argümanını varsayıyor, 0.37 onu seçenek sayıp reddediyordu (takılma
+  kurtarmasının yeniden açması Linux'ta hiç çalışmıyordu); eski biçimle ikinci deneme eklendi, ölçü değişmeden 5/5 kırmızıdan 3/3 yeşile döndü.
+  `WatchFolderTests` sahte kökü her sistemde mutlak yol (Linux'ta `/izle/...`); Windows yolu ve yazma kilidi kolları `[Windows…]`.
+  `OynaticiYolHaritasiTests.P19` süreyi duvar saatiyle ölçüyor, Win32'ye sabit. Linux yazı tipi yedeği `App/YaziTipiYedegi` (yalnız Noto Sans Thai;
+  `AppHost` de kurar): Tay kesikleri 33 → 0. Noto Sans Arabic satırı 33,8 px'e çıkarıp kusuru çoğalttı, eklenmedi. Açık kalanlar (Linux yazı tipi
+  ölçüsü): ar/fa/ur `Farklı Kaydet` düğmesi DejaVu'da iki satıra sarılıyor, uk/el kısayol tablosunda uzun sözcük satır ortasında bölünüyor.
+  `OynaticiKarsilastirmaTests.OnizlemeSesi…` kök kullanıcıyla başlatılmış PulseAudio boş çıkışında saat ilerlemiyor (ortam; ses sunucusu yokken yeşil).
