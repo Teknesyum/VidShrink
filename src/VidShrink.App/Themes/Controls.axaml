@@ -331,7 +331,6 @@
 
       <ControlTheme x:Key="ShortcutKeyButton" TargetType="Button" BasedOn="{StaticResource GhostButton}">
         <Setter Property="Padding" Value="{StaticResource NavTabPadding}"/>
-        <Setter Property="MaxWidth" Value="{StaticResource ShortcutKeyMaxWidth}"/>
         <Setter Property="HorizontalAlignment" Value="Left"/>
         <Setter Property="VerticalAlignment" Value="Top"/>
         <Setter Property="HorizontalContentAlignment" Value="Left"/>

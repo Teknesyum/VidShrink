@@ -40,10 +40,6 @@ internal sealed class ShortcutTable
         }
     }
 
-    /// <summary>Tuş sütununun tavanı (<c>ShortcutKeyMaxWidth</c>); düğmede temadan, düz tuş metninde buradan.</summary>
-    private double KeyMaxWidth()
-        => _rows.TryFindResource("ShortcutKeyMaxWidth", out var value) && value is double width ? width : double.PositiveInfinity;
-
     internal IEnumerable<ShortcutKeyButton> Buttons => _rows.Children.OfType<ShortcutKeyButton>();
 
     internal string Notice
@@ -91,8 +87,7 @@ internal sealed class ShortcutTable
                 gesture = new KeyText
                 {
                     Text = ShortcutKeyButton.Display(slot.Current),
-                    Theme = _find("MonoValue"),
-                    MaxWidth = KeyMaxWidth()
+                    Theme = _find("MonoValue")
                 };
             }
 

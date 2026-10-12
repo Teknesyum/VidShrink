@@ -54,8 +54,8 @@ ship as part of it.
   were already waiting below it; the total now follows the queue.
 - Linux: in the shortcut tables (Settings → Player keys / Editor keys) long key names such as
   Ukrainian "<Клацання середньою кнопкою>" squeezed the description column until words broke in
-  the middle ("повноекранног|о"). The key column is capped and a key name that does not fit wraps
-  at its spaces.
+  the middle ("повноекранног|о", Greek "Αντικατοπτρισμ|ός"). The key column is capped at 200 px; a
+  key name that does not fit wraps only at its spaces, and a key without spaces is never split.
 - Linux: in a Wayland session screen and region recording produced an all-black video (x11grab
   only sees Xwayland's empty root), and the window-capture message even suggested choosing
   screen or region. Every capture target is now refused on Wayland with a message that says why

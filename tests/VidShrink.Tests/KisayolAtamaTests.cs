@@ -526,36 +526,51 @@ public sealed class KisayolAtamaTests
     }
 
     /// <summary>
-    /// Tuş metni tavana sığdıkça tek satır, sığmazsa boşlukta sarılır; metin değişince yeniden
-    /// tek satırdan başlar. Tavansız tuş sütunu uk tablosunda açıklamayı ~120 px'e sıkıştırıyordu
-    /// ("повноекранног|о"); hep sarılan tuş metni th'de yuvarlamayla ikinci satıra düşüyordu.
+    /// Tuş metni tavana (<c>ShortcutKeyMaxWidth</c>) sığdıkça tek satır; sığmazsa yalnız boşlukta
+    /// sarılır, boşluksuz tuş tavanı aşsa da bölünmez; metin değişince yeniden tek satırdan başlar.
+    /// Tavansız tuş sütunu uk/el açıklamasını ~120 px'e sıkıştırıp sözcük ortasından bölüyordu;
+    /// düz tavan "&lt;Ctrl+Shift+Rotellin|a&gt;"yı bölüyordu; hep sarılan tuş th'de ikinci satıra düşüyordu.
     /// </summary>
     [Fact]
-    public void TusMetniYalnizTavanaSigmazsaSarilir()
+    public void TusMetniYalnizBosluktaVeTavanaSigmazsaSarilir()
     {
-        var (kisa, uzun, geri, tavan) = AppHost.Run(() =>
+        var olcu = AppHost.Run(() =>
         {
-            var metin = new VidShrink.App.Playback.KeyText { Text = "<F>", MaxWidth = 120 };
-            int Satir()
+            var kok = new StackPanel();
+            var metin = new VidShrink.App.Playback.KeyText { Text = "<F>", HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
+            kok.Children.Add(metin);
+            var pencere = new Window { Content = kok, Width = 1000, Height = 400 };
+            pencere.Show();
+            (int Satir, TextWrapping Kip, double En, bool Bolunmus) Olc(string yazi)
             {
-                metin.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-                metin.Arrange(new Rect(metin.DesiredSize));
-                return metin.TextLayout.TextLines.Count;
+                metin.Text = yazi;
+                pencere.UpdateLayout();
+                var satirlar = metin.TextLayout.TextLines;
+                var bolunmus = false;
+                var konum = 0;
+                for (var i = 0; i + 1 < satirlar.Count; i++)
+                {
+                    konum += satirlar[i].Length;
+                    if (konum < yazi.Length && yazi[konum - 1] != ' ' && yazi[konum] != ' ') bolunmus = true;
+                }
+                return (satirlar.Count, metin.TextWrapping, metin.DesiredSize.Width, bolunmus);
             }
 
-            var a = (Satir(), metin.TextWrapping);
-            metin.Text = "<Клацання середньою кнопкою>";
-            var b = (Satir(), metin.TextWrapping);
-            var genislik = metin.DesiredSize.Width;
-            metin.Text = "<Esc>";
-            var c = (Satir(), metin.TextWrapping);
-            return (a, b, c, genislik);
+            try
+            {
+                return (tavan: metin.Cap, kisa: Olc("<F>"), bosluklu: Olc("<Клацання середньою кнопкою миші на панелі>"),
+                    bosluksuz: Olc("<Ctrl+Shift+Rotellina-Ctrl+Shift+Rotellina>"), geri: Olc("<Esc>"));
+            }
+            finally { pencere.Close(); }
         });
 
-        Assert.Equal((1, TextWrapping.NoWrap), kisa);
-        Assert.True(uzun.Item1 > 1, "tavanı aşan tuş sarılmadı");
-        Assert.Equal(TextWrapping.Wrap, uzun.Item2);
-        Assert.True(tavan <= 120, $"tuş tavanı aştı: {tavan}");
-        Assert.Equal((1, TextWrapping.NoWrap), geri);
+        Assert.True(double.IsFinite(olcu.tavan), "ShortcutKeyMaxWidth kaynağı bulunamadı");
+        Assert.Equal((1, TextWrapping.NoWrap), (olcu.kisa.Satir, olcu.kisa.Kip));
+        Assert.True(olcu.bosluklu.Satir > 1, $"tavanı aşan boşluklu tuş sarılmadı: en {olcu.bosluklu.En}, tavan {olcu.tavan}, satir {olcu.bosluklu.Satir}, kip {olcu.bosluklu.Kip}");
+        Assert.True(olcu.bosluklu.En <= olcu.tavan, $"boşluklu tuş tavanı aştı: {olcu.bosluklu.En} > {olcu.tavan}");
+        Assert.False(olcu.bosluklu.Bolunmus, "boşluklu tuş sözcük ortasından bölündü");
+        Assert.Equal(1, olcu.bosluksuz.Satir);
+        Assert.True(olcu.bosluksuz.En > olcu.tavan, "boşluksuz örnek tavanı aşmıyor; ölçü bir şey sınamıyor");
+        Assert.Equal((1, TextWrapping.NoWrap), (olcu.geri.Satir, olcu.geri.Kip));
     }
 }
