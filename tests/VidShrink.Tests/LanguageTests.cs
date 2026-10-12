@@ -295,6 +295,7 @@ public sealed class LanguageTests : IDisposable
         "Dolby Digital (AC-3)", "Dolby Digital Plus (E-AC-3)",
         "Windows ARM64", "macOS Apple Silicon (arm64)", "macOS Intel (x64)", "Linux ARM64",
         "GIF palette", "GIF encode",
+        "Noto Sans Thai", // YaziTipiYedegi: yazı tipi ailesinin adı, arayüz metni değil
         "powrprof.dll,SetSuspendState 0,1,0", "-e \"tell application \\\"System Events\\\" to shut down\"",
         "no space left", "not enough space", "disk full", "insufficient disk space",
         "unknown encoder", "encoder not found", "does not support", "could not write header",

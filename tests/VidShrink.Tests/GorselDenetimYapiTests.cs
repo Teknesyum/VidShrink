@@ -870,12 +870,14 @@ public sealed class GorselDenetimYapiTests
         {
             var baslat = w.FindControl<Button>("BtnStart")!;
             var donustur = w.FindControl<Button>("BtnConvert")!;
+            // Gercek iste _cts dolu: plan yenilemesi (zamanlayici) dugmeyi yeniden acmaz.
+            w.BeginEncodingForTest();
             w.ShowEncodeProgressForTest(new VidShrink.Ffmpeg.EncodeProgress(0.4, TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(4), 1.0, "pass 1/2 (attempt 1)"));
             Yerlestir(w, Dar);
             var k = (ToolTip.GetTip(baslat) as string, ToolTip.GetTip(donustur) as string, baslat.IsEnabled);
+            w.EndEncodingForTest();
             w.EndEncodeForTest();
             baslat.IsEnabled = donustur.IsEnabled = false;
-            Yerlestir(w, Dar);
             return (k, (ToolTip.GetTip(baslat) as string, ToolTip.GetTip(donustur) as string));
         }, sekme: 2, dil: "tr");
 
