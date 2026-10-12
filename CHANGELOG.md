@@ -52,6 +52,10 @@ ship as part of it.
   playback continues silently.
 - The shrink queue window said "file 1 of 1" while more requests from "Shrink with VidShrink"
   were already waiting below it; the total now follows the queue.
+- Linux: in the shortcut tables (Settings → Player keys / Editor keys) long key names such as
+  Ukrainian "<Клацання середньою кнопкою>" squeezed the description column until words broke in
+  the middle ("повноекранног|о"). The key column is capped and a key name that does not fit wraps
+  at its spaces.
 
 ## [1.2.15] - 2026-10-10
 

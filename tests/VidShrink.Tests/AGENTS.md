@@ -377,3 +377,7 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   Kuyruk penceresinin "dosya N / toplam" satırı koşarken gelen istekle güncellenir (`KuyrukDuzenlemeTests.KosarkenGelenIstekToplamiGunceller`,
   gerçek kuyruk borusu; `Accept`'teki yenilemeyi kaldırmak kırmızı). `OynaticiListeMenusuTests.AcikMenudeSagTik…` kardeşleri gibi `[WindowsFact]`
   (başsız Linux'ta 1/3 kararsız). Kök olmayan kullanıcıyla 13 parçada yalnız ortam kolları düştü; P26 ve karşılaştırma kare farkı yükte düşer, tek başına yeşil.
+  Kısayol tablosunda tuş sütunu `ShortcutKeyMaxWidth` (= `FieldWidth`) ile tavanlı, tuş metni `KeyText` yalnız tavana sığmazsa sarılır
+  (`KisayolAtamaTests.TusMetniYalnizTavanaSigmazsaSarilir`; sarılmayı kapatmak kırmızı). uk yerleşim kolları 18 kırmızıdan 0'a; hep sarılan
+  tuş th'de yuvarlamayla ikinci satıra düşüyordu, tek yönlü geçiş onu da giderdi. ar/fa/ur `Farklı Kaydet` düğmesi yalnız başsız ölçüde
+  iki satır sayılıyor; canlı X11'de 1024 genişlikte tek satır (ekran görüntüsüyle doğrulandı), açık bırakıldı.

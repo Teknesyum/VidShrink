@@ -524,4 +524,38 @@ public sealed class KisayolAtamaTests
         Assert.NotEqual(sonuc.dinlerken, sonuc.once);
         Assert.Equal(sonuc.once, sonuc.sonra);
     }
+
+    /// <summary>
+    /// Tuş metni tavana sığdıkça tek satır, sığmazsa boşlukta sarılır; metin değişince yeniden
+    /// tek satırdan başlar. Tavansız tuş sütunu uk tablosunda açıklamayı ~120 px'e sıkıştırıyordu
+    /// ("повноекранног|о"); hep sarılan tuş metni th'de yuvarlamayla ikinci satıra düşüyordu.
+    /// </summary>
+    [Fact]
+    public void TusMetniYalnizTavanaSigmazsaSarilir()
+    {
+        var (kisa, uzun, geri, tavan) = AppHost.Run(() =>
+        {
+            var metin = new VidShrink.App.Playback.KeyText { Text = "<F>", MaxWidth = 120 };
+            int Satir()
+            {
+                metin.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                metin.Arrange(new Rect(metin.DesiredSize));
+                return metin.TextLayout.TextLines.Count;
+            }
+
+            var a = (Satir(), metin.TextWrapping);
+            metin.Text = "<Клацання середньою кнопкою>";
+            var b = (Satir(), metin.TextWrapping);
+            var genislik = metin.DesiredSize.Width;
+            metin.Text = "<Esc>";
+            var c = (Satir(), metin.TextWrapping);
+            return (a, b, c, genislik);
+        });
+
+        Assert.Equal((1, TextWrapping.NoWrap), kisa);
+        Assert.True(uzun.Item1 > 1, "tavanı aşan tuş sarılmadı");
+        Assert.Equal(TextWrapping.Wrap, uzun.Item2);
+        Assert.True(tavan <= 120, $"tuş tavanı aştı: {tavan}");
+        Assert.Equal((1, TextWrapping.NoWrap), geri);
+    }
 }
