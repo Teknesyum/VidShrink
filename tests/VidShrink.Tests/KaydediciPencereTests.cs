@@ -337,4 +337,42 @@ public sealed class KaydediciPencereTests
         Assert.Equal("640x360 :1+100,50", olcu.bolgeGirdi);
         Assert.Equal(RecorderArguments.DefaultDisplay, olcu.varsayilan);
     }
+
+    /// <summary>
+    /// Linux turu: tıklama halkası, tıklama sesi, tuş gösterimi ve büyüteç yalnız Win32'de
+    /// çalışıyor; başka sistemde kutular işaretlenebiliyor ama kayıtta hiçbir şey olmuyordu.
+    /// Desteklenmeyen yerde dört kutu sayfada ve mini şeridin seçeneklerinde gizli; imleç
+    /// ve klasör kutusu kalır. Olumlu kontrol: destek açıkken dördü de görünür.
+    /// </summary>
+    [Fact]
+    public void GirdiEtkileriDesteklenmeyenSistemdeGizlenir()
+    {
+        var onceki = RecorderView.InputEffectsAvailable;
+        try
+        {
+            (bool[] sayfa, bool[] mini, bool imlec) Olc(bool destek) => AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+            {
+                RecorderView.InputEffectsAvailable = destek;
+                var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true };
+                var mini = new RecorderMini();
+                string[] adlar = { "ChkShowClicks", "ChkClickSound", "ChkShowKeys", "ChkMagnifier" };
+                return (adlar.Select(a => view.FindControl<CheckBox>(a)!.IsVisible).ToArray(),
+                        adlar.Select(a => mini.FindControl<CheckBox>(a)!.IsVisible).ToArray(),
+                        view.FindControl<CheckBox>("ChkCursor")!.IsVisible && mini.FindControl<CheckBox>("ChkOpenFolder")!.IsVisible);
+            }));
+
+            var yok = Olc(false);
+            var var_ = Olc(true);
+
+            Assert.All(yok.sayfa, g => Assert.False(g));
+            Assert.All(yok.mini, g => Assert.False(g));
+            Assert.True(yok.imlec);
+            Assert.All(var_.sayfa, g => Assert.True(g));
+            Assert.All(var_.mini, g => Assert.True(g));
+        }
+        finally
+        {
+            RecorderView.InputEffectsAvailable = onceki;
+        }
+    }
 }

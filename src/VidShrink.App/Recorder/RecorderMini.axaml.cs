@@ -77,6 +77,8 @@ internal partial class RecorderMini : Window
         Opened += (_, _) => CaptureExcluded = KeepOutOfCapture(this);
         PanelOptions.AttachedToVisualTree += (_, _) => OptionsCaptureExcluded = KeepOutOfCapture(TopLevel.GetTopLevel(PanelOptions));
         if (Playback.HoverZone.MotionReduced) Classes.Add("reduced-motion");
+        if (!RecorderView.InputEffectsAvailable)
+            ChkShowClicks.IsVisible = ChkClickSound.IsVisible = ChkShowKeys.IsVisible = ChkMagnifier.IsVisible = false;
         foreach (var (box, option) in OptionBoxes())
             box.IsCheckedChanged += (_, _) =>
             {

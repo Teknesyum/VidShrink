@@ -28,6 +28,10 @@ ship as part of it.
   grows to fit.
 - While a job runs, the disabled Shrink and Convert buttons said "Load a video file first"; they
   now say a job is already running.
+- Linux: screenshot names kept `:`, `?` and other characters that exFAT, NTFS and Windows shares
+  reject; they are replaced with `_` on every system, as the output-name pattern already required.
+- Linux and macOS: the recorder's click rings, click sound, key display and cursor magnifier only
+  work on Windows, but their boxes were shown and silently did nothing; they are now hidden there.
 
 ## [1.2.15] - 2026-10-10
 

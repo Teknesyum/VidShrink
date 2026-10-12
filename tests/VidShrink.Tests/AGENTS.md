@@ -356,3 +356,7 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   `QualityMeterTests` libvmaf'sız ffmpeg'de düşer (Ubuntu'nun 6.1'i), `SesGirisiCanliTests` `pactl` ve çalışan PulseAudio ister,
   `SesOrneklemeDrcTests.CanliAacTavani…` tablosu ffmpeg 9.0'ın aac kodlayıcısından (güncel ana dal 8 kHz'de 78 kbit veriyor),
   `GorselDenetimYapiTests.PlanPaneliKatliykenHerDildeKaymaz(th)` Linux'un Tay yazı tipiyle 15 px aşar (panel kaydırılır, kesilmez).
+  İkinci tur: ekran görüntüsü adı her sistemde taşınabilir kümeyi `_` yapar (`OynaticiGorunumTests.OynaticiAyarlari…`, Linux'ta `:` kalıyordu),
+  girdi etkileri (halka, ses, tuş, büyüteç) Windows dışında gizli (`KaydediciPencereTests.GirdiEtkileriDesteklenmeyenSistemdeGizlenir`,
+  `RecorderView.InputEffectsAvailable`), `AcilirBolumCanlandirmaTests` duvar saati yerine `KareSayaci` ile sayar (başsız saatte de oynar),
+  `OynaticiKurtarmaMotorTests` `ao-reload`'ı yalnız libmpv ≥ 0.38'de ister (Ubuntu 24.04: 0.37), `KaydediciAyarTests` tablosu gdigrab'a sabitlendi.

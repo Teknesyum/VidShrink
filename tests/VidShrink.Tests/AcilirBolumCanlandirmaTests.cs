@@ -73,14 +73,16 @@ public sealed class AcilirBolumCanlandirmaTests
                     Dongu(() => false, 0.5);
                     window.Classes.Set("reduced-motion", hareketAzaltma);
                     var bolum = window.AdvancedBody;
-                    bolum.IsVisible = true;
                     var enAz = 1.0;
-                    var saat = Stopwatch.StartNew();
-                    while (saat.Elapsed.TotalSeconds < 1)
-                    {
-                        Dongu(() => false, 0.01);
-                        enAz = Math.Min(enAz, bolum.Opacity);
-                    }
+                    void Oku() => enAz = Math.Min(enAz, bolum.Opacity);
+                    bolum.PropertyChanged += (_, e) => { if (e.Property == Avalonia.Visual.OpacityProperty) Oku(); };
+                    bolum.IsVisible = true;
+                    Oku();
+                    // Duvar saatiyle 1 sn ornekleniyordu; yalniz Win32'nin gercek zamanli cizim
+                    // saatinde ilerliyordu, Linux'un bassiz arka ucunda canlandirma hic oynamadi.
+                    // Saat vurusuyla sayilir (BelirisCanlandirmaTests ile ayni kalip).
+                    if (hareketAzaltma) KareSayaci.Pompala(window, k => k >= 5, Oku);
+                    else KareSayaci.Pompala(window, _ => enAz < 0.9 && bolum.Opacity >= 1.0, Oku);
                     var kayma = bolum.RenderTransform is TranslateTransform t ? t.Y
                         : bolum.RenderTransform is TransformGroup g ? g.Children.OfType<TranslateTransform>().Sum(x => x.Y) : 0;
                     return (enAz, bolum.Opacity, kayma);

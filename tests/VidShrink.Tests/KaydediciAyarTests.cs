@@ -211,7 +211,8 @@ public sealed class KaydediciAyarTests
 
         var dosyada = DosyadakiDeger(ayarYolu, satir.Anahtar);
 
-        var sonra = new RecorderView(ayarYolu);
+        // Tablonun argumanlari gdigrab'in (-offset_x, title=); Linux kolu KaydediciPencereTests'te.
+        var sonra = new RecorderView(ayarYolu) { CapturePlatform = RecorderPlatform.Windows };
         if (sonra.PrepareRecording() is not { } hazir)
             return new Olcu(dosyada, "istek kurulmadi: " + sonra.ErrorText, Array.Empty<string>(), null, null);
 
@@ -333,7 +334,7 @@ public sealed class KaydediciAyarTests
         {
             var once = new RecorderView(ayarYolu);
             Elle(once);
-            var sonra = new RecorderView(ayarYolu);
+            var sonra = new RecorderView(ayarYolu) { CapturePlatform = RecorderPlatform.Windows };
             var hazir = sonra.PrepareRecording()!.Value;
             var dosya = JsonNode.Parse(File.ReadAllText(ayarYolu))!.AsObject();
             return (Args: RecorderArguments.Build(hazir.Request, hazir.Path), hazir.Request, hazir.Path, Dosya: dosya);

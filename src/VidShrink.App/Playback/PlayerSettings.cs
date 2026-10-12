@@ -136,6 +136,13 @@ internal sealed class PlayerSettings
         return candidate;
     }
 
+    /// <summary>
+    /// Her işletim sisteminde yasak sayılan işaretler. Linux yalnız <c>/</c>'ı reddediyor;
+    /// <c>:</c> ya da <c>?</c> taşıyan ekran görüntüsü exFAT/NTFS belleğe ya da Windows
+    /// paylaşımına kopyalanamıyordu. Çıktı adı deseni (<c>AdlandirmaDeseni</c>) aynı kümeyi reddediyor.
+    /// </summary>
+    private static readonly char[] PortableForbidden = ['/', '\\', ':', '*', '?', '"', '<', '>', '|'];
+
     internal string FileStem(string media, double seconds)
     {
         var at = TimeSpan.FromSeconds(double.IsFinite(seconds) && seconds > 0 ? seconds : 0);
@@ -144,8 +151,7 @@ internal sealed class PlayerSettings
         var stem = pattern
             .Replace("{name}", Path.GetFileNameWithoutExtension(MediaAddress.IsAddress(media) ? MediaAddress.Name(media) : media), StringComparison.Ordinal)
             .Replace("{time}", time, StringComparison.Ordinal);
-        var invalid = Path.GetInvalidFileNameChars();
-        var clean = new string(stem.Select(c => invalid.Contains(c) ? '_' : c).ToArray()).Trim();
+        var clean = new string(stem.Select(c => Path.GetInvalidFileNameChars().Contains(c) || PortableForbidden.Contains(c) ? '_' : c).ToArray()).Trim();
         return clean.Length == 0 ? "screenshot_" + time : clean;
     }
 }

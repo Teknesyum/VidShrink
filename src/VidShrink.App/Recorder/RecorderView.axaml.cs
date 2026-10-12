@@ -56,6 +56,7 @@ internal partial class RecorderView : UserControl
     {
         _settingsPath = settingsPath;
         InitializeComponent();
+        HideUnavailableInputOptions();
         _settings = RecorderSettings.Load(_settingsPath);
         InitHedef();
         InitSecici();

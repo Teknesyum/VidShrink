@@ -248,6 +248,15 @@ public sealed class OynaticiKurtarmaTests
 
 public sealed class OynaticiKurtarmaMotorTests
 {
+    /// <summary><c>ao-reload</c> komutu libmpv 0.38'den beri var. Sürüm okunamazsa var sayılır (ölçü sıkı kalır).</summary>
+    internal static bool AoReloadVar(string surum)
+    {
+        var m = System.Text.RegularExpressions.Regex.Match(surum, @"v?(\d+)\.(\d+)");
+        if (!m.Success) return true;
+        var (ana, ara) = (int.Parse(m.Groups[1].Value), int.Parse(m.Groups[2].Value));
+        return ana > 0 || ara >= 38;
+    }
+
     [Fact]
     public async Task YenidenAcmaKonumuHiziSesiVeDuraklatmayiKorur()
     {
@@ -261,8 +270,18 @@ public sealed class OynaticiKurtarmaMotorTests
         await KareArtisiBekle(engine, TimeSpan.FromSeconds(5));
 
         var once = engine.FramesRendered;
-        Assert.True(engine.ReloadAudio(), string.Join(" | ", engine.RecentLog));
-        await KareArtisiBekle(engine, TimeSpan.FromSeconds(5), once);
+        var surum = engine.GetProperty("mpv-version") ?? "";
+        if (AoReloadVar(surum))
+        {
+            Assert.True(engine.ReloadAudio(), string.Join(" | ", engine.RecentLog));
+            await KareArtisiBekle(engine, TimeSpan.FromSeconds(5), once);
+        }
+        else
+        {
+            // ao-reload libmpv 0.38'de geldi; Ubuntu 24.04'un 0.37'si komutu tanımıyor. Kurtarıcı
+            // o zaman ses adımını atlayıp yeniden açmaya geçer (SesSonucu(false) -> YenidenAc).
+            Assert.False(engine.ReloadAudio(), surum);
+        }
 
         Assert.True(await engine.ReopenAsync(10, true), string.Join(" | ", engine.RecentLog));
         var acilis = engine.FramesRendered;
