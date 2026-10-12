@@ -167,6 +167,39 @@ public sealed class KaydediciPencereTests
         return view;
     }
 
+    /// <summary>
+    /// Wayland oturumunda ekran ve bölge de reddedilir: x11grab Xwayland'in köksüz ekranını
+    /// tümden siyah okuyor (weston + Xwayland, xclock dahil). Eskiden yalnız pencere reddedilip
+    /// ileti "ekran ya da bölge seç" diyordu. Aynı görünüm X11 oturumunda istek kurar (olumlu kontrol).
+    /// </summary>
+    [Theory]
+    [InlineData(RecorderTargetKind.Screen)]
+    [InlineData(RecorderTargetKind.Region)]
+    public void WaylandOturumundaEkranVeBolgeDeReddedilir(RecorderTargetKind hedef)
+    {
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            RecorderView Kur(params (string, string)[] ortam)
+            {
+                var view = Pencereli(ayarYolu, RecorderPlatform.Linux, _ => null, ortam);
+                view.FindControl<ComboBox>("CmbTarget")!.SelectedIndex = (int)hedef;
+                Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+                return view;
+            }
+
+            var wayland = Kur(("XDG_SESSION_TYPE", "wayland"), ("DISPLAY", ":0"), ("WAYLAND_DISPLAY", "wayland-0"));
+            var x11 = Kur(("XDG_SESSION_TYPE", "x11"), ("DISPLAY", ":0"));
+            return (wayland: wayland.BuildRequest(applyAuto: false), waylandHata: wayland.ErrorText,
+                x11: x11.BuildRequest(applyAuto: false), x11Hata: x11.ErrorText);
+        }));
+
+        Assert.Null(olcu.wayland);
+        Assert.Equal(Metin("recorder.error.window-wayland"), olcu.waylandHata);
+        Assert.NotNull(olcu.x11);
+        Assert.Equal(string.Empty, olcu.x11Hata);
+        Assert.Equal(":0", olcu.x11!.Display);
+    }
+
     [Fact]
     public void SeciciLinuxtaKimlikVeEkranMacteKirpmaYazarWaylandiReddeder()
     {

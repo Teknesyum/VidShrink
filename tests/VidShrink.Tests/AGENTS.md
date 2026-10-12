@@ -381,3 +381,11 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   (`KisayolAtamaTests.TusMetniYalnizTavanaSigmazsaSarilir`; sarılmayı kapatmak kırmızı). uk yerleşim kolları 18 kırmızıdan 0'a; hep sarılan
   tuş th'de yuvarlamayla ikinci satıra düşüyordu, tek yönlü geçiş onu da giderdi. ar/fa/ur `Farklı Kaydet` düğmesi yalnız başsız ölçüde
   iki satır sayılıyor; canlı X11'de 1024 genişlikte tek satır (ekran görüntüsüyle doğrulandı), açık bırakıldı.
+  Wayland (weston 13 headless + Xwayland): x11grab Xwayland'in köksüz ekranını X istemcisi dahil tümden siyah okuyor; Linux'ta Wayland
+  oturumu her hedefte reddedilir (`KaydediciPencereTests.WaylandOturumundaEkranVeBolgeDeReddedilir`, X11 eşi olumlu kontrol; korumayı
+  pencereye geri daraltmak 2/2 kırmızı). Uygulama Xwayland altında açılıyor (pencere 1600x868); weston'un başsız ekran görüntüsü alınamıyor.
+  libmpv 0.40 (noble kütüphaneleriyle kaynaktan, lua + zimg): oynatıcı/düzenleyici libmpv sınıfları 537 yeşil, `OynaticiKurtarmaMotorTests`
+  0.38+ `loadfile … -1` yolunu da geçiyor. zimg'siz derlemede altyazı/metin katmanı çizilmiyor ("Failed rendering OSD"), lua'sız derlemede
+  `ytdl` seçeneği yok ve motor açılmıyor; dağıtım paketleri ikisini de taşıyor. `install-vidshrink.sh` gerçek 1.2.15 yayınını kök olmayan
+  kullanıcıya kurdu ve uygulama açılıp oynattı; masaüstü kaydında `Icon=` yoktu (görsel yalnız macOS yayınındaydı), artık Linux yayınında da
+  (`DosyaIliskiTests.Linux_masaustu_kaydi_yayindaki_simgeyi_gosteriyor`, `dotnet publish -r linux-x64` çıktısında `VidShrink.png` var).

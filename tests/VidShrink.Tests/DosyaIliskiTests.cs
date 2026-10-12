@@ -382,6 +382,41 @@ public sealed class DosyaIliskiTests : IDisposable
     }
 
     /// <summary>
+    /// Masaüstü kaydının simgesi: çalıştırılabilirin yanında <c>VidShrink.png</c> varsa
+    /// <c>Icon=</c> o dosyayı gösterir, yoksa satır yazılmaz (olumsuz kontrol). Görsel Linux
+    /// yayınına da kopyalanır; önce yalnız macOS yayınında olduğu için Linux kurulumunda
+    /// satır hiç yazılmıyordu (1.2.15 gerçek kurulumunda <c>Icon=</c> yok).
+    /// </summary>
+    [Fact]
+    public void Linux_masaustu_kaydi_yayindaki_simgeyi_gosteriyor()
+    {
+        string? Simge(string ad, bool gorselVar)
+        {
+            var home = Path.Combine(_work, ad);
+            var klasor = Path.Combine(home, "uygulama");
+            Directory.CreateDirectory(klasor);
+            var executable = Path.Combine(klasor, "VidShrink.App").Replace('\\', '/');
+            if (gorselVar) File.WriteAllBytes(Path.Combine(klasor, "VidShrink.png"), new byte[] { 0x89, 0x50, 0x4E, 0x47 });
+            var write = Sh(home, "install-vidshrink.sh", "--desktop-entry", executable);
+            Assert.True(write.Code == 0, write.Output);
+            return File.ReadAllLines(Path.Combine(home, ".local", "share", "applications", "vidshrink.desktop"))
+                .SingleOrDefault(line => line.StartsWith("Icon=", StringComparison.Ordinal));
+        }
+
+        Assert.Equal("Icon=" + Path.Combine(_work, "simgeli", "uygulama", "VidShrink.png").Replace('\\', '/'), Simge("simgeli", true));
+        Assert.Null(Simge("simgesiz", false));
+
+        var csproj = XDocument.Load(Path.Combine(TipSources.Root, "src", "VidShrink.App", "VidShrink.App.csproj"));
+        var kosullar = csproj.Descendants("None")
+            .Where(n => (string?)n.Attribute("Include") == @"Assets\VidShrink.png" && (string?)n.Attribute("Link") == "VidShrink.png"
+                && (string?)n.Attribute("CopyToPublishDirectory") == "PreserveNewest")
+            .Select(n => (string?)n.Parent!.Attribute("Condition") ?? "")
+            .ToArray();
+        Assert.Contains(kosullar, k => k.Contains("StartsWith('linux')", StringComparison.Ordinal));
+        Assert.Contains(kosullar, k => k.Contains("StartsWith('osx')", StringComparison.Ordinal));
+    }
+
+    /// <summary>
     /// Desktop Entry Specification'ın Exec anahtarı: tırnaklı argüman içinde ters bölü,
     /// ters tırnak, dolar ve çift tırnak birer ters bölüyle kaçılır; sonra dosya düzeyindeki
     /// string kaçışı (değer türü "string") her ters bölüyü ikiye katlar. İki katman art arda

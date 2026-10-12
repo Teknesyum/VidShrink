@@ -1237,6 +1237,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-10, iki dugmeli guncelleme paneli (teknesyum-ui 0.35.0): <c>main.action.download</c> ve <c>main.action.downloadinstall</c> kalkti, yerlerine <c>main.action.update</c> ve <c>main.action.later</c> geldi. Kalkan <c>downloadinstall</c> 5 dilde koldaydi (cs en sk sl tr); yeni iki anahtar hicbir dilde kola girmiyor, KOL dokumunden sayildi: 3067 - 5 = 3062, en 298 - 1 = 297, tr 104 - 1 = 103.</para>
     /// <para>2026-10-10, K6 eszamanli kodlama: uc yeni anahtardan (<c>main.shrink-job.running</c>, <c>settings-tab.parallel-jobs.label</c>, <c>settings-tab.parallel-jobs.hint</c>) 3 kol 3 dilde (running: pt; label: en, es), KOL dokumunden sayildi, tr girmiyor: 3075 + 3 = 3078, en 299 + 1 = 300, tr 103.</para>
     /// <para>2026-10-10, K2 sistem sesi yakalama: uc yeni anahtardan (<c>recorder.audio.loopback</c>, <c>.switched</c>, <c>.lost</c>) yalniz <c>recorder.audio.loopback</c> 5 dilde kola giriyor (en, hu, it, sl, tr), KOL dokumunden sayildi. Onceki pim 3081 idi: 3081 + 5 = 3086, en 300 + 1 = 301, tr 103 + 1 = 104.</para>
+    /// <para>2026-10-12, Linux Wayland: <c>recorder.error.window-wayland</c> metni artik her kaydi reddediyor ve "Wayland" ile basliyor; bn, hi, th, ur kola giriyor (KOL dokumu). 3086 + 4 = 3090, en ve tr degismedi.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1262,7 +1263,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3086, toplam);
+        Assert.Equal(3090, toplam);
         Assert.Equal(301, dilBasina["en"]);
         Assert.Equal(104, dilBasina["tr"]);
     }

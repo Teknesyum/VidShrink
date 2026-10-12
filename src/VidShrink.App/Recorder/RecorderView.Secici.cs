@@ -48,12 +48,16 @@ internal partial class RecorderView
             && ReadEnvironment("DISPLAY") is { } shown && !string.IsNullOrWhiteSpace(shown))
             request = request with { Display = shown };
 
-        if (request.Target != RecorderTargetKind.Window || CapturePlatform == RecorderPlatform.Windows) return true;
+        // Wayland'da x11grab yalniz Xwayland'in koksuz ekranini gorur: pencere de, ekran ve bolge
+        // de tumden siyah kaydedilir (weston + Xwayland'da olculdu, X istemcisi xclock dahil).
+        // Eskiden yalniz pencere reddediliyor, ileti "ekran ya da bolge sec" diyordu.
         if (CapturePlatform == RecorderPlatform.Linux && RecorderWindowsX11.IsWayland(ReadEnvironment))
         {
             ShowError(Say("recorder.error.window-wayland"));
             return false;
         }
+
+        if (request.Target != RecorderTargetKind.Window || CapturePlatform == RecorderPlatform.Windows) return true;
 
         if (string.IsNullOrWhiteSpace(request.WindowTitle)) return true;
 
