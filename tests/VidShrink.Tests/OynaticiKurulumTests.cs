@@ -334,6 +334,21 @@ public sealed class OynaticiKurulumTests
     }
 
     /// <summary>
+    /// Lua'sız libmpv'de <c>ytdl</c> seçeneği yok; yalnız o seçeneğin "bulunamadı" dönüşü yutulur.
+    /// Önceden motor hiç açılmıyordu (kaynaktan Lua'sız derlenen 0.40, "option ytdl=no failed:
+    /// option not found"). Başka seçenekte ya da başka hatada motor yine reddedilir (olumsuz kontrol).
+    /// </summary>
+    [Fact]
+    public void DerlemedeOlmayanSecenekMotoruDusurmez()
+    {
+        Assert.True(MpvEngine.Absent("ytdl", -5));
+        Assert.False(MpvEngine.Absent("ytdl", -7));
+        Assert.False(MpvEngine.Absent("vo", -5));
+        Assert.False(MpvEngine.Absent("hwdec", -5));
+        Assert.All(MpvEngine.OptionalOptions, ad => Assert.Contains(MpvEngine.OptionsFor(new PlaybackOptions()), o => o.Name == ad));
+    }
+
+    /// <summary>
     /// Linux'ta ses çıkışı SDL'e inmez: ses sunucusu olmayan oturumda oynatıcı ile karşılaştırma
     /// motorları aynı anda açılınca SDL'in ses açılışı süreci düşürüyordu (gdb: libmpv `core` →
     /// libSDL2 → 0x0; iki eş zamanlı iletimde 3/5). Sıra yalnız Linux'ta yazılır, ses sunucusu

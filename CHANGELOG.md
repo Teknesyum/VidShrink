@@ -63,6 +63,9 @@ ship as part of it.
 - Linux: the app's icon was only copied into the macOS release, so `install-vidshrink.sh` never
   wrote an `Icon=` line and menus showed a generic icon. The Linux release now carries
   `VidShrink.png` next to the executable.
+- The player did not start at all with a libmpv built without Lua ("option ytdl=no failed: option
+  not found"). An option that only switches off a feature the build does not have is now skipped;
+  every other option still fails loudly.
 
 ## [1.2.15] - 2026-10-10
 

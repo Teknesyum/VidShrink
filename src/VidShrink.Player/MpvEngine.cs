@@ -88,7 +88,10 @@ public sealed partial class MpvEngine : IPlaybackEngine
         try
         {
             foreach (var (name, value) in OptionsFor(_options))
-                Check(mpv_set_option_string(_mpv, name, value), $"option {name}={value}");
+            {
+                var rc = mpv_set_option_string(_mpv, name, value);
+                if (!Absent(name, rc)) Check(rc, $"option {name}={value}");
+            }
 
             Check(mpv_initialize(_mpv), "mpv_initialize");
             Check(mpv_request_log_messages(_mpv, "info"), "mpv_request_log_messages");
@@ -1061,6 +1064,17 @@ public sealed partial class MpvEngine : IPlaybackEngine
         => line.Contains("/warn:", StringComparison.Ordinal)
            || line.Contains("/error:", StringComparison.Ordinal)
            || line.Contains("/fatal:", StringComparison.Ordinal);
+
+    private const int OptionNotFound = -5;
+
+    /// <summary>
+    /// Yalniz derlemede bulunmayan ozelligi kapatan secenekler. <c>ytdl</c> Lua betigi
+    /// (ytdl_hook) ile gelir; Lua'siz libmpv'de secenek yok ve "option not found" motoru hic
+    /// actirmiyordu (kaynaktan derlenen 0.40'ta olculdu). Secenek yoksa kapattigi ozellik de yok.
+    /// </summary>
+    internal static readonly IReadOnlySet<string> OptionalOptions = new HashSet<string>(StringComparer.Ordinal) { "ytdl" };
+
+    internal static bool Absent(string name, int rc) => rc == OptionNotFound && OptionalOptions.Contains(name);
 
     private static void Check(int rc, string what)
     {

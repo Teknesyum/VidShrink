@@ -390,3 +390,6 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
   `ytdl` seçeneği yok ve motor açılmıyor; dağıtım paketleri ikisini de taşıyor. `install-vidshrink.sh` gerçek 1.2.15 yayınını kök olmayan
   kullanıcıya kurdu ve uygulama açılıp oynattı; masaüstü kaydında `Icon=` yoktu (görsel yalnız macOS yayınındaydı), artık Linux yayınında da
   (`DosyaIliskiTests.Linux_masaustu_kaydi_yayindaki_simgeyi_gosteriyor`, `dotnet publish -r linux-x64` çıktısında `VidShrink.png` var).
+  Lua'sız libmpv 0.40'ta `ytdl` seçeneği yok ve motor hiç açılmıyordu; `MpvEngine.OptionalOptions` yalnız o seçeneğin "bulunamadı" dönüşünü
+  yutar (`OynaticiKurulumTests.DerlemedeOlmayanSecenekMotoruDusurmez`). Lua'sız derlemeyle motor/kurtarma/parça sınıfları 18/18 yeşil, korumayı
+  kaldırmak 18/18 kırmızı.
