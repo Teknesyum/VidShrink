@@ -711,5 +711,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "چھوڑ دیا گیا: کوڈیک معاون نہیں",
   "main.preset.handbrake.dropped.structural": "نظرانداز: HandBrake فہرست کی ساخت",
   "main.share.qr": "شیئر لنک کا QR کوڈ",
-  "main.share.qr-hint": "لنک کھولنے کے لیے فون سے اسکین کریں۔"
+  "main.share.qr-hint": "لنک کھولنے کے لیے فون سے اسکین کریں۔",
+  "main.startup.no-display": "VidShrink کوئی گرافیکل ڈسپلے نہیں کھول سکا۔ اسے ڈیسک ٹاپ سیشن سے چلائیں؛ Wayland پر Xwayland دستیاب ہونا ضروری ہے۔"
 }

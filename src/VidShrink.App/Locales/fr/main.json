@@ -711,5 +711,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Ignoré : codec non pris en charge",
   "main.preset.handbrake.dropped.structural": "Passé : structure de liste HandBrake",
   "main.share.qr": "Code QR du lien de partage",
-  "main.share.qr-hint": "Scannez-le avec votre téléphone pour ouvrir le lien."
+  "main.share.qr-hint": "Scannez-le avec votre téléphone pour ouvrir le lien.",
+  "main.startup.no-display": "VidShrink n'a pas pu ouvrir d'affichage graphique. Lancez-le depuis une session de bureau ; sous Wayland, Xwayland doit être disponible."
 }

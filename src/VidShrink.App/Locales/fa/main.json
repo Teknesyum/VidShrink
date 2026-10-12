@@ -711,5 +711,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "حذف شد: کدک پشتیبانی نمی‌شود",
   "main.preset.handbrake.dropped.structural": "رد شد: ساختار فهرست HandBrake",
   "main.share.qr": "کد QR پیوند اشتراک‌گذاری",
-  "main.share.qr-hint": "برای باز کردن پیوند، آن را با تلفن خود اسکن کنید."
+  "main.share.qr-hint": "برای باز کردن پیوند، آن را با تلفن خود اسکن کنید.",
+  "main.startup.no-display": "VidShrink نتوانست نمایشگر گرافیکی را باز کند. آن را از یک نشست میزکار اجرا کنید؛ در Wayland باید Xwayland در دسترس باشد."
 }

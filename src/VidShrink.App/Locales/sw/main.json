@@ -711,5 +711,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Imeachwa: kodeki haitumiki",
   "main.preset.handbrake.dropped.structural": "Imerukwa: muundo wa orodha wa HandBrake",
   "main.share.qr": "Msimbo wa QR wa kiungo cha kushiriki",
-  "main.share.qr-hint": "Changanua kwa simu yako ili kufungua kiungo."
+  "main.share.qr-hint": "Changanua kwa simu yako ili kufungua kiungo.",
+  "main.startup.no-display": "VidShrink haikuweza kufungua skrini ya michoro. Ianzishe kutoka kwenye kipindi cha eneo-kazi; kwenye Wayland, Xwayland lazima ipatikane."
 }

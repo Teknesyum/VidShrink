@@ -711,5 +711,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Utelatt: kodek støttes ikke",
   "main.preset.handbrake.dropped.structural": "Hoppet over: HandBrakes listestruktur",
   "main.share.qr": "QR-kode for delingslenken",
-  "main.share.qr-hint": "Skann med telefonen for å åpne lenken."
+  "main.share.qr-hint": "Skann med telefonen for å åpne lenken.",
+  "main.startup.no-display": "VidShrink kunne ikke åpne en grafisk skjerm. Start programmet fra en skrivebordsøkt; under Wayland må Xwayland være tilgjengelig."
 }

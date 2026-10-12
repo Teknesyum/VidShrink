@@ -711,5 +711,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Отброшено: кодек не поддерживается",
   "main.preset.handbrake.dropped.structural": "Пропущено: структура списка HandBrake",
   "main.share.qr": "QR-код ссылки для общего доступа",
-  "main.share.qr-hint": "Отсканируйте телефоном, чтобы открыть ссылку."
+  "main.share.qr-hint": "Отсканируйте телефоном, чтобы открыть ссылку.",
+  "main.startup.no-display": "VidShrink не удалось открыть графический дисплей. Запустите его из сеанса рабочего стола; в Wayland необходим Xwayland."
 }

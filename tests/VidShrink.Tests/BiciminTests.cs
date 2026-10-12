@@ -1481,6 +1481,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-10, K6 eszamanli kodlama: uc yeni anahtar (<c>main.shrink-job.running</c>, <c>settings-tab.parallel-jobs.label</c>, <c>settings-tab.parallel-jobs.hint</c>), dusen yok: 1353 + 3 = 1356, 43 x 1356 = 58308. <c>kayip</c> 0.</para>
     /// <para>2026-10-10, K2 sistem sesi yakalama: uc yeni anahtar (<c>recorder.audio.loopback</c>, <c>.switched</c>, <c>.lost</c>), dusen yok. Onceki pim 58437 = 43 x 1359 idi: 1359 + 3 = 1362, 43 x 1362 = 58566. <c>kayip</c> 0.</para>
     /// <para>2026-10-12, Linux turu: is surerken pasif Kucult/Donustur ipucu <c>main.action.busy-tip</c>, dusen yok. 1362 + 1 = 1363, 43 x 1363 = 58609. <c>kayip</c> 0.</para>
+    /// <para>2026-10-12, Linux'ta ekran acilamayinca temiz cikis: tek yeni anahtar (<c>main.startup.no-display</c>, <c>Program.EkranYokIletisi</c>), dusen yok: 1363 + 1 = 1364, 43 x 1364 = 58652. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1508,7 +1509,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(58609, gezilen);
+        Assert.Equal(58652, gezilen);
         Assert.Empty(kayip);
     }
 

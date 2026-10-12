@@ -142,10 +142,10 @@ internal static class Program
             var remaining = Handoff(startup, request => queue.Submit(request));
             queue.Dispose();
             if (remaining is null) return 0;
-            return BuildShrink(remaining, null).StartWithClassicDesktopLifetime(args);
+            return PencereyiAc(() => BuildShrink(remaining, null).StartWithClassicDesktopLifetime(args));
         }
 
-        return BuildShrink(startup, queue).StartWithClassicDesktopLifetime(args);
+        return PencereyiAc(() => BuildShrink(startup, queue).StartWithClassicDesktopLifetime(args));
     }
 
     /// <summary>Açılış hedefi: var olan dosya, yoksa komut satırındaki ilk ağ adresi.</summary>
@@ -165,13 +165,79 @@ internal static class Program
             AllowForeground();
             var forwarded = path is null ? Array.Empty<string>() : new[] { path };
             if (instance.Forward(forwarded, ForwardConnectTimeout, ForwardReplyTimeout)) return 0;
-            return Build(path, files).StartWithClassicDesktopLifetime(args);
+            return PencereyiAc(() => Build(path, files).StartWithClassicDesktopLifetime(args));
         }
 
         JitProfili.Baslat(AcilisBitti.Task);
         instance.StartListening(files.Receive);
         StartLauncherMaintenance();
-        return Build(path, files).StartWithClassicDesktopLifetime(args);
+        return PencereyiAc(() => Build(path, files).StartWithClassicDesktopLifetime(args));
+    }
+
+    /// <summary>
+    /// Grafik ekran açılamadığında dönülen çıkış kodu. CLI'ın genel hata koduyla
+    /// (<c>VidShrink.Cli.ExitCodes.Error</c>) aynı: kullanım yanlışı değil, ortamın eksiği.
+    /// </summary>
+    internal const int EkranYokCikisKodu = 1;
+
+    /// <summary>Ekran yokluğu iletisinin katalog anahtarı.</summary>
+    internal const string EkranYokAnahtari = "main.startup.no-display";
+
+    /// <summary>
+    /// Pencere alt sisteminin kurulamadığını taşır. Yalnız <see cref="EkranKapisi"/> atar;
+    /// <see cref="PencereyiAc"/> yalnız bunu yakalar, uygulamanın kendi istisnaları dokunulmadan geçer.
+    /// </summary>
+    internal sealed class EkranAcilamadiException(Exception ic) : Exception(ic.Message, ic);
+
+    /// <summary>
+    /// Avalonia'yı başlatan çağrıyı sarar. Linux'ta X sunucusuna bağlanılamazsa (DISPLAY yok,
+    /// sunucu reddediyor, Xwayland'siz Wayland, ssh kabuğu) Avalonia <c>XOpenDisplay failed</c>
+    /// atıyordu ve süreç yığın dökümüyle 134 koduyla düşüyordu. Burada stderr'e kısa ileti ve
+    /// teknik ayrıntı yazılır, <see cref="EkranYokCikisKodu"/> dönülür. Tek örnek ve kuyruk
+    /// devri bu çağrıdan önce olur; ikinci süreç ekran istemeden sahibe teslim eder.
+    /// </summary>
+    internal static int PencereyiAc(Func<int> ac, TextWriter? hata = null, Func<string>? ileti = null)
+    {
+        try
+        {
+            return ac();
+        }
+        catch (EkranAcilamadiException ex)
+        {
+            var yazici = hata ?? Console.Error;
+            yazici.WriteLine((ileti ?? EkranYokIletisi)());
+            yazici.WriteLine($"({ex.Message}; DISPLAY={Environment.GetEnvironmentVariable("DISPLAY")})");
+            yazici.Flush();
+            return EkranYokCikisKodu;
+        }
+    }
+
+    /// <summary>
+    /// İleti pencerenin seçeceği dilde: kayıtlı dil, yoksa sistem dili, yoksa İngilizce
+    /// (<see cref="ShrinkJobWindow"/>'un pencere kurulmadan yaptığı çözümün aynısı).
+    /// </summary>
+    internal static string EkranYokIletisi()
+    {
+        var sistem = System.Globalization.CultureInfo.CurrentUICulture.Name;
+        var dil = MainWindow.ResolveLanguage(null, sistem);
+        try { dil = MainWindow.ResolveLanguage(UpdateSettings.Load().Language, sistem); }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+        return Localization.Strings.GetIn(dil, EkranYokAnahtari);
+    }
+
+    /// <summary>
+    /// Linux'ta pencere alt sisteminin kurucusunu sarar: kurucunun attığı her istisna
+    /// <see cref="EkranAcilamadiException"/> olur. İletinin metnine bakılmaz; ayrım, istisnanın
+    /// pencere alt sistemi kurulurken çıkmasıdır. Windows ve macOS'ta builder olduğu gibi döner.
+    /// </summary>
+    internal static AppBuilder EkranKapisi(AppBuilder builder, bool linux)
+    {
+        if (!linux || builder.WindowingSubsystemInitializer is not { } kur) return builder;
+        return builder.UseWindowingSubsystem(() =>
+        {
+            try { kur(); }
+            catch (Exception ex) { throw new EkranAcilamadiException(ex); }
+        }, builder.WindowingSubsystemName ?? "");
     }
 
     /// <summary>
@@ -301,14 +367,14 @@ internal static class Program
     public static AppBuilder BuildAvaloniaApp() => Build(null, null);
 
     private static AppBuilder Build(string? startupFile, Integration.ForwardedFiles? files)
-        => Cizim(AppBuilder.Configure(() => new App(startupFile, files))
+        => EkranKapisi(Cizim(AppBuilder.Configure(() => new App(startupFile, files))
             .UsePlatformDetect()
-            .LogToTrace());
+            .LogToTrace()), OperatingSystem.IsLinux());
 
     private static AppBuilder BuildShrink(ShellShrinkStartup startup, ShrinkRequestQueue? queue)
-        => Cizim(AppBuilder.Configure(() => new App(startup, queue))
+        => EkranKapisi(Cizim(AppBuilder.Configure(() => new App(startup, queue))
             .UsePlatformDetect()
-            .LogToTrace());
+            .LogToTrace()), OperatingSystem.IsLinux());
 
     internal const string CizimDegiskeni = "VIDSHRINK_CIZIM";
 
