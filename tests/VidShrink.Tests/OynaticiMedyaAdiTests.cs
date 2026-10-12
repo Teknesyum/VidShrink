@@ -96,7 +96,7 @@ public sealed class OynaticiMedyaAdiTests
             Assert.Null(view.MediaTitleText);
         });
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void SagTikMenuAcarAdiKopyalaAdiYazar()
         => Kosum((view, window, yol) =>
         {
@@ -148,7 +148,7 @@ public sealed class OynaticiMedyaAdiTests
             Assert.NotEqual(once, panel.IsVisible);
         });
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void SolTikOynatmayiDegistirmez()
         => Kosum((view, window, _) =>
         {

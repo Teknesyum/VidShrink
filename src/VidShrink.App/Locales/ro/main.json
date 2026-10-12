@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "Încă nu rulează nicio sarcină",
   "main.action.shrink": "Micșorează",
   "main.action.shrink.disabled-tip": "Încărcați mai întâi un fișier video",
+  "main.action.busy-tip": "O sarcină rulează deja; așteptați să se termine sau anulați-o",
   "main.action.convert": "Convertește",
   "main.action.convert.disabled-tip": "Încărcați mai întâi un fișier video",
   "main.action.show-in-folder": "Arată în dosar",

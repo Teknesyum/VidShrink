@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "まだ実行中のジョブはありません",
   "main.action.shrink": "圧縮",
   "main.action.shrink.disabled-tip": "先に動画ファイルを読み込んでください",
+  "main.action.busy-tip": "ジョブを実行中です。終わるまで待つか、キャンセルしてください",
   "main.action.convert": "変換",
   "main.action.convert.disabled-tip": "先に動画ファイルを読み込んでください",
   "main.action.show-in-folder": "フォルダーで表示",

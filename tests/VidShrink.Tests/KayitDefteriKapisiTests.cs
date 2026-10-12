@@ -14,7 +14,7 @@ namespace VidShrink.Tests;
 /// </summary>
 public class KayitDefteriKapisiTests
 {
-    [Theory]
+    [WindowsTheory("kayıt defteri kapısı Windows yolunu ayrıştırır")]
     [InlineData(@"C:\Users\x\AppData\Local\Programs\VidShrink\app\VidShrink.App.exe", true)]
     [InlineData(@"C:\repo\src\VidShrink.App\bin\Release\net8.0\VidShrink.App.exe", false)]
     [InlineData(@"C:\Users\x\AppData\Local\Programs\VidShrink\VidShrink.App.exe", false)]

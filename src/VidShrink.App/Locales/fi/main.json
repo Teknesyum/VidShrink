@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "Yhtään tehtävää ei ole vielä käynnissä",
   "main.action.shrink": "Pakkaa",
   "main.action.shrink.disabled-tip": "Lataa ensin videotiedosto",
+  "main.action.busy-tip": "Työ on jo käynnissä; odota sen valmistumista tai peruuta se",
   "main.action.convert": "Muunna",
   "main.action.convert.disabled-tip": "Lataa ensin videotiedosto",
   "main.action.show-in-folder": "Näytä kansiossa",

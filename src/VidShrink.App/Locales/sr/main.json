@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "Nijedan zadatak još nije u toku",
   "main.action.shrink": "Smanji",
   "main.action.shrink.disabled-tip": "Prvo učitajte video fajl",
+  "main.action.busy-tip": "Posao je već u toku; sačekajte da se završi ili ga otkažite",
   "main.action.convert": "Konvertuj",
   "main.action.convert.disabled-tip": "Prvo učitajte video fajl",
   "main.action.show-in-folder": "Prikaži u fascikli",

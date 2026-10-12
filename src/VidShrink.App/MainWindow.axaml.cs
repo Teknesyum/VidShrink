@@ -5008,6 +5008,9 @@ public partial class MainWindow : Window
     {
         BtnStart.IsEnabled = !running && _info is not null;
         BtnConvert.IsEnabled = !running && _info is not null;
+        // Pasif dugmenin ipucu sebebi soyler: is surerken "once video yukleyin" yanlisti.
+        BtnStart.Classes.Set("busy", running);
+        BtnConvert.Classes.Set("busy", running);
         BtnCancel.IsEnabled = BtnConvertCancel.IsEnabled = running;
         if (running) return;
         Preview.Controls.ClearEncode();

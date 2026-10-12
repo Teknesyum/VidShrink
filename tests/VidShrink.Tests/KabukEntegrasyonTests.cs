@@ -199,7 +199,7 @@ public sealed class KabukEntegrasyonTests
     /// komutu yanındaki <c>app\VidShrink.App.exe</c>'yi çalıştırıyor; anahtarın adı başlatıcıda
     /// kalıyor. Negatif kontrol: başlatıcı olmayan ikili kendi yolunu yazıyor.
     /// </summary>
-    [Fact]
+    [WindowsFact("Windows yolu ve kayıt defteri komutu")]
     public void ProgIdKomutuSecilenDosyayiUygulamayaVeriyor()
     {
         const string App = @"C:\Programs\VidShrink\app\VidShrink.App.exe";
@@ -217,7 +217,7 @@ public sealed class KabukEntegrasyonTests
         Assert.Equal($"\"{Loose}\" \"%1\"", looseCommand.Value);
     }
 
-    [Fact]
+    [WindowsFact("Windows yolu ayrıştırması")]
     public void AcmaKomutununHedefiYalnizBaslaticidaDegisiyor()
     {
         Assert.Equal(@"C:\Programs\VidShrink\app\VidShrink.App.exe", ShellIntegration.OpenCommandTarget(Executable));
@@ -230,7 +230,7 @@ public sealed class KabukEntegrasyonTests
     /// G2: not düşülen yol açma komutunun hedefi. Başlatıcıyı not düşmüş 0.8.4 kurulumu bir
     /// kez yeniden yazılıyor, sonra yazılmıyor. Negatif kontrol: yazma başarısızsa not düşülmüyor.
     /// </summary>
-    [Fact]
+    [WindowsFact("Windows yolu ayrıştırması")]
     public void EskiBaslaticiNotuBirKezYenidenYaziliyor()
     {
         var folder = Path.Combine(TestPaths.OutputRoot, "g2", Guid.NewGuid().ToString("N"));

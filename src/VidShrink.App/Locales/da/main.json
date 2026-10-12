@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "Der kører endnu ingen opgave",
   "main.action.shrink": "Krymp",
   "main.action.shrink.disabled-tip": "Indlæs en videofil først",
+  "main.action.busy-tip": "Et job kører allerede; vent til det er færdigt, eller annuller det",
   "main.action.convert": "Konverter",
   "main.action.convert.disabled-tip": "Indlæs en videofil først",
   "main.action.show-in-folder": "Vis i mappe",

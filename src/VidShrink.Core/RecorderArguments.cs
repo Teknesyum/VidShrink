@@ -1471,7 +1471,16 @@ public static class RecorderArguments
         var a = new List<string> { "-f", "x11grab", "-framerate", Number(request.Fps), "-draw_mouse", Flag(request.ShowCursor) };
         var display = string.IsNullOrWhiteSpace(request.Display) ? DefaultDisplay : request.Display!;
 
-        if (request.Target == RecorderTargetKind.Region && request.Region is { } region)
+        // Ekran secimi gdigrab'daki gibi o monitorun dikdortgenine iner: x11grab butun X
+        // ekranini (tum monitorleri) tek kare olarak veriyor, secilen monitor yok sayiliyordu.
+        // Tek monitorde ya da monitor listesi yokken ScreenCapture null doner, ekranin tamami kalir.
+        var area = request.Target == RecorderTargetKind.Region
+            ? request.Region
+            : request.Target == RecorderTargetKind.Screen
+                ? ScreenCapture(request.Screens, request.ScreenIndex)
+                : null;
+
+        if (area is { } region)
         {
             a.AddRange(new[] { "-video_size", Size(region) });
             a.AddRange(new[] { "-i", $"{display}+{Number(region.X)},{Number(region.Y)}" });

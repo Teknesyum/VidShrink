@@ -41,6 +41,13 @@ internal partial class RecorderView
     /// </summary>
     private bool ResolveWindow(ref RecorderRequest request)
     {
+        // x11grab'in adresi her hedefte oturumun DISPLAY'i. Yalniz pencere koluna yaziliyordu;
+        // ekran ve bolge sabit ":0.0"a gidiyor, GNOME'un Xorg oturumu gibi :1'de kosan
+        // masaustunde kayit acilmiyor ya da baska ekrani kaydediyordu.
+        if (CapturePlatform == RecorderPlatform.Linux && string.IsNullOrWhiteSpace(request.Display)
+            && ReadEnvironment("DISPLAY") is { } shown && !string.IsNullOrWhiteSpace(shown))
+            request = request with { Display = shown };
+
         if (request.Target != RecorderTargetKind.Window || CapturePlatform == RecorderPlatform.Windows) return true;
         if (CapturePlatform == RecorderPlatform.Linux && RecorderWindowsX11.IsWayland(ReadEnvironment))
         {

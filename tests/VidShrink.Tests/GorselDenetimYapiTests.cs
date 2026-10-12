@@ -859,6 +859,35 @@ public sealed class GorselDenetimYapiTests
     }
 
     /// <summary>
+    /// Linux turu: iş sürerken pasif Küçült/Dönüştür düğmesi "Önce bir video dosyası yükleyin"
+    /// diyordu, oysa video yüklüydü. Kodlama sürerken ipucu işin sürdüğünü söyler, iş bitince
+    /// eski ipucu geri gelir (olumsuz kontrol).
+    /// </summary>
+    [Fact]
+    public void KodlamaSurerkenPasifDugmeIsiSoyler()
+    {
+        var (kosarken, bitince) = Pencere(Dar, w =>
+        {
+            var baslat = w.FindControl<Button>("BtnStart")!;
+            var donustur = w.FindControl<Button>("BtnConvert")!;
+            w.ShowEncodeProgressForTest(new VidShrink.Ffmpeg.EncodeProgress(0.4, TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(4), 1.0, "pass 1/2 (attempt 1)"));
+            Yerlestir(w, Dar);
+            var k = (ToolTip.GetTip(baslat) as string, ToolTip.GetTip(donustur) as string, baslat.IsEnabled);
+            w.EndEncodeForTest();
+            baslat.IsEnabled = donustur.IsEnabled = false;
+            Yerlestir(w, Dar);
+            return (k, (ToolTip.GetTip(baslat) as string, ToolTip.GetTip(donustur) as string));
+        }, sekme: 2, dil: "tr");
+
+        var mesgul = "Bir iş zaten sürüyor; bitmesini bekleyin ya da iptal edin";
+        Assert.False(kosarken.IsEnabled);
+        Assert.Equal(mesgul, kosarken.Item1);
+        Assert.Equal(mesgul, kosarken.Item2);
+        Assert.Equal("Önce bir video dosyası yükleyin", bitince.Item1);
+        Assert.Equal("Önce bir video dosyası yükleyin", bitince.Item2);
+    }
+
+    /// <summary>
     /// Arayüz tur 4: karşılaştırma panelinin bildirimi motorun "main." anahtarını ham gösteriyordu
     /// ("main.error.unusable"). Anahtar dile çözülür, motorun iletisi balona gider; "playback." anahtarı eskisi gibi çözülür (olumlu kontrol).
     /// </summary>

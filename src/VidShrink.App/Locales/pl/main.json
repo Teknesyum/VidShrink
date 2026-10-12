@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "Żadne zadanie jeszcze nie trwa",
   "main.action.shrink": "Zmniejsz",
   "main.action.shrink.disabled-tip": "Najpierw wczytaj plik wideo",
+  "main.action.busy-tip": "Zadanie już trwa; poczekaj na jego zakończenie lub je anuluj",
   "main.action.convert": "Konwertuj",
   "main.action.convert.disabled-tip": "Najpierw wczytaj plik wideo",
   "main.action.show-in-folder": "Pokaż w folderze",

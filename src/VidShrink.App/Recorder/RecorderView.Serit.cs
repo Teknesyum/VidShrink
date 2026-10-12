@@ -281,11 +281,27 @@ internal partial class RecorderView
 
     internal Action<string> RevealFolder { get; set; } = VidShrink.App.Platform.Reveal;
 
+    /// <summary>
+    /// Klasörü açar; açamazsa hata satırına yazar. Linux'ta <c>xdg-open</c> kurulu değilse
+    /// <c>Process.Start</c> atıyordu: düğmede uygulama çöküyor, teslimde bitince eylemi koşmuyordu.
+    /// </summary>
+    internal void RevealSafely(string path)
+    {
+        try
+        {
+            RevealFolder(path);
+        }
+        catch (Exception ex) when (ex is IOException or System.ComponentModel.Win32Exception or InvalidOperationException)
+        {
+            ShowError($"{Say("main.error.folder")}: {ex.Message}");
+        }
+    }
+
     internal void Deliver(RecordResult result)
     {
         ExpandFromMini();
         ShowResult(result);
-        if (_settings.OpenFolderWhenDone && Delivered() is { } done) RevealFolder(done);
+        if (_settings.OpenFolderWhenDone && Delivered() is { } done) RevealSafely(done);
         if (result.Ok && !result.Partial && Delivered() is { } finished && RecordingDelivered is { } follow) _ = follow(finished);
         StartFinishAction(result);
     }

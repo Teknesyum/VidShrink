@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "Все още няма изпълняваща се задача",
   "main.action.shrink": "Свий",
   "main.action.shrink.disabled-tip": "Първо заредете видео файл",
+  "main.action.busy-tip": "Вече се изпълнява задача; изчакайте я да завърши или я отменете",
   "main.action.convert": "Конвертирай",
   "main.action.convert.disabled-tip": "Първо заредете видео файл",
   "main.action.show-in-folder": "Покажи в папката",

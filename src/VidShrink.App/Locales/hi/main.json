@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "अभी कोई काम नहीं चल रहा",
   "main.action.shrink": "सिकोड़ें",
   "main.action.shrink.disabled-tip": "पहले एक वीडियो फ़ाइल लोड करें",
+  "main.action.busy-tip": "एक काम पहले से चल रहा है; उसके पूरा होने की प्रतीक्षा करें या उसे रद्द करें",
   "main.action.convert": "बदलें",
   "main.action.convert.disabled-tip": "पहले एक वीडियो फ़ाइल लोड करें",
   "main.action.show-in-folder": "फ़ोल्डर में दिखाएँ",

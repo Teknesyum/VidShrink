@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "אין עדיין עבודה פעילה",
   "main.action.shrink": "כווץ",
   "main.action.shrink.disabled-tip": "טענו קודם קובץ וידאו",
+  "main.action.busy-tip": "משימה כבר פועלת; המתינו לסיומה או בטלו אותה",
   "main.action.convert": "המר",
   "main.action.convert.disabled-tip": "טענו קודם קובץ וידאו",
   "main.action.show-in-folder": "הצג בתיקייה",

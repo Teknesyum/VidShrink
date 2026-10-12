@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "Es läuft noch kein Auftrag",
   "main.action.shrink": "Verkleinern",
   "main.action.shrink.disabled-tip": "Zuerst eine Videodatei laden",
+  "main.action.busy-tip": "Ein Auftrag läuft bereits; warten Sie, bis er fertig ist, oder brechen Sie ihn ab",
   "main.action.convert": "Konvertieren",
   "main.action.convert.disabled-tip": "Zuerst eine Videodatei laden",
   "main.action.show-in-folder": "Im Ordner zeigen",

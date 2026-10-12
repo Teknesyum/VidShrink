@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "لا توجد مهمة قيد التشغيل بعد",
   "main.action.shrink": "تقليص",
   "main.action.shrink.disabled-tip": "حمّل ملف فيديو أولاً",
+  "main.action.busy-tip": "تعمل مهمة الآن؛ انتظر حتى تنتهي أو ألغها",
   "main.action.convert": "تحويل",
   "main.action.convert.disabled-tip": "حمّل ملف فيديو أولاً",
   "main.action.show-in-folder": "إظهار في المجلد",

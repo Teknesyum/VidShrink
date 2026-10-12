@@ -53,6 +53,16 @@ internal static class RecorderTray
 
     internal static WindowIcon Render(Color color)
     {
+        using var stream = new MemoryStream(RenderPng(color));
+        return new WindowIcon(stream);
+    }
+
+    /// <summary>
+    /// Simgenin PNG baytları. Ölçü buradan okur: <see cref="WindowIcon.Save"/> platformun simge
+    /// nesnesinden geçiyor ve Linux'un başsız arka ucunda pikselleri geri vermiyor.
+    /// </summary>
+    internal static byte[] RenderPng(Color color)
+    {
         using var bitmap = new RenderTargetBitmap(new PixelSize(IconPixels, IconPixels));
         using (var context = bitmap.CreateDrawingContext())
         {
@@ -62,8 +72,7 @@ internal static class RecorderTray
 
         using var stream = new MemoryStream();
         bitmap.Save(stream, PngBitmapEncoderOptions.Default);
-        stream.Position = 0;
-        return new WindowIcon(stream);
+        return stream.ToArray();
     }
 }
 

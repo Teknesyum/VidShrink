@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "Zatiaľ nebeží žiadna úloha",
   "main.action.shrink": "Zmenšiť",
   "main.action.shrink.disabled-tip": "Najprv načítajte video súbor",
+  "main.action.busy-tip": "Úloha už beží; počkajte, kým sa dokončí, alebo ju zrušte",
   "main.action.convert": "Konvertovať",
   "main.action.convert.disabled-tip": "Najprv načítajte video súbor",
   "main.action.show-in-folder": "Zobraziť v priečinku",

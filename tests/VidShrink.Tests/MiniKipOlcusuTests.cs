@@ -47,8 +47,18 @@ public class MiniKipOlcusuTests
             new UTF8Encoding(false));
 
         Assert.True(belirtec > 0, "RecorderMiniReadoutWidth tanimli degil");
-        Assert.True(belirtec >= olculen, $"sayac belirtece sigmiyor: olculen={olculen:0.##} belirtec={belirtec:0.##}");
-        Assert.True(belirtec - olculen < adim, $"belirtec olculenden bir SpaceMd'den fazla genis: {belirtec:0.##} vs {olculen:0.##}");
+        if (OperatingSystem.IsWindows())
+        {
+            Assert.True(belirtec >= olculen, $"sayac belirtece sigmiyor: olculen={olculen:0.##} belirtec={belirtec:0.##}");
+            Assert.True(belirtec - olculen < adim, $"belirtec olculenden bir SpaceMd'den fazla genis: {belirtec:0.##} vs {olculen:0.##}");
+        }
+        else
+        {
+            // Belirtec Consolas'la olculdu. Linux'ta FontMono DejaVu Sans Mono'ya duser (72 yerine 78 px);
+            // sayac MinWidth ile buyudugu icin kesilmez, ama asim bir SpaceMd'yi gecerse seridin
+            // RecorderMiniMinWidth toplami bayatlar.
+            Assert.True(olculen - belirtec < adim, $"sayac belirteci bir SpaceMd'den fazla asiyor: olculen={olculen:0.##} belirtec={belirtec:0.##}");
+        }
 
         Kapat(klasor, "sayac.txt");
     }

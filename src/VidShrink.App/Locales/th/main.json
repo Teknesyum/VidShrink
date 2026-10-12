@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "ยังไม่มีงานที่กำลังทำงานอยู่",
   "main.action.shrink": "ย่อ",
   "main.action.shrink.disabled-tip": "โหลดไฟล์วิดีโอก่อน",
+  "main.action.busy-tip": "มีงานกำลังทำอยู่ รอให้เสร็จหรือยกเลิกงานนั้น",
   "main.action.convert": "แปลง",
   "main.action.convert.disabled-tip": "โหลดไฟล์วิดีโอก่อน",
   "main.action.show-in-folder": "แสดงในโฟลเดอร์",

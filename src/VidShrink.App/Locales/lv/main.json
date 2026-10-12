@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "Pagaidām nenotiek neviens uzdevums",
   "main.action.shrink": "Saspiest",
   "main.action.shrink.disabled-tip": "Vispirms ielādējiet video failu",
+  "main.action.busy-tip": "Darbs jau notiek; pagaidiet, līdz tas beidzas, vai atceliet to",
   "main.action.convert": "Pārveidot",
   "main.action.convert.disabled-tip": "Vispirms ielādējiet video failu",
   "main.action.show-in-folder": "Rādīt mapē",

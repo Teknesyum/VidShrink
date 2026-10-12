@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "Şu an çalışan bir iş yok",
   "main.action.shrink": "Küçült",
   "main.action.shrink.disabled-tip": "Önce bir video dosyası yükleyin",
+  "main.action.busy-tip": "Bir iş zaten sürüyor; bitmesini bekleyin ya da iptal edin",
   "main.action.convert": "Dönüştür",
   "main.action.convert.disabled-tip": "Önce bir video dosyası yükleyin",
   "main.action.show-in-folder": "Klasörde göster",

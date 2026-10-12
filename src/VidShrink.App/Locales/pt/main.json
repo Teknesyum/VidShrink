@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "Nenhum trabalho está em execução ainda",
   "main.action.shrink": "Reduzir",
   "main.action.shrink.disabled-tip": "Carregue primeiro um arquivo de vídeo",
+  "main.action.busy-tip": "Já há uma tarefa em curso; aguarde que termine ou cancele-a",
   "main.action.convert": "Converter",
   "main.action.convert.disabled-tip": "Carregue primeiro um arquivo de vídeo",
   "main.action.show-in-folder": "Mostrar na pasta",

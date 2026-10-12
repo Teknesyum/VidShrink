@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "Ükski töö ei ole veel käimas",
   "main.action.shrink": "Tihenda",
   "main.action.shrink.disabled-tip": "Laadige kõigepealt videofail",
+  "main.action.busy-tip": "Töö juba käib; oodake, kuni see lõpeb, või tühistage see",
   "main.action.convert": "Teisenda",
   "main.action.convert.disabled-tip": "Laadige kõigepealt videofail",
   "main.action.show-in-folder": "Näita kaustas",

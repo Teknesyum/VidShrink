@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "No job is running yet",
   "main.action.shrink": "Shrink",
   "main.action.shrink.disabled-tip": "Load a video file first",
+  "main.action.busy-tip": "A job is already running; wait for it to finish or cancel it",
   "main.action.convert": "Convert",
   "main.action.convert.disabled-tip": "Load a video file first",
   "main.action.show-in-folder": "Show in Folder",

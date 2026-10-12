@@ -269,4 +269,72 @@ public sealed class KaydediciPencereTests
         Kapat("x11-liste.txt");
         KayitKanit.Kapat("x11-pencere.mkv", "x11-pencere.ffprobe.txt", "x11-olmayan.mkv");
     }
+
+    /// <summary>
+    /// Linux turu, iki kaydedici hatası: (1) oturumun <c>DISPLAY</c>'i yalnız pencere koluna
+    /// yazılıyordu, ekran ve bölge sabit <c>:0.0</c>'a gidiyordu (GNOME'un Xorg oturumu :1'de);
+    /// (2) ekran seçimi x11grab'da yok sayılıyor, "Ekran 2" bütün masaüstünü kaydediyordu.
+    /// Şimdi ekran seçimi gdigrab'daki gibi o monitörün dikdörtgenine iner ve adres DISPLAY'den gelir.
+    /// Olumsuz kontroller: DISPLAY yokken varsayılan <c>:0.0</c>, tek monitörde ekranın tamamı.
+    /// </summary>
+    [Fact]
+    public void LinuxEkranVeBolgeKaydiOturumunEkraniniVeSecilenMonitoruKullanir()
+    {
+        IReadOnlyList<ScreenBounds> IkiEkran() => new[] { new ScreenBounds(0, 0, 0, 1024, 768), new ScreenBounds(1, 1024, 0, 1920, 1080) };
+        IReadOnlyList<ScreenBounds> TekEkran() => new[] { new ScreenBounds(0, 0, 0, 1920, 1080) };
+
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            RecorderView Kur(Func<IReadOnlyList<ScreenBounds>> ekranlar, params (string, string)[] ortam)
+            {
+                var view = new RecorderView(ayarYolu)
+                {
+                    SkipAutoMeasure = true,
+                    CapturePlatform = RecorderPlatform.Linux,
+                    ScreenSource = ekranlar,
+                    ReadEnvironment = ad => ortam.FirstOrDefault(d => d.Item1 == ad).Item2,
+                    DrawRegion = _ => Task.FromResult<Avalonia.PixelRect?>(new Avalonia.PixelRect(100, 50, 640, 360))
+                };
+                Elle(view);
+                view.RefreshScreens();
+                return view;
+            }
+
+            string Girdi(RecorderView view)
+            {
+                var istek = view.BuildRequest(applyAuto: false)!;
+                var args = RecorderArguments.Build(istek with { Container = RecorderContainer.Mkv }, "/tmp/l.mkv");
+                var i = args.ToList().IndexOf("-i");
+                var boyut = args.ToList().IndexOf("-video_size");
+                return (boyut >= 0 ? args[boyut + 1] + " " : "") + args[i + 1];
+            }
+
+            var ekran = Kur(IkiEkran, ("DISPLAY", ":1"));
+            ekran.FindControl<ComboBox>("CmbTarget")!.SelectedIndex = (int)RecorderTargetKind.Screen;
+            ekran.FindControl<ComboBox>("CmbScreen")!.SelectedIndex = 1;
+            var ikinci = Girdi(ekran);
+            ekran.FindControl<ComboBox>("CmbScreen")!.SelectedIndex = 0;
+            var birinci = Girdi(ekran);
+
+            var tek = Kur(TekEkran, ("DISPLAY", ":1"));
+            tek.FindControl<ComboBox>("CmbTarget")!.SelectedIndex = (int)RecorderTargetKind.Screen;
+            var tamami = Girdi(tek);
+
+            var bolge = Kur(TekEkran, ("DISPLAY", ":1"));
+            bolge.DrawRegionAsync().GetAwaiter().GetResult();
+            var bolgeGirdi = Girdi(bolge);
+
+            var ortamsiz = Kur(TekEkran);
+            ortamsiz.FindControl<ComboBox>("CmbTarget")!.SelectedIndex = (int)RecorderTargetKind.Screen;
+            var varsayilan = Girdi(ortamsiz);
+
+            return (ikinci, birinci, tamami, bolgeGirdi, varsayilan);
+        }));
+
+        Assert.Equal("1920x1080 :1+1024,0", olcu.ikinci);
+        Assert.Equal("1024x768 :1+0,0", olcu.birinci);
+        Assert.Equal(":1", olcu.tamami);
+        Assert.Equal("640x360 :1+100,50", olcu.bolgeGirdi);
+        Assert.Equal(RecorderArguments.DefaultDisplay, olcu.varsayilan);
+    }
 }

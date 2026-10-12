@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "Még nem fut feladat",
   "main.action.shrink": "Tömörítés",
   "main.action.shrink.disabled-tip": "Először töltsön be egy videofájlt",
+  "main.action.busy-tip": "Már fut egy feladat; várja meg, amíg befejeződik, vagy szakítsa meg",
   "main.action.convert": "Konvertálás",
   "main.action.convert.disabled-tip": "Először töltsön be egy videofájlt",
   "main.action.show-in-folder": "Megjelenítés mappában",

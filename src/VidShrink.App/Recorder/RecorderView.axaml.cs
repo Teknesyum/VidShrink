@@ -267,7 +267,7 @@ internal partial class RecorderView : UserControl
 
     private void OnReveal(object? sender, RoutedEventArgs e)
     {
-        if (Delivered() is { } path) VidShrink.App.Platform.Reveal(path);
+        if (Delivered() is { } path) RevealSafely(path);
     }
 
     /// <summary>

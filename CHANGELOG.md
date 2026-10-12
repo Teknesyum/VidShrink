@@ -14,6 +14,20 @@ ship as part of it.
   The recorder wizard's four answer buttons, its "same as last time" button and the region
   editor's hide button carry their accessible name from the markup, not only after the first
   refresh.
+- Linux: opening several files at once (or several "Shrink with VidShrink" requests) lost all
+  but one of them. The hand-off pipe is a Unix socket there, and it was closed between requests,
+  so senders waiting in its backlog were reset and opened their own window or dropped the file.
+  The next listener now exists before the current one closes; the same fix applies on Windows.
+- Linux recorder: whole-screen and region recording used a fixed `:0.0` display instead of the
+  session's `DISPLAY` (GNOME on Xorg runs on `:1`), and picking a monitor was ignored, so
+  "Screen 2" recorded the whole desktop. Both now behave like window capture and like Windows.
+- "Show in folder" in the recorder and the editor crashed the app on Linux systems without
+  `xdg-open`; the error is now shown in the status line, and the recorder's "open folder when
+  done" no longer stops the rest of the delivery.
+- The editor's timecode box cut off its last digit with Linux's wider monospace font; it now
+  grows to fit.
+- While a job runs, the disabled Shrink and Convert buttons said "Load a video file first"; they
+  now say a job is already running.
 
 ## [1.2.15] - 2026-10-10
 

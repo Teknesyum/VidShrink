@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "Поки що жодне завдання не виконується",
   "main.action.shrink": "Стиснути",
   "main.action.shrink.disabled-tip": "Спочатку завантажте відеофайл",
+  "main.action.busy-tip": "Завдання вже виконується; дочекайтеся завершення або скасуйте його",
   "main.action.convert": "Конвертувати",
   "main.action.convert.disabled-tip": "Спочатку завантажте відеофайл",
   "main.action.show-in-folder": "Показати в теці",

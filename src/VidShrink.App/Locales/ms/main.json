@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "Belum ada tugas yang sedang berjalan",
   "main.action.shrink": "Kecilkan",
   "main.action.shrink.disabled-tip": "Muatkan fail video dahulu",
+  "main.action.busy-tip": "Satu tugas sedang berjalan; tunggu sehingga selesai atau batalkannya",
   "main.action.convert": "Tukar",
   "main.action.convert.disabled-tip": "Muatkan fail video dahulu",
   "main.action.show-in-folder": "Tunjuk dalam folder",

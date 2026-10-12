@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "아직 실행 중인 작업이 없습니다",
   "main.action.shrink": "축소",
   "main.action.shrink.disabled-tip": "먼저 동영상 파일을 불러오세요",
+  "main.action.busy-tip": "작업이 이미 실행 중입니다. 끝날 때까지 기다리거나 취소하세요",
   "main.action.convert": "변환",
   "main.action.convert.disabled-tip": "먼저 동영상 파일을 불러오세요",
   "main.action.show-in-folder": "폴더에서 보기",

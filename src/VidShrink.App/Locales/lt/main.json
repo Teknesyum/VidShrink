@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "Kol kas nevykdoma jokia užduotis",
   "main.action.shrink": "Mažinti",
   "main.action.shrink.disabled-tip": "Pirmiausia įkelkite vaizdo įrašo failą",
+  "main.action.busy-tip": "Užduotis jau vykdoma; palaukite, kol ji baigsis, arba ją atšaukite",
   "main.action.convert": "Konvertuoti",
   "main.action.convert.disabled-tip": "Pirmiausia įkelkite vaizdo įrašo failą",
   "main.action.show-in-folder": "Rodyti aplanke",

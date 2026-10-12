@@ -140,49 +140,75 @@ public sealed class ShrinkRequestQueue : IDisposable
         }
     }
 
+    /// <summary>
+    /// Bir istek islenirken bir sonraki sunucu ornegi zaten kurulu durur. Unix'te .NET'in
+    /// borusu bir Unix soketi ve ayni adli orneklerin ortak dinleyicisi: tek ornek istekten
+    /// sonra kapaninca dinleyici de kapaniyor, o arada kuyrukta bekleyen gondericiler
+    /// sifirlaniyor ve dosya kayboluyordu (Linux'ta bes eszamanli istekten dordu). Windows'ta
+    /// da bekleyen istemci "boru mesgul" yerine hazir ornege baglanir.
+    /// </summary>
     private void ListenLoop(CancellationToken token)
     {
-        while (!token.IsCancellationRequested)
+        NamedPipeServerStream? next = null;
+        try
         {
-            using var server = new NamedPipeServerStream(
-                _pipeName, PipeDirection.InOut, NamedPipeServerStream.MaxAllowedServerInstances);
-            _listening.Set();
-            try
+            while (!token.IsCancellationRequested)
             {
-                server.WaitForConnectionAsync(token).GetAwaiter().GetResult();
-            }
-            catch (OperationCanceledException)
-            {
-                return;
-            }
-            catch (IOException)
-            {
-                continue;
-            }
-
-            try
-            {
-                using var reader = new StreamReader(server, leaveOpen: true);
-                using var writer = new StreamWriter(server, leaveOpen: true) { AutoFlush = true };
-
-                var line = reader.ReadLine();
-                if (line is null) continue;
-
-                var parts = line.Split('\t', 2);
-                if (parts.Length == 2 && int.TryParse(parts[0], out var target) && Accept(target, parts[1]))
+                using var server = next ?? Open();
+                next = null;
+                _listening.Set();
+                try
                 {
-                    writer.WriteLine(Ack);
+                    server.WaitForConnectionAsync(token).GetAwaiter().GetResult();
                 }
-                else
+                catch (OperationCanceledException)
                 {
-                    writer.WriteLine(Nack);
+                    return;
+                }
+                catch (IOException)
+                {
+                    continue;
                 }
 
-                if (OperatingSystem.IsWindows()) server.WaitForPipeDrain();
+                try { next = Open(); }
+                catch (IOException) { next = null; }
+
+                Serve(server);
             }
-            catch (Exception ex) when (ex is IOException or ObjectDisposedException)
+        }
+        finally
+        {
+            next?.Dispose();
+        }
+    }
+
+    private NamedPipeServerStream Open() => new(
+        _pipeName, PipeDirection.InOut, NamedPipeServerStream.MaxAllowedServerInstances);
+
+    private void Serve(NamedPipeServerStream server)
+    {
+        try
+        {
+            using var reader = new StreamReader(server, leaveOpen: true);
+            using var writer = new StreamWriter(server, leaveOpen: true) { AutoFlush = true };
+
+            var line = reader.ReadLine();
+            if (line is null) return;
+
+            var parts = line.Split('\t', 2);
+            if (parts.Length == 2 && int.TryParse(parts[0], out var target) && Accept(target, parts[1]))
             {
+                writer.WriteLine(Ack);
             }
+            else
+            {
+                writer.WriteLine(Nack);
+            }
+
+            if (OperatingSystem.IsWindows()) server.WaitForPipeDrain();
+        }
+        catch (Exception ex) when (ex is IOException or ObjectDisposedException)
+        {
         }
     }
 

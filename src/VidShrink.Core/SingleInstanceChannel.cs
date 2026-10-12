@@ -88,50 +88,75 @@ public sealed class SingleInstanceChannel : IDisposable
         catch (JsonException) { return null; }
     }
 
+    /// <summary>
+    /// Bir yol listesi islenirken bir sonraki sunucu ornegi zaten kurulu durur. Unix'te boru
+    /// ayni adli orneklerin paylastigi bir Unix soketi: tek ornek kapaninca dinleyici de
+    /// kapaniyor ve o arada baglanmis ikinci gonderici sifirlanip kendi penceresini aciyordu
+    /// (dosya yoneticisinden birden cok dosya acilinca). <see cref="ShrinkRequestQueue"/> ile ayni kalip.
+    /// </summary>
     private void Listen(Func<IReadOnlyList<string>, bool> handler, CancellationToken token)
     {
-        while (!token.IsCancellationRequested)
+        NamedPipeServerStream? next = null;
+        try
         {
-            NamedPipeServerStream server;
-            try
+            while (!token.IsCancellationRequested)
             {
-                server = new NamedPipeServerStream(PipeName, PipeDirection.InOut,
-                    NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Byte,
-                    PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
-            }
-            catch (IOException)
-            {
-                if (token.WaitHandle.WaitOne(TimeSpan.FromMilliseconds(200))) return;
-                continue;
-            }
-
-            using (server)
-            {
-                try
+                var server = next ?? TryOpen();
+                next = null;
+                if (server is null)
                 {
-                    server.WaitForConnectionAsync(token).GetAwaiter().GetResult();
-                }
-                catch (OperationCanceledException)
-                {
-                    return;
-                }
-                catch (IOException)
-                {
+                    if (token.WaitHandle.WaitOne(TimeSpan.FromMilliseconds(200))) return;
                     continue;
                 }
 
-                try
+                using (server)
                 {
-                    using var reader = new StreamReader(server, Encoding.UTF8, false, 1024, leaveOpen: true);
-                    using var writer = new StreamWriter(server, new UTF8Encoding(false), leaveOpen: true) { AutoFlush = true };
-                    var paths = Decode(reader.ReadLine());
-                    writer.WriteLine(paths is not null && Deliver(handler, paths) ? Ack : Nack);
-                    if (OperatingSystem.IsWindows()) server.WaitForPipeDrain();
-                }
-                catch (Exception ex) when (ex is IOException or ObjectDisposedException)
-                {
+                    try
+                    {
+                        server.WaitForConnectionAsync(token).GetAwaiter().GetResult();
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        return;
+                    }
+                    catch (IOException)
+                    {
+                        continue;
+                    }
+
+                    next = TryOpen();
+
+                    try
+                    {
+                        using var reader = new StreamReader(server, Encoding.UTF8, false, 1024, leaveOpen: true);
+                        using var writer = new StreamWriter(server, new UTF8Encoding(false), leaveOpen: true) { AutoFlush = true };
+                        var paths = Decode(reader.ReadLine());
+                        writer.WriteLine(paths is not null && Deliver(handler, paths) ? Ack : Nack);
+                        if (OperatingSystem.IsWindows()) server.WaitForPipeDrain();
+                    }
+                    catch (Exception ex) when (ex is IOException or ObjectDisposedException)
+                    {
+                    }
                 }
             }
+        }
+        finally
+        {
+            next?.Dispose();
+        }
+    }
+
+    private NamedPipeServerStream? TryOpen()
+    {
+        try
+        {
+            return new NamedPipeServerStream(PipeName, PipeDirection.InOut,
+                NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Byte,
+                PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
+        }
+        catch (IOException)
+        {
+            return null;
         }
     }
 

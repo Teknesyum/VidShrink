@@ -742,6 +742,9 @@
                       <Style Selector="Button:disabled">
                         <Setter Property="ToolTip.Tip" Value="{loc:Text main.action.shrink.disabled-tip}"/>
                       </Style>
+                      <Style Selector="Button.busy:disabled">
+                        <Setter Property="ToolTip.Tip" Value="{loc:Text main.action.busy-tip}"/>
+                      </Style>
                     </Button.Styles>
                   </Button>
                 </StackPanel>
@@ -1399,6 +1402,9 @@
                     <Button.Styles>
                       <Style Selector="Button:disabled">
                         <Setter Property="ToolTip.Tip" Value="{loc:Text main.action.convert.disabled-tip}"/>
+                      </Style>
+                      <Style Selector="Button.busy:disabled">
+                        <Setter Property="ToolTip.Tip" Value="{loc:Text main.action.busy-tip}"/>
                       </Style>
                     </Button.Styles>
                   </Button>

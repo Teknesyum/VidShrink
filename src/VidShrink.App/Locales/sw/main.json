@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "Hakuna kazi inayoendelea bado",
   "main.action.shrink": "Finyaza",
   "main.action.shrink.disabled-tip": "Pakia faili la video kwanza",
+  "main.action.busy-tip": "Kazi tayari inaendelea; subiri imalize au ighairi",
   "main.action.convert": "Geuza",
   "main.action.convert.disabled-tip": "Pakia faili la video kwanza",
   "main.action.show-in-folder": "Onyesha kwenye folda",

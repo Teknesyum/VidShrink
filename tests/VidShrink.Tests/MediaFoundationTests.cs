@@ -172,7 +172,7 @@ public sealed class MediaFoundationTests
     /// Kalite kipi istenen plan donanimda CRF'le kosar (NVENC olumsuz kontrol); MF'nin o olcegi
     /// yok. Plan bit hizi kipine doner ve gerekce kodu bunu soyler.
     /// </summary>
-    [Theory]
+    [WindowsTheory("MF kilidi yalnız Windows'ta kabul edilir; Windows dışındaki reddi ayrı testte ölçülüyor")]
     [InlineData("h264_mf")]
     [InlineData("hevc_mf")]
     [InlineData("av1_mf")]
@@ -198,7 +198,7 @@ public sealed class MediaFoundationTests
         Assert.DoesNotContain("-crf", args);
     }
 
-    [Fact]
+    [WindowsFact("MF kilidi yalnız Windows'ta kabul edilir; Windows dışındaki reddi ayrı testte ölçülüyor")]
     public void ElleCrfKilidiMfdeBitHizinaDoner()
     {
         var options = new PlanOptions { TargetMb = 50, LockedCodec = "hevc_mf", LockedCrf = 24 };
@@ -210,7 +210,7 @@ public sealed class MediaFoundationTests
         Assert.Contains(plan.ReasonCodes, n => n.Code == ReasonCode.NoQualityScaleBitrate);
     }
 
-    [Fact]
+    [WindowsFact("MF kilidi yalnız Windows'ta kabul edilir; Windows dışındaki reddi ayrı testte ölçülüyor")]
     public void AcilmayanMfKilidiAilesininYazilimKodlayicisinaDuser()
     {
         Assert.Equal("libx264", PlanCalculator.Build(Kaynak(), new PlanOptions { TargetMb = 50, LockedCodec = "h264_mf" }, new Liste()).Codec);

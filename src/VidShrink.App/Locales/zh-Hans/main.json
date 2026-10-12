@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "目前没有正在运行的任务",
   "main.action.shrink": "压缩",
   "main.action.shrink.disabled-tip": "请先加载视频文件",
+  "main.action.busy-tip": "已有任务在运行；请等待完成或将其取消",
   "main.action.convert": "转换",
   "main.action.convert.disabled-tip": "请先加载视频文件",
   "main.action.show-in-folder": "在文件夹中显示",

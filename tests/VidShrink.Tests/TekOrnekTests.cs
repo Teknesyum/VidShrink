@@ -98,6 +98,29 @@ public sealed class TekOrnekTests : IDisposable
         Assert.Empty(received.Last());
     }
 
+    /// <summary>
+    /// Linux turu: dosya yöneticisinden beş dosya birden açılınca beş süreç aynı anda iletir.
+    /// Unix'te boru tek örnekken her iletimden sonra dinleyici kapanıyor, arada bağlanan
+    /// gönderici sıfırlanıp kendi penceresini açıyordu. Sahip yavaş işlerken de beşi ulaşır.
+    /// </summary>
+    [Fact]
+    public async Task Es_zamanli_bes_iletimin_hepsi_sahibe_ulasiyor()
+    {
+        var channel = NewChannel();
+        var received = new ConcurrentQueue<string>();
+        using var owner = new SingleInstanceChannel(channel);
+        owner.StartListening(paths => { Thread.Sleep(60); received.Enqueue(paths[0]); return true; });
+
+        var sonuclar = await Task.WhenAll(Enumerable.Range(0, 5).Select(i => Task.Run(() =>
+        {
+            using var client = new SingleInstanceChannel(channel);
+            return client.Forward(new[] { $"dosya-{i}.mp4" }, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
+        })));
+
+        Assert.All(sonuclar, ok => Assert.True(ok, "iletim sahibe ulaşmadı"));
+        Assert.Equal(Enumerable.Range(0, 5).Select(i => $"dosya-{i}.mp4").OrderBy(x => x), received.OrderBy(x => x));
+    }
+
     [Fact]
     public void Isleyici_reddedince_ya_da_patlayinca_iletim_basarisiz_ve_kanal_ayakta_kaliyor()
     {

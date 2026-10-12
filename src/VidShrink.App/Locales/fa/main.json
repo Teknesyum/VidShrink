@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "هنوز هیچ کاری در حال اجرا نیست",
   "main.action.shrink": "فشرده کن",
   "main.action.shrink.disabled-tip": "ابتدا یک فایل ویدئویی بارگذاری کنید",
+  "main.action.busy-tip": "یک کار در حال اجراست؛ صبر کنید تا تمام شود یا آن را لغو کنید",
   "main.action.convert": "تبدیل کن",
   "main.action.convert.disabled-tip": "ابتدا یک فایل ویدئویی بارگذاری کنید",
   "main.action.show-in-folder": "نمایش در پوشه",

@@ -53,6 +53,7 @@
   "main.action.cancel.disabled-tip": "Inget jobb körs ännu",
   "main.action.shrink": "Krymp",
   "main.action.shrink.disabled-tip": "Läs in en videofil först",
+  "main.action.busy-tip": "Ett jobb körs redan; vänta tills det är klart eller avbryt det",
   "main.action.convert": "Konvertera",
   "main.action.convert.disabled-tip": "Läs in en videofil först",
   "main.action.show-in-folder": "Visa i mapp",
