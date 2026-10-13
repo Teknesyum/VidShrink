@@ -6,7 +6,7 @@ komut sondaki "Ölçülen Tek Şey" başlığında.
 
 Seçim ölçüsü: doğrulamadan sonra öncelik 1 kalan satırların tamamı, karar gerektirmeyen dört dalgaya giren
 paketlerin dayandığı bütün satırlar (birkaçı aşağıdaki örneklem tablosunda), sahibe sorulacak dokuz sorunun
-paketlerinde ve sahibe bağlı öbür paketlerde o güne dek okunmamış satırlar (tablonun son 79 satırı), bir kusura işaret eden iddialar,
+paketlerinde ve sahibe bağlı öbür paketlerde o güne dek okunmamış satırlar (tablonun 271–349. satırları), öncelik 2 taşıyıp o güne dek okunmamış kalan 3 satır (tablonun son 3 satırı), bir kusura işaret eden iddialar,
 platform kolunun "yalnız Windows'ta var" dediği yerlerden bir demet ve doğrulama kollarının "bizde yarım"
 dediği yerlerden örnekler. Tabloya girmeyen satırlar yalnız doğrulama kolunun okumasına dayanıyor; bunların
 çoğu öncelik 3, kalanı öncelik 2.
@@ -365,6 +365,9 @@ yazılmış bir karşılık gözden kaçmış olabilir.
 | 347 | PLT-37 | VideoToolbox yalnız açık seçimle geliyor; otomatik hızlı sıra onu adlandırmıyor, kalite ölçeği yok. | `src/VidShrink.Core/CodecModel.cs:197-214`, `src/VidShrink.Core/PlanCalculator.cs:1669` | tuttu |
 | 348 | PLT-38 | VAAPI kolu kodda var, yalnız açık seçimle ulaşılıyor ve bu depoda hiç koşmadı. | `src/VidShrink.Core/CodecModel.cs:209-214`, `src/VidShrink.Core/PlanCalculator.cs:1670` | tuttu |
 | 349 | PLT-43 | Linux'ta pulse `.monitor` kaynağı sistem sesi diye sınıflanıyor ama ölçülmedi; README yalnız Windows diyor. | `src/VidShrink.Ffmpeg/CaptureDevices.cs:59`, `:239`, `docs/olcumler/kaydedici-ses-seviyesi.md:53`, `README.md:254` | tuttu |
+| 350 | PLT-06 | macOS'ta kamera katmanı yok: kamera paneli Windows dışında gizli, istek Windows dışında reddediliyor. | `src/VidShrink.App/Recorder/RecorderView.Kamera.cs:53`, `src/VidShrink.Core/RecorderArguments.cs:894-895` | tuttu |
+| 351 | PLT-11 | macOS'ta tuş gösterimi yok: kutu sisteme bakmadan görünüyor, Windows dışında dinleyici boş. | `src/VidShrink.App/Recorder/RecorderView.Girdi.cs:20`, `src/VidShrink.App/Recorder/RecorderView.axaml:624`; `ChkShowKeys` için görünürlük ya da sistem koşulu araması boş | tuttu |
+| 352 | PLT-24 | macOS ve Linux kurucusu ffmpeg'i indirmiyor; paket komutunu yazıp kurulumu yeniden başlatmayı söylüyor. | `install-vidshrink.sh:232-262` | tuttu |
 
 ## Okumanın Gösterdikleri
 
