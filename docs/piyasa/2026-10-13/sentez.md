@@ -2,7 +2,7 @@
 
 On iki tabloda 567 eksik satırı kaldı: 78'i öncelik 1, 246'sı öncelik 2, 243'ü öncelik 3. Satırların 333'ü karar istemiyor, 197'si sahibin kararını bekliyor, 37'si kapalı bir karara denk geliyor. Çekirdek işler sağlam: oynatma, kayıpsız kesim, küçültme ve Windows'ta kayıt yerinde, güncellemede pazarın önündeyiz. Geride kaldığımız yer çekirdeğin çevresi: izler ve altyazı, uzun işin konforu, kayıt sonrası cila, Windows dışı kaydedici ve kullanıcıya ulaşma kanalları.
 
-158 paketin 9'u hemen başlanabilecek küçük iş (Dalga 1), 30'u Dalga 2, 45'i Dalga 3, 9'u Dalga 4. 65 paket sahibin kararını bekliyor ve bu kararların çoğu aşağıdaki birkaç ortak soruya iniyor.
+158 paketin 9'u hemen başlanabilecek küçük iş (Dalga 1), 30'u Dalga 2, 45'i Dalga 3, 9'u Dalga 4. 65 paket sahibin kararını bekliyor ve bu kararların çoğu aşağıdaki birkaç ortak soruya iniyor. *Ana oturumun notu: bu sayılar aynı iş çıkan dört paket birleştirilmeden öncekidir; birleşince raf 154 pakete iner (Dalga 3'te 43, Dalga 4'te 8, sahibi bekleyen 64). Geçerli sayı Sayılar bölümündeki dalga tablosudur.*
 
 **Oynatıcı.** Eksik dosya açılırken ve liste yönetilirken çıkıyor. En ağırları HDR videonun ton eşlemesi (parlaklık aralığını sıradan ekrana sığdırma; OYA-11, OYA-P7), tercih edilen dilde ses ve altyazı seçimi (OYA-04, OYA-P5) ve izlerken ekranın kararması (OYA-01, OYA-P3). Geçmiş tutuluyor ama gösterilmiyor (OYB-11, OYB-P4). En ucuz kazanç OYB-P1, OYA-P1 ve OYB-P2.
 
@@ -24,7 +24,7 @@ On iki tabloda 567 eksik satırı kaldı: 78'i öncelik 1, 246'sı öncelik 2, 2
 
 Sekmeleri aşan ortak temalar:
 
-- Motor hazır, ekrana bağlı değil. Dönüştür'de 14 satırın motoru Küçült yolunda duruyor (DON-04); ekran üstü bildirim rozeti hazır ama çağrılmıyor (OYA-07); metin biçimi modeli hazır, paneli yok (DZB-19); Hızlı kipteki kayma hesaplanıyor ama gösterilmiyor (DZA-05). İlk dalganın çoğu bu türden.
+- Motor hazır, ekrana bağlı değil. Dönüştür'de 14 satırın motoru Küçült yolunda duruyor (DON-04; *ana oturumun notu: DON-04'ün motoru Dönüştür'ün kendi yolunda hazır, on dört satır DON-01, 02, 03, 10, 14, 16, 20, 26, 30, 31, 39, 40, 41 ve 43*); ekran üstü bildirim rozeti hazır ama çağrılmıyor (OYA-07); metin biçimi modeli hazır, paneli yok (DZB-19); Hızlı kipteki kayma hesaplanıyor ama gösterilmiyor (DZA-05). İlk dalganın çoğu bu türden.
 - İzler sessizce düşüyor. Dönüştür ikinci sesi ve altyazıyı (DON-01, DON-02), Düzenleyici ilk görüntü ve ilk ses dışındaki izleri (DZA-02) taşımıyor; dış ses ekleme iki sekmede birden isteniyor (SIK-03, DON-07).
 - Uzun işin konforu. Uyku engeli hem oynatıcıda hem kodlamada eksik (OYA-01, SIK-06); duraklatma, süreç önceliği, bitiş bildirimi ve sesi aynı aileden (SIK-01, SIK-02, AYR-19, AYR-20).
 - Model ve büyük indirme sorusu beş tabloda aynı: büyütme (DON-P15, ARC-P11), kamera arka planı (EKB-P11), gürültü modeli (EKA-P11), hazır içerik (DZB-P16). Tek ilke kararı beş paketin yolunu belirler.
@@ -97,7 +97,7 @@ Aynı satırın iki tabloda çelişen hücreleri; birleştirirken tek değer se�
 
 ## Sahibin Kararları
 
-65 paket sahibin kararını bekliyor (4 küçük, 31 orta, 30 büyük; 115 satır). Aşağıda on tema var; her paket bir kez geçiyor, temalar cevabı en çok işin önünü açandan en aza sıralı. Önerilen cevaplar girdideki plan notlarına dayanan değerlendirmedir, ölçüm değildir.
+65 paket sahibin kararını bekliyor (4 küçük, 31 orta, 30 büyük; 115 satır). *Ana oturumun notu: aynı iş çıkan paketler birleşince 64 paket kalır (4 küçük, 31 orta, 29 büyük; 114 satır).* Aşağıda on tema var; her paket bir kez geçiyor, temalar cevabı en çok işin önünü açandan en aza sıralı. Önerilen cevaplar girdideki plan notlarına dayanan değerlendirmedir, ölçüm değildir.
 
 ### Varsayılan Davranış Değişiklikleri
 
