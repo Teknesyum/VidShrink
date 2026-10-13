@@ -5,7 +5,8 @@ kendisi açıp okuyarak denetledi. Tablodakilerin hiçbiri çalıştırılmadı;
 komut sondaki "Ölçülen Tek Şey" başlığında.
 
 Seçim ölçüsü: doğrulamadan sonra öncelik 1 kalan satırların tamamı, karar gerektirmeyen dört dalgaya giren
-paketlerin dayandığı bütün satırlar (birkaçı aşağıdaki örneklem tablosunda), bir kusura işaret eden iddialar,
+paketlerin dayandığı bütün satırlar (birkaçı aşağıdaki örneklem tablosunda), sahibe sorulacak dokuz sorunun
+paketlerinde ve sahibe bağlı öbür paketlerde o güne dek okunmamış satırlar (tablonun son 79 satırı), bir kusura işaret eden iddialar,
 platform kolunun "yalnız Windows'ta var" dediği yerlerden bir demet ve doğrulama kollarının "bizde yarım"
 dediği yerlerden örnekler. Tabloya girmeyen satırlar yalnız doğrulama kolunun okumasına dayanıyor; bunların
 çoğu öncelik 3, kalanı öncelik 2.
@@ -285,6 +286,85 @@ yazılmış bir karşılık gözden kaçmış olabilir.
 | 268 | DZB-26 | Metin konumu iki nokta arasında yalnız doğrusal; yumuşatma eğrisi yok. | `src/VidShrink.Core/Editing/TextLayer.cs:91-92` | tuttu |
 | 269 | ARC-10 | Slayt gösterisi yapılamıyor; bırakma listesi yalnız video uzantıları, düzenleyicide geçiş yok. | `src/VidShrink.Core/WatchFolder.cs:74`, `src/VidShrink.Core/DroppedMedia.cs:24`; düzenleyici çekirdeğinde `xfade`, `Transition` araması boş | tuttu |
 | 270 | ARC-20 | Sesten video yok; en yakın kod düzenleyicinin dalga biçimi verisi. | `src/VidShrink.Core/Editing/AudioPeaks.cs:9`; kaynakta `showwaves` araması boş | tuttu |
+| 271 | OYA-31 | Altyazı kapalı açılıyor; zorunlu altyazıyı kendiliğinden gösteren ayar yok. | `src/VidShrink.Player/MpvEngine.cs:166`; oynatıcı kodunda `sub-forced`, `slang`, `alang` araması boş | tuttu |
+| 272 | OYA-51 | Taramalı görüntü düzeltmesi yalnız elle açılıp kapanıyor. | `src/VidShrink.Player/MpvEngine.Advanced.cs:97` | tuttu |
+| 273 | OYB-08 | Oynatıcı kuyruğu bellekte duruyor; liste yalnız elle kaydediliyor. | `src/VidShrink.App/Playback/PlayerView.Kuyruk.cs:17`, `src/VidShrink.App/Playback/PlayerView.ListeKaydet.cs:44` | tuttu |
+| 274 | SIK-05 | Küçült kuyruğu yalnız bellekte tutuluyor. | `src/VidShrink.Core/JobPump.cs:60`, `src/VidShrink.App/ShrinkJobWindow.axaml.cs:175`; kaynakta kuyruğu saklayan bir ad araması boş | tuttu |
+| 275 | EKA-08 | Motor 10 bit biçimi ve bt2020 etiketini tanıyor; yakalama 8 bit bgra, HDR aktarım etiketi yok. | `src/VidShrink.Core/RecorderArguments.cs:389`, `:403`, `:1118`; aynı dosyada `smpte2084`, `arib`, `color_trc` araması boş | tuttu |
+| 276 | EKB-24 | Kayıt sonucu kaydedici sekmesindeki panelde görünüyor; küçük resim ve sürükleyip bırakma yok. | `src/VidShrink.App/Recorder/RecorderView.axaml:193`; kaydedici klasöründe `DoDragDrop`, `Thumbnail` araması boş | tuttu |
+| 277 | DZB-18 | Hazır geçiş çeşitleri yok. | kaynakta `xfade` araması boş | tuttu |
+| 278 | DZB-29 | Yeşil perde yalnız kaydedicinin kamerasında. | `src/VidShrink.Core/RecorderArguments.cs:928`; `chromakey` başka yerde çıkmadı | tuttu |
+| 279 | DZB-51 | Vekil dosya yok; "Proxy" yalnız ProRes kodek adında geçiyor. | `src/VidShrink.Core/IntermediateCodecs.cs:33`, `src/VidShrink.App/MainWindow.axaml:1155` | tuttu |
+| 280 | DZB-22 | Hazır başlık şablonu ve alt bant yok. | kaynakta `TitleTemplate`, `LowerThird` araması boş | tuttu |
+| 281 | DZB-52 | Proje şablonu yok. | kaynakta `ProjectTemplate` araması boş | tuttu |
+| 282 | DZB-53 | Hazır varlık kitaplığı yok. | kaynakta `AssetLibrary`, `Sticker` araması boş | tuttu |
+| 283 | DZB-44 | Modelli konuşma temizleme yok. | kaynakta `arnndn` araması boş | tuttu |
+| 284 | DZB-69 | Elle oran kırpması var, özne takibi yok. | `src/VidShrink.Core/Editing/ClipEffects.cs:96`; kaynakta `MotionTrack`, `ObjectTrack` araması boş | tuttu |
+| 285 | DZB-70 | Arka plan silme ve nesne maskesi yok. | kaynakta `Segmentation`, `rembg` araması boş | tuttu |
+| 286 | DZB-71 | Hareket izleme yok. | kaynakta `MotionTrack`, `ObjectTrack` araması boş | tuttu |
+| 287 | DZB-72 | Metinden sese yok. | kaynakta `TextToSpeech`, `SpeechSynth` araması boş | tuttu |
+| 288 | DON-32 | Modelle büyütme yok. | kaynakta `esrgan`, `waifu`, `onnx`, `ncnn` araması boş | tuttu |
+| 289 | EKA-14 | Gürültü için iki süzgeç var (`agate`, `afftdn`), model yok. | `src/VidShrink.Core/AudioCaptureArguments.cs:132`, `:135`; kaynakta `arnndn` araması boş | tuttu |
+| 290 | EKB-28 | Yükleme hedefi tablosu önce kullanıcının kendi kopyasından okunuyor; Ayarlar'da hazır hedefler arasından seçim şeridi var. Özel hedef ekleme arayüzünün yokluğu ayrıca aranmadı. | `src/VidShrink.Core/Share/ShareTargets.cs:188-190`, `src/VidShrink.Core/Share/IShareProvider.cs:66`, `src/VidShrink.App/MainWindow.axaml:1781` | tuttu |
+| 291 | EKB-29 | Hazır tabloda iki servis var (storage.to, uguu.se); kullanıcının kendi bulut deposu yok. | `src/VidShrink.Core/Share/ShareTargets.cs:101-125`; kaynakta `S3`, `AccessKey`, `amazonaws` araması boş | tuttu |
+| 292 | AYR-09 | Sürüm numarasındaki ön sürüm eki ayrıştırılıyor; kanal seçimi yok. | `src/VidShrink.Core/UpdateCheck.cs:286`; kaynakta `UpdateChannel`, `beta`, `nightly` araması boş | tuttu |
+| 293 | DAG-24 | Ön sürüm ya da gecelik güncelleme kanalı yok. | `src/VidShrink.Core/UpdateCheck.cs:286`; kaynakta `UpdateChannel`, `beta`, `nightly` araması boş | tuttu |
+| 294 | AYR-04 | 42 dil klasörü var; çeviri katkısının yolu yalnız sorun açmak. | `src/VidShrink.App/Localization/Strings.cs:62`, `src/VidShrink.App/Locales` (42 klasör), `README.md:348` | tuttu |
+| 295 | AYR-25 | Diller listede eşit duruyor; insan gözünden geçmemiş çeviri işaretlenmiyor. | `src/VidShrink.App/Localization/Strings.cs:62`; aynı klasörde `Reviewed`, `machine`, `verified` araması boş | tuttu |
+| 296 | AYR-23 | İlk açılışta yalnız kaydedici sihirbazı ve varsayılan uygulama önerisi var. | `src/VidShrink.App/Recorder/RecorderSettings.cs:271`, `src/VidShrink.App/MainWindow.axaml.cs:368` | tuttu |
+| 297 | AYR-24 | Kullanım belgesi iki dilde depoda ve README'den bağlı. | `docs/kullanim.md`, `docs/kullanim.tr.md`, `README.md:373` | tuttu |
+| 298 | DAG-08 | Scoop paketi yok. | izlenen dosyalarda `scoop` yalnız bir çeviri dosyasında geçiyor | tuttu |
+| 299 | DAG-12 | Chocolatey paketi yok. | izlenen dosyalarda `choco` araması boş | tuttu |
+| 300 | DAG-09 | AppImage yok. | izlenen dosyalarda `AppImage` araması boş | tuttu |
+| 301 | DAG-05 | macOS paketi yalnız ad-hoc imzalı. | `macos-app-bundle.sh:117-118` | tuttu |
+| 302 | DAG-06 | macOS disk görüntüsü üretilmiyor. | `dmg`, `hdiutil` yalnız `.github/workflows/handbrake-kiyas.yml` içinde geçiyor | tuttu |
+| 303 | DAG-07 | Homebrew cask yok. | `cask`, `brew` yalnız libmpv iş akışlarında ve kök `AGENTS.md` içinde geçiyor | tuttu |
+| 304 | DAG-03 | Microsoft Store paketi yok; `appx` yalnız sağ tık menüsünün yerinde kaydedilen paketi. | `Install-VidShrink.ps1:511`, `.github/workflows/release.yml:283`, `src/VidShrink.ShellExtension/AppxManifest.template.xml` | tuttu |
+| 305 | ARC-11 | Resim yalnız çıktı olarak üretiliyor (hareketli WebP, AVIF). | `src/VidShrink.Core/ConversionPlan.cs:34` | tuttu |
+| 306 | ARC-02 | Kalite ölçer iki serbest dosya yolu alıyor; iki dosyayı ölçen komut ölçüm aracında. | `src/VidShrink.Ffmpeg/QualityMeter.cs:179`, `tools/VidShrink.Bench/Program.cs:83` | tuttu |
+| 307 | ARC-06 | Kare sağlaması yok; en yakın kod altyazı araması için dosya özeti. | `src/VidShrink.Core/Subtitles/MovieHash.cs:13`; kaynakta `framemd5` araması boş | tuttu |
+| 308 | ARC-23 | Altyazı çevirisi yok; `Translate` yalnız HandBrake ön ayar aktarımında ve X11 koordinat çağrısında geçiyor. | `src/VidShrink.App/MainWindow.OnAyar.cs:342`, `src/VidShrink.App/Recorder/RecorderWindowsX11.cs:81`, `src/VidShrink.App/MainWindow.axaml.cs:1818` | tuttu |
+| 309 | ARC-33 | Logo silme yok; en yakın kod Küçült'ün görüntü süzgeçleri. | `src/VidShrink.Core/VideoFilterChain.cs:65`, `src/VidShrink.App/MainWindow.axaml:1030`; kaynakta `delogo` araması boş | tuttu |
+| 310 | ARC-25 | Vokal ayırma yok; en yakın kod sesi tek dosya olarak çıkarma. | `src/VidShrink.Core/ConversionPlan.cs:32`; kaynakta `demucs`, `spleeter` araması boş | tuttu |
+| 311 | ARC-27 | Yalnız klasik ölçekleme var, model yok. | `src/VidShrink.Core/ConversionArguments.cs:232`; kaynakta `esrgan`, `onnx`, `ncnn` araması boş | tuttu |
+| 312 | ARC-29 | Arka plan silme yok. | `src/VidShrink.Core/VideoFilterChain.cs:59`; kaynakta `Segmentation`, `rembg` araması boş | tuttu |
+| 313 | ARC-30 | Yalnız siyah bant algılama var, konu izleme yok. | `src/VidShrink.Ffmpeg/CropProbe.cs:15`; kaynakta `MotionTrack`, `ObjectTrack` araması boş | tuttu |
+| 314 | ARC-31 | Yüz bulanıklaştırma yok. | çekirdekte `facedetect`, `boxblur`, `Blur` araması boş | tuttu |
+| 315 | ARC-18 | Yinelenen video bulucu yok; en yakın kod dosya özeti. | `src/VidShrink.Core/Subtitles/MovieHash.cs:13`; kaynakta `phash`, `PerceptualHash` araması boş | tuttu |
+| 316 | ARC-22 | Düzenleyicide yalnız yazı katmanı var; altyazı dosyası açılıp düzenlenmiyor. | `src/VidShrink.App/Editing/EditorView.Metin.cs:15`; düzenleyici klasöründe `SubRip`, `.srt` araması boş | tuttu |
+| 317 | OYB-31 | Linux ortam denetimi arayüzü (MPRIS) yok. | kaynakta `mpris` araması boş | tuttu |
+| 318 | OYB-35 | İkinci açılış hep ilk örneğe aktarılıyor; yeni pencere seçeneği yok. | `src/VidShrink.Core/SingleInstanceChannel.cs:10`, `src/VidShrink.App/Program.cs:163` | tuttu |
+| 319 | OYB-39 | Uzaktan denetim yok. | kaynakta `HttpListener`, `WebSocket`, `TcpListener` araması boş | tuttu |
+| 320 | OYB-40 | Komut satırı yalnız dosya ya da adres açıyor. | `src/VidShrink.App/Program.cs:152` | tuttu |
+| 321 | OYB-41 | Betik ve eklenti sistemi yok; `load-scripts=no` yazılmış. | `src/VidShrink.Player/MpvEngine.cs:161`; kaynakta `IPlugin`, `AssemblyLoadContext` araması boş | tuttu |
+| 322 | OYB-09 | Liste yalnız m3u8 dosyası olarak dışarı kaydediliyor. | `src/VidShrink.App/Playback/PlayerView.ListeKaydet.cs:18` | tuttu |
+| 323 | OYB-17 | Yerel kitaplık görünümü yok. | kaynakta `MediaLibrary`, `LibraryView` araması boş; `Kitaplik` yalnız libmpv yüklemesinin açıklamasında (`src/VidShrink.App/Program.cs:230`) | tuttu |
+| 324 | OYB-24 | Ağ paylaşımı gezme yok; adres şemaları altı tane. | `src/VidShrink.Core/MediaAddress.cs:15`; kaynakta `smb:`, `sftp:`, `ftp:`, `webdav` araması boş | tuttu |
+| 325 | DZB-10 | Klip sesi kapatılabiliyor ve düzeyi ayarlanıyor; ses ayrı parça olmuyor. | `src/VidShrink.Core/Editing/ClipEffects.cs:29`, `:31` | tuttu |
+| 326 | DZB-46 | Otomatik müzik kısma yok. | kaynakta `sidechaincompress`, `Ducking` araması boş | tuttu |
+| 327 | DZB-47 | Seslendirme kaydı yok. | kaynakta `Voiceover`, `Seslendirme` araması boş | tuttu |
+| 328 | DZB-06 | Çizelgede üç sabit iz var: yazı, video, ses. | `src/VidShrink.App/Editing/EditorTimeline.cs:539-541` | tuttu |
+| 329 | DZB-07 | Klipler sıralı liste; taşıma yalnız sırayı değiştiriyor. | `src/VidShrink.Core/Editing/EditTimeline.cs:134` | tuttu |
+| 330 | SIK-14 | Arayüzde kalite örnek pencerelerde ölçülüyor; biten çıktının tamamını komut satırı `--vmaf` ile ölçüyor. | `src/VidShrink.App/MainWindow.axaml.cs:3639`, `src/VidShrink.Cli/CliRequest.cs:611` | tuttu |
+| 331 | SIK-15 | Hedef kalite, örnek ölçümüyle beslenen tahminden çözülüyor. | `src/VidShrink.Core/PlanCalculator.cs:1170` | tuttu |
+| 332 | SIK-16 | İzinli kodek listesinde VVC yok. | `src/VidShrink.Core/PlanParser.cs:13`; kaynakta `vvc`, `libvvenc`, `h266` araması boş | tuttu |
+| 333 | SIK-19 | Dolby Vision yalnız libx265 ve libsvtav1 ile taşınıyor. | `src/VidShrink.Core/HdrResolver.cs:46`, `:179` | tuttu |
+| 334 | EKA-05 | Oyuna özel yakalama yolu yok; "Oyun" sihirbazın bir seçimi. | `src/VidShrink.Core/RecorderArguments.cs:24`, `src/VidShrink.Core/RecorderWizard.cs:5` | tuttu |
+| 335 | EKB-13 | Büyüteç imlecin yanında duran bir mercek ve yalnız Windows'ta. | `src/VidShrink.App/Recorder/RecorderMagnifier.cs:29-32`, `src/VidShrink.App/Recorder/RecorderView.Girdi.cs:38-42` | tuttu |
+| 336 | EKB-31 | Hareket bulanıklığı yok. | kaynakta `tblend`, `tmix`, `MotionBlur` araması boş | tuttu |
+| 337 | EKB-20 | Kayıtta bildirim susturma yok. | kaynakta `DoNotDisturb`, `QuietHours`, `FocusAssist` araması boş | tuttu |
+| 338 | EKB-21 | Masaüstü simgelerini gizleme yok. | kaynakta `DesktopIcons`, `Progman`, `SHELLDLL_DefView` araması boş | tuttu |
+| 339 | EKB-14 | Girdi efektleri yalnız Windows'ta; öbür sistemlerde boş dinleyici. | `src/VidShrink.App/Recorder/RecorderView.Girdi.cs:14-22` | tuttu |
+| 340 | AYR-22 | Tepsi simgesi yalnız kaydedicide. | `src/VidShrink.App/Recorder/RecorderTray.cs:14`; `TrayIcon` başka dosyada çıkmadı | tuttu |
+| 341 | AYR-12 | Yazı boyutları sabit belirteç; pencere en az 1136×720. | `src/VidShrink.App/Themes/Theme.axaml:219`, `src/VidShrink.App/MainWindow.axaml:12` | tuttu |
+| 342 | AYR-13 | Palet adları sabit liste; sistem karşıtlık ayarı okunmuyor. | `src/VidShrink.App/Themes/PaletteCatalog.cs:51`; kaynakta `HighContrast`, `PlatformSettings` araması boş | tuttu |
+| 343 | DAG-10 | Taşınabilir kip yok; ayar yolu yalnız ölçüm için ortam değişkeniyle değişiyor. | `src/VidShrink.Core/UpdateCheck.cs:476-481`; kaynakta `Portable` araması boş | tuttu |
+| 344 | DAG-11 | Kurucu ağdan indiriyor; yerel klasör kaynak olarak verilebiliyor. | `src/VidShrink.Setup/Program.cs:89-92`, `src/VidShrink.Core/Setup/SetupDownloads.cs:97` | tuttu |
+| 345 | DAG-20 | macOS ve Linux kurucusu ffmpeg yoksa paket komutunu söyleyip duruyor. | `install-vidshrink.sh:232-236`, `docs/kurulum.md:83-86` | tuttu |
+| 346 | DAG-36 | Betik ve eklenti arabirimi yok. | `src/VidShrink.Player/MpvEngine.cs:161`; kaynakta `IPlugin`, `PluginHost`, `ScriptEngine` araması boş | tuttu |
+| 347 | PLT-37 | VideoToolbox yalnız açık seçimle geliyor; otomatik hızlı sıra onu adlandırmıyor, kalite ölçeği yok. | `src/VidShrink.Core/CodecModel.cs:197-214`, `src/VidShrink.Core/PlanCalculator.cs:1669` | tuttu |
+| 348 | PLT-38 | VAAPI kolu kodda var, yalnız açık seçimle ulaşılıyor ve bu depoda hiç koşmadı. | `src/VidShrink.Core/CodecModel.cs:209-214`, `src/VidShrink.Core/PlanCalculator.cs:1670` | tuttu |
+| 349 | PLT-43 | Linux'ta pulse `.monitor` kaynağı sistem sesi diye sınıflanıyor ama ölçülmedi; README yalnız Windows diyor. | `src/VidShrink.Ffmpeg/CaptureDevices.cs:59`, `:239`, `docs/olcumler/kaydedici-ses-seviyesi.md:53`, `README.md:254` | tuttu |
 
 ## Okumanın Gösterdikleri
 
