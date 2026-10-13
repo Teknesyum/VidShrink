@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.16] - 2026-10-13
+
 ### Fixed
 
 - Three buttons that start disabled now say why when hovered: "Cut ranges" and "Split at scene
