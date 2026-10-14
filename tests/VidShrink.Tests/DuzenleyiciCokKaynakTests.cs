@@ -15,7 +15,7 @@ namespace VidShrink.Tests;
 /// <summary>
 /// Duzenleyicide cok kaynak: <see cref="EditTimeline.AddSource"/> ve geri alma, parca basina yol
 /// yazan <see cref="EdlPreview"/>, birden cok kaynagi tek adimda yeniden kodlayan
-/// <see cref="EditExport.Build(EditTimeline, IReadOnlyDictionary{int, ExportSource}, ExportMode, string, string, long, Func{string, bool}?, bool)"/>,
+/// <see cref="EditExport.Build(EditTimeline, IReadOnlyDictionary{int, ExportSource}, ExportMode, string, string, long, Func{string, bool}?, bool, EditExportSettings?)"/>,
 /// surum 1 proje dosyasinin acilmasi, surum 2 gidis donusu, arayuzde kaynak ekleme ve kapanista
 /// butun kaynaklarin taramasinin iptali. Canli kol 2 sn'lik iki kaynagi tek surecle birlestirir.
 /// Kanit <c>.calisma/worktree-agent-a319bef524e550188/cok-kaynak-*</c>, test siler.
