@@ -21,7 +21,9 @@ public sealed class KaydediciAyarGidisDonusTests
     {
         ["CountdownSeconds"] = 5,
         ["ReplaySeconds"] = 120,
-        ["WebcamWidth"] = 480,
+        ["WebcamX"] = 0.25,
+        ["WebcamY"] = 0.5,
+        ["WebcamSize"] = 0.35,
         ["RegionAspect"] = "4:3",
         ["PixelFormat"] = "yuv444p10le",
         ["Codec"] = "libx265",

@@ -1258,6 +1258,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, Donustur toplu kuyrugu (DON-P6): dokuz yeni <c>main.convert-queue.*</c> anahtarindan 11 kol 10 dilde (setting: da, en, fr, hu, nb, tr; headline: en, it, pl, ro; waiting: it), KOL dokumunden sayildi; birlesik agacta 3206 + 11 = 3217, en 311 + 2 = 313, tr 104 + 1 = 105.</para>
     /// <para>2026-10-14, disa aktarim ayarlari ve on ayarlar (DZB-P2): on dokuz yeni <c>editor.export.*</c> anahtarindan 17 kol 7 dilde (en: source; es: audio-bitrate, codec, fps; hu: audio-only, source; ms: audio-bitrate, fps; pt: audio-bitrate, codec, fps, preset.name; ro: audio-bitrate, fps; sw: audio-bitrate, codec, fps), KOL dokumunden sayildi, tr girmiyor; olculen 3206 + 17 = 3223, en 311 + 1 = 312, tr 104.</para>
     /// <para>2026-10-14, tarama araliklarini tek tek yonetme (DZA-P3): bes yeni anahtardan 45 kol (<c>editor.silence.hint</c> 41 dilde, en ve tr dahil; <c>editor.silence.track</c>: es, pt; <c>editor.silence.padding-start</c> ve <c>.padding-end</c>: sw), kaldirilan <c>editor.silence.padding</c> 1 kol goturdu, KOL dokumunden sayildi: 3206 + 45 - 1 = 3250, en 312, tr 105.</para>
+    /// <para>2026-10-14, kamera bicimi ve konumu (EKB-P5): kaldirilan dort kose anahtarindan (<c>recorder.webcam.top-left</c>, <c>.top-right</c>, <c>.bottom-left</c>, <c>.bottom-right</c>) 12 kol 4 dilde gitti (es 4, hr 2, it 4, sr 2); bes yeni anahtar (<c>recorder.webcam.shape</c>, <c>.shape.rectangle</c>, <c>.shape.rounded</c>, <c>.shape.circle</c>, <c>.mirror</c>) hicbir dilde kola girmiyor. Taban dil dosyalariyla ve yenileriyle iki KOL dokumunden sayildi: 3334 - 12 = 3322, en 322, tr 108.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1283,7 +1284,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3334, toplam);
+        Assert.Equal(3322, toplam);
         Assert.Equal(322, dilBasina["en"]);
         Assert.Equal(108, dilBasina["tr"]);
     }
@@ -1521,6 +1522,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, Donustur toplu kuyrugu (DON-P6): dokuz yeni <c>main.convert-queue.*</c> anahtari (headline, shared, setting, waiting, running, done, failed, cancelled, summary), dusen yok; birlesik agacta 61963 + 43 x 9 = 62350. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, disa aktarim ayarlari ve on ayarlar (DZB-P2): on dokuz yeni <c>editor.export.*</c> anahtari (preset, preset.custom/1080p/720p/vertical, preset.name, resolution, source, fps, codec, quality, quality.high/balanced/small, audio-bitrate, audio-only, audio-only.tip, audio-only.no-audio, settings-full), dusen yok; olculen 61963 + 43 x 19 = 62780. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, tarama araliklarini tek tek yonetme (DZA-P3): bes yeni <c>editor.silence.*</c> anahtari (<c>padding-start</c>, <c>padding-end</c>, <c>track</c>, <c>applied</c>, <c>hint</c>), <c>editor.silence.padding</c> dustu; 1441 + 5 - 1 = 1445, 43 x 1445 = 62135. <c>kayip</c> 0.</para>
+    /// <para>2026-10-14, kamera bicimi ve konumu (EKB-P5): yedi anahtar dustu (<c>recorder.webcam.size</c>, <c>.width</c>, <c>.corner</c> ve dort kose), bes yeni geldi (<c>recorder.webcam.shape</c>, <c>.shape.rectangle</c>, <c>.shape.rounded</c>, <c>.shape.circle</c>, <c>.mirror</c>); 43 x (5 - 7) = -86, olculen 65188 - 86 = 65102. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1548,7 +1550,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(65188, gezilen);
+        Assert.Equal(65102, gezilen);
         Assert.Empty(kayip);
     }
 

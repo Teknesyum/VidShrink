@@ -45,8 +45,13 @@ internal partial class RecorderRegionEditor : Window
     private RegionEditorPhase _phase = RegionEditorPhase.Idle;
     private string _hideKey = RecorderHotkeys.Gesture(RecorderHotkeys.Of(RecorderHotkeys.All, HotkeyAction.Frame));
     private readonly Dictionary<RegionGrip, Cursor> _cursors = new();
+    private WebcamPlacement? _camera;
+    private WebcamShape _cameraShape;
+    private (bool Resize, PixelPoint Start, WebcamPlacement Placement)? _cameraDrag;
 
     internal event EventHandler<PixelRect>? RegionChanged;
+
+    internal event EventHandler<WebcamPlacement>? CameraCommitted;
 
     internal event EventHandler<PixelRect>? RegionCommitted;
 
@@ -130,7 +135,11 @@ internal partial class RecorderRegionEditor : Window
     {
         if (phase == _phase) return;
         _phase = phase;
-        if (!Editable(phase)) _drag = null;
+        if (!Editable(phase))
+        {
+            _drag = null;
+            _cameraDrag = null;
+        }
         ShowPhase();
         if (_desktop.Width > 0) Arrange();
     }
@@ -234,10 +243,58 @@ internal partial class RecorderRegionEditor : Window
 
     private PixelPoint ScreenPoint(PointerEventArgs e) => this.PointToScreen(e.GetPosition(this));
 
+    internal WebcamPlacement? CameraPlacement => _camera;
+
+    /// <summary>
+    /// Kamera kutusu bölgenin içinde, kayıttaki yerinde çizilir; gövdesinden sürüklenince taşınır,
+    /// sağ alt tutamaktan sürüklenince boyutlanır. Yer ve boy bölgeye oran olarak tutulur
+    /// (<see cref="WebcamLayout"/>), bırakılınca <see cref="CameraCommitted"/> çıkar.
+    /// </summary>
+    internal void SetCamera(WebcamPlacement? placement, WebcamShape shape)
+    {
+        _cameraShape = shape;
+        if (_cameraDrag is null) _camera = placement;
+        if (_desktop.Width > 0) Arrange();
+    }
+
+    private RecorderRegion Area => new(_region.X, _region.Y, _region.Width, _region.Height);
+
+    private PixelRect? CameraRect
+    {
+        get
+        {
+            if (_camera is null || !Editable(_phase) || _region.Width <= 0 || _region.Height <= 0) return null;
+            var r = WebcamLayout.Rect(Area, _camera, _cameraShape);
+            return new PixelRect(r.X, r.Y, r.Width, r.Height);
+        }
+    }
+
+    private PixelRect CameraGripRect(PixelRect camera)
+    {
+        var size = Math.Max(HandlePixels, 2 * Band);
+        return new PixelRect(camera.Right - size / 2, camera.Bottom - size / 2, size, size);
+    }
+
+    private bool StartCameraDrag(PixelPoint point)
+    {
+        if (CameraRect is not { } camera || _camera is null) return false;
+        var resize = CameraGripRect(camera).Contains(point);
+        if (!resize && !camera.Contains(point)) return false;
+        _cameraDrag = (resize, point, _camera);
+        return true;
+    }
+
     private void OnPressed(object? sender, PointerPressedEventArgs e)
     {
         if (!Editable(_phase) || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
         var point = ScreenPoint(e);
+        if (StartCameraDrag(point))
+        {
+            e.Pointer.Capture(Surface);
+            e.Handled = true;
+            return;
+        }
+
         var grip = RegionEdit.Hit(point, _region, Band, HandlePixels);
         if (grip == RegionGrip.None) return;
         _drag = (grip, point, _region);
@@ -250,9 +307,24 @@ internal partial class RecorderRegionEditor : Window
     {
         if (!Editable(_phase)) return;
         var point = ScreenPoint(e);
+        if (_cameraDrag is { } cam)
+        {
+            var dx = point.X - cam.Start.X;
+            var dy = point.Y - cam.Start.Y;
+            var moved = cam.Resize
+                ? WebcamLayout.Resize(Area, cam.Placement, _cameraShape, dx)
+                : WebcamLayout.Move(Area, cam.Placement, _cameraShape, dx, dy);
+            if (moved == _camera) return;
+            _camera = moved;
+            Arrange();
+            return;
+        }
+
         if (_drag is not { } drag)
         {
-            Surface.Cursor = CursorOf(RegionEdit.Hit(point, _region, Band, HandlePixels));
+            Surface.Cursor = CursorOf(CameraRect is { } c && CameraGripRect(c).Contains(point) ? RegionGrip.BottomRight
+                : CameraRect is { } body && body.Contains(point) ? RegionGrip.Move
+                : RegionEdit.Hit(point, _region, Band, HandlePixels));
             return;
         }
 
@@ -269,6 +341,14 @@ internal partial class RecorderRegionEditor : Window
 
     private void OnReleased(object? sender, PointerReleasedEventArgs e)
     {
+        if (_cameraDrag is not null)
+        {
+            _cameraDrag = null;
+            e.Pointer.Capture(null);
+            if (_camera is not null) CameraCommitted?.Invoke(this, _camera);
+            return;
+        }
+
         if (_drag is null) return;
         _drag = null;
         _snapLines = Array.Empty<PixelRect>();
@@ -312,6 +392,7 @@ internal partial class RecorderRegionEditor : Window
             Canvas.SetTop(handle, center.Y - handle.Height / 2);
         }
 
+        ShowCamera();
         ShowSnapLines();
         ShowSize();
         Toolbar.Measure(Size.Infinity);
@@ -328,6 +409,26 @@ internal partial class RecorderRegionEditor : Window
         Canvas.SetTop(Toolbar, client.Y);
 
         ApplyShape();
+    }
+
+    private void ShowCamera()
+    {
+        var rect = CameraRect;
+        Camera.IsVisible = rect is not null;
+        CameraGrip.IsVisible = rect is not null;
+        if (rect is not { } camera) return;
+        Place(Camera, camera.Position, camera.BottomRight);
+        Camera.BorderThickness = new Thickness(Resource("RecorderFrameThickness"));
+        var side = Math.Min(Camera.Width, Camera.Height);
+        Camera.CornerRadius = new CornerRadius(_cameraShape switch
+        {
+            WebcamShape.Circle => side / 2,
+            WebcamShape.Rounded => side / 5,
+            _ => 0
+        });
+        var grip = this.PointToClient(camera.BottomRight);
+        Canvas.SetLeft(CameraGrip, grip.X - CameraGrip.Width / 2);
+        Canvas.SetTop(CameraGrip, grip.Y - CameraGrip.Height / 2);
     }
 
     private void ShowSnapLines()
@@ -350,7 +451,10 @@ internal partial class RecorderRegionEditor : Window
     private void ApplyShape()
     {
         if (!OperatingSystem.IsWindows() || TryGetPlatformHandle() is not { } handle) return;
-        var parts = RegionEdit.Shape(_region, Band, HandlePixels, _toolbar, Position, Editable(_phase));
+        var parts = RegionEdit.Shape(_region, Band, HandlePixels, _toolbar, Position, Editable(_phase)).ToList();
+        if (CameraRect is { } camera)
+            foreach (var part in new[] { camera, CameraGripRect(camera) })
+                parts.Add(new PixelRect(part.X - Position.X, part.Y - Position.Y, part.Width, part.Height));
         var shape = CreateRectRgn(0, 0, 0, 0);
         if (shape == IntPtr.Zero) return;
         foreach (var part in parts)
@@ -425,7 +529,11 @@ internal interface IRegionEditorHost
 
     event EventHandler? Dismissed;
 
+    event EventHandler<WebcamPlacement>? CameraCommitted { add { } remove { } }
+
     void Show(PixelRect region, double? ratio, RegionEditorPhase phase);
+
+    void ShowCamera(WebcamPlacement? placement, WebcamShape shape) { }
 
     void Hide();
 
@@ -469,11 +577,23 @@ internal sealed class RegionEditorHost : IRegionEditorHost
 
     public event EventHandler? Dismissed;
 
+    public event EventHandler<WebcamPlacement>? CameraCommitted;
+
+    private (WebcamPlacement? Placement, WebcamShape Shape) _camera = (null, WebcamShape.Rectangle);
+
+    public void ShowCamera(WebcamPlacement? placement, WebcamShape shape)
+    {
+        _camera = (placement, shape);
+        _editor?.SetCamera(placement, shape);
+    }
+
     public void Show(PixelRect region, double? ratio, RegionEditorPhase phase)
     {
         if (_editor is null)
         {
             var editor = new RecorderRegionEditor(region, ratio);
+            editor.SetCamera(_camera.Placement, _camera.Shape);
+            editor.CameraCommitted += (_, p) => CameraCommitted?.Invoke(this, p);
             editor.RegionChanged += (_, r) => Changed?.Invoke(this, r);
             editor.RegionCommitted += (_, r) => Committed?.Invoke(this, r);
             editor.StartRequested += (_, _) => StartRequested?.Invoke(this, EventArgs.Empty);

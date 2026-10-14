@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -123,9 +123,16 @@ internal sealed class RecorderSettings
 
     internal string? WebcamName { get; set; }
 
-    internal int WebcamWidth { get; set; } = 240;
+    internal WebcamShape WebcamShape { get; set; } = WebcamShape.Rectangle;
 
-    internal WebcamCorner WebcamCorner { get; set; } = WebcamCorner.BottomRight;
+    internal bool WebcamMirror { get; set; }
+
+    /// <summary>Kamera kutusunun yeri ve boyu, <see cref="WebcamPlacement"/> oranlarıyla; varsayılan sağ alt.</summary>
+    internal double WebcamX { get; set; } = 1;
+
+    internal double WebcamY { get; set; } = 1;
+
+    internal double WebcamSize { get; set; } = 0.2;
 
     internal WebcamBackground WebcamBackground { get; set; } = WebcamBackground.Keep;
 
@@ -286,8 +293,17 @@ internal sealed class RecorderSettings
             settings.MicrophoneName = (string?)root["microphoneName"];
             settings.SystemAudioName = (string?)root["systemAudioName"];
             settings.WebcamName = (string?)root["webcamName"];
-            if ((int?)root["webcamWidth"] is { } camWidth && RecorderArguments.WebcamWidths.Contains(camWidth)) settings.WebcamWidth = camWidth;
-            if (Enum.TryParse<WebcamCorner>((string?)root["webcamCorner"], true, out var corner) && Enum.IsDefined(corner)) settings.WebcamCorner = corner;
+            if (Enum.TryParse<WebcamCorner>((string?)root["webcamCorner"], true, out var corner) && Enum.IsDefined(corner))
+            {
+                settings.WebcamX = corner is WebcamCorner.TopLeft or WebcamCorner.BottomLeft ? 0 : 1;
+                settings.WebcamY = corner is WebcamCorner.TopLeft or WebcamCorner.TopRight ? 0 : 1;
+            }
+            if (Enum.TryParse<WebcamShape>((string?)root["webcamShape"], true, out var shape) && Enum.IsDefined(shape)) settings.WebcamShape = shape;
+            if ((bool?)root["webcamMirror"] is { } mirror) settings.WebcamMirror = mirror;
+            if ((double?)root["webcamX"] is { } camX && camX is >= 0 and <= 1) settings.WebcamX = camX;
+            if ((double?)root["webcamY"] is { } camY && camY is >= 0 and <= 1) settings.WebcamY = camY;
+            if ((double?)root["webcamSize"] is { } camSize && camSize is >= RecorderArguments.MinWebcamSize and <= RecorderArguments.MaxWebcamSize)
+                settings.WebcamSize = camSize;
             if (Enum.TryParse<WebcamBackground>((string?)root["webcamBackground"], true, out var background) && Enum.IsDefined(background)) settings.WebcamBackground = background;
             if (Enum.TryParse<RecorderWizardContent>((string?)root["wizardContent"], true, out var wizardContent) && Enum.IsDefined(wizardContent)) settings.WizardContent = wizardContent;
             if (Enum.TryParse<RecorderWizardAudio>((string?)root["wizardAudio"], true, out var wizardAudio) && Enum.IsDefined(wizardAudio)) settings.WizardAudio = wizardAudio;
@@ -397,8 +413,11 @@ internal sealed class RecorderSettings
                 else writer.WriteString("systemAudioName", SystemAudioName);
                 if (WebcamName is null) writer.WriteNull("webcamName");
                 else writer.WriteString("webcamName", WebcamName);
-                writer.WriteNumber("webcamWidth", WebcamWidth);
-                writer.WriteString("webcamCorner", WebcamCorner.ToString());
+                writer.WriteString("webcamShape", WebcamShape.ToString());
+                writer.WriteBoolean("webcamMirror", WebcamMirror);
+                writer.WriteNumber("webcamX", WebcamX);
+                writer.WriteNumber("webcamY", WebcamY);
+                writer.WriteNumber("webcamSize", WebcamSize);
                 writer.WriteString("webcamBackground", WebcamBackground.ToString());
                 if (WizardContent is { } wizardContent) writer.WriteString("wizardContent", wizardContent.ToString());
                 else writer.WriteNull("wizardContent");

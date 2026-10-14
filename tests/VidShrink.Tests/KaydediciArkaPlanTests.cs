@@ -159,6 +159,6 @@ public sealed class KaydediciArkaPlanTests
         Assert.Equal(3, olcu.ogeler);
         Assert.Equal(0, olcu.ilk);
         Assert.Equal("\"Green\"", olcu.json);
-        Assert.Equal(new RecorderWebcam("Kam A", 240, WebcamCorner.BottomRight, WebcamBackground.Green), olcu.istek);
+        Assert.Equal(new RecorderWebcam("Kam A", 240, WebcamCorner.BottomRight, WebcamBackground.Green) { Placement = new WebcamPlacement(1, 1, 0.2) }, olcu.istek);
     }
 }

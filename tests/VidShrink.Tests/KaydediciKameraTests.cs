@@ -138,9 +138,7 @@ public sealed class KaydediciKameraTests
             var bosIstek = once.PrepareRecording()!.Value.Request.Webcam;
             var ogeler = Bul<ComboBox>(once, "CmbWebcam").ItemsSource!.Cast<object>().Count();
             Bul<ComboBox>(once, "CmbWebcam").SelectedIndex = 2;
-            Bul<ComboBox>(once, "CmbWebcamSize").SelectedIndex = 2;
-            Bul<ComboBox>(once, "CmbWebcamCorner").SelectedIndex = Array.IndexOf(RecorderView.WebcamCorners, WebcamCorner.TopRight);
-            var dosya = (Dosyada(ayarYolu, "webcamName"), Dosyada(ayarYolu, "webcamWidth"), Dosyada(ayarYolu, "webcamCorner"));
+            var dosya = (Dosyada(ayarYolu, "webcamName"), Dosyada(ayarYolu, "webcamX"), Dosyada(ayarYolu, "webcamSize"));
 
             var sonra = new RecorderView(ayarYolu) { SkipAutoMeasure = true, CameraSource = () => iki };
             var istek = sonra.PrepareRecording()!.Value.Request.Webcam;
@@ -154,15 +152,15 @@ public sealed class KaydediciKameraTests
         File.WriteAllLines(Path.Combine(Kanit, "kamera-ayar.txt"), new[]
         {
             $"secimsiz istek webcam={olcu.bosIstek?.ToString() ?? "yok"} kutu ogesi={olcu.ogeler}",
-            $"json webcamName={olcu.dosya.Item1} webcamWidth={olcu.dosya.Item2} webcamCorner={olcu.dosya.Item3}",
+            $"json webcamName={olcu.dosya.Item1} webcamX={olcu.dosya.Item2} webcamSize={olcu.dosya.Item3}",
             $"yeni gorunum istegi={olcu.istek}",
             $"aygit listede yok: istek={olcu.yokIstek?.ToString() ?? "yok"} json ad={olcu.adKaldi}"
         });
 
         Assert.Null(olcu.bosIstek);
         Assert.Equal(3, olcu.ogeler);
-        Assert.Equal(("\"Kam B\"", "320", "\"TopRight\""), olcu.dosya);
-        Assert.Equal(new RecorderWebcam("Kam B", 320, WebcamCorner.TopRight), olcu.istek);
+        Assert.Equal(("\"Kam B\"", "1", "0.2"), olcu.dosya);
+        Assert.Equal(new RecorderWebcam("Kam B", RecorderArguments.DefaultWebcamWidth) { Placement = new WebcamPlacement(1, 1, 0.2) }, olcu.istek);
         Assert.Null(olcu.yokIstek);
         Assert.Equal("\"Kam B\"", olcu.adKaldi);
 
@@ -170,7 +168,7 @@ public sealed class KaydediciKameraTests
     }
 
     /// <summary>
-    /// Kamera seçilmemişken genişlik, köşe ve arka plan kapalı; aygıt seçilince açılır, "Kamera yok"a
+    /// Kamera seçilmemişken biçim, ayna ve arka plan kapalı; aygıt seçilince açılır, "Kamera yok"a
     /// dönünce yine kapanır. Olumsuz kontrol aygıt kutusunun kendisi: o hep açık.
     /// </summary>
     [Fact]
@@ -179,7 +177,7 @@ public sealed class KaydediciKameraTests
         var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
             var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true, CameraSource = () => new[] { "Kam A" } };
-            var kutular = new[] { "CmbWebcamSize", "CmbWebcamCorner", "CmbWebcamBackground" }.Select(ad => Bul<ComboBox>(view, ad)).ToArray();
+            var kutular = new Control[] { Bul<ComboBox>(view, "CmbWebcamShape"), Bul<CheckBox>(view, "ChkWebcamMirror"), Bul<ComboBox>(view, "CmbWebcamBackground") };
             var aygit = Bul<ComboBox>(view, "CmbWebcam");
             var bos = kutular.Select(k => k.IsEnabled).ToArray();
             aygit.SelectedIndex = 1;
@@ -193,6 +191,271 @@ public sealed class KaydediciKameraTests
         Assert.All(olcu.secili, acik => Assert.True(acik));
         Assert.All(olcu.geri, acik => Assert.False(acik));
         Assert.True(olcu.aygitAcik);
+    }
+
+    private const string DaireMaskesi =
+        "format=yuva420p,geq=lum='lum(X,Y)':cb='cb(X,Y)':cr='cr(X,Y)':a='alpha(X,Y)*lte(hypot(max(abs(X-(W-1)/2)-W/2+min(W,H)/2,0),max(abs(Y-(H-1)/2)-H/2+min(W,H)/2,0)),min(W,H)/2)'";
+
+    private const string KoseMaskesi =
+        "format=yuva420p,geq=lum='lum(X,Y)':cb='cb(X,Y)':cr='cr(X,Y)':a='alpha(X,Y)*lte(hypot(max(abs(X-(W-1)/2)-W/2+min(W,H)/5,0),max(abs(Y-(H-1)/2)-H/2+min(W,H)/5,0)),min(W,H)/5)'";
+
+    private static RecorderWebcam Kamera(WebcamShape bicim = WebcamShape.Rectangle, bool ayna = false, WebcamPlacement? yer = null,
+        WebcamBackground arka = WebcamBackground.Keep)
+        => new RecorderWebcam("Kam", 240, WebcamCorner.TopLeft, arka) { Shape = bicim, Mirror = ayna, Placement = yer };
+
+    [Theory]
+    [InlineData(WebcamShape.Rectangle, false, "[1:v]scale=240:-2[cam];")]
+    [InlineData(WebcamShape.Rectangle, true, "[1:v]hflip,scale=240:-2[cam];")]
+    [InlineData(WebcamShape.Circle, false, "[1:v]crop='min(iw,ih)':'min(iw,ih)',scale=240:-2," + DaireMaskesi + "[cam];")]
+    [InlineData(WebcamShape.Rounded, true, "[1:v]hflip,scale=240:-2," + KoseMaskesi + "[cam];")]
+    public void BicimVeAynaKameraDalinaSuzgecEkler(WebcamShape bicim, bool ayna, string beklenen)
+    {
+        var istek = Istek() with { Webcam = Kamera(bicim, ayna) };
+        var graf = Deger(RecorderArguments.Build(istek, "a.mkv"), "-filter_complex")!;
+
+        Assert.Contains(beklenen, graf);
+        Assert.EndsWith("[base][cam]overlay=16:16:eof_action=repeat[vout]", graf);
+        Assert.Empty(RecorderArguments.Validate(istek, "a.mkv"));
+    }
+
+    [Fact]
+    public void ArkaPlanAnahtariVeDaireTekBicimDonusumuyleBirlesir()
+    {
+        var graf = RecorderArguments.WebcamGraph(Istek() with { Webcam = Kamera(WebcamShape.Circle, arka: WebcamBackground.Green) })!;
+
+        Assert.Contains(",format=yuva420p,chromakey=color=0x00FF00:similarity=0.15:blend=0.05,geq=", graf);
+        Assert.Equal(1, graf.Split("format=yuva420p").Length - 1);
+    }
+
+    [Fact]
+    public void SerbestKonumVeBoyutKareninOraniylaYazilir()
+    {
+        var istek = Istek() with { Scale = new RecorderScale(640, 480), Webcam = Kamera(WebcamShape.Circle, true, new WebcamPlacement(0.5, 1, 0.25)) };
+        var graf = Deger(RecorderArguments.Build(istek, "a.mkv"), "-filter_complex");
+
+        Assert.Equal("[0:v]scale=640:480,split[base][wref];"
+                     + "[1:v]hflip,crop='min(iw,ih)':'min(iw,ih)'[wsrc];"
+                     + "[wsrc][wref]scale=w='trunc(rw*0.25/2)*2':h=-2," + DaireMaskesi + "[cam];"
+                     + "[base][cam]overlay=x='16+(main_w-overlay_w-32)*0.5':y='16+(main_h-overlay_h-32)*1':eof_action=repeat[vout]", graf);
+        Assert.Empty(RecorderArguments.Validate(istek, "a.mkv"));
+    }
+
+    [Fact]
+    public void GecersizBicimVeKonumReddedilir()
+    {
+        string[] Hata(RecorderWebcam kam) => RecorderArguments.Validate(Istek() with { Webcam = kam }, "a.mkv").ToArray();
+
+        Assert.Empty(Hata(Kamera(yer: new WebcamPlacement(0, 1, RecorderArguments.MaxWebcamSize))));
+        Assert.Empty(Hata(Kamera(yer: new WebcamPlacement(1, 0, RecorderArguments.MinWebcamSize))));
+        Assert.Contains(Hata(Kamera((WebcamShape)9)), h => h.Contains("webcam shape", StringComparison.Ordinal));
+        Assert.Single(Hata(Kamera((WebcamShape)9)));
+        foreach (var yer in new[]
+                 {
+                     new WebcamPlacement(-0.01, 0, 0.2), new WebcamPlacement(0, 1.01, 0.2), new WebcamPlacement(double.NaN, 0, 0.2),
+                     new WebcamPlacement(0, 0, RecorderArguments.MinWebcamSize - 0.01), new WebcamPlacement(0, 0, RecorderArguments.MaxWebcamSize + 0.01)
+                 })
+            Assert.Single(Hata(Kamera(yer: yer)));
+    }
+
+    [Fact]
+    public void KameraKutusuSurukleninceKonumOraniTasinirBoyutKisilir()
+    {
+        var alan = new RecorderRegion(100, 50, 832, 432);
+        var yer = new WebcamPlacement(1, 1, 0.25);
+
+        Assert.Equal(new RecorderRegion(100 + 832 - 16 - 208, 50 + 432 - 16 - 156, 208, 156), WebcamLayout.Rect(alan, yer, WebcamShape.Rectangle));
+        Assert.Equal(new RecorderRegion(100 + 832 - 16 - 208, 50 + 432 - 16 - 208, 208, 208), WebcamLayout.Rect(alan, yer, WebcamShape.Circle));
+
+        var orta = WebcamLayout.Move(alan, yer, WebcamShape.Rectangle, -(832 - 32 - 208) / 2, -(432 - 32 - 156) / 2);
+        Assert.Equal(new WebcamPlacement(0.5, 0.5, 0.25), orta);
+        Assert.Equal(new WebcamPlacement(0, 1, 0.25), WebcamLayout.Move(alan, yer, WebcamShape.Rectangle, -5000, 5000));
+
+        var buyuk = WebcamLayout.Resize(alan, new WebcamPlacement(0, 0, 0.25), WebcamShape.Rectangle, 5000);
+        Assert.Equal(RecorderArguments.MaxWebcamSize, buyuk.Size);
+        Assert.Equal((0d, 0d), (buyuk.X, buyuk.Y));
+        Assert.Equal(RecorderArguments.MinWebcamSize, WebcamLayout.Resize(alan, yer, WebcamShape.Rectangle, -5000).Size);
+
+        var ust = WebcamLayout.Rect(alan, new WebcamPlacement(0.5, 0.5, 0.25), WebcamShape.Rectangle);
+        var buyutulen = WebcamLayout.Resize(alan, new WebcamPlacement(0.5, 0.5, 0.25), WebcamShape.Rectangle, 40);
+        var sonra = WebcamLayout.Rect(alan, buyutulen, WebcamShape.Rectangle);
+        Assert.Equal((ust.X, ust.Y), (sonra.X, sonra.Y));
+        Assert.Equal(ust.Width + 40, sonra.Width);
+    }
+
+    private static byte[] Kare(string ad, string graf)
+    {
+        var raw = Path.Combine(Kanit, ad + ".rgb");
+        var psi = new ProcessStartInfo("ffmpeg") { RedirectStandardError = true, UseShellExecute = false, CreateNoWindow = true };
+        foreach (var a in new[]
+                 {
+                     "-hide_banner", "-y", "-f", "lavfi", "-i", "color=c=0xFF0000:s=320x240:r=10:d=1",
+                     "-f", "lavfi", "-i", "color=c=0x00FF00:s=160x120:r=10:d=1,drawbox=x=0:y=0:w=60:h=120:c=0x0000FF:t=fill",
+                     "-filter_complex", graf, "-map", "[" + RecorderArguments.WebcamOutputLabel + "]",
+                     "-ss", "0.5", "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", "rgb24", "-threads", "2", raw
+                 })
+            psi.ArgumentList.Add(a);
+
+        using var surec = Process.Start(psi)!;
+        var hata = surec.StandardError.ReadToEndAsync();
+        if (!surec.WaitForExit(20000))
+        {
+            surec.Kill(true);
+            Assert.Fail($"{ad}: ffmpeg 20 sn icinde bitmedi.");
+        }
+
+        File.WriteAllText(Path.Combine(Kanit, ad + ".log"), graf + Environment.NewLine + hata.GetAwaiter().GetResult());
+        Assert.True(surec.ExitCode == 0, $"{ad}: ffmpeg cikis {surec.ExitCode}");
+        var b = File.ReadAllBytes(raw);
+        Assert.Equal(320 * 240 * 3, b.Length);
+        return b;
+    }
+
+    private static string Renk(byte[] b, int x, int y)
+    {
+        var i = (y * 320 + x) * 3;
+        return b[i] > 200 && b[i + 1] < 50 && b[i + 2] < 50 ? "kirmizi"
+            : b[i] < 50 && b[i + 1] > 200 && b[i + 2] < 50 ? "yesil"
+            : b[i] < 50 && b[i + 1] < 50 && b[i + 2] > 200 ? "mavi"
+            : $"{b[i]},{b[i + 1]},{b[i + 2]}";
+    }
+
+    private static RecorderRegion Kutu(byte[] b)
+    {
+        int x0 = 320, y0 = 240, x1 = -1, y1 = -1;
+        for (var y = 0; y < 240; y++)
+            for (var x = 0; x < 320; x++)
+                if (Renk(b, x, y) != "kirmizi")
+                {
+                    x0 = Math.Min(x0, x);
+                    y0 = Math.Min(y0, y);
+                    x1 = Math.Max(x1, x);
+                    y1 = Math.Max(y1, y);
+                }
+        return new RecorderRegion(x0, y0, x1 - x0 + 1, y1 - y0 + 1);
+    }
+
+    /// <summary>
+    /// Plan EKB-P5: lavfi bileşik karesinde kamera kutusu <see cref="WebcamLayout.Rect"/>'in düzenleyicide
+    /// çizdiği yere oturur; daire ve yuvarlak köşede kutunun köşe pikseli saydam kalır (alttaki kırmızı
+    /// görünür), dikdörtgende kalmaz. Ayna, kameranın sol şeridindeki maviyi sağa taşır.
+    /// </summary>
+    [Fact]
+    public void BicimKonumVeAynaBilesikKaredePikseldeOlculur()
+    {
+        var alan = new RecorderRegion(0, 0, 320, 240);
+        var durumlar = new (string Ad, WebcamShape Bicim, bool Ayna, WebcamPlacement Yer)[]
+        {
+            ("dikdortgen", WebcamShape.Rectangle, false, new WebcamPlacement(0, 0, 0.25)),
+            ("ayna", WebcamShape.Rectangle, true, new WebcamPlacement(0, 0, 0.25)),
+            ("daire", WebcamShape.Circle, false, new WebcamPlacement(0.5, 1, 0.25)),
+            ("yuvarlak", WebcamShape.Rounded, false, new WebcamPlacement(1, 0, 0.25))
+        };
+
+        var satirlar = new List<string>();
+        var olcu = new Dictionary<string, (RecorderRegion Beklenen, RecorderRegion Kutu, string Kose, string Orta, string Sol, string Sag)>();
+        foreach (var d in durumlar)
+        {
+            var istek = Istek() with { Webcam = Kamera(d.Bicim, d.Ayna, d.Yer) };
+            var b = Kare(d.Ad, RecorderArguments.WebcamGraph(istek)!);
+            var r = WebcamLayout.Rect(alan, d.Yer, d.Bicim);
+            olcu[d.Ad] = (r, Kutu(b), Renk(b, r.X, r.Y), Renk(b, r.X + r.Width / 2, r.Y + r.Height / 2),
+                Renk(b, r.X + 2, r.Y + r.Height / 2), Renk(b, r.X + r.Width - 3, r.Y + r.Height / 2));
+            satirlar.Add($"{d.Ad}\tbeklenen={r}\tolculen={olcu[d.Ad].Kutu}\tkose={olcu[d.Ad].Kose}\torta={olcu[d.Ad].Orta}\tsol={olcu[d.Ad].Sol}\tsag={olcu[d.Ad].Sag}");
+        }
+
+        File.WriteAllLines(Path.Combine(Kanit, "bicim-konum.txt"), satirlar);
+
+        foreach (var d in durumlar) Assert.Equal(olcu[d.Ad].Beklenen, olcu[d.Ad].Kutu);
+        Assert.Equal(new RecorderRegion(16, 16, 80, 60), olcu["dikdortgen"].Beklenen);
+        Assert.Equal(("mavi", "yesil"), (olcu["dikdortgen"].Kose, olcu["dikdortgen"].Sag));
+        Assert.Equal(("yesil", "mavi"), (olcu["ayna"].Sol, olcu["ayna"].Sag));
+        Assert.Equal(("kirmizi", "yesil"), (olcu["daire"].Kose, olcu["daire"].Orta));
+        Assert.Equal(("kirmizi", "yesil"), (olcu["yuvarlak"].Kose, olcu["yuvarlak"].Orta));
+        Assert.Equal("yesil", olcu["yuvarlak"].Sag);
+
+        Kapat(durumlar.SelectMany(d => new[] { d.Ad + ".rgb", d.Ad + ".log" }).Append("bicim-konum.txt").ToArray());
+    }
+
+    private sealed class SahteKameraDuzenleyici : IRegionEditorHost
+    {
+        public (WebcamPlacement? Yer, WebcamShape Bicim)? Kamera { get; private set; }
+
+        public bool IsOpen { get; private set; }
+
+        public event EventHandler<PixelRect>? Changed { add { } remove { } }
+
+        public event EventHandler<PixelRect>? Committed { add { } remove { } }
+
+        public event EventHandler<WebcamPlacement>? CameraCommitted;
+
+        public event EventHandler? StartRequested { add { } remove { } }
+
+        public event EventHandler? SettingsRequested { add { } remove { } }
+
+        public event EventHandler? PauseRequested { add { } remove { } }
+
+        public event EventHandler? ResumeRequested { add { } remove { } }
+
+        public event EventHandler? StopRequested { add { } remove { } }
+
+        public event EventHandler? SnapshotRequested { add { } remove { } }
+
+        public event EventHandler? HideRequested { add { } remove { } }
+
+        public event EventHandler? Dismissed { add { } remove { } }
+
+        public void Show(PixelRect region, double? ratio, RegionEditorPhase phase) => IsOpen = true;
+
+        public void ShowCamera(WebcamPlacement? placement, WebcamShape shape) => Kamera = (placement, shape);
+
+        public void Hide()
+        {
+        }
+
+        public void Close() => IsOpen = false;
+
+        public void Birak(WebcamPlacement yer) => CameraCommitted?.Invoke(this, yer);
+    }
+
+    [Fact]
+    public void KameraBicimiAynaVeSuruklenenKonumDosyayaVeSonrakiIstegeGecer()
+    {
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            IReadOnlyList<string> kameralar = new[] { "Kam A" };
+            var sahte = new SahteKameraDuzenleyici();
+            var once = new RecorderView(ayarYolu) { SkipAutoMeasure = true, RegionEditorEnabled = true, RegionEditor = sahte, CameraSource = () => kameralar };
+            Elle(once);
+            var bicimler = Bul<ComboBox>(once, "CmbWebcamShape").ItemsSource!.Cast<object>().Count();
+            Bul<ComboBox>(once, "CmbWebcam").SelectedIndex = 1;
+            Bul<ComboBox>(once, "CmbWebcamShape").SelectedIndex = Array.IndexOf(RecorderView.WebcamShapes, WebcamShape.Circle);
+            Bul<CheckBox>(once, "ChkWebcamMirror").IsChecked = true;
+            once.DrawRegion = _ => Task.FromResult<PixelRect?>(new PixelRect(100, 50, 640, 360));
+            once.DrawRegionAsync().GetAwaiter().GetResult();
+            var gosterilen = sahte.Kamera;
+            sahte.Birak(new WebcamPlacement(0.25, 0.75, 0.3));
+            var json = (Dosyada(ayarYolu, "webcamShape"), Dosyada(ayarYolu, "webcamMirror"), Dosyada(ayarYolu, "webcamX"),
+                Dosyada(ayarYolu, "webcamY"), Dosyada(ayarYolu, "webcamSize"));
+
+            var sonra = new RecorderView(ayarYolu) { SkipAutoMeasure = true, CameraSource = () => kameralar };
+            var istek = sonra.PrepareRecording()!.Value.Request.Webcam;
+
+            var eski = JsonNode.Parse(File.ReadAllText(ayarYolu))!.AsObject();
+            foreach (var ad in new[] { "webcamShape", "webcamMirror", "webcamX", "webcamY", "webcamSize" }) eski.Remove(ad);
+            eski["webcamCorner"] = "TopLeft";
+            eski["webcamWidth"] = 480;
+            File.WriteAllText(ayarYolu, eski.ToJsonString());
+            var gocen = new RecorderView(ayarYolu) { SkipAutoMeasure = true, CameraSource = () => kameralar }.PrepareRecording()!.Value.Request.Webcam;
+            return (bicimler, gosterilen, json, istek, gocen);
+        }));
+
+        Assert.Equal(3, olcu.bicimler);
+        Assert.Equal((new WebcamPlacement(1, 1, 0.2), WebcamShape.Circle), olcu.gosterilen);
+        Assert.Equal(("\"Circle\"", "true", "0.25", "0.75", "0.3"), olcu.json);
+        Assert.Equal(new RecorderWebcam("Kam A", RecorderArguments.DefaultWebcamWidth)
+            { Shape = WebcamShape.Circle, Mirror = true, Placement = new WebcamPlacement(0.25, 0.75, 0.3) }, olcu.istek);
+        Assert.Equal(new WebcamPlacement(0, 0, 0.2), olcu.gocen!.Placement);
+        Assert.Equal((WebcamShape.Rectangle, false), (olcu.gocen.Shape, olcu.gocen.Mirror));
     }
 
     [KameraFact]

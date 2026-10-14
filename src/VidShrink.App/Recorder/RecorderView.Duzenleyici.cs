@@ -55,6 +55,7 @@ internal partial class RecorderView
         _regionEditor.SnapshotRequested += OnEditorSnapshot;
         _regionEditor.HideRequested += OnEditorHide;
         _regionEditor.Dismissed += OnEditorDismissed;
+        _regionEditor.CameraCommitted += OnCameraCommitted;
         _regionEditorWired = true;
     }
 
@@ -70,6 +71,7 @@ internal partial class RecorderView
         host.SnapshotRequested -= OnEditorSnapshot;
         host.HideRequested -= OnEditorHide;
         host.Dismissed -= OnEditorDismissed;
+        host.CameraCommitted -= OnCameraCommitted;
     }
 
     private void InitDuzenleyici()
@@ -164,6 +166,7 @@ internal partial class RecorderView
                     FrameHiddenByUser && _session is not null))
         {
             case RegionEditorState.Shown:
+                _regionEditor.ShowCamera(ChosenWebcam() is null ? null : ChosenPlacement, ChosenShape);
                 _regionEditor.Show(region!.Value, RegionDraw.Ratio(SelectedAspect),
                     EditorPhase(_session is not null, State, CountingDown));
                 break;
