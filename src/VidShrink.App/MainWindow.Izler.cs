@@ -23,6 +23,7 @@ public partial class MainWindow
     internal static readonly int[] GainCandidates = { -12, -9, -6, -3, 0, 3, 6, 9, 12 };
 
     private readonly List<ExternalSubtitle> _externalSubtitles = new();
+    private ExternalAudio? _externalAudio;
     private readonly List<int> _burnChoices = new();
     private bool _textBurnOffered = true;
 
@@ -44,6 +45,7 @@ public partial class MainWindow
         CmbBurnSize.SelectedIndex = Math.Max(size, 0);
         RefreshBurnChoices();
         RefreshSubtitleList();
+        RefreshAudioFileList();
         YukseklikDurumu();
     }
 
@@ -126,6 +128,7 @@ public partial class MainWindow
         var gain = CmbAudioGain.SelectedIndex;
         options.AudioGainDb = gain >= 0 && gain < GainCandidates.Length && GainCandidates[gain] != 0 ? GainCandidates[gain] : null;
         options.ExternalSubtitles = _externalSubtitles.ToList();
+        options.ExternalAudio = ExternalAudioChoice;
         if (BurnChoice is int burn) options.Filters = options.Filters with { BurnSubtitle = burn };
         if (BurnsTextSubtitle)
         {
@@ -162,10 +165,13 @@ public partial class MainWindow
         SubtitlesChanged();
     }
 
-    /// <summary>Yeni kaynak: önceki videonun dış altyazıları ve yakma seçimi taşınmaz.</summary>
+    /// <summary>Yeni kaynak: önceki videonun dış altyazıları, dış sesi ve yakma seçimi taşınmaz.</summary>
     private void ResetTracksForSource()
     {
         _externalSubtitles.Clear();
+        _externalAudio = null;
+        ChkAudioReplace.IsChecked = false;
+        RefreshAudioFileList();
         CmbBurnSubtitle.SelectedIndex = 0;
         ResetBurnStyle();
         RefreshBurnChoices();
@@ -234,6 +240,86 @@ public partial class MainWindow
                 }
             });
             AddSubtitleFiles(files.Select(file => file.TryGetLocalPath()).OfType<string>());
+        }
+        catch (Exception ex)
+        {
+            ReportSourceError($"{Say("main.error.pick")}: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// SIK-P4: tek dış ses dosyası. "Yerine koy" kutusu kaynağın sesini bırakır; kutu kapalıyken iz
+    /// kaynağın sesinin yanına eklenir. Desteklenmeyen uzantı ve olmayan dosya <c>false</c> döner.
+    /// </summary>
+    internal bool SetAudioFile(string path)
+    {
+        if (ExternalAudio.FromFile(path) is not { } audio) return false;
+        _externalAudio = audio;
+        RefreshAudioFileList();
+        OnOptionChanged();
+        return true;
+    }
+
+    internal void RemoveAudioFile()
+    {
+        if (_externalAudio is null) return;
+        _externalAudio = null;
+        RefreshAudioFileList();
+        OnOptionChanged();
+    }
+
+    internal ExternalAudio? ExternalAudioChoice
+        => _externalAudio is { } audio ? audio with { Replace = ChkAudioReplace.IsChecked == true } : null;
+
+    private void RefreshAudioFileList()
+    {
+        AudioFileList.Children.Clear();
+        if (_externalAudio is { } audio) AudioFileList.Children.Add(AudioFileRow(audio));
+        AudioFileList.IsVisible = _externalAudio is not null;
+    }
+
+    private Grid AudioFileRow(ExternalAudio audio)
+    {
+        var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), ColumnSpacing = TokenOf("SpaceXs") };
+        var name = new TextBlock
+        {
+            Text = audio.Language is { } language ? $"{Path.GetFileName(audio.Path)} · {language}" : Path.GetFileName(audio.Path),
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        if (this.FindResource("Hint") is Avalonia.Styling.ControlTheme hint) name.Theme = hint;
+        ToolTip.SetTip(name, audio.Language is { } dil ? $"{audio.Path} · {dil}" : audio.Path);
+        row.Children.Add(name);
+        var size = TokenOf("IconSizeSm");
+        var remove = new Button
+        {
+            Content = new PathIcon { Data = this.FindResource("IconClose") as Geometry, Width = size, Height = size },
+            Padding = this.FindResource("ChipPadding") is Avalonia.Thickness padding ? padding : default,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        if (this.FindResource("GhostButton") is Avalonia.Styling.ControlTheme ghost) remove.Theme = ghost;
+        AutomationProperties.SetName(remove, Say("main.audio.external.remove"));
+        ToolTip.SetTip(remove, Say("main.audio.external.remove"));
+        remove.Click += (_, _) => RemoveAudioFile();
+        Grid.SetColumn(remove, 1);
+        row.Children.Add(remove);
+        return row;
+    }
+
+    private async void OnAddAudioFile(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                AllowMultiple = false,
+                FileTypeFilter = new[]
+                {
+                    new FilePickerFileType(Say("main.audio.external.file-type")) { Patterns = ExternalAudio.Extensions.Select(x => "*" + x).ToArray() },
+                    FilePickerFileTypes.All
+                }
+            });
+            if (files.Select(file => file.TryGetLocalPath()).OfType<string>().FirstOrDefault() is { } path) SetAudioFile(path);
         }
         catch (Exception ex)
         {

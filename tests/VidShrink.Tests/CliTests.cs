@@ -473,7 +473,7 @@ public sealed class CliTests
         Availability = () => throw new InvalidOperationException("availability must not run")
     };
 
-    private const int BeklenenTakmaAdSayisi = 49;
+    private const int BeklenenTakmaAdSayisi = 51;
 
     /// <summary>
     /// <para>Ingilizce takma adlar iki CLI belgesinde (<c>docs/cli.md</c>, <c>docs/cli.tr.md</c>) yaziliydi diye degil, <b>kaynaktan
@@ -490,6 +490,7 @@ public sealed class CliTests
     /// elenme sebebini</b> yazar.</para>
     /// <para>SIK-P5 (yakma bicimi) uc cift ekledi: <c>--yak-yazi-tipi</c>/<c>--burn-font</c>,
     /// <c>--yak-boyut</c>/<c>--burn-size</c>, <c>--yak-kutu</c>/<c>--burn-box</c>; sayim 46 → 49.</para>
+    /// <para>SIK-P4 (dis ses) iki cift ekledi: <c>--ses-dosyasi</c>/<c>--audio-file</c>, <c>--ses-degistir</c>/<c>--replace-audio</c>; sayim 49 → 51.</para>
     /// <para>Belgelerin "hepsi" demesi de veriyle pimli: takma adi olmayan uzun anahtarlar
     /// (<c>--json</c>, <c>--vmaf</c>) kaynaktan cikarilip cumlede istisna olarak araniyor.</para>
     /// </summary>

@@ -279,6 +279,7 @@ public partial class MainWindow : Window
         Watch(ChkFltAutoCrop, ToggleButton.IsCheckedProperty, OnAutoCropChanged);
         Watch(ChkAudioLoudnorm, ToggleButton.IsCheckedProperty, OnOptionChanged);
         Watch(ChkAudioDenoise, ToggleButton.IsCheckedProperty, OnOptionChanged);
+        Watch(ChkAudioReplace, ToggleButton.IsCheckedProperty, OnOptionChanged);
         Watch(CmbAudioGain, SelectingItemsControl.SelectedIndexProperty, OnOptionChanged);
         Watch(CmbBurnSubtitle, SelectingItemsControl.SelectedIndexProperty, OnBurnChoiceChanged);
         Watch(CmbBurnFont, SelectingItemsControl.SelectedIndexProperty, OnOptionChanged);
@@ -3343,6 +3344,7 @@ public partial class MainWindow : Window
     {
         var options = CurrentOptions();
         options.ExternalSubtitles = Array.Empty<ExternalSubtitle>();
+        options.ExternalAudio = null;
         options.Filters = options.Filters with { BurnSubtitle = null, Crop = SuzgecOku(out _).Crop };
         return new(paths, options, !_chipSizeCapped && _info is not null, PresetLibrary.DeliveredExtension(_presetContainer), OtomatikKirpmaAcik);
     }
