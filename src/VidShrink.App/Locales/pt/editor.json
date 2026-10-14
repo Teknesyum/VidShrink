@@ -153,5 +153,11 @@
   "editor.export.audio-only": "Exportar Somente o Áudio",
   "editor.export.audio-only.tip": "Grava somente o áudio em um arquivo M4A (AAC) ou MP3. As configurações de vídeo e o texto são ignorados.",
   "editor.export.audio-only.no-audio": "As fontes da linha do tempo não têm áudio, não há nada para exportar.",
-  "editor.export.settings-full": "As configurações de exportação exigem recodificação; mudou para Completa."
+  "editor.export.settings-full": "As configurações de exportação exigem recodificação; mudou para Completa.",
+  "editor.copy": "Copiar",
+  "editor.cut": "Recortar",
+  "editor.paste": "Colar",
+  "editor.duplicate": "Duplicar",
+  "editor.group": "Agrupar",
+  "editor.ungroup": "Desagrupar"
 }

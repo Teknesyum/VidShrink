@@ -153,5 +153,11 @@
   "editor.export.audio-only": "Exportera Endast Ljud",
   "editor.export.audio-only.tip": "Skriver bara ljudet till en M4A- (AAC) eller MP3-fil. Videoinställningar och text ignoreras.",
   "editor.export.audio-only.no-audio": "Tidslinjens källor saknar ljud, så det finns inget att exportera.",
-  "editor.export.settings-full": "Exportinställningarna kräver omkodning; bytte till Full."
+  "editor.export.settings-full": "Exportinställningarna kräver omkodning; bytte till Full.",
+  "editor.copy": "Kopiera",
+  "editor.cut": "Klipp ut",
+  "editor.paste": "Klistra in",
+  "editor.duplicate": "Duplicera",
+  "editor.group": "Gruppera",
+  "editor.ungroup": "Dela upp grupp"
 }

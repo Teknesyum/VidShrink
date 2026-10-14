@@ -153,5 +153,11 @@
   "editor.export.audio-only": "Vie Vain Ääni",
   "editor.export.audio-only.tip": "Kirjoittaa vain äänen M4A- (AAC) tai MP3-tiedostoon. Videoasetukset ja teksti ohitetaan.",
   "editor.export.audio-only.no-audio": "Aikajanan lähteissä ei ole ääntä, joten vietävää ei ole.",
-  "editor.export.settings-full": "Vientiasetukset vaativat uudelleenkoodauksen; vaihdettiin Täyteen."
+  "editor.export.settings-full": "Vientiasetukset vaativat uudelleenkoodauksen; vaihdettiin Täyteen.",
+  "editor.copy": "Kopioi",
+  "editor.cut": "Leikkaa",
+  "editor.paste": "Liitä",
+  "editor.duplicate": "Monista",
+  "editor.group": "Ryhmitä",
+  "editor.ungroup": "Pura ryhmitys"
 }

@@ -153,5 +153,11 @@
   "editor.export.audio-only": "音声のみ書き出す",
   "editor.export.audio-only.tip": "音声のみを M4A (AAC) または MP3 ファイルに書き出します。映像の設定とテキストは無視されます。",
   "editor.export.audio-only.no-audio": "タイムラインのソースに音声がないため、書き出すものがありません。",
-  "editor.export.settings-full": "書き出し設定には再エンコードが必要なため、フルに切り替えました。"
+  "editor.export.settings-full": "書き出し設定には再エンコードが必要なため、フルに切り替えました。",
+  "editor.copy": "コピー",
+  "editor.cut": "切り取り",
+  "editor.paste": "貼り付け",
+  "editor.duplicate": "複製",
+  "editor.group": "グループ化",
+  "editor.ungroup": "グループ解除"
 }

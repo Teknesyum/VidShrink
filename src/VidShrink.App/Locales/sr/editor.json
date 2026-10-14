@@ -153,5 +153,11 @@
   "editor.export.audio-only": "Извези Само Звук",
   "editor.export.audio-only.tip": "Уписује само звук у датотеку M4A (AAC) или MP3. Подешавања слике и текст се занемарују.",
   "editor.export.audio-only.no-audio": "Извори временске линије немају звук, нема шта да се извезе.",
-  "editor.export.settings-full": "Подешавања извоза захтевају поновно кодирање; пребачено на Пуно."
+  "editor.export.settings-full": "Подешавања извоза захтевају поновно кодирање; пребачено на Пуно.",
+  "editor.copy": "Kopiraj",
+  "editor.cut": "Iseci",
+  "editor.paste": "Nalepi",
+  "editor.duplicate": "Dupliraj",
+  "editor.group": "Grupiši",
+  "editor.ungroup": "Razgrupiši"
 }

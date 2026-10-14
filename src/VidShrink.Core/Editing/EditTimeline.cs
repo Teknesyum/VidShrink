@@ -124,21 +124,182 @@ public sealed class EditTimeline
         return true;
     }
 
+    /// <summary>Parcayi siler; parca bir gruptaysa grubun butunu tek adimda silinir.</summary>
     public void Delete(int index)
     {
         CheckIndex(index);
-        Execute(new RemoveCommand(index, _clips[index]));
+        if (_clips[index].Group is null)
+        {
+            Execute(new RemoveCommand(index, _clips[index]));
+            return;
+        }
+
+        RemoveAll(WithGroups(new[] { index }));
     }
 
-    /// <summary>Parcayi tasir; <paramref name="to"/> parcanin tasindiktan sonraki sirasidir.</summary>
+    /// <summary>
+    /// Parcayi tasir; <paramref name="to"/> parcanin tasindiktan sonraki sirasidir. Parca bir
+    /// gruptaysa grup bitisik blok olarak tasinir, parca blok icindeki yerini korur; tek adimda
+    /// geri alinir.
+    /// </summary>
     public bool Move(int from, int to)
     {
         CheckIndex(from);
         CheckIndex(to);
         if (from == to) return false;
 
-        Execute(new MoveCommand(from, to));
+        if (_clips[from].Group is null)
+        {
+            Execute(new MoveCommand(from, to));
+            return true;
+        }
+
+        var members = WithGroups(new[] { from });
+        var rest = Enumerable.Range(0, _clips.Count).Except(members).ToList();
+        var at = Math.Clamp(to - members.ToList().IndexOf(from), 0, rest.Count);
+        var order = rest.Take(at).Concat(members).Concat(rest.Skip(at));
+        if (order.SequenceEqual(Enumerable.Range(0, _clips.Count))) return false;
+
+        var moved = members.Select(i => _clips[i]).ToList();
+        var steps = new List<IEditCommand>();
+        foreach (var index in members.OrderByDescending(i => i))
+        {
+            var remove = new RemoveCommand(index, _clips[index]);
+            remove.Apply(_clips);
+            steps.Add(remove);
+        }
+
+        for (var i = 0; i < moved.Count; i++)
+        {
+            var insert = new InsertCommand(at + i, moved[i]);
+            insert.Apply(_clips);
+            steps.Add(insert);
+        }
+
+        Record(new CompositeCommand(steps));
         return true;
+    }
+
+    /// <summary>Verilen siralari ayni gruptaki parcalarla genisletir; sirali ve tekrarsiz doner.</summary>
+    public IReadOnlyList<int> WithGroups(IReadOnlyList<int> indices)
+    {
+        ArgumentNullException.ThrowIfNull(indices);
+        foreach (var index in indices) CheckIndex(index);
+
+        var groups = indices.Select(i => _clips[i].Group).OfType<int>().ToHashSet();
+        var picked = indices.ToHashSet();
+        return Enumerable.Range(0, _clips.Count)
+            .Where(i => picked.Contains(i) || _clips[i].Group is { } g && groups.Contains(g))
+            .ToList();
+    }
+
+    /// <summary>
+    /// Parcalari (ve gruplarinin uyelerini) yeni bir grupta toplar. Ikiden az parcada ya da hepsi
+    /// zaten ayni gruptaysa <c>false</c> doner ve gecmise adim yazilmaz.
+    /// </summary>
+    public bool Group(IReadOnlyList<int> indices)
+    {
+        var members = WithGroups(indices);
+        if (members.Count < 2) return false;
+        var first = _clips[members[0]].Group;
+        if (first is not null && members.All(i => _clips[i].Group == first)) return false;
+
+        return Regroup(members, NextGroup());
+    }
+
+    /// <summary>Parcalarin (ve gruplarinin uyelerinin) grubunu cozer; tek adim. Gruplu parca yoksa <c>false</c>.</summary>
+    public bool Ungroup(IReadOnlyList<int> indices) => Regroup(WithGroups(indices), null);
+
+    /// <summary>Parcalari (gruplariyla) cizelge sirasiyla dondurur; gecmise adim yazmaz.</summary>
+    public IReadOnlyList<EditClip> Copy(IReadOnlyList<int> indices) => WithGroups(indices).Select(i => _clips[i]).ToList();
+
+    /// <summary>Parcalari (gruplariyla) kopyalar ve siler; tek adimda geri alinir. Kopyalanan parcalari dondurur.</summary>
+    public IReadOnlyList<EditClip> Cut(IReadOnlyList<int> indices)
+    {
+        var members = WithGroups(indices);
+        var copied = members.Select(i => _clips[i]).ToList();
+        if (members.Count > 0) RemoveAll(members);
+        return copied;
+    }
+
+    /// <summary>
+    /// Parcalari <paramref name="at"/> anina koyar; an parcanin ortasindaysa once orada boler.
+    /// Gruplar yeni kimlik alir. Tek adimda geri alinir. Ilk eklenen parcanin sirasini dondurur;
+    /// liste bossa ya da bir parcanin kaynagi bu cizelgede yoksa <c>-1</c> doner ve adim yazilmaz.
+    /// </summary>
+    public int Paste(IReadOnlyList<EditClip> clips, long at)
+    {
+        ArgumentNullException.ThrowIfNull(clips);
+        if (at < 0 || at > Duration)
+            throw new ArgumentOutOfRangeException(nameof(at), at, "An cizelgenin disinda");
+        if (clips.Count == 0 || !clips.All(Fits)) return -1;
+
+        var map = new Dictionary<int, int>();
+        var next = NextGroup();
+        var placed = new List<EditClip>(clips.Count);
+        foreach (var clip in clips)
+        {
+            if (clip.Group is not { } group)
+            {
+                placed.Add(clip);
+                continue;
+            }
+
+            if (!map.TryGetValue(group, out var id)) map[group] = id = next++;
+            placed.Add(clip with { Group = id });
+        }
+
+        var steps = new List<IEditCommand>();
+        if (PlanSplit(at, out var boundary) is { } split)
+        {
+            split.Apply(_clips);
+            steps.Add(split);
+        }
+
+        for (var i = 0; i < placed.Count; i++)
+        {
+            var insert = new InsertCommand(boundary + i, placed[i]);
+            insert.Apply(_clips);
+            steps.Add(insert);
+        }
+
+        Record(new CompositeCommand(steps));
+        return boundary;
+    }
+
+    private bool Fits(EditClip clip)
+        => DurationOf(clip.Source) is { } duration ? clip.SourceEnd <= duration : clip.Source == 0;
+
+    private int NextGroup() => _clips.Select(c => c.Group ?? 0).DefaultIfEmpty(0).Max() + 1;
+
+    private bool Regroup(IReadOnlyList<int> members, int? id)
+    {
+        var steps = new List<IEditCommand>();
+        foreach (var index in members)
+        {
+            var before = _clips[index];
+            if (before.Group == id) continue;
+            var step = new ReplaceCommand(index, before, before with { Group = id });
+            step.Apply(_clips);
+            steps.Add(step);
+        }
+
+        if (steps.Count == 0) return false;
+        Record(new CompositeCommand(steps));
+        return true;
+    }
+
+    private void RemoveAll(IReadOnlyList<int> indices)
+    {
+        var steps = new List<IEditCommand>();
+        foreach (var index in indices.OrderByDescending(i => i))
+        {
+            var remove = new RemoveCommand(index, _clips[index]);
+            remove.Apply(_clips);
+            steps.Add(remove);
+        }
+
+        Record(new CompositeCommand(steps));
     }
 
     /// <summary>
@@ -371,22 +532,13 @@ public sealed class EditTimeline
         return true;
     }
 
+    /// <summary>Parcalari gruplariyla birlikte tek adimda siler.</summary>
     public bool DeleteMany(IReadOnlyList<int> indices)
     {
-        ArgumentNullException.ThrowIfNull(indices);
-        var order = indices.Distinct().OrderByDescending(i => i).ToList();
-        foreach (var index in order) CheckIndex(index);
+        var order = WithGroups(indices);
         if (order.Count == 0) return false;
 
-        var steps = new List<IEditCommand>();
-        foreach (var index in order)
-        {
-            var remove = new RemoveCommand(index, _clips[index]);
-            remove.Apply(_clips);
-            steps.Add(remove);
-        }
-
-        Record(new CompositeCommand(steps));
+        RemoveAll(order);
         return true;
     }
 

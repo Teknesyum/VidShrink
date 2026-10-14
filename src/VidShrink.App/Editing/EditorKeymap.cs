@@ -45,7 +45,13 @@ internal enum EditorCommand
     Export,
     AddText,
     PrevKeyframe,
-    NextKeyframe
+    NextKeyframe,
+    Copy,
+    Cut,
+    Paste,
+    Duplicate,
+    GroupClips,
+    UngroupClips
 }
 
 internal sealed record EditorKeyRow(Key Key, KeyModifiers Modifiers, EditorCommand Command, string LabelKey, string? Symbol = null, PlayerButton? Button = null)
@@ -154,7 +160,13 @@ internal static class EditorKeymap
         new(Key.A, KeyModifiers.Control, EditorCommand.SelectAll, "editor.select-all"),
         new(Key.Z, KeyModifiers.Control, EditorCommand.Undo, "editor.undo"),
         new(Key.Y, KeyModifiers.Control, EditorCommand.Redo, "editor.redo"),
-        new(Key.Z, KeyModifiers.Control | KeyModifiers.Shift, EditorCommand.Redo, "editor.redo")
+        new(Key.Z, KeyModifiers.Control | KeyModifiers.Shift, EditorCommand.Redo, "editor.redo"),
+        new(Key.C, KeyModifiers.Control, EditorCommand.Copy, "editor.copy"),
+        new(Key.X, KeyModifiers.Control, EditorCommand.Cut, "editor.cut"),
+        new(Key.V, KeyModifiers.Control, EditorCommand.Paste, "editor.paste"),
+        new(Key.D, KeyModifiers.Control, EditorCommand.Duplicate, "editor.duplicate"),
+        new(Key.G, KeyModifiers.Control, EditorCommand.GroupClips, "editor.group"),
+        new(Key.G, KeyModifiers.Control | KeyModifiers.Shift, EditorCommand.UngroupClips, "editor.ungroup")
     };
 
     internal static EditorCommand For(Key key, KeyModifiers modifiers)

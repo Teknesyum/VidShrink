@@ -153,5 +153,11 @@
   "editor.export.audio-only": "Eksporter Bare Lyd",
   "editor.export.audio-only.tip": "Skriver bare lyden til en M4A- (AAC) eller MP3-fil. Videoinnstillinger og tekst ignoreres.",
   "editor.export.audio-only.no-audio": "Kildene på tidslinjen har ingen lyd, så det er ingenting å eksportere.",
-  "editor.export.settings-full": "Eksportinnstillingene krever omkoding; byttet til Full."
+  "editor.export.settings-full": "Eksportinnstillingene krever omkoding; byttet til Full.",
+  "editor.copy": "Kopier",
+  "editor.cut": "Klipp ut",
+  "editor.paste": "Lim inn",
+  "editor.duplicate": "Dupliser",
+  "editor.group": "Grupper",
+  "editor.ungroup": "Del opp gruppe"
 }

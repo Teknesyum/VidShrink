@@ -321,6 +321,13 @@
                   <MenuItem x:Name="MnuSplit" Header="{loc:Text editor.split}"/>
                   <MenuItem x:Name="MnuDelete" Header="{loc:Text editor.delete}"/>
                   <Separator/>
+                  <MenuItem x:Name="MnuCopy" Header="{loc:Text editor.copy}"/>
+                  <MenuItem x:Name="MnuCut" Header="{loc:Text editor.cut}"/>
+                  <MenuItem x:Name="MnuPaste" Header="{loc:Text editor.paste}"/>
+                  <MenuItem x:Name="MnuDuplicate" Header="{loc:Text editor.duplicate}"/>
+                  <MenuItem x:Name="MnuGroup" Header="{loc:Text editor.group}"/>
+                  <MenuItem x:Name="MnuUngroup" Header="{loc:Text editor.ungroup}"/>
+                  <Separator/>
                   <MenuItem x:Name="MnuMarkIn" Header="{loc:Text editor.mark-in}"/>
                   <MenuItem x:Name="MnuMarkOut" Header="{loc:Text editor.mark-out}"/>
                   <MenuItem x:Name="MnuDeleteRange" Header="{loc:Text editor.delete-range}"/>
