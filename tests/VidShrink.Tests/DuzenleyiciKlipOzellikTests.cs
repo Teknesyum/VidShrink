@@ -28,11 +28,15 @@ namespace VidShrink.Tests;
 /// <c>afade</c>, <c>volume</c>; etkisiz cizelgede graf degismez), Hizli/Akilli kipin Tam'a
 /// dusmesi, onizlemenin EDL zamanli zincirleri, canli ffmpeg ciktisinin ffprobe olculeri,
 /// libmpv'de geometri ve solmanin EDL zamaninda uygulanmasi, arayuzun paneli ve EDL'yi yeniden
-/// acmadan tazelemesi. Kanit <c>.calisma/worktree-agent-a4f85634f10ca820f/</c>, test siler.
+/// acmadan tazelemesi. Temel renk (<c>eq</c>, <c>colortemperature</c>) ve hazir gorunumler:
+/// normallestirme, grafta geometriden sonra solmadan once, onizlemede parca penceresinde,
+/// proje dosyasinda eski dosyanin notr acilmasi, canli karede siyah beyaz/parlaklik/sicaklik ve
+/// zaman penceresi, libmpv'de EDL zamaninda renk, arayuzde kutular ve hazir gorunum secimi.
+/// Kanit <c>.calisma/worktree-agent-a9a2ac977d9da6c2b/</c>, test siler.
 /// </summary>
 public sealed class DuzenleyiciKlipOzellikTests
 {
-    private const string Dal = "worktree-agent-a4f85634f10ca820f";
+    private const string Dal = "worktree-agent-a9a2ac977d9da6c2b";
     private const long Gb = 1_000_000_000;
 
     private static long S(double saniye) => EditTime.FromSeconds(saniye);
@@ -579,6 +583,342 @@ public sealed class DuzenleyiciKlipOzellikTests
                     Assert.True(view.Split());
                     DenetimSurucu.Pump(view.Player, () => motor.Acilan > acilan, 10);
                     Assert.True(motor.Acilan > acilan, "kesim degisince EDL yeniden acilmadi");
+                }
+                finally
+                {
+                    DuzenleyiciKapanis.Kapat(pencere, view);
+                }
+            });
+        }
+        finally
+        {
+            if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
+            KanitKapanisi.Kapat(Kanit);
+        }
+    }
+
+    [Fact]
+    public void RenkAyarlariNormallesirHazirGorunumlerKayitliDegerdir()
+    {
+        Assert.False(ClipEffects.None.HasColor);
+        Assert.Equal(0, ClipEffects.None.Brightness);
+        Assert.Equal(1, ClipEffects.None.Contrast);
+        Assert.Equal(1, ClipEffects.None.Saturation);
+        Assert.Equal(ClipEffects.NeutralTemperature, ClipEffects.None.Temperature);
+        Assert.Equal(6500, ClipEffects.NeutralTemperature);
+
+        foreach (var tek in new[]
+                 {
+                     ClipEffects.None with { Brightness = 0.1 }, ClipEffects.None with { Contrast = 1.2 },
+                     ClipEffects.None with { Saturation = 0 }, ClipEffects.None with { Temperature = 4000 },
+                 })
+        {
+            Assert.True(tek.HasColor, tek.ToString());
+            Assert.False(tek.IsNeutral, tek.ToString());
+            Assert.False(tek.HasGeometry);
+            Assert.False(tek.HasAudio);
+        }
+
+        var bozuk = new ClipEffects { Brightness = 5, Contrast = -3, Saturation = 9, Temperature = 100 }.Normalized();
+        Assert.Equal((1.0, 0.0, 3.0, 1000), (bozuk.Brightness, bozuk.Contrast, bozuk.Saturation, bozuk.Temperature));
+        var tavan = new ClipEffects { Brightness = -5, Contrast = 7, Temperature = 99999 }.Normalized();
+        Assert.Equal((-1.0, 2.0, 40000), (tavan.Brightness, tavan.Contrast, tavan.Temperature));
+        var sonsuz = new ClipEffects { Brightness = double.NaN, Contrast = double.PositiveInfinity, Saturation = double.NaN }.Normalized();
+        Assert.False(sonsuz.HasColor, sonsuz.ToString());
+        var yuvarlak = new ClipEffects { Brightness = 0.123, Contrast = 1.456, Saturation = 0.789 }.Normalized();
+        Assert.Equal((0.12, 1.46, 0.79), (yuvarlak.Brightness, yuvarlak.Contrast, yuvarlak.Saturation));
+
+        Assert.Equal(0, ClipEffects.BlackWhite.Saturation);
+        Assert.Equal(ClipEffects.BlackWhite, ClipEffects.BlackWhite.Normalized());
+        Assert.False(ClipEffects.BlackWhite.HasGeometry || ClipEffects.BlackWhite.HasAudio);
+        Assert.Equal(ClipEffects.OldFilm, ClipEffects.OldFilm.Normalized());
+        Assert.True(ClipEffects.OldFilm.Saturation is > 0 and < 1, "eski film renksiz ya da doygun");
+        Assert.True(ClipEffects.OldFilm.Temperature < ClipEffects.NeutralTemperature, "eski film sicak degil");
+        Assert.NotEqual(ClipEffects.BlackWhite, ClipEffects.OldFilm);
+
+        var klip = new ClipEffects { Rotation = 90, VolumeDb = -6, FadeIn = S(1), Brightness = 0.3 };
+        var giydirilmis = klip.WithColor(ClipEffects.OldFilm);
+        Assert.Equal(klip with
+        {
+            Brightness = ClipEffects.OldFilm.Brightness, Contrast = ClipEffects.OldFilm.Contrast,
+            Saturation = ClipEffects.OldFilm.Saturation, Temperature = ClipEffects.OldFilm.Temperature,
+        }, giydirilmis);
+        Assert.Equal(klip with { Brightness = 0 }, klip.WithColor(ClipEffects.None));
+    }
+
+    [Fact]
+    public void DisaAktarimGrafiRenkSuzgeciniGeometridenSonraSolmadanOnceYazar()
+    {
+        var yalin = Cizge(EditTimeline.FromSource(S(10)));
+        Assert.DoesNotContain("eq=", yalin);
+        Assert.DoesNotContain("colortemperature", yalin);
+
+        var c = EditTimeline.FromSource(S(10));
+        c.SetEffects(new[] { 0 }, _ => new ClipEffects { Rotation = 90, FadeIn = S(0.5), Brightness = 0.1, Contrast = 1.2, Saturation = 0.5, Temperature = 4000 });
+        Assert.Contains("setpts=PTS-STARTPTS,transpose=1,setsar=1,eq=brightness=0.1:contrast=1.2:saturation=0.5,colortemperature=temperature=4000,fade=t=in:st=0:d=0.5[v0]", Cizge(c));
+
+        var bw = EditTimeline.FromSource(S(10));
+        bw.SetEffects(new[] { 0 }, e => e.WithColor(ClipEffects.BlackWhite));
+        Assert.Contains("setpts=PTS-STARTPTS,eq=saturation=0[v0]", Cizge(bw));
+
+        var sicak = EditTimeline.FromSource(S(10));
+        sicak.SetEffects(new[] { 0 }, e => e with { Temperature = 9000 });
+        var sicakCizge = Cizge(sicak);
+        Assert.Contains("setpts=PTS-STARTPTS,colortemperature=temperature=9000[v0]", sicakCizge);
+        Assert.DoesNotContain("eq=", sicakCizge);
+
+        Assert.Equal(string.Empty, ClipFilters.Color(ClipEffects.None));
+        Assert.Equal("eq=brightness=-0.25", ClipFilters.Color(ClipEffects.None with { Brightness = -0.25 }));
+    }
+
+    [Theory]
+    [InlineData(ExportMode.Fast)]
+    [InlineData(ExportMode.Smart)]
+    public void RenkVarsaTamaDuser(ExportMode kip)
+    {
+        var sinirlar = DuzenleyiciAkilliKodekTests.Sinirlar(Anahtarlar);
+        var c = EditTimeline.FromSource(S(10));
+        Assert.True(c.SetEffects(new[] { 0 }, e => e with { Saturation = 0 }));
+        Assert.True(c.HasEffects);
+        var plan = EditExport.Build(c, Bilgi(), Anahtarlar, 0, kip, "cikti.mp4", "is", 8 * Gb, sinirlar);
+        Assert.Equal(ExportMode.Full, plan.Effective);
+        Assert.True(plan.EffectsForcedFull);
+        Assert.Contains("eq=saturation=0", Deger(plan.Steps[0].Args, "-filter_complex"));
+    }
+
+    [Fact]
+    public void OnizlemeRenkZinciriParcaPenceresindeKalir()
+    {
+        var c = EditTimeline.FromSource(S(10));
+        Assert.True(c.DeleteRange(S(2), S(4)));
+        c.SetEffects(new[] { 1 }, e => e.WithColor(ClipEffects.BlackWhite) with { FadeIn = S(1), Temperature = 3000 });
+        var onizleme = new EdlPreview("k.mp4", c);
+        var (video, ses) = ClipFilters.Timed(onizleme);
+        Assert.Equal("eq=saturation=0:enable='gte(t,2)*lt(t,8)',colortemperature=temperature=3000:enable='gte(t,2)*lt(t,8)',"
+                     + "fade=t=in:st=2:d=1:enable='gte(t,2)*lt(t,3)'", video);
+        Assert.Equal("afade=t=in:st=2:d=1:enable='gte(t,2)*lt(t,3)'", ses);
+
+        c.SetEffects(new[] { 1 }, e => e with { FadeIn = 0 });
+        var (yalnizRenk, yalnizSes) = ClipFilters.Timed(new EdlPreview("k.mp4", c));
+        Assert.Equal("eq=saturation=0:enable='gte(t,2)*lt(t,8)',colortemperature=temperature=3000:enable='gte(t,2)*lt(t,8)'", yalnizRenk);
+        Assert.Null(yalnizSes);
+
+        var gorunum = new EditLook(new EdlPreview("k.mp4", c), 320, 240);
+        Assert.Null(gorunum.Canvas);
+        Assert.Equal(yalnizRenk, gorunum.TimedVideo);
+    }
+
+    [Fact]
+    public void ProjeDosyasiRenkAlanlariniTasirEskiDosyaNotrAcilir()
+    {
+        var model = EditTimeline.FromSource(S(60));
+        Assert.True(model.Split(S(30)));
+        model.SetEffects(new[] { 0 }, e => e.WithColor(ClipEffects.OldFilm));
+        model.SetEffects(new[] { 1 }, e => e with { Rotation = 90, Brightness = -0.2, Temperature = 9000 });
+        var damga = new SourceStamp(@"C:\renk.mp4", 16, 1);
+        var json = EditProject.From(damga, model).ToJson();
+        var okunan = EditProject.Parse(json);
+        Assert.NotNull(okunan);
+        Assert.Equal(model.Clips, okunan!.Clips);
+
+        var eski = Regex.Replace(json, "\"(brightness|contrast|saturation|temperature)\":[^,}]+,?", string.Empty);
+        Assert.DoesNotContain("saturation", eski);
+        var eskiOkunan = EditProject.Parse(eski);
+        Assert.NotNull(eskiOkunan);
+        Assert.Equal(90, eskiOkunan!.Clips[1].Effects.Rotation);
+        Assert.All(eskiOkunan.Clips, k => Assert.False(k.Effects.HasColor, k.Effects.ToString()));
+        Assert.True(eskiOkunan.Clips[0].Effects.IsNeutral);
+    }
+
+    private static (double R, double G, double B) OrtaRenk(string video, string kare, double saniye, int w, int h)
+    {
+        Ffmpeg("-hide_banner", "-nostdin", "-v", "error", "-y", "-ss", saniye.ToString(CultureInfo.InvariantCulture), "-i", video,
+            "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", "rgb24", "-threads", "2", kare);
+        var piksel = File.ReadAllBytes(kare);
+        Assert.Equal(w * h * 3, piksel.Length);
+        double r = 0, g = 0, b = 0;
+        for (var i = 0; i < piksel.Length; i += 3)
+        {
+            r += piksel[i];
+            g += piksel[i + 1];
+            b += piksel[i + 2];
+        }
+
+        var n = w * h;
+        return (r / n, g / n, b / n);
+    }
+
+    [FfmpegFact]
+    public async Task CanliRenkKaresiSiyahBeyazParlaklikVeZamanPenceresi()
+    {
+        var klasor = Path.Combine(Kanit, "renk-canli");
+        Directory.CreateDirectory(klasor);
+        var adlar = new[] { "kaynak.mp4", "yalin.mp4", "siyahbeyaz.mp4", "parlak.mp4", "sicak.mp4", "pencere.mp4", "kare.rgb" };
+        KanitKapanisi.Onceki(klasor, adlar);
+        var kaynak = Path.Combine(klasor, "kaynak.mp4");
+        Ffmpeg("-hide_banner", "-nostdin", "-y", "-f", "lavfi", "-i", "color=0xC03030:s=320x240:r=30:d=2",
+            "-f", "lavfi", "-i", "sine=frequency=440:sample_rate=48000:duration=2",
+            "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p", "-c:a", "aac", "-shortest", "-threads", "2", kaynak);
+        var kare = Path.Combine(klasor, "kare.rgb");
+
+        async Task<(double R, double G, double B)> Aktar(string ad, Func<ClipEffects, ClipEffects> ayar)
+        {
+            var c = EditTimeline.FromSource(S(2));
+            c.SetEffects(new[] { 0 }, ayar);
+            var cikti = Path.Combine(klasor, ad);
+            var plan = await EditExportRunner.PrepareAsync(new[] { kaynak }, c, ExportMode.Fast, cikti, 8 * Gb);
+            Assert.Equal(c.Clips[0].Effects.IsNeutral ? ExportMode.Fast : ExportMode.Full, plan.Effective);
+            await EditExportRunner.RunAsync(IkiIsParcacigi(plan), null);
+            return OrtaRenk(cikti, kare, 1, 320, 240);
+        }
+
+        var yalin = await Aktar("yalin.mp4", e => e);
+        Assert.True(yalin.R - yalin.G > 80, $"kaynak kirmizi degil {yalin}");
+
+        var bw = await Aktar("siyahbeyaz.mp4", e => e.WithColor(ClipEffects.BlackWhite));
+        Assert.True(Math.Abs(bw.R - bw.G) < 6 && Math.Abs(bw.R - bw.B) < 6, $"siyah beyaz karede renk kaldi {bw}");
+
+        var parlak = await Aktar("parlak.mp4", e => e with { Brightness = 0.3 });
+        var gri = (Func<(double R, double G, double B), double>)(p => 0.299 * p.R + 0.587 * p.G + 0.114 * p.B);
+        Assert.True(gri(parlak) - gri(yalin) > 40, $"parlaklik artmadi {yalin} -> {parlak}");
+
+        var sicak = await Aktar("sicak.mp4", e => e with { Temperature = 2000 });
+        Assert.True(sicak.B < yalin.B - 5, $"sicaklik maviyi dusurmedi {yalin} -> {sicak}");
+
+        var pencere = Path.Combine(klasor, "pencere.mp4");
+        var cizelge = EditTimeline.FromSource(S(2));
+        Assert.True(cizelge.Split(S(1)));
+        cizelge.SetEffects(new[] { 1 }, e => e.WithColor(ClipEffects.BlackWhite));
+        var (zincir, _) = ClipFilters.Timed(new EdlPreview(kaynak, cizelge));
+        Assert.Equal("eq=saturation=0:enable='gte(t,1)*lt(t,2)'", zincir);
+        Ffmpeg("-hide_banner", "-nostdin", "-y", "-i", kaynak, "-vf", zincir!, "-an", "-c:v", "libx264", "-preset", "ultrafast",
+            "-pix_fmt", "yuv420p", "-threads", "2", pencere);
+        var once = OrtaRenk(pencere, kare, 0.5, 320, 240);
+        var sonra = OrtaRenk(pencere, kare, 1.5, 320, 240);
+        Assert.True(once.R - once.G > 80, $"pencere disinda renk gitti {once}");
+        Assert.True(Math.Abs(sonra.R - sonra.G) < 6, $"pencere icinde renk kaldi {sonra}");
+
+        KanitKapanisi.Kapat(klasor, adlar);
+    }
+
+    [FfmpegFact]
+    public async Task LibmpvRenkEdlZamanindaUygulanir()
+    {
+        var klasor = Path.Combine(Kanit, "renk-mpv");
+        Directory.CreateDirectory(klasor);
+        var adlar = new[] { "kaynak.mp4" };
+        KanitKapanisi.Onceki(klasor, adlar);
+        var kaynak = Path.Combine(klasor, "kaynak.mp4");
+        Ffmpeg("-hide_banner", "-nostdin", "-y", "-f", "lavfi", "-i", "color=red:s=320x240:r=30:d=3",
+            "-c:v", "libx264", "-preset", "ultrafast", "-g", "15", "-threads", "2", "-pix_fmt", "yuv420p", kaynak);
+
+        var c = EditTimeline.FromSource(S(3));
+        Assert.True(c.Split(S(1.5)));
+        c.SetEffects(new[] { 1 }, e => e.WithColor(ClipEffects.BlackWhite));
+        var onizleme = new EdlPreview(kaynak, c);
+        var gorunum = new EditLook(onizleme, 320, 240);
+        Assert.Equal("eq=saturation=0:enable='gte(t,1.5)*lt(t,3)'", gorunum.TimedVideo);
+
+        using (var motor = new MpvEngine())
+        {
+            motor.SetProperty("ao", "null");
+            var surucu = new EdlPreviewDriver(motor, onizleme, look: gorunum);
+            await surucu.OpenAsync();
+            motor.Pause();
+
+            await surucu.SeekAsync(S(0.5), SeekPrecision.Exact);
+            var renkli = await KareBekleAsync(motor, 0, k => k.Parlak < 30);
+            Assert.True(renkli.Parlak < 30, $"birinci parca renksiz {renkli.Parlak}");
+
+            await surucu.SeekAsync(S(2), SeekPrecision.Exact);
+            var gri = await KareBekleAsync(motor, renkli.Gorulen, k => k.Parlak > 50);
+            Assert.True(gri.Parlak > 50, $"EDL 2 sn'de siyah beyaz yok {gri.Parlak}");
+
+            var duz = EditTimeline.FromSource(S(3));
+            Assert.True(duz.Split(S(1.5)));
+            await surucu.RestyleAsync(new EdlPreview(kaynak, duz), null);
+            await surucu.SeekAsync(S(2), SeekPrecision.Exact);
+            var yalin = await KareBekleAsync(motor, gri.Gorulen, k => k.Parlak < 30);
+            Assert.True(yalin.Parlak < 30, $"ayarsiz onizlemede renk geri gelmedi {yalin.Parlak}");
+        }
+
+        KanitKapanisi.Kapat(klasor, adlar);
+    }
+
+    [Fact]
+    public void ArayuzRenkKutulariVeHazirGorunumModeleVeOnizlemeyeGider()
+    {
+        var klasor = Path.Combine(Kanit, "renk-arayuz");
+        Directory.CreateDirectory(klasor);
+        var dosya = Path.Combine(klasor, "kaynak.mp4");
+        File.WriteAllBytes(dosya, new byte[16]);
+        try
+        {
+            AppHost.Run(() =>
+            {
+                var motor = new KlipMotoru();
+                var view = new EditorView
+                {
+                    KnownInfo = yol => new MediaInfo { FilePath = yol, FileSizeBytes = 16, DurationSeconds = 600, Width = 320, Height = 240, Fps = 30, VideoCodec = "h264", TotalBitrateBps = 1 }
+                };
+                view.Player.EngineFactory = () => motor;
+                view.OverlayRoot = Path.Combine(klasor, "katman");
+                var pencere = new Window { Width = 900, Height = 600, Content = view };
+                pencere.Show();
+                try
+                {
+                    var acilis = view.OpenSourceAsync(dosya);
+                    DenetimSurucu.Pump(view.Player, () => acilis.IsCompleted, 10);
+                    acilis.GetAwaiter().GetResult();
+                    DenetimSurucu.Pump(view.Player, () => motor.Acilan >= 1, 10);
+                    var model = view.Model!;
+                    var acilan = motor.Acilan;
+
+                    view.TimelineView.SelectedIndex = 0;
+                    Assert.True(view.ClipPanel.IsVisible);
+                    Assert.Equal(EditorView.LookPresets.Length, view.CmbClipLook.ItemCount);
+                    Assert.Equal(0, view.CmbClipLook.SelectedIndex);
+
+                    void Yaz(TextBox kutu, string metin)
+                    {
+                        kutu.Text = metin;
+                        kutu.RaiseEvent(new KeyEventArgs { RoutedEvent = InputElement.KeyDownEvent, Key = Key.Enter });
+                    }
+
+                    Yaz(view.TxtClipSaturation, "0");
+                    Assert.Equal(0, model.Clips[0].Effects.Saturation);
+                    Assert.Equal(1, view.CmbClipLook.SelectedIndex);
+                    DenetimSurucu.Pump(view.Player, () => view.Restyles >= 1, 10);
+                    Assert.Equal("eq=saturation=0:enable='gte(t,0)*lt(t,600)'", motor.ZamanliVideo);
+                    Assert.Null(motor.Geometri);
+                    Assert.Equal(acilan, motor.Acilan);
+
+                    view.CmbClipLook.SelectedIndex = 2;
+                    var eski = model.Clips[0].Effects;
+                    Assert.Equal(ClipEffects.None.WithColor(ClipEffects.OldFilm), eski);
+                    Assert.Equal(ClipEffects.OldFilm.Temperature.ToString(CultureInfo.InvariantCulture), view.TxtClipTemperature.Text);
+                    DenetimSurucu.Pump(view.Player, () => view.Restyles >= 2, 10);
+                    Assert.Contains("colortemperature=temperature=" + ClipEffects.OldFilm.Temperature.ToString(CultureInfo.InvariantCulture), motor.ZamanliVideo);
+
+                    Yaz(view.TxtClipBrightness, "0.2");
+                    Assert.Equal(0.2, model.Clips[0].Effects.Brightness, 9);
+                    Assert.Equal(-1, view.CmbClipLook.SelectedIndex);
+
+                    Yaz(view.TxtClipContrast, "1.5");
+                    Assert.Equal(1.5, model.Clips[0].Effects.Contrast, 9);
+                    Yaz(view.TxtClipTemperature, "abc");
+                    Assert.Equal(ClipEffects.OldFilm.Temperature, model.Clips[0].Effects.Temperature);
+                    Assert.Equal(ClipEffects.OldFilm.Temperature.ToString(CultureInfo.InvariantCulture), view.TxtClipTemperature.Text);
+
+                    Assert.True(view.Undo());
+                    Assert.Equal(eski with { Brightness = 0.2 }, model.Clips[0].Effects);
+
+                    view.CmbClipLook.SelectedIndex = 0;
+                    Assert.False(model.Clips[0].Effects.HasColor);
+                    Assert.True(model.Clips[0].Effects.IsNeutral);
+                    DenetimSurucu.Pump(view.Player, () => motor.ZamanliVideo is null, 10);
+                    Assert.Null(motor.ZamanliVideo);
+                    Assert.Equal(acilan, motor.Acilan);
                 }
                 finally
                 {

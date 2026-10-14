@@ -358,6 +358,7 @@ public static class EditExport
             graph.Append('[').Append(input).Append(":v]trim=start=").Append(start).Append(":end=").Append(end).Append(",setpts=PTS-STARTPTS")
                 .Append(VideoMotion(clip, info))
                 .Append(Link(ClipFilters.Geometry(clip.Effects, info.Width, info.Height, info.ParNum, info.ParDen, canvas)))
+                .Append(Link(ClipFilters.Color(clip.Effects)))
                 .Append(",fps=").Append(fps).Append(",format=yuv420p")
                 .Append(Link(ClipFilters.VideoFades(clip.Effects, clip.TimelineLength)))
                 .Append("[v").Append(i).Append("];");
@@ -496,6 +497,7 @@ public static class EditExport
             graph.Append("[0:v]trim=start=").Append(start).Append(":end=").Append(end).Append(",setpts=PTS-STARTPTS")
                 .Append(VideoMotion(clip, info))
                 .Append(Link(ClipFilters.Geometry(clip.Effects, info.Width, info.Height, info.ParNum, info.ParDen, canvas)))
+                .Append(Link(ClipFilters.Color(clip.Effects)))
                 .Append(Link(ClipFilters.VideoFades(clip.Effects, clip.TimelineLength)))
                 .Append("[v").Append(i).Append("];");
             joins.Append("[v").Append(i).Append(']');

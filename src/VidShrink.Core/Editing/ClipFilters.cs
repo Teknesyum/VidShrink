@@ -75,6 +75,22 @@ public static class ClipFilters
         return string.Join(",", parts);
     }
 
+    /// <summary>
+    /// Renk zinciri, basinda virgul olmadan: degisen alanlarla <c>eq</c>, ardindan sicaklik
+    /// notr degilse <c>colortemperature</c>. Renk ayari yoksa bos.
+    /// </summary>
+    public static string Color(ClipEffects effects)
+    {
+        var parts = new List<string>();
+        var eq = new List<string>();
+        if (effects.Brightness != 0) eq.Add("brightness=" + Number(effects.Brightness));
+        if (effects.Contrast != 1) eq.Add("contrast=" + Number(effects.Contrast));
+        if (effects.Saturation != 1) eq.Add("saturation=" + Number(effects.Saturation));
+        if (eq.Count > 0) parts.Add("eq=" + string.Join(":", eq));
+        if (effects.Temperature != ClipEffects.NeutralTemperature) parts.Add("colortemperature=temperature=" + Int(effects.Temperature));
+        return string.Join(",", parts);
+    }
+
     /// <summary>Kazanc ya da sessizlik, ardindan ses solmasi; zaman klip basindan.</summary>
     public static string Audio(ClipEffects effects, long length)
     {
@@ -88,12 +104,13 @@ public static class ClipFilters
     }
 
     /// <summary>
-    /// Onizlemenin sabit zincirleri. EDL zamaninda her parcanin solmasi ve sesi
+    /// Onizlemenin sabit zincirleri. EDL zamaninda her parcanin rengi, solmasi ve sesi
     /// <c>enable</c> penceresiyle yalniz o parcada acilir. Hizli parcada pencere hiz kadar
-    /// uzar; ters parcada giris solmasi parcanin EDL sonunda cikis solmasi olur.
+    /// uzar; ters parcada giris solmasi parcanin EDL sonunda cikis solmasi olur. Renk solmadan once gelir.
     /// </summary>
     public static (string? Video, string? Audio) Timed(EdlPreview preview)
     {
+        var color = new List<string>();
         var video = new List<string>();
         var audio = new List<string>();
         foreach (var part in preview.Parts)
@@ -107,6 +124,10 @@ public static class ClipFilters
             var (fadeIn, fadeOut) = effects.Fades(part.Clip.TimelineLength);
             var head = Math.Min(end - start, EditTime.ToSeconds(fadeIn) * speed);
             var tail = Math.Min(end - start, EditTime.ToSeconds(fadeOut) * speed);
+
+            var window = ":enable='" + Between(start, end) + "'";
+            var tone = Color(effects);
+            if (tone.Length > 0) color.AddRange(tone.Split(',').Select(f => f + window));
 
             if (effects.Muted) audio.Add("volume=volume=0:enable='" + Between(start, end) + "'");
             else if (effects.VolumeDb != 0)
@@ -124,6 +145,7 @@ public static class ClipFilters
             }
         }
 
+        video.InsertRange(0, color);
         return (video.Count == 0 ? null : string.Join(",", video), audio.Count == 0 ? null : string.Join(",", audio));
     }
 
