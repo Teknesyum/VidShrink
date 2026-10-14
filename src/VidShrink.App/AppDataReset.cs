@@ -51,12 +51,14 @@ internal static class AppDataReset
             File.Delete(settingsFile);
             removed.Add(settingsFile);
         }
+        if (!string.IsNullOrEmpty(settingsFile)) removed.AddRange(SettingsCopies(settingsFile));
 
         if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder)) return removed;
 
         var targets = FileNames
             .Select(name => Path.Combine(folder, name))
-            .Concat(Directory.EnumerateFiles(folder, ShareLedgerBrokenPrefix + "*"));
+            .Concat(Directory.EnumerateFiles(folder, ShareLedgerBrokenPrefix + "*"))
+            .Concat(SettingsBackupFiles(Path.Combine(folder, UpdateSettings.FileName)));
         foreach (var path in targets.Distinct(StringComparer.OrdinalIgnoreCase).ToList())
         {
             if (!File.Exists(path)) continue;
@@ -66,6 +68,22 @@ internal static class AppDataReset
 
         removed.AddRange(GunlugeSil(folder));
         removed.AddRange(ProjeleriSil(folder));
+        return removed;
+    }
+
+    /// <summary>Ayar dosyasının yedeği ve yanına ayrılmış bozuk kopyaları.</summary>
+    private static IEnumerable<string> SettingsBackupFiles(string settingsFile)
+        => SettingsBackup.BrokenCopies(settingsFile).Prepend(SettingsBackup.BackupPath(settingsFile));
+
+    private static IReadOnlyList<string> SettingsCopies(string settingsFile)
+    {
+        var removed = new List<string>();
+        foreach (var path in SettingsBackupFiles(settingsFile).ToList())
+        {
+            if (!File.Exists(path)) continue;
+            File.Delete(path);
+            removed.Add(path);
+        }
         return removed;
     }
 

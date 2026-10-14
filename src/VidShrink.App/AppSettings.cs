@@ -121,6 +121,7 @@ public sealed class AppSettings
         var file = path ?? UpdateSettings.DefaultPath;
         var settings = new AppSettings();
         var migrate = false;
+        SettingsBackup.Check(file);
         try
         {
             if (!File.Exists(file)) return settings;
