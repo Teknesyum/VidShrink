@@ -98,6 +98,9 @@ bunların tek yazımı var.
 | `--yak` | `--burn` |
 | `--yak-srt` | `--srt-burn` |
 | `--yak-ass` | `--ssa-burn` |
+| `--yak-yazi-tipi` | `--burn-font` |
+| `--yak-boyut` | `--burn-size` |
+| `--yak-kutu` | `--burn-box` |
 | `--meta-yok` | `--no-metadata` |
 | `--altyazi-dil` | `--subtitle-lang` |
 | `--ilk-altyazi` | `--first-subtitle` |

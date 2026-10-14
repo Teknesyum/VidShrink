@@ -927,6 +927,22 @@
                             </Button>
                           </WrapPanel>
                           <StackPanel Grid.Row="2" Spacing="{StaticResource SpaceXs}">
+                            <WrapPanel x:Name="BurnStylePanel" IsVisible="False" HorizontalAlignment="Left"
+                                       ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                              <StackPanel Spacing="{StaticResource SpaceXs}" VerticalAlignment="Bottom">
+                                <TextBlock Text="{loc:Text main.subtitles.style.font}" Theme="{StaticResource Hint}"/>
+                                <ComboBox x:Name="CmbBurnFont"
+                                          auto:AutomationProperties.Name="{loc:Text main.subtitles.style.font}"/>
+                              </StackPanel>
+                              <StackPanel Spacing="{StaticResource SpaceXs}" VerticalAlignment="Bottom">
+                                <TextBlock Text="{loc:Text main.subtitles.style.size}" Theme="{StaticResource Hint}"/>
+                                <ComboBox x:Name="CmbBurnSize"
+                                          auto:AutomationProperties.Name="{loc:Text main.subtitles.style.size}"/>
+                              </StackPanel>
+                              <CheckBox x:Name="ChkBurnBox" Theme="{StaticResource CheckStyle}" VerticalAlignment="Bottom"
+                                        MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
+                                        Content="{loc:Text main.subtitles.style.box}"/>
+                            </WrapPanel>
                             <TextBlock x:Name="TxtSubtitleScan" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"
                                        auto:AutomationProperties.LiveSetting="Polite"/>
                             <StackPanel x:Name="SubtitleList" Spacing="{StaticResource SpaceXs}" IsVisible="False"/>

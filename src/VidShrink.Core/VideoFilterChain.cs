@@ -89,6 +89,24 @@ public sealed record VideoFilterOptions
     /// </summary>
     public string? BurnFile { get; init; }
 
+    /// <summary>
+    /// Yakilan metin altyazinin yazi tipi adi (<c>force_style</c> <c>FontName</c>). Bos birakilinca
+    /// suzgec metni degismez; resim altyazida yok sayilir.
+    /// </summary>
+    public string? BurnFont { get; init; }
+
+    /// <summary>
+    /// Yakilan metin altyazinin boyutu (<c>force_style</c> <c>FontSize</c>, libass olcegi; SRT'de
+    /// ffmpeg'in varsayilani 16). <see cref="VideoFilterChain.BurnFontSizeMin"/> ile
+    /// <see cref="VideoFilterChain.BurnFontSizeMax"/> arasinda.
+    /// </summary>
+    public int? BurnFontSize { get; init; }
+
+    /// <summary>
+    /// Yakilan metin altyazinin arkasina opak kutu (<c>force_style</c> <c>BorderStyle=3</c>).
+    /// </summary>
+    public bool BurnBox { get; init; }
+
     public bool ChangesPicture =>
         Deinterlace == DeinterlaceMode.On
         || Detelecine
@@ -117,6 +135,11 @@ public static class VideoFilterChain
     public const string GrayscaleFilter = "hue=s=0";
     public const string DeblockFilter = "deblock=filter=strong:block=8";
     public const string DebandFilter = "deband";
+    public const int BurnFontSizeMin = 6;
+    public const int BurnFontSizeMax = 200;
+
+    /// <summary>SIK-P5: arayüzün sunduğu yazı tipleri; CLI <see cref="IsBurnFontName"/> geçen her adı alır.</summary>
+    public static readonly IReadOnlyList<string> BurnFontChoices = new[] { "Arial", "Verdana", "Tahoma", "Segoe UI", "Times New Roman", "Courier New", "Georgia" };
 
     /// <summary>
     /// Anamorfik kaynagin ciktisini kare piksele cevirir. Olcek suzgeci kaynagin SAR
@@ -214,8 +237,30 @@ public static class VideoFilterChain
             if (options.BurnSubtitle is not null) problems.Add("burn: only one subtitle can be burned");
             if (!BurnFileExtensions.Contains(Path.GetExtension(file).ToLowerInvariant())) problems.Add("burn: the file is not .srt, .ass or .ssa");
         }
+        if (options.BurnFont is { } font && !IsBurnFontName(font)) problems.Add("burn style: font name has characters the filter cannot carry");
+        if (options.BurnFontSize is int size && (size < BurnFontSizeMin || size > BurnFontSizeMax)) problems.Add("burn style: font size must be 6 to 200");
         return problems;
     }
+
+    public static bool IsBurnFontName(string? name)
+        => name is { Length: > 0 } && name.Trim().Length > 0
+        && name.All(c => char.IsLetterOrDigit(c) || c is ' ' or '-' or '_' or '.');
+
+    /// <summary>
+    /// Yakma seciminin <c>force_style</c> metni: dolu alanlar sirayla <c>FontName</c>,
+    /// <c>FontSize</c>, <c>BorderStyle=3</c>. Hicbiri secili degilse <c>null</c>.
+    /// </summary>
+    public static string? BurnStyle(VideoFilterOptions options)
+    {
+        var parts = new List<string>();
+        if (options.BurnFont is { Length: > 0 } font) parts.Add("FontName=" + font);
+        if (options.BurnFontSize is int size) parts.Add("FontSize=" + size.ToString(CultureInfo.InvariantCulture));
+        if (options.BurnBox) parts.Add("BorderStyle=3");
+        return parts.Count == 0 ? null : string.Join(",", parts);
+    }
+
+    private static string StyleSuffix(VideoFilterOptions options)
+        => BurnStyle(options) is { } style ? ":force_style='" + style + "'" : "";
 
     /// <summary>ffmpeg'in libass ile derlenince tasidigi suzgec; yakmanin iki yolu da onu yazar.</summary>
     public const string BurnFilterName = "subtitles";
@@ -233,11 +278,11 @@ public static class VideoFilterChain
     public static string? BurnFilter(MediaInfo info, VideoFilterOptions options, double leadSeconds)
     {
         if (options.BurnFile is { Length: > 0 } file)
-            return Shifted(BurnFilterName + "=filename='" + FilterPath(file) + "'", leadSeconds);
+            return Shifted(BurnFilterName + "=filename='" + FilterPath(file) + "'" + StyleSuffix(options), leadSeconds);
         if (options.BurnSubtitle is not int burn) return null;
         var subtitles = info.Streams.Where(stream => stream.Kind == StreamKind.Subtitle).ToList();
         if (burn < 0 || burn >= subtitles.Count || !StreamMapping.IsTextSubtitle(subtitles[burn].Codec)) return null;
-        return Shifted(BurnFilterName + "=filename='" + FilterPath(info.FilePath) + "':si=" + burn.ToString(CultureInfo.InvariantCulture), leadSeconds);
+        return Shifted(BurnFilterName + "=filename='" + FilterPath(info.FilePath) + "':si=" + burn.ToString(CultureInfo.InvariantCulture) + StyleSuffix(options), leadSeconds);
     }
 
     private static string Shifted(string filter, double leadSeconds)

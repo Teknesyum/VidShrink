@@ -35,9 +35,43 @@ public partial class MainWindow
             .Select(db => db == 0 ? Say("main.audio.gain.none") : db.ToString("+0;-0", CultureInfo.InvariantCulture) + " dB")
             .ToList();
         CmbAudioGain.SelectedIndex = gain >= 0 ? gain : Array.IndexOf(GainCandidates, 0);
+        var font = CmbBurnFont.SelectedIndex;
+        CmbBurnFont.ItemsSource = new[] { Say("main.subtitles.style.default") }.Concat(BurnFontChoices).ToList();
+        CmbBurnFont.SelectedIndex = Math.Max(font, 0);
+        var size = CmbBurnSize.SelectedIndex;
+        CmbBurnSize.ItemsSource = new[] { Say("main.subtitles.style.default") }
+            .Concat(BurnSizeCandidates.Select(s => s.ToString(CultureInfo.InvariantCulture))).ToList();
+        CmbBurnSize.SelectedIndex = Math.Max(size, 0);
         RefreshBurnChoices();
         RefreshSubtitleList();
         YukseklikDurumu();
+    }
+
+    internal static IReadOnlyList<string> BurnFontChoices => VideoFilterChain.BurnFontChoices;
+
+    internal static readonly int[] BurnSizeCandidates = { 12, 16, 20, 24, 28, 32, 40, 48 };
+
+    /// <summary>
+    /// SIK-P5: yazı tipi, boyut ve kutu seçimi yalnız metin izi yakılırken görünür; resim
+    /// altyazıda (PGS, VOBSUB, DVB) <c>force_style</c> anlamsızdır ve plan onu yazmaz.
+    /// </summary>
+    private void RefreshBurnStyle() => BurnStylePanel.IsVisible = BurnsTextSubtitle;
+
+    private bool BurnsTextSubtitle
+    {
+        get
+        {
+            if (BurnChoice is not int burn || _info is not { } info) return false;
+            var subtitles = info.Streams.Where(stream => stream.Kind == StreamKind.Subtitle).ToList();
+            return burn < subtitles.Count && StreamMapping.IsTextSubtitle(subtitles[burn].Codec);
+        }
+    }
+
+    private void ResetBurnStyle()
+    {
+        CmbBurnFont.SelectedIndex = 0;
+        CmbBurnSize.SelectedIndex = 0;
+        ChkBurnBox.IsChecked = false;
     }
 
     /// <summary>
@@ -68,6 +102,7 @@ public partial class MainWindow
         var at = chosen is int c ? _burnChoices.IndexOf(c) : -1;
         CmbBurnSubtitle.SelectedIndex = at + 1;
         CmbBurnSubtitle.IsEnabled = _burnChoices.Count > 0;
+        RefreshBurnStyle();
         TaramayiSifirla();
     }
 
@@ -92,6 +127,17 @@ public partial class MainWindow
         options.AudioGainDb = gain >= 0 && gain < GainCandidates.Length && GainCandidates[gain] != 0 ? GainCandidates[gain] : null;
         options.ExternalSubtitles = _externalSubtitles.ToList();
         if (BurnChoice is int burn) options.Filters = options.Filters with { BurnSubtitle = burn };
+        if (BurnsTextSubtitle)
+        {
+            var font = CmbBurnFont.SelectedIndex - 1;
+            var size = CmbBurnSize.SelectedIndex - 1;
+            options.Filters = options.Filters with
+            {
+                BurnFont = font >= 0 && font < BurnFontChoices.Count ? BurnFontChoices[font] : null,
+                BurnFontSize = size >= 0 && size < BurnSizeCandidates.Length ? BurnSizeCandidates[size] : null,
+                BurnBox = ChkBurnBox.IsChecked == true
+            };
+        }
     }
 
     /// <summary>Dosya başına bir kez eklenir; desteklenmeyen uzantı ve olmayan dosya sessizce atlanır. Eklenen sayı döner.</summary>
@@ -121,6 +167,7 @@ public partial class MainWindow
     {
         _externalSubtitles.Clear();
         CmbBurnSubtitle.SelectedIndex = 0;
+        ResetBurnStyle();
         RefreshBurnChoices();
         RefreshSubtitleList();
         YuksekligiSifirla();
