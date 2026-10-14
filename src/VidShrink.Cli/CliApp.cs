@@ -727,7 +727,7 @@ public static class CliApp
         var tracks = copied
             ? Array.Empty<AudioTrack>()
             : StreamMapping.ForOutput(decision.Info, plan, decision.OutputPath).Audio;
-        var silent = !decision.Info.HasAudio || !copied && tracks.Count == 0;
+        var silent = copied ? !decision.Info.HasAudio : tracks.Count == 0;
 
         if (options.AudioSampleRate is int rate)
         {

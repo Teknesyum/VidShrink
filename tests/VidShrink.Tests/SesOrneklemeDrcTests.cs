@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using VidShrink.Cli;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
@@ -354,6 +354,19 @@ public sealed class SesOrneklemeDrcTests(ITestOutputHelper cikti)
         Assert.Contains("libopus encoder cannot write 24000 Hz", redErr);
         Assert.Equal(ExitCodes.InBand, kabul);
         Assert.DoesNotContain("cannot write", kabulErr);
+    }
+
+    [Fact]
+    public async Task SessizKaynagaDisSesEkleninceSesYokNotuCikmiyor()
+    {
+        var dis = Path.Combine(Klasor, "dis-ses.m4a");
+        File.WriteAllText(dis, "x");
+        var (_, eklenen, _) = await PlanAsync(Kaynak(600, Video), Tr, "--ses-hizi", "8", "--ses-drc", "2", "--ses-dosyasi", dis);
+        var (_, eksiz, _) = await PlanAsync(Kaynak(600, Video), Tr, "--ses-hizi", "8", "--ses-drc", "2");
+
+        Assert.DoesNotContain(Tr["note.arate-no-audio"], eklenen);
+        Assert.DoesNotContain(Tr["note.drc-no-audio"], eklenen);
+        Assert.Contains(Tr["note.arate-no-audio"], eksiz);
     }
 
     [Fact]
