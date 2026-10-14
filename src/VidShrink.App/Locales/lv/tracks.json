@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "Uz OpenSubtitles nosūtīts pārāk daudz pieprasījumu — pēc brīža pamēģiniet vēlreiz",
   "player.subtitle.download.badlogin": "OpenSubtitles nepieņēma pieteikšanos",
   "player.subtitle.download.expired": "Lejupielādes saite ir beigusies — mēģiniet vēlreiz",
-  "player.subtitle.download.toofast.wait": "Uz OpenSubtitles nosūtīts pārāk daudz pieprasījumu — pēc {0} s mēģiniet vēlreiz"
+  "player.subtitle.download.toofast.wait": "Uz OpenSubtitles nosūtīts pārāk daudz pieprasījumu — pēc {0} s mēģiniet vēlreiz",
+  "player.subtitle.visibility": "Rādīt/slēpt subtitrus",
+  "player.subtitle.lineprev": "Iepriekšējā subtitru rinda",
+  "player.subtitle.linenext": "Nākamā subtitru rinda",
+  "player.subtitle.stepprev": "Sinhronizēt subtitrus ar iepriekšējo rindu",
+  "player.subtitle.stepnext": "Sinhronizēt subtitrus ar nākamo rindu",
+  "player.subtitle.copy": "Kopēt subtitru tekstu",
+  "player.subtitle.hidden": "Subtitri paslēpti",
+  "player.subtitle.shown": "Subtitri parādīti",
+  "player.subtitle.copied": "Subtitru teksts nokopēts"
 }

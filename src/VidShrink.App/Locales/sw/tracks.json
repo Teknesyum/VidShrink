@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "Maombi mengi sana kwa OpenSubtitles — jaribu tena baada ya muda mfupi",
   "player.subtitle.download.badlogin": "OpenSubtitles haikukubali kuingia",
   "player.subtitle.download.expired": "Kiungo cha kupakua kimeisha muda wake — jaribu tena",
-  "player.subtitle.download.toofast.wait": "Maombi mengi sana kwa OpenSubtitles — jaribu tena baada ya sekunde {0}"
+  "player.subtitle.download.toofast.wait": "Maombi mengi sana kwa OpenSubtitles — jaribu tena baada ya sekunde {0}",
+  "player.subtitle.visibility": "Onyesha/ficha manukuu",
+  "player.subtitle.lineprev": "Mstari uliotangulia wa manukuu",
+  "player.subtitle.linenext": "Mstari unaofuata wa manukuu",
+  "player.subtitle.stepprev": "Linganisha manukuu na mstari uliotangulia",
+  "player.subtitle.stepnext": "Linganisha manukuu na mstari unaofuata",
+  "player.subtitle.copy": "Nakili maandishi ya manukuu",
+  "player.subtitle.hidden": "Manukuu yamefichwa",
+  "player.subtitle.shown": "Manukuu yanaonyeshwa",
+  "player.subtitle.copied": "Maandishi ya manukuu yamenakiliwa"
 }

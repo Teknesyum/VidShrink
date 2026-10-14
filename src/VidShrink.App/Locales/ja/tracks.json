@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "OpenSubtitlesへのリクエストが多すぎます — 少し待ってから再試行してください",
   "player.subtitle.download.badlogin": "OpenSubtitlesがサインインを受け付けませんでした",
   "player.subtitle.download.expired": "ダウンロードリンクの有効期限が切れました — もう一度お試しください",
-  "player.subtitle.download.toofast.wait": "OpenSubtitlesへのリクエストが多すぎます — {0}秒後に再試行してください"
+  "player.subtitle.download.toofast.wait": "OpenSubtitlesへのリクエストが多すぎます — {0}秒後に再試行してください",
+  "player.subtitle.visibility": "字幕の表示/非表示",
+  "player.subtitle.lineprev": "前の字幕行",
+  "player.subtitle.linenext": "次の字幕行",
+  "player.subtitle.stepprev": "字幕を前の行に合わせる",
+  "player.subtitle.stepnext": "字幕を次の行に合わせる",
+  "player.subtitle.copy": "字幕のテキストをコピー",
+  "player.subtitle.hidden": "字幕を非表示にしました",
+  "player.subtitle.shown": "字幕を表示しました",
+  "player.subtitle.copied": "字幕のテキストをコピーしました"
 }

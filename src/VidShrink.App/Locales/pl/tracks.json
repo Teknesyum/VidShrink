@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "Zbyt wiele żądań do OpenSubtitles — spróbuj ponownie za chwilę",
   "player.subtitle.download.badlogin": "OpenSubtitles nie zaakceptowało logowania",
   "player.subtitle.download.expired": "Link do pobierania wygasł — spróbuj ponownie",
-  "player.subtitle.download.toofast.wait": "Zbyt wiele żądań do OpenSubtitles — spróbuj ponownie za {0} s"
+  "player.subtitle.download.toofast.wait": "Zbyt wiele żądań do OpenSubtitles — spróbuj ponownie za {0} s",
+  "player.subtitle.visibility": "Pokaż/ukryj napisy",
+  "player.subtitle.lineprev": "Poprzedni wiersz napisów",
+  "player.subtitle.linenext": "Następny wiersz napisów",
+  "player.subtitle.stepprev": "Synchronizuj napisy z poprzednim wierszem",
+  "player.subtitle.stepnext": "Synchronizuj napisy z następnym wierszem",
+  "player.subtitle.copy": "Kopiuj tekst napisów",
+  "player.subtitle.hidden": "Napisy ukryte",
+  "player.subtitle.shown": "Napisy widoczne",
+  "player.subtitle.copied": "Skopiowano tekst napisów"
 }

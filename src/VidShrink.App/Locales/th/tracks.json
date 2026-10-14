@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "ส่งคำขอไปยัง OpenSubtitles มากเกินไป — โปรดลองใหม่อีกครั้งในอีกสักครู่",
   "player.subtitle.download.badlogin": "OpenSubtitles ไม่ยอมรับการลงชื่อเข้าใช้",
   "player.subtitle.download.expired": "ลิงก์ดาวน์โหลดหมดอายุแล้ว — โปรดลองใหม่",
-  "player.subtitle.download.toofast.wait": "ส่งคำขอไปยัง OpenSubtitles มากเกินไป — โปรดลองใหม่อีกครั้งในอีก {0} วิ"
+  "player.subtitle.download.toofast.wait": "ส่งคำขอไปยัง OpenSubtitles มากเกินไป — โปรดลองใหม่อีกครั้งในอีก {0} วิ",
+  "player.subtitle.visibility": "แสดง/ซ่อนคำบรรยาย",
+  "player.subtitle.lineprev": "บรรทัดคำบรรยายก่อนหน้า",
+  "player.subtitle.linenext": "บรรทัดคำบรรยายถัดไป",
+  "player.subtitle.stepprev": "ซิงค์คำบรรยายกับบรรทัดก่อนหน้า",
+  "player.subtitle.stepnext": "ซิงค์คำบรรยายกับบรรทัดถัดไป",
+  "player.subtitle.copy": "คัดลอกข้อความคำบรรยาย",
+  "player.subtitle.hidden": "ซ่อนคำบรรยายแล้ว",
+  "player.subtitle.shown": "แสดงคำบรรยายแล้ว",
+  "player.subtitle.copied": "คัดลอกข้อความคำบรรยายแล้ว"
 }

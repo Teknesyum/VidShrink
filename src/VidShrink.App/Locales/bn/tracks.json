@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "OpenSubtitles-এ অতিরিক্ত রিকোয়েস্ট পাঠানো হয়েছে — কিছুক্ষণ পর আবার চেষ্টা করুন",
   "player.subtitle.download.badlogin": "OpenSubtitles সাইন-ইন গ্রহণ করেনি",
   "player.subtitle.download.expired": "ডাউনলোড লিংকের মেয়াদ শেষ হয়ে গেছে — আবার চেষ্টা করুন",
-  "player.subtitle.download.toofast.wait": "OpenSubtitles-এ অতিরিক্ত রিকোয়েস্ট পাঠানো হয়েছে — {0} সেকেন্ড পর আবার চেষ্টা করুন"
+  "player.subtitle.download.toofast.wait": "OpenSubtitles-এ অতিরিক্ত রিকোয়েস্ট পাঠানো হয়েছে — {0} সেকেন্ড পর আবার চেষ্টা করুন",
+  "player.subtitle.visibility": "সাবটাইটেল দেখান/লুকান",
+  "player.subtitle.lineprev": "আগের সাবটাইটেল লাইন",
+  "player.subtitle.linenext": "পরের সাবটাইটেল লাইন",
+  "player.subtitle.stepprev": "সাবটাইটেল আগের লাইনে মিলান",
+  "player.subtitle.stepnext": "সাবটাইটেল পরের লাইনে মিলান",
+  "player.subtitle.copy": "সাবটাইটেলের লেখা কপি করুন",
+  "player.subtitle.hidden": "সাবটাইটেল লুকানো",
+  "player.subtitle.shown": "সাবটাইটেল দেখানো হচ্ছে",
+  "player.subtitle.copied": "সাবটাইটেলের লেখা কপি হয়েছে"
 }

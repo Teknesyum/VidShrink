@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "Terlalu banyak permintaan ke OpenSubtitles — coba lagi sesaat lagi",
   "player.subtitle.download.badlogin": "OpenSubtitles tidak menerima proses masuk",
   "player.subtitle.download.expired": "Tautan unduhan telah kedaluwarsa — coba lagi",
-  "player.subtitle.download.toofast.wait": "Terlalu banyak permintaan ke OpenSubtitles — coba lagi dalam {0} dtk"
+  "player.subtitle.download.toofast.wait": "Terlalu banyak permintaan ke OpenSubtitles — coba lagi dalam {0} dtk",
+  "player.subtitle.visibility": "Tampilkan/sembunyikan subtitle",
+  "player.subtitle.lineprev": "Baris subtitle sebelumnya",
+  "player.subtitle.linenext": "Baris subtitle berikutnya",
+  "player.subtitle.stepprev": "Selaraskan subtitle ke baris sebelumnya",
+  "player.subtitle.stepnext": "Selaraskan subtitle ke baris berikutnya",
+  "player.subtitle.copy": "Salin teks subtitle",
+  "player.subtitle.hidden": "Subtitle disembunyikan",
+  "player.subtitle.shown": "Subtitle ditampilkan",
+  "player.subtitle.copied": "Teks subtitle disalin"
 }

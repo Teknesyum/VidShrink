@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "Надто багато запитів до OpenSubtitles — повторіть спробу за мить",
   "player.subtitle.download.badlogin": "OpenSubtitles не прийняв вхід",
   "player.subtitle.download.expired": "Термін дії посилання для завантаження закінчився — спробуйте знову",
-  "player.subtitle.download.toofast.wait": "Надто багато запитів до OpenSubtitles — повторіть спробу за {0} с"
+  "player.subtitle.download.toofast.wait": "Надто багато запитів до OpenSubtitles — повторіть спробу за {0} с",
+  "player.subtitle.visibility": "Показати/сховати субтитри",
+  "player.subtitle.lineprev": "Попередній рядок субтитрів",
+  "player.subtitle.linenext": "Наступний рядок субтитрів",
+  "player.subtitle.stepprev": "Синхронізувати субтитри з попереднім рядком",
+  "player.subtitle.stepnext": "Синхронізувати субтитри з наступним рядком",
+  "player.subtitle.copy": "Копіювати текст субтитрів",
+  "player.subtitle.hidden": "Субтитри приховано",
+  "player.subtitle.shown": "Субтитри показано",
+  "player.subtitle.copied": "Текст субтитрів скопійовано"
 }

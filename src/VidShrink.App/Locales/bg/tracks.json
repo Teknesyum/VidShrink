@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "Твърде много заявки към OpenSubtitles — опитайте отново след малко",
   "player.subtitle.download.badlogin": "OpenSubtitles не прие входа",
   "player.subtitle.download.expired": "Връзката за изтегляне е изтекла — опитайте отново",
-  "player.subtitle.download.toofast.wait": "Твърде много заявки към OpenSubtitles — опитайте отново след {0} с"
+  "player.subtitle.download.toofast.wait": "Твърде много заявки към OpenSubtitles — опитайте отново след {0} с",
+  "player.subtitle.visibility": "Показване/скриване на субтитрите",
+  "player.subtitle.lineprev": "Предишен ред от субтитрите",
+  "player.subtitle.linenext": "Следващ ред от субтитрите",
+  "player.subtitle.stepprev": "Синхронизиране на субтитрите с предишния ред",
+  "player.subtitle.stepnext": "Синхронизиране на субтитрите със следващия ред",
+  "player.subtitle.copy": "Копиране на текста на субтитрите",
+  "player.subtitle.hidden": "Субтитрите са скрити",
+  "player.subtitle.shown": "Субтитрите са показани",
+  "player.subtitle.copied": "Текстът на субтитрите е копиран"
 }

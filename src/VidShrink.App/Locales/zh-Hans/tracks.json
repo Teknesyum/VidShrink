@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "向 OpenSubtitles 发送的请求过多 — 请稍后再试",
   "player.subtitle.download.badlogin": "OpenSubtitles 未接受此次登录",
   "player.subtitle.download.expired": "下载链接已过期 — 请重试",
-  "player.subtitle.download.toofast.wait": "向 OpenSubtitles 发送的请求过多 — 请在 {0} 秒后重试"
+  "player.subtitle.download.toofast.wait": "向 OpenSubtitles 发送的请求过多 — 请在 {0} 秒后重试",
+  "player.subtitle.visibility": "显示/隐藏字幕",
+  "player.subtitle.lineprev": "上一行字幕",
+  "player.subtitle.linenext": "下一行字幕",
+  "player.subtitle.stepprev": "将字幕同步到上一行",
+  "player.subtitle.stepnext": "将字幕同步到下一行",
+  "player.subtitle.copy": "复制字幕文本",
+  "player.subtitle.hidden": "字幕已隐藏",
+  "player.subtitle.shown": "字幕已显示",
+  "player.subtitle.copied": "字幕文本已复制"
 }

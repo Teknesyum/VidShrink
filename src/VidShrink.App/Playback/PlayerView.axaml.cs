@@ -258,6 +258,18 @@ internal partial class PlayerView : UserControl
             case PlayerCommandKind.AudioDelay:
                 ShiftAudioDelay(command.Amount);
                 break;
+            case PlayerCommandKind.SubtitleVisibility:
+                ToggleSubtitleVisible();
+                break;
+            case PlayerCommandKind.SubtitleLine:
+                SeekSubtitleLine(command.Amount < 0);
+                break;
+            case PlayerCommandKind.SubtitleStep:
+                StepSubtitleLine(command.Amount < 0);
+                break;
+            case PlayerCommandKind.SubtitleCopy:
+                CopySubtitleText();
+                break;
             default:
                 if (!ApplyWindow(command) && !ApplyTools(command) && !ApplyEdit(command)) _trace.Add("none");
                 break;

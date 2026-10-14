@@ -177,6 +177,20 @@ public interface IPlaybackEngine : IDisposable
 
     void SetSubtitleCodepage(string codepage) { }
 
+    /// <summary>Altyazinin gorunurlugu (<c>sub-visibility</c>); izi degistirmez.</summary>
+    bool SubtitleVisible => true;
+
+    void SetSubtitleVisible(bool visible) { }
+
+    /// <summary>Sonraki ya da onceki altyazi satirinin basina atlar (<c>sub-seek</c>).</summary>
+    bool SeekSubtitle(bool backward) => false;
+
+    /// <summary>Gecikmeyi sonraki ya da onceki satir su anki konuma gelecek kadar kaydirir (<c>sub-step</c>).</summary>
+    bool StepSubtitle(bool backward) => false;
+
+    /// <summary>Ekrandaki altyazi satirinin metni (<c>sub-text</c>); satir yoksa <c>null</c>.</summary>
+    string? SubtitleText => null;
+
     int Rotation => 0;
 
     bool Mirrored => false;

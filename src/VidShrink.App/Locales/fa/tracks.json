@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "درخواست‌های بیش از حد به OpenSubtitles — کمی بعد دوباره تلاش کنید",
   "player.subtitle.download.badlogin": "OpenSubtitles ورود را نپذیرفت",
   "player.subtitle.download.expired": "پیوند دانلود منقضی شده است — دوباره تلاش کنید",
-  "player.subtitle.download.toofast.wait": "درخواست‌های بیش از حد به OpenSubtitles — پس از {0} ثانیه دوباره تلاش کنید"
+  "player.subtitle.download.toofast.wait": "درخواست‌های بیش از حد به OpenSubtitles — پس از {0} ثانیه دوباره تلاش کنید",
+  "player.subtitle.visibility": "نمایش/پنهان کردن زیرنویس",
+  "player.subtitle.lineprev": "خط قبلی زیرنویس",
+  "player.subtitle.linenext": "خط بعدی زیرنویس",
+  "player.subtitle.stepprev": "همگام‌سازی زیرنویس با خط قبلی",
+  "player.subtitle.stepnext": "همگام‌سازی زیرنویس با خط بعدی",
+  "player.subtitle.copy": "کپی متن زیرنویس",
+  "player.subtitle.hidden": "زیرنویس پنهان شد",
+  "player.subtitle.shown": "زیرنویس نمایش داده می‌شود",
+  "player.subtitle.copied": "متن زیرنویس کپی شد"
 }

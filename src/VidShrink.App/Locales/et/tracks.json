@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "OpenSubtitlesile saadetud liiga palju päringuid — proovige veidi hiljem uuesti",
   "player.subtitle.download.badlogin": "OpenSubtitles ei võtnud sisselogimist vastu",
   "player.subtitle.download.expired": "Allalaadimislink aegus — proovige uuesti",
-  "player.subtitle.download.toofast.wait": "OpenSubtitlesile saadetud liiga palju päringuid — proovige uuesti {0} s pärast"
+  "player.subtitle.download.toofast.wait": "OpenSubtitlesile saadetud liiga palju päringuid — proovige uuesti {0} s pärast",
+  "player.subtitle.visibility": "Näita/peida subtiitrid",
+  "player.subtitle.lineprev": "Eelmine subtiitririda",
+  "player.subtitle.linenext": "Järgmine subtiitririda",
+  "player.subtitle.stepprev": "Sünkrooni subtiitrid eelmise reaga",
+  "player.subtitle.stepnext": "Sünkrooni subtiitrid järgmise reaga",
+  "player.subtitle.copy": "Kopeeri subtiitri tekst",
+  "player.subtitle.hidden": "Subtiitrid peidetud",
+  "player.subtitle.shown": "Subtiitrid nähtaval",
+  "player.subtitle.copied": "Subtiitri tekst kopeeritud"
 }

@@ -149,7 +149,11 @@ public sealed class KeymapTests
         [PlayerCommandKind.PasteUrl] = "paste -> ",
         [PlayerCommandKind.Stop] = "stop -> ",
         [PlayerCommandKind.GoToStart] = "tostart",
-        [PlayerCommandKind.Edit] = "edit -> "
+        [PlayerCommandKind.Edit] = "edit -> ",
+        [PlayerCommandKind.SubtitleVisibility] = "subvisible -> ",
+        [PlayerCommandKind.SubtitleLine] = "subline ",
+        [PlayerCommandKind.SubtitleStep] = "substep ",
+        [PlayerCommandKind.SubtitleCopy] = "subcopy -> "
     };
 
     private static string Onek(PlayerAction action)
@@ -258,6 +262,10 @@ public sealed class KeymapTests
             PlayerCommandKind.PasteUrl when yeni[0] != "paste -> clipboard" => $"pano izi '{yeni[0]}'",
             PlayerCommandKind.Stop when !oynatma || view.IsPlaying || view.PositionSeconds != 0 => $"oynatma {oynatma} -> {view.IsPlaying}, konum {konum} -> {view.PositionSeconds}",
             PlayerCommandKind.GoToStart when konum == 0 || view.PositionSeconds != 0 => $"konum {konum} -> {view.PositionSeconds}",
+            PlayerCommandKind.SubtitleVisibility when yeni[0] != "subvisible -> False" => $"altyazi gizleme izi '{yeni[0]}'",
+            PlayerCommandKind.SubtitleLine when yeni[0] != "subline " + action.Amount.ToString("0", CultureInfo.InvariantCulture) + " -> no" => $"motorsuz satir atlama izi '{yeni[0]}'",
+            PlayerCommandKind.SubtitleStep when yeni[0] != "substep " + action.Amount.ToString("0", CultureInfo.InvariantCulture) + " -> no" => $"motorsuz satir esleme izi '{yeni[0]}'",
+            PlayerCommandKind.SubtitleCopy when yeni[0] != "subcopy -> no" => $"motorsuz altyazi kopyasi izi '{yeni[0]}'",
             _ => null
         };
     }

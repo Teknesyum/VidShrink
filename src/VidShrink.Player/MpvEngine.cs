@@ -402,6 +402,16 @@ public sealed partial class MpvEngine : IPlaybackEngine
                 CommandSync("sub-reload", track.Id.ToString(CultureInfo.InvariantCulture));
     }
 
+    public bool SubtitleVisible => GetProperty("sub-visibility") != "no";
+
+    public void SetSubtitleVisible(bool visible) => TrySet("sub-visibility", visible ? "yes" : "no");
+
+    public bool SeekSubtitle(bool backward) => _isOpen && CommandSync("sub-seek", backward ? "-1" : "1") >= 0;
+
+    public bool StepSubtitle(bool backward) => _isOpen && CommandSync("sub-step", backward ? "-1" : "1") >= 0;
+
+    public string? SubtitleText => GetProperty("sub-text");
+
     private long TrackId(string name)
         => long.TryParse(GetProperty(name), NumberStyles.Integer, CultureInfo.InvariantCulture, out var id) ? id : 0;
 

@@ -32,12 +32,25 @@ internal sealed class SubtitleOptions
     internal static readonly PlayerAction AudioLater = new(PlayerCommandKind.AudioDelay, AudioDelayStep, "player.tracks.delay");
     internal static readonly PlayerAction AudioEarlier = new(PlayerCommandKind.AudioDelay, -AudioDelayStep, "player.tracks.delay");
 
-    internal static readonly IReadOnlyList<string> Extensions = new[] { "srt", "ass", "ssa", "vtt", "sub" };
+    internal static readonly PlayerAction SubtitleVisibility = new(PlayerCommandKind.SubtitleVisibility, 0, "player.subtitle.visibility");
+    internal static readonly PlayerAction SubtitlePreviousLine = new(PlayerCommandKind.SubtitleLine, -1, "player.subtitle.lineprev");
+    internal static readonly PlayerAction SubtitleNextLine = new(PlayerCommandKind.SubtitleLine, 1, "player.subtitle.linenext");
+    internal static readonly PlayerAction SubtitleStepBack = new(PlayerCommandKind.SubtitleStep, -1, "player.subtitle.stepprev");
+    internal static readonly PlayerAction SubtitleStepForward = new(PlayerCommandKind.SubtitleStep, 1, "player.subtitle.stepnext");
+    internal static readonly PlayerAction SubtitleCopy = new(PlayerCommandKind.SubtitleCopy, 0, "player.subtitle.copy");
+
+    internal static readonly IReadOnlyList<string> Extensions = new[] { "srt", "ass", "ssa", "vtt", "sub", "sup", "idx" };
+
+    internal static readonly IReadOnlyList<string> SubtitleFolders = new[] { "Subs", "Subtitles", "Sub", "Subtitle" };
+
+    private static readonly IReadOnlyList<string> ImageExtensions = new[] { "sup", "idx", "sub" };
 
     /// <summary>
-    /// Videonun yanindaki altyazilar: ayni klasorde, adi videonun adiyla baslayan ve uzantisi
-    /// <see cref="Extensions"/>'ta olan dosyalar (<c>film.srt</c>, <c>film.tr.srt</c>). Birebir
-    /// ayni ad en sona konur; motor son ekleneni sectigi icin o secili kalir.
+    /// Videonun altyazilari: ayni klasorde ya da <see cref="SubtitleFolders"/> alt klasorunde adi
+    /// videonun adiyla baslayan, ayrica <c>Subs/&lt;video adi&gt;/</c> icindeki her dosya; uzantisi
+    /// <see cref="Extensions"/>'ta olmali. Esi <c>.idx</c> olan <c>.sub</c> atlanir (VobSub ciftinin
+    /// verisi). Alt klasordekiler once, yandakiler sonra; birebir ayni ad ve metin altyazi en sona
+    /// konur, motor son ekleneni sectigi icin o secili kalir.
     /// </summary>
     internal static IReadOnlyList<string> Sidecars(string mediaPath)
     {
@@ -45,15 +58,57 @@ internal sealed class SubtitleOptions
         if (folder is null || !System.IO.Directory.Exists(folder)) return Array.Empty<string>();
         var name = System.IO.Path.GetFileNameWithoutExtension(mediaPath);
 
-        return System.IO.Directory.EnumerateFiles(folder)
-            .Where(file => Extensions.Contains(System.IO.Path.GetExtension(file).TrimStart('.'), StringComparer.OrdinalIgnoreCase))
-            .Select(file => (File: file, Stem: System.IO.Path.GetFileNameWithoutExtension(file)))
-            .Where(x => x.Stem.StartsWith(name, StringComparison.OrdinalIgnoreCase)
-                        && (x.Stem.Length == name.Length || x.Stem[name.Length] is '.' or '-' or '_' or ' '))
-            .OrderBy(x => x.Stem.Length == name.Length)
+        var found = new List<(string File, bool Main, bool Exact)>();
+        found.AddRange(Named(folder, name).Select(x => (x.File, true, x.Exact)));
+        foreach (var sub in SafeDirectories(folder)
+                     .Where(dir => SubtitleFolders.Contains(System.IO.Path.GetFileName(dir), StringComparer.OrdinalIgnoreCase)))
+        {
+            found.AddRange(Named(sub, name).Select(x => (x.File, false, x.Exact)));
+            foreach (var own in SafeDirectories(sub)
+                         .Where(dir => string.Equals(System.IO.Path.GetFileName(dir), name, StringComparison.OrdinalIgnoreCase)))
+                found.AddRange(SubtitleFiles(own).Select(file => (file, false, false)));
+        }
+
+        return found
+            .DistinctBy(x => x.File, StringComparer.OrdinalIgnoreCase)
+            .OrderBy(x => x.Main)
+            .ThenBy(x => x.Exact)
+            .ThenBy(x => !IsImageSubtitle(x.File))
             .ThenBy(x => x.File, StringComparer.OrdinalIgnoreCase)
             .Select(x => x.File)
             .ToList();
+    }
+
+    private static IEnumerable<(string File, bool Exact)> Named(string folder, string name)
+        => SubtitleFiles(folder)
+            .Select(file => (File: file, Stem: System.IO.Path.GetFileNameWithoutExtension(file)))
+            .Where(x => x.Stem.StartsWith(name, StringComparison.OrdinalIgnoreCase)
+                        && (x.Stem.Length == name.Length || x.Stem[name.Length] is '.' or '-' or '_' or ' '))
+            .Select(x => (x.File, x.Stem.Length == name.Length));
+
+    private static IEnumerable<string> SubtitleFiles(string folder)
+    {
+        var files = SafeFiles(folder).Where(IsSubtitleFile).ToList();
+        return files.Where(file => !HasExtension(file, "sub")
+                                   || !files.Any(other => HasExtension(other, "idx")
+                                                          && string.Equals(System.IO.Path.ChangeExtension(other, null), System.IO.Path.ChangeExtension(file, null), StringComparison.OrdinalIgnoreCase)));
+    }
+
+    private static bool HasExtension(string file, string extension)
+        => string.Equals(System.IO.Path.GetExtension(file).TrimStart('.'), extension, StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsImageSubtitle(string file) => ImageExtensions.Any(extension => HasExtension(file, extension));
+
+    private static IReadOnlyList<string> SafeFiles(string folder)
+    {
+        try { return System.IO.Directory.EnumerateFiles(folder).ToList(); }
+        catch (Exception e) when (e is System.IO.IOException or UnauthorizedAccessException) { return Array.Empty<string>(); }
+    }
+
+    private static IReadOnlyList<string> SafeDirectories(string folder)
+    {
+        try { return System.IO.Directory.EnumerateDirectories(folder).ToList(); }
+        catch (Exception e) when (e is System.IO.IOException or UnauthorizedAccessException) { return Array.Empty<string>(); }
     }
 
     internal static readonly IReadOnlyList<SubtitleCodepage> Codepages = new SubtitleCodepage[]
@@ -85,6 +140,12 @@ internal sealed class SubtitleOptions
     internal double Position { get; private set; } = DefaultPosition;
 
     internal string Codepage { get; private set; } = AutoCodepage;
+
+    internal bool Visible { get; private set; } = true;
+
+    internal void ToggleVisible() => Visible = !Visible;
+
+    internal void SyncSubtitleDelay(double seconds) => SubtitleDelay = Math.Round(seconds, 3);
 
     internal void ShiftSubtitleDelay(double seconds) => SubtitleDelay = Math.Round(SubtitleDelay + seconds, 3);
 
@@ -119,6 +180,7 @@ internal sealed class SubtitleOptions
         engine.SetSubtitlePosition(Position);
         engine.SetSubtitleDelay(SubtitleDelay);
         engine.SetAudioDelay(AudioDelay);
+        engine.SetSubtitleVisible(Visible);
     }
 
     internal static bool IsSubtitleFile(string? path)

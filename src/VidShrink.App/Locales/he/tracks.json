@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "יותר מדי בקשות ל-OpenSubtitles — נסה שוב בעוד רגע",
   "player.subtitle.download.badlogin": "OpenSubtitles לא קיבל את ההתחברות",
   "player.subtitle.download.expired": "תוקף קישור ההורדה פג — נסה שוב",
-  "player.subtitle.download.toofast.wait": "יותר מדי בקשות ל-OpenSubtitles — נסה שוב בעוד {0} שנ'"
+  "player.subtitle.download.toofast.wait": "יותר מדי בקשות ל-OpenSubtitles — נסה שוב בעוד {0} שנ'",
+  "player.subtitle.visibility": "הצג/הסתר כתוביות",
+  "player.subtitle.lineprev": "שורת הכתובית הקודמת",
+  "player.subtitle.linenext": "שורת הכתובית הבאה",
+  "player.subtitle.stepprev": "סנכרן כתוביות לשורה הקודמת",
+  "player.subtitle.stepnext": "סנכרן כתוביות לשורה הבאה",
+  "player.subtitle.copy": "העתק את טקסט הכתובית",
+  "player.subtitle.hidden": "הכתוביות מוסתרות",
+  "player.subtitle.shown": "הכתוביות מוצגות",
+  "player.subtitle.copied": "טקסט הכתובית הועתק"
 }

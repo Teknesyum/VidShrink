@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "Príliš veľa požiadaviek na OpenSubtitles — skúste to o chvíľu znova",
   "player.subtitle.download.badlogin": "OpenSubtitles prihlásenie neprijalo",
   "player.subtitle.download.expired": "Platnosť odkazu na stiahnutie vypršala — skúste to znova",
-  "player.subtitle.download.toofast.wait": "Príliš veľa požiadaviek na OpenSubtitles — skúste to znova o {0} s"
+  "player.subtitle.download.toofast.wait": "Príliš veľa požiadaviek na OpenSubtitles — skúste to znova o {0} s",
+  "player.subtitle.visibility": "Zobraziť/skryť titulky",
+  "player.subtitle.lineprev": "Predchádzajúci riadok titulkov",
+  "player.subtitle.linenext": "Ďalší riadok titulkov",
+  "player.subtitle.stepprev": "Synchronizovať titulky s predchádzajúcim riadkom",
+  "player.subtitle.stepnext": "Synchronizovať titulky s ďalším riadkom",
+  "player.subtitle.copy": "Kopírovať text titulkov",
+  "player.subtitle.hidden": "Titulky skryté",
+  "player.subtitle.shown": "Titulky zobrazené",
+  "player.subtitle.copied": "Text titulkov skopírovaný"
 }

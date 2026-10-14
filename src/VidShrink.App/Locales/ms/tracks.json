@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "Terlalu banyak permintaan ke OpenSubtitles — cuba lagi sebentar lagi",
   "player.subtitle.download.badlogin": "OpenSubtitles tidak menerima log masuk",
   "player.subtitle.download.expired": "Pautan muat turun telah tamat tempoh — cuba lagi",
-  "player.subtitle.download.toofast.wait": "Terlalu banyak permintaan ke OpenSubtitles — cuba lagi dalam {0} s"
+  "player.subtitle.download.toofast.wait": "Terlalu banyak permintaan ke OpenSubtitles — cuba lagi dalam {0} s",
+  "player.subtitle.visibility": "Tunjuk/sembunyi sari kata",
+  "player.subtitle.lineprev": "Baris sari kata sebelumnya",
+  "player.subtitle.linenext": "Baris sari kata seterusnya",
+  "player.subtitle.stepprev": "Selaraskan sari kata dengan baris sebelumnya",
+  "player.subtitle.stepnext": "Selaraskan sari kata dengan baris seterusnya",
+  "player.subtitle.copy": "Salin teks sari kata",
+  "player.subtitle.hidden": "Sari kata disembunyikan",
+  "player.subtitle.shown": "Sari kata ditunjukkan",
+  "player.subtitle.copied": "Teks sari kata disalin"
 }

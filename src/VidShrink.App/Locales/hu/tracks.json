@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "Túl sok kérés érkezett az OpenSubtitles felé — próbálja újra egy pillanat múlva",
   "player.subtitle.download.badlogin": "Az OpenSubtitles nem fogadta el a bejelentkezést",
   "player.subtitle.download.expired": "A letöltési link lejárt — próbálja újra",
-  "player.subtitle.download.toofast.wait": "Túl sok kérés érkezett az OpenSubtitles felé — próbálja újra {0} mp múlva"
+  "player.subtitle.download.toofast.wait": "Túl sok kérés érkezett az OpenSubtitles felé — próbálja újra {0} mp múlva",
+  "player.subtitle.visibility": "Feliratok megjelenítése/elrejtése",
+  "player.subtitle.lineprev": "Előző feliratsor",
+  "player.subtitle.linenext": "Következő feliratsor",
+  "player.subtitle.stepprev": "Felirat igazítása az előző sorhoz",
+  "player.subtitle.stepnext": "Felirat igazítása a következő sorhoz",
+  "player.subtitle.copy": "Felirat szövegének másolása",
+  "player.subtitle.hidden": "Feliratok elrejtve",
+  "player.subtitle.shown": "Feliratok megjelenítve",
+  "player.subtitle.copied": "Felirat szövege másolva"
 }

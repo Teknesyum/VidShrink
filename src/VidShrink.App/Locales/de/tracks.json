@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "Zu viele Anfragen an OpenSubtitles — versuchen Sie es in einem Moment erneut",
   "player.subtitle.download.badlogin": "OpenSubtitles hat die Anmeldung nicht akzeptiert",
   "player.subtitle.download.expired": "Der Download-Link ist abgelaufen — versuchen Sie es erneut",
-  "player.subtitle.download.toofast.wait": "Zu viele Anfragen an OpenSubtitles — versuchen Sie es in {0} s erneut"
+  "player.subtitle.download.toofast.wait": "Zu viele Anfragen an OpenSubtitles — versuchen Sie es in {0} s erneut",
+  "player.subtitle.visibility": "Untertitel ein/aus",
+  "player.subtitle.lineprev": "Vorherige Untertitelzeile",
+  "player.subtitle.linenext": "Nächste Untertitelzeile",
+  "player.subtitle.stepprev": "Untertitel an vorherige Zeile angleichen",
+  "player.subtitle.stepnext": "Untertitel an nächste Zeile angleichen",
+  "player.subtitle.copy": "Untertiteltext kopieren",
+  "player.subtitle.hidden": "Untertitel ausgeblendet",
+  "player.subtitle.shown": "Untertitel eingeblendet",
+  "player.subtitle.copied": "Untertiteltext kopiert"
 }

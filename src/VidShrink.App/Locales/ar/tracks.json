@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "عدد كبير جدًا من الطلبات إلى OpenSubtitles — حاول مرة أخرى بعد لحظة",
   "player.subtitle.download.badlogin": "لم يقبل OpenSubtitles تسجيل الدخول",
   "player.subtitle.download.expired": "انتهت صلاحية رابط التنزيل — حاول مرة أخرى",
-  "player.subtitle.download.toofast.wait": "عدد كبير جدًا من الطلبات إلى OpenSubtitles — حاول مرة أخرى بعد {0} ثانية"
+  "player.subtitle.download.toofast.wait": "عدد كبير جدًا من الطلبات إلى OpenSubtitles — حاول مرة أخرى بعد {0} ثانية",
+  "player.subtitle.visibility": "إظهار/إخفاء الترجمة",
+  "player.subtitle.lineprev": "سطر الترجمة السابق",
+  "player.subtitle.linenext": "سطر الترجمة التالي",
+  "player.subtitle.stepprev": "مزامنة الترجمة مع السطر السابق",
+  "player.subtitle.stepnext": "مزامنة الترجمة مع السطر التالي",
+  "player.subtitle.copy": "نسخ نص الترجمة",
+  "player.subtitle.hidden": "الترجمة مخفية",
+  "player.subtitle.shown": "الترجمة ظاهرة",
+  "player.subtitle.copied": "تم نسخ نص الترجمة"
 }
