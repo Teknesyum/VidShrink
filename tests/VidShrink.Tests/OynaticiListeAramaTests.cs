@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using VidShrink.App.Localization;
 using VidShrink.App.Playback;
@@ -84,8 +84,8 @@ public sealed class OynaticiListeAramaTests
     public void SuzgecAdaBakarHarfBuyuklugunuAyirmaz(string arama, string beklenen)
     {
         var liste = Liste("Bolum 1", "bölüm 2", "Film");
-        var kultur = System.Globalization.CultureInfo.CurrentCulture;
-        System.Globalization.CultureInfo.CurrentCulture = new System.Globalization.CultureInfo("tr-TR");
+        var dil = VidShrink.App.Localization.Strings.Language;
+        VidShrink.App.Localization.Strings.Use("tr");
         try
         {
             var sonuc = PlaylistFilter.Match(liste, arama, Path.GetFileNameWithoutExtension!);
@@ -93,7 +93,7 @@ public sealed class OynaticiListeAramaTests
         }
         finally
         {
-            System.Globalization.CultureInfo.CurrentCulture = kultur;
+            VidShrink.App.Localization.Strings.Use(dil);
         }
     }
 

@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using VidShrink.Cli;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
@@ -226,6 +226,12 @@ public sealed class DisSesTests
 
         var bayt = new FileInfo(cikti).Length;
         var hedef = 1 * Megabayt.Bayt;
+        if (BudgetFill.Plan(plan, bayt / (double)Megabayt.Bayt, Array.Empty<SizeSample>(), 1, info.DurationSeconds) is { } dolgu)
+        {
+            await AkisGirdisi.RunOrThrowAsync(ToolLocator.Ffmpeg, FfmpegArguments.Build(info, dolgu, cikti, 1, log));
+            await AkisGirdisi.RunOrThrowAsync(ToolLocator.Ffmpeg, FfmpegArguments.Build(info, dolgu, cikti, 2, log));
+            bayt = new FileInfo(cikti).Length;
+        }
         File.WriteAllText(Yol("dis-ses-hedef-olcum.txt"), $"bayt={bayt} hedef={hedef} oran={bayt / (double)hedef:0.000}");
         Assert.Equal(2, (await AkislarAsync(cikti)).Count(stream => Alan(stream, "codec_type") == "audio"));
         Assert.InRange(bayt / (double)hedef, BudgetFill.Floor, 1.0);
