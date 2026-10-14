@@ -1145,3 +1145,10 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 - Kanıt: `ResetBurnStyle()` çağrısı (`src/VidShrink.App/MainWindow.Izler.cs:170`) kaldırılınca 21 testin hepsi yeşil kaldı; yeni kaynakta seçimin sıfırlandığını ölçen test yok. Ayrıca kuyruğa taşınan işte `BurnSubtitle` boşaltılıyor (`src/VidShrink.App/MainWindow.axaml.cs:3346`) ama `BurnFont`, `BurnFontSize`, `BurnBox` kalıyor; yakma olmadığı için etkisiz.
 - Plan: İkinci kaynak açan arayüz testi seçimin varsayılana döndüğünü pimler; kuyruk kolunda üç biçim alanı da boşaltılır ve plan testi bunu okur.
+
+## 161. İmleç Vurgusu Kutularını Kancasız Platformda Gizleme
+
+14 Ekim 2026 · Dalga 2 yapımında görüldü (PLT-P2) · Kaydedici · iş küçük · öncelik 2 · karar gerekmez
+
+- Kanıt: "İmleci Vurgula" ve "Spot Işığı" Windows kancasına bağlı; Windows dışında boş kanca kuruluyor (`src/VidShrink.App/Recorder/RecorderView.Girdi.cs:21`), iki ayar `:63`'te okunuyor. Kutular (`RecorderView.axaml:637`, `:641`) yine de görünüyor.
+- Plan: PLT-P2'nin `HooksAvailable` kapısına bu iki kutu ve boyut/renk seçimleri de bağlanır; `KaydediciPlatformKutuTests` Linux ve Mac kolunda görünmezliği ölçer.
