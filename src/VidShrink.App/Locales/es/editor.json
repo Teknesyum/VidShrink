@@ -159,5 +159,8 @@
   "editor.paste": "Pegar",
   "editor.duplicate": "Duplicar",
   "editor.group": "Agrupar",
-  "editor.ungroup": "Desagrupar"
+  "editor.ungroup": "Desagrupar",
+  "editor.export.audio-track": "Pista de audio",
+  "editor.export.audio-track.none": "Sin audio",
+  "editor.monitor.audio-track": "Cambiar pista de audio"
 }

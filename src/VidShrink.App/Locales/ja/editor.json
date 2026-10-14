@@ -159,5 +159,8 @@
   "editor.paste": "貼り付け",
   "editor.duplicate": "複製",
   "editor.group": "グループ化",
-  "editor.ungroup": "グループ解除"
+  "editor.ungroup": "グループ解除",
+  "editor.export.audio-track": "音声トラック",
+  "editor.export.audio-track.none": "音声なし",
+  "editor.monitor.audio-track": "音声トラックを切り替え"
 }

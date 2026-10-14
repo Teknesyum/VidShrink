@@ -159,5 +159,8 @@
   "editor.paste": "Prilepiť",
   "editor.duplicate": "Duplikovať",
   "editor.group": "Zoskupiť",
-  "editor.ungroup": "Zrušiť zoskupenie"
+  "editor.ungroup": "Zrušiť zoskupenie",
+  "editor.export.audio-track": "Zvuková stopa",
+  "editor.export.audio-track.none": "Bez zvuku",
+  "editor.monitor.audio-track": "Prepnúť zvukovú stopu"
 }

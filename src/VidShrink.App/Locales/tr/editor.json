@@ -159,5 +159,8 @@
   "editor.paste": "Yapıştır",
   "editor.duplicate": "Çoğalt",
   "editor.group": "Grupla",
-  "editor.ungroup": "Grubu Çöz"
+  "editor.ungroup": "Grubu Çöz",
+  "editor.export.audio-track": "Ses izi",
+  "editor.export.audio-track.none": "Ses yok",
+  "editor.monitor.audio-track": "Ses izini değiştir"
 }

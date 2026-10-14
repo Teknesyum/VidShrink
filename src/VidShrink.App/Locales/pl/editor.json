@@ -159,5 +159,8 @@
   "editor.paste": "Wklej",
   "editor.duplicate": "Duplikuj",
   "editor.group": "Grupuj",
-  "editor.ungroup": "Rozgrupuj"
+  "editor.ungroup": "Rozgrupuj",
+  "editor.export.audio-track": "Ścieżka dźwiękowa",
+  "editor.export.audio-track.none": "Bez dźwięku",
+  "editor.monitor.audio-track": "Przełącz ścieżkę dźwiękową"
 }

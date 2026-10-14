@@ -96,7 +96,7 @@ internal partial class EditorView
 
     private EditProject? CurrentProject()
         => _model is { } model && _stamp is { } stamp && ExtraStamps() is { } extras
-            ? EditProject.From(stamp, model, SelectedExportMode.ToString(), extras, Timeline.MarkerList)
+            ? EditProject.From(stamp, model, SelectedExportMode.ToString(), extras, Timeline.MarkerList, SelectedAudioTrack)
             : null;
 
     private EditTimeline OpenedTimeline(string path, long sourceDuration, EditProject? given)
@@ -124,6 +124,7 @@ internal partial class EditorView
             model = new EditTimeline(model.Clips, sourceDuration, extraSources: project.ExtraSources.Select(extra => extra.Duration));
         }
 
+        UseAudioTrack(project.AudioTrack);
         if (!model.Restore(project.Clips, project.Texts) && project.Markers.Count == 0) return model;
         _pendingMarkers = project.Markers;
         UseExportMode(project.ExportMode);
@@ -186,6 +187,7 @@ internal partial class EditorView
             }
 
             _stamp = stamp;
+            UseAudioTrack(project.AudioTrack);
             if (Apply(m => m.Restore(project.Clips, project.Texts), -1, reload: true)) AfterTextEdit(-1);
             Timeline.SetMarkers(project.Markers);
             UseExportMode(project.ExportMode);

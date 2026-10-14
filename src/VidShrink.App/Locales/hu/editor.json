@@ -159,5 +159,8 @@
   "editor.paste": "Beillesztés",
   "editor.duplicate": "Kettőzés",
   "editor.group": "Csoportosítás",
-  "editor.ungroup": "Csoport bontása"
+  "editor.ungroup": "Csoport bontása",
+  "editor.export.audio-track": "Hangsáv",
+  "editor.export.audio-track.none": "Nincs hang",
+  "editor.monitor.audio-track": "Hangsáv váltása"
 }

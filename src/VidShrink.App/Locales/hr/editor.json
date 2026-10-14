@@ -159,5 +159,8 @@
   "editor.paste": "Zalijepi",
   "editor.duplicate": "Udvostruči",
   "editor.group": "Grupiraj",
-  "editor.ungroup": "Razgrupiraj"
+  "editor.ungroup": "Razgrupiraj",
+  "editor.export.audio-track": "Zvučni zapis",
+  "editor.export.audio-track.none": "Bez zvuka",
+  "editor.monitor.audio-track": "Promijeni zvučni zapis"
 }

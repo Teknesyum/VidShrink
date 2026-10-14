@@ -159,5 +159,8 @@
   "editor.paste": "Paste",
   "editor.duplicate": "Duplicate",
   "editor.group": "Group",
-  "editor.ungroup": "Ungroup"
+  "editor.ungroup": "Ungroup",
+  "editor.export.audio-track": "Audio track",
+  "editor.export.audio-track.none": "No audio",
+  "editor.monitor.audio-track": "Switch audio track"
 }

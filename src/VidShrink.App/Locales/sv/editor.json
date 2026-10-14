@@ -159,5 +159,8 @@
   "editor.paste": "Klistra in",
   "editor.duplicate": "Duplicera",
   "editor.group": "Gruppera",
-  "editor.ungroup": "Dela upp grupp"
+  "editor.ungroup": "Dela upp grupp",
+  "editor.export.audio-track": "Ljudspår",
+  "editor.export.audio-track.none": "Inget ljud",
+  "editor.monitor.audio-track": "Byt ljudspår"
 }

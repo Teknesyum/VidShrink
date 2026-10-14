@@ -159,5 +159,8 @@
   "editor.paste": "粘贴",
   "editor.duplicate": "创建副本",
   "editor.group": "编组",
-  "editor.ungroup": "取消编组"
+  "editor.ungroup": "取消编组",
+  "editor.export.audio-track": "音轨",
+  "editor.export.audio-track.none": "无音频",
+  "editor.monitor.audio-track": "切换音轨"
 }

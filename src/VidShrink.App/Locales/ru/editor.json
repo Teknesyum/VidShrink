@@ -159,5 +159,8 @@
   "editor.paste": "Вставить",
   "editor.duplicate": "Дублировать",
   "editor.group": "Сгруппировать",
-  "editor.ungroup": "Разгруппировать"
+  "editor.ungroup": "Разгруппировать",
+  "editor.export.audio-track": "Звуковая дорожка",
+  "editor.export.audio-track.none": "Без звука",
+  "editor.monitor.audio-track": "Сменить звуковую дорожку"
 }

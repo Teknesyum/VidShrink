@@ -159,5 +159,8 @@
   "editor.paste": "Incolla",
   "editor.duplicate": "Duplica",
   "editor.group": "Raggruppa",
-  "editor.ungroup": "Separa"
+  "editor.ungroup": "Separa",
+  "editor.export.audio-track": "Traccia audio",
+  "editor.export.audio-track.none": "Nessun audio",
+  "editor.monitor.audio-track": "Cambia traccia audio"
 }

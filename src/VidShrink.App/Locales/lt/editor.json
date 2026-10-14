@@ -159,5 +159,8 @@
   "editor.paste": "Įklijuoti",
   "editor.duplicate": "Dubliuoti",
   "editor.group": "Grupuoti",
-  "editor.ungroup": "Išgrupuoti"
+  "editor.ungroup": "Išgrupuoti",
+  "editor.export.audio-track": "Garso takelis",
+  "editor.export.audio-track.none": "Be garso",
+  "editor.monitor.audio-track": "Perjungti garso takelį"
 }

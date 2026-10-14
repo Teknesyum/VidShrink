@@ -159,5 +159,8 @@
   "editor.paste": "Liitä",
   "editor.duplicate": "Monista",
   "editor.group": "Ryhmitä",
-  "editor.ungroup": "Pura ryhmitys"
+  "editor.ungroup": "Pura ryhmitys",
+  "editor.export.audio-track": "Ääniraita",
+  "editor.export.audio-track.none": "Ei ääntä",
+  "editor.monitor.audio-track": "Vaihda ääniraitaa"
 }

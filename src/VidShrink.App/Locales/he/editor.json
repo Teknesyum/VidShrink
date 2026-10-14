@@ -159,5 +159,8 @@
   "editor.paste": "הדבקה",
   "editor.duplicate": "שכפול",
   "editor.group": "קיבוץ",
-  "editor.ungroup": "ביטול קיבוץ"
+  "editor.ungroup": "ביטול קיבוץ",
+  "editor.export.audio-track": "רצועת שמע",
+  "editor.export.audio-track.none": "ללא שמע",
+  "editor.monitor.audio-track": "החלפת רצועת שמע"
 }

@@ -159,5 +159,8 @@
   "editor.paste": "Tampal",
   "editor.duplicate": "Gandakan",
   "editor.group": "Kumpulkan",
-  "editor.ungroup": "Nyahkumpulkan"
+  "editor.ungroup": "Nyahkumpulkan",
+  "editor.export.audio-track": "Trek audio",
+  "editor.export.audio-track.none": "Tiada audio",
+  "editor.monitor.audio-track": "Tukar trek audio"
 }

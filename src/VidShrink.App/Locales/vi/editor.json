@@ -159,5 +159,8 @@
   "editor.paste": "Dán",
   "editor.duplicate": "Nhân bản",
   "editor.group": "Nhóm",
-  "editor.ungroup": "Bỏ nhóm"
+  "editor.ungroup": "Bỏ nhóm",
+  "editor.export.audio-track": "Rãnh âm thanh",
+  "editor.export.audio-track.none": "Không có âm thanh",
+  "editor.monitor.audio-track": "Đổi rãnh âm thanh"
 }

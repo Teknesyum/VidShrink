@@ -159,5 +159,8 @@
   "editor.paste": "Lipește",
   "editor.duplicate": "Duplică",
   "editor.group": "Grupează",
-  "editor.ungroup": "Degrupează"
+  "editor.ungroup": "Degrupează",
+  "editor.export.audio-track": "Pistă audio",
+  "editor.export.audio-track.none": "Fără sunet",
+  "editor.monitor.audio-track": "Schimbă pista audio"
 }

@@ -159,5 +159,8 @@
   "editor.paste": "ஒட்டு",
   "editor.duplicate": "நகல் உருவாக்கு",
   "editor.group": "குழுவாக்கு",
-  "editor.ungroup": "குழுவைப் பிரி"
+  "editor.ungroup": "குழுவைப் பிரி",
+  "editor.export.audio-track": "ஒலித் தடம்",
+  "editor.export.audio-track.none": "ஒலி இல்லை",
+  "editor.monitor.audio-track": "ஒலித் தடத்தை மாற்று"
 }

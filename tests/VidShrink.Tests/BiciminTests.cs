@@ -1261,6 +1261,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, klip gruplama ve pano (DZB-P4): alti yeni anahtardan (<c>editor.copy</c>, <c>.cut</c>, <c>.paste</c>, <c>.duplicate</c>, <c>.group</c>, <c>.ungroup</c>) 1 kol 1 dilde (paste: sv), KOL dokumunden sayildi, en ve tr girmiyor; 887cb448 agacinda olculen 3334 + 1 = 3335, en 322, tr 108.</para>
     /// <para>2026-10-14, medya bilgisi ve denetim raporu (ARC-P2): 56 yeni <c>mediainfo.*</c> anahtarindan 82 kol 14 dilde (cs 1, en 2: failed, save; es 16, fr 6, hr 2, hu 1, id 1, lt 1, ms 4, pt 19, ro 12, sl 2, sr 4, sw 11), KOL dokumunden sayildi, tr girmiyor: 3334 + 82 = 3416, en 322 + 2 = 324, tr 108.</para>
     /// <para>2026-10-14, kamera bicimi ve konumu (EKB-P5): kaldirilan dort kose anahtarindan (<c>recorder.webcam.top-left</c>, <c>.top-right</c>, <c>.bottom-left</c>, <c>.bottom-right</c>) 12 kol 4 dilde gitti (es 4, hr 2, it 4, sr 2); bes yeni anahtar (<c>recorder.webcam.shape</c>, <c>.shape.rectangle</c>, <c>.shape.rounded</c>, <c>.shape.circle</c>, <c>.mirror</c>) hicbir dilde kola girmiyor. Taban dil dosyalariyla ve yenileriyle iki KOL dokumunden sayildi: 3334 - 12 = 3322, en 322, tr 108.</para>
+    /// <para>2026-10-14, iz secim paneli (DZA-P5): uc yeni anahtardan (<c>editor.export.audio-track</c>, <c>.none</c>, <c>editor.monitor.audio-track</c>) 6 kol 4 dilde (es: export ve monitor; fr: monitor; lt: none; pt: export ve monitor), KOL dokumunden sayildi, en ve tr girmiyor: taban pimi 3334 + 6 = 3340, en 322, tr 108.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1286,7 +1287,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3405, toplam);
+        Assert.Equal(3411, toplam);
         Assert.Equal(324, dilBasina["en"]);
         Assert.Equal(108, dilBasina["tr"]);
     }
@@ -1527,6 +1528,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, klip gruplama ve pano (DZB-P4): alti yeni <c>editor.*</c> anahtari (copy, cut, paste, duplicate, group, ungroup), dusen yok; 887cb448 agacinda olculen 65188 + 43 x 6 = 65446. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, medya bilgisi ve denetim raporu (ARC-P2): 56 yeni <c>mediainfo.*</c> anahtari, dusen yok; olculen 65188 + 43 x 56 = 67596. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, kamera bicimi ve konumu (EKB-P5): yedi anahtar dustu (<c>recorder.webcam.size</c>, <c>.width</c>, <c>.corner</c> ve dort kose), bes yeni geldi (<c>recorder.webcam.shape</c>, <c>.shape.rectangle</c>, <c>.shape.rounded</c>, <c>.shape.circle</c>, <c>.mirror</c>); 43 x (5 - 7) = -86, olculen 65188 - 86 = 65102. <c>kayip</c> 0.</para>
+    /// <para>2026-10-14, iz secim paneli (DZA-P5): uc yeni anahtar (<c>editor.export.audio-track</c>, <c>.none</c>, <c>editor.monitor.audio-track</c>), dusen yok; taban pimi 65188 + 43 x 3 = 65317. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1554,7 +1556,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(67768, gezilen);
+        Assert.Equal(67897, gezilen);
         Assert.Empty(kayip);
     }
 

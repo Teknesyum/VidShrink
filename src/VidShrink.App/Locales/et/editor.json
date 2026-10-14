@@ -159,5 +159,8 @@
   "editor.paste": "Kleebi",
   "editor.duplicate": "Dubleeri",
   "editor.group": "Rühmita",
-  "editor.ungroup": "Tühista rühmitus"
+  "editor.ungroup": "Tühista rühmitus",
+  "editor.export.audio-track": "Heliriba",
+  "editor.export.audio-track.none": "Heli puudub",
+  "editor.monitor.audio-track": "Vaheta heliriba"
 }

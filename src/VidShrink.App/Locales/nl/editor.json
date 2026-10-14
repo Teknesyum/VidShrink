@@ -159,5 +159,8 @@
   "editor.paste": "Plakken",
   "editor.duplicate": "Dupliceren",
   "editor.group": "Groeperen",
-  "editor.ungroup": "Groepering opheffen"
+  "editor.ungroup": "Groepering opheffen",
+  "editor.export.audio-track": "Audiospoor",
+  "editor.export.audio-track.none": "Geen audio",
+  "editor.monitor.audio-track": "Audiospoor wisselen"
 }

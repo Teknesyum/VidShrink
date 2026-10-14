@@ -159,5 +159,8 @@
   "editor.paste": "붙여넣기",
   "editor.duplicate": "복제",
   "editor.group": "그룹화",
-  "editor.ungroup": "그룹 해제"
+  "editor.ungroup": "그룹 해제",
+  "editor.export.audio-track": "오디오 트랙",
+  "editor.export.audio-track.none": "오디오 없음",
+  "editor.monitor.audio-track": "오디오 트랙 전환"
 }

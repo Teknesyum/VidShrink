@@ -159,5 +159,8 @@
   "editor.paste": "Ielīmēt",
   "editor.duplicate": "Dublēt",
   "editor.group": "Grupēt",
-  "editor.ungroup": "Atgrupēt"
+  "editor.ungroup": "Atgrupēt",
+  "editor.export.audio-track": "Audio celiņš",
+  "editor.export.audio-track.none": "Bez skaņas",
+  "editor.monitor.audio-track": "Pārslēgt audio celiņu"
 }

@@ -139,6 +139,7 @@ internal partial class EditorView
             if (empty || TxtPartNameError.Text.Length == 0) PartNamePatternChanged?.Invoke(PartNamePattern);
         };
         InitExportSettings();
+        InitAudioTrack();
     }
 
     private void RefreshExport() => EnableExport(!Exporting);
@@ -164,7 +165,7 @@ internal partial class EditorView
         _pendingPlan = null;
     }
 
-    private string SaveKey(EditTimeline model) => Fingerprint(model) + "|" + SelectedExportMode + (ExportSeparately ? "|parts|" + PartNamePattern : string.Empty) + (DropMetadata ? "|meta" : string.Empty) + "|set|" + ExportSettings;
+    private string SaveKey(EditTimeline model) => Fingerprint(model) + "|" + SelectedExportMode + (ExportSeparately ? "|parts|" + PartNamePattern : string.Empty) + (DropMetadata ? "|meta" : string.Empty) + "|set|" + ExportSettings + "|aud|" + SelectedAudioTrack.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
     internal async Task<bool> SaveAsync()
     {
@@ -215,8 +216,8 @@ internal partial class EditorView
         try
         {
             plans = ExportSeparately
-                ? await EditExportRunner.PrepareSegmentsAsync(sources, snapshot, SelectedExportMode, output, ExportMemoryBudget(), OutputExists, DropMetadata, partPattern: PartNamePattern, settings: ExportSettings).ConfigureAwait(true)
-                : new[] { await EditExportRunner.PrepareAsync(sources, snapshot, SelectedExportMode, output, ExportMemoryBudget(), DropMetadata, settings: ExportSettings).ConfigureAwait(true) };
+                ? await EditExportRunner.PrepareSegmentsAsync(sources, snapshot, SelectedExportMode, output, ExportMemoryBudget(), OutputExists, DropMetadata, partPattern: PartNamePattern, settings: ExportSettings, audioTrack: SelectedAudioTrack).ConfigureAwait(true)
+                : new[] { await EditExportRunner.PrepareAsync(sources, snapshot, SelectedExportMode, output, ExportMemoryBudget(), DropMetadata, settings: ExportSettings, audioTrack: SelectedAudioTrack).ConfigureAwait(true) };
         }
         catch (EditExportNoAudioException)
         {

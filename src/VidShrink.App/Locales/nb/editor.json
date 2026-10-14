@@ -159,5 +159,8 @@
   "editor.paste": "Lim inn",
   "editor.duplicate": "Dupliser",
   "editor.group": "Grupper",
-  "editor.ungroup": "Del opp gruppe"
+  "editor.ungroup": "Del opp gruppe",
+  "editor.export.audio-track": "Lydspor",
+  "editor.export.audio-track.none": "Ingen lyd",
+  "editor.monitor.audio-track": "Bytt lydspor"
 }

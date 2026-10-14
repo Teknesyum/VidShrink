@@ -159,5 +159,8 @@
   "editor.paste": "چسپاں کریں",
   "editor.duplicate": "نقل بنائیں",
   "editor.group": "گروپ بنائیں",
-  "editor.ungroup": "گروپ ختم کریں"
+  "editor.ungroup": "گروپ ختم کریں",
+  "editor.export.audio-track": "آڈیو ٹریک",
+  "editor.export.audio-track.none": "آڈیو نہیں",
+  "editor.monitor.audio-track": "آڈیو ٹریک بدلیں"
 }

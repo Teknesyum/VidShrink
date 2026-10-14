@@ -159,5 +159,8 @@
   "editor.paste": "Indsæt",
   "editor.duplicate": "Dupliker",
   "editor.group": "Gruppér",
-  "editor.ungroup": "Opdel gruppe"
+  "editor.ungroup": "Opdel gruppe",
+  "editor.export.audio-track": "Lydspor",
+  "editor.export.audio-track.none": "Ingen lyd",
+  "editor.monitor.audio-track": "Skift lydspor"
 }
