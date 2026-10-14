@@ -54,6 +54,12 @@ internal sealed class PlayerSettings
 
     internal HardwareDecoding Hardware { get; set; }
 
+    internal const double DefaultVolume = 100;
+
+    internal double Volume { get; set; } = DefaultVolume;
+
+    internal bool Muted { get; set; }
+
     internal static PlayerSettings Load(string? file)
     {
         var settings = new PlayerSettings();
@@ -73,6 +79,8 @@ internal sealed class PlayerSettings
             settings.SpeedModeB = string.Equals((string?)root["speedMode"], "B", StringComparison.OrdinalIgnoreCase);
             if (Enum.TryParse<HardwareDecoding>((string?)root["hardwareDecoding"], true, out var hardware) && Enum.IsDefined(hardware))
                 settings.Hardware = hardware;
+            settings.Volume = (double?)root["volume"] is { } volume && double.IsFinite(volume) && volume >= 0 && volume <= SoundAdjust.BoostCeiling ? volume : DefaultVolume;
+            settings.Muted = (bool?)root["muted"] ?? false;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or FormatException)
         {
@@ -105,6 +113,8 @@ internal sealed class PlayerSettings
                 writer.WriteNumber("speedB", SpeedB);
                 writer.WriteString("speedMode", SpeedModeB ? "B" : "A");
                 writer.WriteString("hardwareDecoding", Hardware.ToString());
+                writer.WriteNumber("volume", Volume);
+                writer.WriteBoolean("muted", Muted);
                 writer.WriteEndObject();
             }
             File.Move(temp, file, true);

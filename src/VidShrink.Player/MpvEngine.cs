@@ -443,6 +443,22 @@ public sealed partial class MpvEngine : IPlaybackEngine
         }
     }
 
+    public IReadOnlyList<string> ChapterTitles
+    {
+        get
+        {
+            var count = ReadInt("chapter-list/count");
+            var titles = new List<string>();
+            for (var i = 0; i < count; i++)
+            {
+                if (!double.IsFinite(GetDouble($"chapter-list/{i}/time"))) continue;
+                titles.Add(GetProperty($"chapter-list/{i}/title") ?? "");
+            }
+
+            return titles;
+        }
+    }
+
     public MediaDetails? Details
     {
         get

@@ -44,20 +44,19 @@ internal static class BolumKanit
 
     internal static string Bolumsuz => Uret("bolumsuz-160x90.mkv", Kaynak.Concat(Kodlama).ToArray());
 
-    internal static string UcBolum
+    internal static string UcBolum => UcBolumUret("uc-bolum-160x90.mkv", "bolumler.txt");
+
+    internal static string UcBolumUret(string ad, string metaAd)
     {
-        get
-        {
-            var meta = Path.Combine(Folder, "bolumler.txt");
-            File.WriteAllText(meta, string.Join("\n",
-                ";FFMETADATA1",
-                "[CHAPTER]", "TIMEBASE=1/1000", "START=0", "END=1500", "title=a",
-                "[CHAPTER]", "TIMEBASE=1/1000", "START=1500", "END=3000", "title=b",
-                "[CHAPTER]", "TIMEBASE=1/1000", "START=3000", "END=4500", "title=c") + "\n", new UTF8Encoding(false));
-            return Uret("uc-bolum-160x90.mkv", Kaynak
-                .Concat(new[] { "-i", meta, "-map", "0:v", "-map_metadata", "1", "-map_chapters", "1" })
-                .Concat(Kodlama).ToArray());
-        }
+        var meta = Path.Combine(Folder, metaAd);
+        File.WriteAllText(meta, string.Join("\n",
+            ";FFMETADATA1",
+            "[CHAPTER]", "TIMEBASE=1/1000", "START=0", "END=1500", "title=a",
+            "[CHAPTER]", "TIMEBASE=1/1000", "START=1500", "END=3000", "title=b",
+            "[CHAPTER]", "TIMEBASE=1/1000", "START=3000", "END=4500", "title=c") + "\n", new UTF8Encoding(false));
+        return Uret(ad, Kaynak
+            .Concat(new[] { "-i", meta, "-map", "0:v", "-map_metadata", "1", "-map_chapters", "1" })
+            .Concat(Kodlama).ToArray());
     }
 
     private static string Uret(string ad, string[] args)

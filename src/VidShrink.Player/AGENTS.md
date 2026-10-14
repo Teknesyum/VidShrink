@@ -19,6 +19,7 @@ Oynatıcı sekmesinin ve karşılaştırma panelinin motoru. `IPlaybackEngine` m
   `video-aspect-override`; ekran görüntüsü `screenshot-to-file .. video`, bilgi `track-list` + `file-size` + `video-params` (`primaries`, `gamma`, `pixelformat`; ilk kareden önce boş) ve iz başına `dolby-vision-profile`.
   Canlı ölçüm `Stats` (`PlaybackStats`): `frame-drop-count`, `decoder-frame-drop-count`, `hwdec-current` (`no` = yazılım), `video-bitrate`, `estimated-vf-fps`; zamanlayıcısı yok, çağıran sorar.
   Arayüze yalnız varsayılan gövdeli üyeler eklenir.
+- Bölümler: `ChapterTimes` ve aynı sırada `ChapterTitles` (`chapter-list/N/title`, adsız bölüm boş metin), `StepChapter`.
 - Gelişmiş (`MpvEngine.Advanced.cs`): renk, ton, keskinlik, kırpma, ekolayzer ve normalleştirme etiketli `vf`/`af`
   halkaları (`@vscolor`…); altyazı biçimi ve `volume-max` özellikten. Geri okumada mpv'nin `%uzunluk%` kaçışı ayıklanır.
 Testler `OynaticiMotorTests.cs`, `OynaticiKarsilastirmaTests.cs`, `OynaticiParcaTests.cs`, `OynaticiGorunumTests.cs`.

@@ -805,4 +805,277 @@ public sealed class OynaticiGorunumTests
         Assert.Equal(RepeatMode.Off, PlayerSettings.Load(bozuk).Repeat);
         GorunumKanit.Kapat("oynatici-ayarlari.txt");
     }
+
+    [Fact]
+    public void SesDuzeyiVeSessizAyarDosyasindaGidipGelir()
+    {
+        var klasor = GorunumKanit.Gecici("ses-ayar");
+        var dosya = Path.Combine(klasor, PlayerSettings.FileName);
+        new PlayerSettings { Volume = 65, Muted = true }.Save(dosya);
+        var geri = PlayerSettings.Load(dosya);
+        var metin = File.ReadAllText(dosya);
+
+        var tasan = Path.Combine(klasor, "tasan.json");
+        File.WriteAllText(tasan, "{\"volume\": 500, \"muted\": true}");
+        var eksi = Path.Combine(klasor, "eksi.json");
+        File.WriteAllText(eksi, "{\"volume\": -3}");
+        var bos = Path.Combine(klasor, "bos.json");
+        File.WriteAllText(bos, "{}");
+
+        Assert.Equal(65, geri.Volume);
+        Assert.True(geri.Muted);
+        Assert.Contains("\"volume\": 65", metin);
+        Assert.Contains("\"muted\": true", metin);
+        Assert.Equal(100, PlayerSettings.Load(tasan).Volume);
+        Assert.True(PlayerSettings.Load(tasan).Muted);
+        Assert.Equal(100, PlayerSettings.Load(eksi).Volume);
+        Assert.Equal(100, PlayerSettings.Load(bos).Volume);
+        Assert.False(PlayerSettings.Load(bos).Muted);
+        Directory.Delete(klasor, true);
+    }
+
+    [Fact]
+    public void SesDuzeyiVeSessizYenidenAcilistaGeriGelir()
+    {
+        var gecmis = Ayar("ses-acilis");
+        var sonuc = AppHost.Run(() =>
+        {
+            var ilk = BildirimKanit.Ac(new BildirimMotoru(), gecmis, out var ilkPencere);
+            ilk.Apply(new PlayerCommand(PlayerCommandKind.Volume, -35));
+            ilk.Apply(new PlayerCommand(PlayerCommandKind.ToggleMute, 0));
+            BildirimKanit.Kapat(ilk, ilkPencere);
+
+            var motor = new BildirimMotoru();
+            var ikinci = BildirimKanit.Ac(motor, gecmis, out var ikinciPencere);
+            var okunan = (ikinci.VolumeLevel, ikinci.IsMuted, motor.Ses, motor.Sessiz);
+            BildirimKanit.Kapat(ikinci, ikinciPencere);
+
+            var bos = new PlayerView { HistoryPath = () => gecmis };
+            bos.Apply(new PlayerCommand(PlayerCommandKind.Volume, 5));
+            var dosyasiz = bos.VolumeLevel;
+            bos.Close();
+            return (okunan, dosyasiz);
+        });
+
+        Assert.Equal(65, sonuc.okunan.VolumeLevel);
+        Assert.True(sonuc.okunan.IsMuted);
+        Assert.Equal(65, sonuc.okunan.Ses);
+        Assert.True(sonuc.okunan.Sessiz);
+        Assert.Equal(70, sonuc.dosyasiz);
+        Directory.Delete(Path.GetDirectoryName(gecmis)!, true);
+    }
+
+    [Fact]
+    public void RozetParcaGecikmeAbBolumVeKareSonucunuSoyler()
+    {
+        var gecmis = Ayar("rozet");
+        var klasor = Path.GetDirectoryName(gecmis)!;
+        var sonuc = AppHost.Run(() =>
+        {
+            Strings.Use("tr");
+            var motor = new BildirimMotoru();
+            var view = BildirimKanit.Ac(motor, gecmis, out var pencere);
+            view.Settings.ScreenshotFolder = klasor;
+            view.FrameScratchFolder = klasor;
+            var metinler = new List<string?>();
+            void Komut(PlayerCommandKind tur, double miktar = 0)
+            {
+                view.Apply(new PlayerCommand(tur, miktar));
+                metinler.Add(view.OsdText);
+            }
+
+            Komut(PlayerCommandKind.AudioCycle);
+            Komut(PlayerCommandKind.SubtitleCycle);
+            Komut(PlayerCommandKind.SubtitleDelay, 0.1);
+            Komut(PlayerCommandKind.AudioDelay, -0.05);
+            Komut(PlayerCommandKind.LoopStart);
+            motor.Konum = 12.5;
+            Komut(PlayerCommandKind.LoopEnd);
+            Komut(PlayerCommandKind.LoopClear);
+            motor.Konum = 0;
+            Komut(PlayerCommandKind.ChapterStep, 1);
+            motor.Konum = 401;
+            Komut(PlayerCommandKind.ChapterStep, -1);
+            motor.Konum = 410;
+            Komut(PlayerCommandKind.ChapterStep, -1);
+
+            Komut(PlayerCommandKind.Screenshot);
+            DenetimSurucu.Pump(view, () => view.LastScreenshot.IsCompleted, 5);
+            metinler.Add(view.OsdText);
+            Komut(PlayerCommandKind.CopyFrame);
+            DenetimSurucu.Pump(view, () => view.LastFrameCopy.IsCompleted, 5);
+            metinler.Add(view.OsdText);
+
+            BildirimKanit.Kapat(view, pencere);
+            return metinler;
+        });
+
+        GorunumKanit.Write("rozet-bildirimleri.txt", string.Join("\n", sonuc));
+        Assert.Equal("Ses parçası: Parça 2 · Yorum", sonuc[0]);
+        Assert.Equal("Altyazı: Parça 3", sonuc[1]);
+        Assert.Equal("Altyazı gecikmesi +0,1 sn", sonuc[2]);
+        Assert.Equal("Ses gecikmesi −0,05 sn", sonuc[3]);
+        Assert.Equal("A-B 0 - … sn", sonuc[4]);
+        Assert.Equal("A-B 0 - 12,5 sn", sonuc[5]);
+        Assert.Equal("A-B kapalı", sonuc[6]);
+        Assert.Equal("Bölüm 2 · Orta", sonuc[7]);
+        Assert.Equal("Bölüm 2 · Orta", sonuc[8]);
+        Assert.Equal("Bölüm 3 · Son", sonuc[9]);
+        Assert.Equal("ekran görüntüsü kaydedildi: bildirim_00-06-50-000.png", sonuc[11]);
+        Assert.Equal("kare panoya kopyalanamadı", sonuc[13]);
+        Directory.Delete(klasor, true);
+        GorunumKanit.Kapat("rozet-bildirimleri.txt");
+    }
+
+    [Fact]
+    public void BolumAdiSeritEtiketindeVeMenudeOkunur()
+    {
+        var gecmis = Ayar("bolum-adi");
+        var sonuc = AppHost.Run(() =>
+        {
+            Strings.Use("tr");
+            var motor = new BildirimMotoru();
+            var view = BildirimKanit.Ac(motor, gecmis, out var pencere);
+            var etiketler = new[] { view.SeekLabel(100), view.SeekLabel(250), view.SeekLabel(450) };
+            var menu = view.BuildMenu().Items.OfType<MenuItem>().FirstOrDefault(i => i.Header as string == "Bölümler");
+            var satirlar = menu?.Items.OfType<MenuItem>().Select(i => i.Header as string).ToList();
+            menu?.Items.OfType<MenuItem>().ElementAt(2).RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(MenuItem.ClickEvent));
+            DenetimSurucu.Pump(view, () => motor.Konum == 400, 5);
+            var sonra = (motor.Konum, view.OsdText, Iz: view.Trace[^1]);
+            BildirimKanit.Kapat(view, pencere);
+            return (etiketler, satirlar, sonra);
+        });
+
+        Assert.Equal("00:01:40 · Giriş", sonuc.etiketler[0]);
+        Assert.Equal("00:04:10 · Orta", sonuc.etiketler[1]);
+        Assert.Equal("00:07:30 · Son", sonuc.etiketler[2]);
+        Assert.Equal(new[] { "Bölüm 1 · Giriş", "Bölüm 2 · Orta", "Bölüm 3 · Son" }, sonuc.satirlar);
+        Assert.Equal(400, sonuc.sonra.Konum);
+        Assert.Equal("Bölüm 3 · Son", sonuc.sonra.OsdText);
+        Assert.Equal("chapter -> 2", sonuc.sonra.Iz);
+        Directory.Delete(Path.GetDirectoryName(gecmis)!, true);
+    }
+}
+
+internal static class BildirimKanit
+{
+    internal static PlayerView Ac(BildirimMotoru motor, string gecmis, out Window pencere)
+    {
+        var view = new PlayerView { EngineFactory = () => motor, HistoryPath = () => gecmis };
+        pencere = new Window { Width = 640, Height = 360, Content = view };
+        pencere.Show();
+        var dosya = Path.Combine(Path.GetDirectoryName(gecmis)!, "bildirim.mp4");
+        File.WriteAllBytes(dosya, new byte[16]);
+        var acilis = view.OpenAsync(dosya);
+        DenetimSurucu.Pump(view, () => acilis.IsCompleted, 10);
+        acilis.GetAwaiter().GetResult();
+        return view;
+    }
+
+    internal static void Kapat(PlayerView view, Window pencere)
+    {
+        view.Close();
+        pencere.Close();
+        Dispatcher.UIThread.RunJobs();
+        Strings.Reset();
+    }
+}
+
+internal sealed class BildirimMotoru : IPlaybackEngine
+{
+    private readonly byte[] _piksel = Enumerable.Repeat((byte)128, 4 * 64 * 36).ToArray();
+
+    public string Name => "bildirim-motoru";
+
+    public bool IsOpen { get; private set; }
+
+    public double DurationSeconds => 600;
+
+    public bool HasAudio => true;
+
+    public bool IsPaused { get; private set; } = true;
+
+    public bool EndReached => false;
+
+    internal double Konum { get; set; }
+
+    public double PositionSeconds => Konum;
+
+    public double AudioVideoOffsetSeconds => 0;
+
+    public long FramesRendered { get; private set; }
+
+    public event EventHandler<PlaybackFault>? Faulted { add { } remove { } }
+
+    public double Speed { get; private set; } = 1;
+
+    internal double Ses { get; private set; } = 100;
+
+    internal bool Sessiz { get; private set; }
+
+    public void SetVolume(double volume) => Ses = volume;
+
+    public void SetMuted(bool muted) => Sessiz = muted;
+
+    public IReadOnlyList<double> ChapterTimes { get; } = new double[] { 0, 200, 400 };
+
+    public IReadOnlyList<string> ChapterTitles { get; } = new[] { "Giriş", "Orta", "Son" };
+
+    public bool StepChapter(bool backward) => true;
+
+    public IReadOnlyList<PlaybackTrack> Tracks { get; } = new[]
+    {
+        new PlaybackTrack(1, PlaybackTrackKind.Audio, null, null, false, true),
+        new PlaybackTrack(2, PlaybackTrackKind.Audio, "Yorum", null, false, false),
+        new PlaybackTrack(3, PlaybackTrackKind.Subtitle, null, null, false, false)
+    };
+
+    public long AudioTrack { get; private set; } = 1;
+
+    public long SubtitleTrack { get; private set; }
+
+    public void SetAudioTrack(long id) => AudioTrack = id;
+
+    public void SetSubtitleTrack(long id) => SubtitleTrack = id;
+
+    public Task<bool> SaveScreenshotAsync(string path, CancellationToken ct = default) => Task.FromResult(true);
+
+    public Task OpenAsync(string path, CancellationToken ct = default)
+    {
+        IsOpen = true;
+        FramesRendered = 1;
+        return Task.CompletedTask;
+    }
+
+    public void Play() => IsPaused = false;
+
+    public void Pause() => IsPaused = true;
+
+    public void SetSpeed(double speed) => Speed = speed;
+
+    public Task<SeekResult> SeekAsync(double seconds, SeekPrecision precision, CancellationToken ct = default)
+    {
+        Konum = seconds;
+        FramesRendered++;
+        return Task.FromResult(new SeekResult(SeekOutcome.Shown, 1));
+    }
+
+    public bool TryCopyLatest(ref long seen, FrameCopy copy)
+    {
+        if (seen == FramesRendered) return false;
+        seen = FramesRendered;
+        var handle = GCHandle.Alloc(_piksel, GCHandleType.Pinned);
+        try
+        {
+            copy(handle.AddrOfPinnedObject(), 64, 36, 64 * 4);
+        }
+        finally
+        {
+            handle.Free();
+        }
+
+        return true;
+    }
+
+    public void Dispose() => IsOpen = false;
 }

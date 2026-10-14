@@ -138,6 +138,7 @@ internal partial class PlayerView : UserControl
     internal void Apply(PlayerCommand command)
     {
         RestoreSpeedMode();
+        RestoreSound();
         KullaniciIslemi();
         switch (command.Kind)
         {
@@ -184,12 +185,14 @@ internal partial class PlayerView : UserControl
                 _engine?.SetVolume(_volume);
                 _trace.Add("volume " + Saat.Tani.Konum(command.Amount) + " -> " + Saat.Tani.Konum(_volume));
                 ShowSoundOsd(false);
+                RememberSound();
                 break;
             case PlayerCommandKind.ToggleMute:
                 _muted = !_muted;
                 _engine?.SetMuted(_muted);
                 _trace.Add("mute -> " + _muted);
                 ShowSoundOsd(true);
+                RememberSound();
                 break;
             case PlayerCommandKind.Speed:
                 _speed = Math.Clamp(Math.Round(_speed + command.Amount, 2), Keymap.MinimumSpeed, Keymap.MaximumSpeed);
@@ -223,6 +226,7 @@ internal partial class PlayerView : UserControl
                 _loopEnd = double.NaN;
                 _engine?.SetLoop(_loopStart, _loopEnd);
                 _trace.Add("loopclear");
+                ShowLoopOsd();
                 break;
             case PlayerCommandKind.BookmarkAdd:
                 AddBookmark();
@@ -310,6 +314,7 @@ internal partial class PlayerView : UserControl
         if (double.IsFinite(_loopEnd) && _loopEnd <= _loopStart) _loopEnd = double.NaN;
         _engine?.SetLoop(_loopStart, _loopEnd);
         _trace.Add("loop a -> " + Saat.Tani.Konum(_loopStart));
+        ShowLoopOsd();
     }
 
     private void MarkLoopEnd()
@@ -326,6 +331,7 @@ internal partial class PlayerView : UserControl
         _loopEnd = at;
         _engine?.SetLoop(_loopStart, _loopEnd);
         _trace.Add("loop b -> " + Saat.Tani.Konum(_loopEnd));
+        ShowLoopOsd();
     }
 
     private void AddBookmark()
@@ -363,7 +369,14 @@ internal partial class PlayerView : UserControl
     private void StepChapter(bool backward)
     {
         var name = backward ? "chapter -1 -> " : "chapter 1 -> ";
-        if (_engine is not { } engine || _chapters.Count == 0 || !engine.StepChapter(backward))
+        if (_engine is not { } engine || _chapters.Count == 0)
+        {
+            _trace.Add(name + "no");
+            return;
+        }
+
+        var target = ChapterTarget(_chapters, CurrentPosition(), backward);
+        if (!engine.StepChapter(backward))
         {
             _trace.Add(name + "no");
             return;
@@ -372,6 +385,7 @@ internal partial class PlayerView : UserControl
         _trackPaused = true;
         _stall.Reset();
         _trace.Add(name + "ok");
+        ShowChapterOsd(target);
     }
 
     private void OnWheel(object? sender, PointerWheelEventArgs e)
@@ -736,6 +750,7 @@ internal partial class PlayerView : UserControl
         if (HistoryPath?.Invoke() is { } file) _history = PlaybackHistory.Load(file);
         ApplyAdvanced(engine);
         ApplyHardwareDecoding(engine);
+        RestoreSound();
         if (_volume != 100) engine.SetVolume(_volume);
         if (_muted) engine.SetMuted(true);
         RestoreSpeedMode();
@@ -882,9 +897,7 @@ internal partial class PlayerView : UserControl
         var parts = new List<string> { Strings.Get("main.player.volume", Bicim.Yuzde.HazirTam(_volume, Strings.Culture)) };
         if (_muted) parts.Add(Strings.Get("main.player.muted"));
         parts.Add(Strings.Get("main.player.speed", Bicim.Kat(_speed, Strings.Culture)));
-        parts.Add(double.IsFinite(_loopStart)
-            ? Strings.Get("main.player.loopstate", Saat.Konum(_loopStart, Strings.Culture), double.IsFinite(_loopEnd) ? Saat.Konum(_loopEnd, Strings.Culture) : "…")
-            : Strings.Get("main.player.loopoff"));
+        parts.Add(LoopText());
         parts.Add(Strings.Get("main.player.bookmarkcount", _path is null ? 0 : _history.Bookmarks(_path).Count));
         AppendTrackState(parts);
         AppendAdvancedState(parts);

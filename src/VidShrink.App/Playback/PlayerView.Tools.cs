@@ -350,7 +350,7 @@ internal partial class PlayerView
     private void PlaceThumbnail(double seconds)
     {
         if (ThumbChip is null || ThumbTime is null) return;
-        ThumbTime.Text = Saat.Ekran(TimeSpan.FromSeconds(Math.Max(0, seconds)), TimeSpan.FromHours(1));
+        ThumbTime.Text = SeekLabel(seconds);
         ThumbChip.IsVisible = true;
 
         var duration = _seek.Duration;

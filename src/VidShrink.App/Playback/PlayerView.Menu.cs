@@ -25,6 +25,7 @@ internal partial class PlayerView
         flyout.Items.Add(ActionMenu("player.menu.view", Keymap.ViewMenu));
         flyout.Items.Add(ActionMenu("player.menu.playback", Keymap.PlaybackMenu));
         flyout.Items.Add(ActionMenu("player.menu.loop", Keymap.LoopMenu));
+        flyout.Items.Add(ChapterMenu());
         flyout.Items.Add(new Separator());
         var shot = ActionRow(Keymap.Screenshot);
         shot.IsEnabled = !AudioOnly;
