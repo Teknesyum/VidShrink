@@ -70,11 +70,11 @@ public sealed class MetaSilDonusturTests
     }
 
     /// <summary>
-    /// Altyazı dili yalnız kaynakta tek altyazı izi varken yazılır; iki izde ve altyazısız kaynakta
-    /// yazılmaz. Dili olmayan ses izi için de satır çıkmaz.
+    /// Altyazı izleri açık <c>-map</c> ile eşlendiği için (DON-P2) dil her eşlenen ize kendi sırasıyla
+    /// yazılır; eskiden yalnız tek izde yazılıyordu. Dili olmayan ses izi için satır çıkmaz.
     /// </summary>
     [Fact]
-    public void AltyaziDiliYalnizTekIzdeYaziliyor()
+    public void AltyaziDiliEslenenHerIzeYaziliyor()
     {
         var plan = new ConversionPlan { Container = "mkv", VideoCodec = "libx264", AudioCodec = "aac", DropMetadata = true };
         var deu = new SourceStream(2, StreamKind.Subtitle, "subrip", "deu");
@@ -85,7 +85,8 @@ public sealed class MetaSilDonusturTests
         var dilsiz = Kur(Ornek(Video, Tur with { Language = null }), plan, "c.mkv");
 
         Assert.Equal("language=deu", Sonraki(tek, "-metadata:s:s:0"));
-        Assert.DoesNotContain("-metadata:s:s:0", iki);
+        Assert.Equal("language=deu", Sonraki(iki, "-metadata:s:s:0"));
+        Assert.Equal("language=fra", Sonraki(iki, "-metadata:s:s:1"));
         Assert.Equal("language=tur", Sonraki(iki, "-metadata:s:a:0"));
         Assert.DoesNotContain("-metadata:s:a:0", dilsiz);
         Assert.Equal("-1", Sonraki(dilsiz, "-map_metadata"));

@@ -29,6 +29,15 @@ public sealed class ConversionPlan
 
     /// <summary>Kap ve akış etiketleri silinir, iz dili açıkça geri yazılır. GIF'te okunmaz.</summary>
     public bool DropMetadata { get; init; }
+
+    /// <summary>
+    /// Ciktiya giden kaynak altyazi izleri (0 tabanli altyazi sirasi). <c>null</c> hepsi, bos liste
+    /// hicbiri. Kabin tasiyamadigi iz kuralla cevrilir ya da duser (<see cref="StreamMapping.SubtitleTracks"/>).
+    /// </summary>
+    public IReadOnlyList<int>? SubtitleTracks { get; init; }
+
+    /// <summary>Ek <c>-i</c> girdisi olarak baglanan .srt/.ass dosyalari.</summary>
+    public IReadOnlyList<ExternalSubtitle> ExternalSubtitles { get; init; } = Array.Empty<ExternalSubtitle>();
     public bool AudioOnly => Container is "mp3" or "m4a" or "wav" or "flac";
     public bool Gif => Container == "gif";
     public bool AnimatedImage => Container is "webp" or "avif";

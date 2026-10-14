@@ -709,6 +709,21 @@ public sealed class EncodeRunner
     }
 
     /// <summary>
+    /// Secilen metin altyazi izini tek basina bir dosyaya yazar (<see cref="SubtitleExtraction.Build"/>).
+    /// Dosya once ara adla yazilir; dusen ya da iptal edilen komut yarim dosya birakmaz.
+    /// </summary>
+    public async Task ExtractSubtitleAsync(MediaInfo info, int ordinal, string outputPath, CancellationToken ct = default)
+    {
+        var partialPath = PartialPathFor(outputPath);
+        try
+        {
+            await RunCommandAsync(SubtitleExtraction.Build(info, ordinal, partialPath), info.DurationSeconds, null, "subtitle", 0, 1, ct);
+            File.Move(partialPath, outputPath, overwrite: true);
+        }
+        catch { TryDelete(partialPath); throw; }
+    }
+
+    /// <summary>
     /// Kaynagin sahne haritasini uretir. Basarisiz olursa <b>atmaz</b>: haritasiz bir deneme
     /// dondurur ve nedenini soyler. Haritasiz kodlama gecerli bir kodlamadir — anahtar kare
     /// tavani <see cref="FfmpegArguments.KeyframeCeilingDefaultSeconds"/> varsayilanina duser.
