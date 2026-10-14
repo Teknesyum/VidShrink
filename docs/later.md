@@ -8,80 +8,6 @@ Aşağıdaki her başlık, ikinci aşamada tek seferde teslim edilebilecek bir i
 Sıra yapım sırasıdır. Bir paketin işi başlayınca başlığı buradan silinir.
 Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md).
 
-**Dalga 1 — Karar Gerekmez, Küçük İş, Öncelik 1**
-
-## 1. Bildirim, Ses Düzeyi Ve Bölüm Adları
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · OYA-P1 · Oynatıcı · iş küçük · öncelik 1 · karar gerekmez
-
-- Satırlar (OYA-P1): OYA-06 Ses düzeyini hatırlama; OYA-07 Ekran üstü bildirim kapsamı; OYA-09 Bölüm adları ve bölüm listesi. [Tablo](piyasa/2026-10-13/oynatici-cekirdek-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Playback/PlayerView.axaml.cs, src/VidShrink.App/Playback/PlayerView.Tracks.cs, src/VidShrink.App/Playback/PlayerView.Gosterge.cs, src/VidShrink.App/Playback/PlayerSettings.cs, src/VidShrink.App/Playback/PlayerView.Window.cs, src/VidShrink.Player/MpvEngine.cs, src/VidShrink.Player/IPlaybackEngine.cs
-- Plan: Ses düzeyi ve sessiz durumu `PlayerSettings`'e iki alan olarak yazılır, açılışta okunur. Hazır duran `ShowOsd` rozeti (PlayerView.Gosterge.cs:72) iz değişimi, gecikme, A-B noktası, bölüm atlama ve kare kaydı sonucunda da çağrılır; bugün bu olaylar yalnız izleme günlüğüne düşüyor. Bölüm adı mpv'nin `chapter-list/N/title` özelliğinden okunur, zaman çubuğu işaretinde ve bölüm atlama bildiriminde gösterilir, sağ tık menüsüne bölüm listesi eklenir. Doğrulama: `OynaticiGorunumTests` ve `OynaticiParcaTests` içinde rozet metni, ayar gidiş-dönüşü ve bölüm adı okuma.
-
-## 2. HLS Ve Liste Adresi Düzeltmesi
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · OYB-P1 · Oynatıcı · iş küçük · öncelik 1 · karar gerekmez
-
-- Satırlar (OYB-P1): OYB-20 HLS adresi yerel liste yoluna giriyor. [Tablo](piyasa/2026-10-13/oynatici-kitaplik-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Playback/PlayerView.Kuyruk.cs, src/VidShrink.Core/PlaylistFile.cs, tests/VidShrink.Tests/OynaticiAdresTests.cs
-- Plan: Kuyruk çözümü (`ResolveQueue`) yolu liste saymadan önce uzak adres mi diye bakar; adres ise liste yoluna girmeden motora olduğu gibi verilir. Liste dosyasının içindeki liste uzantılı adres girdisi de artık atılmaz (`PlaylistFile.cs:48`). Önce düşen bir test yazılır (`.m3u8` ve `.pls` ile biten adreste kuyruk kurulmadığı, motora adresin gittiği), sonra yerel bir http sunucusundan gerçek HLS adresi açılarak görülür. HLS olmayan uzak liste (örneğin radyo `.pls` adresi) motorun kendi listesine düşer; arayüzün bunu nasıl gösterdiği aynı pakette ölçülür.
-
-## 3. Çoklu Bırakma Ve Klasör Açma
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · OYB-P2 · Oynatıcı · iş küçük · öncelik 1 · karar gerekmez
-
-- Satırlar (OYB-P2): OYB-01 Çoklu dosya ve klasör bırakma; OYB-07 Klasör açma. [Tablo](piyasa/2026-10-13/oynatici-kitaplik-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Playback/PlayerView.Window.cs, src/VidShrink.App/Playback/PlayerView.Kuyruk.cs, src/VidShrink.App/Playback/FolderNavigator.cs, src/VidShrink.App/Locales/
-- Plan: Bırakmadaki tek dosya şartı kalkar (`PlayerView.Window.cs:473`); bırakılan dosyalar ve klasörlerin içindeki oynatılabilir dosyalar, alt klasörlerle birlikte, doğal ad sırasıyla kuyruğa yazılır ve ilki çalar. Aynı toplayıcıya menüden bir "Klasör aç" komutu bağlanır. Küçült kolundaki toplayıcı (`src/VidShrink.Core/DroppedMedia.cs:9`) örnek alınır ama olduğu gibi kullanılmaz: yalnız küçültme adaylarını alır ve alt klasöre inmez. Başsız testle kuyruğun sayısı ve sırası ölçülür.
-
-## 4. Hızlı Kip Kayma Bildirimi
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DZA-P1 · Düzenleyici · iş küçük · öncelik 1 · karar gerekmez
-
-- Satırlar (DZA-P1): DZA-05 Hızlı kipte kayma bildirimi; DZA-12 Anahtar kareye atlama; DZA-30 Anahtar karede olduğunu gösterme. [Tablo](piyasa/2026-10-13/duzenleyici-kesim-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/Editing/EditExport.cs, src/VidShrink.App/Editing/EditorView.Teslim.cs, src/VidShrink.App/Editing/EditorKeymap.cs, src/VidShrink.App/Editing/EditorView.Kisayol.cs, src/VidShrink.App/Editing/EditorView.Monitor.cs, src/VidShrink.App/Locales/
-- Plan: Hızlı kip kesim başını zaten önceki anahtar kareye (kendi başına çözülebilen tam kare) çekiyor (EditExport.cs:533, :572); aradaki fark plana yazılır ve teslim notlarına "çıktı şu kadar saniye erken başlar" satırı olarak eklenir. Çizelgenin elindeki anahtar kare listesiyle (EditorTimeline.Serit.cs:36-46) önceki ve sonraki anahtar kareye giden iki komut ve monitörde "anahtar karede" göstergesi gelir. Doğrulama: bilinen bir anahtar kare listesiyle plandaki sayıyı ve komutların vardığı kareyi ölçen birim testleri.
-
-## 5. Metin Biçim Ve Süsleme
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DZB-P1 · Düzenleyici · iş küçük · öncelik 1 · karar gerekmez
-
-- Satırlar (DZB-P1): DZB-19 Metin biçim denetimleri; DZB-21 Metin kenarlığı, gölgesi ve arka plan kutusu. [Tablo](piyasa/2026-10-13/duzenleyici-kurgu-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Editing/EditorView.axaml, src/VidShrink.App/Editing/EditorView.Metin.cs, src/VidShrink.Core/Editing/TextLayer.cs, src/VidShrink.Core/Editing/AssWriter.cs, src/VidShrink.Core/Editing/EditProject.cs, src/VidShrink.App/Locales/, tests/VidShrink.Tests/DuzenleyiciMetinTests.cs
-- Plan: Metin paneline yazı tipi, kalın, italik ve solma süresi denetimleri eklenir; model bu alanları zaten tutuyor (TextLayer.cs:43-57), yalnız arayüz bağlanır. Kenarlık kalınlığı, gölge ve arka plan kutusu için modele üç alan eklenir ve AssWriter'ın stil satırına yazılır (ASS, metnin biçimini de taşıyan altyazı dosyasıdır). Önizleme ve teslim aynı .ass dosyasını okuduğu için ikinci bir yol gerekmez. Doğrulama: DuzenleyiciMetinTests'e stil satırı ölçüsü ve aynı andaki önizleme karesi ile teslim karesinin karşılaştırması.
-
-## 6. Kodlama Süreç Önceliği Ayarı
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · SIK-P1 · Küçült · iş küçük · öncelik 1 · karar gerekmez
-
-- Satırlar (SIK-P1): SIK-02 Kodlama süreç önceliği; SIK-20 İş parçacığı sınırı. [Tablo](piyasa/2026-10-13/kucult-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Ffmpeg/EncodeRunner.cs, src/VidShrink.Ffmpeg/FfmpegRunner.cs, src/VidShrink.Core/FfmpegArguments.cs, src/VidShrink.App/MainWindow.axaml (Ayarlar, `CmbParallelJobs` yanı), src/VidShrink.App/AppSettings.cs, src/VidShrink.Cli/CliRequest.cs, src/VidShrink.App/Locales/
-- Plan: Ayarlar'a kodlama önceliği seçimi eklenir (Normal, Normalin Altı, Düşük; varsayılan bugünkü gibi Normal) ve kodlama süreci başlar başlamaz `Process.PriorityClass` ile atanır; aynı atama yardımcı süreçlerde zaten yapılıyor (`src/VidShrink.Core/Editing/ThumbnailQueue.cs:276`). Yanına çekirdek sınırı seçimi konur ve kodlama komutuna `-threads` olarak yazılır. Bu seçenek her kodlayıcıda aynı etkiyi vermeyebilir; işçi önce her kodlayıcıda ölçer, sınırlamayan kodlayıcıda seçimi gizler. Doğrulama: ayar varsayılandayken komutun değişmediğini pimleyen argüman testi ve başlatılan sürecin önceliğini okuyan test.
-
-## 7. Dönüştür'de Donanım Kodlayıcıları
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DON-P1 · Dönüştür · iş küçük · öncelik 1 · karar gerekmez
-
-- Satırlar (DON-P1): DON-04 Donanım kodlayıcıları. [Tablo](piyasa/2026-10-13/donustur-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/MainWindow.DonusturKap.cs, src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.App/Locales/, tests/VidShrink.Tests/
-- Plan: Kodek listesine NVENC, QSV ve AMF kodlayıcıları (Nvidia, Intel ve AMD ekran kartlarının kodlayıcıları; H.264, HEVC, AV1) eklenir. Motor bu adları zaten sürüyor (`ConversionArguments.cs:78`, `:134`, `:144`), yeni argüman yazılmaz; yoklama makinede olmayan kodlayıcıyı gizler. Kayıtlı seçim sıra numarası yerine adla saklanır, yoksa yeni öğe eski seçimi kaydırır. Doğrulama: liste ile kap uyum tablosunu eşleyen test ve ekran kartlı bir makinede elle tek dönüşüm.
-
-## 8. Dosyada Gürültü Temizleme Ve Yükseklik Raporu
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · ARC-P1 · Bizde Olmayan Araçlar · iş küçük · öncelik 1 · karar gerekmez
-
-- Satırlar (ARC-P1): ARC-24 Dosyada gürültü temizleme; ARC-04 Ses yüksekliği raporu. [Tablo](piyasa/2026-10-13/eksik-araclar-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/StreamMapping.cs, src/VidShrink.Core/AudioCaptureArguments.cs, src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/MainWindow.Izler.cs, src/VidShrink.Cli/CliRequest.cs, src/VidShrink.App/Locales/
-- Plan: Kaydedicinin kullandığı gürültü süzgeci (afftdn, AudioCaptureArguments.cs:73) Küçült'ün ses bölümüne, yükseklik kutusunun yanına ikinci kutu olarak bağlanır; komut satırına eş bayrak eklenir. Aynı bölümde kaynağın yüksekliği ebur128 süzgeciyle bir kez ölçülüp LUFS ve gerçek tepe olarak gösterilir. Doğrulama: IzPaneliTests'teki gibi kutu açıkken süzgecin argümanda geçtiği, kapalıyken hiç yazılmadığı sınanır; canlı kolda gürültülü kısa bir örnekte gürültü tabanının düştüğü ölçülür.
-
-## 9. macOS Ekran Seçimi Adla
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · PLT-P1 · Platform Eşitliği · iş küçük · öncelik 1 · karar gerekmez
-
-- Satırlar (PLT-P1): PLT-01 macOS'ta ekran seçimi. [Tablo](piyasa/2026-10-13/platform-esitligi-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/RecorderArguments.cs, src/VidShrink.App/Recorder/RecorderView.Secici.cs, src/VidShrink.App/Recorder/RecorderView.Hedef.cs, tests/VidShrink.Tests
-- Plan: `MacInput` ekranı sıra numarasıyla değil `Capture screen N:none` adıyla verir; ffmpeg kaynağı bu adı tanır ve N kamera sayısından bağımsızdır. Bölge ve pencere hedefi de aynı girdiden geçtiği için üç hedef birden düzelir. Argüman testleri ekran, bölge ve pencere hedefinde girdi metnini pimler. Kameralı ve çok ekranlı Mac'te gerçek kayıt bu makinede ölçülemez; belgeye ölçülmedi diye yazılır.
-
 **Dalga 2 — Karar Gerekmez, Küçük İş Öncelik 2 Ya Da Orta İş Öncelik 1**
 
 ## 10. Altyazı Bulma Ve Tuşları
@@ -1317,3 +1243,26 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.App/MainWindow.axaml, src/VidShrink.Core/Subtitles/, src/VidShrink.Core/Editing/AudioPeaks.cs
 - Sahibin kararı: kendi sekmesini isteyen araç ürüne girsin mi
 - Plan: Yinelenen video bulucu: klasördeki her videodan birkaç karenin özeti ffmpeg ile çıkarılır, yakın özetler gruplanır, kullanıcı hangisini sileceğini seçer. Altyazı düzenleyici: satır listesi, metin ve zaman düzenleme, düzenleyicinin dalga biçimi verisi üstünde hizalama. Sahip "evet" derse iki pakete bölünür; altyazı düzenleyicinin hafif hali DZB-62'de zaten yazılı. Doğrulama: aynı videonun yeniden kodlanmış kopyası aynı gruba düşer; düzenlenen altyazı geri okununca aynı satırları verir.
+
+**Dalga 1 Yan Bulguları — Karar Gerekmez, Küçük İş**
+
+## 155. macOS'ta Bölge Kaydı Seçili Ekrandan
+
+14 Ekim 2026 · Dalga 1 yapımında görüldü (PLT-P1) · Platform Eşitliği · iş küçük · öncelik 2 · karar gerekmez
+
+- Kanıt: `src/VidShrink.App/Recorder/RecorderView.Hedef.cs:177` `ScreenIndex = target == RecorderTargetKind.Screen ? ChosenScreen : 0` yazıyor; bölge ve pencere hedefinde ekran sırası 0'a düşüyor, Mac'te bölge her zaman birinci ekrandan kesiliyor.
+- Plan: Bölge ve pencere hedefi, seçimin bulunduğu ekranın sırasını taşır. Argüman testi iki ekranlı sahte düzende bölgenin ikinci ekranın adıyla girdiğini pimler. Gerçek çok ekranlı Mac bu makinede ölçülemez; belgeye ölçülmedi diye yazılır.
+
+## 156. Uzak Liste Adresinde Yayın Adı
+
+14 Ekim 2026 · Dalga 1 yapımında ölçüldü (OYB-P1) · Oynatıcı · iş küçük · öncelik 2 · karar gerekmez
+
+- Kanıt: uzak bir `.pls` adresi açılınca başlıkta yayının adı yerine dosya adı ("radyo.pls") görünüyor.
+- Plan: Adres listeyse başlık, mpv'nin `media-title` değerini ya da listenin `Title1` satırını alır; ikisi de yoksa bugünkü gibi dosya adı. Yerel 127.0.0.1 sunucusuyla başlık testi.
+
+## 157. Gürültü Temizleme Süzgeci Yokken Kutu
+
+14 Ekim 2026 · Dalga 1 yapımında görüldü (ARC-P1) · Küçült · iş küçük · öncelik 2 · karar gerekmez
+
+- Kanıt: ajan raporu, `afftdn` içermeyen bir ffmpeg kullanılırsa gürültü kutusunun gizlenmediğini söylüyor; kutu açılırsa kodlama düşer. Kodda doğrulandı: `afftdn` için yoklama yok (`MainWindow.Izler.cs:90` kutuyu doğrudan plana yazıyor); kaydedicinin gürültü kutusu da aynı durumda.
+- Plan: Süzgeç yoklaması (`-filters`) kodlayıcı yoklamasının yanına girer; `afftdn` yoksa kutu gizlenir, CLI bayrağı açık bir hata verir.
