@@ -256,6 +256,7 @@
                     </Style>
                   </Button.Styles>
                 </Button>
+                <Button x:Name="BtnSilenceSaveList" Theme="{StaticResource GhostButton}" Content="{loc:Text mediainfo.audit.save-list}" AutomationProperties.Name="{loc:Text mediainfo.audit.save-list}" IsEnabled="False"/>
               </StackPanel>
               <Button x:Name="BtnSceneSplit" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.scene.split}" AutomationProperties.Name="{loc:Text editor.scene.split}" IsEnabled="False">
                 <Button.Styles>

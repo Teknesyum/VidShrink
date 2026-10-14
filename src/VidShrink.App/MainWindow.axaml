@@ -302,9 +302,10 @@
                       </StackPanel>
                     </Panel>
 
-                    <Grid x:Name="SourceCard" IsVisible="False" ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+                    <Grid x:Name="SourceCard" IsVisible="False" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
                       <TextBlock x:Name="TxtFileName" Theme="{StaticResource Body}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip.Tip="{Binding $self.Text}"/>
-                      <Button Grid.Column="1" Content="{loc:Text main.action.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowse"/>
+                      <Button Grid.Column="1" x:Name="BtnMediaDetails" Content="{loc:Text mediainfo.open}" Theme="{StaticResource GhostButton}" Click="OnMediaDetails"/>
+                      <Button Grid.Column="2" Content="{loc:Text main.action.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowse"/>
                     </Grid>
 
                     <TextBlock x:Name="TxtSourceStatus" Classes="reveal" Theme="{StaticResource StatusError}" IsVisible="False"/>

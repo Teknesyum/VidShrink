@@ -52,6 +52,7 @@ internal partial class EditorView
         BtnSilenceScan.Click += (_, _) => _ = ScanSilenceAsync();
         BtnSilenceCancel.Click += (_, _) => _silenceCts?.Cancel();
         BtnSilenceApply.Click += (_, _) => ApplySilence();
+        BtnSilenceSaveList.Click += (_, _) => _ = SaveAuditListAsync();
         BtnSceneSplit.Click += (_, _) => _ = SplitScenesAsync();
         TxtSceneThreshold.Text = SceneMap.DefaultThreshold.ToString("0.###", Strings.Culture);
         CmbAutoSplit.SelectedIndex = 0;
@@ -192,9 +193,12 @@ internal partial class EditorView
         _silenceSource = null;
         _silenceCuts = Array.Empty<(long Start, long End)>();
         _silenceActions.Clear();
+        _sceneCuts = null;
+        _sceneSource = null;
         Timeline.CutPreview = Array.Empty<IdlePreview>();
         TxtSilenceStatus.Text = string.Empty;
         BtnSilenceApply.IsEnabled = false;
+        BtnSilenceSaveList.IsEnabled = false;
     }
 
     private void RefreshSilence()
@@ -249,6 +253,7 @@ internal partial class EditorView
 
         Timeline.CutPreview = spans;
         BtnSilenceApply.IsEnabled = spans.Any(s => s.Action != IdleAction.Keep) && !SilenceScanning;
+        RefreshAuditSave();
         return spans;
     }
 
@@ -261,6 +266,7 @@ internal partial class EditorView
         BtnSceneSplit.IsEnabled = !busy;
         BtnAutoSplit.IsEnabled = !busy;
         BtnSilenceApply.IsEnabled = false;
+        BtnSilenceSaveList.IsEnabled = !busy && HasAuditList;
     }
 
     private static bool TryNumber(string? text, out double value)
