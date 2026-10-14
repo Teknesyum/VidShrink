@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 
 namespace VidShrink.Core;
 
@@ -160,6 +160,9 @@ public sealed record RecorderRequest
 
     /// <summary>Fare imleci kayda girsin mi (<c>-draw_mouse</c> / <c>-capture_cursor</c>).</summary>
     public bool ShowCursor { get; init; } = true;
+
+    /// <summary>Tıklamalar kayda işaretlensin mi; yalnız macOS'ta ffmpeg'in <c>-capture_mouse_clicks</c> seçeneğine gider.</summary>
+    public bool ShowClicks { get; init; }
 
     /// <summary>
     /// macOS'ta <c>avfoundation</c> ekran adinin numarasi (<c>Capture screen N</c>), Linux'ta <see cref="Display"/> ile
@@ -1465,13 +1468,13 @@ public static class RecorderArguments
         return a;
     }
 
-    private static IReadOnlyList<string> MacInput(RecorderRequest request) => new[]
+    private static IReadOnlyList<string> MacInput(RecorderRequest request)
     {
-        "-f", "avfoundation",
-        "-framerate", Number(request.Fps),
-        "-capture_cursor", Flag(request.ShowCursor),
-        "-i", $"{MacScreenName(request.ScreenIndex)}:none"
-    };
+        var a = new List<string> { "-f", "avfoundation", "-framerate", Number(request.Fps), "-capture_cursor", Flag(request.ShowCursor) };
+        if (request.ShowClicks) a.AddRange(new[] { "-capture_mouse_clicks", "1" });
+        a.AddRange(new[] { "-i", $"{MacScreenName(request.ScreenIndex)}:none" });
+        return a;
+    }
 
     /// <summary>
     /// avfoundation ekrani adla secilir: sira numarasinda ekranlar kameralardan sonra geliyor

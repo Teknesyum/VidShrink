@@ -35,6 +35,11 @@ internal partial class RecorderView
     /// <summary>Tıklama, tıklama sesi, tuş ve büyüteç Windows kancasıyla çalışıyor; öteki platformda kutular gizli, kayıtlı ayar işe geçmez.</summary>
     private bool HooksAvailable => CapturePlatform == RecorderPlatform.Windows;
 
+    /// <summary>macOS'ta tıklamayı kancasız ffmpeg işaretliyor (<c>-capture_mouse_clicks</c>); kutu yalnız orada da açık.</summary>
+    private bool ClicksAvailable => HooksAvailable || CapturePlatform == RecorderPlatform.MacOs;
+
+    private bool ClicksInCapture => CapturePlatform == RecorderPlatform.MacOs && ChkShowClicks.IsChecked == true;
+
     private bool ShowClicksOn => HooksAvailable && _settings.ShowClicks;
 
     private bool ClickSoundOn => HooksAvailable && _settings.ClickSound;
@@ -47,7 +52,7 @@ internal partial class RecorderView
 
     internal void RefreshInputBoxes()
     {
-        ChkShowClicks.IsVisible = HooksAvailable;
+        ChkShowClicks.IsVisible = ClicksAvailable;
         ChkClickSound.IsVisible = HooksAvailable;
         ChkShowKeys.IsVisible = HooksAvailable;
         ChkMagnifier.IsVisible = HooksAvailable;

@@ -14,7 +14,8 @@ namespace VidShrink.Tests;
 /// PLT-P2: tıklama, tıklama sesi, tuş ve büyüteç kutuları Windows kancasına bağlı; macOS ve
 /// Linux'ta görünür ama etkisizdi. Kapı <see cref="RecorderView.CapturePlatform"/>: kapalıyken
 /// dört kutu ana görünümde ve mini şeritte gizli, kayıtlı ayarda açık gelen seçenek kancayı
-/// ve büyüteci başlatmaz.
+/// ve büyüteci başlatmaz. PLT-P3: tıklama kutusu Mac'te geri açılır ve isteğe <c>ShowClicks</c> olarak
+/// geçer (ffmpeg <c>-capture_mouse_clicks</c>); Windows'ta tıklamayı bindirme çizdiği için istekte yanlış kalır.
 /// </summary>
 public sealed class KaydediciPlatformKutuTests
 {
@@ -54,7 +55,7 @@ public sealed class KaydediciPlatformKutuTests
         public void Play() { }
     }
 
-    private sealed record Olcu(string Ana, string Mini, string Isaretli, string Kanca, bool Buyutec);
+    private sealed record Olcu(string Ana, string Mini, string Isaretli, string Kanca, bool Buyutec, bool? IstekTiklama);
 
     private static Olcu Olc(RecorderPlatform platform) => AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
     {
@@ -81,8 +82,9 @@ public sealed class KaydediciPlatformKutuTests
         var mini = string.Join(" ", new[] { m.ChkShowClicks, m.ChkClickSound, m.ChkShowKeys, m.ChkMagnifier }.Select(k => k.IsVisible ? 1 : 0));
         view.ExpandFromMini();
 
+        var istekTiklama = view.BuildRequest(applyAuto: false)?.ShowClicks;
         view.SyncInput(true);
-        var olcu = new Olcu(ana, mini, isaretli, string.Join(" | ", kanca.Cagrilar), buyutec.Running);
+        var olcu = new Olcu(ana, mini, isaretli, string.Join(" | ", kanca.Cagrilar), buyutec.Running, istekTiklama);
         view.SyncInput(false);
         return olcu;
     }));
@@ -95,10 +97,12 @@ public sealed class KaydediciPlatformKutuTests
         var olcu = Olc(platform);
 
         Assert.Equal("1 1 1 1", olcu.Isaretli);
-        Assert.Equal("0 0 0 0", olcu.Ana);
-        Assert.Equal("0 0 0 0", olcu.Mini);
+        var mac = platform == RecorderPlatform.MacOs;
+        Assert.Equal(mac ? "1 0 0 0" : "0 0 0 0", olcu.Ana);
+        Assert.Equal(mac ? "1 0 0 0" : "0 0 0 0", olcu.Mini);
         Assert.Equal(string.Empty, olcu.Kanca);
         Assert.False(olcu.Buyutec);
+        Assert.Equal(mac, olcu.IstekTiklama);
     }
 
     [Fact]
@@ -110,5 +114,6 @@ public sealed class KaydediciPlatformKutuTests
         Assert.Equal("1 1 1 1", olcu.Mini);
         Assert.Equal("basla fare=True klavye=True", olcu.Kanca);
         Assert.True(olcu.Buyutec);
+        Assert.False(olcu.IstekTiklama);
     }
 }
