@@ -106,6 +106,29 @@
               <TextBox x:Name="TxtTextColor" Width="{StaticResource NumberBoxWidth}" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.text.color}"/>
               <Border x:Name="TextSwatch" Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" VerticalAlignment="Center" CornerRadius="{StaticResource RadiusChip}" BorderThickness="{StaticResource BorderThin}" BorderBrush="{StaticResource HeaderRestBorder}"/>
             </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <TextBlock x:Name="LblTextFont" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.font}"/>
+              <ComboBox x:Name="CmbTextFont" Width="{StaticResource FieldWidthSm}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.text.font}"/>
+              <ToggleButton x:Name="BtnTextBold" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.text.bold}" AutomationProperties.Name="{loc:Text editor.text.bold}"/>
+              <ToggleButton x:Name="BtnTextItalic" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.text.italic}" AutomationProperties.Name="{loc:Text editor.text.italic}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <TextBlock x:Name="LblTextFadeIn" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.fade-in}"/>
+              <TextBox x:Name="TxtTextFadeIn" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.fade-in}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <TextBlock x:Name="LblTextFadeOut" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.fade-out}"/>
+              <TextBox x:Name="TxtTextFadeOut" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.fade-out}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <TextBlock x:Name="LblTextOutline" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.outline}"/>
+              <TextBox x:Name="TxtTextOutline" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" PlaceholderText="{loc:Text editor.text.auto}" AutomationProperties.Name="{loc:Text editor.text.outline}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <TextBlock x:Name="LblTextShadow" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.shadow}"/>
+              <TextBox x:Name="TxtTextShadow" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.text.shadow}"/>
+              <ToggleButton x:Name="BtnTextBox" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.text.box}" AutomationProperties.Name="{loc:Text editor.text.box}"/>
+            </StackPanel>
           </WrapPanel>
           <WrapPanel x:Name="ClipPanel" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.clip.panel}">
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">

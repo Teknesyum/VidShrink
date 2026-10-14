@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Media;
 using VidShrink.App.Localization;
 using VidShrink.Core;
 using VidShrink.Core.Editing;
@@ -21,6 +23,7 @@ internal partial class EditorView
     private string? _overlayFonts;
     private string? _overlayRoot;
     private bool _showingText;
+    private List<string>? _fonts;
 
     /// <summary>Onizleme katmaninin klasoru; testler kendi <c>.calisma</c> klasorunu verir.</summary>
     internal string OverlayRoot
@@ -48,6 +51,18 @@ internal partial class EditorView
         TxtTextSize.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, CommitTextSize);
         TxtTextColor.LostFocus += (_, _) => CommitTextColor();
         TxtTextColor.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, CommitTextColor);
+        CmbTextFont.SelectionChanged += (_, _) => { if (_showingText && CmbTextFont.SelectedItem is string font) UpdateSelectedText(t => t with { FontName = font }); };
+        BtnTextBold.Click += (_, _) => { if (_showingText) UpdateSelectedText(t => t with { Bold = BtnTextBold.IsChecked == true }); };
+        BtnTextItalic.Click += (_, _) => { if (_showingText) UpdateSelectedText(t => t with { Italic = BtnTextItalic.IsChecked == true }); };
+        BtnTextBox.Click += (_, _) => { if (_showingText) UpdateSelectedText(t => t with { Box = BtnTextBox.IsChecked == true }); };
+        TxtTextFadeIn.LostFocus += (_, _) => CommitTextFade(true);
+        TxtTextFadeIn.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitTextFade(true));
+        TxtTextFadeOut.LostFocus += (_, _) => CommitTextFade(false);
+        TxtTextFadeOut.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitTextFade(false));
+        TxtTextOutline.LostFocus += (_, _) => CommitTextOutline();
+        TxtTextOutline.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, CommitTextOutline);
+        TxtTextShadow.LostFocus += (_, _) => CommitTextShadow();
+        TxtTextShadow.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, CommitTextShadow);
         ShowTextPanel();
     }
 
@@ -130,6 +145,93 @@ internal partial class EditorView
         if (!KullaniciRengi.Coz(TxtTextColor.Text, out var rgb) || !UpdateSelectedText(t => t with { Color = rgb })) ShowTextPanel();
     }
 
+    /// <summary>Bos girdi <c>null</c> verir; sayi degilse, sonsuzsa ya da negatifse <c>false</c>.</summary>
+    private static bool TryReadAmount(string? input, out double? value)
+    {
+        value = null;
+        var text = input?.Trim();
+        if (string.IsNullOrEmpty(text)) return true;
+        if (!double.TryParse(text, NumberStyles.Float, Strings.Culture, out var number)
+            && !double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out number)) return false;
+        if (!double.IsFinite(number) || number < 0) return false;
+        value = number;
+        return true;
+    }
+
+    private void CommitTextFade(bool fadeIn)
+    {
+        if (!_showingText) return;
+        if (!TryReadAmount((fadeIn ? TxtTextFadeIn : TxtTextFadeOut).Text, out var seconds))
+        {
+            ShowTextPanel();
+            return;
+        }
+
+        var ticks = EditTime.FromSeconds(Math.Round(seconds ?? 0, 2));
+        if (!UpdateSelectedText(t => fadeIn
+                ? t with { FadeIn = Math.Min(ticks, t.Length - t.FadeOut) }
+                : t with { FadeOut = Math.Min(ticks, t.Length - t.FadeIn) }))
+            ShowTextPanel();
+    }
+
+    private void CommitTextOutline()
+    {
+        if (!_showingText) return;
+        if (!TryReadAmount(TxtTextOutline.Text, out var outline))
+        {
+            ShowTextPanel();
+            return;
+        }
+
+        double? value = outline is { } o ? Math.Min(Math.Round(o, 1), TextLayer.MaxOutline) : null;
+        if (!UpdateSelectedText(t => t with { Outline = value })) ShowTextPanel();
+    }
+
+    private void CommitTextShadow()
+    {
+        if (!_showingText) return;
+        if (!TryReadAmount(TxtTextShadow.Text, out var shadow))
+        {
+            ShowTextPanel();
+            return;
+        }
+
+        var value = Math.Min(Math.Round(shadow ?? 0, 1), TextLayer.MaxShadow);
+        if (!UpdateSelectedText(t => t with { Shadow = value })) ShowTextPanel();
+    }
+
+    /// <summary>
+    /// Yazi tipi listesi Avalonia'nin sistem yazi tiplerinden gelir, her platformda dolar. Secili
+    /// katmanin ailesi listede yoksa (baska makinede kaydedilmis proje) siraya eklenir.
+    /// </summary>
+    private void ShowFont(string family)
+    {
+        if (_fonts is null)
+        {
+            _fonts = FontManager.Current.SystemFonts.Select(f => f.Name)
+                .Append(TextLayer.DefaultFont)
+                .Where(f => !string.IsNullOrWhiteSpace(f))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            CmbTextFont.ItemsSource = null;
+            CmbTextFont.Items.Clear();
+            foreach (var font in _fonts) CmbTextFont.Items.Add(font);
+        }
+
+        var known = _fonts.FirstOrDefault(f => string.Equals(f, family, StringComparison.OrdinalIgnoreCase));
+        if (known is null)
+        {
+            var at = _fonts.FindIndex(f => StringComparer.OrdinalIgnoreCase.Compare(f, family) > 0);
+            if (at < 0) at = _fonts.Count;
+            _fonts.Insert(at, family);
+            CmbTextFont.Items.Insert(at, family);
+            known = family;
+        }
+
+        CmbTextFont.SelectedItem = known;
+    }
+
     private void AfterTextEdit(int select)
     {
         Timeline.RefreshTexts();
@@ -156,6 +258,14 @@ internal partial class EditorView
         TxtTextSize.Text = text.Size.ToString("0.#", Strings.Culture);
         TxtTextColor.Text = KullaniciRengi.Yaz(text.Color);
         TextSwatch.Background = KullaniciRengi.Firca(text.Color);
+        ShowFont(text.FontName);
+        BtnTextBold.IsChecked = text.Bold;
+        BtnTextItalic.IsChecked = text.Italic;
+        TxtTextFadeIn.Text = EditTime.ToSeconds(text.FadeIn).ToString("0.##", Strings.Culture);
+        TxtTextFadeOut.Text = EditTime.ToSeconds(text.FadeOut).ToString("0.##", Strings.Culture);
+        TxtTextOutline.Text = text.Outline is { } outline ? outline.ToString("0.#", Strings.Culture) : string.Empty;
+        TxtTextShadow.Text = text.Shadow.ToString("0.#", Strings.Culture);
+        BtnTextBox.IsChecked = text.Box;
         TextPanel.IsVisible = true;
         _showingText = true;
     }

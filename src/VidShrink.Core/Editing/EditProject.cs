@@ -320,6 +320,9 @@ public sealed class EditProject
         writer.WriteBoolean("italic", text.Italic);
         writer.WriteNumber("fadeIn", text.FadeIn);
         writer.WriteNumber("fadeOut", text.FadeOut);
+        if (text.Outline is { } outline) writer.WriteNumber("outline", outline);
+        writer.WriteNumber("shadow", text.Shadow);
+        writer.WriteBoolean("box", text.Box);
         writer.WriteStartArray("keyframes");
         foreach (var key in text.Keyframes)
         {
@@ -345,6 +348,9 @@ public sealed class EditProject
             Italic = item.GetProperty("italic").GetBoolean(),
             FadeIn = item.GetProperty("fadeIn").GetInt64(),
             FadeOut = item.GetProperty("fadeOut").GetInt64(),
+            Outline = item.TryGetProperty("outline", out var outline) && outline.ValueKind != JsonValueKind.Null ? outline.GetDouble() : null,
+            Shadow = item.TryGetProperty("shadow", out var shadow) ? shadow.GetDouble() : 0,
+            Box = item.TryGetProperty("box", out var box) && box.GetBoolean(),
             Keyframes = item.GetProperty("keyframes").EnumerateArray()
                 .Select(k => new TextKeyframe(k.GetProperty("offset").GetInt64(), k.GetProperty("x").GetDouble(), k.GetProperty("y").GetDouble()))
                 .ToArray(),

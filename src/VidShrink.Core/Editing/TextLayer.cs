@@ -24,6 +24,10 @@ public sealed record TextLayer
 
     public const uint DefaultColor = 0xFFFFFF;
 
+    public const double MaxOutline = 50;
+
+    public const double MaxShadow = 50;
+
     public TextLayer(string text, long start, long end)
     {
         ArgumentNullException.ThrowIfNull(text);
@@ -54,6 +58,15 @@ public sealed record TextLayer
 
     public long FadeOut { get; init; }
 
+    /// <summary>Kenarlik kalinligi, kaynak karenin pikseli; <c>null</c> boyuttan hesaplanan kendiliginden kalinliktir.</summary>
+    public double? Outline { get; init; }
+
+    /// <summary>Golge uzakligi, kaynak karenin pikseli.</summary>
+    public double Shadow { get; init; }
+
+    /// <summary>Metnin arkasina yari saydam kutu; kenarlik o zaman kutunun ic boslugudur.</summary>
+    public bool Box { get; init; }
+
     public IReadOnlyList<TextKeyframe> Keyframes { get; init; } = new[] { new TextKeyframe(0, 0.5, 0.5) };
 
     public long Length => End - Start;
@@ -73,6 +86,10 @@ public sealed record TextLayer
             throw new ArgumentOutOfRangeException(nameof(Color), Color, "Renk 0xRRGGBB olmalidir");
         if (FadeIn < 0 || FadeOut < 0 || FadeIn + FadeOut > Length)
             throw new ArgumentOutOfRangeException(nameof(FadeIn), FadeIn, "Solmalar negatif ya da katmandan uzun");
+        if (Outline is { } outline && (!double.IsFinite(outline) || outline < 0 || outline > MaxOutline))
+            throw new ArgumentOutOfRangeException(nameof(Outline), Outline, "Kenarlik 0-50 piksel olmalidir");
+        if (!double.IsFinite(Shadow) || Shadow < 0 || Shadow > MaxShadow)
+            throw new ArgumentOutOfRangeException(nameof(Shadow), Shadow, "Golge 0-50 piksel olmalidir");
         if (Keyframes is null || Keyframes.Count == 0)
             throw new ArgumentException("En az bir anahtar kare gerekir", nameof(Keyframes));
         foreach (var k in Keyframes)
@@ -144,6 +161,7 @@ public sealed record TextLayer
            && FontName == other.FontName && Size.Equals(other.Size) && Color == other.Color
            && Bold == other.Bold && Italic == other.Italic
            && FadeIn == other.FadeIn && FadeOut == other.FadeOut
+           && Nullable.Equals(Outline, other.Outline) && Shadow.Equals(other.Shadow) && Box == other.Box
            && Keyframes.SequenceEqual(other.Keyframes);
 
     public override int GetHashCode()
@@ -159,6 +177,9 @@ public sealed record TextLayer
         hash.Add(Italic);
         hash.Add(FadeIn);
         hash.Add(FadeOut);
+        hash.Add(Outline);
+        hash.Add(Shadow);
+        hash.Add(Box);
         foreach (var k in Keyframes) hash.Add(k);
         return hash.ToHashCode();
     }

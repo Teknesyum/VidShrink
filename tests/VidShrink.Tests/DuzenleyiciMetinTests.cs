@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using VidShrink.App.Editing;
@@ -183,6 +184,98 @@ public sealed class DuzenleyiciMetinTests
 
         var sabit = OlaySatiri(AssWriter.Write(new[] { new TextLayer("f", 0, S(2)) }, 320, 240));
         Assert.DoesNotContain("\\fad", sabit);
+    }
+
+    [Fact]
+    public void StilSatiriVarsayilanlarlaBugunkuGorunum()
+    {
+        var kucuk = new TextLayer("v", 0, S(1));
+        Assert.Null(kucuk.Outline);
+        Assert.Equal(0, kucuk.Shadow);
+        Assert.False(kucuk.Box);
+        Assert.Equal("Style: T0,Arial,19,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1,0,5,0,0,0,1",
+            StilSatiri(AssWriter.Write(new[] { kucuk }, 320, 240), 0));
+        Assert.Equal("Style: T0,Arial,144,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,9,0,5,0,0,0,1",
+            StilSatiri(AssWriter.Write(new[] { new TextLayer("v", 0, S(1)) { Size = 20 } }, 1280, 720), 0));
+    }
+
+    [Fact]
+    public void StilSatiriBicimVeSuslemeyiTasir()
+    {
+        var tam = new TextLayer("b", 0, S(1)) { FontName = "Verdana", Bold = true, Italic = true, Outline = 3, Shadow = 2.5, Box = true };
+        Assert.Equal("Style: T0,Verdana,19,&H00FFFFFF,&H00FFFFFF,&H80000000,&H00000000,-1,-1,0,0,100,100,0,0,3,3,2.5,5,0,0,0,1",
+            StilSatiri(AssWriter.Write(new[] { tam }, 320, 240), 0));
+
+        var kenarsiz = StilSatiri(AssWriter.Write(new[] { new TextLayer("b", 0, S(1)) { Outline = 0 } }, 320, 240), 0);
+        Assert.EndsWith(",&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,0,0,5,0,0,0,1", kenarsiz);
+
+        var kutu = StilSatiri(AssWriter.Write(new[] { new TextLayer("b", 0, S(1)) { Box = true } }, 320, 240), 0);
+        Assert.EndsWith(",&H80000000,&H00000000,0,0,0,0,100,100,0,0,3,1,0,5,0,0,0,1", kutu);
+
+        var golge = StilSatiri(AssWriter.Write(new[] { new TextLayer("b", 0, S(1)) { Shadow = 4 } }, 320, 240), 0);
+        Assert.EndsWith(",0,0,1,1,4,5,0,0,0,1", golge);
+
+        tam.Validate();
+        Assert.Throws<ArgumentOutOfRangeException>(() => (tam with { Outline = -1 }).Validate());
+        Assert.Throws<ArgumentOutOfRangeException>(() => (tam with { Outline = TextLayer.MaxOutline + 1 }).Validate());
+        Assert.Throws<ArgumentOutOfRangeException>(() => (tam with { Outline = double.NaN }).Validate());
+        Assert.Throws<ArgumentOutOfRangeException>(() => (tam with { Shadow = -0.5 }).Validate());
+        Assert.Throws<ArgumentOutOfRangeException>(() => (tam with { Shadow = TextLayer.MaxShadow + 1 }).Validate());
+        Assert.Throws<ArgumentOutOfRangeException>(() => (tam with { Shadow = double.PositiveInfinity }).Validate());
+        (tam with { Outline = TextLayer.MaxOutline, Shadow = TextLayer.MaxShadow }).Validate();
+
+        Assert.NotEqual(tam, tam with { Outline = null });
+        Assert.NotEqual(tam, tam with { Shadow = 0 });
+        Assert.NotEqual(tam, tam with { Box = false });
+        Assert.Equal(tam, tam with { });
+        Assert.Equal(tam.GetHashCode(), (tam with { }).GetHashCode());
+    }
+
+    [Fact]
+    public void OnizlemeBelgesiDisaAktarmaBelgesiyleAyni()
+    {
+        var metinler = new[] { new TextLayer("o", S(1), S(3)) { Bold = true, Outline = 2, Shadow = 1, Box = true, FadeIn = S(0.5) } };
+        var onizleme = new EdlPreview(new[] { "a.mp4" }, EditTimeline.FromSource(S(10)));
+        Assert.Equal(AssWriter.Write(metinler, 320, 240), AssWriter.WritePreview(metinler, 320, 240, onizleme));
+    }
+
+    private static string EskiProje(string metinAlanlari)
+        => "{\"version\":1,\"source\":{\"path\":\"a.mp4\",\"size\":1,\"modifiedUtcTicks\":1},\"sourceDuration\":" + S(10)
+           + ",\"clips\":[{\"start\":0,\"end\":" + S(10) + ",\"speed\":1,\"reversed\":false}],\"texts\":[{\"text\":\"e\",\"start\":0,\"end\":" + S(1)
+           + ",\"font\":\"Arial\",\"size\":8,\"color\":16777215,\"bold\":false,\"italic\":false,\"fadeIn\":0,\"fadeOut\":0" + metinAlanlari
+           + ",\"keyframes\":[{\"offset\":0,\"x\":0.5,\"y\":0.5}]}]}";
+
+    [Fact]
+    public void EskiProjeYeniAlanlarOlmadanAcilir()
+    {
+        var eski = EditProject.Parse(EskiProje(string.Empty));
+        Assert.NotNull(eski);
+        var metin = Assert.Single(eski!.Texts);
+        Assert.Null(metin.Outline);
+        Assert.Equal(0, metin.Shadow);
+        Assert.False(metin.Box);
+        Assert.Equal("Style: T0,Arial,19,&H00FFFFFF,&H00FFFFFF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,1,0,5,0,0,0,1",
+            StilSatiri(AssWriter.Write(eski.Texts, 320, 240), 0));
+
+        var yeni = EditProject.Parse(EskiProje(",\"outline\":2.5,\"shadow\":3,\"box\":true"));
+        Assert.NotNull(yeni);
+        Assert.Equal(2.5, yeni!.Texts[0].Outline);
+        Assert.Equal(3, yeni.Texts[0].Shadow);
+        Assert.True(yeni.Texts[0].Box);
+        Assert.Null(EditProject.Parse(EskiProje(",\"outline\":null"))!.Texts[0].Outline);
+        Assert.Null(EditProject.Parse(EskiProje(",\"shadow\":-1")));
+        Assert.Null(EditProject.Parse(EskiProje(",\"outline\":99")));
+
+        var zaman = EditTimeline.FromSource(S(10));
+        zaman.AddText(new TextLayer("g", 0, S(1)) { Outline = 4, Shadow = 1.5, Box = true });
+        zaman.AddText(new TextLayer("v", 0, S(1)));
+        var json = EditProject.From(new SourceStamp("a.mp4", 1, 1), zaman).ToJson();
+        var okunan = EditProject.Parse(json);
+        Assert.NotNull(okunan);
+        Assert.Equal(zaman.Texts, okunan!.Texts);
+        using var belge = System.Text.Json.JsonDocument.Parse(json);
+        var ikinci = belge.RootElement.GetProperty("texts")[1];
+        Assert.False(ikinci.TryGetProperty("outline", out _));
     }
 
     [Fact]
@@ -456,6 +549,108 @@ public sealed class DuzenleyiciMetinTests
         KanitKapanisi.Kapat(klasor, adlar);
     }
 
+    private static void GriKlip(string yol)
+        => Ffmpeg("-hide_banner", "-nostdin", "-y", "-f", "lavfi", "-i", "color=gray:s=320x240:r=30:d=2",
+            "-c:v", "libx264", "-preset", "ultrafast", "-threads", "2", "-pix_fmt", "yuv420p", yol);
+
+    private const int Koyu = 96;
+
+    private const int Kara = 32;
+
+    private readonly record struct KoyuOlcu(int Sayi, int Yari, int X0, int Y0, int X1, int Y1)
+    {
+        public double Doluluk => Sayi == 0 ? 0 : (double)Sayi / ((X1 - X0 + 1) * (Y1 - Y0 + 1));
+    }
+
+    private static KoyuOlcu KoyuAlan(Func<int, int, int> parlaklik)
+    {
+        var sayi = 0;
+        var yari = 0;
+        int x0 = int.MaxValue, y0 = int.MaxValue, x1 = -1, y1 = -1;
+        for (var y = 0; y < 240; y++)
+        for (var x = 0; x < 320; x++)
+        {
+            var deger = parlaklik(x, y);
+            if (deger >= Koyu) continue;
+            sayi++;
+            if (deger >= Kara) yari++;
+            x0 = Math.Min(x0, x);
+            y0 = Math.Min(y0, y);
+            x1 = Math.Max(x1, x);
+            y1 = Math.Max(y1, y);
+        }
+
+        return new KoyuOlcu(sayi, yari, x0, y0, x1, y1);
+    }
+
+    private static KoyuOlcu DisaKoyu(string video, string kare)
+    {
+        Ffmpeg("-hide_banner", "-nostdin", "-v", "error", "-y", "-ss", "1", "-i", video, "-frames:v", "1",
+            "-f", "rawvideo", "-pix_fmt", "gray", "-threads", "2", kare);
+        var piksel = File.ReadAllBytes(kare);
+        Assert.Equal(320 * 240, piksel.Length);
+        return KoyuAlan((x, y) => piksel[y * 320 + x]);
+    }
+
+    private static async Task<KoyuOlcu> OnizlemeKoyu(string kaynak, string katman, string belge)
+    {
+        File.WriteAllBytes(katman, AssWriter.Bytes(belge));
+        using var motor = new MpvEngine();
+        motor.SetProperty("ao", "null");
+        await motor.OpenAsync(kaynak);
+        motor.Pause();
+        await motor.SeekAsync(0.5, SeekPrecision.Exact);
+        var (_, _, gorulen) = await YeniKareAsync(motor, 0);
+        Assert.True(motor.AddOverlay(katman) > 0, "sub-add iz vermedi; son log: " + string.Join(" | ", motor.RecentLog));
+        await motor.SeekAsync(1.0, SeekPrecision.Exact);
+        var (piksel, stride, _) = await YeniKareAsync(motor, gorulen);
+        return KoyuAlan((x, y) =>
+        {
+            var i = y * stride + x * 4;
+            return (piksel[i] + piksel[i + 1] + piksel[i + 2]) / 3;
+        });
+    }
+
+    [FfmpegFact]
+    public async Task OnizlemeKaresiDisaAktarmaKaresiyleAyniKutuyuCizer()
+    {
+        var klasor = Path.Combine(Kanit, "metin-kutu");
+        Directory.CreateDirectory(klasor);
+        var adlar = new[] { "kaynak.mp4", "kutulu.mp4", "kutusuz.mp4", "kutulu.gray", "kutusuz.gray", "kutulu.ass", "kutusuz.ass" };
+        KanitKapanisi.Onceki(klasor, adlar);
+        var kaynak = Path.Combine(klasor, "kaynak.mp4");
+        GriKlip(kaynak);
+
+        async Task<(KoyuOlcu Disa, KoyuOlcu Onizleme)> Olc(string ad, bool kutu)
+        {
+            var zaman = EditTimeline.FromSource(S(2));
+            zaman.AddText(new TextLayer("HH", 0, S(2)) { Size = 20, Outline = kutu ? 2 : 0, Box = kutu });
+            var plan = await EditExportRunner.PrepareAsync(new[] { kaynak }, zaman, ExportMode.Full, Path.Combine(klasor, ad + ".mp4"), 8 * Gb);
+            Assert.NotNull(plan.SubtitleContent);
+            await EditExportRunner.RunAsync(IkiIsParcacigi(plan), null);
+            var disa = DisaKoyu(Path.Combine(klasor, ad + ".mp4"), Path.Combine(klasor, ad + ".gray"));
+            var onizleme = await OnizlemeKoyu(kaynak, Path.Combine(klasor, ad + ".ass"), plan.SubtitleContent!);
+            return (disa, onizleme);
+        }
+
+        var (disaKutu, onKutu) = await Olc("kutulu", true);
+        Assert.True(disaKutu.Yari > 2000 && disaKutu.Doluluk > 0.5, $"disa aktarmada kutu yok: {disaKutu} doluluk {disaKutu.Doluluk:0.00}");
+        Assert.True(onKutu.Yari > 2000 && onKutu.Doluluk > 0.5, $"onizlemede kutu yok: {onKutu} doluluk {onKutu.Doluluk:0.00}");
+        Assert.InRange(Math.Abs(disaKutu.Sayi - onKutu.Sayi), 0, disaKutu.Sayi / 10);
+        Assert.InRange(Math.Abs(disaKutu.Yari - onKutu.Yari), 0, disaKutu.Yari / 10);
+        Assert.InRange(Math.Abs(disaKutu.X0 - onKutu.X0), 0, 3);
+        Assert.InRange(Math.Abs(disaKutu.Y0 - onKutu.Y0), 0, 3);
+        Assert.InRange(Math.Abs(disaKutu.X1 - onKutu.X1), 0, 3);
+        Assert.InRange(Math.Abs(disaKutu.Y1 - onKutu.Y1), 0, 3);
+        Assert.True(disaKutu.X0 < 160 && disaKutu.X1 > 160 && disaKutu.Y0 < 120 && disaKutu.Y1 > 120, $"kutu merkezde degil {disaKutu}");
+
+        var (disaYalin, onYalin) = await Olc("kutusuz", false);
+        Assert.Equal(0, disaYalin.Sayi);
+        Assert.Equal(0, onYalin.Sayi);
+
+        KanitKapanisi.Kapat(klasor, adlar);
+    }
+
     private static bool Bas(EditorView v, Key tus, KeyModifiers ek = KeyModifiers.None)
     {
         var olay = new KeyEventArgs { RoutedEvent = InputElement.KeyDownEvent, Key = tus, KeyModifiers = ek };
@@ -534,6 +729,110 @@ public sealed class DuzenleyiciMetinTests
         finally
         {
             KanitKapanisi.Kapat(Kanit, "metin-arayuz");
+        }
+    }
+
+    private static void Gir(TextBox kutu, string metin)
+    {
+        kutu.Text = metin;
+        kutu.RaiseEvent(new KeyEventArgs { RoutedEvent = InputElement.KeyDownEvent, Key = Key.Enter });
+    }
+
+    private static void Tikla(ToggleButton dugme, bool acik)
+    {
+        dugme.IsChecked = acik;
+        dugme.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+    }
+
+    [Fact]
+    public void ArayuzBicimVeSuslemeDenetimleriModeliYazar()
+    {
+        var klasor = Path.Combine(Kanit, "metin-bicim");
+        Directory.CreateDirectory(klasor);
+        var dosya = Path.Combine(klasor, "kaynak.mp4");
+        File.WriteAllBytes(dosya, new byte[16]);
+        try
+        {
+            AppHost.Run(() =>
+            {
+                var motor = new KatmanMotoru();
+                var view = new EditorView
+                {
+                    KnownInfo = yol => new MediaInfo { FilePath = yol, FileSizeBytes = 16, DurationSeconds = 600, Width = 320, Height = 240, Fps = 30, VideoCodec = "h264", TotalBitrateBps = 1 }
+                };
+                view.Player.EngineFactory = () => motor;
+                view.OverlayRoot = Path.Combine(klasor, "katman");
+                var pencere = new Window { Width = 900, Height = 600, Content = view };
+                pencere.Show();
+                try
+                {
+                    var acilis = view.OpenSourceAsync(dosya);
+                    DenetimSurucu.Pump(view.Player, () => acilis.IsCompleted, 10);
+                    acilis.GetAwaiter().GetResult();
+                    Assert.True(Bas(view, Key.T));
+                    var model = view.Model!;
+                    TextLayer Metin() => model.Texts[0];
+
+                    Assert.True(view.TextPanel.IsVisible);
+                    Assert.Equal(TextLayer.DefaultFont, view.CmbTextFont.SelectedItem);
+                    Assert.False(view.BtnTextBold.IsChecked);
+                    Assert.False(view.BtnTextBox.IsChecked);
+                    Assert.Equal(string.Empty, view.TxtTextOutline.Text ?? string.Empty);
+
+                    const string baska = "Yok Yazi Tipi";
+                    Assert.True(view.UpdateSelectedText(t => t with { FontName = baska }));
+                    Assert.Equal(baska, view.CmbTextFont.SelectedItem);
+                    Assert.Contains(baska, view.CmbTextFont.Items.OfType<string>());
+                    view.CmbTextFont.SelectedItem = TextLayer.DefaultFont;
+                    Assert.Equal(TextLayer.DefaultFont, Metin().FontName);
+                    view.CmbTextFont.SelectedItem = baska;
+                    Assert.Equal(baska, Metin().FontName);
+
+                    Tikla(view.BtnTextBold, true);
+                    Assert.True(Metin().Bold);
+                    Tikla(view.BtnTextItalic, true);
+                    Assert.True(Metin().Italic);
+
+                    Gir(view.TxtTextFadeIn, "0.5");
+                    Assert.Equal(S(0.5), Metin().FadeIn);
+                    Gir(view.TxtTextFadeOut, "0.25");
+                    Assert.Equal(S(0.25), Metin().FadeOut);
+                    Gir(view.TxtTextFadeIn, "99");
+                    Assert.Equal(Metin().Length - S(0.25), Metin().FadeIn);
+                    Gir(view.TxtTextFadeIn, "-1");
+                    Assert.Equal(Metin().Length - S(0.25), Metin().FadeIn);
+
+                    Gir(view.TxtTextOutline, "4");
+                    Assert.Equal(4, Metin().Outline);
+                    Gir(view.TxtTextShadow, "2");
+                    Assert.Equal(2, Metin().Shadow);
+                    Gir(view.TxtTextShadow, "abc");
+                    Assert.Equal(2, Metin().Shadow);
+                    Tikla(view.BtnTextBox, true);
+                    Assert.True(Metin().Box);
+                    Assert.Contains(",&H80000000,&H00000000,-1,-1,0,0,100,100,0,0,3,4,2,5,", File.ReadAllText(view.OverlayPath));
+
+                    Gir(view.TxtTextOutline, string.Empty);
+                    Assert.Null(Metin().Outline);
+
+                    Assert.True(view.Undo());
+                    Assert.Equal(4, Metin().Outline);
+                    Assert.Equal("4", view.TxtTextOutline.Text);
+                    Assert.True(view.Undo());
+                    Assert.False(Metin().Box);
+                    Assert.False(view.BtnTextBox.IsChecked);
+                    Assert.True(view.BtnTextBold.IsChecked);
+                    Assert.Equal(baska, view.CmbTextFont.SelectedItem);
+                }
+                finally
+                {
+                    pencere.Close();
+                }
+            });
+        }
+        finally
+        {
+            KanitKapanisi.Kapat(Kanit, "metin-bicim");
         }
     }
 }
