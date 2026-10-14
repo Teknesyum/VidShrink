@@ -50,6 +50,8 @@
 
   "main.action.browse": "Огляд",
   "main.action.cancel": "Скасувати",
+  "main.action.pause-run": "Пауза",
+  "main.action.resume-run": "Продовжити",
   "main.action.cancel.disabled-tip": "Поки що жодне завдання не виконується",
   "main.action.shrink": "Стиснути",
   "main.action.shrink.disabled-tip": "Спочатку завантажте відеофайл",
@@ -248,7 +250,8 @@
   "main.shrink-job.move-down": "Перемістити нижче",
   "main.shrink-job.pause": "Призупинити черзу",
   "main.shrink-job.resume": "Продовжити черзу",
-  "main.shrink-job.paused": "Призупинено: поточний файл завершується, наступний чекає",
+  "main.shrink-job.paused": "Призупинено: поточний файл зупинено, наступний чекає",
+  "main.shrink-job.disk-paused": "Призупинено: на цільовому диску залишилося лише {0} МБ вільного місця. Звільніть місце й продовжте.",
   "main.shrink-job.when-done": "Після завершення",
   "main.shrink-job.done.nothing": "Нічого не робити",
   "main.shrink-job.done.open-folder": "Відкрити папку виводу",

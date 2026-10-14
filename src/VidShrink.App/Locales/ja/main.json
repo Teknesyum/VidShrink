@@ -50,6 +50,8 @@
 
   "main.action.browse": "参照",
   "main.action.cancel": "キャンセル",
+  "main.action.pause-run": "一時停止",
+  "main.action.resume-run": "再開",
   "main.action.cancel.disabled-tip": "まだ実行中のジョブはありません",
   "main.action.shrink": "圧縮",
   "main.action.shrink.disabled-tip": "先に動画ファイルを読み込んでください",
@@ -248,7 +250,8 @@
   "main.shrink-job.move-down": "下へ移動",
   "main.shrink-job.pause": "キューを一時停止",
   "main.shrink-job.resume": "キューを再開",
-  "main.shrink-job.paused": "一時停止中: 現在のファイルは完了し、次のファイルは待機します",
+  "main.shrink-job.paused": "一時停止中: 実行中のファイルは保留され、次のファイルは待機します",
+  "main.shrink-job.disk-paused": "一時停止中: 保存先ドライブの空き容量が {0} MB しか残っていません。空き容量を確保してから再開してください。",
   "main.shrink-job.when-done": "完了時",
   "main.shrink-job.done.nothing": "何もしない",
   "main.shrink-job.done.open-folder": "出力フォルダーを開く",

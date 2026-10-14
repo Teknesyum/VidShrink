@@ -272,7 +272,7 @@ public sealed class EncodeRunnerTests
     {
         var source = File.ReadAllText(TipSources.WindowCodePath);
 
-        Assert.Contains("CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync, _sceneMap?.Map);", source);
+        Assert.Contains("CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync, _sceneMap?.Map, RunPause);", source);
     }
 
     [Fact]

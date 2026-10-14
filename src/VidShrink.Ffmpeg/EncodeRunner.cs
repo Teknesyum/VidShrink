@@ -303,6 +303,7 @@ public sealed class EncodeRunner
         {
             attempt++;
             var fillClock = Stopwatch.StartNew();
+            using var fillPause = Pause?.Track(fillClock);
             var upDropped = new List<string>();
             try
             {
@@ -421,6 +422,7 @@ public sealed class EncodeRunner
                 attempt++;
                 var twoPass = current.ModeEnum == EncodeMode.TwoPass && FfmpegArguments.NeedsTwoPasses(current.Codec);
                 var attemptClock = Stopwatch.StartNew();
+                using var attemptPause = Pause?.Track(attemptClock);
                 var dropped = new List<string>();
 
                 if (twoPass)
@@ -776,6 +778,9 @@ public sealed class EncodeRunner
     /// <summary>Testin kodlama sureci baslar baslamaz okudugu kanca; onceligi atandiktan sonra cagrilir.</summary>
     internal Action<Process>? Started { get; init; }
 
+    /// <summary>SIK-P3: kodlama süreçlerini ve deneme saatini askıya alan düğme; <c>null</c> ise kodlama duraklatılamaz.</summary>
+    public EncodePause? Pause { get; init; }
+
     public static ProcessPriorityClass PriorityClassOf(EncodePriority priority) => priority switch
     {
         EncodePriority.BelowNormal => ProcessPriorityClass.BelowNormal,
@@ -794,7 +799,7 @@ public sealed class EncodeRunner
             return new EncodeCommandOutcome(0, Array.Empty<string>(), Array.Empty<string>());
         }
         var args = EncodeArguments(info, plan, outputPath, pass, passLogPrefix, EncoderCapabilities.Instance, scenes);
-        return await RunCommandAsync(args, plan.EffectiveDurationSeconds(info.DurationSeconds), progress, stage, spanFrom, spanTo, ct, () => attemptClock.Elapsed, plan.Priority, Started);
+        return await RunCommandAsync(args, plan.EffectiveDurationSeconds(info.DurationSeconds), progress, stage, spanFrom, spanTo, ct, () => attemptClock.Elapsed, plan.Priority, Started, Pause);
     }
 
     /// <summary>
@@ -818,8 +823,9 @@ public sealed class EncodeRunner
     internal static async Task<EncodeCommandOutcome> RunCommandAsync(
         IReadOnlyList<string> commandArgs, double durationSeconds, IProgress<EncodeProgress>? progress,
         string stage, double spanFrom, double spanTo, CancellationToken ct, Func<TimeSpan>? spanElapsed = null,
-        EncodePriority priority = EncodePriority.Normal, Action<Process>? started = null)
+        EncodePriority priority = EncodePriority.Normal, Action<Process>? started = null, EncodePause? pause = null)
     {
+        if (pause is not null) await pause.WaitWhilePausedAsync(ct);
         var args = commandArgs.ToList();
         args.InsertRange(0, new[] { "-progress", "pipe:1", "-nostats" });
 
@@ -836,6 +842,8 @@ public sealed class EncodeRunner
             catch (System.ComponentModel.Win32Exception) { }
         }
         started?.Invoke(process);
+        using var processPause = pause?.Track(process);
+        using var clockPause = pause?.Track(stopwatch);
         using var cancellationRegistration = ct.Register(() => TryKill(process));
 
         var stderrTask = Task.Run(async () =>

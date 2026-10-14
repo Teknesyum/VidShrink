@@ -50,6 +50,8 @@
 
   "main.action.browse": "เรียกดู",
   "main.action.cancel": "ยกเลิก",
+  "main.action.pause-run": "หยุดชั่วคราว",
+  "main.action.resume-run": "ดำเนินการต่อ",
   "main.action.cancel.disabled-tip": "ยังไม่มีงานที่กำลังทำงานอยู่",
   "main.action.shrink": "ย่อ",
   "main.action.shrink.disabled-tip": "โหลดไฟล์วิดีโอก่อน",
@@ -248,7 +250,8 @@
   "main.shrink-job.move-down": "เลื่อนลง",
   "main.shrink-job.pause": "หยุดคิวชั่วคราว",
   "main.shrink-job.resume": "ดำเนินคิวต่อ",
-  "main.shrink-job.paused": "หยุดชั่วคราว: ไฟล์ปัจจุบันจะเสร็จสิ้น ไฟล์ถัดไปรออยู่",
+  "main.shrink-job.paused": "หยุดชั่วคราว: ไฟล์ที่กำลังทำงานถูกพักไว้ ไฟล์ถัดไปรออยู่",
+  "main.shrink-job.disk-paused": "หยุดชั่วคราว: ไดรฟ์ปลายทางเหลือพื้นที่ว่างเพียง {0} MB โปรดเพิ่มพื้นที่ว่างแล้วดำเนินการต่อ",
   "main.shrink-job.when-done": "เมื่อเสร็จแล้ว",
   "main.shrink-job.done.nothing": "ไม่ทำอะไร",
   "main.shrink-job.done.open-folder": "เปิดโฟลเดอร์ผลลัพธ์",

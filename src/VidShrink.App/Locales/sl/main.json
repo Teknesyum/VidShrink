@@ -50,6 +50,8 @@
 
   "main.action.browse": "Prebrskaj",
   "main.action.cancel": "Prekliči",
+  "main.action.pause-run": "Premor",
+  "main.action.resume-run": "Nadaljuj",
   "main.action.cancel.disabled-tip": "Noben opravilo še ne teče",
   "main.action.shrink": "Skrči",
   "main.action.shrink.disabled-tip": "Najprej naložite video datoteko",
@@ -248,7 +250,8 @@
   "main.shrink-job.move-down": "Premakni navzdol",
   "main.shrink-job.pause": "Zaustavi vrsto",
   "main.shrink-job.resume": "Nadaljuj vrsto",
-  "main.shrink-job.paused": "Zaustavljeno: trenutna datoteka se konča, naslednja čaka",
+  "main.shrink-job.paused": "Zaustavljeno: trenutna datoteka miruje, naslednja čaka",
+  "main.shrink-job.disk-paused": "Zaustavljeno: na ciljnem pogonu je ostalo le še {0} MB prostora. Sprostite prostor in nadaljujte.",
   "main.shrink-job.when-done": "Ko je končano",
   "main.shrink-job.done.nothing": "Ne stori ničesar",
   "main.shrink-job.done.open-folder": "Odpri izhodno mapo",

@@ -50,6 +50,8 @@
 
   "main.action.browse": "Durchsuchen",
   "main.action.cancel": "Abbrechen",
+  "main.action.pause-run": "Pause",
+  "main.action.resume-run": "Fortsetzen",
   "main.action.cancel.disabled-tip": "Es läuft noch kein Auftrag",
   "main.action.shrink": "Verkleinern",
   "main.action.shrink.disabled-tip": "Zuerst eine Videodatei laden",
@@ -248,7 +250,8 @@
   "main.shrink-job.move-down": "Nach unten",
   "main.shrink-job.pause": "Warteschlange pausieren",
   "main.shrink-job.resume": "Warteschlange fortsetzen",
-  "main.shrink-job.paused": "Pausiert: Die aktuelle Datei wird fertig, die nächste wartet",
+  "main.shrink-job.paused": "Pausiert: Die laufende Datei wird angehalten, die nächste wartet",
+  "main.shrink-job.disk-paused": "Pausiert: Auf dem Ziellaufwerk sind nur noch {0} MB frei. Schaffen Sie Platz und setzen Sie dann fort.",
   "main.shrink-job.when-done": "Wenn fertig",
   "main.shrink-job.done.nothing": "Nichts tun",
   "main.shrink-job.done.open-folder": "Ausgabeordner öffnen",

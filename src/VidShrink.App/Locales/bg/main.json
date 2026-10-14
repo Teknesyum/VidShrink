@@ -50,6 +50,8 @@
 
   "main.action.browse": "Избери",
   "main.action.cancel": "Отказ",
+  "main.action.pause-run": "Пауза",
+  "main.action.resume-run": "Продължи",
   "main.action.cancel.disabled-tip": "Все още няма изпълняваща се задача",
   "main.action.shrink": "Свий",
   "main.action.shrink.disabled-tip": "Първо заредете видео файл",
@@ -248,7 +250,8 @@
   "main.shrink-job.move-down": "Премести надолу",
   "main.shrink-job.pause": "Пауза на опашката",
   "main.shrink-job.resume": "Продължаване на опашката",
-  "main.shrink-job.paused": "На пауза: текущият файл завършва, следващият изчаква",
+  "main.shrink-job.paused": "На пауза: текущият файл е задържан, следващият изчаква",
+  "main.shrink-job.disk-paused": "На пауза: на целевото устройство са останали само {0} MB свободно място. Освободете място и продължете.",
   "main.shrink-job.when-done": "След приключване",
   "main.shrink-job.done.nothing": "Без действие",
   "main.shrink-job.done.open-folder": "Отваряне на изходната папка",

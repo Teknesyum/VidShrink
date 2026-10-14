@@ -50,6 +50,8 @@
 
   "main.action.browse": "Browse",
   "main.action.cancel": "Cancel",
+  "main.action.pause-run": "Pause",
+  "main.action.resume-run": "Resume",
   "main.action.cancel.disabled-tip": "No job is running yet",
   "main.action.shrink": "Shrink",
   "main.action.shrink.disabled-tip": "Load a video file first",
@@ -248,7 +250,8 @@
   "main.shrink-job.move-down": "Move down",
   "main.shrink-job.pause": "Pause queue",
   "main.shrink-job.resume": "Resume queue",
-  "main.shrink-job.paused": "Paused: the current file finishes, the next one waits",
+  "main.shrink-job.paused": "Paused: the running file is on hold, the next one waits",
+  "main.shrink-job.disk-paused": "Paused: only {0} MB left free on the target drive. Free up space, then resume.",
   "main.shrink-job.when-done": "When done",
   "main.shrink-job.done.nothing": "Do nothing",
   "main.shrink-job.done.open-folder": "Open the output folder",

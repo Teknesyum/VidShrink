@@ -129,8 +129,9 @@ public static class ShrinkEngine
         FillPolicy fillPolicy,
         ComplexityProfile? profile,
         RetryDecisionAsync? askBeforeRetry,
-        SceneMap? scenes)
-        => new EncodeRunner().RunAsync(info, plan, outputPath, targetMb, progress, ct, fillPolicy, profile, askBeforeRetry, scenes);
+        SceneMap? scenes,
+        EncodePause? pause = null)
+        => new EncodeRunner { Pause = pause }.RunAsync(info, plan, outputPath, targetMb, progress, ct, fillPolicy, profile, askBeforeRetry, scenes);
 
     private static double PlanScale(MediaInfo info, EncodePlan plan)
         => info.Height <= 0 ? 1.0 : (double)plan.Height / info.Height;

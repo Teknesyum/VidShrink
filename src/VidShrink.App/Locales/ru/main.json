@@ -50,6 +50,8 @@
 
   "main.action.browse": "Обзор",
   "main.action.cancel": "Отмена",
+  "main.action.pause-run": "Пауза",
+  "main.action.resume-run": "Продолжить",
   "main.action.cancel.disabled-tip": "Пока не выполняется ни одна задача",
   "main.action.shrink": "Сжать",
   "main.action.shrink.disabled-tip": "Сначала загрузите видеофайл",
@@ -248,7 +250,8 @@
   "main.shrink-job.move-down": "Переместить ниже",
   "main.shrink-job.pause": "Приостановить очередь",
   "main.shrink-job.resume": "Продолжить очередь",
-  "main.shrink-job.paused": "Приостановлено: текущий файл завершится, следующий ждёт",
+  "main.shrink-job.paused": "Приостановлено: текущий файл остановлен, следующий ждёт",
+  "main.shrink-job.disk-paused": "Приостановлено: на целевом диске осталось всего {0} МБ свободного места. Освободите место и продолжите.",
   "main.shrink-job.when-done": "После завершения",
   "main.shrink-job.done.nothing": "Ничего не делать",
   "main.shrink-job.done.open-folder": "Открыть папку с результатом",

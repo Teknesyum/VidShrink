@@ -50,6 +50,8 @@
 
   "main.action.browse": "Răsfoiește",
   "main.action.cancel": "Anulează",
+  "main.action.pause-run": "Pauză",
+  "main.action.resume-run": "Reia",
   "main.action.cancel.disabled-tip": "Încă nu rulează nicio sarcină",
   "main.action.shrink": "Micșorează",
   "main.action.shrink.disabled-tip": "Încărcați mai întâi un fișier video",
@@ -248,7 +250,8 @@
   "main.shrink-job.move-down": "Deplasează jos",
   "main.shrink-job.pause": "Pune coada pe pauză",
   "main.shrink-job.resume": "Continuă coada",
-  "main.shrink-job.paused": "În pauză: fișierul curent se termină, următorul așteaptă",
+  "main.shrink-job.paused": "În pauză: fișierul curent este oprit, următorul așteaptă",
+  "main.shrink-job.disk-paused": "În pauză: pe unitatea de destinație au mai rămas doar {0} MB liberi. Eliberați spațiu, apoi reluați.",
   "main.shrink-job.when-done": "La finalizare",
   "main.shrink-job.done.nothing": "Nu face nimic",
   "main.shrink-job.done.open-folder": "Deschide folderul de ieșire",

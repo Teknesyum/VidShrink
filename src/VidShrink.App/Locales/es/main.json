@@ -50,6 +50,8 @@
 
   "main.action.browse": "Examinar",
   "main.action.cancel": "Cancelar",
+  "main.action.pause-run": "Pausar",
+  "main.action.resume-run": "Reanudar",
   "main.action.cancel.disabled-tip": "Todavía no hay ningún trabajo en curso",
   "main.action.shrink": "Reducir",
   "main.action.shrink.disabled-tip": "Cargue primero un archivo de vídeo",
@@ -248,7 +250,8 @@
   "main.shrink-job.move-down": "Bajar",
   "main.shrink-job.pause": "Pausar la cola",
   "main.shrink-job.resume": "Reanudar la cola",
-  "main.shrink-job.paused": "En pausa: el archivo actual termina, el siguiente espera",
+  "main.shrink-job.paused": "En pausa: el archivo en curso está detenido, el siguiente espera",
+  "main.shrink-job.disk-paused": "En pausa: solo quedan {0} MB libres en la unidad de destino. Libera espacio y reanuda.",
   "main.shrink-job.when-done": "Al terminar",
   "main.shrink-job.done.nothing": "No hacer nada",
   "main.shrink-job.done.open-folder": "Abrir la carpeta de salida",

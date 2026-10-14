@@ -50,6 +50,8 @@
 
   "main.action.browse": "انتخاب",
   "main.action.cancel": "لغو",
+  "main.action.pause-run": "مکث",
+  "main.action.resume-run": "ادامه",
   "main.action.cancel.disabled-tip": "هنوز هیچ کاری در حال اجرا نیست",
   "main.action.shrink": "فشرده کن",
   "main.action.shrink.disabled-tip": "ابتدا یک فایل ویدئویی بارگذاری کنید",
@@ -248,7 +250,8 @@
   "main.shrink-job.move-down": "انتقال به پایین",
   "main.shrink-job.pause": "توقف موقت صف",
   "main.shrink-job.resume": "ازسرگیری صف",
-  "main.shrink-job.paused": "متوقف‌شده: فایل فعلی تمام می‌شود، بعدی منتظر می‌ماند",
+  "main.shrink-job.paused": "متوقف‌شده: فایل در حال اجرا نگه داشته شده، بعدی منتظر می‌ماند",
+  "main.shrink-job.disk-paused": "متوقف‌شده: فقط {0} مگابایت فضای خالی روی درایو مقصد مانده است. فضا آزاد کنید و سپس ادامه دهید.",
   "main.shrink-job.when-done": "پس از پایان",
   "main.shrink-job.done.nothing": "کاری انجام نشود",
   "main.shrink-job.done.open-folder": "باز کردن پوشه خروجی",

@@ -50,6 +50,8 @@
 
   "main.action.browse": "Bla gjennom",
   "main.action.cancel": "Avbryt",
+  "main.action.pause-run": "Pause",
+  "main.action.resume-run": "Fortsett",
   "main.action.cancel.disabled-tip": "Ingen jobb kjører ennå",
   "main.action.shrink": "Krymp",
   "main.action.shrink.disabled-tip": "Last inn en videofil først",
@@ -248,7 +250,8 @@
   "main.shrink-job.move-down": "Flytt ned",
   "main.shrink-job.pause": "Sett køen på pause",
   "main.shrink-job.resume": "Gjenoppta køen",
-  "main.shrink-job.paused": "På pause: den nåværende filen fullføres, den neste venter",
+  "main.shrink-job.paused": "På pause: filen som kjører, står stille, den neste venter",
+  "main.shrink-job.disk-paused": "På pause: bare {0} MB ledig plass igjen på måldisken. Frigjør plass, og fortsett.",
   "main.shrink-job.when-done": "Når ferdig",
   "main.shrink-job.done.nothing": "Gjør ingenting",
   "main.shrink-job.done.open-folder": "Åpne utdatamappen",

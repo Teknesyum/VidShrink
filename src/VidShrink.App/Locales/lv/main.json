@@ -50,6 +50,8 @@
 
   "main.action.browse": "Pārlūkot",
   "main.action.cancel": "Atcelt",
+  "main.action.pause-run": "Pauzēt",
+  "main.action.resume-run": "Turpināt",
   "main.action.cancel.disabled-tip": "Pagaidām nenotiek neviens uzdevums",
   "main.action.shrink": "Saspiest",
   "main.action.shrink.disabled-tip": "Vispirms ielādējiet video failu",
@@ -248,7 +250,8 @@
   "main.shrink-job.move-down": "Pārvietot lejup",
   "main.shrink-job.pause": "Pauzēt rindu",
   "main.shrink-job.resume": "Atsākt rindu",
-  "main.shrink-job.paused": "Pauzēts: pašreizējais fails tiek pabeigts, nākamais gaida",
+  "main.shrink-job.paused": "Pauzēts: pašreizējais fails ir apturēts, nākamais gaida",
+  "main.shrink-job.disk-paused": "Pauzēts: mērķa diskā atlikuši tikai {0} MB brīvas vietas. Atbrīvojiet vietu un turpiniet.",
   "main.shrink-job.when-done": "Kad pabeigts",
   "main.shrink-job.done.nothing": "Nedarīt nekā",
   "main.shrink-job.done.open-folder": "Atvērt izvades mapi",

@@ -7,6 +7,11 @@ public static class DiskSpaceGuard
     private const long ExtraBufferMb = 200;
     private const long Multiplier = 3;
 
+    /// <summary>SIK-P3: kuyruk koşarken boş alan bunun altına inince kodlama kendiliğinden duraklar.</summary>
+    public static readonly long PauseBelowBytes = (long)(ExtraBufferMb * Megabayt.Bayt);
+
+    public static bool ShouldPause(long freeBytes) => freeBytes < PauseBelowBytes;
+
     public static long RequiredBytes(double targetMb)
         => (long)((targetMb * Multiplier + ExtraBufferMb) * Megabayt.Bayt);
 

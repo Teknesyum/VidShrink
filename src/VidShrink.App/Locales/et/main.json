@@ -50,6 +50,8 @@
 
   "main.action.browse": "Sirvi",
   "main.action.cancel": "Loobu",
+  "main.action.pause-run": "Peata ajutiselt",
+  "main.action.resume-run": "Jätka",
   "main.action.cancel.disabled-tip": "Ükski töö ei ole veel käimas",
   "main.action.shrink": "Tihenda",
   "main.action.shrink.disabled-tip": "Laadige kõigepealt videofail",
@@ -248,7 +250,8 @@
   "main.shrink-job.move-down": "Liiguta alla",
   "main.shrink-job.pause": "Peata järjekord",
   "main.shrink-job.resume": "Jätka järjekorda",
-  "main.shrink-job.paused": "Peatatud: praegune fail lõpetatakse, järgmine ootab",
+  "main.shrink-job.paused": "Peatatud: käimasolev fail on ootel, järgmine ootab",
+  "main.shrink-job.disk-paused": "Peatatud: sihtkettal on vaba ruumi alles vaid {0} MB. Vabasta ruumi ja jätka.",
   "main.shrink-job.when-done": "Kui valmis",
   "main.shrink-job.done.nothing": "Ära tee midagi",
   "main.shrink-job.done.open-folder": "Ava väljundikaust",

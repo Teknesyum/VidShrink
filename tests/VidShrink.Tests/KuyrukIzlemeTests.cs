@@ -218,7 +218,7 @@ public sealed class KuyrukIzlemeTests : IDisposable
     {
         var kaynak = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.App", "ShrinkJobWindow.axaml.cs"));
         var bildirim = kaynak.IndexOf("QueueWatch.MarkOwn(output);", StringComparison.Ordinal);
-        var kodlama = kaynak.IndexOf("new EncodeRunner().RunAsync(", StringComparison.Ordinal);
+        var kodlama = kaynak.IndexOf("new EncodeRunner { Pause = EncodePause }.RunAsync(", StringComparison.Ordinal);
 
         Assert.True(bildirim > 0, "kuyruk çıktısını bildirmiyor");
         Assert.True(kodlama > bildirim, "bildirim kodlamadan sonra");
