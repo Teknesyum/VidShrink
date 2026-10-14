@@ -107,6 +107,8 @@ single spelling.
 | `--profiller` | `--presets` |
 | `--olcumsuz` | `--no-measure` |
 | `--hizli` | `--fast` |
+| `--oncelik` | `--priority` |
+| `--is-parcacigi` | `--threads` |
 | `--dil` | `--lang` |
 
 Exit codes: `0` in band, `2` under the band (quality saturated, the smaller file kept), `3`

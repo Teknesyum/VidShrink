@@ -527,6 +527,19 @@ public static class FfmpegArguments
     /// ama kodlayicinin secildigi yerde <c>-hw_encoding 1</c> ister: verilmezse ffmpeg yazilim
     /// MFT'sine duser, o da bu makinede yalniz h264'u acar (<c>docs/olcumler/hb15-media-foundation.md</c>).
     /// </summary>
+    /// <summary>
+    /// <c>-threads</c> ile cekirdek sinirina uyan kodlayicilar. Olcum (<c>docs/olcumler/kodlama-oncelik-is-parcacigi.md</c>):
+    /// libx264 ve libvpx-vp9 is parcacigini degistiriyor; libx265'in havuzu ve libsvtav1'in surecleri
+    /// sayidan bagimsiz kaliyor; donanim kodlayicilari <c>ffmpeg -h encoder=</c>'da "Threading capabilities: none".
+    /// </summary>
+    public static bool HonoursThreadLimit(string codec)
+        => codec.Equals("libx264", StringComparison.OrdinalIgnoreCase) || CodecModel.IsVp9(codec);
+
+    public static IReadOnlyList<string> ThreadArgs(string codec, int? threads)
+        => threads is int n && n > 0 && HonoursThreadLimit(codec)
+            ? new[] { "-threads", n.ToString(CultureInfo.InvariantCulture) }
+            : Array.Empty<string>();
+
     public static IReadOnlyList<string> SpeedArgs(string codec, string preset)
     {
         if (CodecModel.IsVp9(codec))
@@ -578,6 +591,7 @@ public static class FfmpegArguments
 
         a.AddRange(new[] { cover ? "-c:v:0" : "-c:v", plan.Codec });
         a.AddRange(SpeedArgs(plan.Codec, pass == 1 ? FirstPassPreset(plan.Codec, plan.Preset, plan.TurboFirstPass) : plan.Preset));
+        a.AddRange(ThreadArgs(plan.Codec, plan.EncoderThreads));
         if (plan.Tune is { Length: > 0 } lockedTune && IsValidTune(plan.Codec, lockedTune)
             && !plan.Codec.Equals("libsvtav1", StringComparison.OrdinalIgnoreCase))
             a.AddRange(new[] { "-tune", lockedTune });

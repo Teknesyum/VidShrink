@@ -61,6 +61,12 @@ public sealed class AppSettings
     /// </summary>
     public int ParallelJobs { get; set; } = VidShrink.Core.ParallelJobs.Default;
 
+    /// <summary>Kodlama surecinin onceligi; varsayilan Normal (bugunku davranis).</summary>
+    public EncodePriority EncodePriority { get; set; } = EncodePriority.Normal;
+
+    /// <summary>Kodlayici is parcacigi siniri; 0 ffmpeg'in kendi secimi.</summary>
+    public int EncoderThreads { get; set; }
+
     /// <summary>
     /// Kuyruk penceresinin izleme klasörü. İkisini <see cref="Save"/> yazmaz: ana pencere
     /// ayarı denetimlerinden yeniden kurup kaydettiği için orada bu alanlar hep boş gelir ve
@@ -146,6 +152,8 @@ public sealed class AppSettings
             ReadBool(root, "followRecording", value => settings.FollowRecording = value);
             ReadBool(root, "notifyWhenDone", value => settings.NotifyWhenDone = value);
             ReadInt(root, "parallelJobs", value => settings.ParallelJobs = Math.Max(VidShrink.Core.ParallelJobs.Default, value));
+            ReadInt(root, "encodePriority", value => settings.EncodePriority = Enum.IsDefined(typeof(EncodePriority), value) ? (EncodePriority)value : EncodePriority.Normal);
+            ReadInt(root, "encoderThreads", value => settings.EncoderThreads = Math.Max(0, value));
             ReadBool(root, "watchEnabled", value => settings.WatchEnabled = value);
             ReadString(root, "watchFolder", value => settings.WatchDirectory = value);
             ReadInt(root, "ffmpegPathMode", value => settings.FfmpegPathMode = value);
@@ -233,6 +241,8 @@ public sealed class AppSettings
         root["followRecording"] = FollowRecording;
         root["notifyWhenDone"] = NotifyWhenDone;
         root["parallelJobs"] = ParallelJobs;
+        root["encodePriority"] = (int)EncodePriority;
+        root["encoderThreads"] = EncoderThreads;
         root["ffmpegPathMode"] = FfmpegPathMode;
         root["ffmpegPath"] = FfmpegPath;
         root["openSubtitlesApiKey"] = OpenSubtitlesApiKey;

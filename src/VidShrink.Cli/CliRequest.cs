@@ -170,6 +170,12 @@ public sealed record CliRequest
     /// <summary><c>--ses-drc</c> (HandBrake <c>--drc</c>): AC-3/E-AC-3 kaynagin cozucusune DRC olcegi.</summary>
     public double? AudioDrcScale { get; init; }
 
+    /// <summary><c>--oncelik</c>: kodlama surecinin isletim sistemi onceligi.</summary>
+    public EncodePriority Priority { get; init; } = EncodePriority.Normal;
+
+    /// <summary><c>--is-parcacigi</c>: siniri dinleyen kodlayiciya yazilan <c>-threads</c>; digerlerinde yok sayilir.</summary>
+    public int? EncoderThreads { get; init; }
+
     /// <summary>
     /// <see cref="SubtitleFiles"/> ve <see cref="SidecarSubtitles"/>'in diskten cozulmus hali;
     /// <see cref="ResolvedSubtitles"/> doldurur.
@@ -271,7 +277,9 @@ public sealed record CliRequest
             HdrPolicy = HdrPolicy.Preserve,
             FillPolicy = FillPolicy.FillTarget,
             SpeedMode = Fast ? SpeedMode.Fast : SpeedMode.Quality,
-            PreferredLanguage = PreferredLanguage
+            PreferredLanguage = PreferredLanguage,
+            Priority = Priority,
+            EncoderThreads = EncoderThreads
         };
         if (Profile is { } profil)
         {
@@ -614,6 +622,17 @@ public static class CliParser
                 case "--hizli" or "--fast":
                     request = request with { Fast = true };
                     break;
+                case "--oncelik" or "--priority":
+                    if (!TryValue(args, ref i, out var oncelik)) return Fail("error.missing-value", arg);
+                    if (!TryParsePriority(oncelik, out var sinif)) return Fail("error.bad-priority", oncelik);
+                    request = request with { Priority = sinif };
+                    break;
+                case "--is-parcacigi" or "--threads":
+                    if (!TryValue(args, ref i, out var isParcacigi)) return Fail("error.missing-value", arg);
+                    if (!int.TryParse(isParcacigi, NumberStyles.None, CultureInfo.InvariantCulture, out var adet) || adet < 1 || adet > 64)
+                        return Fail("error.bad-threads", isParcacigi);
+                    request = request with { EncoderThreads = adet };
+                    break;
                 default:
                     if (command == CliCommand.Watch && NotInWatch.Contains(arg)) return Fail("error.not-in-watch", arg);
                     if (arg.StartsWith('-') && arg.Length > 1) return Fail("error.unknown-option", arg);
@@ -661,6 +680,17 @@ public static class CliParser
             case "av1": codec = CliCodec.Av1; return true;
             case "vp9" or "libvpx-vp9": codec = CliCodec.Vp9; return true;
             default: codec = CliCodec.Auto; return false;
+        }
+    }
+
+    public static bool TryParsePriority(string text, out EncodePriority priority)
+    {
+        switch (text.Trim().ToLowerInvariant())
+        {
+            case "normal": priority = EncodePriority.Normal; return true;
+            case "normalin-alti" or "below-normal": priority = EncodePriority.BelowNormal; return true;
+            case "dusuk" or "low": priority = EncodePriority.Low; return true;
+            default: priority = EncodePriority.Normal; return false;
         }
     }
 

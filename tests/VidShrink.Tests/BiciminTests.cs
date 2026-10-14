@@ -1238,6 +1238,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-10, K6 eszamanli kodlama: uc yeni anahtardan (<c>main.shrink-job.running</c>, <c>settings-tab.parallel-jobs.label</c>, <c>settings-tab.parallel-jobs.hint</c>) 3 kol 3 dilde (running: pt; label: en, es), KOL dokumunden sayildi, tr girmiyor: 3075 + 3 = 3078, en 299 + 1 = 300, tr 103.</para>
     /// <para>2026-10-10, K2 sistem sesi yakalama: uc yeni anahtardan (<c>recorder.audio.loopback</c>, <c>.switched</c>, <c>.lost</c>) yalniz <c>recorder.audio.loopback</c> 5 dilde kola giriyor (en, hu, it, sl, tr), KOL dokumunden sayildi. Onceki pim 3081 idi: 3081 + 5 = 3086, en 300 + 1 = 301, tr 103 + 1 = 104.</para>
     /// <para>2026-10-14, hizli kip kayma bildirimi: dort yeni anahtardan 9 kol 9 dilde (<c>editor.export.keyframe-lead</c>: bn, hi, ja, th, ur; <c>editor.on-keyframe</c>: en, it; <c>editor.key.prev-keyframe</c> ve <c>next-keyframe</c>: hr), KOL dokumunden sayildi, tr girmiyor: 3086 + 9 = 3095, en 301 + 1 = 302, tr 104.</para>
+    /// <para>2026-10-14, kodlama sureci onceligi (SIK-P1): yedi yeni anahtardan 7 kol 4 dilde (es: encode-priority.label, .below-normal; fr: encoder-threads.label; pt: encode-priority.label, .below-normal, encoder-threads.label; sw: encode-priority.below-normal), KOL dokumunden sayildi, en ve tr girmiyor: 3095 + 7 = 3102, en 302, tr 104.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1263,7 +1264,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3095, toplam);
+        Assert.Equal(3102, toplam);
         Assert.Equal(302, dilBasina["en"]);
         Assert.Equal(104, dilBasina["tr"]);
     }
@@ -1481,6 +1482,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-10, K6 eszamanli kodlama: uc yeni anahtar (<c>main.shrink-job.running</c>, <c>settings-tab.parallel-jobs.label</c>, <c>settings-tab.parallel-jobs.hint</c>), dusen yok: 1353 + 3 = 1356, 43 x 1356 = 58308. <c>kayip</c> 0.</para>
     /// <para>2026-10-10, K2 sistem sesi yakalama: uc yeni anahtar (<c>recorder.audio.loopback</c>, <c>.switched</c>, <c>.lost</c>), dusen yok. Onceki pim 58437 = 43 x 1359 idi: 1359 + 3 = 1362, 43 x 1362 = 58566. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, hizli kip kayma bildirimi: dort yeni anahtar (<c>editor.key.prev-keyframe</c>, <c>next-keyframe</c>, <c>editor.on-keyframe</c>, <c>editor.export.keyframe-lead</c>), dusen yok: 1362 + 4 = 1366, 43 x 1366 = 58738. <c>kayip</c> 0.</para>
+    /// <para>2026-10-14, kodlama sureci onceligi (SIK-P1): yedi yeni anahtar (<c>settings-tab.encode-priority.label</c>, <c>.hint</c>, <c>.normal</c>, <c>.below-normal</c>, <c>.low</c>, <c>settings-tab.encoder-threads.label</c>, <c>.hint</c>), dusen yok: 1366 + 7 = 1373, 43 x 1373 = 59039. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1508,7 +1510,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(58738, gezilen);
+        Assert.Equal(59039, gezilen);
         Assert.Empty(kayip);
     }
 

@@ -161,6 +161,12 @@ public sealed class PlanOptions
     /// </summary>
     public double? MaxFps { get; set; }
 
+    /// <summary>Kodlayici is parcacigi siniri; bkz. <see cref="EncodePlan.EncoderThreads"/>.</summary>
+    public int? EncoderThreads { get; set; }
+
+    /// <summary>Kodlama surecinin onceligi; bkz. <see cref="EncodePlan.Priority"/>.</summary>
+    public EncodePriority Priority { get; set; }
+
     /// <summary>
     /// Yeniden kodlanan sesin ornekleme hizi, Hz (<see cref="StreamMapping.SampleRates"/>). Kaynak
     /// zaten bu hizdaysa hicbir seyi degistirmez ve kopyalama yolunu kapatmaz.
@@ -339,6 +345,8 @@ public static class PlanCalculator
         result.Plan.Trim = options.Trim;
         result.Plan.FrameRate = options.FrameRate;
         result.Plan.FrameRateCeiling = options.MaxFps;
+        result.Plan.EncoderThreads = options.EncoderThreads;
+        result.Plan.Priority = options.Priority;
         result.Plan.CodecNotMeasured = probe.CodecNotMeasured;
         result.Plan.Filters = filters;
         result.Plan.SuggestedCrop = filters.Crop is null ? options.DetectedCrop : null;
@@ -1268,6 +1276,8 @@ public static class PlanCalculator
         FirstSubtitleOnly = options.FirstSubtitleOnly,
         FrameRate = options.FrameRate,
         MaxFps = options.MaxFps,
+        EncoderThreads = options.EncoderThreads,
+        Priority = options.Priority,
         AudioSampleRate = options.AudioSampleRate,
         AudioDrcScale = options.AudioDrcScale
     };

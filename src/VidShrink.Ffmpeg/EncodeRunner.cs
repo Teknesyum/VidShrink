@@ -773,6 +773,16 @@ public sealed class EncodeRunner
     /// <summary>Testin ffmpeg yerine koydugu kodlayici: plani, cikti yolunu ve gecisi alir, dosyayi kendisi yazar.</summary>
     internal Func<EncodePlan, string, int, Task>? SahteKodlayici { get; init; }
 
+    /// <summary>Testin kodlama sureci baslar baslamaz okudugu kanca; onceligi atandiktan sonra cagrilir.</summary>
+    internal Action<Process>? Started { get; init; }
+
+    public static ProcessPriorityClass PriorityClassOf(EncodePriority priority) => priority switch
+    {
+        EncodePriority.BelowNormal => ProcessPriorityClass.BelowNormal,
+        EncodePriority.Low => ProcessPriorityClass.Idle,
+        _ => ProcessPriorityClass.Normal
+    };
+
     private async Task<EncodeCommandOutcome> RunOneAsync(
         MediaInfo info, EncodePlan plan, string outputPath, int pass, string? passLogPrefix,
         IProgress<EncodeProgress>? progress, string stage, double spanFrom, double spanTo,
@@ -784,7 +794,7 @@ public sealed class EncodeRunner
             return new EncodeCommandOutcome(0, Array.Empty<string>(), Array.Empty<string>());
         }
         var args = EncodeArguments(info, plan, outputPath, pass, passLogPrefix, EncoderCapabilities.Instance, scenes);
-        return await RunCommandAsync(args, plan.EffectiveDurationSeconds(info.DurationSeconds), progress, stage, spanFrom, spanTo, ct, () => attemptClock.Elapsed);
+        return await RunCommandAsync(args, plan.EffectiveDurationSeconds(info.DurationSeconds), progress, stage, spanFrom, spanTo, ct, () => attemptClock.Elapsed, plan.Priority, Started);
     }
 
     /// <summary>
@@ -807,7 +817,8 @@ public sealed class EncodeRunner
 
     internal static async Task<EncodeCommandOutcome> RunCommandAsync(
         IReadOnlyList<string> commandArgs, double durationSeconds, IProgress<EncodeProgress>? progress,
-        string stage, double spanFrom, double spanTo, CancellationToken ct, Func<TimeSpan>? spanElapsed = null)
+        string stage, double spanFrom, double spanTo, CancellationToken ct, Func<TimeSpan>? spanElapsed = null,
+        EncodePriority priority = EncodePriority.Normal, Action<Process>? started = null)
     {
         var args = commandArgs.ToList();
         args.InsertRange(0, new[] { "-progress", "pipe:1", "-nostats" });
@@ -818,6 +829,13 @@ public sealed class EncodeRunner
         var watch = new StderrWatch();
 
         process.Start();
+        if (priority != EncodePriority.Normal)
+        {
+            try { process.PriorityClass = PriorityClassOf(priority); }
+            catch (InvalidOperationException) { }
+            catch (System.ComponentModel.Win32Exception) { }
+        }
+        started?.Invoke(process);
         using var cancellationRegistration = ct.Register(() => TryKill(process));
 
         var stderrTask = Task.Run(async () =>
