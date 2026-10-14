@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "صف پایان یافت. آماده: {0}، ناموفق: {1}.",
 
   "main.convert.title": "تبدیل",
+  "main.convert.preset.label": "پیش‌تنظیم",
+  "main.convert.preset.placeholder": "یک پیش‌تنظیم انتخاب کنید",
+  "main.convert.preset.add.tip": "تنظیمات تبدیل را با یک نام ذخیره می‌کند. جدا از پیش‌تنظیم‌های فشرده‌سازی نگه داشته می‌شود.",
   "main.convert.source-empty": "منبعی در فشرده‌سازی بارگذاری کنید یا اینجا انتخاب کنید.",
   "main.convert.browse": "انتخاب منبع",
   "main.convert.container": "قالب",

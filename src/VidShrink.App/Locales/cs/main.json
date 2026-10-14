@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Fronta dokončena. Hotovo: {0}, neúspěšné: {1}.",
 
   "main.convert.title": "Převod",
+  "main.convert.preset.label": "Předvolba",
+  "main.convert.preset.placeholder": "Vyberte předvolbu",
+  "main.convert.preset.add.tip": "Uloží nastavení převodu pod názvem. Ukládá se odděleně od předvoleb zmenšení.",
   "main.convert.source-empty": "Načtěte zdroj v záložce Zmenšit nebo procházejte zde.",
   "main.convert.browse": "Procházet zdroj",
   "main.convert.container": "Kontejner",

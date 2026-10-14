@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Red je završen. Spremno: {0}, neuspjelo: {1}.",
 
   "main.convert.title": "Pretvorba",
+  "main.convert.preset.label": "Predložak",
+  "main.convert.preset.placeholder": "Odaberite predložak",
+  "main.convert.preset.add.tip": "Sprema postavke pretvorbe pod imenom. Čuvaju se odvojeno od predložaka smanjivanja.",
   "main.convert.source-empty": "Učitajte izvor u kartici Smanji ili pregledajte ovdje.",
   "main.convert.browse": "Pregledaj izvor",
   "main.convert.container": "Spremnik",

@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Coda terminata. Pronti: {0}, non riusciti: {1}.",
 
   "main.convert.title": "Conversione",
+  "main.convert.preset.label": "Preset",
+  "main.convert.preset.placeholder": "Scegli un preset",
+  "main.convert.preset.add.tip": "Salva le impostazioni di conversione con un nome. Conservate separatamente dai preset di riduzione.",
   "main.convert.source-empty": "Carica una sorgente in Riduci o sfoglia qui.",
   "main.convert.browse": "Sfoglia sorgente",
   "main.convert.container": "Contenitore",

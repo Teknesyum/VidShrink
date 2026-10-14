@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "انتهت قائمة الانتظار. جاهز: {0}، فشل: {1}.",
 
   "main.convert.title": "التحويل",
+  "main.convert.preset.label": "الإعداد المسبق",
+  "main.convert.preset.placeholder": "اختر إعدادًا مسبقًا",
+  "main.convert.preset.add.tip": "يحفظ إعدادات التحويل باسم. تُحفظ منفصلة عن إعدادات التقليص المسبقة.",
   "main.convert.source-empty": "حمّل مصدراً في تبويب التقليص أو استعرض هنا.",
   "main.convert.browse": "استعراض المصدر",
   "main.convert.container": "الحاوية",

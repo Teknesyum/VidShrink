@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Cola terminada. Listos: {0}, fallidos: {1}.",
 
   "main.convert.title": "Conversión",
+  "main.convert.preset.label": "Ajuste",
+  "main.convert.preset.placeholder": "Elige un ajuste",
+  "main.convert.preset.add.tip": "Guarda los ajustes de conversión con un nombre. Se guardan aparte de los ajustes de Reducir.",
   "main.convert.source-empty": "Carga una fuente en Reducir o examina aquí.",
   "main.convert.browse": "Examinar fuente",
   "main.convert.container": "Contenedor",

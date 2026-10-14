@@ -317,6 +317,7 @@ public partial class MainWindow : Window
         Watch(TxtOpenSubtitlesKey, TextBox.TextProperty, SaveAppSettings);
         Watch(TxtOpenSubtitlesUser, TextBox.TextProperty, SaveAppSettings);
         InitUserPresets();
+        InitConvertPresets();
         BuildShareTargetStrip();
         Watch(CmbShareRetention, SelectingItemsControl.SelectedIndexProperty, SaveSettings);
         foreach (var control in new SelectingItemsControl[]

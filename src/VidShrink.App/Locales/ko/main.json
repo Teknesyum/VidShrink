@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "대기열이 끝났습니다. 완료: {0}, 실패: {1}.",
 
   "main.convert.title": "변환",
+  "main.convert.preset.label": "프리셋",
+  "main.convert.preset.placeholder": "프리셋 선택",
+  "main.convert.preset.add.tip": "변환 설정을 이름으로 저장합니다. 축소 프리셋과 따로 보관됩니다.",
   "main.convert.source-empty": "축소 탭에서 원본을 불러오거나 여기서 찾아보세요.",
   "main.convert.browse": "원본 찾아보기",
   "main.convert.container": "컨테이너",

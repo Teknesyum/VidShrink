@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Foleni imekamilika. Tayari: {0}, zilizoshindwa: {1}.",
 
   "main.convert.title": "Ugeuzaji",
+  "main.convert.preset.label": "Mpangilio",
+  "main.convert.preset.placeholder": "Chagua mpangilio",
+  "main.convert.preset.add.tip": "Huhifadhi mipangilio ya kugeuza kwa jina. Huwekwa tofauti na mipangilio ya kufinyaza.",
   "main.convert.source-empty": "Pakia chanzo kwenye Finyaza au vinjari hapa.",
   "main.convert.browse": "Vinjari chanzo",
   "main.convert.container": "Kontena",

@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "সারি শেষ হয়েছে। প্রস্তুত: {0}, ব্যর্থ: {1}।",
 
   "main.convert.title": "রূপান্তর",
+  "main.convert.preset.label": "প্রিসেট",
+  "main.convert.preset.placeholder": "একটি প্রিসেট বেছে নিন",
+  "main.convert.preset.add.tip": "রূপান্তরের সেটিংস একটি নামে সংরক্ষণ করে। সংকোচনের প্রিসেট থেকে আলাদা রাখা হয়।",
   "main.convert.source-empty": "সংকোচন ট্যাবে উৎস লোড করুন বা এখানে ব্রাউজ করুন।",
   "main.convert.browse": "উৎস ব্রাউজ",
   "main.convert.container": "কনটেইনার",

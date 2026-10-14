@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "队列已完成。就绪：{0}，失败：{1}。",
 
   "main.convert.title": "转换",
+  "main.convert.preset.label": "预设",
+  "main.convert.preset.placeholder": "选择预设",
+  "main.convert.preset.add.tip": "以名称保存转换设置。与压缩预设分开存放。",
   "main.convert.source-empty": "在“压缩”中加载源文件，或在此处浏览。",
   "main.convert.browse": "浏览源文件",
   "main.convert.container": "容器",

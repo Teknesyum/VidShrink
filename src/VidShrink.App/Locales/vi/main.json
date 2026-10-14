@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Hàng đợi đã xong. Sẵn sàng: {0}, thất bại: {1}.",
 
   "main.convert.title": "Chuyển đổi",
+  "main.convert.preset.label": "Cài đặt sẵn",
+  "main.convert.preset.placeholder": "Chọn cài đặt sẵn",
+  "main.convert.preset.add.tip": "Lưu cài đặt chuyển đổi dưới một tên. Được giữ riêng với cài đặt sẵn của Nén.",
   "main.convert.source-empty": "Nạp nguồn ở tab Nén hoặc duyệt tại đây.",
   "main.convert.browse": "Duyệt nguồn",
   "main.convert.container": "Định dạng chứa",

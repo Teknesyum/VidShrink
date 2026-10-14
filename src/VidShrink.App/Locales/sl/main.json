@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Čakalna vrsta je končana. Pripravljeno: {0}, neuspelo: {1}.",
 
   "main.convert.title": "Pretvorba",
+  "main.convert.preset.label": "Prednastavitev",
+  "main.convert.preset.placeholder": "Izberite prednastavitev",
+  "main.convert.preset.add.tip": "Shrani nastavitve pretvorbe pod imenom. Hranijo se ločeno od prednastavitev krčenja.",
   "main.convert.source-empty": "Naložite vir v zavihku Skrči ali prebrskajte tukaj.",
   "main.convert.browse": "Prebrskaj vir",
   "main.convert.container": "Vsebnik",

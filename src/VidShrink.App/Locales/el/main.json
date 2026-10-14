@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Η ουρά ολοκληρώθηκε. Έτοιμα: {0}, αποτυχίες: {1}.",
 
   "main.convert.title": "Μετατροπή",
+  "main.convert.preset.label": "Προρύθμιση",
+  "main.convert.preset.placeholder": "Επιλέξτε προρύθμιση",
+  "main.convert.preset.add.tip": "Αποθηκεύει τις ρυθμίσεις μετατροπής με ένα όνομα. Διατηρούνται χωριστά από τις προρυθμίσεις σμίκρυνσης.",
   "main.convert.source-empty": "Φορτώστε πηγή στη Σμίκρυνση ή αναζητήστε εδώ.",
   "main.convert.browse": "Αναζήτηση πηγής",
   "main.convert.container": "Περιέκτης",

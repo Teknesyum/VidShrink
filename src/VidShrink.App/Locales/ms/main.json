@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Baris gilir selesai. Sedia: {0}, gagal: {1}.",
 
   "main.convert.title": "Penukaran",
+  "main.convert.preset.label": "Pratetap",
+  "main.convert.preset.placeholder": "Pilih pratetap",
+  "main.convert.preset.add.tip": "Menyimpan tetapan penukaran dengan satu nama. Disimpan berasingan daripada pratetap Kecilkan.",
   "main.convert.source-empty": "Muatkan sumber di Kecilkan atau layari di sini.",
   "main.convert.browse": "Layari sumber",
   "main.convert.container": "Bekas",

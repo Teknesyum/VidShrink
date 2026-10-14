@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Rad je dokončený. Hotové: {0}, neúspešné: {1}.",
 
   "main.convert.title": "Konverzia",
+  "main.convert.preset.label": "Predvoľba",
+  "main.convert.preset.placeholder": "Vyberte predvoľbu",
+  "main.convert.preset.add.tip": "Uloží nastavenia konverzie pod názvom. Ukladajú sa oddelene od predvolieb zmenšenia.",
   "main.convert.source-empty": "Načítajte zdroj v karte Zmenšiť alebo ho vyhľadajte tu.",
   "main.convert.browse": "Vyhľadať zdroj",
   "main.convert.container": "Kontajner",

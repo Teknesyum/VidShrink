@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "File terminée. Prêts : {0}, échecs : {1}.",
 
   "main.convert.title": "Conversion",
+  "main.convert.preset.label": "Préréglage",
+  "main.convert.preset.placeholder": "Choisissez un préréglage",
+  "main.convert.preset.add.tip": "Enregistre les réglages de conversion sous un nom. Conservés à part des préréglages de réduction.",
   "main.convert.source-empty": "Chargez une source dans Réduire ou parcourez ici.",
   "main.convert.browse": "Parcourir la source",
   "main.convert.container": "Conteneur",

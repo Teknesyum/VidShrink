@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Чергу завершено. Готово: {0}, з помилкою: {1}.",
 
   "main.convert.title": "Конвертація",
+  "main.convert.preset.label": "Передналаштування",
+  "main.convert.preset.placeholder": "Виберіть передналаштування",
+  "main.convert.preset.add.tip": "Зберігає налаштування конвертування під назвою. Зберігаються окремо від передналаштувань стиснення.",
   "main.convert.source-empty": "Завантажте джерело у вкладці «Стиснути» або виберіть тут.",
   "main.convert.browse": "Вибрати джерело",
   "main.convert.container": "Контейнер",

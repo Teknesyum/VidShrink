@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "قطار مکمل ہو گئی۔ تیار: {0}، ناکام: {1}۔",
 
   "main.convert.title": "تبدیلی",
+  "main.convert.preset.label": "پری سیٹ",
+  "main.convert.preset.placeholder": "پری سیٹ منتخب کریں",
+  "main.convert.preset.add.tip": "تبدیلی کی ترتیبات کو ایک نام سے محفوظ کرتا ہے۔ سکیڑنے کے پری سیٹ سے الگ رکھی جاتی ہیں۔",
   "main.convert.source-empty": "سکیڑیں میں ماخذ لوڈ کریں یا یہاں براؤز کریں۔",
   "main.convert.browse": "ماخذ براؤز کریں",
   "main.convert.container": "کنٹینر",

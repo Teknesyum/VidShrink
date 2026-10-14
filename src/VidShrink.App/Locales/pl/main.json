@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Kolejka zakończona. Gotowe: {0}, nieudane: {1}.",
 
   "main.convert.title": "Konwersja",
+  "main.convert.preset.label": "Ustawienie wstępne",
+  "main.convert.preset.placeholder": "Wybierz ustawienie",
+  "main.convert.preset.add.tip": "Zapisuje ustawienia konwersji pod nazwą. Przechowywane osobno od ustawień zmniejszania.",
   "main.convert.source-empty": "Wczytaj źródło w zakładce Zmniejsz lub przeglądaj tutaj.",
   "main.convert.browse": "Przeglądaj źródło",
   "main.convert.container": "Kontener",

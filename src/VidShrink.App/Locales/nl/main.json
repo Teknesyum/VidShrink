@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Wachtrij klaar. Gereed: {0}, mislukt: {1}.",
 
   "main.convert.title": "Conversie",
+  "main.convert.preset.label": "Voorinstelling",
+  "main.convert.preset.placeholder": "Kies een voorinstelling",
+  "main.convert.preset.add.tip": "Bewaart de conversie-instellingen onder een naam. Apart gehouden van de verkleinvoorinstellingen.",
   "main.convert.source-empty": "Laad een bron in Verkleinen of blader hier.",
   "main.convert.browse": "Bron bladeren",
   "main.convert.container": "Container",

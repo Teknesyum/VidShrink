@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Rinda ir pabeigta. Gatavi: {0}, neizdevās: {1}.",
 
   "main.convert.title": "Pārveidošana",
+  "main.convert.preset.label": "Iestatījumu kopa",
+  "main.convert.preset.placeholder": "Izvēlieties kopu",
+  "main.convert.preset.add.tip": "Saglabā pārveidošanas iestatījumus ar nosaukumu. Glabājas atsevišķi no saspiešanas kopām.",
   "main.convert.source-empty": "Ielādējiet avotu cilnē Saspiest vai pārlūkojiet šeit.",
   "main.convert.browse": "Pārlūkot avotu",
   "main.convert.container": "Konteiners",
