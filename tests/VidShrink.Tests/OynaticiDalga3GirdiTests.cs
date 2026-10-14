@@ -531,12 +531,14 @@ public sealed class OynaticiDalga3GirdiTests
     }
 
     [Fact]
-    public void HamSurukleBirakDosyayiAcarKlasorVeSilinenDosyaAcmaz()
+    public void HamSurukleBirakDosyayiAcarOynatilabilirDosyasizKlasorVeSilinenDosyaAcmaz()
     {
         var clip = MotorKlipleri.Kucuk;
         var klasor = GorunumKanit.Gecici("birak");
         var ikinci = Klip(klasor, "birakilan.mp4");
         var silinen = Klip(klasor, "silinen.mp4");
+        var bos = GorunumKanit.Gecici("birak-bos");
+        File.WriteAllText(Path.Combine(bos, "oku.txt"), "video degil");
         var rapor = AppHost.Run(() =>
         {
             var body = new StringBuilder();
@@ -546,7 +548,7 @@ public sealed class OynaticiDalga3GirdiTests
             var nokta = Merkez(window, view);
 
             body.AppendLine("klasor:");
-            var klasorOgesi = window.StorageProvider.TryGetFolderFromPathAsync(new Uri(klasor));
+            var klasorOgesi = window.StorageProvider.TryGetFolderFromPathAsync(new Uri(bos));
             DenetimSurucu.Pump(view, () => klasorOgesi.IsCompleted, 5);
             Birak(window, nokta, klasorOgesi.Result!, body);
             DenetimSurucu.Wait(view, 0.3);
@@ -576,8 +578,7 @@ public sealed class OynaticiDalga3GirdiTests
         Assert.Contains($"silinenden sonra acik: {clipAdi}", rapor);
         if (!rapor.Contains("dosyadan sonra acik: birakilan.mp4", StringComparison.Ordinal)) Assert.Fail("dosya birakma acmadi:\n" + rapor);
         Assert.Contains("DragOver: etki Copy", rapor.Split("dosya:")[1]);
-        Assert.DoesNotContain("DragOver: etki Copy", rapor.Split("dosya:")[0]);
-        Assert.Contains("drop -> birakilan.mp4", rapor);
+        Assert.DoesNotContain("DragOver: etki Copy", rapor.Split("silinen:")[1].Split("dosya:")[0]);        Assert.Contains("drop -> birakilan.mp4", rapor);
         Assert.DoesNotContain("drop -> silinen.mp4", rapor);
         Kapat("ham-birak.txt");
     }

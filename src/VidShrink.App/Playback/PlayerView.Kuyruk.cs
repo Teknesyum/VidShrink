@@ -50,6 +50,23 @@ internal partial class PlayerView
             ? queue
             : FolderNavigator.Order(_queue ?? FolderNavigator.Siblings(path), _settings.Shuffle, _shuffleSeed);
 
+    internal bool OpenFolder(string folder) => OpenCollected(new[] { folder }, "folder -> ");
+
+    internal bool OpenDroppedItems(IReadOnlyList<string> paths) => OpenCollected(paths, "drop -> ");
+
+    private bool OpenCollected(IReadOnlyList<string> paths, string trace)
+    {
+        var files = FolderNavigator.Collect(paths);
+        if (files.Count == 0) return false;
+        _queue = files;
+        _queueArranged = false;
+        QueueSource = null;
+        _trace.Add(trace + files.Count);
+        _trace.Add("queue " + files.Count);
+        _navigation = OpenQuietlyAsync(files[0]);
+        return true;
+    }
+
     internal bool Enqueue(string file) => EditQueue(file, QueueEdit.Append, "enqueue ");
 
     internal bool PlayNext(string file) => EditQueue(file, QueueEdit.InsertNext, "playnext ");

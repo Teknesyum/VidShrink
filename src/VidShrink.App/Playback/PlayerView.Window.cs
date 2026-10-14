@@ -436,9 +436,27 @@ internal partial class PlayerView
         }
     }
 
+    private async void OnPickFolder(object? sender, RoutedEventArgs e)
+    {
+        if (TopLevel.GetTopLevel(this)?.StorageProvider is not { CanPickFolder: true } storage) return;
+        try
+        {
+            var folders = await storage.OpenFolderPickerAsync(new FolderPickerOpenOptions
+            {
+                AllowMultiple = false,
+                Title = Strings.Get("player.menu.open-folder")
+            });
+            if (folders.Count == 0 || folders[0].TryGetLocalPath() is not { } local) return;
+            OpenFolder(local);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException)
+        {
+        }
+    }
+
     private void OnFileDragOver(object? sender, DragEventArgs e)
     {
-        e.DragEffects = DroppedFile(e) is not null || DroppedAddress(e) is not null ? DragDropEffects.Copy : DragDropEffects.None;
+        e.DragEffects = DroppedFile(e) is not null || DroppedItems(e) is not null || DroppedAddress(e) is not null ? DragDropEffects.Copy : DragDropEffects.None;
         e.Handled = true;
     }
 
@@ -450,7 +468,8 @@ internal partial class PlayerView
         e.Handled = true;
         if (file is null)
         {
-            if (DroppedAddress(e) is { } address) OpenDroppedAddress(address);
+            if (FileDropped is null && DroppedItems(e) is { } items) OpenDroppedItems(items);
+            else if (DroppedAddress(e) is { } address) OpenDroppedAddress(address);
             return;
         }
 
@@ -466,6 +485,20 @@ internal partial class PlayerView
     }
 
     private static string? DroppedAddress(DragEventArgs e) => MediaAddress.FromText(e.DataTransfer.TryGetText());
+
+    private static IReadOnlyList<string>? DroppedItems(DragEventArgs e)
+    {
+        var items = e.DataTransfer.TryGetFiles()?.ToList();
+        if (items is null || items.Count == 0) return null;
+        var paths = new List<string>();
+        foreach (var item in items)
+        {
+            var path = item.TryGetLocalPath();
+            if (path is not null && (Directory.Exists(path) || File.Exists(path))) paths.Add(path);
+        }
+
+        return paths.Count > 0 && (paths.Count > 1 || Directory.Exists(paths[0])) ? paths : null;
+    }
 
     private static string? DroppedFile(DragEventArgs e)
     {

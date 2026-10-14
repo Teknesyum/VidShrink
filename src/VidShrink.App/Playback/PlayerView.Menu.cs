@@ -33,6 +33,7 @@ internal partial class PlayerView
         copy.IsEnabled = !AudioOnly;
         flyout.Items.Add(copy);
         flyout.Items.Add(ToolsMenu());
+        flyout.Items.Add(OpenFolderRow());
         flyout.Items.Add(RecentMenu());
         flyout.Items.Add(SettingsMenu());
         return flyout;
@@ -73,6 +74,13 @@ internal partial class PlayerView
         var item = new MenuItem { Header = Strings.Get("player.menu.reveal"), IsEnabled = RevealTarget() is not null };
         item.Click += (_, _) => RevealFile();
         if (OnAddress) ExplainAddress(item);
+        return item;
+    }
+
+    private MenuItem OpenFolderRow()
+    {
+        var item = new MenuItem { Header = Strings.Get("player.menu.open-folder") };
+        item.Click += OnPickFolder;
         return item;
     }
 
