@@ -1,3 +1,7 @@
+using System.Diagnostics;
+using System.Globalization;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using Avalonia;
 using Avalonia.Controls;
@@ -6,6 +10,7 @@ using VidShrink.App;
 using VidShrink.App.Localization;
 using VidShrink.App.Playback;
 using VidShrink.Core;
+using VidShrink.Ffmpeg;
 using VidShrink.Player;
 using Xunit;
 
@@ -547,5 +552,320 @@ public sealed class OynaticiAdresTests
         Assert.True(rapor.gorunur, "hata satiri gorunmedi");
         Assert.StartsWith(rapor.beklenen, rapor.metin, StringComparison.Ordinal);
         Assert.True(rapor.sure < 15, $"404 {rapor.sure:0.0} sn surdu");
+    }
+
+    [Theory]
+    [InlineData("http://127.0.0.1:9/canli/yayin.m3u8")]
+    [InlineData("https://ornek.test/radyo/dinle.pls")]
+    [InlineData("http://127.0.0.1:9/liste.M3U")]
+    [InlineData("rtsp://127.0.0.1:9/akis.asx")]
+    public void ListeUzantiliAdresKuyrukKurmadanMotoraGider(string adres)
+    {
+        var rapor = AppHost.Run(() =>
+        {
+            var view = Ac(adres, out var window);
+            try
+            {
+                return (yol: view.LoadedPath, kuyruk: view.Queue, kaynak: view.QueueSource, hata: view.TxtStall.IsVisible, metin: view.TxtStall.Text);
+            }
+            finally
+            {
+                Kapat(view, window);
+            }
+        });
+
+        Assert.False(rapor.hata, "adres liste dosyasi gibi okundu: " + rapor.metin);
+        Assert.Equal(adres, rapor.yol);
+        Assert.Null(rapor.kuyruk);
+        Assert.Null(rapor.kaynak);
+    }
+
+    [Fact]
+    public void ListeIcindekiListeUzantiliAdresAtilmazYerelAltListeAtilir()
+    {
+        var klasor = Gecici();
+        try
+        {
+            const string hls = "http://127.0.0.1:9/canli/yayin.m3u8";
+            const string radyo = "https://ornek.test/radyo/dinle.pls?kanal=2";
+            var klip = Path.Combine(klasor, "klip.mp4");
+            File.WriteAllBytes(klip, Array.Empty<byte>());
+            File.WriteAllText(Path.Combine(klasor, "alt.m3u"), "klip.mp4\n");
+            var liste = Path.Combine(klasor, "liste.m3u8");
+            File.WriteAllText(liste, "#EXTM3U\n" + hls + "\nalt.m3u\nklip.mp4\n" + radyo + "\nfile:///" + klasor.Replace('\\', '/') + "/alt.m3u\n");
+
+            Assert.Equal(new[] { hls, klip, radyo }, PlaylistFile.ReadPlayable(liste));
+            Assert.Equal(new[] { hls }, PlaylistFile.Parse("[playlist]\nFile1=" + hls + "\nFile2=yerel.pls\n", "pls", klasor));
+
+            var rapor = AppHost.Run(() =>
+            {
+                var view = Kur(out var window);
+                try
+                {
+                    var acilis = view.OpenAsync(liste);
+                    DenetimSurucu.Pump(view, () => acilis.IsCompleted, 10);
+                    return (yol: view.LoadedPath, kuyruk: view.Queue?.ToList(), kaynak: view.QueueSource);
+                }
+                finally
+                {
+                    Kapat(view, window);
+                }
+            });
+
+            Assert.Equal(hls, rapor.yol);
+            Assert.Equal(new[] { hls, klip, radyo }, rapor.kuyruk);
+            Assert.Equal(Path.GetFullPath(liste), rapor.kaynak);
+        }
+        finally
+        {
+            Sil(klasor);
+        }
+    }
+
+    [Fact]
+    public void YerelSunucudakiHlsAdresiAcilirParcalarIstenir()
+    {
+        var klasor = Gecici();
+        try
+        {
+            HlsUret(MotorKlipleri.Kucuk, klasor);
+            using var sunucu = new KlasorSunucu(klasor);
+            var adres = sunucu.Adres("yayin.m3u8");
+
+            var rapor = AppHost.Run(() =>
+            {
+                var view = new PlayerView { EngineFactory = GercekMotor };
+                var window = new Window { Width = 640, Height = 480, Content = view };
+                try
+                {
+                    var kabul = view.OpenAddress(adres);
+                    DenetimSurucu.Pump(view, () => view.Navigation.IsCompleted, 30);
+                    DenetimSurucu.Pump(view, () => view.Engine is { IsOpen: true }, 10);
+                    var motor = view.Engine as MpvEngine;
+                    return (kabul, acik: view.Engine is { IsOpen: true }, motorYolu: motor?.GetProperty("path"), sure: view.Engine?.DurationSeconds ?? 0,
+                        yol: view.LoadedPath, kuyruk: view.Queue, hata: view.TxtStall.IsVisible, metin: view.TxtStall.Text, ad: view.MediaTitleText);
+                }
+                finally
+                {
+                    view.Close();
+                    window.Close();
+                }
+            });
+
+            Assert.True(rapor.kabul, "adres kabul edilmedi");
+            Assert.False(rapor.hata, "hata satiri: " + rapor.metin);
+            Assert.True(rapor.acik, "HLS adresi acilmadi");
+            Assert.Equal(adres, rapor.motorYolu);
+            Assert.Equal(adres, rapor.yol);
+            Assert.Null(rapor.kuyruk);
+            Assert.Equal("yayin.m3u8", rapor.ad);
+            Assert.True(rapor.sure > 4, $"HLS suresi {rapor.sure}");
+            Assert.Contains(sunucu.Satirlar, satir => satir.StartsWith("GET /yayin.m3u8 ", StringComparison.Ordinal));
+            Assert.Contains(sunucu.Satirlar, satir => satir.Contains(".ts ", StringComparison.Ordinal));
+        }
+        finally
+        {
+            Sil(klasor);
+        }
+    }
+
+    [Fact]
+    public void UzakPlsAdresiMotorunListesineDuserIlkGirdiCalar()
+    {
+        var klasor = Gecici();
+        try
+        {
+            File.Copy(MotorKlipleri.Kucuk, Path.Combine(klasor, "klip.mp4"));
+            using var sunucu = new KlasorSunucu(klasor);
+            var girdi = sunucu.Adres("klip.mp4");
+            File.WriteAllText(Path.Combine(klasor, "radyo.pls"), "[playlist]\nNumberOfEntries=1\nFile1=" + girdi + "\nTitle1=Radyo\nLength1=-1\nVersion=2\n");
+            var adres = sunucu.Adres("radyo.pls");
+
+            var rapor = AppHost.Run(() =>
+            {
+                var view = new PlayerView { EngineFactory = GercekMotor };
+                var window = new Window { Width = 640, Height = 480, Content = view };
+                try
+                {
+                    var kabul = view.OpenAddress(adres);
+                    DenetimSurucu.Pump(view, () => view.Navigation.IsCompleted, 30);
+                    DenetimSurucu.Pump(view, () => view.Engine is { IsOpen: true }, 10);
+                    var motor = view.Engine as MpvEngine;
+                    return (kabul, acik: view.Engine is { IsOpen: true }, motorYolu: motor?.GetProperty("path"), listeSayisi: motor?.GetProperty("playlist-count"),
+                        yol: view.LoadedPath, kuyruk: view.Queue, hata: view.TxtStall.IsVisible, metin: view.TxtStall.Text, ad: view.MediaTitleText,
+                        ipucu: ToolTip.GetTip(view.FindControl<Border>("MediaTitle")!) as string);
+                }
+                finally
+                {
+                    view.Close();
+                    window.Close();
+                }
+            });
+
+            Assert.True(rapor.kabul, "adres kabul edilmedi");
+            Assert.False(rapor.hata, "hata satiri: " + rapor.metin);
+            Assert.True(rapor.acik, "pls adresi acilmadi");
+            Assert.Equal(girdi, rapor.motorYolu);
+            Assert.Equal("1", rapor.listeSayisi);
+            Assert.Equal(adres, rapor.yol);
+            Assert.Null(rapor.kuyruk);
+            Assert.Equal("radyo.pls", rapor.ad);
+            Assert.Equal(adres, rapor.ipucu);
+            Assert.Contains(sunucu.Satirlar, satir => satir.StartsWith("GET /radyo.pls ", StringComparison.Ordinal));
+            Assert.Contains(sunucu.Satirlar, satir => satir.StartsWith("GET /klip.mp4 ", StringComparison.Ordinal));
+        }
+        finally
+        {
+            Sil(klasor);
+        }
+    }
+
+    private static IPlaybackEngine GercekMotor()
+    {
+        var engine = new MpvEngine();
+        engine.SetProperty("ao", "null");
+        return engine;
+    }
+
+    private static void HlsUret(string kaynak, string klasor)
+    {
+        Assert.True(ToolLocator.IsAvailable(out var eksik), $"HLS uretimi icin {eksik} gerekli");
+        var psi = new ProcessStartInfo(ToolLocator.Ffmpeg)
+        {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+        foreach (var arg in new[] { "-y", "-hide_banner", "-threads", "2", "-i", kaynak, "-t", "6", "-c", "copy", "-f", "hls", "-hls_time", "2", "-hls_list_size", "0",
+                     "-hls_segment_filename", Path.Combine(klasor, "parca%d.ts"), Path.Combine(klasor, "yayin.m3u8") })
+            psi.ArgumentList.Add(arg);
+
+        using var surec = Process.Start(psi)!;
+        var cikti = surec.StandardOutput.ReadToEndAsync();
+        var hata = surec.StandardError.ReadToEndAsync();
+        Assert.True(surec.WaitForExit(60_000), "HLS uretimi 60 sn icinde bitmedi");
+        cikti.GetAwaiter().GetResult();
+        var gunluk = hata.GetAwaiter().GetResult();
+        Assert.True(surec.ExitCode == 0, $"HLS uretilemedi (kod {surec.ExitCode}): {gunluk[Math.Max(0, gunluk.Length - 600)..]}");
+    }
+}
+
+/// <summary>
+/// Yalnız 127.0.0.1'de dinleyen, verilen klasördeki dosyaları adıyla sunan sınama sunucusu:
+/// HLS listesi ve parçaları, uzak pls gibi birden çok dosyalı adresler için. Aralık isteğine
+/// 206 döner, olmayan dosyaya 404.
+/// </summary>
+internal sealed class KlasorSunucu : IDisposable
+{
+    private readonly TcpListener _yuva;
+    private readonly string _klasor;
+    private readonly CancellationTokenSource _iptal = new();
+
+    internal KlasorSunucu(string klasor)
+    {
+        _klasor = klasor;
+        _yuva = new TcpListener(IPAddress.Loopback, 0);
+        _yuva.Start();
+        _ = Task.Run(DinleAsync);
+    }
+
+    internal System.Collections.Concurrent.ConcurrentQueue<string> Satirlar { get; } = new();
+
+    internal string Adres(string ad) => FormattableString.Invariant(
+        $"http://127.0.0.1:{((IPEndPoint)_yuva.LocalEndpoint).Port}/{ad}");
+
+    private async Task DinleAsync()
+    {
+        while (!_iptal.IsCancellationRequested)
+        {
+            TcpClient istemci;
+            try
+            {
+                istemci = await _yuva.AcceptTcpClientAsync(_iptal.Token);
+            }
+            catch (Exception ex) when (ex is OperationCanceledException or ObjectDisposedException or SocketException)
+            {
+                return;
+            }
+
+            _ = Task.Run(() => YanitlaAsync(istemci));
+        }
+    }
+
+    private async Task YanitlaAsync(TcpClient istemci)
+    {
+        using (istemci)
+        {
+            try
+            {
+                using var akis = istemci.GetStream();
+                var tampon = new byte[8192];
+                var okunan = await akis.ReadAsync(tampon, _iptal.Token);
+                if (okunan <= 0) return;
+                var istek = Encoding.ASCII.GetString(tampon, 0, okunan);
+                var satir = istek.Split('\r')[0];
+                Satirlar.Enqueue(satir);
+
+                var parcalar = satir.Split(' ');
+                var ad = parcalar.Length > 1 ? Uri.UnescapeDataString(parcalar[1].TrimStart('/').Split('?')[0]) : "";
+                var dosya = Path.Combine(_klasor, ad);
+                if (ad.Length == 0 || ad.Contains("..", StringComparison.Ordinal) || !File.Exists(dosya))
+                {
+                    await akis.WriteAsync(Encoding.ASCII.GetBytes("HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"), _iptal.Token);
+                    return;
+                }
+
+                var govde = await File.ReadAllBytesAsync(dosya, _iptal.Token);
+                var (bas, son) = Aralik(istek, govde.Length);
+                var uzunluk = son - bas + 1;
+                var tur = Path.GetExtension(dosya).ToLowerInvariant() switch
+                {
+                    ".m3u8" => "application/vnd.apple.mpegurl",
+                    ".ts" => "video/mp2t",
+                    ".pls" => "audio/x-scpls",
+                    _ => "video/mp4"
+                };
+                var basliklar = new StringBuilder();
+                basliklar.Append(bas == 0 && uzunluk == govde.Length ? "HTTP/1.1 200 OK\r\n" : "HTTP/1.1 206 Partial Content\r\n");
+                basliklar.Append(CultureInfo.InvariantCulture, $"Content-Type: {tur}\r\n");
+                basliklar.Append(CultureInfo.InvariantCulture, $"Content-Length: {uzunluk}\r\n");
+                basliklar.Append("Accept-Ranges: bytes\r\n");
+                if (bas != 0 || uzunluk != govde.Length)
+                    basliklar.Append(CultureInfo.InvariantCulture, $"Content-Range: bytes {bas}-{son}/{govde.Length}\r\n");
+                basliklar.Append("Connection: close\r\n\r\n");
+
+                await akis.WriteAsync(Encoding.ASCII.GetBytes(basliklar.ToString()), _iptal.Token);
+                if (!istek.StartsWith("HEAD", StringComparison.Ordinal))
+                    await akis.WriteAsync(govde.AsMemory(bas, uzunluk), _iptal.Token);
+                await akis.FlushAsync(_iptal.Token);
+            }
+            catch (Exception ex) when (ex is IOException or OperationCanceledException or ObjectDisposedException or SocketException)
+            {
+            }
+        }
+    }
+
+    private static (int Bas, int Son) Aralik(string istek, int uzunluk)
+    {
+        foreach (var satir in istek.Split("\r\n"))
+        {
+            if (!satir.StartsWith("Range: bytes=", StringComparison.OrdinalIgnoreCase)) continue;
+            var deger = satir["Range: bytes=".Length..].Split('-');
+            if (int.TryParse(deger[0], NumberStyles.None, CultureInfo.InvariantCulture, out var bas) && bas < uzunluk)
+            {
+                var son = deger.Length > 1 && int.TryParse(deger[1], NumberStyles.None, CultureInfo.InvariantCulture, out var s) ? Math.Min(s, uzunluk - 1) : uzunluk - 1;
+                return (bas, son);
+            }
+        }
+
+        return (0, uzunluk - 1);
+    }
+
+    public void Dispose()
+    {
+        _iptal.Cancel();
+        _yuva.Stop();
+        _iptal.Dispose();
     }
 }
