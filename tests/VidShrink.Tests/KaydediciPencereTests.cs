@@ -73,7 +73,7 @@ public sealed class KaydediciPencereTests
         var eksi = RecorderArguments.Validate(Mac(new RecorderRegion(-2, 0, 640, 480)), "/tmp/p.mov");
         File.WriteAllLines(Path.Combine(Kanit, "mac-pencere.txt"), new[] { string.Join(' ', args), string.Join(' ', ham), string.Join(' ', tek), string.Join(' ', eksi) });
 
-        Assert.Equal("1:none", Deger(args, "-i"));
+        Assert.Equal("Capture screen 1:none", Deger(args, "-i"));
         Assert.Equal("avfoundation", Deger(args, "-f"));
         Assert.Equal("crop=1280:720:200:100", Deger(args, "-vf"));
         Assert.Contains("crop=1280:720:200:100,fps=1,scale=320:-2", args);
@@ -213,7 +213,7 @@ public sealed class KaydediciPencereTests
 
         Assert.Equal(new RecorderRegion(200, 100, 640, 480), olcu.macIstek!.WindowRegion);
         Assert.Equal("crop=640:480:200:100", Deger(olcu.macArgs, "-vf"));
-        Assert.Equal("0:none", Deger(olcu.macArgs, "-i"));
+        Assert.Equal("Capture screen 0:none", Deger(olcu.macArgs, "-i"));
 
         Kapat("secici.txt");
     }

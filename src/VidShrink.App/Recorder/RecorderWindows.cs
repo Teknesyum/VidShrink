@@ -88,7 +88,7 @@ internal static class RecorderWindows
 
     /// <summary>
     /// macOS: pencerenin nokta dikdörtgenini en çok örtüştüğü ekranın piksel karesine çevirir.
-    /// Ekranlar piksel sınırı ve ölçeğiyle verilir; dönen indeks o ekranın <c>avfoundation</c> sırası.
+    /// Ekranlar piksel sınırı ve ölçeğiyle verilir; dönen indeks o ekranın <c>avfoundation</c> adındaki numara (<c>Capture screen N</c>).
     /// </summary>
     internal static (int Screen, RecorderRegion Crop)? MacCrop(DesktopWindow window, IReadOnlyList<(ScreenBounds Bounds, double Scale)> screens)
     {
