@@ -1411,7 +1411,8 @@ public partial class MainWindow : Window
             TxtQuality.Text = settings.QualityValue.ToString(CultureInfo.InvariantCulture);
             CmbContainer.SelectedIndex = settings.Container;
             KapSecenekleriniYokla();
-            CmbConvertCodec.SelectedIndex = settings.ConvertCodec;
+            KodekSec(ConversionCodecChoice.FromSaved(settings.ConvertCodecName, settings.ConvertCodec));
+            DonanimKodlayicilariniYokla();
             CmbResolution.SelectedIndex = settings.Resolution;
             TxtCustomResolution.Text = settings.CustomResolution;
             CmbConvertFps.SelectedIndex = settings.ConvertFps;
@@ -1455,7 +1456,8 @@ public partial class MainWindow : Window
         QualityMode = CmbQualityMode.SelectedIndex,
         QualityValue = int.TryParse(TxtQuality.Text, out var quality) ? quality : 23,
         Container = CmbContainer.SelectedIndex,
-        ConvertCodec = CmbConvertCodec.SelectedIndex,
+        ConvertCodec = ConversionCodecChoice.LegacyIndex(SelectedTag(CmbConvertCodec)),
+        ConvertCodecName = SelectedTag(CmbConvertCodec),
         Resolution = CmbResolution.SelectedIndex,
         CustomResolution = TxtCustomResolution.Text ?? "",
         ConvertFps = CmbConvertFps.SelectedIndex,

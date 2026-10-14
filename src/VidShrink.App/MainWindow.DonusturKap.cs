@@ -10,6 +10,8 @@ namespace VidShrink.App;
 /// AVIF) listede görünmez. Liste öğesi silinmez, gizlenir: ayar kabı sıra numarasıyla saklıyor.
 /// Yoklama okunamadıysa (<see cref="EncoderCapabilities.Loaded"/> false) kap açık kalır.
 /// Ara kodek profilleri (ProRes, DNxHR) kodek listesinde hep durur; kodlayıcısı yoksa yalnız kapanır.
+/// Donanım kodlayıcıları (NVENC, QSV, AMF) yalnız yoklamada çalıştıysa görünür; kodek seçimi adla
+/// saklandığı için (<see cref="ConversionCodecChoice"/>) listeye girmeleri eski kaydı kaydırmaz.
 /// </summary>
 public partial class MainWindow
 {
@@ -44,6 +46,8 @@ public partial class MainWindow
             if (IntermediateCodecs.FromId(item.Tag as string) is { } profile)
                 item.IsEnabled = encoders is null || encoders.HasEncoder(profile.Encoder);
 
+        DonanimKodlayicilariniYokla();
+
         if (CmbContainer.SelectedItem is not ComboBoxItem { IsVisible: false }) return;
         var wasSyncing = _syncing;
         _syncing = true;
@@ -51,5 +55,33 @@ public partial class MainWindow
         _syncing = wasSyncing;
         OzelDonusturAlanlari();
         RefreshConversion();
+    }
+
+    /// <summary>
+    /// Donanım kodlayıcılarını gecikmeli yoklamadan okur. Kodlayıcılar sırayla sorulur: biri ölçülmeden
+    /// sonrakine geçilmez, böylece aynı anda tek yoklama süreci koşar. Ölçüm bitince geçit bu yöntemi
+    /// yeniden çağırır. Seçili kodlayıcı ölçülüp çalışmıyorsa seçim H.264'e döner; ölçülmemişse yerinde kalır.
+    /// </summary>
+    private void DonanimKodlayicilariniYokla()
+    {
+        var gate = _planEncoders;
+        var waiting = false;
+        foreach (var item in CmbConvertCodec.Items.OfType<ComboBoxItem>())
+        {
+            if (item.Tag is not string tag || !ConversionCodecChoice.Hardware.Contains(tag)) continue;
+            var state = gate is null || waiting ? EncoderProbeState.Unmeasured : gate.EncoderState(tag);
+            if (gate is not null && gate.Pending) waiting = true;
+            var works = state == EncoderProbeState.Working;
+            item.IsVisible = works;
+            item.IsEnabled = works;
+            if (state == EncoderProbeState.NotWorking && ReferenceEquals(CmbConvertCodec.SelectedItem, item))
+                KodekSec(ConversionCodecChoice.Default);
+        }
+    }
+
+    private void KodekSec(string tag)
+    {
+        var items = CmbConvertCodec.Items.OfType<ComboBoxItem>().ToList();
+        CmbConvertCodec.SelectedItem = items.FirstOrDefault(item => item.Tag as string == tag) ?? items.FirstOrDefault();
     }
 }

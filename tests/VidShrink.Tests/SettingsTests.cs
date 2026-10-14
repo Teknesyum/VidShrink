@@ -36,6 +36,7 @@ public sealed class SettingsTests
         yield return [nameof(UpdateSettings.QualityValue), 2500];
         yield return [nameof(UpdateSettings.Container), 1];
         yield return [nameof(UpdateSettings.ConvertCodec), 2];
+        yield return [nameof(UpdateSettings.ConvertCodecName), "hevc_nvenc"];
         yield return [nameof(UpdateSettings.Resolution), 4];
         yield return [nameof(UpdateSettings.CustomResolution), "1024x576"];
         yield return [nameof(UpdateSettings.ConvertFps), 2];

@@ -376,7 +376,11 @@ public partial class MainWindow
         _encoders = encoders;
         _planEncoders = encoders is null
             ? null
-            : new DeferredEncoderAvailability(encoders, () => Dispatcher.UIThread.Post(ScheduleRecalculate));
+            : new DeferredEncoderAvailability(encoders, () => Dispatcher.UIThread.Post(() =>
+            {
+                DonanimKodlayicilariniYokla();
+                ScheduleRecalculate();
+            }));
         if (_preview is not null) _preview.Availability = encoders;
         _hardwareProbed = true;
         _hardwareEncoderAvailable = available;
