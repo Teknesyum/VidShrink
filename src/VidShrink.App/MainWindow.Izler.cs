@@ -15,7 +15,7 @@ namespace VidShrink.App;
 
 /// <summary>
 /// C1-6: B1'in yalnız CLI'da duran yüzeyi arayüze iner — ses yüksekliği (<c>loudnorm</c>),
-/// sabit kazanç, dış altyazı dosyaları ve kaynağın metin ya da görüntü altyazısını yakma. Dış altyazı ve
+/// gürültü temizleme (<c>afftdn</c>, ARC-P1), sabit kazanç, dış altyazı dosyaları ve kaynağın metin ya da görüntü altyazısını yakma. Dış altyazı ve
 /// yakma o videoya aittir: yeni kaynak açılınca sıfırlanır, kuyruk penceresine taşınmaz.
 /// </summary>
 public partial class MainWindow
@@ -37,6 +37,7 @@ public partial class MainWindow
         CmbAudioGain.SelectedIndex = gain >= 0 ? gain : Array.IndexOf(GainCandidates, 0);
         RefreshBurnChoices();
         RefreshSubtitleList();
+        YukseklikDurumu();
     }
 
     /// <summary>
@@ -86,6 +87,7 @@ public partial class MainWindow
     private void ApplyTrackOptions(PlanOptions options)
     {
         options.AudioLoudnorm = ChkAudioLoudnorm.IsChecked == true;
+        options.AudioDenoise = ChkAudioDenoise.IsChecked == true;
         var gain = CmbAudioGain.SelectedIndex;
         options.AudioGainDb = gain >= 0 && gain < GainCandidates.Length && GainCandidates[gain] != 0 ? GainCandidates[gain] : null;
         options.ExternalSubtitles = _externalSubtitles.ToList();
@@ -121,6 +123,7 @@ public partial class MainWindow
         CmbBurnSubtitle.SelectedIndex = 0;
         RefreshBurnChoices();
         RefreshSubtitleList();
+        YuksekligiSifirla();
     }
 
     private void SubtitlesChanged()

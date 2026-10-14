@@ -278,6 +278,7 @@ public partial class MainWindow : Window
         Watch(TxtAdvFilters, TextBox.TextProperty, OnFilterTextChanged);
         Watch(ChkFltAutoCrop, ToggleButton.IsCheckedProperty, OnAutoCropChanged);
         Watch(ChkAudioLoudnorm, ToggleButton.IsCheckedProperty, OnOptionChanged);
+        Watch(ChkAudioDenoise, ToggleButton.IsCheckedProperty, OnOptionChanged);
         Watch(CmbAudioGain, SelectingItemsControl.SelectedIndexProperty, OnOptionChanged);
         Watch(CmbBurnSubtitle, SelectingItemsControl.SelectedIndexProperty, OnBurnChoiceChanged);
 

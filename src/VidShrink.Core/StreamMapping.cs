@@ -127,7 +127,7 @@ public sealed record ExternalSubtitle(string Path, string Codec, string? Languag
 }
 
 /// <summary>
-/// Akis kararinin girdisi. Ses suzgeci (<see cref="AudioLoudnorm"/>, <see cref="AudioGainDb"/>),
+/// Akis kararinin girdisi. Ses suzgeci (<see cref="AudioLoudnorm"/>, <see cref="AudioGainDb"/>, <see cref="AudioDenoise"/>),
 /// dis altyazilar ve yakilan altyazi da burada tasinir: <see cref="StreamMapping.ForOutput"/>
 /// kap degisince karari bu istekten yeniden kurar, alan burada durmazsa orada kaybolur.
 /// <see cref="BurnedSubtitle"/> kaynagin altyazi sirasi (0 tabanli, ffmpeg'in <c>si</c>'si).
@@ -150,7 +150,8 @@ public sealed record StreamRequest(
     IReadOnlyList<string>? SubtitleLanguages = null,
     bool FirstSubtitleOnly = false,
     int? AudioSampleRate = null,
-    double? AudioDrcScale = null)
+    double? AudioDrcScale = null,
+    bool AudioDenoise = false)
 {
     public static StreamRequest Default { get; } = new();
 
@@ -159,7 +160,7 @@ public sealed record StreamRequest(
         => AudioSampleRate is int rate && source.SampleRate != rate
            || AudioDrcScale is not null && StreamMapping.IsDolby(source.Codec);
 
-    public bool FiltersAudio => AudioLoudnorm || AudioGainDb is { } gain && gain != 0;
+    public bool FiltersAudio => AudioLoudnorm || AudioDenoise || AudioGainDb is { } gain && gain != 0;
 }
 
 public sealed record AudioTrack(string Map, TrackAction Action, string Codec, int BitrateK, int? Channels, string? Language, string? Title = null,
@@ -519,7 +520,7 @@ public static class StreamMapping
         => (int)Math.Ceiling((sampleRate > 0 ? sampleRate : DefaultSampleRate) * (double)Math.Max(channels, 1) * FlacBitsPerSample / 1000.0);
 
     /// <summary>
-    /// Yeniden kodlanan izin ses suzgeci. Istek yoksa yalniz hizalama; kazanc ve normallestirme
+    /// Yeniden kodlanan izin ses suzgeci. Istek yoksa yalniz hizalama; gurultu temizleme (<c>afftdn</c>), kazanc ve normallestirme
     /// hizalamadan sonra, <c>loudnorm</c>'un 192 kHz'i ise sondaki <c>aresample</c> ile kaynak hizina doner.
     /// </summary>
     public static string AudioFilter(StreamRequest request, int sampleRate)
@@ -527,6 +528,7 @@ public static class StreamMapping
         if (!request.FiltersAudio) return SesHizalama;
         if (request.AudioSampleRate is int wanted) sampleRate = wanted;
         var chain = new List<string> { SesHizalama };
+        if (request.AudioDenoise) chain.Add(AudioCaptureArguments.NoiseSuppressionFilterName);
         if (request.AudioGainDb is { } gain && gain != 0)
             chain.Add("volume=" + gain.ToString("0.##", CultureInfo.InvariantCulture) + "dB");
         if (request.AudioLoudnorm)
