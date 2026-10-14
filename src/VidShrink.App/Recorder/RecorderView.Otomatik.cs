@@ -70,8 +70,8 @@ internal partial class RecorderView
     {
         var advanced = AdvancedMode;
         PanelOptions.IsVisible = advanced;
-        PanelPointer.IsVisible = advanced;
         PanelAdvanced.IsVisible = advanced;
+        ChkOpenFolder.IsVisible = advanced;
         ApplyReplayVisibility();
         KartYerlesimi();
     }
@@ -87,15 +87,14 @@ internal partial class RecorderView
         var gelismis = AdvancedMode;
         var otomatik = gelismis && AutoMode;
         var ucSutun = _darDuvar && otomatik;
-        Diz(CardsLeft, ucSutun ? new Control[] { PanelTarget, PanelWebcam, PanelPointer }
+        Diz(CardsLeft, ucSutun ? new Control[] { PanelTarget, PanelWebcam }
             : gelismis ? new Control[] { PanelTarget, PanelAudio } : new Control[] { PanelTarget });
         Diz(CardsMiddle, ucSutun ? new Control[] { PanelOptions, PanelReplay }
-            : gelismis && _darDuvar ? new Control[] { PanelOptions, PanelPointer }
             : gelismis ? new Control[] { PanelOptions } : new Control[] { PanelOptions, PanelAudio });
         Diz(CardsRight, ucSutun ? new Control[] { PanelAdvanced, PanelAudio }
             : otomatik ? new Control[] { PanelAdvanced, PanelReplay } : new Control[] { PanelAdvanced, PanelReplay, PanelWebcam });
-        Diz(CardsExtra, otomatik && !ucSutun ? new Control[] { PanelWebcam, PanelEncoding, PanelPointer }
-            : _darDuvar && gelismis ? new Control[] { PanelEncoding } : new Control[] { PanelEncoding, PanelPointer });
+        Diz(CardsExtra, otomatik && !ucSutun ? new Control[] { PanelWebcam, PanelEncoding }
+            : new Control[] { PanelEncoding });
         KartSutunlari();
     }
 
@@ -108,6 +107,10 @@ internal partial class RecorderView
     /// sütuna düşünce dördüncü sütun ilk üçün en kısasının altına girip 1024 px pencerede
     /// sayfayı 1319 px'e uzatıyordu (görünen 1008); orada kamera hedefin, tampon seçeneklerin,
     /// ses gelişmiş ayarların altına iner ve dördüncü sütun boş kalır.
+    /// <para>İmleç vurgusu ayrı kartta kameranın altına, gizlilik maskesi kendi satırında hedefin
+    /// içine girince 1024 × 1060 pencerede sol sütun 1018 px'e çıkıp sayfayı 1140 px'e uzatıyordu
+    /// (görünen 1008). İmleç seçenekleri seçenek kartına katıldı, "kayıt bitince klasörü aç" bitiş
+    /// eyleminin altına, maske başlığı düğmelerin satırına geçti; en uzun sütun 875 px.</para>
     /// </summary>
     private static void Diz(StackPanel sutun, Control[] kartlar)
     {

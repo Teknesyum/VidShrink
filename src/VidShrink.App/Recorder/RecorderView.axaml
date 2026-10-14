@@ -505,23 +505,21 @@
                        TextWrapping="Wrap"
                        IsVisible="{Binding #RowRegion.IsVisible}"/>
 
-            <StackPanel Spacing="{StaticResource SpaceSm}">
-              <TextBlock Text="{loc:Text recorder.mask.title}" Theme="{StaticResource Label}"/>
-              <WrapPanel ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
-                <Button x:Name="BtnDrawMask"
-                        Theme="{StaticResource GhostButton}"
-                        Content="{loc:Text recorder.mask.draw}"
-                        ToolTip.Tip="{loc:Text recorder.mask.draw-hint}"
-                        auto:AutomationProperties.Name="{loc:Text recorder.mask.draw}"/>
-                <Button x:Name="BtnClearMasks"
-                        Theme="{StaticResource GhostButton}"
-                        Content="{loc:Text recorder.mask.clear}"
-                        auto:AutomationProperties.Name="{loc:Text recorder.mask.clear}"/>
-                <TextBlock x:Name="TxtMaskCount"
-                           Theme="{StaticResource Hint}"
-                           VerticalAlignment="Center"/>
-              </WrapPanel>
-            </StackPanel>
+            <WrapPanel ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
+              <TextBlock Text="{loc:Text recorder.mask.title}" Theme="{StaticResource Label}" VerticalAlignment="Center"/>
+              <Button x:Name="BtnDrawMask"
+                      Theme="{StaticResource GhostButton}"
+                      Content="{loc:Text recorder.mask.draw}"
+                      ToolTip.Tip="{loc:Text recorder.mask.draw-hint}"
+                      auto:AutomationProperties.Name="{loc:Text recorder.mask.draw}"/>
+              <Button x:Name="BtnClearMasks"
+                      Theme="{StaticResource GhostButton}"
+                      Content="{loc:Text recorder.mask.clear}"
+                      auto:AutomationProperties.Name="{loc:Text recorder.mask.clear}"/>
+              <TextBlock x:Name="TxtMaskCount"
+                         Theme="{StaticResource Hint}"
+                         VerticalAlignment="Center"/>
+            </WrapPanel>
 
             <izi:SutunIzgara MaxColumns="2" Uniform="True"
                              ColumnSpacing="{StaticResource SpaceMd}"
@@ -541,6 +539,11 @@
                           auto:AutomationProperties.Name="{loc:Text recorder.finish.title}"/>
               </StackPanel>
             </izi:SutunIzgara>
+
+            <CheckBox x:Name="ChkOpenFolder"
+                      Theme="{StaticResource CheckStyle}"
+                      Content="{loc:Text recorder.output.open-when-done}"
+                      auto:AutomationProperties.Name="{loc:Text recorder.output.open-when-done}"/>
           </StackPanel>
         </Border>
       </StackPanel>
@@ -635,6 +638,14 @@
                         Theme="{StaticResource CheckStyle}"
                         Content="{loc:Text recorder.option.show-clicks}"
                         auto:AutomationProperties.Name="{loc:Text recorder.option.show-clicks}"/>
+              <CheckBox x:Name="ChkCursorHighlight"
+                        Theme="{StaticResource CheckStyle}"
+                        Content="{loc:Text recorder.option.cursor-highlight}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.option.cursor-highlight}"/>
+              <CheckBox x:Name="ChkSpotlight"
+                        Theme="{StaticResource CheckStyle}"
+                        Content="{loc:Text recorder.option.spotlight}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.option.spotlight}"/>
               <CheckBox x:Name="ChkClickSound"
                         Theme="{StaticResource CheckStyle}"
                         Content="{loc:Text recorder.option.click-sound}"
@@ -654,46 +665,9 @@
                         auto:AutomationProperties.Name="{loc:Text recorder.option.live-preview}"/>
             </izi:SutunIzgara>
 
-            <StackPanel>
-              <TextBlock Text="{loc:Text recorder.output.title}" Theme="{StaticResource Label}"/>
-              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
-                <TextBox Grid.Column="0"
-                         x:Name="TxtOutputFolder"
-                         ToolTip.Tip="{Binding $self.Text}"
-                         auto:AutomationProperties.Name="{loc:Text recorder.output.title}"/>
-                <Button Grid.Column="1"
-                        x:Name="BtnBrowse"
-                        Theme="{StaticResource GhostButton}"
-                        Content="{loc:Text recorder.output.browse}"
-                        auto:AutomationProperties.Name="{loc:Text recorder.output.browse}"
-                        Click="OnBrowse"/>
-              </Grid>
-            </StackPanel>
-
-            <CheckBox x:Name="ChkOpenFolder"
-                      Theme="{StaticResource CheckStyle}"
-                      Content="{loc:Text recorder.output.open-when-done}"
-                      auto:AutomationProperties.Name="{loc:Text recorder.output.open-when-done}"/>
-          </StackPanel>
-        </Border>
-
-        <Border x:Name="PanelPointer" Theme="{StaticResource Panel}">
-          <StackPanel Spacing="{StaticResource SpaceSm}">
-            <TextBlock Text="{loc:Text recorder.pointer.title}" Theme="{StaticResource H2}"/>
-
-            <izi:SutunIzgara MaxColumns="2" Uniform="True"
-                             ColumnSpacing="{StaticResource SpaceMd}"
-                             RowSpacing="{StaticResource SpaceSm}">
-              <CheckBox x:Name="ChkCursorHighlight"
-                        Theme="{StaticResource CheckStyle}"
-                        Content="{loc:Text recorder.option.cursor-highlight}"
-                        auto:AutomationProperties.Name="{loc:Text recorder.option.cursor-highlight}"/>
-              <CheckBox x:Name="ChkSpotlight"
-                        Theme="{StaticResource CheckStyle}"
-                        Content="{loc:Text recorder.option.spotlight}"
-                        auto:AutomationProperties.Name="{loc:Text recorder.option.spotlight}"/>
-            </izi:SutunIzgara>
-
+            <TextBlock Text="{loc:Text recorder.pointer.title}"
+                       Theme="{StaticResource Label}"
+                       IsVisible="{Binding #PointerChoices.IsVisible}"/>
             <izi:SutunIzgara x:Name="PointerChoices" MaxColumns="2" Uniform="True"
                              ColumnSpacing="{StaticResource SpaceMd}"
                              RowSpacing="{StaticResource SpaceSm}">
@@ -725,6 +699,22 @@
                           auto:AutomationProperties.Name="{loc:Text recorder.pointer.right-color}"/>
               </StackPanel>
             </izi:SutunIzgara>
+
+            <StackPanel>
+              <TextBlock Text="{loc:Text recorder.output.title}" Theme="{StaticResource Label}"/>
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
+                <TextBox Grid.Column="0"
+                         x:Name="TxtOutputFolder"
+                         ToolTip.Tip="{Binding $self.Text}"
+                         auto:AutomationProperties.Name="{loc:Text recorder.output.title}"/>
+                <Button Grid.Column="1"
+                        x:Name="BtnBrowse"
+                        Theme="{StaticResource GhostButton}"
+                        Content="{loc:Text recorder.output.browse}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.output.browse}"
+                        Click="OnBrowse"/>
+              </Grid>
+            </StackPanel>
           </StackPanel>
         </Border>
 
