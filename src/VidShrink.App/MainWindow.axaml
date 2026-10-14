@@ -1159,6 +1159,7 @@
                   <TextBlock Text="{loc:Text main.convert.title}" Theme="{StaticResource H2}"/>
                   <TextBlock x:Name="TxtConvertSource" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
                   <Button x:Name="BtnBrowseConvert" Content="{loc:Text main.convert.browse}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" Click="OnBrowseConvert"/>
+                  <Button x:Name="BtnBrowseSequence" Content="{loc:Text main.convert.sequence.browse}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" Click="OnBrowseSequence"/>
                   <StackPanel Spacing="{StaticResource SpaceXs}">
                     <TextBlock Text="{loc:Text main.convert.preset.label}" Theme="{StaticResource Label}"/>
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
@@ -1193,7 +1194,7 @@
                     </Grid>
                   </StackPanel>
                   <Grid x:Name="ConvertForm" Grid.IsSharedSizeScope="True" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}" RowSpacing="{StaticResource SpaceLg}"
-                        RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                        RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
                     <Grid.Styles>
                       <Style Selector="Grid#ConvertForm > Grid">
                         <Setter Property="VerticalAlignment" Value="Top"/>
@@ -1227,6 +1228,8 @@
                         <ComboBoxItem Content="WebP" Tag="webp"/>
                         <ComboBoxItem Content="AVIF" Tag="avif"/>
                         <ComboBoxItem Content="MXF" Tag="mxf"/>
+                        <ComboBoxItem Content="{loc:Text main.convert.container.png-sequence}" Tag="png"/>
+                        <ComboBoxItem Content="{loc:Text main.convert.container.jpg-sequence}" Tag="jpg"/>
                       </ComboBox>
                     </Grid>
 
@@ -1463,6 +1466,12 @@
                     <CheckBox x:Name="ChkConvertDropMetadata" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Theme="{StaticResource CheckStyle}" IsChecked="False" HorizontalAlignment="Left" Content="{loc:Text main.advanced.drop-metadata.label}">
                       <ToolTip.Tip>
                         <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.drop-metadata.tip}"/>
+                      </ToolTip.Tip>
+                    </CheckBox>
+
+                    <CheckBox x:Name="ChkConvertSingleFrame" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Theme="{StaticResource CheckStyle}" IsChecked="False" IsVisible="False" HorizontalAlignment="Left" Content="{loc:Text main.convert.single-frame}">
+                      <ToolTip.Tip>
+                        <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.single-frame.tip}"/>
                       </ToolTip.Tip>
                     </CheckBox>
 

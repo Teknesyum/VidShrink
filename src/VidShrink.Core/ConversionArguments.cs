@@ -19,16 +19,17 @@ public static class ConversionArguments
         if (plan.Fps is <= 0) errors.Add("Frame rate must be greater than zero.");
         if (plan.VideoCodec == "copy" && (plan.Height is not null || plan.Width is not null || plan.Fps is not null)) errors.Add("Stream copy cannot change resolution or frame rate.");
         if (plan.VideoCodec == "copy" && plan.Container == "gif") errors.Add("GIF requires video encoding and cannot use stream copy.");
+        if (plan.VideoCodec == "copy" && plan.ImageSequenceOutput) errors.Add("Image sequence output requires video encoding and cannot use stream copy.");
         if (plan.CarriesAudio && plan.AudioCodec == "copy" && !info.HasAudio) errors.Add("The source has no audio stream to copy.");
         if (plan.AudioOnly && !info.HasAudio) errors.Add("The source has no audio stream to extract.");
 
-        if (!plan.AudioOnly && !plan.Gif && !plan.AnimatedImage && plan.VideoCodec != "copy" && !VideoEncodeCompatible(plan.Container, plan.VideoCodec))
+        if (!plan.AudioOnly && !plan.Gif && !plan.AnimatedImage && !plan.ImageSequenceOutput && plan.VideoCodec != "copy" && !VideoEncodeCompatible(plan.Container, plan.VideoCodec))
             errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support the selected {plan.VideoCodec} video encoder.");
         if (plan.CarriesAudio && plan.AudioCodec is { } audioCodec && audioCodec != "copy" && !AudioEncodeCompatible(plan.Container, audioCodec))
             errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support the selected {audioCodec} audio encoder.");
 
         var source = info.VideoCodec.ToLowerInvariant();
-        if (plan.VideoCodec == "copy" && !VideoCopyCompatible(plan.Container, source))
+        if (plan.VideoCodec == "copy" && !plan.ImageSequenceOutput && !VideoCopyCompatible(plan.Container, source))
             errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support copying the source {source} video stream.");
         if (plan.Start is { } trimStart && plan.End is { } trimEnd && trimEnd <= trimStart)
             errors.Add("The trim end must come after the trim start.");
@@ -74,10 +75,10 @@ public static class ConversionArguments
         if (WritesIntermediate(plan) && IntermediateCodecs.Find(plan.VideoCodec, plan.VideoProfile) is null)
             throw new ArgumentException($"Unsupported {plan.VideoCodec} profile: {plan.VideoProfile ?? "none"}", nameof(plan));
         var a = new List<string> { "-hide_banner", "-y" };
-        var encodesVideo = !plan.AudioOnly && !plan.Gif && !plan.AnimatedImage && plan.VideoCodec != "copy";
+        var encodesVideo = !plan.AudioOnly && !plan.Gif && !plan.AnimatedImage && !plan.ImageSequenceOutput && plan.VideoCodec != "copy";
         if (encodesVideo) a.AddRange(CodecModel.DeviceArgs(plan.VideoCodec));
         if (plan.Start is { } start) a.AddRange(new[] { "-ss", FormatTime(start) });
-        a.AddRange(new[] { "-i", info.FilePath });
+        a.AddRange(info.Sequence is { } sequence ? sequence.InputArgs(info.Fps) : new[] { "-i", info.FilePath });
         if (plan.End is { } end)
         {
             var trimSeconds = end.TotalSeconds - (plan.Start?.TotalSeconds ?? 0);
@@ -115,6 +116,14 @@ public static class ConversionArguments
             if (filters.Count > 0) a.AddRange(new[] { "-vf", string.Join(',', filters) });
             a.AddRange(AnimatedImageArgs(plan));
             a.AddRange(MetadataArgs(info, plan));
+            a.Add(outputPath);
+            return a;
+        }
+
+        if (plan.ImageSequenceOutput)
+        {
+            if (filters.Count > 0) a.AddRange(new[] { "-vf", string.Join(',', filters) });
+            a.AddRange(ImageOutputArgs(plan));
             a.Add(outputPath);
             return a;
         }
@@ -188,6 +197,25 @@ public static class ConversionArguments
     }
 
     /// <summary>
+    /// PNG ya da JPEG dizisi: ses düşer, kareler <c>image2</c> ile 1'den numaralanır. Tek karede yalnız ilk kare
+    /// numarasız tek dosyaya yazılır. JPEG kalitesi sabit <c>-q:v 2</c>; kalite kutuları okunmaz.
+    /// </summary>
+    private static IReadOnlyList<string> ImageOutputArgs(ConversionPlan plan)
+    {
+        var a = new List<string>();
+        a.AddRange(plan.Container == "jpg" ? new[] { "-c:v", "mjpeg", "-q:v", "2" } : new[] { "-c:v", "png" });
+        a.Add("-an");
+        a.AddRange(plan.SingleFrame
+            ? new[] { "-frames:v", "1", "-update", "1" }
+            : new[] { "-f", "image2", "-start_number", "1" });
+        return a;
+    }
+
+    /// <summary>Resim dizisi çıktısının <c>image2</c> deseni: <c>klasör/ad_%05d.uzantı</c>. Addaki <c>%</c> kaçırılır.</summary>
+    public static string SequenceOutputPattern(string folder, string stem, string container)
+        => Path.Combine(folder, ImageSequence.Escape(stem) + "_%05d." + container);
+
+    /// <summary>
     /// Meta silme argümanları küçültmeyle aynı kaynaktan (<see cref="StreamMapping.MetadataArguments"/>).
     /// Dönüştür akış eşlemez; çıktıya giren sesi ffmpeg seçer (<see cref="AutoAudio"/>) ve dili ondan
     /// yazılır. Altyazı dili yalnız kaynakta tek altyazı izi varken yazılır: birden çok izde hangisinin
@@ -254,7 +282,7 @@ public static class ConversionArguments
 
     /// <summary>Plan bir ara kodekle video yaziyor mu; ses, GIF ve hareketli gorsel kaplarinda kodek okunmaz.</summary>
     private static bool WritesIntermediate(ConversionPlan plan)
-        => !plan.AudioOnly && !plan.Gif && !plan.AnimatedImage && IntermediateCodecs.IsIntermediate(plan.VideoCodec);
+        => !plan.AudioOnly && !plan.Gif && !plan.AnimatedImage && !plan.ImageSequenceOutput && IntermediateCodecs.IsIntermediate(plan.VideoCodec);
 
     private static bool VideoCopyCompatible(string container, string codec) => container switch
     {

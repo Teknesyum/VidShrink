@@ -96,6 +96,9 @@ public sealed record MediaInfo
         ? Math.Max(1, (int)Math.Round(Width * (double)ParNum / ParDen))
         : Width;
 
+    /// <summary>Kaynak numaralı bir resim dizisiyse dizi; girdi <c>-i FilePath</c> yerine <c>image2</c> ile okunur.</summary>
+    public ImageSequence? Sequence { get; init; }
+
     public double FileSizeMb => Megabayt.Oku(FileSizeBytes);
     public long Pixels => (long)Width * Height;
 }

@@ -293,6 +293,7 @@ public partial class MainWindow : Window
         foreach (var box in new[] { CmbContainer, CmbResolution, CmbConvertFps, CmbConvertAudio })
             Watch(box, SelectingItemsControl.SelectedIndexProperty, OnConvertChanged);
         Watch(ChkConvertDropMetadata, ToggleButton.IsCheckedProperty, OnConvertChanged);
+        Watch(ChkConvertSingleFrame, ToggleButton.IsCheckedProperty, OnConvertChanged);
         foreach (var field in new[] { TxtCustomResolution, TxtCustomFps, TxtAudioBitrate, TxtTrimStart, TxtTrimEnd })
             Watch(field, TextBox.TextProperty, OnConvertChanged);
 
@@ -3458,12 +3459,14 @@ public partial class MainWindow : Window
     private void ShowSourceName()
     {
         TxtFileName.Text = _sourceName ?? Say("main.source.placeholder");
-        TxtConvertSource.Text = _info is null ? Say("main.convert.source-empty") : _sourceName;
+        TxtConvertSource.Text = _sequence is { } sequence ? SequenceSourceText(sequence)
+            : _info is null ? Say("main.convert.source-empty") : _sourceName;
         ApplyDropText();
     }
 
     private async Task LoadAsync(string path)
     {
+        _sequence = null;
         _sourceName = Path.GetFileName(path);
         ShowSourceName();
         Fade(SourceCard, true);
@@ -4814,7 +4817,8 @@ public partial class MainWindow : Window
             Start = ParseTime(TxtTrimStart.Text),
             End = ParseTime(TxtTrimEnd.Text),
             HdrPolicy = HdrPolicyIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve,
-            DropMetadata = ChkConvertDropMetadata.IsChecked == true
+            DropMetadata = ChkConvertDropMetadata.IsChecked == true,
+            SingleFrame = ChkConvertSingleFrame.IsChecked == true
         };
     }
 
@@ -4880,19 +4884,20 @@ public partial class MainWindow : Window
         TxtCustomFps.IsEnabled = SelectedTag(CmbConvertFps) == "custom";
         var plan = ReadConversionPlan();
         TxtAudioBitrate.IsEnabled = plan.AudioCodec is { } ses && ses != "copy";
-        var kaliteOkunur = !IntermediateCodecs.IsIntermediate(plan.VideoCodec);
+        var kaliteOkunur = !IntermediateCodecs.IsIntermediate(plan.VideoCodec) && !plan.ImageSequenceOutput;
         CmbQualityMode.IsEnabled = SliderQuality.IsEnabled = TxtQuality.IsEnabled = kaliteOkunur;
+        ChkConvertSingleFrame.IsVisible = plan.ImageSequenceOutput;
     }
 
     private void RefreshConversion()
     {
-        if (_info is null) return;
+        if (ConvertInfo is not { } info) return;
         var plan = ReadConversionPlan();
-        var errors = ConversionArguments.Validate(_info, plan).Select(message => LanguageCatalog.Validation(message)).ToList();
+        var errors = ConversionArguments.Validate(info, plan).Select(message => LanguageCatalog.Validation(message)).ToList();
         if (plan.Start == TimeSpan.MinValue || plan.End == TimeSpan.MinValue)
             errors.Add(LanguageCatalog.Validation(LanguageCatalog.TrimFormatError));
 
-        var output = BuildUniqueOutputPath(_info.FilePath, "converted", plan.Container);
+        var output = CommandOutputPath(plan, ConversionOutputPath(info, plan));
         TxtConvertValidation.Text = errors.Count == 0
             ? string.Join("\n", ConversionArguments.Notes(plan).Select(note => Say(ConversionNoteKey(note))).Prepend(Say("main.convert.ready")))
             : string.Join("\n", errors);
@@ -4901,7 +4906,7 @@ public partial class MainWindow : Window
         try
         {
             TxtConvertCommand.Text = errors.Count == 0
-                ? FfmpegArguments.ToCommandLine(ConversionArguments.Build(_info, plan, output, plan.Gif ? "palette.png" : null))
+                ? FfmpegArguments.ToCommandLine(ConversionArguments.Build(info, plan, output, plan.Gif ? "palette.png" : null))
                 : "";
         }
         catch (Exception ex)
@@ -4913,14 +4918,14 @@ public partial class MainWindow : Window
 
     private async void OnConvert(object? sender, RoutedEventArgs e)
     {
-        if (_info is null || _cts is not null) return;
+        if (ConvertInfo is not { } info || _cts is not null) return;
 
         var plan = ReadConversionPlan();
-        var output = BuildUniqueOutputPath(_info.FilePath, "converted", plan.Container);
+        var output = ConversionOutputPath(info, plan);
         QueueWatch.MarkOwn(output);
         var cts = new CancellationTokenSource();
         _cts = cts;
-        var biten = new BitenIs(_info.FilePath, IsSonucu.Hatali);
+        var biten = new BitenIs(info.FilePath, IsSonucu.Hatali);
         try
         {
             SetRunning(true);
@@ -4932,10 +4937,10 @@ public partial class MainWindow : Window
                 SetStage(TxtConvertStage, LocalizeStage(p.Stage));
             });
 
-            var result = await new EncodeRunner().ConvertAsync(_info, plan, output, progress, cts.Token);
-            _lastOutput = result.OutputPath;
-            RefreshPreviewSource();
-            TxtConvertResult.Text = Say("main.run.converted", Num(_info.FileSizeMb, "0.0"), Num(result.OutputMb, "0.0"));
+            var result = await new EncodeRunner().ConvertAsync(info, plan, output, progress, cts.Token);
+            _lastOutput = FirstFrameOf(result.OutputPath);
+            if (info.Sequence is null && !plan.ImageSequenceOutput) RefreshPreviewSource();
+            TxtConvertResult.Text = Say("main.run.converted", Num(info.FileSizeMb, "0.0"), Num(result.OutputMb, "0.0"));
             BtnConvertReveal.IsVisible = true;
             biten = biten with { Sonuc = IsSonucu.Basarili };
         }

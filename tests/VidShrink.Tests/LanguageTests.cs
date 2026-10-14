@@ -314,6 +314,7 @@ public sealed class LanguageTests : IDisposable
         "Frame rate must be greater than zero.",
         "Stream copy cannot change resolution or frame rate.",
         "GIF requires video encoding and cannot use stream copy.",
+        "Image sequence output requires video encoding and cannot use stream copy.",
         "The source has no audio stream to copy.",
         "The source has no audio stream to extract.",
         "The trim end must come after the trim start.",
