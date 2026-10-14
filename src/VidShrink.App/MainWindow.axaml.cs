@@ -658,6 +658,7 @@ public partial class MainWindow : Window
             UpdateMaximizeGlyph();
             ApplyWindowFrame();
             WindowShell.Margin = OffScreenMargin;
+            var recovery = CheckSettingsRecovery();
             var settings = UpdateSettings.Load(SettingsPathOverride);
             _settingsSyncing = true;
             UseLanguage(ResolveLanguage(settings.Language, CultureInfo.CurrentUICulture.Name));
@@ -666,6 +667,7 @@ public partial class MainWindow : Window
             RestoreSettings(settings);
             var appSettings = AppSettings.Load(SettingsPathOverride);
             RestoreAppSettings(appSettings);
+            ShowSettingsRecovery(recovery);
             InitializeUpdateUi(settings);
             AcilisIzi.Yaz("ayarlar");
             PlayPanelEntrance();

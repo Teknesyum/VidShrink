@@ -120,6 +120,33 @@
             </Grid>
           </Border>
 
+          <Border x:Name="SettingsRecoveryNotice" Classes="reveal-panel"
+                  Margin="{StaticResource NoticeMargin}"
+                  IsVisible="False"
+                  Background="{StaticResource Surface}"
+                  BorderBrush="{StaticResource NeonBlueBorder}"
+                  BorderThickness="{StaticResource BorderThin}"
+                  CornerRadius="{StaticResource RadiusControl}"
+                  Padding="{StaticResource ButtonPaddingSm}">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
+              <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}"
+                    Stretch="Uniform" VerticalAlignment="Center"
+                    Data="{StaticResource IconWarning}" Fill="{StaticResource TextBody}"/>
+              <TextBlock x:Name="TxtSettingsRecovery" Grid.Column="1"
+                         Theme="{StaticResource StatusWarning}"
+                         TextWrapping="Wrap"
+                         VerticalAlignment="Center"/>
+              <Button Grid.Column="2"
+                      x:Name="BtnSettingsRecoveryDismiss"
+                      Content="×"
+                      Theme="{StaticResource GhostButton}"
+                      FontFamily="{StaticResource FontMono}"
+                      VerticalAlignment="Center"
+                      auto:AutomationProperties.Name="{loc:Text main.window.close}"
+                      Click="OnDismissSettingsRecovery"/>
+            </Grid>
+          </Border>
+
           <Border x:Name="UpdateNotice" Classes="reveal-panel"
                   Margin="{StaticResource NoticeMargin}"
                   IsVisible="False"
@@ -1881,6 +1908,18 @@
 
               <Border x:Name="ResetSettingsPanel" izi:KartDuvari.Sutun="3" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
+                  <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
+                    <Button x:Name="BtnExportSettings"
+                            Content="{loc:Text settings.backup.export}"
+                            Theme="{StaticResource GhostButton}"
+                            Click="OnExportSettings"/>
+                    <Button x:Name="BtnImportSettings"
+                            Content="{loc:Text settings.backup.import}"
+                            Theme="{StaticResource GhostButton}"
+                            Click="OnImportSettings"/>
+                  </WrapPanel>
+                  <TextBlock x:Name="TxtSettingsBackup" Theme="{StaticResource Body}" TextWrapping="Wrap"
+                             IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                   <Button x:Name="BtnResetSettings"
                           Content="{loc:Text settings.reset-all}"
                           Theme="{StaticResource GhostButton}"

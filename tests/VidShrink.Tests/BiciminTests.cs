@@ -1243,6 +1243,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, ARC-P1 gurultu temizleme ve yukseklik olcumu: bes yeni <c>main.audio.*</c> anahtarindan 9 kol 8 dilde (denoise: es, fr, pt, ro; loudness.measure: vi; loudness.result: bn, hi, th, ur), KOL dokumunden sayildi, en ve tr girmiyor; dalga 1 birlesik agacinda 3107 + 9 = 3116, en 302, tr 104.</para>
     /// <para>2026-10-14, gecmis penceresi ve devam ayari (OYB-P4): dokuz yeni anahtardan 14 kol 11 dilde (history.empty: en, et, fi, nl; history.title: es, fr, pt, ro, sw; view.resume: en, it, nl, pt, ro), KOL dokumunden sayildi, tr girmiyor: 3116 + 14 = 3130, en 302 + 2 = 304, tr 104.</para>
     /// <para>2026-10-14, adli Donustur on ayari (DON-P5): uc yeni <c>main.convert.preset.*</c> anahtarindan yalniz <c>main.convert.preset.placeholder</c> 1 dilde kola giriyor (en), KOL dokumunden sayildi, tr girmiyor: 3116 + 1 = 3117, en 302 + 1 = 303, tr 104.</para>
+    /// <para>2026-10-14, AYR-P2 ayar yedegi: on yeni <c>settings.backup.*</c>, <c>settings.recovery.*</c>, <c>settings.error.export/import</c> anahtarindan 19 kol 10 dilde (cs 1, en 3, es 1, fr 1, hu 3, nl 3, pt 3, ro 1, sk 1, sr 2), KOL dokumunden sayildi, tr girmiyor; 3116 + 19 = 3135, en 305, tr 104.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1268,8 +1269,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3131, toplam);
-        Assert.Equal(305, dilBasina["en"]);
+        Assert.Equal(3150, toplam);
+        Assert.Equal(308, dilBasina["en"]);
         Assert.Equal(104, dilBasina["tr"]);
     }
 
@@ -1491,6 +1492,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, ARC-P1 gurultu temizleme ve yukseklik olcumu: bes yeni anahtar (<c>main.audio.denoise</c>, <c>main.audio.loudness.measure</c>, <c>.running</c>, <c>.result</c>, <c>.failed</c>), dusen yok; dalga 1 birlesik agacinda 1385 + 5 = 1390, 43 x 1390 = 59770. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, gecmis penceresi ve devam ayari (OYB-P4): dokuz yeni anahtar (<c>player.list.history</c>, <c>.clear-history</c>, <c>.history-cleared</c>, <c>player.history.title</c>, <c>.search</c>, <c>.open</c>, <c>.empty</c>, <c>player.view.keep-history</c>, <c>.resume</c>), dusen yok: 1390 + 9 = 1399, 43 x 1399 = 60157. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, adli Donustur on ayari (DON-P5): uc yeni anahtar (<c>main.convert.preset.label</c>, <c>.placeholder</c>, <c>.add.tip</c>), dusen yok: 1390 + 3 = 1393, 43 x 1393 = 59899. <c>kayip</c> 0.</para>
+    /// <para>2026-10-14, AYR-P2 ayar yedegi: on yeni <c>settings.*</c> anahtari, dusen yok; 1390 + 10 = 1400, 43 x 1400 = 60200. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1518,7 +1520,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(60286, gezilen);
+        Assert.Equal(60716, gezilen);
         Assert.Empty(kayip);
     }
 
