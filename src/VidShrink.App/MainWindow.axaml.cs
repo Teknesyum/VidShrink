@@ -281,6 +281,9 @@ public partial class MainWindow : Window
         Watch(ChkAudioDenoise, ToggleButton.IsCheckedProperty, OnOptionChanged);
         Watch(CmbAudioGain, SelectingItemsControl.SelectedIndexProperty, OnOptionChanged);
         Watch(CmbBurnSubtitle, SelectingItemsControl.SelectedIndexProperty, OnBurnChoiceChanged);
+        Watch(CmbBurnFont, SelectingItemsControl.SelectedIndexProperty, OnOptionChanged);
+        Watch(CmbBurnSize, SelectingItemsControl.SelectedIndexProperty, OnOptionChanged);
+        Watch(ChkBurnBox, ToggleButton.IsCheckedProperty, OnOptionChanged);
 
         Watch(SliderQuality, RangeBase.ValueProperty, OnQualitySliderChanged);
         Watch(TxtQuality, TextBox.TextProperty, OnQualityTextChanged);

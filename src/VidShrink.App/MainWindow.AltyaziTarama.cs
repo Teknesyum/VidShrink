@@ -85,6 +85,7 @@ public partial class MainWindow
 
     private void OnBurnChoiceChanged()
     {
+        RefreshBurnStyle();
         TaramayiSifirla();
         OnOptionChanged();
     }

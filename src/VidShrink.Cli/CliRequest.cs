@@ -146,6 +146,15 @@ public sealed record CliRequest
     /// </summary>
     public bool SubtitleScan { get; init; }
 
+    /// <summary><c>--yak-yazi-tipi</c>: yakilan metin altyazinin yazi tipi (<c>force_style</c> <c>FontName</c>).</summary>
+    public string? BurnFont { get; init; }
+
+    /// <summary><c>--yak-boyut</c>: yakilan metin altyazinin boyutu (<c>force_style</c> <c>FontSize</c>).</summary>
+    public int? BurnFontSize { get; init; }
+
+    /// <summary><c>--yak-kutu</c>: yakilan metin altyazinin arkasina opak kutu (<c>BorderStyle=3</c>).</summary>
+    public bool BurnBox { get; init; }
+
     /// <summary><c>--meta-yok</c>: kaynagin kap etiketleri ciktiya tasinmaz.</summary>
     public bool DropMetadata { get; init; }
 
@@ -304,6 +313,8 @@ public sealed record CliRequest
         if (Filters is { } suzgecler) options.Filters = suzgecler;
         if (BurnSubtitle is int yak) options.Filters = (options.Filters ?? VideoFilterOptions.Default) with { BurnSubtitle = yak - 1 };
         if (BurnFile is { } yakDosya) options.Filters = (options.Filters ?? VideoFilterOptions.Default) with { BurnFile = yakDosya };
+        if (BurnFont is not null || BurnFontSize is not null || BurnBox)
+            options.Filters = (options.Filters ?? VideoFilterOptions.Default) with { BurnFont = BurnFont, BurnFontSize = BurnFontSize, BurnBox = BurnBox };
         if (AudioCodec is { } sesKodek) options.AudioCodec = sesKodek;
         options.AudioLoudnorm = AudioLoudnorm;
         options.AudioDenoise = AudioDenoise;
@@ -356,6 +367,7 @@ public static class CliParser
         "--suzgec", "--filters", "--ses-kodek", "--audio-codec", "--ses-normal", "--loudnorm", "--ses-temizle", "--denoise",
         "--ses-kazanc", "--gain", "--altyazi", "--subtitle", "--yan-altyazi", "--sidecar-subtitles",
         "--yak", "--burn", "--yak-srt", "--srt-burn", "--yak-ass", "--ssa-burn", "--altyazi-tara", "--subtitle-scan",
+        "--yak-yazi-tipi", "--burn-font", "--yak-boyut", "--burn-size", "--yak-kutu", "--burn-box",
         "--meta-yok", "--no-metadata",
         "--altyazi-dil", "--subtitle-lang", "--ilk-altyazi", "--first-subtitle",
         "--sabit-kare", "--cfr", "--tavan-kare", "--pfr", "--kare-hizi", "--fps",
@@ -589,6 +601,21 @@ public static class CliParser
                         return Fail("error.bad-burn-file", yakAss);
                     request = request with { BurnFile = yakAss };
                     break;
+                case "--yak-yazi-tipi" or "--burn-font" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var yaziTipi)) return Fail("error.missing-value", arg);
+                    if (!VideoFilterChain.IsBurnFontName(yaziTipi)) return Fail("error.bad-burn-font", yaziTipi);
+                    request = request with { BurnFont = yaziTipi };
+                    break;
+                case "--yak-boyut" or "--burn-size" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var yakBoyut)) return Fail("error.missing-value", arg);
+                    if (!int.TryParse(yakBoyut, NumberStyles.Integer, CultureInfo.InvariantCulture, out var boyut)
+                        || boyut < VideoFilterChain.BurnFontSizeMin || boyut > VideoFilterChain.BurnFontSizeMax)
+                        return Fail("error.bad-burn-size", yakBoyut);
+                    request = request with { BurnFontSize = boyut };
+                    break;
+                case "--yak-kutu" or "--burn-box" when command != CliCommand.Watch:
+                    request = request with { BurnBox = true };
+                    break;
                 case "--altyazi-tara" or "--subtitle-scan" when command != CliCommand.Watch:
                     request = request with { SubtitleScan = true };
                     break;
@@ -653,6 +680,9 @@ public static class CliParser
             return Fail("error.bad-max-duration", enCok.ToString(CultureInfo.InvariantCulture));
         if (request.BurnSubtitle is not null && request.BurnFile is not null) return Fail("error.burn-conflict", null);
         if (request.SubtitleScan && (request.BurnSubtitle is not null || request.BurnFile is not null)) return Fail("error.scan-burn-conflict", null);
+        if ((request.BurnFont is not null || request.BurnFontSize is not null || request.BurnBox)
+            && request.BurnSubtitle is null && request.BurnFile is null && !request.SubtitleScan)
+            return Fail("error.burn-style-needs-burn", null);
         if (CropModeConflict(request) is { } kirpmaHatasi) return Fail(kirpmaHatasi, CropModeText(request.CropMode!.Value));
         if (request.ConstantFrameRate && request.PeakFrameRate) return Fail("error.cfr-and-pfr", null);
         if (request.PeakFrameRate && request.FrameRate is null) return Fail("error.pfr-needs-fps", null);
