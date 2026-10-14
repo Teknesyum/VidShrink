@@ -1248,6 +1248,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, OYA-P2 altyazi satiri ve tuslari: dokuz yeni <c>player.subtitle.*</c> anahtarindan 22 kol 9 dilde (de, en, es, fr, hu, lt, pt, ro, sw; en yalniz stepprev/stepnext), KOL dokumunden sayildi, tr girmiyor; 3116 + 22 = 3138, en 304, tr 104.</para>
     /// <para>2026-10-14, DZA-P2 otomatik bolme ve parca adlari: on uc yeni <c>editor.*</c> anahtarindan 24 kol 10 dilde (en: split.count; es, fr: split.count, split.value, scene.threshold, export.part-name; pt: ayni dordu ve marker.name; ro: split.count, split.value, scene.threshold; sw: split.count, split.value; bn, hi, ja, th, ur: export.part-name.hint), KOL dokumunden sayildi, tr girmiyor; 3116 + 24 = 3140, en 303, tr 104.</para>
     /// <para>2026-10-14, kosan kodlamayi duraklatma (SIK-P3): uc yeni anahtardan 6 kol 6 dilde (<c>main.shrink-job.disk-paused</c>: bn, hi, ja, th, ur; <c>main.action.pause-run</c>: it), yeniden yazilan <c>main.shrink-job.paused</c> kol sayisini degistirmedi, KOL dokumunden sayildi, en ve tr degismiyor: 3116 + 6 = 3122, en 302, tr 104.</para>
+    /// <para>2026-10-14, liste penceresinde arama ve siralama (OYB-P3): yedi yeni anahtardan 7 kol 5 dilde (en ve tr: sort-name, sort-date; hr ve it: item.move-up; hu: search), KOL dokumunden sayildi; olculen 3206 + 7 = 3213, en 311 + 2 = 313, tr 104 + 2 = 106.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1273,9 +1274,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3206, toplam);
-        Assert.Equal(311, dilBasina["en"]);
-        Assert.Equal(104, dilBasina["tr"]);
+        Assert.Equal(3213, toplam);
+        Assert.Equal(313, dilBasina["en"]);
+        Assert.Equal(106, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1501,6 +1502,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, OYA-P2 altyazi satiri ve tuslari: dokuz yeni <c>player.subtitle.*</c> anahtari (visibility, lineprev, linenext, stepprev, stepnext, copy, hidden, shown, copied), dusen yok; 1390 + 9 = 1399, 43 x 1399 = 60157. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, DZA-P2 otomatik bolme ve parca adlari: on uc yeni <c>editor.*</c> anahtari (<c>editor.split.*</c> sekiz, <c>editor.scene.threshold</c>, <c>editor.clip.label</c>, <c>editor.marker.name</c>, <c>editor.export.part-name</c>, <c>.hint</c>), dusen yok; 1390 + 13 = 1403, 43 x 1403 = 60329. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, kosan kodlamayi duraklatma (SIK-P3): uc yeni anahtar (<c>main.action.pause-run</c>, <c>main.action.resume-run</c>, <c>main.shrink-job.disk-paused</c>), <c>main.shrink-job.paused</c> yeniden yazildi, dusen yok: 1390 + 3 = 1393, 43 x 1393 = 59899. <c>kayip</c> 0.</para>
+    /// <para>2026-10-14, liste penceresinde arama ve siralama (OYB-P3): yedi yeni anahtar (<c>player.list.search</c>, <c>player.list.item.move-up</c>, <c>.move-down</c>, <c>player.list.sort</c>, <c>.sort-name</c>, <c>.sort-date</c>, <c>.sort-reverse</c>), dusen yok; olculen 61963 + 43 x 7 = 62264. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1528,7 +1530,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(61963, gezilen);
+        Assert.Equal(62264, gezilen);
         Assert.Empty(kayip);
     }
 

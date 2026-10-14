@@ -175,6 +175,10 @@ internal sealed class PlaybackHistory
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException) { return (-1, -1); }
     }
 
+    /// <summary>Liste satırının ilerlemesi: kalınan yer ve bilinen süre. İzlenmemiş ya da geçmişi silinmiş dosyada yok.</summary>
+    internal (double Position, double Duration)? Progress(string media)
+        => _entries.TryGetValue(Normalize(media), out var entry) && entry.Seen > 0 ? (entry.Position, entry.Duration) : null;
+
     internal IReadOnlyList<double> Bookmarks(string media)
         => _entries.TryGetValue(Normalize(media), out var entry) ? entry.Bookmarks.ToArray() : Array.Empty<double>();
 

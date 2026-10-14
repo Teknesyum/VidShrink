@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -9,6 +11,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using VidShrink.Core;
 
 namespace VidShrink.App.Playback;
 
@@ -53,6 +56,32 @@ internal static class PlaylistPlacement
     internal static double AnchorX(double? pointerX, double? focusedLeft, double menuLeft) => pointerX ?? focusedLeft ?? menuLeft;
 }
 
+internal static class PlaylistFilter
+{
+    /// <summary>Liste penceresinin süzgeci: görünen adda, büyük-küçük harf ayırmadan, geçerli kültürle. Boş arama listeyi olduğu gibi bırakır.</summary>
+    internal static IReadOnlyList<string> Match(IReadOnlyList<string> files, string? search, Func<string, string> name)
+    {
+        var text = search?.Trim() ?? "";
+        if (text.Length == 0) return files;
+        var compare = CultureInfo.CurrentCulture.CompareInfo;
+        return files.Where(file => compare.IndexOf(name(file), text, CompareOptions.IgnoreCase) >= 0).ToList();
+    }
+}
+
+internal static class PlaylistRow
+{
+    /// <summary>Satırın sağındaki yazı: kalınan yer ve süre, ölçeği süreden alır. Geçmişte iz yoksa yazı yok.</summary>
+    internal static string? Progress(double position, double duration)
+    {
+        var known = double.IsFinite(duration) && duration > 0;
+        var resumed = double.IsFinite(position) && position >= PlaybackHistory.MinimumResumeSeconds;
+        var scale = TimeSpan.FromSeconds(known ? duration : resumed ? position : 0);
+        if (resumed && known) return Saat.Ekran(TimeSpan.FromSeconds(position), scale) + " / " + Saat.Ekran(scale);
+        if (resumed) return Saat.Ekran(TimeSpan.FromSeconds(position), scale);
+        return known ? Saat.Ekran(scale) : null;
+    }
+}
+
 internal partial class PlayerView
 {
     private PixelPoint? _menuPointer;
@@ -64,6 +93,8 @@ internal partial class PlayerView
     internal ListBox Playlist => PlaylistList;
 
     internal Border PlaylistFrame => PlaylistPanel;
+
+    internal TextBox PlaylistSearchBox => PlaylistSearch;
 
     internal PixelPoint? MenuPointer => _menuPointer;
 
@@ -89,6 +120,10 @@ internal partial class PlayerView
         PlaylistPopup.PlacementTarget = this;
         PlaylistList.AddHandler(PointerReleasedEvent, OnPlaylistReleased, RoutingStrategies.Bubble, handledEventsToo: true);
         PlaylistList.AddHandler(KeyDownEvent, OnPlaylistKey, RoutingStrategies.Tunnel);
+        PlaylistSearch.TextChanged += (_, _) =>
+        {
+            if (PlaylistPopup.IsOpen) FillPlaylist();
+        };
     }
 
     private bool FillPlaylist()
@@ -97,25 +132,37 @@ internal partial class PlayerView
         PlaylistList.Items.Clear();
         if (files.Count == 0) return false;
 
-        foreach (var file in files)
+        var shown = PlaylistFilter.Match(files, PlaylistSearch.Text, MediaName);
+        foreach (var file in shown)
         {
             var name = MediaName(file);
-            var item = new ListBoxItem
-            {
-                Tag = file,
-                Content = new TextBlock
-                {
-                    Text = name,
-                    TextTrimming = TextTrimming.CharacterEllipsis,
-                    TextWrapping = TextWrapping.NoWrap,
-                },
-            };
+            var item = new ListBoxItem { Tag = file, Content = PlaylistContent(file, name) };
             ToolTip.SetTip(item, name);
             PlaylistList.Items.Add(item);
         }
 
-        PlaylistList.SelectedIndex = _path is { } current ? FolderNavigator.IndexOf(files, current) : -1;
+        PlaylistList.SelectedIndex = _path is { } current ? FolderNavigator.IndexOf(shown, current) : -1;
         return true;
+    }
+
+    private Control PlaylistContent(string file, string name)
+    {
+        var title = new TextBlock
+        {
+            Text = name,
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            TextWrapping = TextWrapping.NoWrap,
+        };
+        if (_history.Progress(file) is not { } progress || PlaylistRow.Progress(progress.Position, progress.Duration) is not { } text) return title;
+
+        var time = new TextBlock { Text = text, TextWrapping = TextWrapping.NoWrap, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
+        if (this.TryFindResource("FontSizeSm", out var size) && size is double small) time.FontSize = small;
+        var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
+        if (this.TryFindResource("SpaceSm", out var gap) && gap is double space) row.ColumnSpacing = space;
+        Grid.SetColumn(time, 1);
+        row.Children.Add(title);
+        row.Children.Add(time);
+        return row;
     }
 
     private Control? KeyboardMenuTarget()
@@ -132,6 +179,7 @@ internal partial class PlayerView
         if (flyout.Items.Count == 0 || flyout.Items[0] is not Visual first) return;
         if (first.FindAncestorOfType<MenuFlyoutPresenter>() is not { } presenter) return;
         if (TopLevel.GetTopLevel(presenter) is not { } menuRoot) return;
+        PlaylistSearch.Text = "";
         if (!FillPlaylist()) return;
         if (!PlacePlaylist(flyout, presenter, menuRoot, pointer, focused)) return;
 
@@ -233,10 +281,34 @@ internal partial class PlayerView
 
     private void OnPlaylistKey(object? sender, KeyEventArgs e)
     {
+        if (e.KeyModifiers == KeyModifiers.Alt && e.Key is Key.Up or Key.Down)
+        {
+            if (PlaylistList.SelectedItem is ListBoxItem { Tag: string moving })
+            {
+                if (e.Key == Key.Up ? MoveUp(moving) : MoveDown(moving)) SelectAfterMove(moving);
+                e.Handled = true;
+            }
+
+            return;
+        }
+
         if (e.Key != Key.Enter) return;
         if (PlaylistList.SelectedItem is not ListBoxItem item) return;
         PlayFromPlaylist(item);
         e.Handled = true;
+    }
+
+    private void SelectAfterMove(string file)
+    {
+        FillPlaylist();
+        foreach (var entry in PlaylistList.Items)
+        {
+            if (entry is not ListBoxItem { Tag: string tag } row || !QueueEdit.Same(tag, file)) continue;
+            PlaylistList.SelectedItem = row;
+            PlaylistList.ScrollIntoView(row);
+            row.Focus();
+            return;
+        }
     }
 
     private void PlayFromPlaylist(ListBoxItem item)

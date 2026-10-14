@@ -24,19 +24,33 @@ internal partial class PlayerView
     internal MenuFlyout BuildItemMenu(string file)
     {
         var current = _path is { } playing && QueueEdit.Same(file, playing);
+        var list = PlaylistFiles();
+        var index = FolderNavigator.IndexOf(list, file);
         var flyout = new MenuFlyout();
         flyout.Items.Add(ItemRow("play", "player.list.item.play", true, () => PlayFile(file)));
         flyout.Items.Add(new Separator());
         flyout.Items.Add(ItemRow("enqueue", "player.list.item.enqueue", !current, () => AfterEdit(Enqueue(file))));
         flyout.Items.Add(ItemRow("play-next", "player.list.item.play-next", !current, () => AfterEdit(PlayNext(file))));
+        flyout.Items.Add(ItemRow("move-up", "player.list.item.move-up", index > 0, () => AfterEdit(MoveUp(file))));
+        flyout.Items.Add(ItemRow("move-down", "player.list.item.move-down", index >= 0 && index < list.Count - 1, () => AfterEdit(MoveDown(file))));
         flyout.Items.Add(new Separator());
         flyout.Items.Add(ItemRow("reveal", "player.menu.reveal", File.Exists(file), () => RevealPath(file)));
         flyout.Items.Add(ItemRow("copy-path", "player.list.item.copy-path", true, () => _ = PathCopier(TopLevel.GetTopLevel(this), file)));
         flyout.Items.Add(new Separator());
         flyout.Items.Add(ItemRow("remove", "player.list.item.remove", !current, () => AfterEdit(RemoveFromList(file))));
         flyout.Items.Add(new Separator());
+        flyout.Items.Add(SortMenu(list.Count > 1));
         flyout.Items.Add(SavePlaylistRow());
         return flyout;
+    }
+
+    private MenuItem SortMenu(bool enabled)
+    {
+        var item = new MenuItem { Header = Strings.Get("player.list.sort"), Tag = "sort", IsEnabled = enabled };
+        item.Items.Add(ItemRow("sort-name", "player.list.sort-name", true, () => AfterEdit(SortPlaylist(PlaylistSort.Name))));
+        item.Items.Add(ItemRow("sort-date", "player.list.sort-date", true, () => AfterEdit(SortPlaylist(PlaylistSort.Date))));
+        item.Items.Add(ItemRow("sort-reverse", "player.list.sort-reverse", true, () => AfterEdit(SortPlaylist(PlaylistSort.Reverse))));
+        return item;
     }
 
     private MenuItem ItemRow(string tag, string key, bool enabled, Action run)

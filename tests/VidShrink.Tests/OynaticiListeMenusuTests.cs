@@ -15,13 +15,14 @@ namespace VidShrink.Tests;
 
 public sealed class OynaticiListeMenusuTests
 {
-    private static readonly string[] Sira = { "play", "enqueue", "play-next", "reveal", "copy-path", "remove", "save" };
+    private static readonly string[] Sira = { "play", "enqueue", "play-next", "move-up", "move-down", "reveal", "copy-path", "remove", "sort", "save" };
 
     private static readonly string[] Anahtarlar =
     {
         "player.list.item.play", "player.list.item.enqueue", "player.list.item.play-next",
+        "player.list.item.move-up", "player.list.item.move-down",
         "player.menu.reveal", "player.list.item.copy-path", "player.list.item.remove",
-        "player.list.save",
+        "player.list.sort", "player.list.save",
     };
 
     private static int Say(PlayerView view, string iz) => view.Trace.Count(t => t == iz);
