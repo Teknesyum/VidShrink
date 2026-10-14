@@ -462,6 +462,12 @@ public sealed class UpdateSettings
     public int QualityValue { get; set; } = 23;
     public int Container { get; set; }
     public int ConvertCodec { get; set; }
+
+    /// <summary>
+    /// Dönüştür kodeğinin adı (liste etiketi). Varsa <see cref="ConvertCodec"/> sıra numarasının önüne
+    /// geçer; sıra numarası eski sürümler için eski listedeki yeriyle yazılmaya devam eder.
+    /// </summary>
+    public string? ConvertCodecName { get; set; }
     public int Resolution { get; set; }
     public string CustomResolution { get; set; } = "1280x720";
     public int ConvertFps { get; set; }
@@ -533,6 +539,7 @@ public sealed class UpdateSettings
             ReadInt(document.RootElement, "qualityValue", value => settings.QualityValue = value);
             ReadInt(document.RootElement, "container", value => settings.Container = value);
             ReadInt(document.RootElement, "convertCodec", value => settings.ConvertCodec = value);
+            ReadString(document.RootElement, "convertCodecName", value => settings.ConvertCodecName = value);
             ReadInt(document.RootElement, "resolution", value => settings.Resolution = value);
             ReadString(document.RootElement, "customResolution", value => settings.CustomResolution = value);
             ReadInt(document.RootElement, "convertFps", value => settings.ConvertFps = value);
@@ -599,6 +606,7 @@ public sealed class UpdateSettings
         writer.WriteNumber("qualityValue", QualityValue);
         writer.WriteNumber("container", Container);
         writer.WriteNumber("convertCodec", ConvertCodec);
+        if (!string.IsNullOrWhiteSpace(ConvertCodecName)) writer.WriteString("convertCodecName", ConvertCodecName);
         writer.WriteNumber("resolution", Resolution);
         writer.WriteString("customResolution", CustomResolution);
         writer.WriteNumber("convertFps", ConvertFps);
