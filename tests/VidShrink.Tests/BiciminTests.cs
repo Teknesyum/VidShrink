@@ -1255,6 +1255,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, gizlilik maskesi (EKB-P4): bes yeni <c>recorder.mask.*</c> anahtarindan 4 kol 4 dilde (<c>recorder.mask.title</c>: es, fr, pt, ro), KOL dokumunden sayildi, en ve tr degismiyor: 3206 + 4 = 3210, en 311, tr 104.</para>
     /// <para>2026-10-14, temel renk ve hazir gorunum (DZB-P3): sekiz yeni <c>editor.clip.*</c> anahtarindan (brightness, contrast, saturation, temperature, look, look.none, look.bw, look.old-film) 2 kol 2 dilde (look.bw: en; look.old-film: sw), KOL dokumunden sayildi, tr girmiyor: 3206 + 2 = 3208, en 311 + 1 = 312, tr 104.</para>
     /// <para>2026-10-14, dis ses izi (SIK-P4): bes yeni <c>main.audio.external.*</c> anahtarindan 9 kol 4 dilde (es: add, file-type, remove; hu: replace; pt: add, file-type, remove; sw: label, replace), KOL dokumunden sayildi, en ve tr girmiyor; dalga 2 agacinda olculen 3206 + 9 = 3215, en 311, tr 104.</para>
+    /// <para>2026-10-14, Donustur toplu kuyrugu (DON-P6): dokuz yeni <c>main.convert-queue.*</c> anahtarindan 11 kol 10 dilde (setting: da, en, fr, hu, nb, tr; headline: en, it, pl, ro; waiting: it), KOL dokumunden sayildi; birlesik agacta 3206 + 11 = 3217, en 311 + 2 = 313, tr 104 + 1 = 105.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1280,9 +1281,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(1, toplam);
-        Assert.Equal(1, dilBasina["en"]);
-        Assert.Equal(1, dilBasina["tr"]);
+        Assert.Equal(3273, toplam);
+        Assert.Equal(320, dilBasina["en"]);
+        Assert.Equal(107, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1515,6 +1516,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, gizlilik maskesi (EKB-P4): bes yeni <c>recorder.mask.*</c> anahtari (title, draw, draw-hint, clear, count), dusen yok; 43 x 5 = 215, 61963 + 215 = 62178. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, temel renk ve hazir gorunum (DZB-P3): sekiz yeni <c>editor.clip.*</c> anahtari, dusen yok; 61963 + 43 x 8 = 62307. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, dis ses izi (SIK-P4): bes yeni anahtar (<c>main.audio.external.label</c>, <c>.add</c>, <c>.replace</c>, <c>.remove</c>, <c>.file-type</c>), dusen yok; dalga 2 agacinda olculen 61963 + 43 x 5 = 62178. <c>kayip</c> 0.</para>
+    /// <para>2026-10-14, Donustur toplu kuyrugu (DON-P6): dokuz yeni <c>main.convert-queue.*</c> anahtari (headline, shared, setting, waiting, running, done, failed, cancelled, summary), dusen yok; birlesik agacta 61963 + 43 x 9 = 62350. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1542,7 +1544,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(1, gezilen);
+        Assert.Equal(64199, gezilen);
         Assert.Empty(kayip);
     }
 

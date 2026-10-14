@@ -15,7 +15,8 @@ namespace VidShrink.Tests;
 /// Küçült sekmesinin "Gözat" seçicisi çoklu seçime açık. Tek dosya eskisi gibi süzülmeden pencereye
 /// yüklenir; birden çok dosya bırakmanın süzgecinden geçip bırakmayla aynı kuyruk koluna gider. Seçici
 /// testte açılmaz: yollar <see cref="MainWindow.SourcePicker"/> dikişinden, kuyruğa giden liste
-/// <see cref="MainWindow.BatchOpener"/> dikişinden, yüklenen dosya sahte yoklayıcıdan okunur. Kuyruk
+/// <see cref="MainWindow.BatchOpener"/> ya da Dönüştür sekmesinde <see cref="MainWindow.ConvertBatchOpener"/>
+/// dikişinden, yüklenen dosya sahte yoklayıcıdan okunur. Kuyruk
 /// penceresi açılmaz, ffprobe ve ffmpeg koşmaz.
 /// </summary>
 public sealed class GozatCokluSecimTests : IDisposable
@@ -47,7 +48,7 @@ public sealed class GozatCokluSecimTests : IDisposable
         }
     }
 
-    private sealed record Olcu(int SeciciAcildi, string[] Yuklenen, string[][] Kuyruklar, bool[] Coklu);
+    private sealed record Olcu(int SeciciAcildi, string[] Yuklenen, string[][] Kuyruklar, bool[] Coklu, string[][] DonusturKuyruklari);
 
     /// <summary>
     /// Pencereyi üç dikişle kurar, <paramref name="eylem"/>i koşturur. Yoklayıcı yolu yazıp düşer:
@@ -64,10 +65,12 @@ public sealed class GozatCokluSecimTests : IDisposable
             var yuklenen = new List<string>();
             var kuyruklar = new List<string[]>();
             var kipler = new List<bool>();
+            var donustur = new List<string[]>();
             try
             {
                 window.SourcePicker = coklu => { acildi++; kipler.Add(coklu); return Task.FromResult(secilen); };
                 window.BatchOpener = yollar => kuyruklar.Add(yollar.ToArray());
+                window.ConvertBatchOpener = yollar => donustur.Add(yollar.ToArray());
                 window.Prober = (yol, _) => { yuklenen.Add(yol); return Task.FromException<MediaInfo>(new IOException("sahte yoklama")); };
                 if (isKosuyor) window.BeginEncodingForTest();
 
@@ -75,7 +78,7 @@ public sealed class GozatCokluSecimTests : IDisposable
                 if (is_ is not null) Dongu(() => is_.IsCompleted, 30);
                 else Dongu(() => false, 0.2);
                 if (is_ is { IsFaulted: true }) is_.GetAwaiter().GetResult();
-                return new Olcu(acildi, yuklenen.ToArray(), kuyruklar.ToArray(), kipler.ToArray());
+                return new Olcu(acildi, yuklenen.ToArray(), kuyruklar.ToArray(), kipler.ToArray(), donustur.ToArray());
             }
             finally
             {
@@ -159,11 +162,11 @@ public sealed class GozatCokluSecimTests : IDisposable
     }
 
     /// <summary>
-    /// Küçült sekmesinin Gözat düğmesi seçiciyi çoklu seçimle açar ve aynı yoldan geçer. Dönüştür
-    /// sekmesinin düğmesi tek seçimli kalır (orada kuyruk yok) ve tek dosyayı eskisi gibi yükler.
+    /// İki sekmenin Gözat düğmesi de seçiciyi çoklu seçimle açar (DON-P6). Küçült'te birden çok dosya
+    /// Küçült kuyruğuna, Dönüştür sekmesindeyken Dönüştür kuyruğuna gider; tek dosya eskisi gibi yüklenir.
     /// </summary>
     [Fact]
-    public void KucultDugmesiCokluDonusturDugmesiTekSecimle()
+    public void IkiSekmeninDugmesiCokluSecimle()
     {
         var a = Dosya("a.mp4");
         var b = Dosya("b.mp4");
@@ -172,17 +175,44 @@ public sealed class GozatCokluSecimTests : IDisposable
             window.BtnBrowseEmpty.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             return null;
         });
-        var donustur = Kos(new[] { a }, window =>
+        var donustur = Kos(new[] { b, a }, window =>
         {
+            window.TabConvert.IsSelected = true;
+            window.BtnBrowseConvert.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            return null;
+        });
+        var donusturTek = Kos(new[] { a }, window =>
+        {
+            window.TabConvert.IsSelected = true;
             window.BtnBrowseConvert.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             return null;
         });
 
         Assert.Equal(new[] { true }, kucult.Coklu);
         Assert.Equal(new[] { a, b }, Assert.Single(kucult.Kuyruklar));
-        Assert.Equal(new[] { false }, donustur.Coklu);
-        Assert.Equal(new[] { a }, donustur.Yuklenen);
+        Assert.Empty(kucult.DonusturKuyruklari);
+        Assert.Equal(new[] { true }, donustur.Coklu);
+        Assert.Equal(new[] { a, b }, Assert.Single(donustur.DonusturKuyruklari));
         Assert.Empty(donustur.Kuyruklar);
+        Assert.Empty(donustur.Yuklenen);
+        Assert.Equal(new[] { a }, donusturTek.Yuklenen);
+        Assert.Empty(donusturTek.DonusturKuyruklari);
+    }
+
+    /// <summary>Dönüştür sekmesinde bırakılan dosyalar da Dönüştür kuyruğuna gider, Küçült kuyruğuna değil.</summary>
+    [Fact]
+    public void DonusturSekmesindeBirakmaDonusturKuyrugunaGider()
+    {
+        var a = Dosya("a.mp4");
+        var b = Dosya("b.mkv");
+        var olcu = Kos(Array.Empty<string>(), window =>
+        {
+            window.TabConvert.IsSelected = true;
+            return Birak(window, b, a);
+        });
+
+        Assert.Equal(new[] { a, b }, Assert.Single(olcu.DonusturKuyruklari));
+        Assert.Empty(olcu.Kuyruklar);
     }
 
     /// <summary>

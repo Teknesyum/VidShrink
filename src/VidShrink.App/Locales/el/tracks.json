@@ -55,7 +55,7 @@
   "player.subtitle.download.badlogin": "Το OpenSubtitles δεν δέχτηκε τη σύνδεση",
   "player.subtitle.download.expired": "Ο σύνδεσμος λήψης έληξε — δοκιμάστε ξανά",
   "player.subtitle.download.toofast.wait": "Πολλά αιτήματα προς το OpenSubtitles — δοκιμάστε ξανά σε {0} δ",
-  "player.subtitle.visibility": "Εμφάνιση/απόκρυψη υποτίτλων",
+  "player.subtitle.visibility": "Εμφάνιση ή απόκρυψη υποτίτλων",
   "player.subtitle.lineprev": "Προηγούμενη γραμμή υποτίτλων",
   "player.subtitle.linenext": "Επόμενη γραμμή υποτίτλων",
   "player.subtitle.stepprev": "Συγχρονισμός υποτίτλων με την προηγούμενη γραμμή",
