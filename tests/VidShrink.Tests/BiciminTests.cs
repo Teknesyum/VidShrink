@@ -1254,6 +1254,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, liste penceresinde arama ve siralama (OYB-P3): yedi yeni anahtardan 7 kol 5 dilde (en ve tr: sort-name, sort-date; hr ve it: item.move-up; hu: search), KOL dokumunden sayildi; olculen 3206 + 7 = 3213, en 311 + 2 = 313, tr 104 + 2 = 106.</para>
     /// <para>2026-10-14, gizlilik maskesi (EKB-P4): bes yeni <c>recorder.mask.*</c> anahtarindan 4 kol 4 dilde (<c>recorder.mask.title</c>: es, fr, pt, ro), KOL dokumunden sayildi, en ve tr degismiyor: 3206 + 4 = 3210, en 311, tr 104.</para>
     /// <para>2026-10-14, temel renk ve hazir gorunum (DZB-P3): sekiz yeni <c>editor.clip.*</c> anahtarindan (brightness, contrast, saturation, temperature, look, look.none, look.bw, look.old-film) 2 kol 2 dilde (look.bw: en; look.old-film: sw), KOL dokumunden sayildi, tr girmiyor: 3206 + 2 = 3208, en 311 + 1 = 312, tr 104.</para>
+    /// <para>2026-10-14, dis ses izi (SIK-P4): bes yeni <c>main.audio.external.*</c> anahtarindan 9 kol 4 dilde (es: add, file-type, remove; hu: replace; pt: add, file-type, remove; sw: label, replace), KOL dokumunden sayildi, en ve tr girmiyor; dalga 2 agacinda olculen 3206 + 9 = 3215, en 311, tr 104.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1513,6 +1514,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, liste penceresinde arama ve siralama (OYB-P3): yedi yeni anahtar (<c>player.list.search</c>, <c>player.list.item.move-up</c>, <c>.move-down</c>, <c>player.list.sort</c>, <c>.sort-name</c>, <c>.sort-date</c>, <c>.sort-reverse</c>), dusen yok; olculen 61963 + 43 x 7 = 62264. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, gizlilik maskesi (EKB-P4): bes yeni <c>recorder.mask.*</c> anahtari (title, draw, draw-hint, clear, count), dusen yok; 43 x 5 = 215, 61963 + 215 = 62178. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, temel renk ve hazir gorunum (DZB-P3): sekiz yeni <c>editor.clip.*</c> anahtari, dusen yok; 61963 + 43 x 8 = 62307. <c>kayip</c> 0.</para>
+    /// <para>2026-10-14, dis ses izi (SIK-P4): bes yeni anahtar (<c>main.audio.external.label</c>, <c>.add</c>, <c>.replace</c>, <c>.remove</c>, <c>.file-type</c>), dusen yok; dalga 2 agacinda olculen 61963 + 43 x 5 = 62178. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()

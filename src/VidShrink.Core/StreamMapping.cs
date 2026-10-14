@@ -127,6 +127,25 @@ public sealed record ExternalSubtitle(string Path, string Codec, string? Languag
 }
 
 /// <summary>
+/// SIK-P4: ciktiya eklenen ses dosyasi. Ana girdiden sonraki ilk <c>-i</c> girdisidir ve
+/// <c>1:a:0</c> ile eslenir; <see cref="Replace"/> kaynagin sesini birakir, degilse dis iz onun
+/// yanina eklenir. Iz her zaman yeniden kodlanir, dil adindan okunur (<c>muzik.tr.m4a</c> → <c>tur</c>).
+/// </summary>
+public sealed record ExternalAudio(string Path, string? Language, bool Replace = false)
+{
+    public static readonly string[] Extensions = { ".aac", ".ac3", ".eac3", ".flac", ".m4a", ".mka", ".mp3", ".ogg", ".opus", ".wav", ".wma" };
+
+    public static ExternalAudio? FromFile(string path, bool replace = false)
+    {
+        if (!Extensions.Contains(System.IO.Path.GetExtension(path).ToLowerInvariant()) || !File.Exists(path)) return null;
+        var stem = System.IO.Path.GetFileNameWithoutExtension(path);
+        var dot = stem.LastIndexOf('.');
+        var language = dot > 0 ? StreamMapping.LanguageTag(stem[(dot + 1)..]) : null;
+        return new ExternalAudio(System.IO.Path.GetFullPath(path), language, replace);
+    }
+}
+
+/// <summary>
 /// Akis kararinin girdisi. Ses suzgeci (<see cref="AudioLoudnorm"/>, <see cref="AudioGainDb"/>, <see cref="AudioDenoise"/>),
 /// dis altyazilar ve yakilan altyazi da burada tasinir: <see cref="StreamMapping.ForOutput"/>
 /// kap degisince karari bu istekten yeniden kurar, alan burada durmazsa orada kaybolur.
@@ -151,7 +170,8 @@ public sealed record StreamRequest(
     bool FirstSubtitleOnly = false,
     int? AudioSampleRate = null,
     double? AudioDrcScale = null,
-    bool AudioDenoise = false)
+    bool AudioDenoise = false,
+    ExternalAudio? ExternalAudio = null)
 {
     public static StreamRequest Default { get; } = new();
 
@@ -164,7 +184,7 @@ public sealed record StreamRequest(
 }
 
 public sealed record AudioTrack(string Map, TrackAction Action, string Codec, int BitrateK, int? Channels, string? Language, string? Title = null,
-    string? Filter = null, int? SampleRate = null, double? DrcScale = null)
+    string? Filter = null, int? SampleRate = null, double? DrcScale = null, string? InputPath = null)
 {
     public bool Copies => Action == TrackAction.Copy;
 
@@ -214,10 +234,15 @@ public sealed record StreamPlan(
     public string Extension => StreamMapping.ExtensionOf(Container);
 
     /// <summary>
-    /// Ana girdiden sonra eklenen <c>-i</c> girdileri, sirasiyla: dis altyazi dosyalari.
-    /// Esleme <c>1:0</c>, <c>2:0</c>... bu siradan turer.
+    /// Ana girdiden sonra eklenen <c>-i</c> girdileri, sirasiyla: dis ses dosyasi, sonra dis altyazi
+    /// dosyalari. Esleme <c>1:a:0</c>, <c>1:0</c>, <c>2:0</c>... bu siradan turer.
     /// </summary>
-    public IReadOnlyList<string> ExtraInputs => Subtitles.Where(track => track.InputPath is not null).Select(track => track.InputPath!).ToList();
+    public IReadOnlyList<string> ExtraInputs
+        => Audio.Where(track => track.InputPath is not null).Select(track => track.InputPath!)
+            .Concat(Subtitles.Where(track => track.InputPath is not null).Select(track => track.InputPath!)).ToList();
+
+    /// <summary>Dis ses dosyasinin yolu; komut bu girdiye video suresinde biten <c>-t</c> yazar.</summary>
+    public string? ExternalAudioInput => Audio.FirstOrDefault(track => track.InputPath is not null)?.InputPath;
 
     /// <summary>
     /// Ana girdinin <c>-i</c>'sinden once yazilan cozucu secenekleri. <c>-drc_scale</c> yalniz
@@ -283,8 +308,12 @@ public sealed record StreamPlan(
         if (!Request.KeepAllTracks && Audio.Count == 1) a.AddRange(new[] { "-disposition:a:0", "default" });
 
         for (var i = 0; i < Audio.Count; i++)
+        {
             if (!string.IsNullOrWhiteSpace(Audio[i].Title))
                 a.AddRange(new[] { "-metadata:s:a:" + i.ToString(CultureInfo.InvariantCulture), "title=" + Audio[i].Title });
+            if (Audio[i].InputPath is not null && !Request.DropMetadata && !string.IsNullOrWhiteSpace(Audio[i].Language))
+                a.AddRange(new[] { "-metadata:s:a:" + i.ToString(CultureInfo.InvariantCulture), "language=" + Audio[i].Language });
+        }
 
         for (var i = 0; i < Subtitles.Count; i++)
         {
@@ -610,6 +639,9 @@ public static class StreamMapping
         return audio.FirstOrDefault(stream => stream.IsDefault) ?? audio[0];
     }
 
+    private const int ExternalAudioIndex = -2;
+    private const string ExternalAudioMap = "1:a:0";
+
     public static StreamPlan Decide(
         MediaInfo info,
         StreamRequest request,
@@ -633,22 +665,32 @@ public static class StreamMapping
         var videoMap = video is null ? "0:v:0" : Map(video);
 
         var audio = new List<AudioTrack>();
-        if (audioCodec is not null && audioK > 0 && (info.HasAudio || !inventory))
+        var externalAudio = request.ExternalAudio;
+        if (audioCodec is not null && audioK > 0 && (info.HasAudio || !inventory || externalAudio is not null))
         {
-            var sources = inventory
+            var keepSource = externalAudio is not { Replace: true } && (info.HasAudio || !inventory);
+            var sources = !keepSource
+                ? new List<SourceStream>()
+                : inventory
                 ? (keepAll
                     ? info.Streams.Where(stream => stream.Kind == StreamKind.Audio).ToList()
                     : new List<SourceStream> { PrimaryAudio(info.Streams, request.PreferredLanguage)! })
                 : new List<SourceStream> { new(-1, StreamKind.Audio, info.AudioCodec ?? "", Channels: info.AudioChannels, BitrateBps: info.AudioBitrateBps) };
+            if (externalAudio is not null)
+                sources.Add(new SourceStream(ExternalAudioIndex, StreamKind.Audio, "", externalAudio.Language));
 
-            if (!keepAll && inventory && info.Streams.Count(stream => stream.Kind == StreamKind.Audio) > 1)
+            if (keepSource && !keepAll && inventory && info.Streams.Count(stream => stream.Kind == StreamKind.Audio) > 1)
                 notes.Add(request.KeepAllTracks && !request.PlatformDelivery ? StreamNote.ExtraAudioDroppedByContainer : StreamNote.ExtraAudioDropped);
 
             var passthroughBudgetK = targetMb > 0 ? targetMb * PassthroughTargetShare * Megabayt.Kbit / duration : 0;
             var passedK = 0.0;
+            var sourceCodec = audioCodec;
             foreach (var source in sources)
             {
-                var map = source.Index < 0 ? "0:a:0?" : Map(source);
+                var externalTrack = source.Index == ExternalAudioIndex;
+                audioCodec = externalTrack && sourceCodec == "copy" ? FallbackAudioCodec(container) : sourceCodec;
+                var inputPath = externalTrack ? externalAudio!.Path : null;
+                var map = externalTrack ? ExternalAudioMap : source.Index < 0 ? "0:a:0?" : Map(source);
                 var sourceK = source.BitrateBps / 1000.0;
                 if (audioCodec == "copy" && container == OutputContainer.WebM && !WebmCarriesAudio(source.Codec))
                 {
@@ -746,8 +788,9 @@ public static class StreamMapping
 
                 audio.Add(new AudioTrack(map, TrackAction.Encode, codec, trackK, channels, source.Language, source.Title,
                     request.FiltersAudio ? AudioFilter(request, source.SampleRate) : null,
-                    request.AudioSampleRate, IsDolby(source.Codec) ? request.AudioDrcScale : null));
+                    request.AudioSampleRate, IsDolby(source.Codec) ? request.AudioDrcScale : null, inputPath));
             }
+            audioCodec = sourceCodec;
         }
 
         var subtitles = new List<SubtitleTrack>();
@@ -805,7 +848,7 @@ public static class StreamMapping
                 continue;
             }
             var codec = IsMp4Family(container) ? "mov_text" : container == OutputContainer.WebM ? "webvtt" : "copy";
-            var input = subtitles.Count(track => track.InputPath is not null) + 1;
+            var input = subtitles.Count(track => track.InputPath is not null) + 1 + audio.Count(track => track.InputPath is not null);
             subtitles.Add(new SubtitleTrack(input.ToString(CultureInfo.InvariantCulture) + ":0", codec, false, external.Language, external.Bytes,
                 InputPath: external.Path));
         }

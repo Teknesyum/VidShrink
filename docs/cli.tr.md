@@ -95,6 +95,8 @@ bunların tek yazımı var.
 | `--ses-kazanc` | `--gain` |
 | `--altyazi` | `--subtitle` |
 | `--yan-altyazi` | `--sidecar-subtitles` |
+| `--ses-dosyasi` | `--audio-file` |
+| `--ses-degistir` | `--replace-audio` |
 | `--yak` | `--burn` |
 | `--yak-srt` | `--srt-burn` |
 | `--yak-ass` | `--ssa-burn` |

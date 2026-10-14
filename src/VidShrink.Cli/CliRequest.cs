@@ -131,6 +131,12 @@ public sealed record CliRequest
     /// <summary><c>--yan-altyazi</c>: girdinin yanindaki ayni adli altyazilar da eklenir.</summary>
     public bool SidecarSubtitles { get; init; }
 
+    /// <summary><c>--ses-dosyasi</c>: ikinci girdi olarak eklenen dis ses dosyasi.</summary>
+    public string? AudioFile { get; init; }
+
+    /// <summary><c>--ses-degistir</c>: dis ses kaynagin sesinin yanina degil yerine konur.</summary>
+    public bool ReplaceAudio { get; init; }
+
     /// <summary><c>--yak</c>: kaynagin bu altyazisi (1 tabanli) goruntuye yakilir.</summary>
     public int? BurnSubtitle { get; init; }
 
@@ -194,6 +200,9 @@ public sealed record CliRequest
     /// </summary>
     public IReadOnlyList<ExternalSubtitle> ExternalSubtitles { get; init; } = Array.Empty<ExternalSubtitle>();
 
+    /// <summary><see cref="AudioFile"/>'in diskten cozulmus hali; <see cref="ResolvedSubtitles"/> doldurur.</summary>
+    public ExternalAudio? ExternalAudio { get; init; }
+
     /// <summary>
     /// Dis altyazi dosyalarini okur ve yakilacak izi kaynakta dogrular. Donen deger hata
     /// anahtaridir, <paramref name="argument"/> iletideki yer tutucudur; <c>null</c> ise
@@ -235,7 +244,13 @@ public sealed record CliRequest
             }
             burnFile = Path.GetFullPath(burnFile);
         }
-        resolved = this with { ExternalSubtitles = list, BurnFile = burnFile };
+        ExternalAudio? externalAudio = null;
+        if (AudioFile is not null && (externalAudio = ExternalAudio.FromFile(AudioFile, ReplaceAudio)) is null)
+        {
+            argument = AudioFile;
+            return "error.bad-audio-file";
+        }
+        resolved = this with { ExternalSubtitles = list, BurnFile = burnFile, ExternalAudio = externalAudio };
         return null;
     }
 
@@ -322,6 +337,7 @@ public sealed record CliRequest
         options.AudioSampleRate = AudioSampleRate;
         options.AudioDrcScale = AudioDrcScale;
         options.ExternalSubtitles = ExternalSubtitles;
+        options.ExternalAudio = ExternalAudio;
         options.DropMetadata = DropMetadata || Profile is { DropMetadata: true };
         options.SubtitleLanguages = SubtitleLanguages;
         options.FirstSubtitleOnly = FirstSubtitleOnly;
@@ -366,6 +382,7 @@ public static class CliParser
         "--azami-sure", "--max-duration",
         "--suzgec", "--filters", "--ses-kodek", "--audio-codec", "--ses-normal", "--loudnorm", "--ses-temizle", "--denoise",
         "--ses-kazanc", "--gain", "--altyazi", "--subtitle", "--yan-altyazi", "--sidecar-subtitles",
+        "--ses-dosyasi", "--audio-file", "--ses-degistir", "--replace-audio",
         "--yak", "--burn", "--yak-srt", "--srt-burn", "--yak-ass", "--ssa-burn", "--altyazi-tara", "--subtitle-scan",
         "--yak-yazi-tipi", "--burn-font", "--yak-boyut", "--burn-size", "--yak-kutu", "--burn-box",
         "--meta-yok", "--no-metadata",
@@ -581,6 +598,15 @@ public static class CliParser
                 case "--yan-altyazi" or "--sidecar-subtitles" when command != CliCommand.Watch:
                     request = request with { SidecarSubtitles = true };
                     break;
+                case "--ses-dosyasi" or "--audio-file" when command != CliCommand.Watch:
+                    if (!TryValue(args, ref i, out var sesDosyasi)) return Fail("error.missing-value", arg);
+                    if (!ExternalAudio.Extensions.Contains(Path.GetExtension(sesDosyasi).ToLowerInvariant()))
+                        return Fail("error.bad-audio-file", sesDosyasi);
+                    request = request with { AudioFile = sesDosyasi };
+                    break;
+                case "--ses-degistir" or "--replace-audio" when command != CliCommand.Watch:
+                    request = request with { ReplaceAudio = true };
+                    break;
                 case "--yak" or "--burn" when command != CliCommand.Watch:
                     if (!TryValue(args, ref i, out var yak)) return Fail("error.missing-value", arg);
                     if (!int.TryParse(yak, NumberStyles.Integer, CultureInfo.InvariantCulture, out var yakNo) || yakNo < 1)
@@ -679,6 +705,7 @@ public static class CliParser
         if (request.MinDurationSeconds is { } enAz && request.MaxDurationSeconds is { } enCok && enCok < enAz)
             return Fail("error.bad-max-duration", enCok.ToString(CultureInfo.InvariantCulture));
         if (request.BurnSubtitle is not null && request.BurnFile is not null) return Fail("error.burn-conflict", null);
+        if (request.ReplaceAudio && request.AudioFile is null) return Fail("error.replace-audio-needs-file", null);
         if (request.SubtitleScan && (request.BurnSubtitle is not null || request.BurnFile is not null)) return Fail("error.scan-burn-conflict", null);
         if ((request.BurnFont is not null || request.BurnFontSize is not null || request.BurnBox)
             && request.BurnSubtitle is null && request.BurnFile is null && !request.SubtitleScan)

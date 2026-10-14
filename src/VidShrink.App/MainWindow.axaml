@@ -893,6 +893,18 @@
                           </WrapPanel>
                           <TextBlock x:Name="TxtLoudness" Grid.Row="2" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
                         </Grid>
+                        <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+                          <TextBlock Text="{loc:Text main.audio.external.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                            <Button x:Name="BtnAddAudioFile" Theme="{StaticResource GhostButton}" Click="OnAddAudioFile" VerticalAlignment="Bottom"
+                                    MinHeight="{StaticResource FieldMinHeight}"
+                                    Padding="{StaticResource ButtonPaddingSm}" Content="{loc:Text main.audio.external.add}"/>
+                            <CheckBox x:Name="ChkAudioReplace" Theme="{StaticResource CheckStyle}" IsChecked="False" VerticalAlignment="Bottom"
+                                      MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
+                                      Content="{loc:Text main.audio.external.replace}"/>
+                          </WrapPanel>
+                          <StackPanel x:Name="AudioFileList" Grid.Row="2" Spacing="{StaticResource SpaceXs}" IsVisible="False"/>
+                        </Grid>
                         <CheckBox x:Name="ChkAdvKeepTracks" Theme="{StaticResource CheckStyle}" IsChecked="False" Content="{loc:Text main.advanced.keep-tracks.label}"/>
                         <CheckBox x:Name="ChkAdvDropMetadata" Theme="{StaticResource CheckStyle}" IsChecked="False" HorizontalAlignment="Left" Content="{loc:Text main.advanced.drop-metadata.label}">
                           <ToolTip.Tip>

@@ -576,7 +576,12 @@ public static class FfmpegArguments
             if (plan.Disc is { } kaynak) a.AddRange(kaynak.InputArguments());
             a.AddRange(streams.InputArguments());
             a.AddRange(new[] { "-i", info.FilePath });
-            foreach (var extra in extraInputs) a.AddRange(new[] { "-i", extra });
+            foreach (var extra in extraInputs)
+            {
+                if (extra == streams.ExternalAudioInput && info.DurationSeconds > 0)
+                    a.AddRange(new[] { "-t", Seconds(info.DurationSeconds) });
+                a.AddRange(new[] { "-i", extra });
+            }
         }
 
         var overlay = VideoFilterChain.OverlayGraph(info, plan, streams.VideoMap);

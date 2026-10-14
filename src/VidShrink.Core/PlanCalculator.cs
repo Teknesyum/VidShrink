@@ -143,6 +143,9 @@ public sealed class PlanOptions
     /// <summary>B1c: ciktiya iz olarak eklenen dis metin altyazi dosyalari.</summary>
     public IReadOnlyList<ExternalSubtitle> ExternalSubtitles { get; set; } = Array.Empty<ExternalSubtitle>();
 
+    /// <summary>SIK-P4: ikinci girdi olarak eklenen dis ses dosyasi; kaynagin sesinin yanina ya da yerine.</summary>
+    public ExternalAudio? ExternalAudio { get; set; }
+
     /// <summary>
     /// Kaynagin kap duzeyindeki etiketleri (baslik, yorum, tarih) ciktiya tasinmaz. Iz dili ve
     /// iz adi kalir: onlar oynaticinin iz secimini tasir, kimlik bilgisi degil.
@@ -525,10 +528,11 @@ public static class PlanCalculator
         var (audioK, audioChannels) = PickAudio(info, options, regime, totalK, notes);
 
         var audioSilenced = options.AudioChannels == AudioChannelOverride.None;
+        var hasAudio = info.HasAudio || options.ExternalAudio is not null;
 
         if (options.LockedAudioKbps is int manualAudioK)
         {
-            if (!info.HasAudio)
+            if (!hasAudio)
             {
                 reason.Add($"kullanici ses hedefini {manualAudioK}kbps olarak sabitledi ama {NoAudioStream}; istek karsilanmadi, cikti sessiz");
                 reasonCodes.Add(new ReasonNote(ReasonCode.ManualAudioBitrateUnmet,
@@ -550,7 +554,7 @@ public static class PlanCalculator
 
         if (options.AudioChannels != AudioChannelOverride.Auto)
         {
-            if (!info.HasAudio)
+            if (!hasAudio)
             {
                 reason.Add($"kullanici ses kanalini {options.AudioChannels} olarak sabitledi ama {NoAudioStream}; istek karsilanmadi, cikti sessiz");
                 reasonCodes.Add(new ReasonNote(ReasonCode.ManualAudioChannelsUnmet,
@@ -595,13 +599,14 @@ public static class PlanCalculator
             FirstSubtitleOnly: options.FirstSubtitleOnly,
             AudioSampleRate: options.AudioSampleRate,
             AudioDrcScale: options.AudioDrcScale,
-            AudioDenoise: options.AudioDenoise);
+            AudioDenoise: options.AudioDenoise,
+            ExternalAudio: options.ExternalAudio);
         var audioPassthrough = options.LockedAudioKbps is null && options.AudioChannels == AudioChannelOverride.Auto && audioChannels is null;
         var container = options.DeliveredContainer is { } teslim && (teslim != OutputContainer.WebM || CodecModel.FitsWebM(codec))
             ? teslim
             : StreamMapping.ContainerFor(streamRequest, codec);
         var streams = StreamMapping.Decide(info, streamRequest, container, audioK, audioChannels,
-            info.HasAudio && audioK > 0 ? PickAudioCodec(options.AudioCodec) : null, audioPassthrough, effectiveTargetMb,
+            hasAudio && audioK > 0 ? PickAudioCodec(options.AudioCodec) : null, audioPassthrough, effectiveTargetMb,
             options.AudioChannels == AudioChannelOverride.Source);
         if (lockedCodec is not null && CodecModel.IsVp9(lockedCodec) && !CodecModel.IsVp9(codec) && streams.Container != OutputContainer.WebM)
             streams = streams with { Notes = streams.Notes.Append(streams.Container == OutputContainer.Mp4 ? StreamNote.Vp9FellBackToMp4 : StreamNote.Vp9FellBack).ToList() };
@@ -627,6 +632,7 @@ public static class PlanCalculator
             AudioDenoise = options.AudioDenoise,
             AudioGainDb = options.AudioGainDb,
             ExternalSubtitles = options.ExternalSubtitles,
+            ExternalAudio = options.ExternalAudio,
             DropMetadata = options.DropMetadata,
             SubtitleLanguages = options.SubtitleLanguages,
             FirstSubtitleOnly = options.FirstSubtitleOnly
@@ -982,7 +988,7 @@ public static class PlanCalculator
     {
         Codec = codec,
         Streams = streams,
-        AudioCodec = !info.HasAudio || audioK <= 0 ? null : streams.Audio.Count > 0 ? (streams.Audio[0].Copies ? "copy" : streams.Audio[0].Codec) : PickAudioCodec(options.AudioCodec),
+        AudioCodec = !info.HasAudio && options.ExternalAudio is null || audioK <= 0 ? null : streams.Audio.Count > 0 ? (streams.Audio[0].Copies ? "copy" : streams.Audio[0].Codec) : PickAudioCodec(options.AudioCodec),
         AudioBitrateK = audioK,
         AudioChannels = audioChannels,
         Width = best.Width,
@@ -1031,6 +1037,7 @@ public static class PlanCalculator
         || options.AudioDenoise
         || options.AudioGainDb is { } gain && gain != 0
         || options.ExternalSubtitles.Count > 0
+        || options.ExternalAudio is not null
         || options.DropMetadata
         || options.SubtitleLanguages.Count > 0
         || options.FirstSubtitleOnly
@@ -1278,6 +1285,7 @@ public static class PlanCalculator
         AudioDenoise = options.AudioDenoise,
         AudioGainDb = options.AudioGainDb,
         ExternalSubtitles = options.ExternalSubtitles,
+        ExternalAudio = options.ExternalAudio,
         DropMetadata = options.DropMetadata,
         SubtitleLanguages = options.SubtitleLanguages,
         FirstSubtitleOnly = options.FirstSubtitleOnly,
@@ -1599,12 +1607,13 @@ public static class PlanCalculator
 
     private static (int BitrateK, int? Channels) PickAudio(MediaInfo info, PlanOptions options, CompressionRegime regime, double totalK, List<AdviceCode> notes)
     {
-        if (!info.HasAudio) return (0, null);
+        if (!info.HasAudio && options.ExternalAudio is null) return (0, null);
 
-        var stereo = info.AudioChannels >= 2;
+        var fromSource = info.HasAudio && options.ExternalAudio is not { Replace: true };
+        var stereo = !fromSource || info.AudioChannels >= 2;
         var baseK = stereo ? 128 : 96;
         if (options.Intent == Intent.Archive) baseK = stereo ? 160 : 112;
-        if (info.AudioBitrateBps > 0)
+        if (fromSource && info.AudioBitrateBps > 0)
             baseK = Math.Min(baseK, (int)Math.Round(info.AudioBitrateBps / 1000.0));
 
         var cap = totalK * CompressionStrategy.AudioBudgetShare(regime);
