@@ -70,6 +70,7 @@ internal partial class PlayerView
         var next = SubtitleOptions.Next(ids, engine.AudioTrack, false);
         engine.SetAudioTrack(next);
         _trace.Add("audio -> " + next.ToString(CultureInfo.InvariantCulture));
+        ShowTrackOsd(PlaybackTrackKind.Audio, next);
     }
 
     private void CycleSubtitle()
@@ -83,6 +84,7 @@ internal partial class PlayerView
         var next = SubtitleOptions.Next(TrackIds(PlaybackTrackKind.Subtitle), engine.SubtitleTrack, true);
         SetPrimarySubtitle(engine, next);
         _trace.Add("subtitle -> " + SubtitleName(next));
+        ShowTrackOsd(PlaybackTrackKind.Subtitle, next);
     }
 
     /// <summary>
@@ -99,6 +101,7 @@ internal partial class PlayerView
         _subtitles.ShiftSubtitleDelay(seconds);
         _engine?.SetSubtitleDelay(_subtitles.SubtitleDelay);
         _trace.Add("subdelay " + Saat.Tani.Konum(seconds) + " -> " + Saat.Tani.Konum(_subtitles.SubtitleDelay));
+        ShowOsd(Strings.Get("player.subtitle.delay", SubtitleOptions.Signed(_subtitles.SubtitleDelay)));
     }
 
     private void ShiftAudioDelay(double seconds)
@@ -106,12 +109,14 @@ internal partial class PlayerView
         _subtitles.ShiftAudioDelay(seconds);
         _engine?.SetAudioDelay(_subtitles.AudioDelay);
         _trace.Add("audiodelay " + Saat.Tani.Konum(seconds) + " -> " + Saat.Tani.Konum(_subtitles.AudioDelay));
+        ShowOsd(Strings.Get("player.tracks.delay", SubtitleOptions.Signed(_subtitles.AudioDelay)));
     }
 
     internal void SelectAudio(long id)
     {
         _engine?.SetAudioTrack(id);
         _trace.Add("audio -> " + id.ToString(CultureInfo.InvariantCulture));
+        ShowTrackOsd(PlaybackTrackKind.Audio, id);
         RefreshState();
     }
 
@@ -119,6 +124,7 @@ internal partial class PlayerView
     {
         if (_engine is { } engine) SetPrimarySubtitle(engine, id);
         _trace.Add("subtitle -> " + SubtitleName(id));
+        ShowTrackOsd(PlaybackTrackKind.Subtitle, id);
         RefreshState();
     }
 

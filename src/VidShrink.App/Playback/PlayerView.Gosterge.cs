@@ -1,10 +1,12 @@
 using System;
+using System.Linq;
 using Avalonia.Animation;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Threading;
 using VidShrink.App.Localization;
 using VidShrink.Core;
+using VidShrink.Player;
 
 namespace VidShrink.App.Playback;
 
@@ -64,6 +66,25 @@ internal partial class PlayerView
         if (!_muted) ShowOsd(Strings.Get("main.player.osd.volume", volume));
         else if (muteToggled) ShowOsd(Strings.Get("main.player.osd.muted"));
         else ShowOsd(Strings.Get("main.player.osd.mutedvolume", volume));
+    }
+
+    private string LoopText() => double.IsFinite(_loopStart)
+        ? Strings.Get("main.player.loopstate", Saat.Konum(_loopStart, Strings.Culture), double.IsFinite(_loopEnd) ? Saat.Konum(_loopEnd, Strings.Culture) : "…")
+        : Strings.Get("main.player.loopoff");
+
+    private void ShowLoopOsd() => ShowOsd(LoopText());
+
+    private void ShowChapterOsd(int index)
+    {
+        if (index >= 0 && index < _chapters.Count) ShowOsd(ChapterName(index));
+    }
+
+    private void ShowTrackOsd(PlaybackTrackKind kind, long id)
+    {
+        var key = kind == PlaybackTrackKind.Audio ? "main.player.osd.audio" : "main.player.osd.subtitle";
+        var track = _engine?.Tracks.FirstOrDefault(t => t.Kind == kind && t.Id == id);
+        var name = track is not null ? TrackName(track) : id > 0 ? Strings.Get("player.tracks.item", id) : Strings.Get("player.subtitle.off");
+        ShowOsd(Strings.Get(key, name));
     }
 
     private bool OsdMotionReduced

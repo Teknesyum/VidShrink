@@ -192,6 +192,24 @@ public sealed class OynaticiParcaTests
     }
 
     [Fact]
+    public async Task BolumAdlariMotordanZamanlariylaAyniSiradaOkunur()
+    {
+        var klip = BolumKanit.UcBolumUret("bolum-adlari-160x90.mkv", "bolum-adlari.txt");
+        using var engine = new MpvEngine();
+        engine.SetProperty("ao", "null");
+        await engine.OpenAsync(klip);
+        var zamanlar = engine.ChapterTimes;
+        var adlar = engine.ChapterTitles;
+        IPlaybackEngine bos = new BolumMotoru(new double[] { 0, 1 });
+
+        Assert.Equal(new[] { 0, 1.5, 3 }, zamanlar);
+        Assert.Equal(new[] { "a", "b", "c" }, adlar);
+        Assert.Empty(bos.ChapterTitles);
+        engine.Dispose();
+        BolumKanit.Kapat("bolum-adlari-160x90.mkv", "bolum-adlari.txt");
+    }
+
+    [Fact]
     public async Task GecikmeBoyutKonumVeKodlamaMotordaGeriOkunur()
     {
         using var engine = await ParcaKanit.AcAsync();

@@ -37,6 +37,9 @@ internal partial class PlayerView
     private bool _seekDragging;
     private string? _notice;
     private IReadOnlyList<double> _chapters = Array.Empty<double>();
+    private IReadOnlyList<string> _chapterTitles = Array.Empty<string>();
+    private PlayerSettings? _soundRestoredFrom;
+    private const double ChapterSeekThreshold = 5;
     private IReadOnlyList<SeekMark> _marks = Array.Empty<SeekMark>();
     private string _marksKey = "";
     private Task<string?> _lastShot = Task.FromResult<string?>(null);
@@ -91,6 +94,94 @@ internal partial class PlayerView
     internal string ViewStateText => TxtView.Text ?? "";
 
     internal void SaveSettings() => _settings.Save(SettingsFile());
+
+    /// <summary>
+    /// Ses düzeyi ve sessiz durumu ayar nesnesi başına bir kez ayardan alınır; dosya açılmadan basılan
+    /// ses tuşu da kayıtlı düzeyin üstüne çalışır, varsayılan 100'ün üstüne değil.
+    /// </summary>
+    private void RestoreSound()
+    {
+        var settings = Settings;
+        if (ReferenceEquals(settings, _soundRestoredFrom)) return;
+        _soundRestoredFrom = settings;
+        var volume = Math.Clamp(settings.Volume, 0, VolumeCeiling());
+        if (volume != _volume)
+        {
+            _volume = volume;
+            _engine?.SetVolume(_volume);
+        }
+
+        if (settings.Muted == _muted) return;
+        _muted = settings.Muted;
+        _engine?.SetMuted(_muted);
+    }
+
+    private void RememberSound()
+    {
+        var settings = Settings;
+        if (settings.Volume == _volume && settings.Muted == _muted) return;
+        settings.Volume = _volume;
+        settings.Muted = _muted;
+        SaveSettings();
+    }
+
+    internal static int ChapterTarget(IReadOnlyList<double> chapters, double position, bool backward)
+    {
+        if (chapters.Count == 0) return -1;
+        var current = -1;
+        for (var i = 0; i < chapters.Count; i++)
+            if (chapters[i] <= position) current = i;
+        if (!backward) return Math.Min(current + 1, chapters.Count - 1);
+        if (current >= 0 && position - chapters[current] > ChapterSeekThreshold) return current;
+        return Math.Max(current - 1, 0);
+    }
+
+    private string ChapterName(int index)
+    {
+        var name = Strings.Get("main.player.osd.chapter", index + 1);
+        var title = index < _chapterTitles.Count ? _chapterTitles[index] : "";
+        return string.IsNullOrWhiteSpace(title) ? name : name + " · " + title;
+    }
+
+    private string? ChapterTitleAt(double seconds)
+    {
+        var index = -1;
+        for (var i = 0; i < _chapters.Count; i++)
+            if (_chapters[i] <= seconds) index = i;
+        if (index < 0 || index >= _chapterTitles.Count) return null;
+        return string.IsNullOrWhiteSpace(_chapterTitles[index]) ? null : _chapterTitles[index];
+    }
+
+    internal string SeekLabel(double seconds)
+    {
+        var time = Saat.Ekran(TimeSpan.FromSeconds(Math.Max(0, seconds)), TimeSpan.FromHours(1));
+        return ChapterTitleAt(seconds) is { } title ? time + " · " + title : time;
+    }
+
+    private MenuItem ChapterMenu()
+    {
+        var menu = new MenuItem { Header = Strings.Get("main.player.menu.chapters"), IsEnabled = _chapters.Count > 0 };
+        for (var i = 0; i < _chapters.Count; i++)
+        {
+            var index = i;
+            var item = new MenuItem { Header = ChapterName(index) };
+            item.Click += (_, _) => SeekToChapter(index);
+            menu.Items.Add(item);
+        }
+
+        return menu;
+    }
+
+    internal void SeekToChapter(int index)
+    {
+        if (_engine is null || index < 0 || index >= _chapters.Count) return;
+        _trackPaused = false;
+        KullaniciIslemi();
+        _seek.GoTo(_chapters[index]);
+        _trace.Add("chapter -> " + index.ToString(CultureInfo.InvariantCulture));
+        ShowChapterOsd(index);
+        RefreshState();
+    }
 
     private void InitWindow()
     {
@@ -184,6 +275,7 @@ internal partial class PlayerView
             _recent.Save(RecentFile());
         }
         _chapters = engine.ChapterTimes;
+        _chapterTitles = engine.ChapterTitles;
         _marksKey = "";
         _aspectIndex = 0;
         _rotation = 0;
@@ -282,6 +374,7 @@ internal partial class PlayerView
         }
 
         _notice = saved ? Strings.Get("player.view.screenshot-saved", target) : Strings.Get("player.view.screenshot-failed");
+        ShowOsd(saved ? Strings.Get("player.view.screenshot-saved", Path.GetFileName(target)) : _notice);
         RefreshState();
         return saved ? target : null;
     }
@@ -325,6 +418,7 @@ internal partial class PlayerView
         }
 
         _notice = Strings.Get(copied ? "player.view.screenshot-copied" : "player.view.screenshot-copy-failed");
+        ShowOsd(_notice);
         RefreshState();
         return copied;
     }

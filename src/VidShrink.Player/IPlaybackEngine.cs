@@ -192,6 +192,9 @@ public interface IPlaybackEngine : IDisposable
 
     IReadOnlyList<double> ChapterTimes => Array.Empty<double>();
 
+    /// <summary><see cref="ChapterTimes"/> ile ayni sirada bolum adlari; adsiz bolum bos metindir.</summary>
+    IReadOnlyList<string> ChapterTitles => Array.Empty<string>();
+
     /// <summary>Bir sonraki ya da onceki bolume atlar; bolum yoksa ya da son bolumden ileri gidilemiyorsa <c>false</c>.</summary>
     bool StepChapter(bool backward) => false;
 

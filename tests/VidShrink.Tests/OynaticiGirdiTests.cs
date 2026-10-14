@@ -495,6 +495,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
         Strings.Get("player.menu.view"),
         Strings.Get("player.menu.playback"),
         Strings.Get("player.menu.loop"),
+        Strings.Get("main.player.menu.chapters"),
         Strings.Get("player.tools.menu"),
         Strings.Get("player.list.recent")
     };
@@ -510,6 +511,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
         Strings.Get("player.menu.view"),
         Strings.Get("player.menu.playback"),
         Strings.Get("player.menu.loop"),
+        Strings.Get("main.player.menu.chapters"),
         "-",
         Strings.Get(Keymap.Screenshot.LabelKey),
         Strings.Get(Keymap.CopyFrame.LabelKey),
@@ -522,7 +524,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
         => Hepsi(view.BuildMenu().Items).First(item => ReferenceEquals(item.Tag, eylem));
 
     [Fact]
-    public void UstMenuOnUcSatirVeIkiAyiriciTasir()
+    public void UstMenuOnDortSatirVeIkiAyiriciTasir()
     {
         var rapor = AppHost.Run(() =>
         {
@@ -537,7 +539,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
                 var ust = menu.Items.Select(item => item is Separator ? "-" : (item as MenuItem)?.Header?.ToString() ?? "").ToList();
                 body.AppendLine($"[{dil}] {string.Join(" | ", ust)}");
                 Assert.Equal(UstSatirlar(), ust);
-                Assert.Equal(13, menu.Items.OfType<MenuItem>().Count());
+                Assert.Equal(14, menu.Items.OfType<MenuItem>().Count());
                 Assert.Equal(2, menu.Items.OfType<Separator>().Count());
                 var tumu = Hepsi(menu.Items).ToList();
                 Assert.DoesNotContain(tumu, item => ReferenceEquals(item.Tag, Keymap.Stop));
