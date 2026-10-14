@@ -1,0 +1,18 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="VidShrink.App.Recorder.RecorderSpotlight"
+        Title="VidShrink" FontSize="{StaticResource FontSizeMd}" FontFamily="{StaticResource FontSans}"
+        WindowDecorations="None"
+        CanResize="False" CanMaximize="False"
+        ShowInTaskbar="False"
+        ShowActivated="False"
+        Topmost="True"
+        Focusable="False"
+        IsHitTestVisible="False"
+        Background="Transparent"
+        TransparencyLevelHint="Transparent">
+  <Path x:Name="Dim"
+        Fill="{StaticResource PlaybackScrim}"
+        Opacity="{StaticResource RecorderSpotlightOpacity}"
+        IsHitTestVisible="False"/>
+</Window>

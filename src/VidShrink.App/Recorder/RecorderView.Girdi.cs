@@ -9,7 +9,7 @@ internal partial class RecorderView
     private IInputHooks? _inputHooks;
     private IClickSound? _clickSound;
     private KeyTracker _keys = new();
-    private (bool WantsClicks, bool ShowKeys) _inputMode;
+    private (bool WantsClicks, bool ShowKeys, PointerStyle Style) _inputMode;
 
     private static bool RealDesktop
         => OperatingSystem.IsWindows()
@@ -33,6 +33,10 @@ internal partial class RecorderView
 
     private bool WantsClicks => _settings.ShowClicks || _settings.ClickSound;
 
+    private bool WantsPointer => _settings.CursorHighlight || _settings.Spotlight;
+
+    private PointerStyle CurrentPointerStyle => new(_settings.CursorHighlight, _settings.Spotlight, _settings.PointerSize, _settings.HighlightColor, _settings.LeftClickColor, _settings.RightClickColor);
+
     private IMagnifier? _magnifier;
 
     internal IMagnifier Magnifier
@@ -47,8 +51,8 @@ internal partial class RecorderView
         if (lens && !Magnifier.Running) Magnifier.Start();
         else if (!lens && Magnifier.Running) Magnifier.Stop();
 
-        var wanted = recording && (WantsClicks || _settings.ShowKeys);
-        var mode = (WantsClicks, _settings.ShowKeys);
+        var wanted = recording && (WantsClicks || WantsPointer || _settings.ShowKeys);
+        var mode = (WantsClicks, _settings.ShowKeys, CurrentPointerStyle);
         if (wanted == InputActive && (!wanted || mode == _inputMode)) return;
 
         if (InputActive)
@@ -61,16 +65,23 @@ internal partial class RecorderView
         if (!wanted) return;
 
         _keys = new KeyTracker();
-        InputHooks.Start(mode.WantsClicks, mode.ShowKeys, OnInputClick, OnInputKey);
+        InputOverlay.Style(mode.CurrentPointerStyle);
+        InputHooks.Start(mode.WantsClicks, WantsPointer, mode.ShowKeys, OnInputClick, OnInputMove, OnInputKey);
         _inputMode = mode;
         InputActive = true;
     }
 
-    internal void OnInputClick(PixelPoint point)
+    internal void OnInputClick(PixelPoint point, PointerButton button)
     {
         if (!InputActive) return;
         if (_settings.ClickSound) ClickSound.Play();
-        if (_settings.ShowClicks && (_frameRegion is not { } region || region.Contains(point))) InputOverlay.Ring(point);
+        if (_settings.ShowClicks && (_frameRegion is not { } region || region.Contains(point))) InputOverlay.Ring(point, button);
+    }
+
+    internal void OnInputMove(PixelPoint point)
+    {
+        if (!InputActive || !_inputMode.Style.Highlight && !_inputMode.Style.Spotlight) return;
+        InputOverlay.Pointer(point, _frameRegion ?? CaptionFallback());
     }
 
     internal void OnInputKey(uint virtualKey, bool down)

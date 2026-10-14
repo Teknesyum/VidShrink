@@ -1241,6 +1241,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, kodlama sureci onceligi (SIK-P1): yedi yeni anahtardan 7 kol 4 dilde (es: encode-priority.label, .below-normal; fr: encoder-threads.label; pt: encode-priority.label, .below-normal, encoder-threads.label; sw: encode-priority.below-normal), KOL dokumunden sayildi, en ve tr girmiyor: 3095 + 7 = 3102, en 302, tr 104.</para>
     /// <para>2026-10-14, dalga 1 birlesmesi: OYA-P1 (4), OYB-P2 (1) ve DZB-P1 (7) anahtarlari pinleri guncellemeden geldi; birlesik agacta olculdu: 3102 + 5 = 3107, en 302, tr 104.</para>
     /// <para>2026-10-14, ARC-P1 gurultu temizleme ve yukseklik olcumu: bes yeni <c>main.audio.*</c> anahtarindan 9 kol 8 dilde (denoise: es, fr, pt, ro; loudness.measure: vi; loudness.result: bn, hi, th, ur), KOL dokumunden sayildi, en ve tr girmiyor; dalga 1 birlesik agacinda 3107 + 9 = 3116, en 302, tr 104.</para>
+    /// <para>2026-10-14, EKB-P2 imlec vurgusu ve spot isigi: on bir yeni anahtardan 16 kol 9 dilde (en: option.cursor-highlight; da, nb: pointer.left-color, .right-color; es: pointer.highlight-color; fr: pointer.highlight-color, .size; pt: pointer.title, .highlight-color, .left-color, .right-color, .size; sw: pointer.highlight-color, .left-color, .right-color), KOL dokumunden sayildi: 3116 + 16 = 3132, en 303, tr 104.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1266,8 +1267,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3116, toplam);
-        Assert.Equal(302, dilBasina["en"]);
+        Assert.Equal(3132, toplam);
+        Assert.Equal(303, dilBasina["en"]);
         Assert.Equal(104, dilBasina["tr"]);
     }
 
@@ -1487,6 +1488,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, kodlama sureci onceligi (SIK-P1): yedi yeni anahtar (<c>settings-tab.encode-priority.label</c>, <c>.hint</c>, <c>.normal</c>, <c>.below-normal</c>, <c>.low</c>, <c>settings-tab.encoder-threads.label</c>, <c>.hint</c>), dusen yok: 1366 + 7 = 1373, 43 x 1373 = 59039. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, dalga 1 birlesmesi: OYA-P1, OYB-P2 ve DZB-P1 on iki anahtari pinsiz getirdi; birlesik agacta olculdu: 1373 + 12 = 1385, 43 x 1385 = 59555. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, ARC-P1 gurultu temizleme ve yukseklik olcumu: bes yeni anahtar (<c>main.audio.denoise</c>, <c>main.audio.loudness.measure</c>, <c>.running</c>, <c>.result</c>, <c>.failed</c>), dusen yok; dalga 1 birlesik agacinda 1385 + 5 = 1390, 43 x 1390 = 59770. <c>kayip</c> 0.</para>
+    /// <para>2026-10-14, EKB-P2 imlec vurgusu ve spot isigi: on bir yeni anahtar (<c>recorder.option.cursor-highlight</c>, <c>.spotlight</c>, <c>recorder.pointer.title</c>, <c>.size</c>, <c>.size.small</c>, <c>.size.medium</c>, <c>.size.large</c>, <c>.highlight-color</c>, <c>.left-color</c>, <c>.right-color</c>, <c>.color</c>), dusen yok: 1390 + 11 = 1401, 43 x 1401 = 60243. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1514,7 +1516,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(59770, gezilen);
+        Assert.Equal(60243, gezilen);
         Assert.Empty(kayip);
     }
 

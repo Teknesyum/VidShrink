@@ -303,6 +303,7 @@ internal partial class RecorderView
         _settings.MicrophoneName = DeviceChoice(CmbMicrophone, AudioSourceRole.Microphone, _settings.MicrophoneName);
         _settings.SystemAudioName = DeviceChoice(CmbSystemAudio, AudioSourceRole.SystemAudio, _settings.SystemAudioName);
         CollectWebcam();
+        CollectPointer();
 
         if (int.TryParse(TxtFps.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var fps)) _settings.Fps = fps;
         if (double.TryParse(TxtQuality.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var quality)) _settings.Quality = quality;

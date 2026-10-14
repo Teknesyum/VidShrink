@@ -10,9 +10,16 @@ using Avalonia.Threading;
 
 namespace VidShrink.App.Recorder;
 
+internal enum PointerButton
+{
+    Left,
+    Right,
+    Middle
+}
+
 internal interface IInputHooks
 {
-    bool Start(bool clicks, bool keys, Action<PixelPoint> clicked, Action<uint, bool> key);
+    bool Start(bool clicks, bool moves, bool keys, Action<PixelPoint, PointerButton> clicked, Action<PixelPoint> moved, Action<uint, bool> key);
 
     void Stop();
 }
@@ -24,7 +31,7 @@ internal interface IClickSound
 
 internal sealed class NoInputHooks : IInputHooks
 {
-    public bool Start(bool clicks, bool keys, Action<PixelPoint> clicked, Action<uint, bool> key) => false;
+    public bool Start(bool clicks, bool moves, bool keys, Action<PixelPoint, PointerButton> clicked, Action<PixelPoint> moved, Action<uint, bool> key) => false;
 
     public void Stop()
     {
@@ -163,6 +170,7 @@ internal sealed class Win32InputHooks : IInputHooks
     private const nint WmKeyUp = 0x0101;
     private const nint WmSysKeyDown = 0x0104;
     private const nint WmSysKeyUp = 0x0105;
+    private const nint WmMouseMove = 0x0200;
     private const nint WmLButtonDown = 0x0201;
     private const nint WmRButtonDown = 0x0204;
     private const nint WmMButtonDown = 0x0207;
@@ -173,14 +181,28 @@ internal sealed class Win32InputHooks : IInputHooks
     private uint _threadId;
     private HookProc? _mouseProc;
     private HookProc? _keyProc;
+    private long _lastMove;
+    private int _movePending;
 
-    public bool Start(bool clicks, bool keys, Action<PixelPoint> clicked, Action<uint, bool> key)
+    internal static PointerButton? ButtonOf(nint message) => message switch
+    {
+        WmLButtonDown => PointerButton.Left,
+        WmRButtonDown => PointerButton.Right,
+        WmMButtonDown => PointerButton.Middle,
+        _ => null
+    };
+
+    internal static long Pack(int x, int y) => ((long)x << 32) | (uint)y;
+
+    internal static PixelPoint Unpack(long packed) => new((int)(packed >> 32), (int)packed);
+
+    public bool Start(bool clicks, bool moves, bool keys, Action<PixelPoint, PointerButton> clicked, Action<PixelPoint> moved, Action<uint, bool> key)
     {
         Stop();
-        if (!clicks && !keys) return false;
+        if (!clicks && !moves && !keys) return false;
 
         var ready = new TaskCompletionSource<bool>();
-        _thread = new Thread(() => Loop(clicks, keys, clicked, key, ready)) { IsBackground = true };
+        _thread = new Thread(() => Loop(clicks, moves, keys, clicked, moved, key, ready)) { IsBackground = true };
         _thread.Start();
         return ready.Task.GetAwaiter().GetResult();
     }
@@ -193,7 +215,7 @@ internal sealed class Win32InputHooks : IInputHooks
         _thread = null;
     }
 
-    private void Loop(bool clicks, bool keys, Action<PixelPoint> clicked, Action<uint, bool> key, TaskCompletionSource<bool> ready)
+    private void Loop(bool clicks, bool moves, bool keys, Action<PixelPoint, PointerButton> clicked, Action<PixelPoint> moved, Action<uint, bool> key, TaskCompletionSource<bool> ready)
     {
         _threadId = GetCurrentThreadId();
         PeekMessageW(out _, 0, 0, 0, 0);
@@ -201,11 +223,22 @@ internal sealed class Win32InputHooks : IInputHooks
 
         _mouseProc = (code, wParam, lParam) =>
         {
-            if (code >= 0 && wParam is WmLButtonDown or WmRButtonDown or WmMButtonDown)
+            if (code >= 0 && moves && wParam == WmMouseMove)
+            {
+                var info = Marshal.PtrToStructure<MouseInfo>(lParam);
+                Interlocked.Exchange(ref _lastMove, Pack(info.X, info.Y));
+                if (Interlocked.Exchange(ref _movePending, 1) == 0)
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        Interlocked.Exchange(ref _movePending, 0);
+                        moved(Unpack(Interlocked.Read(ref _lastMove)));
+                    });
+            }
+            else if (code >= 0 && clicks && ButtonOf(wParam) is { } button)
             {
                 var info = Marshal.PtrToStructure<MouseInfo>(lParam);
                 var point = new PixelPoint(info.X, info.Y);
-                Dispatcher.UIThread.Post(() => clicked(point));
+                Dispatcher.UIThread.Post(() => clicked(point, button));
             }
 
             return CallNextHookEx(0, code, wParam, lParam);
@@ -223,9 +256,10 @@ internal sealed class Win32InputHooks : IInputHooks
             return CallNextHookEx(0, code, wParam, lParam);
         };
 
-        var mouse = clicks ? SetWindowsHookExW(WhMouseLl, _mouseProc, module, 0) : 0;
+        var pointer = clicks || moves;
+        var mouse = pointer ? SetWindowsHookExW(WhMouseLl, _mouseProc, module, 0) : 0;
         var keyboard = keys ? SetWindowsHookExW(WhKeyboardLl, _keyProc, module, 0) : 0;
-        ready.SetResult((!clicks || mouse != 0) && (!keys || keyboard != 0));
+        ready.SetResult((!pointer || mouse != 0) && (!keys || keyboard != 0));
 
         while (GetMessageW(out _, 0, 0, 0) > 0)
         {
