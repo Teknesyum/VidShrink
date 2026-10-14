@@ -257,7 +257,13 @@ public partial class ShrinkJobWindow : Window
     /// <summary>İsteğin plan seçenekleri ve hedefi. Kabuk isteği yalnız hedefi taşır; bırakılan kuyruk pencerenin ayarlarını.</summary>
     internal (PlanOptions Options, double TargetMb) OptionsFor(ShrinkRequest request, MediaInfo info)
     {
-        if (_template is null) return (new PlanOptions { TargetMb = request.TargetMegabytes }, request.TargetMegabytes);
+        if (_template is null)
+            return (new PlanOptions
+            {
+                TargetMb = request.TargetMegabytes,
+                Priority = _appSettings.EncodePriority,
+                EncoderThreads = _appSettings.EncoderThreads > 0 ? _appSettings.EncoderThreads : null
+            }, request.TargetMegabytes);
         var targetMb = _ceilingTarget ? PlanCalculator.QualityCeilingTargetMb(info) : _template.TargetMb;
         return (PlanCalculator.WithTarget(_template, targetMb), targetMb);
     }

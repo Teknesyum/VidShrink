@@ -111,6 +111,12 @@ public sealed record ReasonNote(
 /// </summary>
 public enum FrameRateMode { Auto, Constant, Peak }
 
+/// <summary>
+/// Kodlama surecinin onceligi: <see cref="Normal"/> bugunku davranis, <see cref="BelowNormal"/>
+/// Normalin Alti, <see cref="Low"/> isletim sisteminin bosta sinifi.
+/// </summary>
+public enum EncodePriority { Normal, BelowNormal, Low }
+
 public sealed class EncodePlan
 {
     [JsonPropertyName("codec")] public string Codec { get; set; } = "libx264";
@@ -155,6 +161,15 @@ public sealed class EncodePlan
 
     /// <summary>Kullanicinin verdigi kare hizi tavani; <see cref="VideoFilterChain.FrameRateArgs"/> okur.</summary>
     [JsonIgnore] public double? FrameRateCeiling { get; set; }
+
+    /// <summary>
+    /// Kodlayicinin is parcacigi siniri; yalniz <see cref="FfmpegArguments.HonoursThreadLimit"/>
+    /// dogru olan kodlayicida <c>-threads</c> olarak yazilir. <c>null</c> ffmpeg'in kendi secimi.
+    /// </summary>
+    [JsonIgnore] public int? EncoderThreads { get; set; }
+
+    /// <summary>Kodlama surecinin isletim sistemi onceligi; kosucu sureci baslatir baslatmaz atar.</summary>
+    [JsonIgnore] public EncodePriority Priority { get; set; }
     [JsonPropertyName("extraArgs")] public List<string> ExtraArgs { get; set; } = new();
     [JsonPropertyName("reason")] public string Reason { get; set; } = "";
     [JsonIgnore] public List<ReasonNote> ReasonCodes { get; set; } = new();

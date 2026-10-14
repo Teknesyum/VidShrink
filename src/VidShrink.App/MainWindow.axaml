@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:auto="using:Avalonia.Automation"
         xmlns:playback="using:VidShrink.App.Playback"
@@ -1633,21 +1633,39 @@
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.output-name.hint}"/>
                   </StackPanel>
 
-                  <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
-                      <TextBlock Text="{loc:Text settings-tab.parallel-jobs.label}" Theme="{StaticResource Label}"/>
+                  <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}">
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Center">
+                      <TextBlock Text="{loc:Text settings-tab.parallel-jobs.label}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
                       <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.parallel-jobs.label}">
                         <ToolTip.Tip>
                           <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.parallel-jobs.hint}"/>
                         </ToolTip.Tip>
                       </Button>
                     </Grid>
-                    <ComboBox x:Name="CmbParallelJobs" HorizontalAlignment="Left" MinWidth="{StaticResource FieldWidthSm}"/>
-                  </StackPanel>
+                    <ComboBox Grid.Row="0" Grid.Column="1" x:Name="CmbParallelJobs" HorizontalAlignment="Stretch" VerticalAlignment="Center" MinWidth="{StaticResource FieldWidthSm}"/>
+                    <Grid Grid.Row="1" ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Center">
+                      <TextBlock Text="{loc:Text settings-tab.encode-priority.label}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                      <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.encode-priority.label}">
+                        <ToolTip.Tip>
+                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.encode-priority.hint}"/>
+                        </ToolTip.Tip>
+                      </Button>
+                    </Grid>
+                    <ComboBox Grid.Row="1" Grid.Column="1" x:Name="CmbEncodePriority" HorizontalAlignment="Stretch" VerticalAlignment="Center" MinWidth="{StaticResource FieldWidthSm}"/>
+                    <Grid Grid.Row="2" x:Name="EncoderThreadsRow" ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Center">
+                      <TextBlock Text="{loc:Text settings-tab.encoder-threads.label}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                      <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.encoder-threads.label}">
+                        <ToolTip.Tip>
+                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.encoder-threads.hint}"/>
+                        </ToolTip.Tip>
+                      </Button>
+                    </Grid>
+                    <ComboBox Grid.Row="2" Grid.Column="1" x:Name="CmbEncoderThreads" IsVisible="{Binding #EncoderThreadsRow.IsVisible}" HorizontalAlignment="Stretch" VerticalAlignment="Center" MinWidth="{StaticResource FieldWidthSm}"/>
+                  </Grid>
                 </StackPanel>
               </Border>
 
-              <Border x:Name="ShellMenuPanel" izi:KartDuvari.Sutun="1" Theme="{StaticResource Panel}">
+              <Border x:Name="ShellMenuPanel" izi:KartDuvari.Sutun="3" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <TextBlock Text="{loc:Text settings-tab.shell-menu.title}" Theme="{StaticResource H2}"/>
                   <StackPanel Spacing="{StaticResource SpaceSm}">
@@ -1767,7 +1785,7 @@
                 </StackPanel>
               </Border>
 
-              <Border x:Name="SharePanel" izi:KartDuvari.Sutun="3" Theme="{StaticResource Panel}">
+              <Border x:Name="SharePanel" izi:KartDuvari.Sutun="1" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{loc:Text settings.share.title}" Theme="{StaticResource H2}"/>

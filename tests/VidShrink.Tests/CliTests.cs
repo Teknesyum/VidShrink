@@ -473,7 +473,7 @@ public sealed class CliTests
         Availability = () => throw new InvalidOperationException("availability must not run")
     };
 
-    private const int BeklenenTakmaAdSayisi = 43;
+    private const int BeklenenTakmaAdSayisi = 45;
 
     /// <summary>
     /// <para>Ingilizce takma adlar iki CLI belgesinde (<c>docs/cli.md</c>, <c>docs/cli.tr.md</c>) yaziliydi diye degil, <b>kaynaktan

@@ -1,4 +1,4 @@
-﻿{
+{
 
   "main.chip.archive.tip": "• 보관 칩에는 크기 상한이 없습니다.\n• 엔진은 시각적 무손실 품질까지 비트를 쓰고 거기서 멈춥니다.\n• 이 칩이 켜져 있는 동안 목표 상자의 숫자는 계획에 쓰이지 않습니다.\n• 파일은 작아지지만, 얼마나 작아질지는 사용자가 아니라 원본이 정합니다.\n• 어딘가에 맞춰야 한다면 MB 수치가 적힌 칩을 고르세요.\n• 목표를 건드리면 크기 상한이 다시 생깁니다.",
   "main.derivation.size": "목표 {0} MB",
@@ -600,6 +600,13 @@
   "settings-tab.notify-done.hint": "창이 뒤에 있을 때 축소, 변환 또는 대기열이 끝나면 작업 표시줄 단추가 깜박이고 알림이 나타납니다. 취소한 작업은 알리지 않습니다.",
   "settings-tab.parallel-jobs.label": "동시에 인코딩하는 작업 수",
   "settings-tab.parallel-jobs.hint": "• 대기열이 이 개수만큼 파일을 함께 인코딩합니다.\n• 1이면 차례로 실행합니다.\n• 늘리면 대기열이 더 빨리 끝나지만 프로세서를 많이 씁니다.\n• 하드웨어 인코더는 동시에 최대 두 작업을 실행합니다.",
+  "settings-tab.encode-priority.label": "인코딩 우선순위",
+  "settings-tab.encode-priority.hint": "• 우선순위를 낮추면 인코딩 중에도 컴퓨터가 원활하게 반응합니다.\n• 다른 프로그램이 바쁠 때는 인코딩이 더 오래 걸립니다.",
+  "settings-tab.encode-priority.normal": "보통",
+  "settings-tab.encode-priority.below-normal": "보통 미만",
+  "settings-tab.encode-priority.low": "낮음",
+  "settings-tab.encoder-threads.label": "인코더 스레드",
+  "settings-tab.encoder-threads.hint": "• 인코더가 사용하는 스레드 수를 제한합니다.\n• 이 제한은 x264와 VP9만 따르며, 다른 인코더에서는 이 행이 숨겨집니다.\n• 자동이면 인코더가 직접 정합니다.",
   "settings-tab.ffmpeg-path.label": "ffmpeg 경로",
   "settings-tab.ffmpeg-path.auto": "자동",
   "settings-tab.ffmpeg-path.manual": "수동",

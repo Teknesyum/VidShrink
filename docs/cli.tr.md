@@ -109,6 +109,8 @@ bunların tek yazımı var.
 | `--profiller` | `--presets` |
 | `--olcumsuz` | `--no-measure` |
 | `--hizli` | `--fast` |
+| `--oncelik` | `--priority` |
+| `--is-parcacigi` | `--threads` |
 | `--dil` | `--lang` |
 
 Çıkış kodları: bantta `0`, bandın altında `2` (kalite doyduğu için daha küçük dosya

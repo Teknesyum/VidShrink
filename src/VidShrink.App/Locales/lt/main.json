@@ -1,4 +1,4 @@
-﻿{
+{
 
   "main.chip.archive.tip": "• Archyvo žymė neturi dydžio ribos.\n• Variklis skiria bitų iki vizualiai nuostolingos kokybės ir ten sustoja.\n• Kol ši žymė įjungta, skaičius tikslo laukelyje plano nesudaro.\n• Failas sumažėja, bet kiek — sprendžia šaltinis, ne jūs.\n• Jei reikia tilpti į ribą, rinkitės žymę su MB skaičiumi.\n• Palietus tikslą, dydžio riba grįžta.",
   "main.derivation.size": "Tikslas {0} MB",
@@ -600,6 +600,13 @@
   "settings-tab.notify-done.hint": "Jei mažinimas, konvertavimas ar eilė baigiasi, kol langas yra fone, užduočių juostos mygtukas mirksi ir pasirodo pranešimas. Apie atšauktas užduotis nepranešama.",
   "settings-tab.parallel-jobs.label": "Vienu metu koduojamos užduotys",
   "settings-tab.parallel-jobs.hint": "• Eilė vienu metu koduoja tiek failų.\n• 1 juos apdoroja vieną po kito.\n• Daugiau užbaigia eilę anksčiau, bet apkrauna procesorių.\n• Aparatiniai kodavimo įrenginiai vienu metu vykdo ne daugiau kaip dvi užduotis.",
+  "settings-tab.encode-priority.label": "Kodavimo prioritetas",
+  "settings-tab.encode-priority.hint": "• Žemesnis prioritetas palaiko kompiuterio sklandumą koduojant.\n• Kodavimas trunka ilgiau, kai kitos programos užimtos.",
+  "settings-tab.encode-priority.normal": "Įprastas",
+  "settings-tab.encode-priority.below-normal": "Žemesnis nei įprastas",
+  "settings-tab.encode-priority.low": "Žemas",
+  "settings-tab.encoder-threads.label": "Koduotuvo gijos",
+  "settings-tab.encoder-threads.hint": "• Riboja, kiek gijų naudoja koduotuvas.\n• Šios ribos laikosi tik x264 ir VP9; kitiems koduotuvams eilutė paslėpta.\n• Pasirinkus automatinį, sprendžia pats koduotuvas.",
   "settings-tab.ffmpeg-path.label": "ffmpeg kelias",
   "settings-tab.ffmpeg-path.auto": "Automatinis",
   "settings-tab.ffmpeg-path.manual": "Rankinis",

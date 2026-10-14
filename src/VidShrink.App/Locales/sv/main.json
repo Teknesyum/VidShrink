@@ -1,4 +1,4 @@
-﻿{
+{
 
   "main.chip.archive.tip": "• Arkivknappen har inget storlekstak.\n• Motorn spenderar bitar upp till visuellt förlustfri kvalitet och stannar där.\n• Så länge den här knappen är på bygger siffran i målrutan inte planen.\n• Filen blir mindre, men källan avgör hur mycket, inte du.\n• Måste du få plats någonstans, välj en av knapparna som anger ett MB-värde.\n• Rör du målet kommer storlekstaket tillbaka.",
   "main.derivation.size": "Mål {0} MB",
@@ -600,6 +600,13 @@
   "settings-tab.notify-done.hint": "Om en krympning, en konvertering eller kön blir klar medan fönstret ligger i bakgrunden blinkar knappen i aktivitetsfältet och en avisering visas. Avbrutna jobb meddelas inte.",
   "settings-tab.parallel-jobs.label": "Jobb som kodas samtidigt",
   "settings-tab.parallel-jobs.hint": "• Kön kodar så här många filer samtidigt.\n• 1 kör dem en efter en.\n• Fler gör kön klar tidigare men håller processorn upptagen.\n• Hårdvarukodare kör högst två jobb åt gången.",
+  "settings-tab.encode-priority.label": "Kodningsprioritet",
+  "settings-tab.encode-priority.hint": "• Lägre prioritet håller datorn responsiv under kodning.\n• Kodningen tar längre tid när andra program är upptagna.",
+  "settings-tab.encode-priority.normal": "Normal",
+  "settings-tab.encode-priority.below-normal": "Under normal",
+  "settings-tab.encode-priority.low": "Låg",
+  "settings-tab.encoder-threads.label": "Kodartrådar",
+  "settings-tab.encoder-threads.hint": "• Begränsar hur många trådar kodaren använder.\n• Bara x264 och VP9 följer denna gräns; för andra kodare döljs raden.\n• Vid Automatiskt bestämmer kodaren själv.",
   "settings-tab.ffmpeg-path.label": "ffmpeg-sökväg",
   "settings-tab.ffmpeg-path.auto": "Automatisk",
   "settings-tab.ffmpeg-path.manual": "Manuell",

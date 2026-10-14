@@ -306,6 +306,7 @@ public partial class MainWindow : Window
         CmbParallelJobs.ItemsSource = ParallelJobChoices(Environment.ProcessorCount);
         CmbParallelJobs.SelectedIndex = 0;
         Watch(CmbParallelJobs, SelectingItemsControl.SelectedIndexProperty, SaveAppSettings);
+        InitializeEncodeLoadUi();
         Player.Opened += OnPlayerOpened;
         Watch(ChkAdvKeepTracks, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkAdvDropMetadata, ToggleButton.IsCheckedProperty, SaveAppSettings);
@@ -1219,6 +1220,7 @@ public partial class MainWindow : Window
        RelabelShellMenu();
         RefreshShareTarget();
         RefreshAdvancedTexts();
+        RefreshEncodeLoadTexts();
         UpdateToolStatus();
         RefreshPlatforms();
         if (!_performanceRunning) ShowPerformanceResult(_performanceShown);
@@ -1623,6 +1625,8 @@ public partial class MainWindow : Window
             FollowRecording = ChkFollowRecording.IsChecked == true,
             NotifyWhenDone = ChkNotifyWhenDone.IsChecked == true,
             ParallelJobs = Math.Max(0, CmbParallelJobs.SelectedIndex) + 1,
+            EncodePriority = SelectedEncodePriority,
+            EncoderThreads = SelectedEncoderThreads,
             FfmpegPathMode = FfmpegPathModeIndex,
             FfmpegPath = TxtFfmpegPath.Text ?? "",
             OpenSubtitlesApiKey = (TxtOpenSubtitlesKey.Text ?? "").Trim(),
@@ -1676,6 +1680,7 @@ public partial class MainWindow : Window
             ChkFollowRecording.IsChecked = settings.FollowRecording;
             ChkNotifyWhenDone.IsChecked = settings.NotifyWhenDone;
             CmbParallelJobs.SelectedIndex = ParallelJobs.Clamp(settings.ParallelJobs, Environment.ProcessorCount) - 1;
+            RestoreEncodeLoad(settings);
 
             FfmpegPathModeIndex = Math.Clamp(settings.FfmpegPathMode, 0, 1);
             TxtFfmpegPath.Text = settings.FfmpegPath;
@@ -3208,6 +3213,7 @@ public partial class MainWindow : Window
             DeliveredContainer = PresetLibrary.DeliveredContainer(_presetContainer)
         };
         ApplyAdvancedOptions(options);
+        ApplyEncodeLoad(options);
         if (ChkWhatsAppCompatible.IsChecked == true) options.LockedCodec = null;
         return options;
     }
