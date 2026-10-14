@@ -27,6 +27,8 @@ internal sealed class RecentFiles
         if (_items.Count > Capacity) _items.RemoveRange(Capacity, _items.Count - Capacity);
     }
 
+    internal void Clear() => _items.Clear();
+
     internal bool Remove(string path)
         => _items.RemoveAll(item => PathComparer.Equals(item, Path.GetFullPath(path))) > 0;
 

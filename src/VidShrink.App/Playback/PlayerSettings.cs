@@ -60,6 +60,10 @@ internal sealed class PlayerSettings
 
     internal bool Muted { get; set; }
 
+    internal bool KeepHistory { get; set; } = true;
+
+    internal bool Resume { get; set; } = true;
+
     internal static PlayerSettings Load(string? file)
     {
         var settings = new PlayerSettings();
@@ -81,6 +85,8 @@ internal sealed class PlayerSettings
                 settings.Hardware = hardware;
             settings.Volume = (double?)root["volume"] is { } volume && double.IsFinite(volume) && volume >= 0 && volume <= SoundAdjust.BoostCeiling ? volume : DefaultVolume;
             settings.Muted = (bool?)root["muted"] ?? false;
+            settings.KeepHistory = (bool?)root["keepHistory"] ?? true;
+            settings.Resume = (bool?)root["resume"] ?? true;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or FormatException)
         {
@@ -115,6 +121,8 @@ internal sealed class PlayerSettings
                 writer.WriteString("hardwareDecoding", Hardware.ToString());
                 writer.WriteNumber("volume", Volume);
                 writer.WriteBoolean("muted", Muted);
+                writer.WriteBoolean("keepHistory", KeepHistory);
+                writer.WriteBoolean("resume", Resume);
                 writer.WriteEndObject();
             }
             File.Move(temp, file, true);

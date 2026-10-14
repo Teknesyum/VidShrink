@@ -269,7 +269,7 @@ internal partial class PlayerView
     private void AfterOpen(string path, IPlaybackEngine engine)
     {
         EnsureSettings();
-        if (!IsAddress(path))
+        if (!IsAddress(path) && _settings.KeepHistory)
         {
             _recent.Add(path);
             _recent.Save(RecentFile());
@@ -486,6 +486,13 @@ internal partial class PlayerView
             recent.Items.Add(entry);
         }
 
+        recent.Items.Add(new Separator());
+        var history = new MenuItem { Header = Strings.Get("player.list.history") };
+        history.Click += (_, _) => ShowHistory();
+        recent.Items.Add(history);
+        var clear = new MenuItem { Header = Strings.Get("player.list.clear-history") };
+        clear.Click += (_, _) => ClearHistory();
+        recent.Items.Add(clear);
         return recent;
     }
 
