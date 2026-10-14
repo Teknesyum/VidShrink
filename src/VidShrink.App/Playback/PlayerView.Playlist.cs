@@ -1,4 +1,5 @@
 ﻿using System;
+using VidShrink.App.Localization;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -63,7 +64,7 @@ internal static class PlaylistFilter
     {
         var text = search?.Trim() ?? "";
         if (text.Length == 0) return files;
-        var compare = CultureInfo.CurrentCulture.CompareInfo;
+        var compare = Strings.Culture.CompareInfo;
         return files.Where(file => compare.IndexOf(name(file), text, CompareOptions.IgnoreCase) >= 0).ToList();
     }
 }

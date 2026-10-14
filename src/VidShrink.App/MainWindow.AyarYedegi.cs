@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Styling;
+using VidShrink.App.Localization;
 using VidShrink.Core;
 
 namespace VidShrink.App;
@@ -82,7 +83,7 @@ public partial class MainWindow
         {
             var folder = Path.GetDirectoryName(Path.GetFullPath(SettingsFile)) ?? "";
             var names = AppDataArchive.Export(zipPath, folder, SettingsFile);
-            ShowSettingsBackup(string.Format(CultureInfo.CurrentCulture, Say("settings.backup.exported"), names.Count), error: false);
+            ShowSettingsBackup(string.Format(Strings.Culture, Say("settings.backup.exported"), names.Count), error: false);
             return true;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -105,7 +106,7 @@ public partial class MainWindow
             UseLanguage(ResolveLanguage(settings.Language, CultureInfo.CurrentUICulture.Name));
             RestoreSettings(settings);
             RestoreAppSettings(AppSettings.Load(SettingsPathOverride));
-            ShowSettingsBackup(string.Format(CultureInfo.CurrentCulture, Say("settings.backup.imported"), names.Count), error: false);
+            ShowSettingsBackup(string.Format(Strings.Culture, Say("settings.backup.imported"), names.Count), error: false);
             return true;
         }
         catch (InvalidDataException)

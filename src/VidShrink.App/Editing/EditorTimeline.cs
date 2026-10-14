@@ -54,7 +54,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
     private long _trimEdge;
     private StandardCursorType _cursorKind = StandardCursorType.Arrow;
 
-    private IReadOnlyList<(long Start, long End)> _cuts = Array.Empty<(long Start, long End)>();
+    private IReadOnlyList<IdlePreview> _cuts = Array.Empty<IdlePreview>();
     private AudioPeaks? _peaks;
     private readonly Dictionary<int, AudioPeaks> _extraPeaks = new();
     private readonly Dictionary<int, WaveSlice> _wave = new();
@@ -142,12 +142,13 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
 
     internal long? MarkOut { get; private set; }
 
-    internal IReadOnlyList<(long Start, long End)> CutPreview
+    /// <summary>Taranan araliklarin cizelgedeki onizlemesi; duz tik araligin durumunu cevirir.</summary>
+    internal IReadOnlyList<IdlePreview> CutPreview
     {
         get => _cuts;
         set
         {
-            _cuts = value ?? Array.Empty<(long Start, long End)>();
+            _cuts = value ?? Array.Empty<IdlePreview>();
             _overlay.InvalidateVisual();
         }
     }
@@ -286,6 +287,15 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         _selected = index;
         _anchor = from;
         ApplySelection();
+    }
+
+    internal event Action<int>? IdleSpanClicked;
+
+    private int? PreviewAt(double x)
+    {
+        foreach (var span in _cuts)
+            if (x >= TimeToX(span.Start) && x < TimeToX(span.End)) return span.Index;
+        return null;
     }
 
     internal void ZoomToFit()
@@ -605,6 +615,13 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         {
             _pressIndex = -1;
             Razor(position.X);
+            return;
+        }
+
+        if (plain && onTracks && PreviewAt(position.X) is { } idle)
+        {
+            _pressIndex = -1;
+            IdleSpanClicked?.Invoke(idle);
             return;
         }
 

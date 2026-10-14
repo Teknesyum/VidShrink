@@ -15,21 +15,29 @@ using VidShrink.Ffmpeg;
 
 namespace VidShrink.App.Editing;
 
+/// <summary>Cizelgede boyanan taranmis aralik: kaynaktaki sirasi ve kesilecek, tutulacak ya da hizlanacak durumu.</summary>
+internal readonly record struct IdlePreview(long Start, long End, IdleAction Action, int Index);
+
 /// <summary>
-/// Otomatik sessizlik ve siyah kare kesme paneli. Tarama bir kez kosar; en kisa sure ve kenar
-/// payi degisince plan taramasiz tazelenir, esik ya da tur degisince yeniden tarama istenir.
-/// Onerilen araliklar cizelgede boyanir, "Araliklari kes" tek geri alma adimidir.
+/// Otomatik sessizlik ve siyah kare kesme paneli. Tarama secilen ses izinde bir kez kosar; en kisa sure,
+/// on pay ve arka pay degisince plan taramasiz tazelenir, esik, tur ya da ses izi degisince yeniden tarama
+/// istenir. Onerilen araliklar cizelgede boyanir; araliga tiklamak onu kes, tut ve hizlandir arasinda cevirir.
+/// Uygulama tek geri alma adimidir: kesilenler silinir, hizlandirilanlar bolunup hizlanir.
 /// </summary>
 internal partial class EditorView
 {
     private SilenceScan? _silenceScan;
     private string? _silenceSource;
+    private string? _silenceTrackSource;
     private CancellationTokenSource? _silenceCts;
     private IReadOnlyList<(long Start, long End)> _silenceCuts = Array.Empty<(long Start, long End)>();
+    private readonly List<IdleAction> _silenceActions = new();
 
     internal Func<string, SilenceCutOptions, double, IProgress<double>, CancellationToken, Task<SilenceScan>> SilenceScanner { get; set; } = DefaultSilenceScan;
 
     internal IReadOnlyList<(long Start, long End)> SilenceCuts => _silenceCuts;
+
+    internal IReadOnlyList<IdleAction> SilenceActions => _silenceActions;
 
     internal bool SilenceScanning => _silenceCts is not null;
 
@@ -37,7 +45,8 @@ internal partial class EditorView
     {
         TxtSilenceThreshold.Text = SilenceCutOptions.DefaultThresholdDb.ToString("0.#", Strings.Culture);
         TxtSilenceMin.Text = SilenceCutOptions.DefaultMinSeconds.ToString("0.##", Strings.Culture);
-        TxtSilencePadding.Text = SilenceCutOptions.DefaultPaddingSeconds.ToString("0.##", Strings.Culture);
+        TxtSilencePaddingStart.Text = SilenceCutOptions.DefaultPaddingSeconds.ToString("0.##", Strings.Culture);
+        TxtSilencePaddingEnd.Text = SilenceCutOptions.DefaultPaddingSeconds.ToString("0.##", Strings.Culture);
 
         BtnSilence.Click += (_, _) => ShowSilencePanel(BtnSilence.IsChecked == true);
         BtnSilenceScan.Click += (_, _) => _ = ScanSilenceAsync();
@@ -53,8 +62,11 @@ internal partial class EditorView
         ChkSilenceBlack.IsCheckedChanged += (_, _) => RefreshSilence();
         TxtSilenceThreshold.TextChanged += (_, _) => RefreshSilence();
         TxtSilenceMin.TextChanged += (_, _) => RefreshSilence();
-        TxtSilencePadding.TextChanged += (_, _) => RefreshSilence();
+        TxtSilencePaddingStart.TextChanged += (_, _) => RefreshSilence();
+        TxtSilencePaddingEnd.TextChanged += (_, _) => RefreshSilence();
+        CmbSilenceTrack.SelectionChanged += (_, _) => RefreshSilence();
         Timeline.SelectionChanged += () => UpdateSilencePreview();
+        Timeline.IdleSpanClicked += CycleSilenceAction;
         RefreshSilence();
     }
 
@@ -69,9 +81,11 @@ internal partial class EditorView
     /// <summary>Paneldeki ayar; gecersiz sayi ya da hic tur secilmemisse <c>null</c>.</summary>
     internal SilenceCutOptions? ReadSilenceOptions()
     {
+        EnsureSilenceTracks();
         if (!TryNumber(TxtSilenceThreshold.Text, out var threshold)
             || !TryNumber(TxtSilenceMin.Text, out var min)
-            || !TryNumber(TxtSilencePadding.Text, out var padding))
+            || !TryNumber(TxtSilencePaddingStart.Text, out var paddingStart)
+            || !TryNumber(TxtSilencePaddingEnd.Text, out var paddingEnd))
             return null;
 
         var options = new SilenceCutOptions
@@ -80,7 +94,9 @@ internal partial class EditorView
             Black = ChkSilenceBlack.IsChecked == true,
             ThresholdDb = threshold,
             MinSeconds = min,
-            PaddingSeconds = padding
+            PaddingStartSeconds = paddingStart,
+            PaddingEndSeconds = paddingEnd,
+            AudioTrack = Math.Max(0, CmbSilenceTrack.SelectedIndex)
         };
         return options.IsValid ? options : null;
     }
@@ -130,12 +146,43 @@ internal partial class EditorView
 
     internal bool ApplySilence()
     {
-        var cuts = _silenceCuts;
-        if (cuts.Count == 0) return false;
-        var count = _model?.SourceToTimeline(cuts).Count ?? 0;
-        if (!Apply(model => model.RemoveSource(cuts), -1)) return false;
-        TxtSilenceStatus.Text = string.Format(Strings.Culture, Strings.Get("editor.silence.cut"), count);
+        var (cuts, faster) = SilenceCut.Split(_silenceCuts, _silenceActions);
+        if (cuts.Count == 0 && faster.Count == 0) return false;
+        var cutCount = _model?.SourceToTimeline(cuts).Count ?? 0;
+        var fastCount = faster.Count;
+        if (!Apply(model => model.ReshapeSource(cuts, faster, SilenceCut.SpeedFactor), -1)) return false;
+        TxtSilenceStatus.Text = fastCount == 0
+            ? string.Format(Strings.Culture, Strings.Get("editor.silence.cut"), cutCount)
+            : string.Format(Strings.Culture, Strings.Get("editor.silence.applied"), cutCount, fastCount);
         return true;
+    }
+
+    private void CycleSilenceAction(int index)
+    {
+        if (index < 0 || index >= _silenceActions.Count) return;
+        _silenceActions[index] = SilenceCut.Next(_silenceActions[index]);
+        RefreshSilence();
+    }
+
+    private void EnsureSilenceTracks()
+    {
+        var key = _source ?? string.Empty;
+        if (_silenceTrackSource == key) return;
+        _silenceTrackSource = key;
+        var names = new List<string>();
+        if (_source is { } source && KnownInfo?.Invoke(source) is { } info)
+            foreach (var stream in info.Streams.Where(s => s.Kind == StreamKind.Audio && !s.IsAttachedPicture))
+                names.Add(TrackName(names.Count + 1, stream));
+        if (names.Count == 0) names.Add(1.ToString(Strings.Culture));
+        CmbSilenceTrack.ItemsSource = names;
+        CmbSilenceTrack.SelectedIndex = 0;
+    }
+
+    private static string TrackName(int number, SourceStream stream)
+    {
+        var parts = new[] { number.ToString(Strings.Culture), stream.Language, stream.Title }
+            .Where(p => !string.IsNullOrWhiteSpace(p) && p != "und");
+        return string.Join(" · ", parts);
     }
 
     private void ForgetSilence()
@@ -144,7 +191,8 @@ internal partial class EditorView
         _silenceScan = null;
         _silenceSource = null;
         _silenceCuts = Array.Empty<(long Start, long End)>();
-        Timeline.CutPreview = Array.Empty<(long Start, long End)>();
+        _silenceActions.Clear();
+        Timeline.CutPreview = Array.Empty<IdlePreview>();
         TxtSilenceStatus.Text = string.Empty;
         BtnSilenceApply.IsEnabled = false;
     }
@@ -174,20 +222,33 @@ internal partial class EditorView
         }
 
         _silenceCuts = SilenceCut.ToTicks(SilenceCut.Plan(scan.All, EditTime.ToSeconds(duration), options));
+        if (_silenceActions.Count != _silenceCuts.Count)
+        {
+            _silenceActions.Clear();
+            _silenceActions.AddRange(Enumerable.Repeat(IdleAction.Cut, _silenceCuts.Count));
+        }
+
         var spans = UpdateSilencePreview();
+        var cut = spans.Where(s => s.Action == IdleAction.Cut).ToList();
         TxtSilenceStatus.Text = spans.Count == 0
             ? Strings.Get("editor.silence.none")
-            : string.Format(Strings.Culture, Strings.Get("editor.silence.found"), spans.Count,
-                Saat.Kesit(TimeSpan.FromSeconds(EditTime.ToSeconds(spans.Sum(s => s.End - s.Start))), Strings.Culture));
+            : string.Format(Strings.Culture, Strings.Get("editor.silence.found"), spans.Select(s => s.Index).Distinct().Count(),
+                Saat.Kesit(TimeSpan.FromSeconds(EditTime.ToSeconds(cut.Sum(s => s.End - s.Start))), Strings.Culture));
     }
 
-    private IReadOnlyList<(long Start, long End)> UpdateSilencePreview()
+    private IReadOnlyList<IdlePreview> UpdateSilencePreview()
     {
-        var spans = SilencePanel.IsVisible && _model is { } model && _silenceCuts.Count > 0
-            ? model.SourceToTimeline(_silenceCuts)
-            : Array.Empty<(long Start, long End)>();
+        var spans = new List<IdlePreview>();
+        if (SilencePanel.IsVisible && _model is { } model)
+            for (var i = 0; i < _silenceCuts.Count; i++)
+            {
+                var action = i < _silenceActions.Count ? _silenceActions[i] : IdleAction.Cut;
+                foreach (var (start, end) in model.SourceToTimeline(new[] { _silenceCuts[i] }))
+                    spans.Add(new IdlePreview(start, end, action, i));
+            }
+
         Timeline.CutPreview = spans;
-        BtnSilenceApply.IsEnabled = spans.Count > 0 && !SilenceScanning;
+        BtnSilenceApply.IsEnabled = spans.Any(s => s.Action != IdleAction.Keep) && !SilenceScanning;
         return spans;
     }
 

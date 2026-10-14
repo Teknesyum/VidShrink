@@ -1,3 +1,4 @@
+using VidShrink.App.Localization;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -34,7 +35,7 @@ internal sealed class PlaybackHistory
     internal IReadOnlyList<HistoryRow> Rows(string? search)
     {
         var text = search?.Trim() ?? "";
-        var compare = CultureInfo.CurrentCulture.CompareInfo;
+        var compare = Strings.Culture.CompareInfo;
         return _entries
             .Where(pair => pair.Value.Seen > 0 && !MediaAddress.IsAddress(pair.Key))
             .Where(pair => text.Length == 0 || compare.IndexOf(pair.Key, text, CompareOptions.IgnoreCase) >= 0)

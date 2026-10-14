@@ -1,3 +1,4 @@
+using VidShrink.App.Localization;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -59,7 +60,7 @@ internal sealed partial class HistoryWindow : Window
             var name = new TextBlock { Text = Path.GetFileName(row.Path), TextTrimming = Avalonia.Media.TextTrimming.CharacterEllipsis };
             var detail = new TextBlock
             {
-                Text = row.Seen.ToLocalTime().ToString("g", CultureInfo.CurrentCulture) + " · " + Path.GetDirectoryName(row.Path),
+                Text = row.Seen.ToLocalTime().ToString("g", Strings.Culture) + " · " + Path.GetDirectoryName(row.Path),
                 TextTrimming = Avalonia.Media.TextTrimming.CharacterEllipsis,
             };
             if (this.TryFindResource("Hint", out var hint) && hint is Avalonia.Styling.ControlTheme theme) detail.Theme = theme;

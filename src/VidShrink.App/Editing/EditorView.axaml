@@ -232,14 +232,25 @@
                 <TextBox x:Name="TxtSilenceMin" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.silence.min}"/>
               </StackPanel>
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.silence.padding}"/>
-                <TextBox x:Name="TxtSilencePadding" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.silence.padding}"/>
+                <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.silence.padding-start}"/>
+                <TextBox x:Name="TxtSilencePaddingStart" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.silence.padding-start}"/>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.silence.padding-end}"/>
+                <TextBox x:Name="TxtSilencePaddingEnd" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.silence.padding-end}"/>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.silence.track}"/>
+                <ComboBox x:Name="CmbSilenceTrack" MinWidth="{StaticResource FieldWidthSm}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.silence.track}" IsEnabled="{Binding #ChkSilenceAudio.IsChecked}"/>
               </StackPanel>
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                 <Button x:Name="BtnSilenceScan" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.silence.scan}" AutomationProperties.Name="{loc:Text editor.silence.scan}"/>
                 <Button x:Name="BtnSilenceCancel" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.cancel}" IsVisible="False"/>
                 <Button x:Name="BtnSilenceApply" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.silence.apply}" AutomationProperties.Name="{loc:Text editor.silence.apply}" IsEnabled="False">
                   <Button.Styles>
+                    <Style Selector="Button">
+                      <Setter Property="ToolTip.Tip" Value="{loc:Text editor.silence.hint}"/>
+                    </Style>
                     <Style Selector="Button:disabled">
                       <Setter Property="ToolTip.Tip" Value="{loc:Text editor.silence.none}"/>
                     </Style>
