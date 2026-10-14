@@ -4,6 +4,8 @@
   "player.tracks.delay": "Ljudfördröjning {0} s",
   "player.tracks.delayreset": "Återställ ljudfördröjning",
   "player.tracks.none": "Inget ljudspår",
+  "player.tracks.output": "Ljudutgång",
+  "player.tracks.output-auto": "Automatiskt",
   "player.tracks.item": "Spår {0}",
   "player.subtitle.menu": "Undertexter",
   "player.subtitle.off": "Av",

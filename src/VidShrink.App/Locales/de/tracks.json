@@ -4,6 +4,8 @@
   "player.tracks.delay": "Audioverzögerung {0} s",
   "player.tracks.delayreset": "Audioverzögerung zurücksetzen",
   "player.tracks.none": "Keine Audiospur",
+  "player.tracks.output": "Audioausgabe",
+  "player.tracks.output-auto": "Automatisch",
   "player.tracks.item": "Spur {0}",
   "player.subtitle.menu": "Untertitel",
   "player.subtitle.off": "Aus",

@@ -54,6 +54,10 @@ internal sealed class PlayerSettings
 
     internal HardwareDecoding Hardware { get; set; }
 
+    internal string? AudioDevice { get; set; }
+
+    internal AudioOutput AudioOutput { get; set; } = AudioOutput.Plain;
+
     internal const double DefaultVolume = 100;
 
     internal double Volume { get; set; } = DefaultVolume;
@@ -83,6 +87,11 @@ internal sealed class PlayerSettings
             settings.SpeedModeB = string.Equals((string?)root["speedMode"], "B", StringComparison.OrdinalIgnoreCase);
             if (Enum.TryParse<HardwareDecoding>((string?)root["hardwareDecoding"], true, out var hardware) && Enum.IsDefined(hardware))
                 settings.Hardware = hardware;
+            settings.AudioDevice = (string?)root["audioDevice"] is { Length: > 0 } device && device != VidShrink.Player.AudioDevice.Auto ? device : null;
+            settings.AudioOutput = new AudioOutput(
+                (bool?)root["audioPassthrough"] ?? false,
+                (bool?)root["audioExclusive"] ?? false,
+                (bool?)root["audioStereo"] ?? false);
             settings.Volume = (double?)root["volume"] is { } volume && double.IsFinite(volume) && volume >= 0 && volume <= SoundAdjust.BoostCeiling ? volume : DefaultVolume;
             settings.Muted = (bool?)root["muted"] ?? false;
             settings.KeepHistory = (bool?)root["keepHistory"] ?? true;
@@ -119,6 +128,11 @@ internal sealed class PlayerSettings
                 writer.WriteNumber("speedB", SpeedB);
                 writer.WriteString("speedMode", SpeedModeB ? "B" : "A");
                 writer.WriteString("hardwareDecoding", Hardware.ToString());
+                if (AudioDevice is null) writer.WriteNull("audioDevice");
+                else writer.WriteString("audioDevice", AudioDevice);
+                writer.WriteBoolean("audioPassthrough", AudioOutput.Passthrough);
+                writer.WriteBoolean("audioExclusive", AudioOutput.Exclusive);
+                writer.WriteBoolean("audioStereo", AudioOutput.Stereo);
                 writer.WriteNumber("volume", Volume);
                 writer.WriteBoolean("muted", Muted);
                 writer.WriteBoolean("keepHistory", KeepHistory);

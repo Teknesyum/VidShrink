@@ -4,6 +4,8 @@
   "player.tracks.delay": "Hang késleltetése {0} mp",
   "player.tracks.delayreset": "Hangkésleltetés visszaállítása",
   "player.tracks.none": "Nincs hangsáv",
+  "player.tracks.output": "Hangkimenet",
+  "player.tracks.output-auto": "Automatikus",
   "player.tracks.item": "Sáv {0}",
   "player.subtitle.menu": "Feliratok",
   "player.subtitle.off": "Ki",

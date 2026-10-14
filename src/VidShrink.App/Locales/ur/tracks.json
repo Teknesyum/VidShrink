@@ -4,6 +4,8 @@
   "player.tracks.delay": "آڈیو تاخیر {0} س",
   "player.tracks.delayreset": "آڈیو تاخیر ری سیٹ کریں",
   "player.tracks.none": "کوئی آڈیو ٹریک نہیں",
+  "player.tracks.output": "آڈیو آؤٹ پٹ",
+  "player.tracks.output-auto": "خودکار",
   "player.tracks.item": "ٹریک {0}",
   "player.subtitle.menu": "زیر نویس",
   "player.subtitle.off": "بند",

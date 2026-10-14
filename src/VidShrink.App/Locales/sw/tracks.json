@@ -4,6 +4,8 @@
   "player.tracks.delay": "Ucheleweshaji wa sauti {0} s",
   "player.tracks.delayreset": "Weka upya ucheleweshaji wa sauti",
   "player.tracks.none": "Hakuna wimbo wa sauti",
+  "player.tracks.output": "Toleo la sauti",
+  "player.tracks.output-auto": "Otomatiki",
   "player.tracks.item": "Wimbo {0}",
   "player.subtitle.menu": "Manukuu",
   "player.subtitle.off": "Imezimwa",

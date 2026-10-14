@@ -4,6 +4,8 @@
   "player.tracks.delay": "ऑडियो विलंब {0} सेकंड",
   "player.tracks.delayreset": "ऑडियो विलंब रीसेट करें",
   "player.tracks.none": "कोई ऑडियो ट्रैक नहीं",
+  "player.tracks.output": "ऑडियो आउटपुट",
+  "player.tracks.output-auto": "स्वचालित",
   "player.tracks.item": "ट्रैक {0}",
   "player.subtitle.menu": "उपशीर्षक",
   "player.subtitle.off": "बंद",

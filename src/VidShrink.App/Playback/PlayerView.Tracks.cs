@@ -340,6 +340,8 @@ internal partial class PlayerView
         items.Add(Bound(SubtitleOptions.AudioLater));
         items.Add(Bound(SubtitleOptions.AudioEarlier));
         items.Add(Plain(Strings.Get("player.tracks.delayreset"), ResetAudioDelay));
+        items.Add(new Separator());
+        items.Add(Submenu(Strings.Get("player.tracks.output"), AudioOutputItems()));
         return items;
     }
 

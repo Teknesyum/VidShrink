@@ -4,6 +4,8 @@
   "player.tracks.delay": "Opóźnienie audio {0} s",
   "player.tracks.delayreset": "Zresetuj opóźnienie audio",
   "player.tracks.none": "Brak ścieżki audio",
+  "player.tracks.output": "Wyjście audio",
+  "player.tracks.output-auto": "Automatycznie",
   "player.tracks.item": "Ścieżka {0}",
   "player.subtitle.menu": "Napisy",
   "player.subtitle.off": "Wyłączone",

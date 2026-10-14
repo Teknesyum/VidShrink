@@ -4,6 +4,8 @@
   "player.tracks.delay": "Audio delay {0} s",
   "player.tracks.delayreset": "Reset audio delay",
   "player.tracks.none": "No audio track",
+  "player.tracks.output": "Audio Output",
+  "player.tracks.output-auto": "Automatic",
   "player.tracks.item": "Track {0}",
   "player.subtitle.menu": "Subtitles",
   "player.subtitle.off": "Off",

@@ -255,6 +255,31 @@ public interface IPlaybackEngine : IDisposable
     bool ReloadAudio() => false;
 
     Task<bool> ReopenAsync(double atSeconds, bool playing, CancellationToken ct = default) => Task.FromResult(false);
+
+    /// <summary>Motorun gordugu ses cikis aygitlari; ilk satir otomatik secimdir.</summary>
+    IReadOnlyList<AudioDevice> AudioDevices => Array.Empty<AudioDevice>();
+
+    string CurrentAudioDevice => AudioDevice.Auto;
+
+    /// <summary>Ses cikis aygitini secer; motor desteklemiyorsa ya da aygit reddedilirse false.</summary>
+    bool SetAudioDevice(string name) => false;
+
+    AudioOutput Output => AudioOutput.Plain;
+
+    /// <summary>Passthrough, ozel kip ve stereoya indirme seceneklerini calan dosyada da degistirir.</summary>
+    void SetAudioOutput(AudioOutput output) { }
+}
+
+public sealed record AudioDevice(string Name, string Description)
+{
+    public const string Auto = "auto";
+}
+
+public sealed record AudioOutput(bool Passthrough = false, bool Exclusive = false, bool Stereo = false)
+{
+    public static AudioOutput Plain { get; } = new();
+
+    public bool IsPlain => Equals(Plain);
 }
 
 public sealed class PlaybackOpenException : Exception

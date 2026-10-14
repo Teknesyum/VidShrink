@@ -4,6 +4,8 @@
   "player.tracks.delay": "Kelewatan audio {0} s",
   "player.tracks.delayreset": "Set semula kelewatan audio",
   "player.tracks.none": "Tiada trek audio",
+  "player.tracks.output": "Output audio",
+  "player.tracks.output-auto": "Automatik",
   "player.tracks.item": "Trek {0}",
   "player.subtitle.menu": "Sarikata",
   "player.subtitle.off": "Mati",

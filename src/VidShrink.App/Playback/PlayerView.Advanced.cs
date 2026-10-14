@@ -268,6 +268,7 @@ internal partial class PlayerView
         }
 
         if (HardwareDecodingOn) UseHardwareDecoding(HardwareDecoding.Off);
+        if (!AudioOutput.IsPlain) UseAudioOutput(AudioOutput.Plain);
         Settle("advanced" + ResetTrace);
     }
 

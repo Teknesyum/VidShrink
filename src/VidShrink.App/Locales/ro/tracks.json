@@ -4,6 +4,8 @@
   "player.tracks.delay": "Întârziere audio {0} s",
   "player.tracks.delayreset": "Resetează întârzierea audio",
   "player.tracks.none": "Fără pistă audio",
+  "player.tracks.output": "Ieșire audio",
+  "player.tracks.output-auto": "Automat",
   "player.tracks.item": "Pista {0}",
   "player.subtitle.menu": "Subtitrări",
   "player.subtitle.off": "Dezactivat",

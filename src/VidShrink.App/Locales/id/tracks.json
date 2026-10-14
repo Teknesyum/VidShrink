@@ -4,6 +4,8 @@
   "player.tracks.delay": "Keterlambatan audio {0} dtk",
   "player.tracks.delayreset": "Atur ulang keterlambatan audio",
   "player.tracks.none": "Tidak ada trek audio",
+  "player.tracks.output": "Keluaran audio",
+  "player.tracks.output-auto": "Otomatis",
   "player.tracks.item": "Trek {0}",
   "player.subtitle.menu": "Subtitel",
   "player.subtitle.off": "Nonaktif",

@@ -4,6 +4,8 @@
   "player.tracks.delay": "השהיית שמע {0} שנ'",
   "player.tracks.delayreset": "איפוס השהיית שמע",
   "player.tracks.none": "אין רצועת שמע",
+  "player.tracks.output": "פלט שמע",
+  "player.tracks.output-auto": "אוטומטי",
   "player.tracks.item": "רצועה {0}",
   "player.subtitle.menu": "כתוביות",
   "player.subtitle.off": "כבוי",

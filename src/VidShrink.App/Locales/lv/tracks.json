@@ -4,6 +4,8 @@
   "player.tracks.delay": "Audio aizture {0} s",
   "player.tracks.delayreset": "Atiestatīt audio aizturi",
   "player.tracks.none": "Nav audio celiņa",
+  "player.tracks.output": "Audio izvade",
+  "player.tracks.output-auto": "Automātiski",
   "player.tracks.item": "Celiņš {0}",
   "player.subtitle.menu": "Subtitri",
   "player.subtitle.off": "Izslēgti",

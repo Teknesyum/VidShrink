@@ -4,6 +4,8 @@
   "player.tracks.delay": "Аудио закъснение {0} с",
   "player.tracks.delayreset": "Нулиране на аудио закъснението",
   "player.tracks.none": "Няма аудио пътечка",
+  "player.tracks.output": "Аудио изход",
+  "player.tracks.output-auto": "Автоматично",
   "player.tracks.item": "Пътечка {0}",
   "player.subtitle.menu": "Субтитри",
   "player.subtitle.off": "Изключени",

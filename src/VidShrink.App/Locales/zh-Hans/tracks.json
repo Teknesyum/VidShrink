@@ -4,6 +4,8 @@
   "player.tracks.delay": "音频延迟 {0} 秒",
   "player.tracks.delayreset": "重置音频延迟",
   "player.tracks.none": "无音频轨道",
+  "player.tracks.output": "音频输出",
+  "player.tracks.output-auto": "自动",
   "player.tracks.item": "轨道 {0}",
   "player.subtitle.menu": "字幕",
   "player.subtitle.off": "关闭",

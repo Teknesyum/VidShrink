@@ -4,6 +4,8 @@
   "player.tracks.delay": "Затримка звуку {0} с",
   "player.tracks.delayreset": "Скинути затримку звуку",
   "player.tracks.none": "Немає звукової доріжки",
+  "player.tracks.output": "Вивід звуку",
+  "player.tracks.output-auto": "Автоматично",
   "player.tracks.item": "Доріжка {0}",
   "player.subtitle.menu": "Субтитри",
   "player.subtitle.off": "Вимкнено",

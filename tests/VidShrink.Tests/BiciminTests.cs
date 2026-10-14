@@ -1249,6 +1249,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, DZA-P2 otomatik bolme ve parca adlari: on uc yeni <c>editor.*</c> anahtarindan 24 kol 10 dilde (en: split.count; es, fr: split.count, split.value, scene.threshold, export.part-name; pt: ayni dordu ve marker.name; ro: split.count, split.value, scene.threshold; sw: split.count, split.value; bn, hi, ja, th, ur: export.part-name.hint), KOL dokumunden sayildi, tr girmiyor; 3116 + 24 = 3140, en 303, tr 104.</para>
     /// <para>2026-10-14, kosan kodlamayi duraklatma (SIK-P3): uc yeni anahtardan 6 kol 6 dilde (<c>main.shrink-job.disk-paused</c>: bn, hi, ja, th, ur; <c>main.action.pause-run</c>: it), yeniden yazilan <c>main.shrink-job.paused</c> kol sayisini degistirmedi, KOL dokumunden sayildi, en ve tr degismiyor: 3116 + 6 = 3122, en 302, tr 104.</para>
     /// <para>2026-10-14, EKB-P2 imlec vurgusu ve spot isigi: on bir yeni anahtardan 16 kol 9 dilde (en: option.cursor-highlight; da, nb: pointer.left-color, .right-color; es: pointer.highlight-color; fr: pointer.highlight-color, .size; pt: pointer.title, .highlight-color, .left-color, .right-color, .size; sw: pointer.highlight-color, .left-color, .right-color), KOL dokumunden sayildi: 3116 + 16 = 3132, en 303, tr 104.</para>
+    /// <para>2026-10-14, ses cikisi ve cikis secenekleri (OYA-P4): bes yeni anahtardan (<c>player.advanced.passthrough</c>, <c>.exclusive</c>, <c>.stereo</c>, <c>player.tracks.output</c>, <c>.output-auto</c>) 13 kol 9 dilde (cs, en, it, pl, sk: stereo; es: passthrough, exclusive, stereo, output; pt: passthrough, exclusive, output; ro: passthrough), KOL dokumunden sayildi, tr girmiyor: 3206 + 13 = 3219, en 311 + 1 = 312, tr 104.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1274,8 +1275,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3222, toplam);
-        Assert.Equal(312, dilBasina["en"]);
+        Assert.Equal(3235, toplam);
+        Assert.Equal(313, dilBasina["en"]);
         Assert.Equal(104, dilBasina["tr"]);
     }
 
@@ -1503,6 +1504,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, DZA-P2 otomatik bolme ve parca adlari: on uc yeni <c>editor.*</c> anahtari (<c>editor.split.*</c> sekiz, <c>editor.scene.threshold</c>, <c>editor.clip.label</c>, <c>editor.marker.name</c>, <c>editor.export.part-name</c>, <c>.hint</c>), dusen yok; 1390 + 13 = 1403, 43 x 1403 = 60329. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, kosan kodlamayi duraklatma (SIK-P3): uc yeni anahtar (<c>main.action.pause-run</c>, <c>main.action.resume-run</c>, <c>main.shrink-job.disk-paused</c>), <c>main.shrink-job.paused</c> yeniden yazildi, dusen yok: 1390 + 3 = 1393, 43 x 1393 = 59899. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, EKB-P2 imlec vurgusu ve spot isigi: on bir yeni anahtar (<c>recorder.option.cursor-highlight</c>, <c>.spotlight</c>, <c>recorder.pointer.title</c>, <c>.size</c>, <c>.size.small</c>, <c>.size.medium</c>, <c>.size.large</c>, <c>.highlight-color</c>, <c>.left-color</c>, <c>.right-color</c>, <c>.color</c>), dusen yok: 1390 + 11 = 1401, 43 x 1401 = 60243. <c>kayip</c> 0.</para>
+    /// <para>2026-10-14, ses cikisi ve cikis secenekleri (OYA-P4): bes yeni anahtar (<c>player.advanced.passthrough</c>, <c>.exclusive</c>, <c>.stereo</c>, <c>player.tracks.output</c>, <c>.output-auto</c>), dusen yok: 1441 + 5 = 1446, 43 x 1446 = 62178. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1530,7 +1532,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(62436, gezilen);
+        Assert.Equal(62651, gezilen);
         Assert.Empty(kayip);
     }
 
