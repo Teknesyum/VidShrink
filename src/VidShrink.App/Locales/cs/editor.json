@@ -153,5 +153,11 @@
   "editor.export.audio-only": "Exportovat Jen Zvuk",
   "editor.export.audio-only.tip": "Zapíše jen zvuk do souboru M4A (AAC) nebo MP3. Nastavení obrazu a text se ignorují.",
   "editor.export.audio-only.no-audio": "Zdroje časové osy nemají zvuk, není co exportovat.",
-  "editor.export.settings-full": "Nastavení exportu vyžaduje překódování; přepnuto na Plný."
+  "editor.export.settings-full": "Nastavení exportu vyžaduje překódování; přepnuto na Plný.",
+  "editor.copy": "Kopírovat",
+  "editor.cut": "Vyjmout",
+  "editor.paste": "Vložit",
+  "editor.duplicate": "Duplikovat",
+  "editor.group": "Seskupit",
+  "editor.ungroup": "Zrušit seskupení"
 }

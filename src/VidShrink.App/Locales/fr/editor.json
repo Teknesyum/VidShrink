@@ -153,5 +153,11 @@
   "editor.export.audio-only": "Exporter Uniquement l'Audio",
   "editor.export.audio-only.tip": "Écrit uniquement le son dans un fichier M4A (AAC) ou MP3. Les réglages vidéo et le texte sont ignorés.",
   "editor.export.audio-only.no-audio": "Les sources de la timeline n'ont pas de son, il n'y a rien à exporter.",
-  "editor.export.settings-full": "Les réglages d'export exigent un réencodage ; passage en mode Complet."
+  "editor.export.settings-full": "Les réglages d'export exigent un réencodage ; passage en mode Complet.",
+  "editor.copy": "Copier",
+  "editor.cut": "Couper",
+  "editor.paste": "Coller",
+  "editor.duplicate": "Dupliquer",
+  "editor.group": "Grouper",
+  "editor.ungroup": "Dissocier"
 }

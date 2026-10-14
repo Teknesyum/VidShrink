@@ -153,5 +153,11 @@
   "editor.export.audio-only": "صرف آڈیو برآمد کریں",
   "editor.export.audio-only.tip": "صرف آواز کو M4A (AAC) یا MP3 فائل میں لکھتا ہے۔ ویڈیو کی ترتیبات اور متن نظرانداز ہوتے ہیں۔",
   "editor.export.audio-only.no-audio": "ٹائم لائن کے ماخذوں میں آواز نہیں، برآمد کرنے کو کچھ نہیں۔",
-  "editor.export.settings-full": "برآمد کی ترتیبات کو دوبارہ انکوڈنگ درکار ہے؛ مکمل پر منتقل کیا گیا۔"
+  "editor.export.settings-full": "برآمد کی ترتیبات کو دوبارہ انکوڈنگ درکار ہے؛ مکمل پر منتقل کیا گیا۔",
+  "editor.copy": "کاپی کریں",
+  "editor.cut": "کاٹیں",
+  "editor.paste": "چسپاں کریں",
+  "editor.duplicate": "نقل بنائیں",
+  "editor.group": "گروپ بنائیں",
+  "editor.ungroup": "گروپ ختم کریں"
 }

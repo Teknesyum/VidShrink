@@ -69,6 +69,12 @@ internal partial class EditorView
             case EditorCommand.ToolRipple: UseTool(EditorTool.Ripple); break;
             case EditorCommand.Export: RequestExport(); break;
             case EditorCommand.AddText: AddText(); break;
+            case EditorCommand.Copy: CopySelected(); break;
+            case EditorCommand.Cut: CutSelected(); break;
+            case EditorCommand.Paste: PasteClipboard(); break;
+            case EditorCommand.Duplicate: DuplicateSelected(); break;
+            case EditorCommand.GroupClips: GroupSelected(); break;
+            case EditorCommand.UngroupClips: UngroupSelected(); break;
             default: return false;
         }
 
@@ -154,6 +160,12 @@ internal partial class EditorView
         MnuDelete.InputGesture = Gesture(EditorCommand.DeleteSelected);
         MnuMarkIn.InputGesture = Gesture(EditorCommand.MarkIn);
         MnuMarkOut.InputGesture = Gesture(EditorCommand.MarkOut);
+        MnuCopy.InputGesture = Gesture(EditorCommand.Copy);
+        MnuCut.InputGesture = Gesture(EditorCommand.Cut);
+        MnuPaste.InputGesture = Gesture(EditorCommand.Paste);
+        MnuDuplicate.InputGesture = Gesture(EditorCommand.Duplicate);
+        MnuGroup.InputGesture = Gesture(EditorCommand.GroupClips);
+        MnuUngroup.InputGesture = Gesture(EditorCommand.UngroupClips);
         ToolTip.SetTip(BtnSplit, Tip("editor.split", EditorCommand.Split));
         ToolTip.SetTip(BtnUndo, Tip("editor.undo", EditorCommand.Undo));
         ToolTip.SetTip(BtnRedo, Tip("editor.redo", EditorCommand.Redo));

@@ -153,5 +153,11 @@
   "editor.export.audio-only": "Ekspor Audio Saja",
   "editor.export.audio-only.tip": "Hanya menulis audio ke file M4A (AAC) atau MP3. Pengaturan video dan teks diabaikan.",
   "editor.export.audio-only.no-audio": "Sumber linimasa tidak memiliki audio, tidak ada yang bisa diekspor.",
-  "editor.export.settings-full": "Pengaturan ekspor memerlukan pengodean ulang; beralih ke Penuh."
+  "editor.export.settings-full": "Pengaturan ekspor memerlukan pengodean ulang; beralih ke Penuh.",
+  "editor.copy": "Salin",
+  "editor.cut": "Potong",
+  "editor.paste": "Tempel",
+  "editor.duplicate": "Gandakan",
+  "editor.group": "Kelompokkan",
+  "editor.ungroup": "Pisahkan grup"
 }

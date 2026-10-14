@@ -288,6 +288,7 @@ public sealed class EditProject
         writer.WriteBoolean("reversed", clip.Reversed);
         if (clip.Source != 0) writer.WriteNumber("source", clip.Source);
         if (clip.Label is { } label) writer.WriteString("label", label);
+        if (clip.Group is { } group) writer.WriteNumber("group", group);
         var effects = clip.Effects;
         if (!effects.IsNeutral)
         {
@@ -320,6 +321,7 @@ public sealed class EditProject
         {
             Source = item.TryGetProperty("source", out var source) ? source.GetInt32() : 0,
             Label = item.TryGetProperty("label", out var label) ? label.GetString() : null,
+            Group = item.TryGetProperty("group", out var group) ? group.GetInt32() : null,
         };
         if (!item.TryGetProperty("effects", out var e)) return clip;
 

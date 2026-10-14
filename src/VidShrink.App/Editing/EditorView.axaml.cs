@@ -65,6 +65,7 @@ internal partial class EditorView : UserControl
         InitSilence();
         InitProject();
         InitSources();
+        InitClipboard();
 
         MnuSplit.Click += (_, _) => Split();
         MnuDelete.Click += (_, _) => DeleteSelected();
@@ -143,6 +144,7 @@ internal partial class EditorView : UserControl
         ForgetSaved();
         ForgetSilence();
         ForgetSources();
+        ForgetClipboard();
         _source = path;
         _model = null;
         Timeline.Show(null);
@@ -240,7 +242,7 @@ internal partial class EditorView : UserControl
         return Apply(model =>
         {
             if (selected.Any(i => i < 0 || i >= model.Clips.Count)) return false;
-            if (!all && selected.Count >= model.Clips.Count) return false;
+            if (!all && model.WithGroups(selected).Count >= model.Clips.Count) return false;
             return model.DeleteMany(selected);
         }, Math.Max(0, selected.Min() - 1));
     }

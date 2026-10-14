@@ -153,5 +153,11 @@
   "editor.export.audio-only": "فقط صدا را برون‌بری کن",
   "editor.export.audio-only.tip": "فقط صدا را در فایل M4A (AAC) یا MP3 می‌نویسد. تنظیمات تصویر و متن نادیده گرفته می‌شوند.",
   "editor.export.audio-only.no-audio": "منابع خط زمانی صدا ندارند، چیزی برای برون‌بری نیست.",
-  "editor.export.settings-full": "تنظیمات برون‌بری به کدگذاری دوباره نیاز دارد؛ به حالت کامل رفت."
+  "editor.export.settings-full": "تنظیمات برون‌بری به کدگذاری دوباره نیاز دارد؛ به حالت کامل رفت.",
+  "editor.copy": "کپی",
+  "editor.cut": "برش",
+  "editor.paste": "چسباندن",
+  "editor.duplicate": "تکثیر",
+  "editor.group": "گروه‌بندی",
+  "editor.ungroup": "لغو گروه‌بندی"
 }

@@ -153,5 +153,11 @@
   "editor.export.audio-only": "仅导出音频",
   "editor.export.audio-only.tip": "只把音频写入 M4A (AAC) 或 MP3 文件。视频设置和文字会被忽略。",
   "editor.export.audio-only.no-audio": "时间线上的源没有音频，没有可导出的内容。",
-  "editor.export.settings-full": "导出设置需要重新编码；已切换到完整模式。"
+  "editor.export.settings-full": "导出设置需要重新编码；已切换到完整模式。",
+  "editor.copy": "复制",
+  "editor.cut": "剪切",
+  "editor.paste": "粘贴",
+  "editor.duplicate": "创建副本",
+  "editor.group": "编组",
+  "editor.ungroup": "取消编组"
 }

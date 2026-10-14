@@ -153,5 +153,11 @@
   "editor.export.audio-only": "Hamisha Sauti Pekee",
   "editor.export.audio-only.tip": "Huandika sauti pekee kwenye faili ya M4A (AAC) au MP3. Mipangilio ya video na maandishi hupuuzwa.",
   "editor.export.audio-only.no-audio": "Vyanzo vya ratiba havina sauti, hakuna cha kuhamisha.",
-  "editor.export.settings-full": "Mipangilio ya kuhamisha inahitaji kusimba upya; imebadilishwa kuwa Kamili."
+  "editor.export.settings-full": "Mipangilio ya kuhamisha inahitaji kusimba upya; imebadilishwa kuwa Kamili.",
+  "editor.copy": "Nakili",
+  "editor.cut": "Kata",
+  "editor.paste": "Bandika",
+  "editor.duplicate": "Rudufu",
+  "editor.group": "Panga kikundi",
+  "editor.ungroup": "Vunja kikundi"
 }

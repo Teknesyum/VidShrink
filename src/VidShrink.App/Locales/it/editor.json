@@ -153,5 +153,11 @@
   "editor.export.audio-only": "Esporta Solo l'Audio",
   "editor.export.audio-only.tip": "Scrive solo l'audio in un file M4A (AAC) o MP3. Le impostazioni video e il testo vengono ignorati.",
   "editor.export.audio-only.no-audio": "Le sorgenti della timeline non hanno audio, non c'è nulla da esportare.",
-  "editor.export.settings-full": "Le impostazioni di esportazione richiedono una ricodifica; passato a Completa."
+  "editor.export.settings-full": "Le impostazioni di esportazione richiedono una ricodifica; passato a Completa.",
+  "editor.copy": "Copia",
+  "editor.cut": "Taglia",
+  "editor.paste": "Incolla",
+  "editor.duplicate": "Duplica",
+  "editor.group": "Raggruppa",
+  "editor.ungroup": "Separa"
 }
