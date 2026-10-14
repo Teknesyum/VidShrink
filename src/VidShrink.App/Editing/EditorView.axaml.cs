@@ -273,6 +273,15 @@ internal partial class EditorView : UserControl
         return true;
     }
 
+    internal bool GoToKeyframe(bool next)
+    {
+        if (_model is not { } model) return false;
+        var times = TimelineStrip.AllKeyframes(model, Timeline.KeyframeSources());
+        if (TimelineStrip.NeighborKeyframe(times, Timeline.Playhead, next, Timeline.KeyframeTolerance) is not { } at) return false;
+        SeekTo(at);
+        return true;
+    }
+
     internal bool DeleteRange()
     {
         if (Timeline.MarkIn is not { } start || Timeline.MarkOut is not { } end) return false;

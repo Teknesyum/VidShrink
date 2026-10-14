@@ -53,6 +53,8 @@ internal partial class EditorView
             case EditorCommand.TrimTail: TrimToPlayhead(false); break;
             case EditorCommand.PrevEdit: GoToEdit(false); break;
             case EditorCommand.NextEdit: GoToEdit(true); break;
+            case EditorCommand.PrevKeyframe: GoToKeyframe(false); break;
+            case EditorCommand.NextKeyframe: GoToKeyframe(true); break;
             case EditorCommand.Back5: StepFrame(-5); break;
             case EditorCommand.Forward5: StepFrame(5); break;
             case EditorCommand.ZoomIn: Timeline.ZoomCentered(true); break;

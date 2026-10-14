@@ -45,6 +45,17 @@ internal sealed partial class EditorTimeline
         }
     }
 
+    /// <summary>Her kaynagin anahtar kare tick'leri; sira 0 ilk kaynaktir.</summary>
+    internal IReadOnlyDictionary<int, IReadOnlyList<long>> KeyframeSources()
+    {
+        var sources = new Dictionary<int, IReadOnlyList<long>> { [0] = _keyframes };
+        foreach (var (source, ticks) in _extraKeyframes) sources[source] = ticks;
+        return sources;
+    }
+
+    /// <summary>Oynatma basinin anahtar karede sayildigi uzaklik: yarim kare, tick.</summary>
+    internal long KeyframeTolerance => Math.Max(0, (long)Math.Round(FrameTicks / 2) - 1);
+
     internal ThumbnailQueue? Thumbnails
     {
         get => _thumbnails;

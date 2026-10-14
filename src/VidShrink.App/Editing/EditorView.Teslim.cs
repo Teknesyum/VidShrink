@@ -356,7 +356,7 @@ internal partial class EditorView
         => string.Format(Strings.Culture, Strings.Get("editor.export.segments-done"), paths.Count,
             Path.GetDirectoryName(paths[0]) ?? paths[0]);
 
-    private static string Notes(IReadOnlyList<ExportPlan> plans)
+    internal static string Notes(IReadOnlyList<ExportPlan> plans)
     {
         var plan = plans[0];
         var motion = plans.SelectMany(p => p.MotionClips).Distinct().OrderBy(i => i).ToArray();
@@ -368,6 +368,10 @@ internal partial class EditorView
         else if (plan.FellBackToFull) lines.Add(Strings.Get("editor.export.fallback"));
         else if (plans.Any(p => p.Effective != ExportMode.Full) && motion.Length > 0)
             lines.Add(string.Format(Strings.Culture, Strings.Get("editor.export.reencoded"), ClipNumbers(motion)));
+        var (shifted, longest) = EditExport.KeyframeLeadSummary(plans);
+        if (shifted.Count > 0)
+            lines.Add(string.Format(Strings.Culture, Strings.Get("editor.export.keyframe-lead"), ClipNumbers(shifted),
+                longest.ToString("0.##", Strings.Culture)));
 
         return string.Join(Environment.NewLine, lines);
     }

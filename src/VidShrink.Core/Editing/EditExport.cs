@@ -32,6 +32,12 @@ public sealed record ExportPlan(
 {
     public IReadOnlyList<int> MotionClips { get; init; } = Array.Empty<int>();
 
+    /// <summary>
+    /// Hizli kipte her klibin onceki anahtar kareye cekilen basinin kaymasi, saniye, cizelge sirasinda;
+    /// yeniden kodlanan klipte 0. Hizli disindaki kiplerde bos.
+    /// </summary>
+    public IReadOnlyList<double> KeyframeLeads { get; init; } = Array.Empty<double>();
+
     /// <summary>Cizelgede metin oldugu icin <c>-c copy</c> yolu birakilip Tam'a gecildi.</summary>
     public bool TextForcedFull { get; init; }
 
@@ -73,6 +79,20 @@ public static class EditExport
     public const string MergeAudioFormat = "aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo";
 
     public const string MergeSilence = "anullsrc=r=48000:cl=stereo";
+
+    /// <summary>Bildirilecek en kucuk kayma, saniye; altindaki fark notta 0 olarak yazilirdi.</summary>
+    public const double KeyframeLeadNotice = 0.005;
+
+    /// <summary>
+    /// Planlarin kaymalarini cizelge sirasiyla duzler; bildirim esigini gecen kliplerin sifirdan sira
+    /// numaralari ve en buyuk kayma.
+    /// </summary>
+    public static (IReadOnlyList<int> Clips, double Longest) KeyframeLeadSummary(IReadOnlyList<ExportPlan> plans)
+    {
+        var leads = plans.SelectMany(p => p.KeyframeLeads).ToArray();
+        var clips = Enumerable.Range(0, leads.Length).Where(i => leads[i] >= KeyframeLeadNotice).ToArray();
+        return (clips, clips.Length == 0 ? 0 : clips.Max(i => leads[i]));
+    }
 
     /// <summary>
     /// Akilli kesimde yalniz aynen kopyalanan ses kodegi (<c>docs/olcumler/akilli-kesme-opus.md</c>):
@@ -525,12 +545,14 @@ public static class EditExport
         double limit, IReadOnlyList<int> over)
     {
         var list = new StringBuilder("ffconcat version 1.0\n");
+        var leads = new List<double>(timeline.Clips.Count);
         double expected = 0;
         foreach (var clip in timeline.Clips)
         {
             var start = EditTime.ToSeconds(clip.SourceStart);
             var end = EditTime.ToSeconds(clip.SourceEnd);
             var inpoint = KeyframeAtOrBefore(keyframes, start);
+            leads.Add(start - inpoint);
             expected += end - inpoint;
             list.Append("file ").Append(Quote(info.FilePath)).Append('\n');
             if (inpoint > 0) list.Append("inpoint ").Append(Number(inpoint + startTime)).Append('\n');
@@ -545,7 +567,7 @@ public static class EditExport
         args.Add(output);
 
         return new ExportPlan(ExportMode.Fast, ExportMode.Fast, new[] { new ExportStep(args, expected, listPath, list.ToString()) },
-            over, limit, output, work);
+            over, limit, output, work) { KeyframeLeads = leads };
     }
 
     private static ExportPlan Segmented(
@@ -554,6 +576,7 @@ public static class EditExport
     {
         var steps = new List<ExportStep>();
         var segments = new List<string>();
+        var leads = new List<double>(timeline.Clips.Count);
         double expected = 0;
 
         foreach (var clip in timeline.Clips)
@@ -566,10 +589,12 @@ public static class EditExport
                 var length = EditTime.ToSeconds(clip.TimelineLength);
                 steps.Add(Encode(info, start, end - start, VideoMotion(clip, info), AudioMotion(clip), Segment(work, segments)));
                 expected += length;
+                leads.Add(0);
                 continue;
             }
 
             var inpoint = KeyframeAtOrBefore(keyframes, start);
+            leads.Add(start - inpoint);
             steps.Add(Copy(info, inpoint, end - inpoint, Segment(work, segments)));
             expected += end - inpoint;
         }
@@ -584,7 +609,7 @@ public static class EditExport
         join.Add(output);
         steps.Add(new ExportStep(join, expected, listPath, list.ToString()));
 
-        return new ExportPlan(ExportMode.Fast, ExportMode.Fast, steps, over, limit, output, work);
+        return new ExportPlan(ExportMode.Fast, ExportMode.Fast, steps, over, limit, output, work) { KeyframeLeads = leads };
     }
 
     /// <summary>
