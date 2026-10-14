@@ -109,5 +109,18 @@
   "editor.scene.done": "Delat vid {0} scenbyten.",
   "editor.source.add": "Lägg till källa",
   "editor.source.failed": "Det gick inte att lägga till {0}: den saknar video eller kan inte läsas.",
-  "editor.export.merge-full": "Flera källor slås ihop, så hela videon kodas om."
+  "editor.export.merge-full": "Flera källor slås ihop, så hela videon kodas om.",
+  "editor.split.auto": "Automatisk delning",
+  "editor.split.count": "Lika antal delar",
+  "editor.split.duration": "Fast längd (s)",
+  "editor.split.size": "Målstorlek (MB)",
+  "editor.split.value": "Delningsvärde",
+  "editor.split.apply": "Dela",
+  "editor.split.invalid": "Ogiltigt värde.",
+  "editor.split.done": "{0} nya delar skapades.",
+  "editor.scene.threshold": "Scentröskel",
+  "editor.clip.label": "Etikett",
+  "editor.marker.name": "Markörnamn",
+  "editor.export.part-name": "Delnamn",
+  "editor.export.part-name.hint": "Namnmönster för separata delar. Platshållare: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Lämna tomt för att använda standard."
 }

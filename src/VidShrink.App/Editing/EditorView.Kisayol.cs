@@ -42,7 +42,7 @@ internal partial class EditorView
             case EditorCommand.GoToEnd: SeekTo(model.Duration); break;
             case EditorCommand.MarkIn: MarkIn(); break;
             case EditorCommand.MarkOut: MarkOut(); break;
-            case EditorCommand.AddMarker: Timeline.AddMarker(Timeline.Playhead); break;
+            case EditorCommand.AddMarker: Timeline.AddMarker(Timeline.Playhead); MarkEdited(); break;
             case EditorCommand.Split: Split(); break;
             case EditorCommand.DeleteSelected: DeleteSelected(); break;
             case EditorCommand.SelectAll: Timeline.SelectAll(); break;

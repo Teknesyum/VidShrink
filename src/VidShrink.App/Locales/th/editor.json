@@ -109,5 +109,18 @@
   "editor.scene.done": "แบ่งที่จุดเปลี่ยนฉาก {0} จุดแล้ว",
   "editor.source.add": "เพิ่มแหล่งที่มา",
   "editor.source.failed": "เพิ่ม {0} ไม่ได้: ไม่มีวิดีโอหรืออ่านไฟล์ไม่ได้",
-  "editor.export.merge-full": "มีการรวมหลายแหล่งที่มา จึงเข้ารหัสวิดีโอใหม่ทั้งหมด"
+  "editor.export.merge-full": "มีการรวมหลายแหล่งที่มา จึงเข้ารหัสวิดีโอใหม่ทั้งหมด",
+  "editor.split.auto": "แบ่งอัตโนมัติ",
+  "editor.split.count": "จำนวนส่วนเท่ากัน",
+  "editor.split.duration": "ระยะเวลาคงที่ (วินาที)",
+  "editor.split.size": "ขนาดเป้าหมาย (MB)",
+  "editor.split.value": "ค่าการแบ่ง",
+  "editor.split.apply": "แบ่ง",
+  "editor.split.invalid": "ค่าไม่ถูกต้อง",
+  "editor.split.done": "สร้างส่วนใหม่ {0} ส่วน",
+  "editor.scene.threshold": "เกณฑ์ฉาก",
+  "editor.clip.label": "ป้ายกำกับ",
+  "editor.marker.name": "ชื่อตัวทำเครื่องหมาย",
+  "editor.export.part-name": "ชื่อส่วน",
+  "editor.export.part-name.hint": "รูปแบบชื่อของส่วนที่แยกกัน ตัวยึดตำแหน่ง: {ad}, {parca}, {etiket}, {zaman}, {tarih} เว้นว่างไว้เพื่อใช้ค่าเริ่มต้น"
 }

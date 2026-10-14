@@ -109,5 +109,18 @@
   "editor.scene.done": "Razdeljeno ob menjavah prizora: {0}.",
   "editor.source.add": "Dodaj vir",
   "editor.source.failed": "{0} ni bilo mogoče dodati: nima videa ali ga ni mogoče prebrati.",
-  "editor.export.merge-full": "Združuje se več virov, zato se celoten video znova kodira."
+  "editor.export.merge-full": "Združuje se več virov, zato se celoten video znova kodira.",
+  "editor.split.auto": "Samodejna razdelitev",
+  "editor.split.count": "Enako število delov",
+  "editor.split.duration": "Fiksno trajanje (s)",
+  "editor.split.size": "Ciljna velikost (MB)",
+  "editor.split.value": "Vrednost razdelitve",
+  "editor.split.apply": "Razdeli",
+  "editor.split.invalid": "Neveljavna vrednost.",
+  "editor.split.done": "Ustvarjenih novih delov: {0}.",
+  "editor.scene.threshold": "Prag prizora",
+  "editor.clip.label": "Oznaka",
+  "editor.marker.name": "Ime označevalca",
+  "editor.export.part-name": "Ime dela",
+  "editor.export.part-name.hint": "Vzorec imen ločenih delov. Ograde: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Pustite prazno za privzeto."
 }

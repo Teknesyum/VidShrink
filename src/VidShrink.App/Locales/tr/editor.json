@@ -109,5 +109,18 @@
   "editor.scene.done": "{0} sahne sınırında bölündü.",
   "editor.source.add": "Kaynak ekle",
   "editor.source.failed": "{0} eklenemedi: görüntü yok ya da dosya okunamıyor.",
-  "editor.export.merge-full": "Birden çok kaynak birleştiriliyor, bu yüzden videonun tamamı yeniden kodlanır."
+  "editor.export.merge-full": "Birden çok kaynak birleştiriliyor, bu yüzden videonun tamamı yeniden kodlanır.",
+  "editor.split.auto": "Otomatik böl",
+  "editor.split.count": "Eşit parça sayısı",
+  "editor.split.duration": "Sabit süre (sn)",
+  "editor.split.size": "Hedef boyut (MB)",
+  "editor.split.value": "Bölme değeri",
+  "editor.split.apply": "Böl",
+  "editor.split.invalid": "Geçersiz değer.",
+  "editor.split.done": "{0} yeni parça oluştu.",
+  "editor.scene.threshold": "Sahne eşiği",
+  "editor.clip.label": "Etiket",
+  "editor.marker.name": "İşaretçi adı",
+  "editor.export.part-name": "Parça adı",
+  "editor.export.part-name.hint": "Ayrı parçaların ad deseni. Yer tutucular: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Boş bırakılırsa varsayılan kullanılır."
 }

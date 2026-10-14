@@ -220,6 +220,8 @@ internal partial class EditorView : UserControl
         _model = model;
         Timeline.Fps = fps;
         Timeline.Show(model);
+        Timeline.SetMarkers(_pendingMarkers);
+        _pendingMarkers = Array.Empty<EditMarker>();
         RefreshToolbar();
     }
 
@@ -431,7 +433,7 @@ internal partial class EditorView : UserControl
         MnuDeleteRange.IsEnabled = Timeline.MarkIn is { } a && Timeline.MarkOut is { } b && b > a;
     }
 
-    private int ActiveIndex => Timeline.AllSelected && _model is { Clips.Count: > 0 } ? 0 : Timeline.SelectedIndex;
+    internal int ActiveIndex => Timeline.AllSelected && _model is { Clips.Count: > 0 } ? 0 : Timeline.SelectedIndex;
 
     private bool Reversed()
     {

@@ -190,7 +190,7 @@ public sealed class DuzenleyiciSahneBolmeTests
             Assert.True(view.BtnSceneSplit.IsEnabled);
             string? kaynak = null;
             var sure = 0d;
-            view.SceneScanner = (yol, saniye, ilerleme, _) =>
+            view.SceneScanner = (yol, saniye, _, ilerleme, _) =>
             {
                 kaynak = yol;
                 sure = saniye;
@@ -221,14 +221,14 @@ public sealed class DuzenleyiciSahneBolmeTests
         Arayuz("sahne-bos", (view, model) =>
         {
             var once = model.Clips.ToArray();
-            view.SceneScanner = (_, _, _, _) => Task.FromResult<IReadOnlyList<double>>(Array.Empty<double>());
+            view.SceneScanner = (_, _, _, _, _) => Task.FromResult<IReadOnlyList<double>>(Array.Empty<double>());
             var bos = view.SplitScenesAsync();
             DenetimSurucu.Pump(view.Player, () => bos.IsCompleted, 10);
             Assert.Equal(0, bos.Result);
             Assert.Equal(Strings.Get("editor.scene.none"), view.TxtSilenceStatus.Text);
             Assert.Equal(once, model.Clips);
 
-            view.SceneScanner = (_, _, _, _) => Task.FromResult<IReadOnlyList<double>>(new[] { 0.2, 599.9, 900 });
+            view.SceneScanner = (_, _, _, _, _) => Task.FromResult<IReadOnlyList<double>>(new[] { 0.2, 599.9, 900 });
             var yakin = view.SplitScenesAsync();
             DenetimSurucu.Pump(view.Player, () => yakin.IsCompleted, 10);
             Assert.Equal(0, yakin.Result);
@@ -244,7 +244,7 @@ public sealed class DuzenleyiciSahneBolmeTests
         Arayuz("sahne-iptal", (view, model) =>
         {
             var once = model.Clips.ToArray();
-            view.SceneScanner = async (_, _, _, ct) =>
+            view.SceneScanner = async (_, _, _, _, ct) =>
             {
                 await Task.Delay(Timeout.Infinite, ct);
                 return new[] { 300d };
@@ -264,7 +264,7 @@ public sealed class DuzenleyiciSahneBolmeTests
             Assert.Equal(once, model.Clips);
             Assert.False(view.Undo());
 
-            view.SceneScanner = (_, _, _, _) => Task.FromException<IReadOnlyList<double>>(new InvalidOperationException("bozuk"));
+            view.SceneScanner = (_, _, _, _, _) => Task.FromException<IReadOnlyList<double>>(new InvalidOperationException("bozuk"));
             var bozuk = view.SplitScenesAsync();
             DenetimSurucu.Pump(view.Player, () => bozuk.IsCompleted, 10);
             Assert.Equal(0, bozuk.Result);

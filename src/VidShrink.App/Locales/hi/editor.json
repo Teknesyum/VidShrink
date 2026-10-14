@@ -109,5 +109,18 @@
   "editor.scene.done": "{0} दृश्य बदलावों पर विभाजित किया गया।",
   "editor.source.add": "स्रोत जोड़ें",
   "editor.source.failed": "{0} जोड़ा नहीं जा सका: इसमें वीडियो नहीं है या फ़ाइल पढ़ी नहीं जा सकती।",
-  "editor.export.merge-full": "एक से अधिक स्रोत जोड़े जा रहे हैं, इसलिए पूरा वीडियो फिर से एन्कोड होता है।"
+  "editor.export.merge-full": "एक से अधिक स्रोत जोड़े जा रहे हैं, इसलिए पूरा वीडियो फिर से एन्कोड होता है।",
+  "editor.split.auto": "स्वचालित विभाजन",
+  "editor.split.count": "बराबर भागों की संख्या",
+  "editor.split.duration": "निश्चित अवधि (से)",
+  "editor.split.size": "लक्ष्य आकार (MB)",
+  "editor.split.value": "विभाजन मान",
+  "editor.split.apply": "विभाजित करें",
+  "editor.split.invalid": "अमान्य मान।",
+  "editor.split.done": "{0} नए भाग बनाए गए।",
+  "editor.scene.threshold": "दृश्य सीमा",
+  "editor.clip.label": "लेबल",
+  "editor.marker.name": "मार्कर का नाम",
+  "editor.export.part-name": "भाग का नाम",
+  "editor.export.part-name.hint": "अलग भागों के नाम का पैटर्न। प्लेसहोल्डर: {ad}, {parca}, {etiket}, {zaman}, {tarih}। डिफ़ॉल्ट उपयोग करने के लिए खाली छोड़ें।"
 }

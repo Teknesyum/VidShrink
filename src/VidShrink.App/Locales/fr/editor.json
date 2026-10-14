@@ -109,5 +109,18 @@
   "editor.scene.done": "Scindé à {0} changements de scène.",
   "editor.source.add": "Ajouter une source",
   "editor.source.failed": "Impossible d'ajouter {0} : pas de vidéo ou fichier illisible.",
-  "editor.export.merge-full": "Plusieurs sources sont fusionnées, la vidéo entière est donc réencodée."
+  "editor.export.merge-full": "Plusieurs sources sont fusionnées, la vidéo entière est donc réencodée.",
+  "editor.split.auto": "Scission automatique",
+  "editor.split.count": "Nombre égal de parties",
+  "editor.split.duration": "Durée fixe (s)",
+  "editor.split.size": "Taille cible (Mo)",
+  "editor.split.value": "Valeur de scission",
+  "editor.split.apply": "Scinder",
+  "editor.split.invalid": "Valeur non valide.",
+  "editor.split.done": "{0} nouvelles parties créées.",
+  "editor.scene.threshold": "Seuil de scène",
+  "editor.clip.label": "Étiquette",
+  "editor.marker.name": "Nom du repère",
+  "editor.export.part-name": "Nom de la partie",
+  "editor.export.part-name.hint": "Modèle de nom des parties séparées. Espaces réservés : {ad}, {parca}, {etiket}, {zaman}, {tarih}. Laisser vide pour utiliser la valeur par défaut."
 }

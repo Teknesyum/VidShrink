@@ -86,6 +86,24 @@ internal partial class EditorView
 
     internal Action<bool>? DropMetadataChanged { get; set; }
 
+    /// <summary>
+    /// Ayri parcalarin ad deseni; kutu bos ya da bozuksa <c>null</c> ve parcalar eski adlarini alir. Secim ana
+    /// pencerenin ayarinda saklanir, degisimi <see cref="PartNamePatternChanged"/> bildirir.
+    /// </summary>
+    internal string? PartNamePattern
+    {
+        get => AdlandirmaDeseni.ParcaHata(TxtPartName.Text) is null ? TxtPartName.Text!.Trim() : null;
+        set => TxtPartName.Text = value ?? string.Empty;
+    }
+
+    internal Action<string?>? PartNamePatternChanged { get; set; }
+
+    /// <summary>Ayri teslimde parcalarin alacagi adlar; <paramref name="output"/> cikti adinin govdesini verir.</summary>
+    internal IReadOnlyList<string> PartNames(string output)
+        => _model is { Clips.Count: > 0 } model
+            ? EditOutputName.Segments(output, EditExportRunner.PartNames(model), PartNamePattern, OutputExists)
+            : Array.Empty<string>();
+
     internal ExportMode SelectedExportMode
     {
         get => CmbExportMode.SelectedIndex switch { 0 => ExportMode.Fast, 2 => ExportMode.Full, _ => ExportMode.Smart };
@@ -110,6 +128,15 @@ internal partial class EditorView
         {
             _pendingPlan = null;
             DropMetadataChanged?.Invoke(DropMetadata);
+        };
+        TxtPartName.PlaceholderText = EditOutputName.PartPattern;
+        TxtPartName.PropertyChanged += (_, e) =>
+        {
+            if (e.Property != TextBox.TextProperty) return;
+            _pendingPlan = null;
+            var empty = string.IsNullOrWhiteSpace(TxtPartName.Text);
+            TxtPartNameError.Text = empty || AdlandirmaDeseni.ParcaHata(TxtPartName.Text) is null ? string.Empty : Strings.Get("editor.export.part-name.hint");
+            if (empty || TxtPartNameError.Text.Length == 0) PartNamePatternChanged?.Invoke(PartNamePattern);
         };
     }
 
@@ -136,7 +163,7 @@ internal partial class EditorView
         _pendingPlan = null;
     }
 
-    private string SaveKey(EditTimeline model) => Fingerprint(model) + "|" + SelectedExportMode + (ExportSeparately ? "|parts" : string.Empty) + (DropMetadata ? "|meta" : string.Empty);
+    private string SaveKey(EditTimeline model) => Fingerprint(model) + "|" + SelectedExportMode + (ExportSeparately ? "|parts|" + PartNamePattern : string.Empty) + (DropMetadata ? "|meta" : string.Empty);
 
     internal async Task<bool> SaveAsync()
     {
@@ -187,7 +214,7 @@ internal partial class EditorView
         try
         {
             plans = ExportSeparately
-                ? await EditExportRunner.PrepareSegmentsAsync(sources, snapshot, SelectedExportMode, output, ExportMemoryBudget(), OutputExists, DropMetadata).ConfigureAwait(true)
+                ? await EditExportRunner.PrepareSegmentsAsync(sources, snapshot, SelectedExportMode, output, ExportMemoryBudget(), OutputExists, DropMetadata, partPattern: PartNamePattern).ConfigureAwait(true)
                 : new[] { await EditExportRunner.PrepareAsync(sources, snapshot, SelectedExportMode, output, ExportMemoryBudget(), DropMetadata).ConfigureAwait(true) };
         }
         catch (Exception ex) when (ex is IOException or InvalidOperationException or UnauthorizedAccessException or System.Text.Json.JsonException or System.ComponentModel.Win32Exception)

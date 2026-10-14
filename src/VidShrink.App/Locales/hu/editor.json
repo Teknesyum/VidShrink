@@ -109,5 +109,18 @@
   "editor.scene.done": "Felosztva {0} jelenetváltásnál.",
   "editor.source.add": "Forrás hozzáadása",
   "editor.source.failed": "{0} nem adható hozzá: nincs benne videó, vagy nem olvasható.",
-  "editor.export.merge-full": "Több forrás kerül összefűzésre, ezért a teljes videó újrakódolódik."
+  "editor.export.merge-full": "Több forrás kerül összefűzésre, ezért a teljes videó újrakódolódik.",
+  "editor.split.auto": "Automatikus felosztás",
+  "editor.split.count": "Egyenlő részszám",
+  "editor.split.duration": "Rögzített időtartam (mp)",
+  "editor.split.size": "Célméret (MB)",
+  "editor.split.value": "Felosztási érték",
+  "editor.split.apply": "Felosztás",
+  "editor.split.invalid": "Érvénytelen érték.",
+  "editor.split.done": "{0} új rész jött létre.",
+  "editor.scene.threshold": "Jelenetküszöb",
+  "editor.clip.label": "Címke",
+  "editor.marker.name": "Jelölő neve",
+  "editor.export.part-name": "Rész neve",
+  "editor.export.part-name.hint": "A különálló részek névmintája. Helyőrzők: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Hagyja üresen az alapértelmezetthez."
 }

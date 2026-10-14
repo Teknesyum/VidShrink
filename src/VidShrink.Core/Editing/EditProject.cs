@@ -45,8 +45,9 @@ public sealed class EditProject
     private static readonly UTF8Encoding Utf8 = new(false);
 
     private EditProject(SourceStamp source, long sourceDuration, IReadOnlyList<EditClip> clips, IReadOnlyList<TextLayer> texts, string? exportMode,
-        IReadOnlyList<ExtraSource> extraSources)
+        IReadOnlyList<ExtraSource> extraSources, IReadOnlyList<EditMarker> markers)
     {
+        Markers = markers;
         ExtraSources = extraSources;
         Source = source;
         SourceDuration = sourceDuration;
@@ -67,10 +68,14 @@ public sealed class EditProject
 
     public IReadOnlyList<ExtraSource> ExtraSources { get; }
 
+    /// <summary>Cizelgenin isaretcileri, ana gore sirali. Bos liste dosyaya yazilmaz.</summary>
+    public IReadOnlyList<EditMarker> Markers { get; }
+
     /// <summary>
     /// <paramref name="extraSources"/> cizelgenin ek kaynaklariyla ayni sirada ve ayni sayida olmalidir.
     /// </summary>
-    public static EditProject From(SourceStamp source, EditTimeline timeline, string? exportMode = null, IReadOnlyList<SourceStamp>? extraSources = null)
+    public static EditProject From(SourceStamp source, EditTimeline timeline, string? exportMode = null, IReadOnlyList<SourceStamp>? extraSources = null,
+        IReadOnlyList<EditMarker>? markers = null)
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(timeline);
@@ -79,7 +84,7 @@ public sealed class EditProject
             throw new ArgumentException("Her ek kaynaga bir kimlik gerekir", nameof(extraSources));
         var duration = timeline.SourceDuration ?? timeline.Clips.Where(c => c.Source == 0).Select(c => c.SourceEnd).DefaultIfEmpty(1).Max();
         var extras = stamps.Select((stamp, i) => new ExtraSource(stamp, timeline.ExtraSources[i])).ToArray();
-        return new EditProject(source, duration, timeline.Clips.ToArray(), timeline.Texts.ToArray(), exportMode, extras);
+        return new EditProject(source, duration, timeline.Clips.ToArray(), timeline.Texts.ToArray(), exportMode, extras, Sorted(markers ?? Array.Empty<EditMarker>()));
     }
 
     /// <summary>
@@ -129,6 +134,21 @@ public sealed class EditProject
             writer.WriteStartArray("texts");
             foreach (var text in Texts) WriteText(writer, text);
             writer.WriteEndArray();
+
+            if (Markers.Count > 0)
+            {
+                writer.WriteStartArray("markers");
+                foreach (var marker in Markers)
+                {
+                    writer.WriteStartObject();
+                    writer.WriteNumber("time", marker.Time);
+                    if (marker.Name is { } name) writer.WriteString("name", name);
+                    writer.WriteEndObject();
+                }
+
+                writer.WriteEndArray();
+            }
+
             writer.WriteEndObject();
         }
 
@@ -159,8 +179,10 @@ public sealed class EditProject
                 ? list.EnumerateArray().Select(ReadExtra).ToArray()
                 : Array.Empty<ExtraSource>();
 
+            var markers = root.TryGetProperty("markers", out var marks) ? Sorted(marks.EnumerateArray().Select(ReadMarker)) : Array.Empty<EditMarker>();
+
             _ = new EditTimeline(clips, duration, texts, extras.Select(e => e.Duration));
-            var project = new EditProject(stamp, duration, clips, texts, mode, extras);
+            var project = new EditProject(stamp, duration, clips, texts, mode, extras, markers);
             return project.FitsIn(duration) ? project : null;
         }
         catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException or FormatException or ArgumentException or OverflowException)
@@ -168,6 +190,11 @@ public sealed class EditProject
             return null;
         }
     }
+
+    private static EditMarker ReadMarker(JsonElement item)
+        => new(item.GetProperty("time").GetInt64(), item.TryGetProperty("name", out var name) ? name.GetString() : null);
+
+    private static EditMarker[] Sorted(IEnumerable<EditMarker> markers) => markers.OrderBy(m => m.Time).ToArray();
 
     private static ExtraSource ReadExtra(JsonElement item)
     {
@@ -260,6 +287,7 @@ public sealed class EditProject
         writer.WriteNumber("speed", clip.Speed);
         writer.WriteBoolean("reversed", clip.Reversed);
         if (clip.Source != 0) writer.WriteNumber("source", clip.Source);
+        if (clip.Label is { } label) writer.WriteString("label", label);
         var effects = clip.Effects;
         if (!effects.IsNeutral)
         {
@@ -286,7 +314,8 @@ public sealed class EditProject
         var clip = new EditClip(item.GetProperty("start").GetInt64(), item.GetProperty("end").GetInt64(),
             item.GetProperty("speed").GetDecimal(), item.GetProperty("reversed").GetBoolean())
         {
-            Source = item.TryGetProperty("source", out var source) ? source.GetInt32() : 0
+            Source = item.TryGetProperty("source", out var source) ? source.GetInt32() : 0,
+            Label = item.TryGetProperty("label", out var label) ? label.GetString() : null,
         };
         if (!item.TryGetProperty("effects", out var e)) return clip;
 

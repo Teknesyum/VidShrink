@@ -109,5 +109,18 @@
   "editor.scene.done": "장면 전환 {0}곳에서 분할했습니다.",
   "editor.source.add": "소스 추가",
   "editor.source.failed": "{0}을(를) 추가할 수 없습니다. 영상이 없거나 읽을 수 없습니다.",
-  "editor.export.merge-full": "여러 소스를 합치므로 영상 전체를 다시 인코딩합니다."
+  "editor.export.merge-full": "여러 소스를 합치므로 영상 전체를 다시 인코딩합니다.",
+  "editor.split.auto": "자동 분할",
+  "editor.split.count": "같은 개수로 나누기",
+  "editor.split.duration": "고정 길이(초)",
+  "editor.split.size": "목표 크기(MB)",
+  "editor.split.value": "분할 값",
+  "editor.split.apply": "분할",
+  "editor.split.invalid": "잘못된 값입니다.",
+  "editor.split.done": "새 조각 {0}개를 만들었습니다.",
+  "editor.scene.threshold": "장면 임계값",
+  "editor.clip.label": "레이블",
+  "editor.marker.name": "마커 이름",
+  "editor.export.part-name": "조각 이름",
+  "editor.export.part-name.hint": "개별 조각의 이름 패턴. 자리 표시자: {ad}, {parca}, {etiket}, {zaman}, {tarih}. 비워 두면 기본값을 사용합니다."
 }

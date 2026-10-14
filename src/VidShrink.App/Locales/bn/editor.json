@@ -109,5 +109,18 @@
   "editor.scene.done": "{0}টি দৃশ্য পরিবর্তনে ভাগ করা হয়েছে।",
   "editor.source.add": "উৎস যোগ করুন",
   "editor.source.failed": "{0} যোগ করা যায়নি: এতে ভিডিও নেই বা ফাইলটি পড়া যাচ্ছে না।",
-  "editor.export.merge-full": "একাধিক উৎস জোড়া হচ্ছে, তাই পুরো ভিডিও আবার এনকোড করা হয়।"
+  "editor.export.merge-full": "একাধিক উৎস জোড়া হচ্ছে, তাই পুরো ভিডিও আবার এনকোড করা হয়।",
+  "editor.split.auto": "স্বয়ংক্রিয় ভাগ",
+  "editor.split.count": "সমান অংশের সংখ্যা",
+  "editor.split.duration": "নির্দিষ্ট সময়কাল (সে)",
+  "editor.split.size": "লক্ষ্য আকার (MB)",
+  "editor.split.value": "ভাগের মান",
+  "editor.split.apply": "ভাগ করুন",
+  "editor.split.invalid": "অবৈধ মান।",
+  "editor.split.done": "{0}টি নতুন অংশ তৈরি হয়েছে।",
+  "editor.scene.threshold": "দৃশ্যের সীমা",
+  "editor.clip.label": "লেবেল",
+  "editor.marker.name": "মার্কারের নাম",
+  "editor.export.part-name": "অংশের নাম",
+  "editor.export.part-name.hint": "আলাদা অংশগুলোর নামের প্যাটার্ন। প্লেসহোল্ডার: {ad}, {parca}, {etiket}, {zaman}, {tarih}। ডিফল্ট ব্যবহার করতে খালি রাখুন।"
 }

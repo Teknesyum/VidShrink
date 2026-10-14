@@ -109,5 +109,18 @@
   "editor.scene.done": "Delt ved {0} sceneskift.",
   "editor.source.add": "Tilføj kilde",
   "editor.source.failed": "{0} kunne ikke tilføjes: den har ingen video eller kan ikke læses.",
-  "editor.export.merge-full": "Flere kilder flettes, så hele videoen omkodes."
+  "editor.export.merge-full": "Flere kilder flettes, så hele videoen omkodes.",
+  "editor.split.auto": "Automatisk opdeling",
+  "editor.split.count": "Lige antal dele",
+  "editor.split.duration": "Fast varighed (s)",
+  "editor.split.size": "Målstørrelse (MB)",
+  "editor.split.value": "Opdelingsværdi",
+  "editor.split.apply": "Opdel",
+  "editor.split.invalid": "Ugyldig værdi.",
+  "editor.split.done": "{0} nye dele oprettet.",
+  "editor.scene.threshold": "Scenetærskel",
+  "editor.clip.label": "Etiket",
+  "editor.marker.name": "Markørnavn",
+  "editor.export.part-name": "Delnavn",
+  "editor.export.part-name.hint": "Navnemønster for separate dele. Pladsholdere: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Lad feltet være tomt for at bruge standarden."
 }

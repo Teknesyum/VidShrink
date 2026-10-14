@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,6 +23,7 @@ internal partial class EditorView
     private bool _unsaved;
     private Window? _projectWindow;
     private bool _projectNotice;
+    private IReadOnlyList<EditMarker> _pendingMarkers = Array.Empty<EditMarker>();
 
     internal EditProjectStore? Projects { get; set; } = EditProjectStore.Default;
 
@@ -94,11 +96,12 @@ internal partial class EditorView
 
     private EditProject? CurrentProject()
         => _model is { } model && _stamp is { } stamp && ExtraStamps() is { } extras
-            ? EditProject.From(stamp, model, SelectedExportMode.ToString(), extras)
+            ? EditProject.From(stamp, model, SelectedExportMode.ToString(), extras, Timeline.MarkerList)
             : null;
 
     private EditTimeline OpenedTimeline(string path, long sourceDuration, EditProject? given)
     {
+        _pendingMarkers = Array.Empty<EditMarker>();
         var model = EditTimeline.FromSource(sourceDuration);
         _stamp = SourceStamp.Of(path);
         if (_stamp is not { } stamp) return model;
@@ -121,10 +124,19 @@ internal partial class EditorView
             model = new EditTimeline(model.Clips, sourceDuration, extraSources: project.ExtraSources.Select(extra => extra.Duration));
         }
 
-        if (!model.Restore(project.Clips, project.Texts)) return model;
+        if (!model.Restore(project.Clips, project.Texts) && project.Markers.Count == 0) return model;
+        _pendingMarkers = project.Markers;
         UseExportMode(project.ExportMode);
         ShowProjectStatus("StatusSuccess", Strings.Get("editor.project.restored"));
         return model;
+    }
+
+    /// <summary>Kutudaki adi oynatma basindaki isaretciye yazar; isaretci yoksa ekler. Bos ad adi siler.</summary>
+    internal bool CommitMarkerName()
+    {
+        if (_model is null || !Timeline.NameMarker(Timeline.Playhead, TxtMarkerName.Text)) return false;
+        MarkEdited();
+        return true;
     }
 
     private void UseExportMode(string? name)
@@ -175,6 +187,7 @@ internal partial class EditorView
 
             _stamp = stamp;
             if (Apply(m => m.Restore(project.Clips, project.Texts), -1, reload: true)) AfterTextEdit(-1);
+            Timeline.SetMarkers(project.Markers);
             UseExportMode(project.ExportMode);
             ShowProjectStatus("StatusSuccess", Strings.Get("editor.project.restored"));
             return true;

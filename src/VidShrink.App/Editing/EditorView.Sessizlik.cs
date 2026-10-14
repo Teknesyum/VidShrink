@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Input;
 using VidShrink.App.Localization;
 using VidShrink.Core;
 using VidShrink.Core.Editing;
@@ -43,6 +44,11 @@ internal partial class EditorView
         BtnSilenceCancel.Click += (_, _) => _silenceCts?.Cancel();
         BtnSilenceApply.Click += (_, _) => ApplySilence();
         BtnSceneSplit.Click += (_, _) => _ = SplitScenesAsync();
+        TxtSceneThreshold.Text = SceneMap.DefaultThreshold.ToString("0.###", Strings.Culture);
+        CmbAutoSplit.SelectedIndex = 0;
+        BtnAutoSplit.Click += (_, _) => AutoSplitClips();
+        TxtMarkerName.LostFocus += (_, _) => CommitMarkerName();
+        TxtMarkerName.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitMarkerName());
         ChkSilenceAudio.IsCheckedChanged += (_, _) => RefreshSilence();
         ChkSilenceBlack.IsCheckedChanged += (_, _) => RefreshSilence();
         TxtSilenceThreshold.TextChanged += (_, _) => RefreshSilence();
@@ -149,6 +155,7 @@ internal partial class EditorView
         var options = ReadSilenceOptions();
         BtnSilenceScan.IsEnabled = _model is { SourceDuration: not null } && options is not null && !SilenceScanning;
         BtnSceneSplit.IsEnabled = _model is { SourceDuration: not null } && !SilenceScanning;
+        BtnAutoSplit.IsEnabled = BtnSceneSplit.IsEnabled;
         if (SilenceScanning) return;
 
         var scan = _silenceScan;
@@ -191,6 +198,7 @@ internal partial class EditorView
         BtnSilenceCancel.IsVisible = busy;
         BtnSilenceScan.IsEnabled = !busy;
         BtnSceneSplit.IsEnabled = !busy;
+        BtnAutoSplit.IsEnabled = !busy;
         BtnSilenceApply.IsEnabled = false;
     }
 

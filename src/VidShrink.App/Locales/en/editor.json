@@ -109,5 +109,18 @@
   "editor.scene.done": "Split at {0} scene changes.",
   "editor.source.add": "Add source",
   "editor.source.failed": "Couldn't add {0}: it has no video or can't be read.",
-  "editor.export.merge-full": "More than one source is merged, so the whole video is re-encoded."
+  "editor.export.merge-full": "More than one source is merged, so the whole video is re-encoded.",
+  "editor.split.auto": "Auto split",
+  "editor.split.count": "Equal number of parts",
+  "editor.split.duration": "Fixed duration (s)",
+  "editor.split.size": "Target size (MB)",
+  "editor.split.value": "Split value",
+  "editor.split.apply": "Split",
+  "editor.split.invalid": "Invalid value.",
+  "editor.split.done": "{0} new parts created.",
+  "editor.scene.threshold": "Scene threshold",
+  "editor.clip.label": "Label",
+  "editor.marker.name": "Marker name",
+  "editor.export.part-name": "Part name",
+  "editor.export.part-name.hint": "Name pattern for separate parts. Placeholders: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Leave empty to use the default."
 }

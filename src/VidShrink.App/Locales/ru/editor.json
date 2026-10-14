@@ -109,5 +109,18 @@
   "editor.scene.done": "Разделено по сменам сцен: {0}.",
   "editor.source.add": "Добавить источник",
   "editor.source.failed": "Не удалось добавить {0}: нет видео или файл не читается.",
-  "editor.export.merge-full": "Объединяется несколько источников, поэтому всё видео кодируется заново."
+  "editor.export.merge-full": "Объединяется несколько источников, поэтому всё видео кодируется заново.",
+  "editor.split.auto": "Автоматическое разделение",
+  "editor.split.count": "Равное число частей",
+  "editor.split.duration": "Фиксированная длительность (с)",
+  "editor.split.size": "Целевой размер (МБ)",
+  "editor.split.value": "Значение разделения",
+  "editor.split.apply": "Разделить",
+  "editor.split.invalid": "Недопустимое значение.",
+  "editor.split.done": "Создано новых частей: {0}.",
+  "editor.scene.threshold": "Порог сцены",
+  "editor.clip.label": "Метка",
+  "editor.marker.name": "Имя маркера",
+  "editor.export.part-name": "Имя части",
+  "editor.export.part-name.hint": "Шаблон имён отдельных частей. Подстановки: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Оставьте пустым, чтобы использовать шаблон по умолчанию."
 }

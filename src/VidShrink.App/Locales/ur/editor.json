@@ -109,5 +109,18 @@
   "editor.scene.done": "منظر کی {0} تبدیلیوں پر تقسیم کیا گیا۔",
   "editor.source.add": "ماخذ شامل کریں",
   "editor.source.failed": "{0} شامل نہیں ہو سکا: اس میں ویڈیو نہیں یا فائل پڑھی نہیں جا سکتی۔",
-  "editor.export.merge-full": "ایک سے زیادہ ماخذ ملائے جا رہے ہیں، اس لیے پوری ویڈیو دوبارہ انکوڈ ہوتی ہے۔"
+  "editor.export.merge-full": "ایک سے زیادہ ماخذ ملائے جا رہے ہیں، اس لیے پوری ویڈیو دوبارہ انکوڈ ہوتی ہے۔",
+  "editor.split.auto": "خودکار تقسیم",
+  "editor.split.count": "برابر حصوں کی تعداد",
+  "editor.split.duration": "مقررہ دورانیہ (سیکنڈ)",
+  "editor.split.size": "ہدف سائز (MB)",
+  "editor.split.value": "تقسیم کی قدر",
+  "editor.split.apply": "تقسیم کریں",
+  "editor.split.invalid": "غلط قدر۔",
+  "editor.split.done": "{0} نئے حصے بنائے گئے۔",
+  "editor.scene.threshold": "منظر کی حد",
+  "editor.clip.label": "لیبل",
+  "editor.marker.name": "نشان کا نام",
+  "editor.export.part-name": "حصے کا نام",
+  "editor.export.part-name.hint": "الگ حصوں کے نام کا نمونہ۔ پلیس ہولڈر: {ad}، {parca}، {etiket}، {zaman}، {tarih}۔ ڈیفالٹ استعمال کرنے کے لیے خالی چھوڑیں۔"
 }

@@ -103,6 +103,9 @@ internal sealed class EditorPlayhead : RangeBase
             }
 
             context.DrawGeometry(brush, null, geometry);
+            if (_owner.MarkerName(marker) is not { } name) continue;
+            var text = new FormattedText(name, CultureInfo.CurrentUICulture, FlowDirection.LeftToRight, new Typeface(EditorTokens.Font(this, "FontMono")), EditorTokens.Size(this, "FontSizeSm"), EditorTokens.Brush(this, "TextBody"));
+            context.DrawText(text, new Point(x + handle / 2, ruler));
         }
     }
 
