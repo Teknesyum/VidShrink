@@ -6,7 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using VidShrink.App.Editing;
@@ -89,7 +91,7 @@ public sealed class DuzenleyiciSessizlikTests
     [Fact]
     public void PlanBirlestirirEnKisayiAtarKenarPayiBirakir()
     {
-        var ayar = new SilenceCutOptions { MinSeconds = 0.5, PaddingSeconds = 0.1 };
+        var ayar = new SilenceCutOptions { MinSeconds = 0.5, PaddingStartSeconds = 0.1, PaddingEndSeconds = 0.1 };
 
         var birlesen = SilenceCut.Plan(new[] { new IdleSpan(1, 2), new IdleSpan(1.9, 3) }, 10, ayar);
         Assert.Equal(new[] { new IdleSpan(1.1, 2.9) }, Yuvarla(birlesen));
@@ -102,10 +104,10 @@ public sealed class DuzenleyiciSessizlikTests
         Assert.Equal(new[] { new IdleSpan(0, 0.9) }, Yuvarla(SilenceCut.Plan(new[] { new IdleSpan(-0.02, 1) }, 10, ayar)));
         Assert.Equal(new[] { new IdleSpan(9.1, 10) }, Yuvarla(SilenceCut.Plan(new[] { new IdleSpan(9, 12) }, 10, ayar)));
 
-        var genisPay = ayar with { MinSeconds = 0.1, PaddingSeconds = 0.1 };
+        var genisPay = ayar with { MinSeconds = 0.1, PaddingStartSeconds = 0.1, PaddingEndSeconds = 0.1 };
         Assert.Empty(SilenceCut.Plan(new[] { new IdleSpan(1, 1.15) }, 10, genisPay));
 
-        var paysiz = ayar with { PaddingSeconds = 0 };
+        var paysiz = ayar with { PaddingStartSeconds = 0, PaddingEndSeconds = 0 };
         Assert.Equal(new[] { new IdleSpan(1, 2) }, Yuvarla(SilenceCut.Plan(new[] { new IdleSpan(1, 2) }, 10, paysiz)));
 
         var tersSira = SilenceCut.Plan(new[] { new IdleSpan(5, 6), new IdleSpan(1, 2) }, 10, ayar);
@@ -162,13 +164,102 @@ public sealed class DuzenleyiciSessizlikTests
         Assert.False((SilenceCutOptions.Default with { ThresholdDb = -120 }).IsValid);
         Assert.False((SilenceCutOptions.Default with { MinSeconds = 0 }).IsValid);
         Assert.False((SilenceCutOptions.Default with { MinSeconds = double.NaN }).IsValid);
-        Assert.False((SilenceCutOptions.Default with { PaddingSeconds = -0.1 }).IsValid);
-        Assert.True((SilenceCutOptions.Default with { PaddingSeconds = 0 }).IsValid);
+        Assert.False((SilenceCutOptions.Default with { PaddingStartSeconds = -0.1 }).IsValid);
+        Assert.True((SilenceCutOptions.Default with { PaddingStartSeconds = 0, PaddingEndSeconds = 0 }).IsValid);
 
         var temel = SilenceCutOptions.Default;
-        Assert.True(temel.SameScan(temel with { MinSeconds = 2, PaddingSeconds = 0.3 }));
+        Assert.True(temel.SameScan(temel with { MinSeconds = 2, PaddingStartSeconds = 0.3, PaddingEndSeconds = 0.4 }));
         Assert.False(temel.SameScan(temel with { ThresholdDb = -40 }));
         Assert.False(temel.SameScan(temel with { Black = true }));
+        Assert.False(temel.SameScan(temel with { AudioTrack = 1 }));
+        Assert.False((SilenceCutOptions.Default with { PaddingEndSeconds = -0.1 }).IsValid);
+        Assert.False((SilenceCutOptions.Default with { PaddingEndSeconds = double.NaN }).IsValid);
+        Assert.False((SilenceCutOptions.Default with { AudioTrack = -1 }).IsValid);
+        Assert.True((SilenceCutOptions.Default with { AudioTrack = 3 }).IsValid);
+    }
+
+    [Fact]
+    public void OnVeArkaPayAyriUygulanir()
+    {
+        var ayar = new SilenceCutOptions { MinSeconds = 0.5, PaddingStartSeconds = 0.3, PaddingEndSeconds = 0.1 };
+        Assert.Equal(new[] { new IdleSpan(1.3, 2.9) }, Yuvarla(SilenceCut.Plan(new[] { new IdleSpan(1, 3) }, 10, ayar)));
+
+        var ters = ayar with { PaddingStartSeconds = 0.1, PaddingEndSeconds = 0.3 };
+        Assert.Equal(new[] { new IdleSpan(1.1, 2.7) }, Yuvarla(SilenceCut.Plan(new[] { new IdleSpan(1, 3) }, 10, ters)));
+
+        Assert.Equal(new[] { new IdleSpan(0, 0.7) }, Yuvarla(SilenceCut.Plan(new[] { new IdleSpan(0, 1) }, 10, ters)));
+        Assert.Equal(new[] { new IdleSpan(9.3, 10) }, Yuvarla(SilenceCut.Plan(new[] { new IdleSpan(9, 10) }, 10, ayar)));
+
+        var sikisan = ayar with { PaddingStartSeconds = 0.4, PaddingEndSeconds = 0.2 };
+        Assert.Empty(SilenceCut.Plan(new[] { new IdleSpan(1, 1.5) }, 10, sikisan));
+    }
+
+    [Fact]
+    public void TaranacakSesIziSecilir()
+    {
+        var ilk = SilenceCut.Arguments("k.mp4", SilenceCutOptions.Default).ToList();
+        Assert.Equal("0:a:0?", ilk[ilk.IndexOf("-af") - 1]);
+
+        var ikinci = SilenceCut.Arguments("k.mp4", SilenceCutOptions.Default with { AudioTrack = 1 }).ToList();
+        Assert.Equal("0:a:1?", ikinci[ikinci.IndexOf("-af") - 1]);
+        Assert.DoesNotContain("0:a:0?", ikinci);
+
+        var siyah = SilenceCut.Arguments("k.mp4", SilenceCutOptions.Default with { Silence = false, Black = true, AudioTrack = 2 }).ToList();
+        Assert.DoesNotContain(siyah, a => a.StartsWith("0:a:", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void AralikDurumuDonerVeListeyeAyrilir()
+    {
+        Assert.Equal(IdleAction.Keep, SilenceCut.Next(IdleAction.Cut));
+        Assert.Equal(IdleAction.Speed, SilenceCut.Next(IdleAction.Keep));
+        Assert.Equal(IdleAction.Cut, SilenceCut.Next(IdleAction.Speed));
+
+        var araliklar = new[] { (S(1), S(2)), (S(3), S(4)), (S(5), S(6)), (S(7), S(8)) };
+        var (kes, hizli) = SilenceCut.Split(araliklar, new[] { IdleAction.Cut, IdleAction.Keep, IdleAction.Speed });
+        Assert.Equal(new[] { (S(1), S(2)), (S(7), S(8)) }, kes);
+        Assert.Equal(new[] { (S(5), S(6)) }, hizli);
+
+        var (hepsiKes, hicHizli) = SilenceCut.Split(araliklar, Array.Empty<IdleAction>());
+        Assert.Equal(araliklar, hepsiKes);
+        Assert.Empty(hicHizli);
+    }
+
+    [Fact]
+    public void HizlandirilanAralikTekAdimdaBolunupHizlanir()
+    {
+        var c = EditTimeline.FromSource(S(10));
+        var once = c.Clips.ToArray();
+
+        Assert.True(c.ReshapeSource(new[] { (S(6), S(7)) }, new[] { (S(2), S(4)) }, SilenceCut.SpeedFactor));
+        Assert.Equal(new[] { (S(0), S(2), 1m), (S(2), S(4), 4m), (S(4), S(6), 1m), (S(7), S(10), 1m) },
+            c.Clips.Select(k => (k.SourceStart, k.SourceEnd, k.Speed)));
+        Assert.Equal(S(2 + 0.5 + 2 + 3), c.Duration);
+
+        Assert.True(c.Undo());
+        Assert.Equal(once, c.Clips);
+        Assert.False(c.CanUndo);
+
+        Assert.False(c.ReshapeSource(Array.Empty<(long, long)>(), Array.Empty<(long, long)>(), SilenceCut.SpeedFactor));
+        Assert.False(c.CanUndo);
+
+        var tavan = new EditTimeline(new[] { new EditClip(0, S(10), 50m) }, S(10));
+        Assert.True(tavan.ReshapeSource(Array.Empty<(long, long)>(), new[] { (S(2), S(4)) }, SilenceCut.SpeedFactor));
+        Assert.Equal(new[] { 50m, EditClip.MaxSpeed, 50m }, tavan.Clips.Select(k => k.Speed));
+    }
+
+    [Fact]
+    public void TersKliptekiHizlandirmaSirayiVeSolmayiKorur()
+    {
+        var klip = new EditClip(0, S(10), 2m, reversed: true) { Effects = ClipEffects.None with { FadeIn = S(0.5), FadeOut = S(0.5), VolumeDb = -6 } };
+        var c = new EditTimeline(new[] { klip }, S(10));
+
+        Assert.True(c.ReshapeSource(new[] { (S(6), S(7)) }, new[] { (S(2), S(3)) }, SilenceCut.SpeedFactor));
+        Assert.Equal(new[] { (S(7), S(10), 2m), (S(3), S(6), 2m), (S(2), S(3), 8m), (S(0), S(2), 2m) },
+            c.Clips.Select(k => (k.SourceStart, k.SourceEnd, k.Speed)));
+        Assert.All(c.Clips, k => Assert.True(k.Reversed && k.Effects.VolumeDb == -6));
+        Assert.Equal(new[] { S(0.5), 0, 0, 0 }, c.Clips.Select(k => k.Effects.FadeIn));
+        Assert.Equal(new[] { 0, 0, 0, S(0.5) }, c.Clips.Select(k => k.Effects.FadeOut));
     }
 
     [Fact]
@@ -265,7 +356,7 @@ public sealed class DuzenleyiciSessizlikTests
                     Assert.True(tarama.Result);
                     Assert.Equal(1, taranan);
                     Assert.Equal(SilenceCutOptions.DefaultThresholdDb, son!.ThresholdDb);
-                    Assert.Equal(new[] { (S(10.1), S(19.9)) }, view.TimelineView.CutPreview);
+                    Assert.Equal(new[] { new IdlePreview(S(10.1), S(19.9), IdleAction.Cut, 0) }, view.TimelineView.CutPreview);
                     Assert.True(view.BtnSilenceApply.IsEnabled);
                     Assert.Equal(string.Format(Strings.Culture, Strings.Get("editor.silence.found"), 1, Saat.Kesit(TimeSpan.FromSeconds(9.8), Strings.Culture)), view.TxtSilenceStatus.Text);
 
@@ -282,10 +373,14 @@ public sealed class DuzenleyiciSessizlikTests
                     Yaz(view.TxtSilenceThreshold, "-35");
                     Assert.Single(view.TimelineView.CutPreview);
 
-                    Yaz(view.TxtSilencePadding, "abc");
+                    Yaz(view.TxtSilencePaddingStart, "abc");
                     Assert.Empty(view.TimelineView.CutPreview);
                     Assert.False(view.BtnSilenceScan.IsEnabled);
-                    Yaz(view.TxtSilencePadding, "0.1");
+                    Yaz(view.TxtSilencePaddingStart, "0.1");
+                    Yaz(view.TxtSilencePaddingEnd, "-1");
+                    Assert.Empty(view.TimelineView.CutPreview);
+                    Yaz(view.TxtSilencePaddingEnd, "0.1");
+                    Assert.Single(view.TimelineView.CutPreview);
 
                     view.BtnSilenceApply.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
                     Assert.Equal(new[] { (S(0), S(10.1)), (S(19.9), S(600)) }, model.Clips.Select(k => (k.SourceStart, k.SourceEnd)));
@@ -333,6 +428,172 @@ public sealed class DuzenleyiciSessizlikTests
             if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
             KanitKapanisi.Kapat(Kanit);
         }
+    }
+
+    [Fact]
+    public void ArayuzAralikTiklanincaDurumDegisirIzSecilirVeHizlanir()
+    {
+        var klasor = Path.Combine(Kanit, "sessizlik-durum");
+        Directory.CreateDirectory(klasor);
+        var dosya = Path.Combine(klasor, "kaynak.mp4");
+        File.WriteAllBytes(dosya, new byte[16]);
+        try
+        {
+            AppHost.Run(() =>
+            {
+                var motor = new KlipMotoru();
+                var izler = new[]
+                {
+                    new SourceStream(0, StreamKind.Video, "h264"),
+                    new SourceStream(1, StreamKind.Audio, "aac", "tur", IsDefault: true),
+                    new SourceStream(2, StreamKind.Audio, "aac", "eng", Title: "Yorum"),
+                    new SourceStream(3, StreamKind.Video, "mjpeg", IsAttachedPicture: true)
+                };
+                var view = new EditorView
+                {
+                    KnownInfo = yol => new MediaInfo { FilePath = yol, FileSizeBytes = 16, DurationSeconds = 600, Width = 320, Height = 240, Fps = 30, VideoCodec = "h264", TotalBitrateBps = 1, Streams = izler }
+                };
+                view.Player.EngineFactory = () => motor;
+                view.OverlayRoot = Path.Combine(klasor, "katman");
+                var taranan = new List<int>();
+                view.SilenceScanner = (_, ayar, _, _, _) =>
+                {
+                    taranan.Add(ayar.AudioTrack);
+                    return Task.FromResult(new SilenceScan(new[] { new IdleSpan(100, 200), new IdleSpan(300, 400) }, Array.Empty<IdleSpan>(), ayar));
+                };
+                var pencere = new Window { Width = 1200, Height = 700, Content = view };
+                pencere.Show();
+                try
+                {
+                    var acilis = view.OpenSourceAsync(dosya);
+                    DenetimSurucu.Pump(view.Player, () => acilis.IsCompleted, 10);
+                    acilis.GetAwaiter().GetResult();
+                    var model = view.Model!;
+                    view.ShowSilencePanel(true);
+
+                    Assert.Equal(2, view.CmbSilenceTrack.ItemCount);
+                    Assert.Equal(0, view.CmbSilenceTrack.SelectedIndex);
+                    Tara(view);
+                    view.CmbSilenceTrack.SelectedIndex = 1;
+                    Dispatcher.UIThread.RunJobs();
+                    Assert.Equal(Strings.Get("editor.silence.stale"), view.TxtSilenceStatus.Text);
+                    Assert.Empty(view.TimelineView.CutPreview);
+                    Tara(view);
+                    Assert.Equal(new[] { 0, 1 }, taranan);
+
+                    Yaz(view.TxtSilencePaddingStart, "0.3");
+                    Yaz(view.TxtSilencePaddingEnd, "0.2");
+                    Assert.Equal(new[] { new IdlePreview(S(100.3), S(199.8), IdleAction.Cut, 0), new IdlePreview(S(300.3), S(399.8), IdleAction.Cut, 1) },
+                        view.TimelineView.CutPreview);
+
+                    view.TimelineView.ZoomToFit();
+                    Dispatcher.UIThread.RunJobs();
+                    Tikla(view.TimelineView, S(150));
+                    Assert.Equal(new[] { IdleAction.Keep, IdleAction.Cut }, view.TimelineView.CutPreview.Select(p => p.Action));
+                    Assert.Equal(string.Format(Strings.Culture, Strings.Get("editor.silence.found"), 2, Saat.Kesit(TimeSpan.FromSeconds(99.5), Strings.Culture)), view.TxtSilenceStatus.Text);
+                    Assert.Single(model.Clips);
+
+                    Yaz(view.TxtSilencePaddingEnd, "0.1");
+                    Assert.Equal(new[] { IdleAction.Keep, IdleAction.Cut }, view.TimelineView.CutPreview.Select(p => p.Action));
+
+                    Tikla(view.TimelineView, S(350));
+                    Assert.Equal(new[] { IdleAction.Keep, IdleAction.Keep }, view.TimelineView.CutPreview.Select(p => p.Action));
+                    Assert.False(view.BtnSilenceApply.IsEnabled);
+                    Tikla(view.TimelineView, S(150));
+                    Tikla(view.TimelineView, S(150));
+                    Assert.Equal(new[] { IdleAction.Cut, IdleAction.Keep }, view.TimelineView.CutPreview.Select(p => p.Action));
+                    Tikla(view.TimelineView, S(350));
+                    Assert.Equal(new[] { IdleAction.Cut, IdleAction.Speed }, view.TimelineView.CutPreview.Select(p => p.Action));
+                    Assert.True(view.BtnSilenceApply.IsEnabled);
+
+                    view.BtnSilenceApply.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                    Assert.Equal(new[] { (S(0), S(100.3), 1m), (S(199.9), S(300.3), 1m), (S(300.3), S(399.9), SilenceCut.SpeedFactor), (S(399.9), S(600), 1m) },
+                        model.Clips.Select(k => (k.SourceStart, k.SourceEnd, k.Speed)));
+                    Assert.Equal(string.Format(Strings.Culture, Strings.Get("editor.silence.applied"), 1, 1), view.TxtSilenceStatus.Text);
+
+                    Assert.True(view.Undo());
+                    Assert.Single(model.Clips);
+                    Assert.Equal(1m, model.Clips[0].Speed);
+
+                    var yeniden = view.OpenSourceAsync(dosya);
+                    DenetimSurucu.Pump(view.Player, () => yeniden.IsCompleted, 10);
+                    yeniden.GetAwaiter().GetResult();
+                    view.ShowSilencePanel(true);
+                    Tara(view);
+                    Assert.Equal(new[] { IdleAction.Cut, IdleAction.Cut }, view.TimelineView.CutPreview.Select(p => p.Action));
+                }
+                finally
+                {
+                    DuzenleyiciKapanis.Kapat(pencere, view);
+                }
+            });
+        }
+        finally
+        {
+            if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
+            KanitKapanisi.Kapat(Kanit);
+        }
+    }
+
+    [Fact]
+    public void BilgisizKaynaktaTekIzVeIlkIzTaranir()
+    {
+        var klasor = Path.Combine(Kanit, "sessizlik-izsiz");
+        Directory.CreateDirectory(klasor);
+        var dosya = Path.Combine(klasor, "kaynak.mp4");
+        File.WriteAllBytes(dosya, new byte[16]);
+        try
+        {
+            AppHost.Run(() =>
+            {
+                var motor = new KlipMotoru();
+                var view = new EditorView
+                {
+                    KnownInfo = yol => new MediaInfo { FilePath = yol, FileSizeBytes = 16, DurationSeconds = 60, Width = 320, Height = 240, Fps = 30, VideoCodec = "h264", TotalBitrateBps = 1 }
+                };
+                view.Player.EngineFactory = () => motor;
+                view.OverlayRoot = Path.Combine(klasor, "katman");
+                var pencere = new Window { Width = 900, Height = 600, Content = view };
+                pencere.Show();
+                try
+                {
+                    var acilis = view.OpenSourceAsync(dosya);
+                    DenetimSurucu.Pump(view.Player, () => acilis.IsCompleted, 10);
+                    acilis.GetAwaiter().GetResult();
+                    view.ShowSilencePanel(true);
+                    Assert.Equal(1, view.CmbSilenceTrack.ItemCount);
+                    Assert.Equal(0, view.ReadSilenceOptions()!.AudioTrack);
+                }
+                finally
+                {
+                    DuzenleyiciKapanis.Kapat(pencere, view);
+                }
+            });
+        }
+        finally
+        {
+            if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
+            KanitKapanisi.Kapat(Kanit);
+        }
+    }
+
+    private static void Tara(EditorView view)
+    {
+        var tarama = view.ScanSilenceAsync();
+        DenetimSurucu.Pump(view.Player, () => tarama.IsCompleted, 10);
+        Assert.True(tarama.Result);
+    }
+
+    private static void Tikla(EditorTimeline cizelge, long an)
+    {
+        var isaretci = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, true);
+        var kok = TopLevel.GetTopLevel(cizelge)!;
+        var nokta = cizelge.TranslatePoint(new Point(cizelge.TimeToX(an), cizelge.VideoTop + 2), kok)!.Value;
+        cizelge.RaiseEvent(new PointerPressedEventArgs(cizelge, isaretci, kok, nokta, 0,
+            new PointerPointProperties(RawInputModifiers.LeftMouseButton, PointerUpdateKind.LeftButtonPressed), KeyModifiers.None));
+        cizelge.RaiseEvent(new PointerReleasedEventArgs(cizelge, isaretci, kok, nokta, 0,
+            new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.LeftButtonReleased), KeyModifiers.None, MouseButton.Left));
+        Dispatcher.UIThread.RunJobs();
     }
 
     private static void Yaz(TextBox kutu, string metin)

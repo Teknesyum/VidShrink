@@ -6,6 +6,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using VidShrink.App.Localization;
 using VidShrink.Core;
+using VidShrink.Core.Editing;
 
 namespace VidShrink.App.Editing;
 
@@ -56,14 +57,24 @@ internal sealed class EditorPlayhead : RangeBase
     private void DrawCuts(DrawingContext context, double top, double bottom)
     {
         if (_owner.CutPreview.Count == 0) return;
-        var fill = EditorTokens.Brush(this, "NeonPinkFill");
-        var pen = new Pen(EditorTokens.Brush(this, "NeonPink"), EditorTokens.Size(this, "EditorClipBorder"));
+        var border = EditorTokens.Size(this, "EditorClipBorder");
+        var cutFill = EditorTokens.Brush(this, "NeonPinkFill");
+        var cutPen = new Pen(EditorTokens.Brush(this, "NeonPink"), border);
+        var fastFill = EditorTokens.Brush(this, "NeonBlueFill");
+        var fastPen = new Pen(EditorTokens.Brush(this, "NeonBlue"), border);
+        var keepPen = new Pen(EditorTokens.Brush(this, "NeonBlueBorder"), border);
         var left = _owner.HeaderWidth;
-        foreach (var (start, end) in _owner.CutPreview)
+        foreach (var span in _owner.CutPreview)
         {
-            var x0 = Math.Max(left, _owner.TimeToX(start));
-            var x1 = Math.Min(Bounds.Width, _owner.TimeToX(end));
+            var x0 = Math.Max(left, _owner.TimeToX(span.Start));
+            var x1 = Math.Min(Bounds.Width, _owner.TimeToX(span.End));
             if (x1 <= x0) continue;
+            var (fill, pen) = span.Action switch
+            {
+                IdleAction.Speed => (fastFill, fastPen),
+                IdleAction.Keep => ((IBrush?)null, keepPen),
+                _ => (cutFill, cutPen)
+            };
             context.DrawRectangle(fill, pen, new Rect(x0, top, x1 - x0, bottom - top));
         }
     }

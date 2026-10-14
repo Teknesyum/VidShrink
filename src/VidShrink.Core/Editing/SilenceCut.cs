@@ -5,9 +5,18 @@ using System.Text.RegularExpressions;
 
 namespace VidShrink.Core.Editing;
 
+/// <summary>Bulunan araligin cizelgede alacagi durum: kesilir, oldugu gibi kalir ya da hizlanir.</summary>
+public enum IdleAction
+{
+    Cut,
+    Keep,
+    Speed
+}
+
 /// <summary>
-/// Otomatik kesimin ayarlari. Esik ve tur taramayi belirler; en kisa sure ve kenar payi
-/// yalniz plani, bu yuzden onlar degisince yeniden taranmaz.
+/// Otomatik kesimin ayarlari. Esik, tur ve taranan ses izi taramayi belirler; en kisa sure ve
+/// on/arka pay yalniz plani, bu yuzden onlar degisince yeniden taranmaz. On pay sessizligin
+/// basinda (konusmanin sonunda), arka pay sessizligin sonunda (konusmanin basinda) kalir.
 /// </summary>
 public sealed record SilenceCutOptions
 {
@@ -26,7 +35,12 @@ public sealed record SilenceCutOptions
 
     public double MinSeconds { get; init; } = DefaultMinSeconds;
 
-    public double PaddingSeconds { get; init; } = DefaultPaddingSeconds;
+    public double PaddingStartSeconds { get; init; } = DefaultPaddingSeconds;
+
+    public double PaddingEndSeconds { get; init; } = DefaultPaddingSeconds;
+
+    /// <summary>Sessizligi aranan ses izinin sirasi (<c>0:a:N</c>); ilk iz 0.</summary>
+    public int AudioTrack { get; init; }
 
     public static SilenceCutOptions Default { get; } = new();
 
@@ -34,11 +48,13 @@ public sealed record SilenceCutOptions
         (Silence || Black)
         && double.IsFinite(ThresholdDb) && ThresholdDb >= MinThresholdDb && ThresholdDb <= MaxThresholdDb
         && double.IsFinite(MinSeconds) && MinSeconds > 0 && MinSeconds <= MaxSeconds
-        && double.IsFinite(PaddingSeconds) && PaddingSeconds >= 0 && PaddingSeconds <= MaxSeconds;
+        && double.IsFinite(PaddingStartSeconds) && PaddingStartSeconds >= 0 && PaddingStartSeconds <= MaxSeconds
+        && double.IsFinite(PaddingEndSeconds) && PaddingEndSeconds >= 0 && PaddingEndSeconds <= MaxSeconds
+        && AudioTrack >= 0;
 
-    /// <summary>Iki ayar ayni taramayi paylasir mi: tur ve esik ayni.</summary>
+    /// <summary>Iki ayar ayni taramayi paylasir mi: tur, esik ve ses izi ayni.</summary>
     public bool SameScan(SilenceCutOptions other)
-        => other is not null && other.Silence == Silence && other.Black == Black && other.ThresholdDb.Equals(ThresholdDb);
+        => other is not null && other.Silence == Silence && other.Black == Black && other.ThresholdDb.Equals(ThresholdDb) && other.AudioTrack == AudioTrack;
 }
 
 /// <summary>Taramanin ham sonucu: kaynak saniyesinde sessiz ve siyah araliklar.</summary>
@@ -58,6 +74,9 @@ public static class SilenceCut
     public const string BlackPixelThreshold = "0.10";
     public const string BlackPictureThreshold = "0.98";
     public const int Threads = 2;
+
+    /// <summary>Hizlandirilan araligin hiz carpani.</summary>
+    public const decimal SpeedFactor = 4m;
 
     private static readonly Regex SilenceLine = new(
         @"silence_(?<kind>start|end):\s*(?<value>-?[0-9]+(?:\.[0-9]+)?(?:[eE][-+]?[0-9]+)?)",
@@ -87,7 +106,7 @@ public static class SilenceCut
             "-i", sourcePath
         };
         if (options.Silence)
-            args.AddRange(new[] { "-map", "0:a:0?", "-af", $"silencedetect=noise={Number(options.ThresholdDb)}dB:d={Number(ScanMinSeconds)}" });
+            args.AddRange(new[] { "-map", $"0:a:{options.AudioTrack.ToString(CultureInfo.InvariantCulture)}?", "-af", $"silencedetect=noise={Number(options.ThresholdDb)}dB:d={Number(ScanMinSeconds)}" });
         else
             args.Add("-an");
         if (options.Black)
@@ -144,7 +163,7 @@ public static class SilenceCut
     /// <summary>
     /// Kesilecek kaynak araliklari: kaynaga kirpilir, ortusen ya da degen araliklar birlesir,
     /// <see cref="SilenceCutOptions.MinSeconds"/> altindakiler atilir, kalanlar her yandan
-    /// kenar payi kadar daraltilir. Dosyanin basina ve sonuna degen kenarda pay birakilmaz.
+    /// on ve arka pay kadar daraltilir. Dosyanin basina ve sonuna degen kenarda pay birakilmaz.
     /// </summary>
     public static IReadOnlyList<IdleSpan> Plan(IEnumerable<IdleSpan> detected, double durationSeconds, SilenceCutOptions options)
     {
@@ -168,8 +187,8 @@ public static class SilenceCut
         foreach (var span in merged)
         {
             if (span.Length < options.MinSeconds) continue;
-            var start = span.Start <= 0 ? 0 : span.Start + options.PaddingSeconds;
-            var end = span.End >= durationSeconds ? durationSeconds : span.End - options.PaddingSeconds;
+            var start = span.Start <= 0 ? 0 : span.Start + options.PaddingStartSeconds;
+            var end = span.End >= durationSeconds ? durationSeconds : span.End - options.PaddingEndSeconds;
             if (end > start) cuts.Add(new IdleSpan(start, end));
         }
 
@@ -186,6 +205,35 @@ public static class SilenceCut
     }
 
     public static double Total(IReadOnlyList<IdleSpan> spans) => spans.Sum(s => s.Length);
+
+    /// <summary>Tiklanan araligin sonraki durumu: kes, tut, hizlandir, yeniden kes.</summary>
+    public static IdleAction Next(IdleAction action) => action switch
+    {
+        IdleAction.Cut => IdleAction.Keep,
+        IdleAction.Keep => IdleAction.Speed,
+        _ => IdleAction.Cut
+    };
+
+    /// <summary>
+    /// Plan araliklarini durumlarina gore kesilecek ve hizlanacak listelere ayirir; tutulan aralik
+    /// ikisine de girmez, durumu verilmemis aralik kesilir.
+    /// </summary>
+    public static (IReadOnlyList<(long Start, long End)> Cut, IReadOnlyList<(long Start, long End)> Faster) Split(
+        IReadOnlyList<(long Start, long End)> spans, IReadOnlyList<IdleAction> actions)
+    {
+        ArgumentNullException.ThrowIfNull(spans);
+        ArgumentNullException.ThrowIfNull(actions);
+        var cut = new List<(long Start, long End)>();
+        var faster = new List<(long Start, long End)>();
+        for (var i = 0; i < spans.Count; i++)
+        {
+            var action = i < actions.Count ? actions[i] : IdleAction.Cut;
+            if (action == IdleAction.Cut) cut.Add(spans[i]);
+            else if (action == IdleAction.Speed) faster.Add(spans[i]);
+        }
+
+        return (cut, faster);
+    }
 
     public static async Task<SilenceScan> ScanAsync(
         string ffmpegPath,

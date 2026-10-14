@@ -139,18 +139,40 @@ public sealed record EditClip
     /// parcanin kendi kenarinda kalir; hiz, yon ve oteki ayarlar tasinir.
     /// </summary>
     internal IReadOnlyList<EditClip> Without(IReadOnlyList<(long Start, long End)> ranges)
+        => Reshape(ranges, Array.Empty<(long Start, long End)>(), 1m);
+
+    /// <summary>
+    /// <paramref name="cuts"/> cikarilmis, <paramref name="faster"/> ayri parcaya bolunup hizi
+    /// <paramref name="factor"/> ile carpilmis (en cok <see cref="MaxSpeed"/>) parcalar, oynatma
+    /// sirasiyla. Kesim hizlandirmanin onune gecer; hicbir sey degismezse parcanin kendisi doner.
+    /// </summary>
+    internal IReadOnlyList<EditClip> Reshape(IReadOnlyList<(long Start, long End)> cuts, IReadOnlyList<(long Start, long End)> faster, decimal factor)
     {
-        var kept = new List<(long Start, long End)>();
-        var cursor = SourceStart;
-        foreach (var (start, end) in ranges.Where(r => r.End > SourceStart && r.Start < SourceEnd).OrderBy(r => r.Start))
+        var fastSpeed = Math.Min(MaxSpeed, decimal.Round(Speed * factor, 2));
+        var points = new SortedSet<long> { SourceStart, SourceEnd };
+        foreach (var (start, end) in cuts.Concat(faster))
         {
-            if (start > cursor) kept.Add((cursor, Math.Min(start, SourceEnd)));
-            cursor = Math.Max(cursor, end);
-            if (cursor >= SourceEnd) break;
+            if (start > SourceStart && start < SourceEnd) points.Add(start);
+            if (end > SourceStart && end < SourceEnd) points.Add(end);
         }
 
-        if (cursor < SourceEnd) kept.Add((cursor, SourceEnd));
-        if (kept.Count == 1 && kept[0] == (SourceStart, SourceEnd)) return new[] { this };
+        var kept = new List<(long Start, long End, bool Fast)>();
+        long? previous = null;
+        foreach (var point in points)
+        {
+            if (previous is { } from && !Covers(cuts, from, point))
+            {
+                var fast = fastSpeed != Speed && Covers(faster, from, point);
+                if (kept.Count > 0 && kept[^1].End == from && kept[^1].Fast == fast)
+                    kept[^1] = kept[^1] with { End = point };
+                else
+                    kept.Add((from, point, fast));
+            }
+
+            previous = point;
+        }
+
+        if (kept.Count == 1 && kept[0] == (SourceStart, SourceEnd, false)) return new[] { this };
         if (Reversed) kept.Reverse();
 
         var pieces = new EditClip[kept.Count];
@@ -159,11 +181,14 @@ public sealed record EditClip
             var effects = Effects;
             if (i > 0) effects = effects with { FadeIn = 0 };
             if (i < kept.Count - 1) effects = effects with { FadeOut = 0 };
-            pieces[i] = new EditClip(kept[i].Start, kept[i].End, Speed, Reversed) { Effects = effects, Source = Source, Label = Label };
+            pieces[i] = new EditClip(kept[i].Start, kept[i].End, kept[i].Fast ? fastSpeed : Speed, Reversed) { Effects = effects, Source = Source, Label = Label };
         }
 
         return pieces;
     }
+
+    private static bool Covers(IReadOnlyList<(long Start, long End)> ranges, long from, long to)
+        => ranges.Any(r => r.Start <= from && r.End >= to);
 
     private long OffsetOfConsumed(long consumed) => Math.Min(CeilDiv(consumed * 100, Hundredths), TimelineLength);
 

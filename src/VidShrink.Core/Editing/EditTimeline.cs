@@ -190,16 +190,28 @@ public sealed class EditTimeline
     /// cizelgede parca kalmayacaksa <c>false</c> doner.
     /// </summary>
     public bool RemoveSource(IReadOnlyList<(long Start, long End)> ranges, int sourceIndex = 0)
+        => ReshapeSource(ranges, Array.Empty<(long Start, long End)>(), 1m, sourceIndex);
+
+    /// <summary>
+    /// <paramref name="cuts"/> araliklarini cikarir, <paramref name="faster"/> araliklarini bolup
+    /// hizini <paramref name="factor"/> ile carpar (en cok <see cref="EditClip.MaxSpeed"/>).
+    /// Kesim hizlandirmanin onune gecer. Tek adimda geri alinir; hicbir sey degismezse ya da
+    /// cizelgede parca kalmayacaksa <c>false</c> doner.
+    /// </summary>
+    public bool ReshapeSource(IReadOnlyList<(long Start, long End)> cuts, IReadOnlyList<(long Start, long End)> faster, decimal factor, int sourceIndex = 0)
     {
-        ArgumentNullException.ThrowIfNull(ranges);
-        if (ranges.Any(r => r.Start < 0 || r.End < r.Start))
-            throw new ArgumentOutOfRangeException(nameof(ranges), "Aralik negatif ya da ters");
+        ArgumentNullException.ThrowIfNull(cuts);
+        ArgumentNullException.ThrowIfNull(faster);
+        if (cuts.Concat(faster).Any(r => r.Start < 0 || r.End < r.Start))
+            throw new ArgumentOutOfRangeException(nameof(cuts), "Aralik negatif ya da ters");
+        if (factor < 1m)
+            throw new ArgumentOutOfRangeException(nameof(factor), factor, "Carpan 1'den kucuk olamaz");
 
         var plans = new List<(int Index, IReadOnlyList<EditClip> Pieces)>();
         var survivors = 0;
         for (var i = 0; i < _clips.Count; i++)
         {
-            var pieces = _clips[i].Source == sourceIndex ? _clips[i].Without(ranges) : new[] { _clips[i] };
+            var pieces = _clips[i].Source == sourceIndex ? _clips[i].Reshape(cuts, faster, factor) : new[] { _clips[i] };
             survivors += pieces.Count;
             if (pieces.Count != 1 || !ReferenceEquals(pieces[0], _clips[i])) plans.Add((i, pieces));
         }
