@@ -109,5 +109,18 @@
   "editor.scene.done": "Έγινε διαχωρισμός σε {0} αλλαγές σκηνής.",
   "editor.source.add": "Προσθήκη πηγής",
   "editor.source.failed": "Το {0} δεν προστέθηκε: δεν έχει βίντεο ή δεν διαβάζεται.",
-  "editor.export.merge-full": "Συνενώνονται περισσότερες πηγές, γι' αυτό όλο το βίντεο κωδικοποιείται ξανά."
+  "editor.export.merge-full": "Συνενώνονται περισσότερες πηγές, γι' αυτό όλο το βίντεο κωδικοποιείται ξανά.",
+  "editor.split.auto": "Αυτόματος διαχωρισμός",
+  "editor.split.count": "Ίσος αριθμός τμημάτων",
+  "editor.split.duration": "Σταθερή διάρκεια (δ)",
+  "editor.split.size": "Μέγεθος-στόχος (MB)",
+  "editor.split.value": "Τιμή διαχωρισμού",
+  "editor.split.apply": "Διαχωρισμός",
+  "editor.split.invalid": "Μη έγκυρη τιμή.",
+  "editor.split.done": "Δημιουργήθηκαν {0} νέα τμήματα.",
+  "editor.scene.threshold": "Όριο σκηνής",
+  "editor.clip.label": "Ετικέτα",
+  "editor.marker.name": "Όνομα δείκτη",
+  "editor.export.part-name": "Όνομα τμήματος",
+  "editor.export.part-name.hint": "Μοτίβο ονομάτων για ξεχωριστά τμήματα. Σύμβολα κράτησης θέσης: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Αφήστε κενό για την προεπιλογή."
 }

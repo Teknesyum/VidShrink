@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using VidShrink.Core;
 using VidShrink.Core.Editing;
@@ -77,8 +77,8 @@ public static class SceneDetector
     }
 
     /// <summary>
-    /// Duzenleyicinin hafif taramasi: kodlama yok, yalniz <see cref="SceneMap.DefaultThreshold"/>
-    /// ustundeki kareler yazilir. Ilk kare her zaman gecer: hic kare secilmezse bos hedefin
+    /// Duzenleyicinin hafif taramasi: kodlama yok, yalniz esigin (varsayilan
+    /// <see cref="SceneMap.DefaultThreshold"/>) ustundeki kareler yazilir. Ilk kare her zaman gecer: hic kare secilmezse bos hedefin
     /// kodlayicisi acilamaz ve ffmpeg -22 ile duser; o kare sonuctan skoruyla elenir. Ikinci
     /// cikis butun kareleri bos hedefe akitir ki <c>-progress</c> kaynagin suresiyle ilerlesin.
     /// </summary>
@@ -113,9 +113,10 @@ public static class SceneDetector
         double durationSeconds,
         IProgress<double>? progress = null,
         CancellationToken ct = default,
-        Action<Process>? started = null)
+        Action<Process>? started = null,
+        double threshold = SceneMap.DefaultThreshold)
     {
-        var args = CutArgs(path);
+        var args = CutArgs(path, threshold);
         ct.ThrowIfCancellationRequested();
 
         using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
@@ -153,12 +154,18 @@ public static class SceneDetector
             throw new InvalidOperationException($"ffmpeg sahne taramasi basarisiz ({process.ExitCode}): {FfmpegRunner.Tail(log)}");
 
         progress?.Report(1);
-        return ParseScores(log)
-            .Where(s => s.Score >= SceneMap.DefaultThreshold && s.Time > 0)
+        return Cuts(ParseScores(log), threshold);
+    }
+
+    /// <summary>
+    /// Skorlardan sahne sinirlari: esigin ustundeki kareler, ilk kare (an 0) haric, artan sirada.
+    /// </summary>
+    public static IReadOnlyList<double> Cuts(IEnumerable<SceneScore> scores, double threshold)
+        => scores
+            .Where(s => s.Score >= threshold && s.Time > 0)
             .Select(s => s.Time)
             .OrderBy(t => t)
             .ToArray();
-    }
 
     public static IReadOnlyList<SceneScore> ParseScores(string log)
     {

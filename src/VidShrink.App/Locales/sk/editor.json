@@ -109,5 +109,18 @@
   "editor.scene.done": "Rozdelené pri zmenách scény: {0}.",
   "editor.source.add": "Pridať zdroj",
   "editor.source.failed": "{0} sa nepodarilo pridať: nemá obraz alebo sa nedá prečítať.",
-  "editor.export.merge-full": "Spája sa viac zdrojov, preto sa celé video kóduje znova."
+  "editor.export.merge-full": "Spája sa viac zdrojov, preto sa celé video kóduje znova.",
+  "editor.split.auto": "Automatické rozdelenie",
+  "editor.split.count": "Rovnaký počet častí",
+  "editor.split.duration": "Pevná dĺžka (s)",
+  "editor.split.size": "Cieľová veľkosť (MB)",
+  "editor.split.value": "Hodnota rozdelenia",
+  "editor.split.apply": "Rozdeliť",
+  "editor.split.invalid": "Neplatná hodnota.",
+  "editor.split.done": "Vytvorené nové časti: {0}.",
+  "editor.scene.threshold": "Prah scény",
+  "editor.clip.label": "Štítok",
+  "editor.marker.name": "Názov značky",
+  "editor.export.part-name": "Názov časti",
+  "editor.export.part-name.hint": "Vzor názvov samostatných častí. Zástupné symboly: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Nechajte prázdne pre predvolený."
 }

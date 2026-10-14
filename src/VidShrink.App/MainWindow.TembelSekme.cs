@@ -11,6 +11,7 @@ public partial class MainWindow
     private RecorderView? _recorderPane;
     private EditorView? _editorPane;
     private bool _editorDropMetadata;
+    private string _editorPartNamePattern = string.Empty;
 
     /// <summary>
     /// Kaydedici sekmesinin icerigi ilk secildiginde kuruluyor. XAML'in icinde dururken
@@ -73,6 +74,12 @@ public partial class MainWindow
             _editorPane.DropMetadataChanged = value =>
             {
                 _editorDropMetadata = value;
+                SaveAppSettings();
+            };
+            _editorPane.PartNamePattern = _editorPartNamePattern;
+            _editorPane.PartNamePatternChanged = value =>
+            {
+                _editorPartNamePattern = value ?? string.Empty;
                 SaveAppSettings();
             };
             PageEditor.Content = _editorPane;

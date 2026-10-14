@@ -109,5 +109,18 @@
   "editor.scene.done": "Împărțit la {0} schimbări de scenă.",
   "editor.source.add": "Adaugă sursă",
   "editor.source.failed": "{0} nu a putut fi adăugat: nu are video sau nu poate fi citit.",
-  "editor.export.merge-full": "Se unesc mai multe surse, așa că întregul video este recodat."
+  "editor.export.merge-full": "Se unesc mai multe surse, așa că întregul video este recodat.",
+  "editor.split.auto": "Împărțire automată",
+  "editor.split.count": "Număr egal de părți",
+  "editor.split.duration": "Durată fixă (s)",
+  "editor.split.size": "Dimensiune țintă (MB)",
+  "editor.split.value": "Valoare de împărțire",
+  "editor.split.apply": "Împarte",
+  "editor.split.invalid": "Valoare nevalidă.",
+  "editor.split.done": "Au fost create {0} părți noi.",
+  "editor.scene.threshold": "Prag de scenă",
+  "editor.clip.label": "Etichetă",
+  "editor.marker.name": "Numele markerului",
+  "editor.export.part-name": "Numele părții",
+  "editor.export.part-name.hint": "Model de nume pentru părțile separate. Substituenți: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Lăsați gol pentru valoarea implicită."
 }

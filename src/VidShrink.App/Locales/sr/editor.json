@@ -109,5 +109,18 @@
   "editor.scene.done": "Podeljeno na promenama scene: {0}.",
   "editor.source.add": "Dodaj izvor",
   "editor.source.failed": "{0} nije dodat: nema video ili ne može da se pročita.",
-  "editor.export.merge-full": "Spaja se više izvora pa se ceo video ponovo kodira."
+  "editor.export.merge-full": "Spaja se više izvora pa se ceo video ponovo kodira.",
+  "editor.split.auto": "Automatska podela",
+  "editor.split.count": "Jednak broj delova",
+  "editor.split.duration": "Fiksno trajanje (s)",
+  "editor.split.size": "Ciljna veličina (MB)",
+  "editor.split.value": "Vrednost podele",
+  "editor.split.apply": "Podeli",
+  "editor.split.invalid": "Nevažeća vrednost.",
+  "editor.split.done": "Napravljeno novih delova: {0}.",
+  "editor.scene.threshold": "Prag scene",
+  "editor.clip.label": "Oznaka",
+  "editor.marker.name": "Naziv markera",
+  "editor.export.part-name": "Naziv dela",
+  "editor.export.part-name.hint": "Šablon naziva zasebnih delova. Čuvari mesta: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Ostavite prazno za podrazumevani."
 }

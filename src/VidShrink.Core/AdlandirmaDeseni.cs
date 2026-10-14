@@ -21,6 +21,18 @@ public static class AdlandirmaDeseni
     public static readonly IReadOnlyList<string> YerTutucular =
         ["ad", "hedef", "kalite", "cozunurluk", "kodek", "tarih"];
 
+    /// <summary>Düzenleyicinin parça adı deseninin varsayılanı; etiketsiz parçada eski <c>&lt;ad&gt;-01</c> adını verir.</summary>
+    public const string ParcaVarsayilan = "{ad}-{parca}-{etiket}";
+
+    /// <summary>
+    /// Düzenleyicinin parça adlarında tanınan yer tutucular. Küçült'ün kümesinden ayrı ve kapalı:
+    /// parçanın hedefi, kalitesi ve kodeği yok; sırası, etiketi ve kesim zamanı var.
+    /// </summary>
+    public static readonly IReadOnlyList<string> ParcaYerTutuculari =
+        ["ad", "parca", "etiket", "zaman", "tarih"];
+
+    private static readonly AdBilgisi ParcaOrnegi = new("x") { Parca = "01", Etiket = "x", Zaman = "00h00m00s" };
+
     /// <summary>Dosya adında duramayan işaretler; işletim sisteminin listesine ek.</summary>
     private static readonly char[] YasakIsaretler = ['/', '\\', ':', '*', '?', '"', '<', '>', '|'];
 
@@ -28,7 +40,18 @@ public static class AdlandirmaDeseni
     /// Desenin kullanılabilirliği. Hata varsa dil dosyasının anahtarı döner; yoksa
     /// <c>null</c>.
     /// </summary>
-    public static string? Hata(string? desen)
+    public static string? Hata(string? desen) => Hata(desen, YerTutucular, new AdBilgisi("x"));
+
+    /// <summary>Parça adı deseninin kullanılabilirliği; <see cref="ParcaYerTutuculari"/> kümesiyle.</summary>
+    public static string? ParcaHata(string? desen) => Hata(desen, ParcaYerTutuculari, ParcaOrnegi);
+
+    /// <summary>
+    /// Parça adı desenini uygular, uzantısız ad döner. Bozuk desen <see cref="ParcaVarsayilan"/>'a düşer.
+    /// </summary>
+    public static string ParcaUygula(string? desen, AdBilgisi bilgi)
+        => UygulaHam(ParcaHata(desen) is null ? desen! : ParcaVarsayilan, bilgi);
+
+    private static string? Hata(string? desen, IReadOnlyList<string> kume, AdBilgisi ornek)
     {
         if (string.IsNullOrWhiteSpace(desen)) return "settings-tab.output-name.empty";
         if (desen.IndexOfAny(YasakIsaretler) >= 0) return "settings-tab.output-name.bad-char";
@@ -50,7 +73,7 @@ public static class AdlandirmaDeseni
             {
                 if (derinlik == 0) return "settings-tab.output-name.bad-placeholder";
                 derinlik--;
-                if (!YerTutucular.Contains(ad.ToString())) return "settings-tab.output-name.bad-placeholder";
+                if (!kume.Contains(ad.ToString())) return "settings-tab.output-name.bad-placeholder";
                 continue;
             }
 
@@ -58,7 +81,7 @@ public static class AdlandirmaDeseni
         }
 
         if (derinlik != 0) return "settings-tab.output-name.bad-placeholder";
-        return UygulaHam(desen, new AdBilgisi("x")).Length == 0 ? "settings-tab.output-name.empty" : null;
+        return UygulaHam(desen, ornek).Length == 0 ? "settings-tab.output-name.empty" : null;
     }
 
     /// <summary>Kullanılabilir desen mi.</summary>
@@ -110,8 +133,26 @@ public static class AdlandirmaDeseni
             : string.Empty,
         "kodek" => KisaKodek(bilgi.Kodek),
         "tarih" => bilgi.Tarih.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+        "parca" => bilgi.Parca ?? string.Empty,
+        "etiket" => Temizle(bilgi.Etiket),
+        "zaman" => bilgi.Zaman ?? string.Empty,
         _ => string.Empty
     };
+
+    /// <summary>Kullanıcının yazdığı etiketten dosya adında duramayan işaretleri atar.</summary>
+    private static string Temizle(string? metin)
+    {
+        if (string.IsNullOrWhiteSpace(metin)) return string.Empty;
+        var gecersiz = Path.GetInvalidFileNameChars();
+        var sonuc = new StringBuilder(metin.Length);
+        foreach (var isaret in metin.Trim())
+        {
+            if (Array.IndexOf(YasakIsaretler, isaret) >= 0 || Array.IndexOf(gecersiz, isaret) >= 0) continue;
+            sonuc.Append(isaret);
+        }
+
+        return sonuc.ToString();
+    }
 
     /// <summary>
     /// Kodlayıcı adı değil kodek adı yazılır: <c>libx265</c> ve <c>hevc_nvenc</c> aynı
@@ -165,4 +206,13 @@ public sealed record AdBilgisi(string Ad)
     public string? Kodek { get; init; }
 
     public DateTime Tarih { get; init; } = DateTime.Now;
+
+    /// <summary>Parça adında sıra numarası, sıfır dolgulu.</summary>
+    public string? Parca { get; init; }
+
+    /// <summary>Parça adında klibin etiketi; dosya adında duramayan işaretler atılır.</summary>
+    public string? Etiket { get; init; }
+
+    /// <summary>Parça adında kesim zamanı (<c>00h01m15s</c>).</summary>
+    public string? Zaman { get; init; }
 }

@@ -109,5 +109,18 @@
   "editor.scene.done": "Dipisahkan pada {0} pertukaran babak.",
   "editor.source.add": "Tambah sumber",
   "editor.source.failed": "{0} tidak dapat ditambah: tiada video atau tidak dapat dibaca.",
-  "editor.export.merge-full": "Beberapa sumber digabungkan, jadi seluruh video dikod semula."
+  "editor.export.merge-full": "Beberapa sumber digabungkan, jadi seluruh video dikod semula.",
+  "editor.split.auto": "Pisah automatik",
+  "editor.split.count": "Bilangan bahagian sama",
+  "editor.split.duration": "Tempoh tetap (s)",
+  "editor.split.size": "Saiz sasaran (MB)",
+  "editor.split.value": "Nilai pemisahan",
+  "editor.split.apply": "Pisahkan",
+  "editor.split.invalid": "Nilai tidak sah.",
+  "editor.split.done": "{0} bahagian baharu dicipta.",
+  "editor.scene.threshold": "Ambang babak",
+  "editor.clip.label": "Label",
+  "editor.marker.name": "Nama penanda",
+  "editor.export.part-name": "Nama bahagian",
+  "editor.export.part-name.hint": "Corak nama untuk bahagian berasingan. Pemegang tempat: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Biarkan kosong untuk guna lalai."
 }

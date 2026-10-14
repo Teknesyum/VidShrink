@@ -41,6 +41,9 @@ public sealed class AppSettings
     /// <summary>Düzenleyici teslimindeki meta silme kutusu; eski dosyada anahtar yoktur ve kapalı okunur.</summary>
     public bool EditorDropMetadata { get; set; }
 
+    /// <summary>Düzenleyicide ayrı parçaların ad deseni; boş ise parçalar eski adlarını alır.</summary>
+    public string EditorPartNamePattern { get; set; } = "";
+
     /// <summary>0 = kaynağın yanı, 1 = sabit klasör.</summary>
     public int OutputFolderMode { get; set; }
     public string OutputFolder { get; set; } = "";
@@ -145,6 +148,7 @@ public sealed class AppSettings
             ReadBool(root, "advDropMetadata", value => settings.AdvDropMetadata = value);
             ReadBool(root, "convertDropMetadata", value => settings.ConvertDropMetadata = value);
             ReadBool(root, "editorDropMetadata", value => settings.EditorDropMetadata = value);
+            ReadString(root, "editorPartNamePattern", value => settings.EditorPartNamePattern = value);
             ReadInt(root, "outputFolderMode", value => settings.OutputFolderMode = value);
             ReadString(root, "outputFolder", value => settings.OutputFolder = value);
             ReadString(root, "outputNamePattern", value => settings.OutputNamePattern = value);
@@ -233,6 +237,7 @@ public sealed class AppSettings
         root["advDropMetadata"] = AdvDropMetadata;
         root["convertDropMetadata"] = ConvertDropMetadata;
         root["editorDropMetadata"] = EditorDropMetadata;
+        root["editorPartNamePattern"] = EditorPartNamePattern;
         root["theme"] = Theme;
         root[ThemeMigrationMarker] = true;
         root["outputFolderMode"] = OutputFolderMode;

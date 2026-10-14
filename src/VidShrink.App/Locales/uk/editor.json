@@ -109,5 +109,18 @@
   "editor.scene.done": "Розділено за змінами сцен: {0}.",
   "editor.source.add": "Додати джерело",
   "editor.source.failed": "Не вдалося додати {0}: немає відео або файл не читається.",
-  "editor.export.merge-full": "Об'єднується кілька джерел, тому все відео кодується заново."
+  "editor.export.merge-full": "Об'єднується кілька джерел, тому все відео кодується заново.",
+  "editor.split.auto": "Автоматичне розділення",
+  "editor.split.count": "Однакова кількість частин",
+  "editor.split.duration": "Фіксована тривалість (с)",
+  "editor.split.size": "Цільовий розмір (МБ)",
+  "editor.split.value": "Значення розділення",
+  "editor.split.apply": "Розділити",
+  "editor.split.invalid": "Неприпустиме значення.",
+  "editor.split.done": "Створено нових частин: {0}.",
+  "editor.scene.threshold": "Поріг сцени",
+  "editor.clip.label": "Мітка",
+  "editor.marker.name": "Назва маркера",
+  "editor.export.part-name": "Назва частини",
+  "editor.export.part-name.hint": "Шаблон назв окремих частин. Підстановки: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Залиште порожнім, щоб використати типовий."
 }

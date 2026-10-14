@@ -36,14 +36,15 @@ public static class EditExportRunner
 
     /// <summary>
     /// Her parcayi ayri dosyaya yazan planlar. Adlar <see cref="EditOutputName.Segments"/> ile
-    /// <paramref name="outputPath"/>'ten turer; her parcanin kendi yarim dosyasi ve is klasoru olur.
+    /// <paramref name="outputPath"/>'ten turer; <paramref name="partPattern"/> klibin etiketini ve cizelgedeki
+    /// basini ada katar. Her parcanin kendi yarim dosyasi ve is klasoru olur.
     /// </summary>
     public static async Task<IReadOnlyList<ExportPlan>> PrepareSegmentsAsync(
         IReadOnlyList<string> sources, EditTimeline timeline, ExportMode mode, string outputPath, long memoryBudgetBytes,
-        Func<string, bool>? exists = null, bool dropMetadata = false, CancellationToken ct = default)
+        Func<string, bool>? exists = null, bool dropMetadata = false, CancellationToken ct = default, string? partPattern = null)
     {
         var probed = await ProbeSourcesAsync(sources, timeline, mode, true, ct).ConfigureAwait(false);
-        var outputs = EditOutputName.Segments(outputPath, timeline.Clips.Count, exists);
+        var outputs = EditOutputName.Segments(outputPath, PartNames(timeline), partPattern, exists);
         var partials = outputs.Select(EncodeRunner.PartialPathFor).ToArray();
         var works = outputs.Select(WorkDirectoryFor).ToArray();
         return EditExport.BuildSegments(timeline, probed, mode, partials, works, memoryBudgetBytes,
@@ -51,6 +52,10 @@ public static class EditExportRunner
             .Select((plan, i) => plan with { OutputPath = outputs[i] })
             .ToArray();
     }
+
+    /// <summary>Parca adina giren bilgiler: her klibin etiketi ve cizelgedeki basi.</summary>
+    public static IReadOnlyList<SegmentName> PartNames(EditTimeline timeline)
+        => timeline.Clips.Select((clip, i) => new SegmentName(clip.Label, timeline.ClipStart(i))).ToArray();
 
     /// <summary>
     /// Planlari sirayla, tek surecle kosar; ilerleme toplam is suresi uzerinden tek cubuga iner.

@@ -109,5 +109,18 @@
   "editor.scene.done": "Đã tách tại {0} điểm chuyển cảnh.",
   "editor.source.add": "Thêm nguồn",
   "editor.source.failed": "Không thể thêm {0}: không có video hoặc không đọc được tệp.",
-  "editor.export.merge-full": "Nhiều nguồn được ghép lại nên toàn bộ video được mã hóa lại."
+  "editor.export.merge-full": "Nhiều nguồn được ghép lại nên toàn bộ video được mã hóa lại.",
+  "editor.split.auto": "Tách tự động",
+  "editor.split.count": "Số phần bằng nhau",
+  "editor.split.duration": "Thời lượng cố định (giây)",
+  "editor.split.size": "Kích thước mục tiêu (MB)",
+  "editor.split.value": "Giá trị tách",
+  "editor.split.apply": "Tách",
+  "editor.split.invalid": "Giá trị không hợp lệ.",
+  "editor.split.done": "Đã tạo {0} phần mới.",
+  "editor.scene.threshold": "Ngưỡng cảnh",
+  "editor.clip.label": "Nhãn",
+  "editor.marker.name": "Tên điểm đánh dấu",
+  "editor.export.part-name": "Tên phần",
+  "editor.export.part-name.hint": "Mẫu tên cho các phần riêng. Chỗ giữ chỗ: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Để trống để dùng mặc định."
 }

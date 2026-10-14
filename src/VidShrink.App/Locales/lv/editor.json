@@ -109,5 +109,18 @@
   "editor.scene.done": "Sadalīts pie {0} ainu maiņām.",
   "editor.source.add": "Pievienot avotu",
   "editor.source.failed": "Neizdevās pievienot {0}: tajā nav video vai to nevar nolasīt.",
-  "editor.export.merge-full": "Tiek apvienoti vairāki avoti, tāpēc viss video tiek kodēts no jauna."
+  "editor.export.merge-full": "Tiek apvienoti vairāki avoti, tāpēc viss video tiek kodēts no jauna.",
+  "editor.split.auto": "Automātiska sadalīšana",
+  "editor.split.count": "Vienāds daļu skaits",
+  "editor.split.duration": "Fiksēts ilgums (s)",
+  "editor.split.size": "Mērķa izmērs (MB)",
+  "editor.split.value": "Sadalīšanas vērtība",
+  "editor.split.apply": "Sadalīt",
+  "editor.split.invalid": "Nederīga vērtība.",
+  "editor.split.done": "Izveidotas jaunas daļas: {0}.",
+  "editor.scene.threshold": "Ainas slieksnis",
+  "editor.clip.label": "Etiķete",
+  "editor.marker.name": "Marķiera nosaukums",
+  "editor.export.part-name": "Daļas nosaukums",
+  "editor.export.part-name.hint": "Atsevišķo daļu nosaukumu veidne. Vietturi: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Atstājiet tukšu, lai izmantotu noklusējumu."
 }

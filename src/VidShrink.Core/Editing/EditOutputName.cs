@@ -53,4 +53,71 @@ public static class EditOutputName
         for (var n = 2; names.Any(exists); n++) names = Names(stem + "-" + n.ToString(invariant));
         return names;
     }
+
+    /// <summary>Parca adi deseninin varsayilani (<see cref="AdlandirmaDeseni.ParcaVarsayilan"/>).</summary>
+    public const string PartPattern = AdlandirmaDeseni.ParcaVarsayilan;
+
+    /// <summary>
+    /// Parca adlari desenden (<see cref="AdlandirmaDeseni.ParcaUygula"/>): <c>{ad}</c> cikti adinin
+    /// govdesi, <c>{parca}</c> sira, <c>{etiket}</c> klibin etiketi, <c>{zaman}</c> parcanin cizelgedeki
+    /// basi. Etiketsiz parcalar ve varsayilan desen eski adlari verir. Bos kalan ad govdeye duser;
+    /// kumede ayni ad iki kez cikarsa sira numarasi eklenir. Adlardan biri varsa <c>{ad}</c>
+    /// <c>-2</c>, <c>-3</c> ile (desende <c>{ad}</c> yoksa adin sonuna) yeniden denenir.
+    /// </summary>
+    public static IReadOnlyList<string> Segments(string output, IReadOnlyList<SegmentName> parts, string? pattern, Func<string, bool>? exists = null)
+    {
+        ArgumentNullException.ThrowIfNull(parts);
+        if (parts.Count < 1) throw new ArgumentOutOfRangeException(nameof(parts), parts.Count, "Parca sayisi pozitif olmalidir");
+        var usable = AdlandirmaDeseni.ParcaHata(pattern) is null ? pattern! : PartPattern;
+        if (usable == PartPattern && parts.All(p => p.Label is null)) return Segments(output, parts.Count, exists);
+
+        exists ??= path => File.Exists(path) || Directory.Exists(path);
+        var folder = Path.GetDirectoryName(Path.GetFullPath(output)) ?? string.Empty;
+        var stem = Path.GetFileNameWithoutExtension(output);
+        var ext = Path.GetExtension(output);
+        var invariant = System.Globalization.CultureInfo.InvariantCulture;
+        var width = Math.Max(2, parts.Count.ToString(invariant).Length);
+        var carriesStem = usable.Contains("{ad}", StringComparison.Ordinal);
+        var now = DateTime.Now;
+
+        string Number(int i) => (i + 1).ToString(invariant).PadLeft(width, '0');
+
+        string[] Names(string root, string tail)
+        {
+            var bare = parts.Select((part, i) =>
+            {
+                var name = AdlandirmaDeseni.ParcaUygula(usable, new AdBilgisi(root)
+                {
+                    Parca = Number(i),
+                    Etiket = part.Label,
+                    Zaman = Stamp(part.Start),
+                    Tarih = now,
+                });
+                return (name.Length == 0 ? root : name) + tail;
+            }).ToArray();
+
+            var repeated = bare.GroupBy(n => n, StringComparer.OrdinalIgnoreCase).Where(g => g.Count() > 1).Select(g => g.Key)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            return bare.Select((name, i) => Path.Combine(folder, (repeated.Contains(name) ? name + "-" + Number(i) : name) + ext)).ToArray();
+        }
+
+        var names = Names(stem, string.Empty);
+        for (var n = 2; names.Any(exists); n++)
+        {
+            var suffix = "-" + n.ToString(invariant);
+            names = carriesStem ? Names(stem + suffix, string.Empty) : Names(stem, suffix);
+        }
+
+        return names;
+    }
+
+    /// <summary>Cizelge anini parca adina uygun yazar: <c>01h02m05s</c>.</summary>
+    public static string Stamp(long ticks)
+    {
+        var seconds = Math.Max(0, ticks) / EditTime.TicksPerSecond;
+        return string.Create(System.Globalization.CultureInfo.InvariantCulture, $"{seconds / 3600:00}h{seconds / 60 % 60:00}m{seconds % 60:00}s");
+    }
 }
+
+/// <summary>Ayri yazilan parcanin adina giren bilgiler: klibin etiketi ve cizelgedeki basi (tick).</summary>
+public sealed record SegmentName(string? Label, long Start);

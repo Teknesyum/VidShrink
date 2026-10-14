@@ -44,7 +44,22 @@ internal partial class EditorView
         TxtClipFadeIn.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitClipFade(true));
         TxtClipFadeOut.LostFocus += (_, _) => CommitClipFade(false);
         TxtClipFadeOut.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitClipFade(false));
+        TxtClipLabel.LostFocus += (_, _) => { if (_showingClip) CommitClipLabel(); };
+        TxtClipLabel.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitClipLabel());
         ShowClipPanel();
+    }
+
+    /// <summary>Kutudaki etiketi secili kliplere yazar; secim yoksa oynatma basinin altindaki klibe. Tek geri alma adimi.</summary>
+    internal bool CommitClipLabel()
+    {
+        if (_model is null) return false;
+        var text = TxtClipLabel.Text;
+        if (ActiveIndex < 0) Timeline.SelectedIndex = Timeline.ClipAt(Timeline.Playhead);
+        var targets = ClipTargets();
+        if (targets.Count == 0) return false;
+        var done = Apply(model => model.SetLabel(targets, text), -1);
+        if (!done) ShowClipPanel();
+        return done;
     }
 
     /// <summary>Panelin yazdigi klipler: hepsi seciliyse hepsi, degilse secim; secim bossa etkin klip.</summary>
@@ -148,6 +163,7 @@ internal partial class EditorView
         TxtClipVolume.Text = effects.VolumeDb.ToString("0.#", Strings.Culture);
         TxtClipFadeIn.Text = EditTime.ToSeconds(effects.FadeIn).ToString("0.##", Strings.Culture);
         TxtClipFadeOut.Text = EditTime.ToSeconds(effects.FadeOut).ToString("0.##", Strings.Culture);
+        TxtClipLabel.Text = model.Clips[index].Label;
         ClipPanel.IsVisible = true;
         _showingClip = true;
     }

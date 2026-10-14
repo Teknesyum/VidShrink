@@ -109,5 +109,18 @@
   "editor.scene.done": "Gesplitst bij {0} scènewissels.",
   "editor.source.add": "Bron toevoegen",
   "editor.source.failed": "{0} kon niet worden toegevoegd: geen video of niet leesbaar.",
-  "editor.export.merge-full": "Meerdere bronnen worden samengevoegd, dus de hele video wordt opnieuw gecodeerd."
+  "editor.export.merge-full": "Meerdere bronnen worden samengevoegd, dus de hele video wordt opnieuw gecodeerd.",
+  "editor.split.auto": "Automatisch splitsen",
+  "editor.split.count": "Gelijk aantal delen",
+  "editor.split.duration": "Vaste duur (s)",
+  "editor.split.size": "Doelgrootte (MB)",
+  "editor.split.value": "Splitswaarde",
+  "editor.split.apply": "Splitsen",
+  "editor.split.invalid": "Ongeldige waarde.",
+  "editor.split.done": "{0} nieuwe delen gemaakt.",
+  "editor.scene.threshold": "Scènedrempel",
+  "editor.clip.label": "Label",
+  "editor.marker.name": "Markeringsnaam",
+  "editor.export.part-name": "Naam van deel",
+  "editor.export.part-name.hint": "Naampatroon voor afzonderlijke delen. Plaatsaanduidingen: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Laat leeg voor de standaard."
 }

@@ -477,6 +477,32 @@ public sealed class EditTimeline
     }
 
     /// <summary>
+    /// Secili parcalarin etiketini yazar (<see cref="EditClip.Label"/>); bos etiket siler. Tek
+    /// adimda geri alinir; hicbir parca degismezse <c>false</c> doner ve gecmise adim yazilmaz.
+    /// </summary>
+    public bool SetLabel(IReadOnlyList<int> indices, string? label)
+    {
+        ArgumentNullException.ThrowIfNull(indices);
+        var order = indices.Distinct().OrderBy(i => i).ToList();
+        foreach (var index in order) CheckIndex(index);
+
+        var normalized = EditClip.NormalizeLabel(label);
+        var steps = new List<IEditCommand>();
+        foreach (var index in order)
+        {
+            var before = _clips[index];
+            if (before.Label == normalized) continue;
+            var step = new ReplaceCommand(index, before, before with { Label = normalized });
+            step.Apply(_clips);
+            steps.Add(step);
+        }
+
+        if (steps.Count == 0) return false;
+        Record(new CompositeCommand(steps));
+        return true;
+    }
+
+    /// <summary>
     /// T1 izinin metin klipleri, eklenme sirasiyla; sonraki klip ustte cizilir. Zamanlari
     /// cizelge zamanidir, klip silmek ya da kaydirmak metni tasimaz.
     /// </summary>

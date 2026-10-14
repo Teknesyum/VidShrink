@@ -109,5 +109,18 @@
   "editor.scene.done": "Разделено при {0} смени на сцена.",
   "editor.source.add": "Добавяне на източник",
   "editor.source.failed": "{0} не можа да се добави: няма видео или файлът не се чете.",
-  "editor.export.merge-full": "Обединяват се няколко източника, затова цялото видео се кодира наново."
+  "editor.export.merge-full": "Обединяват се няколко източника, затова цялото видео се кодира наново.",
+  "editor.split.auto": "Автоматично разделяне",
+  "editor.split.count": "Равен брой части",
+  "editor.split.duration": "Фиксирана продължителност (с)",
+  "editor.split.size": "Целеви размер (MB)",
+  "editor.split.value": "Стойност за разделяне",
+  "editor.split.apply": "Раздели",
+  "editor.split.invalid": "Невалидна стойност.",
+  "editor.split.done": "Създадени са {0} нови части.",
+  "editor.scene.threshold": "Праг на сцената",
+  "editor.clip.label": "Етикет",
+  "editor.marker.name": "Име на маркера",
+  "editor.export.part-name": "Име на частта",
+  "editor.export.part-name.hint": "Шаблон за имената на отделните части. Заместители: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Оставете празно за стандартния."
 }

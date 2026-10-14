@@ -109,5 +109,18 @@
   "editor.scene.done": "{0} 件のシーンの切り替わりで分割しました。",
   "editor.source.add": "ソースを追加",
   "editor.source.failed": "{0} を追加できませんでした。映像がないか、読み込めません。",
-  "editor.export.merge-full": "複数のソースを結合するため、動画全体を再エンコードします。"
+  "editor.export.merge-full": "複数のソースを結合するため、動画全体を再エンコードします。",
+  "editor.split.auto": "自動分割",
+  "editor.split.count": "均等なパート数",
+  "editor.split.duration": "固定の長さ（秒）",
+  "editor.split.size": "目標サイズ（MB）",
+  "editor.split.value": "分割の値",
+  "editor.split.apply": "分割",
+  "editor.split.invalid": "無効な値です。",
+  "editor.split.done": "{0} 個の新しいパートを作成しました。",
+  "editor.scene.threshold": "シーンのしきい値",
+  "editor.clip.label": "ラベル",
+  "editor.marker.name": "マーカー名",
+  "editor.export.part-name": "パート名",
+  "editor.export.part-name.hint": "個別パートの名前パターン。プレースホルダー: {ad}, {parca}, {etiket}, {zaman}, {tarih}。空欄にすると既定値を使います。"
 }

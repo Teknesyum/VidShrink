@@ -109,5 +109,18 @@
   "editor.scene.done": "تم التقسيم عند {0} من تغيّرات المشاهد.",
   "editor.source.add": "إضافة مصدر",
   "editor.source.failed": "تعذّرت إضافة {0}: لا يحتوي على فيديو أو لا يمكن قراءته.",
-  "editor.export.merge-full": "يُدمج أكثر من مصدر، لذلك يُعاد ترميز الفيديو كاملًا."
+  "editor.export.merge-full": "يُدمج أكثر من مصدر، لذلك يُعاد ترميز الفيديو كاملًا.",
+  "editor.split.auto": "تقسيم تلقائي",
+  "editor.split.count": "عدد أجزاء متساوٍ",
+  "editor.split.duration": "مدة ثابتة (ث)",
+  "editor.split.size": "الحجم المستهدف (ميغابايت)",
+  "editor.split.value": "قيمة التقسيم",
+  "editor.split.apply": "تقسيم",
+  "editor.split.invalid": "قيمة غير صالحة.",
+  "editor.split.done": "تم إنشاء {0} من الأجزاء الجديدة.",
+  "editor.scene.threshold": "عتبة المشهد",
+  "editor.clip.label": "التسمية",
+  "editor.marker.name": "اسم العلامة",
+  "editor.export.part-name": "اسم الجزء",
+  "editor.export.part-name.hint": "نمط تسمية الأجزاء المنفصلة. العناصر النائبة: {ad}، {parca}، {etiket}، {zaman}، {tarih}. اتركه فارغًا لاستخدام الافتراضي."
 }

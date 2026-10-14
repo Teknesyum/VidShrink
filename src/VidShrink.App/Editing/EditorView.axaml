@@ -89,6 +89,11 @@
                           <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.drop-metadata.tip}"/>
                         </ToolTip.Tip>
                       </CheckBox>
+                      <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                        <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.part-name}"/>
+                        <TextBox x:Name="TxtPartName" Width="{StaticResource FieldWidth}" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.export.part-name}" ToolTip.Tip="{loc:Text editor.export.part-name.hint}"/>
+                      </StackPanel>
+                      <TextBlock x:Name="TxtPartNameError" Theme="{StaticResource StatusError}" TextWrapping="Wrap" MaxWidth="{StaticResource FieldWidth}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                     </StackPanel>
                   </Flyout>
                 </Button.Flyout>
@@ -154,6 +159,10 @@
               <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.fade-out}"/>
               <TextBox x:Name="TxtClipFadeOut" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.fade-out}"/>
             </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.label}"/>
+              <TextBox x:Name="TxtClipLabel" Width="{StaticResource FieldWidthSm}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.label}"/>
+            </StackPanel>
             <Button x:Name="BtnClipReset" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.reset}" AutomationProperties.Name="{loc:Text editor.clip.reset}"/>
           </WrapPanel>
           <StackPanel x:Name="SilencePanel" Spacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.silence.panel}">
@@ -192,6 +201,24 @@
                   </Style>
                 </Button.Styles>
               </Button>
+              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.scene.threshold}"/>
+                <TextBox x:Name="TxtSceneThreshold" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.scene.threshold}"/>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.split.auto}"/>
+                <ComboBox x:Name="CmbAutoSplit" MinWidth="{StaticResource FieldWidthSm}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.split.auto}">
+                  <ComboBoxItem Content="{loc:Text editor.split.count}"/>
+                  <ComboBoxItem Content="{loc:Text editor.split.duration}"/>
+                  <ComboBoxItem Content="{loc:Text editor.split.size}"/>
+                </ComboBox>
+                <TextBox x:Name="TxtAutoSplit" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.split.value}"/>
+                <Button x:Name="BtnAutoSplit" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.split.apply}" AutomationProperties.Name="{loc:Text editor.split.apply}" IsEnabled="False"/>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.marker.name}"/>
+                <TextBox x:Name="TxtMarkerName" Width="{StaticResource FieldWidthSm}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.marker.name}"/>
+              </StackPanel>
             </WrapPanel>
             <ProgressBar x:Name="SilenceProgress" Maximum="1" IsVisible="False"/>
             <TextBlock x:Name="TxtSilenceStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>

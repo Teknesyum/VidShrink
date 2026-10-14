@@ -109,5 +109,18 @@
   "editor.scene.done": "Tükeldati {0} stseenivahetusel.",
   "editor.source.add": "Lisa allikas",
   "editor.source.failed": "{0} lisamine ebaõnnestus: selles pole videot või seda ei saa lugeda.",
-  "editor.export.merge-full": "Ühendatakse mitu allikat, seetõttu kodeeritakse kogu video uuesti."
+  "editor.export.merge-full": "Ühendatakse mitu allikat, seetõttu kodeeritakse kogu video uuesti.",
+  "editor.split.auto": "Automaatne tükeldus",
+  "editor.split.count": "Võrdne osade arv",
+  "editor.split.duration": "Kindel kestus (s)",
+  "editor.split.size": "Sihtsuurus (MB)",
+  "editor.split.value": "Tükeldamise väärtus",
+  "editor.split.apply": "Tükelda",
+  "editor.split.invalid": "Vigane väärtus.",
+  "editor.split.done": "Loodi {0} uut osa.",
+  "editor.scene.threshold": "Stseenilävi",
+  "editor.clip.label": "Silt",
+  "editor.marker.name": "Markeri nimi",
+  "editor.export.part-name": "Osa nimi",
+  "editor.export.part-name.hint": "Eraldi osade nimemuster. Kohatäited: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Jäta tühjaks, et kasutada vaikimisi mustrit."
 }

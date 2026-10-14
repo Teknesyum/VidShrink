@@ -109,5 +109,18 @@
   "editor.scene.done": "Suskaidyta ties scenų pasikeitimais: {0}.",
   "editor.source.add": "Pridėti šaltinį",
   "editor.source.failed": "Nepavyko pridėti {0}: nėra vaizdo arba failo negalima perskaityti.",
-  "editor.export.merge-full": "Sujungiami keli šaltiniai, todėl visas vaizdo įrašas koduojamas iš naujo."
+  "editor.export.merge-full": "Sujungiami keli šaltiniai, todėl visas vaizdo įrašas koduojamas iš naujo.",
+  "editor.split.auto": "Automatinis skaidymas",
+  "editor.split.count": "Vienodas dalių skaičius",
+  "editor.split.duration": "Fiksuota trukmė (s)",
+  "editor.split.size": "Tikslinis dydis (MB)",
+  "editor.split.value": "Skaidymo reikšmė",
+  "editor.split.apply": "Skaidyti",
+  "editor.split.invalid": "Netinkama reikšmė.",
+  "editor.split.done": "Sukurta naujų dalių: {0}.",
+  "editor.scene.threshold": "Scenos slenkstis",
+  "editor.clip.label": "Etiketė",
+  "editor.marker.name": "Žymeklio pavadinimas",
+  "editor.export.part-name": "Dalies pavadinimas",
+  "editor.export.part-name.hint": "Atskirų dalių pavadinimų šablonas. Vietos rezervavimo ženklai: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Palikite tuščią, kad būtų naudojamas numatytasis."
 }

@@ -109,5 +109,18 @@
   "editor.scene.done": "{0} காட்சி மாற்றங்களில் பிரிக்கப்பட்டது.",
   "editor.source.add": "மூலத்தைச் சேர்",
   "editor.source.failed": "{0} சேர்க்க முடியவில்லை: இதில் வீடியோ இல்லை அல்லது படிக்க முடியவில்லை.",
-  "editor.export.merge-full": "பல மூலங்கள் இணைக்கப்படுகின்றன, எனவே முழு வீடியோவும் மீண்டும் குறியாக்கப்படும்."
+  "editor.export.merge-full": "பல மூலங்கள் இணைக்கப்படுகின்றன, எனவே முழு வீடியோவும் மீண்டும் குறியாக்கப்படும்.",
+  "editor.split.auto": "தானியங்கி பிரிப்பு",
+  "editor.split.count": "சம எண்ணிக்கை பகுதிகள்",
+  "editor.split.duration": "நிலையான நீளம் (வி)",
+  "editor.split.size": "இலக்கு அளவு (MB)",
+  "editor.split.value": "பிரிப்பு மதிப்பு",
+  "editor.split.apply": "பிரி",
+  "editor.split.invalid": "தவறான மதிப்பு.",
+  "editor.split.done": "{0} புதிய பகுதிகள் உருவாக்கப்பட்டன.",
+  "editor.scene.threshold": "காட்சி வரம்பு",
+  "editor.clip.label": "லேபிள்",
+  "editor.marker.name": "குறிப்பான் பெயர்",
+  "editor.export.part-name": "பகுதியின் பெயர்",
+  "editor.export.part-name.hint": "தனிப் பகுதிகளின் பெயர் வடிவம். இடம்பிடிகள்: {ad}, {parca}, {etiket}, {zaman}, {tarih}. இயல்புநிலையைப் பயன்படுத்த வெறுமையாக விடவும்."
 }

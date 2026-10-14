@@ -109,5 +109,18 @@
   "editor.scene.done": "در {0} تغییر صحنه تقسیم شد.",
   "editor.source.add": "افزودن منبع",
   "editor.source.failed": "{0} افزوده نشد: ویدیو ندارد یا خوانده نمی‌شود.",
-  "editor.export.merge-full": "چند منبع ادغام می‌شود، بنابراین کل ویدیو دوباره کدگذاری می‌شود."
+  "editor.export.merge-full": "چند منبع ادغام می‌شود، بنابراین کل ویدیو دوباره کدگذاری می‌شود.",
+  "editor.split.auto": "تقسیم خودکار",
+  "editor.split.count": "تعداد بخش‌های برابر",
+  "editor.split.duration": "مدت ثابت (ثانیه)",
+  "editor.split.size": "اندازه هدف (MB)",
+  "editor.split.value": "مقدار تقسیم",
+  "editor.split.apply": "تقسیم",
+  "editor.split.invalid": "مقدار نامعتبر.",
+  "editor.split.done": "{0} بخش جدید ساخته شد.",
+  "editor.scene.threshold": "آستانه صحنه",
+  "editor.clip.label": "برچسب",
+  "editor.marker.name": "نام نشانگر",
+  "editor.export.part-name": "نام بخش",
+  "editor.export.part-name.hint": "الگوی نام بخش‌های جداگانه. جای‌نگهدارها: {ad}، {parca}، {etiket}، {zaman}، {tarih}. برای استفاده از پیش‌فرض خالی بگذارید."
 }

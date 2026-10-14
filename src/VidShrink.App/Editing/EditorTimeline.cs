@@ -356,6 +356,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         _set.Clear();
         _anchor = -1;
         _markers.Clear();
+        _markerNames.Clear();
         MarkIn = null;
         MarkOut = null;
         _viewStart = 0;
@@ -376,6 +377,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         if (MarkIn is { } a && a > (_model?.Duration ?? 0)) MarkIn = null;
         if (MarkOut is { } b && b > (_model?.Duration ?? 0)) MarkOut = null;
         _markers.RemoveAll(m => m > (_model?.Duration ?? 0));
+        PruneMarkerNames();
         if (_model is not { Clips.Count: > 0 }) _all = false;
         Playhead = _playhead;
         PixelsPerTick = _ppt;
@@ -404,7 +406,11 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         if (_model is not { } model) return false;
         var at = Math.Clamp(time, 0, model.Duration);
         var index = _markers.BinarySearch(at);
-        if (index >= 0) _markers.RemoveAt(index);
+        if (index >= 0)
+        {
+            _markers.RemoveAt(index);
+            _markerNames.Remove(at);
+        }
         else _markers.Insert(~index, at);
         _overlay.InvalidateVisual();
         return index < 0;

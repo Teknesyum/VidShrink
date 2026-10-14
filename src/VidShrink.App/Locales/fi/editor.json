@@ -109,5 +109,18 @@
   "editor.scene.done": "Jaettu {0} kohtausvaihdoksen kohdalta.",
   "editor.source.add": "Lisää lähde",
   "editor.source.failed": "Kohdetta {0} ei voitu lisätä: siinä ei ole videota tai sitä ei voi lukea.",
-  "editor.export.merge-full": "Useita lähteitä yhdistetään, joten koko video koodataan uudelleen."
+  "editor.export.merge-full": "Useita lähteitä yhdistetään, joten koko video koodataan uudelleen.",
+  "editor.split.auto": "Automaattinen jako",
+  "editor.split.count": "Yhtä monta osaa",
+  "editor.split.duration": "Kiinteä kesto (s)",
+  "editor.split.size": "Tavoitekoko (Mt)",
+  "editor.split.value": "Jakoarvo",
+  "editor.split.apply": "Jaa",
+  "editor.split.invalid": "Virheellinen arvo.",
+  "editor.split.done": "Luotiin {0} uutta osaa.",
+  "editor.scene.threshold": "Kohtauskynnys",
+  "editor.clip.label": "Tunniste",
+  "editor.marker.name": "Merkin nimi",
+  "editor.export.part-name": "Osan nimi",
+  "editor.export.part-name.hint": "Erillisten osien nimimalli. Paikkamerkit: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Jätä tyhjäksi käyttääksesi oletusta."
 }

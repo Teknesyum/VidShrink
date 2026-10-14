@@ -109,5 +109,18 @@
   "editor.scene.done": "Dividido em {0} mudanças de cena.",
   "editor.source.add": "Adicionar fonte",
   "editor.source.failed": "Não foi possível adicionar {0}: não tem vídeo ou não pode ser lido.",
-  "editor.export.merge-full": "Várias fontes são unidas, por isso o vídeo inteiro é recodificado."
+  "editor.export.merge-full": "Várias fontes são unidas, por isso o vídeo inteiro é recodificado.",
+  "editor.split.auto": "Divisão automática",
+  "editor.split.count": "Número igual de partes",
+  "editor.split.duration": "Duração fixa (s)",
+  "editor.split.size": "Tamanho alvo (MB)",
+  "editor.split.value": "Valor de divisão",
+  "editor.split.apply": "Dividir",
+  "editor.split.invalid": "Valor inválido.",
+  "editor.split.done": "{0} novas partes criadas.",
+  "editor.scene.threshold": "Limiar de cena",
+  "editor.clip.label": "Rótulo",
+  "editor.marker.name": "Nome do marcador",
+  "editor.export.part-name": "Nome da parte",
+  "editor.export.part-name.hint": "Padrão de nome para as partes separadas. Marcadores: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Deixe vazio para usar o padrão."
 }

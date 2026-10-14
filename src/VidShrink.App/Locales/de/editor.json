@@ -109,5 +109,18 @@
   "editor.scene.done": "An {0} Szenenwechseln geteilt.",
   "editor.source.add": "Quelle hinzufügen",
   "editor.source.failed": "{0} ließ sich nicht hinzufügen: kein Video oder nicht lesbar.",
-  "editor.export.merge-full": "Mehrere Quellen werden zusammengefügt, daher wird das ganze Video neu kodiert."
+  "editor.export.merge-full": "Mehrere Quellen werden zusammengefügt, daher wird das ganze Video neu kodiert.",
+  "editor.split.auto": "Automatisch teilen",
+  "editor.split.count": "Gleiche Anzahl Teile",
+  "editor.split.duration": "Feste Dauer (s)",
+  "editor.split.size": "Zielgröße (MB)",
+  "editor.split.value": "Teilungswert",
+  "editor.split.apply": "Teilen",
+  "editor.split.invalid": "Ungültiger Wert.",
+  "editor.split.done": "{0} neue Teile erstellt.",
+  "editor.scene.threshold": "Szenenschwelle",
+  "editor.clip.label": "Bezeichnung",
+  "editor.marker.name": "Markername",
+  "editor.export.part-name": "Teilname",
+  "editor.export.part-name.hint": "Namensmuster für separate Teile. Platzhalter: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Leer lassen für den Standard."
 }

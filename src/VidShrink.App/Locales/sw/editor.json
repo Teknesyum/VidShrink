@@ -109,5 +109,18 @@
   "editor.scene.done": "Imegawanywa kwenye mabadiliko {0} ya onyesho.",
   "editor.source.add": "Ongeza chanzo",
   "editor.source.failed": "{0} haikuweza kuongezwa: haina video au haisomeki.",
-  "editor.export.merge-full": "Vyanzo kadhaa vinaunganishwa, kwa hiyo video nzima inasimbwa upya."
+  "editor.export.merge-full": "Vyanzo kadhaa vinaunganishwa, kwa hiyo video nzima inasimbwa upya.",
+  "editor.split.auto": "Gawa kiotomatiki",
+  "editor.split.count": "Idadi sawa ya sehemu",
+  "editor.split.duration": "Muda maalum (s)",
+  "editor.split.size": "Ukubwa lengwa (MB)",
+  "editor.split.value": "Thamani ya kugawa",
+  "editor.split.apply": "Gawa",
+  "editor.split.invalid": "Thamani si sahihi.",
+  "editor.split.done": "Sehemu mpya {0} zimeundwa.",
+  "editor.scene.threshold": "Kizingiti cha onyesho",
+  "editor.clip.label": "Lebo",
+  "editor.marker.name": "Jina la alama",
+  "editor.export.part-name": "Jina la sehemu",
+  "editor.export.part-name.hint": "Muundo wa majina ya sehemu tofauti. Vishika nafasi: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Acha tupu kutumia chaguo-msingi."
 }

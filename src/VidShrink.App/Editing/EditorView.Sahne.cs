@@ -11,17 +11,24 @@ using VidShrink.Ffmpeg;
 namespace VidShrink.App.Editing;
 
 /// <summary>
-/// Sahne degisimlerinden bolme. Sessizlik panelinin iptalini, ilerleme cubugunu ve durum
-/// satirini paylasir; tarama bitince bulunan sinirlarda parcalar bolunur ve bu tek geri alma
-/// adimidir. Sinir yoksa, tarama duserse ya da iptal edilirse cizelge degismez.
+/// Sahne degisimlerinden ve otomatik bolme. Sessizlik panelinin iptalini, ilerleme cubugunu ve
+/// durum satirini paylasir; tarama bitince bulunan sinirlarda parcalar bolunur ve bu tek geri alma
+/// adimidir. Sinir yoksa, tarama duserse ya da iptal edilirse cizelge degismez. Sahne esigi
+/// panelden okunur (0 ile 1 arasi); otomatik bolme esit sayi, sabit sure ya da hedef boyuttan
+/// <see cref="AutoSplit"/> sinirlarini ayni <see cref="EditTimeline.SplitSource"/>'a verir.
 /// </summary>
 internal partial class EditorView
 {
-    internal Func<string, double, IProgress<double>, CancellationToken, Task<IReadOnlyList<double>>> SceneScanner { get; set; } = DefaultSceneScan;
+    internal Func<string, double, double, IProgress<double>, CancellationToken, Task<IReadOnlyList<double>>> SceneScanner { get; set; } = DefaultSceneScan;
 
     internal async Task<int> SplitScenesAsync()
     {
         if (_model is not { SourceDuration: { } duration } || _source is not { } source) return 0;
+        if (!TryNumber(TxtSceneThreshold.Text, out var threshold) || threshold <= 0 || threshold >= 1)
+        {
+            TxtSilenceStatus.Text = Strings.Get("editor.split.invalid");
+            return 0;
+        }
 
         _silenceCts?.Cancel();
         using var cts = new CancellationTokenSource();
@@ -34,7 +41,7 @@ internal partial class EditorView
         var split = 0;
         try
         {
-            var cuts = await SceneScanner(source, EditTime.ToSeconds(duration), progress, cts.Token).ConfigureAwait(true);
+            var cuts = await SceneScanner(source, EditTime.ToSeconds(duration), threshold, progress, cts.Token).ConfigureAwait(true);
             if (!ReferenceEquals(_silenceCts, cts) || !CurrentMedia.SamePath(source, _source)) return 0;
 
             var boundaries = SceneSplit.ToTicks(cuts);
@@ -65,9 +72,52 @@ internal partial class EditorView
         }
     }
 
-    private static Task<IReadOnlyList<double>> DefaultSceneScan(string source, double duration, IProgress<double> progress, CancellationToken ct)
+    internal int AutoSplitClips()
+    {
+        var mode = CmbAutoSplit.SelectedIndex switch
+        {
+            1 => AutoSplitMode.Duration,
+            2 => AutoSplitMode.Size,
+            _ => AutoSplitMode.Count,
+        };
+        if (TryNumber(TxtAutoSplit.Text, out var value)) return AutoSplitClips(mode, value);
+
+        TxtSilenceStatus.Text = Strings.Get("editor.split.invalid");
+        return 0;
+    }
+
+    internal int AutoSplitClips(AutoSplitMode mode, double value)
+    {
+        if (_model is not { SourceDuration: { } duration } || _source is not { } source || SilenceScanning) return 0;
+
+        IReadOnlyList<long> boundaries;
+        try
+        {
+            boundaries = AutoSplit.Boundaries(duration, mode, value, mode == AutoSplitMode.Size ? SourceBytes(source) : 0);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            TxtSilenceStatus.Text = Strings.Get("editor.split.invalid");
+            return 0;
+        }
+
+        var split = 0;
+        Apply(model => (split = model.SplitSource(boundaries, SceneSplit.MinPieceTicks)) > 0, -1);
+        RefreshSilence();
+        TxtSilenceStatus.Text = string.Format(Strings.Culture, Strings.Get("editor.split.done"), split);
+        return split;
+    }
+
+    private long SourceBytes(string source)
+    {
+        if (KnownInfo?.Invoke(source) is { FileSizeBytes: > 0 } info) return info.FileSizeBytes;
+        try { return new FileInfo(source).Length; }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return 0; }
+    }
+
+    private static Task<IReadOnlyList<double>> DefaultSceneScan(string source, double duration, double threshold, IProgress<double> progress, CancellationToken ct)
     {
         if (!ToolLocator.IsAvailable(out var missing)) throw new InvalidOperationException(missing);
-        return Task.Run(() => SceneDetector.CutsAsync(source, duration, progress, ct), ct);
+        return Task.Run(() => SceneDetector.CutsAsync(source, duration, progress, ct, threshold: threshold), ct);
     }
 }

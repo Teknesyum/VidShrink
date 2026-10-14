@@ -109,5 +109,18 @@
   "editor.scene.done": "已在 {0} 处场景切换分割。",
   "editor.source.add": "添加来源",
   "editor.source.failed": "无法添加 {0}：没有视频或无法读取。",
-  "editor.export.merge-full": "正在合并多个来源，因此将重新编码整个视频。"
+  "editor.export.merge-full": "正在合并多个来源，因此将重新编码整个视频。",
+  "editor.split.auto": "自动分割",
+  "editor.split.count": "等分份数",
+  "editor.split.duration": "固定时长（秒）",
+  "editor.split.size": "目标大小（MB）",
+  "editor.split.value": "分割值",
+  "editor.split.apply": "分割",
+  "editor.split.invalid": "数值无效。",
+  "editor.split.done": "已创建 {0} 个新片段。",
+  "editor.scene.threshold": "场景阈值",
+  "editor.clip.label": "标签",
+  "editor.marker.name": "标记名称",
+  "editor.export.part-name": "片段名称",
+  "editor.export.part-name.hint": "单独片段的命名模式。占位符：{ad}、{parca}、{etiket}、{zaman}、{tarih}。留空则使用默认值。"
 }

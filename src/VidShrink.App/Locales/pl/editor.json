@@ -109,5 +109,18 @@
   "editor.scene.done": "Podzielono na zmianach sceny: {0}.",
   "editor.source.add": "Dodaj źródło",
   "editor.source.failed": "Nie udało się dodać {0}: brak obrazu lub pliku nie można odczytać.",
-  "editor.export.merge-full": "Łączonych jest kilka źródeł, więc cały film jest kodowany ponownie."
+  "editor.export.merge-full": "Łączonych jest kilka źródeł, więc cały film jest kodowany ponownie.",
+  "editor.split.auto": "Automatyczny podział",
+  "editor.split.count": "Równa liczba części",
+  "editor.split.duration": "Stały czas trwania (s)",
+  "editor.split.size": "Rozmiar docelowy (MB)",
+  "editor.split.value": "Wartość podziału",
+  "editor.split.apply": "Podziel",
+  "editor.split.invalid": "Nieprawidłowa wartość.",
+  "editor.split.done": "Utworzono nowe części: {0}.",
+  "editor.scene.threshold": "Próg sceny",
+  "editor.clip.label": "Etykieta",
+  "editor.marker.name": "Nazwa znacznika",
+  "editor.export.part-name": "Nazwa części",
+  "editor.export.part-name.hint": "Wzorzec nazw osobnych części. Symbole zastępcze: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Pozostaw puste, aby użyć domyślnego."
 }

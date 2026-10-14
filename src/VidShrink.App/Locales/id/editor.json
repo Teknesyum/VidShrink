@@ -109,5 +109,18 @@
   "editor.scene.done": "Dipisahkan di {0} pergantian adegan.",
   "editor.source.add": "Tambah sumber",
   "editor.source.failed": "{0} tidak dapat ditambahkan: tidak ada video atau tidak dapat dibaca.",
-  "editor.export.merge-full": "Beberapa sumber digabung, jadi seluruh video dienkode ulang."
+  "editor.export.merge-full": "Beberapa sumber digabung, jadi seluruh video dienkode ulang.",
+  "editor.split.auto": "Pisah otomatis",
+  "editor.split.count": "Jumlah bagian sama",
+  "editor.split.duration": "Durasi tetap (dtk)",
+  "editor.split.size": "Ukuran target (MB)",
+  "editor.split.value": "Nilai pemisahan",
+  "editor.split.apply": "Pisahkan",
+  "editor.split.invalid": "Nilai tidak valid.",
+  "editor.split.done": "{0} bagian baru dibuat.",
+  "editor.scene.threshold": "Ambang adegan",
+  "editor.clip.label": "Label",
+  "editor.marker.name": "Nama penanda",
+  "editor.export.part-name": "Nama bagian",
+  "editor.export.part-name.hint": "Pola nama untuk bagian terpisah. Placeholder: {ad}, {parca}, {etiket}, {zaman}, {tarih}. Biarkan kosong untuk memakai bawaan."
 }
