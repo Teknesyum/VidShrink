@@ -84,7 +84,7 @@ internal static class AkisGirdisi
             "-i", srt, "-i", sup, "-i", meta,
             "-map", "0:v", "-map", "1:a", "-map", "2:a", "-map", "3:s", "-map", "4:s",
             "-map_metadata", "5", "-map_chapters", "5",
-            "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p",
+            "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p", "-threads", "2",
             "-c:a:0", "aac", "-b:a:0", "96k", "-ac:a:0", "2",
             "-c:a:1", "ac3", "-b:a:1", "192k", "-ac:a:1", "6",
             "-c:s:0", "srt", "-c:s:1", "copy",
