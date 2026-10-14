@@ -122,14 +122,15 @@ public static class AssWriter
         {
             var t = texts[i];
             var px = FontPixels(t, height);
-            var outline = Math.Max(1, (int)Math.Round(px / 16.0, MidpointRounding.AwayFromZero));
+            var outline = t.Outline ?? Math.Max(1, (int)Math.Round(px / 16.0, MidpointRounding.AwayFromZero));
             doc.Append("Style: T").Append(i.ToString(CultureInfo.InvariantCulture)).Append(',')
                 .Append(t.FontName.Replace(",", string.Empty, StringComparison.Ordinal).Trim()).Append(',')
                 .Append(px.ToString(CultureInfo.InvariantCulture)).Append(',')
-                .Append(Color(t.Color)).Append(',').Append(Color(t.Color)).Append(",&H00000000,&H00000000,")
+                .Append(Color(t.Color)).Append(',').Append(Color(t.Color)).Append(t.Box ? ",&H80000000,&H00000000," : ",&H00000000,&H00000000,")
                 .Append(t.Bold ? "-1" : "0").Append(',').Append(t.Italic ? "-1" : "0")
-                .Append(",0,0,100,100,0,0,1,").Append(outline.ToString(CultureInfo.InvariantCulture))
-                .Append(",0,5,0,0,0,").Append(HasRightToLeft(t.Text) ? "-1" : "1").Append('\n');
+                .Append(",0,0,100,100,0,0,").Append(t.Box ? '3' : '1').Append(',').Append(outline.ToString("0.##", CultureInfo.InvariantCulture))
+                .Append(',').Append(t.Shadow.ToString("0.##", CultureInfo.InvariantCulture))
+                .Append(",5,0,0,0,").Append(HasRightToLeft(t.Text) ? "-1" : "1").Append('\n');
         }
 
         doc.Append("\n[Events]\n")
