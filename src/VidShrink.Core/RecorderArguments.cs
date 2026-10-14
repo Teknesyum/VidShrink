@@ -304,11 +304,81 @@ public enum WebcamBackground
     Green
 }
 
+public enum WebcamShape
+{
+    Rectangle,
+    Rounded,
+    Circle
+}
+
+/// <summary>
+/// Kamera kutusunun karedeki yeri, kenar payindan arta kalan bosluga oranla: <c>X</c> ve <c>Y</c>
+/// 0 sol/ust, 1 sag/alt kenar; <c>Size</c> kutu genisliginin kare genisligine orani.
+/// </summary>
+public sealed record WebcamPlacement(double X, double Y, double Size);
+
+/// <summary>
+/// <see cref="Placement"/> verilince <c>Width</c> ve <c>Corner</c> kullanilmaz; kutu karenin
+/// oraniyla olceklenip serbest konuma oturur.
+/// </summary>
 public sealed record RecorderWebcam(
     string Device,
     int Width,
     WebcamCorner Corner = WebcamCorner.BottomRight,
-    WebcamBackground Background = WebcamBackground.Keep);
+    WebcamBackground Background = WebcamBackground.Keep)
+{
+    public WebcamShape Shape { get; init; }
+
+    public bool Mirror { get; init; }
+
+    public WebcamPlacement? Placement { get; init; }
+}
+
+/// <summary>
+/// Kamera kutusunun bolge uzerindeki dikdortgeni ve surukleme hesabi; bolge duzenleyicisi ile
+/// <see cref="RecorderArguments.WebcamGraph"/>'in <c>overlay</c> ifadesi ayni formulu kullanir.
+/// Kameranin gercek en-boy orani kayittan once bilinmiyor; kutu 4:3 (dairede 1:1) cizilir.
+/// </summary>
+public static class WebcamLayout
+{
+    public static double Aspect(WebcamShape shape) => shape == WebcamShape.Circle ? 1 : 4d / 3;
+
+    public static RecorderRegion Rect(RecorderRegion area, WebcamPlacement placement, WebcamShape shape)
+    {
+        ArgumentNullException.ThrowIfNull(area);
+        ArgumentNullException.ThrowIfNull(placement);
+        var margin = RecorderArguments.WebcamMargin;
+        var width = (int)Math.Round(area.Width * placement.Size);
+        var height = (int)Math.Round(width / Aspect(shape));
+        var x = area.X + margin + (int)Math.Round(Math.Max(0, area.Width - width - 2 * margin) * placement.X);
+        var y = area.Y + margin + (int)Math.Round(Math.Max(0, area.Height - height - 2 * margin) * placement.Y);
+        return new RecorderRegion(x, y, width, height);
+    }
+
+    public static WebcamPlacement Move(RecorderRegion area, WebcamPlacement placement, WebcamShape shape, int dx, int dy)
+    {
+        var rect = Rect(area, placement, shape);
+        return At(area, rect.X + dx, rect.Y + dy, rect.Width, rect.Height, placement.Size);
+    }
+
+    public static WebcamPlacement Resize(RecorderRegion area, WebcamPlacement placement, WebcamShape shape, int dx)
+    {
+        var rect = Rect(area, placement, shape);
+        var size = Math.Clamp((double)(rect.Width + dx) / area.Width, RecorderArguments.MinWebcamSize, RecorderArguments.MaxWebcamSize);
+        var width = (int)Math.Round(area.Width * size);
+        return At(area, rect.X, rect.Y, width, (int)Math.Round(width / Aspect(shape)), size);
+    }
+
+    private static WebcamPlacement At(RecorderRegion area, int x, int y, int width, int height, double size)
+    {
+        var margin = RecorderArguments.WebcamMargin;
+        static double Ratio(int offset, int room) => room <= 0 ? 0 : Math.Clamp((double)offset / room, 0, 1);
+        return new WebcamPlacement(
+            Ratio(x - area.X - margin, area.Width - width - 2 * margin),
+            Ratio(y - area.Y - margin, area.Height - height - 2 * margin),
+            size);
+    }
+}
 
 /// <summary>
 /// Ekran kaydi argumanlarini uretir. Kosturmaz — surec surmeyi
@@ -896,7 +966,11 @@ public static class RecorderArguments
 
     public const string WebcamBufferSize = "256M";
 
-    public static IReadOnlyList<int> WebcamWidths { get; } = new[] { 160, 240, 320, 480 };
+    public const int DefaultWebcamWidth = 240;
+
+    public const double MinWebcamSize = 0.05;
+
+    public const double MaxWebcamSize = 0.5;
 
     private static IEnumerable<string> WebcamErrors(RecorderRequest request)
     {
@@ -913,6 +987,11 @@ public static class RecorderArguments
             yield return "The webcam corner is not one of the four corners.";
         if (!Enum.IsDefined(cam.Background))
             yield return "The webcam background mode is not one of keep, static or green.";
+        if (!Enum.IsDefined(cam.Shape))
+            yield return "The webcam shape is not one of rectangle, rounded or circle.";
+        if (cam.Placement is { } place
+            && !(place.X is >= 0 and <= 1 && place.Y is >= 0 and <= 1 && place.Size is >= MinWebcamSize and <= MaxWebcamSize))
+            yield return $"The webcam position must lie between 0 and 1 and its size between {MinWebcamSize.ToString(CultureInfo.InvariantCulture)} and {MaxWebcamSize.ToString(CultureInfo.InvariantCulture)} of the frame width.";
     }
 
     public static string WebcamPosition(WebcamCorner corner)
@@ -944,14 +1023,55 @@ public static class RecorderArguments
         _ => string.Empty
     };
 
+    /// <summary>
+    /// Daire ve yuvarlak kose icin saydamlik maskesi: kosedeki ceyrek dairelerin disinda kalan
+    /// piksel saydam olur, anahtarlanmis arka planin saydamligi korunur (<c>alpha(X,Y)</c> ile carpilir).
+    /// </summary>
+    public static string WebcamMask(WebcamShape shape)
+    {
+        var radius = shape switch
+        {
+            WebcamShape.Circle => "min(W,H)/2",
+            WebcamShape.Rounded => "min(W,H)/5",
+            _ => null
+        };
+        return radius is null
+            ? string.Empty
+            : $"geq=lum='lum(X,Y)':cb='cb(X,Y)':cr='cr(X,Y)':a='alpha(X,Y)*lte(hypot(max(abs(X-(W-1)/2)-W/2+{radius},0),max(abs(Y-(H-1)/2)-H/2+{radius},0)),{radius})'";
+    }
+
+    private static string Ratio(double value) => value.ToString("0.####", CultureInfo.InvariantCulture);
+
     public static string? WebcamGraph(RecorderRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);
         if (request.Webcam is not { } cam) return null;
         var index = Number(AudioFirstInputIndex + (request.Audio?.InputCount ?? 0));
-        return $"[0:v]{VideoFilter(request) ?? "null"}[base];"
-               + $"[{index}:v]scale={Number(cam.Width)}:-2{WebcamKey(cam.Background)}[cam];"
-               + $"[base][cam]overlay={WebcamPosition(cam.Corner)}:eof_action=repeat[{WebcamOutputLabel}]";
+
+        var before = new List<string>();
+        if (cam.Mirror) before.Add("hflip");
+        if (cam.Shape == WebcamShape.Circle) before.Add("crop='min(iw,ih)':'min(iw,ih)'");
+
+        var key = WebcamKey(cam.Background);
+        var mask = WebcamMask(cam.Shape);
+        var after = key + (mask.Length == 0 ? string.Empty : (key.Length == 0 ? ",format=yuva420p," : ",") + mask);
+        var source = VideoFilter(request) ?? "null";
+        var margin = Number(WebcamMargin);
+
+        if (cam.Placement is not { } place)
+        {
+            var chain = string.Join(",", before.Append($"scale={Number(cam.Width)}:-2"));
+            return $"[0:v]{source}[base];"
+                   + $"[{index}:v]{chain}{after}[cam];"
+                   + $"[base][cam]overlay={WebcamPosition(cam.Corner)}:eof_action=repeat[{WebcamOutputLabel}]";
+        }
+
+        var room = Number(2 * WebcamMargin);
+        return $"[0:v]{source},split[base][wref];"
+               + $"[{index}:v]{(before.Count == 0 ? "null" : string.Join(",", before))}[wsrc];"
+               + $"[wsrc][wref]scale=w='trunc(rw*{Ratio(place.Size)}/2)*2':h=-2{after}[cam];"
+               + $"[base][cam]overlay=x='{margin}+(main_w-overlay_w-{room})*{Ratio(place.X)}'"
+               + $":y='{margin}+(main_h-overlay_h-{room})*{Ratio(place.Y)}':eof_action=repeat[{WebcamOutputLabel}]";
     }
 
     private static IEnumerable<string> ScreenSelectionErrors(RecorderRequest request)

@@ -873,17 +873,10 @@
               </StackPanel>
 
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.webcam.size}" Theme="{StaticResource Label}"/>
-                <ComboBox x:Name="CmbWebcamSize"
+                <TextBlock Text="{loc:Text recorder.webcam.shape}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbWebcamShape"
                           HorizontalAlignment="Stretch"
-                          auto:AutomationProperties.Name="{loc:Text recorder.webcam.size}"/>
-              </StackPanel>
-
-              <StackPanel>
-                <TextBlock Text="{loc:Text recorder.webcam.corner}" Theme="{StaticResource Label}"/>
-                <ComboBox x:Name="CmbWebcamCorner"
-                          HorizontalAlignment="Stretch"
-                          auto:AutomationProperties.Name="{loc:Text recorder.webcam.corner}"/>
+                          auto:AutomationProperties.Name="{loc:Text recorder.webcam.shape}"/>
               </StackPanel>
 
               <StackPanel>
@@ -893,6 +886,12 @@
                           HorizontalAlignment="Stretch"
                           auto:AutomationProperties.Name="{loc:Text recorder.webcam.background.label}"/>
               </StackPanel>
+
+              <CheckBox x:Name="ChkWebcamMirror"
+                        Theme="{StaticResource CheckStyle}"
+                        VerticalAlignment="Bottom"
+                        Content="{loc:Text recorder.webcam.mirror}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.webcam.mirror}"/>
             </izi:SutunIzgara>
           </StackPanel>
         </Border>

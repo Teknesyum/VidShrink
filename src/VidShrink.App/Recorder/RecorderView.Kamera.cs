@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Avalonia.Controls;
 using VidShrink.Core;
@@ -12,16 +11,19 @@ internal partial class RecorderView
 {
     private IReadOnlyList<string> _cameras = Array.Empty<string>();
 
-    internal static readonly WebcamCorner[] WebcamCorners =
-        { WebcamCorner.BottomRight, WebcamCorner.BottomLeft, WebcamCorner.TopRight, WebcamCorner.TopLeft };
+    internal static readonly WebcamShape[] WebcamShapes = { WebcamShape.Rectangle, WebcamShape.Rounded, WebcamShape.Circle };
 
-    private static string CornerKey(WebcamCorner corner) => corner switch
+    private static string ShapeKey(WebcamShape shape) => shape switch
     {
-        WebcamCorner.BottomLeft => "recorder.webcam.bottom-left",
-        WebcamCorner.TopRight => "recorder.webcam.top-right",
-        WebcamCorner.TopLeft => "recorder.webcam.top-left",
-        _ => "recorder.webcam.bottom-right"
+        WebcamShape.Rounded => "recorder.webcam.shape.rounded",
+        WebcamShape.Circle => "recorder.webcam.shape.circle",
+        _ => "recorder.webcam.shape.rectangle"
     };
+
+    private WebcamShape ChosenShape
+        => CmbWebcamShape.SelectedIndex >= 0 ? WebcamShapes[CmbWebcamShape.SelectedIndex] : _settings.WebcamShape;
+
+    private WebcamPlacement ChosenPlacement => new(_settings.WebcamX, _settings.WebcamY, _settings.WebcamSize);
 
     internal static readonly WebcamBackground[] WebcamBackgrounds =
         { WebcamBackground.Keep, WebcamBackground.Static, WebcamBackground.Green };
@@ -60,13 +62,16 @@ internal partial class RecorderView
         var index = string.IsNullOrEmpty(wanted) ? 0 : items.FindIndex(1, i => string.Equals(i, wanted, StringComparison.OrdinalIgnoreCase));
         CmbWebcam.SelectedIndex = Math.Max(0, index);
 
-        var width = CmbWebcamSize.SelectedIndex >= 0 ? RecorderArguments.WebcamWidths[CmbWebcamSize.SelectedIndex] : _settings.WebcamWidth;
-        CmbWebcamSize.ItemsSource = RecorderArguments.WebcamWidths.Select(w => Say("recorder.webcam.width", w.ToString(CultureInfo.InvariantCulture))).ToList();
-        CmbWebcamSize.SelectedIndex = Math.Max(0, IndexOf(RecorderArguments.WebcamWidths, width));
-
-        var corner = CmbWebcamCorner.SelectedIndex >= 0 ? WebcamCorners[CmbWebcamCorner.SelectedIndex] : _settings.WebcamCorner;
-        CmbWebcamCorner.ItemsSource = WebcamCorners.Select(c => Say(CornerKey(c))).ToList();
-        CmbWebcamCorner.SelectedIndex = Array.IndexOf(WebcamCorners, corner);
+        var shape = ChosenShape;
+        CmbWebcamShape.ItemsSource = WebcamShapes.Select(s => Say(ShapeKey(s))).ToList();
+        CmbWebcamShape.SelectedIndex = Array.IndexOf(WebcamShapes, shape);
+        if (!_webcamLoaded)
+        {
+            _webcamLoaded = true;
+            ChkWebcamMirror.IsChecked = _settings.WebcamMirror;
+            CmbWebcam.SelectionChanged += (_, _) => SyncRegionEditor();
+            CmbWebcamShape.SelectionChanged += (_, _) => SyncRegionEditor();
+        }
 
         var background = ChosenBackground;
         CmbWebcamBackground.ItemsSource = WebcamBackgrounds.Select(b => Say(BackgroundKey(b))).ToList();
@@ -75,30 +80,40 @@ internal partial class RecorderView
     }
 
     /// <summary>
-    /// Kamera seçilmemişken genişlik, köşe ve arka plan kapalı: <see cref="ChosenWebcam"/> o durumda
-    /// bindirme kurmuyor, seçilebilir görünen üç kutu kayda hiçbir şey katmıyordu.
+    /// Kamera seçilmemişken biçim, ayna ve arka plan kapalı: <see cref="ChosenWebcam"/> o durumda
+    /// bindirme kurmuyor, seçilebilir görünen kutular kayda hiçbir şey katmıyordu.
     /// </summary>
     private void KameraSecenekleri()
     {
         var acik = CmbWebcam.SelectedIndex > 0;
-        CmbWebcamSize.IsEnabled = acik;
-        CmbWebcamCorner.IsEnabled = acik;
+        CmbWebcamShape.IsEnabled = acik;
+        ChkWebcamMirror.IsEnabled = acik;
         CmbWebcamBackground.IsEnabled = acik;
     }
 
-    private static int IndexOf(IReadOnlyList<int> list, int value)
-    {
-        for (var i = 0; i < list.Count; i++)
-            if (list[i] == value) return i;
-        return -1;
-    }
+    private bool _webcamLoaded;
 
+    /// <summary>
+    /// Yer ve boy köşe/genişlik kutusundan değil, bölge düzenleyicisinde sürüklenen kutunun
+    /// oranlarından gelir (<see cref="OnCameraCommitted"/>); kayıt çıktısının boyutundan bağımsızdır.
+    /// </summary>
     internal RecorderWebcam? ChosenWebcam()
     {
         if (CmbWebcam.SelectedIndex <= 0 || CmbWebcam.SelectedItem is not string device) return null;
-        var width = CmbWebcamSize.SelectedIndex >= 0 ? RecorderArguments.WebcamWidths[CmbWebcamSize.SelectedIndex] : _settings.WebcamWidth;
-        var corner = CmbWebcamCorner.SelectedIndex >= 0 ? WebcamCorners[CmbWebcamCorner.SelectedIndex] : _settings.WebcamCorner;
-        return new RecorderWebcam(device, width, corner, ChosenBackground);
+        return new RecorderWebcam(device, RecorderArguments.DefaultWebcamWidth, WebcamCorner.BottomRight, ChosenBackground)
+        {
+            Shape = ChosenShape,
+            Mirror = ChkWebcamMirror.IsChecked ?? false,
+            Placement = ChosenPlacement
+        };
+    }
+
+    private void OnCameraCommitted(object? sender, WebcamPlacement placement)
+    {
+        _settings.WebcamX = placement.X;
+        _settings.WebcamY = placement.Y;
+        _settings.WebcamSize = placement.Size;
+        StoreChoices();
     }
 
     private void CollectWebcam()
@@ -106,8 +121,8 @@ internal partial class RecorderView
         if (CmbWebcam.SelectedIndex > 0) _settings.WebcamName = CmbWebcam.SelectedItem as string;
         else if (CmbWebcam.SelectedIndex == 0 && (_settings.WebcamName is null || _cameras.Contains(_settings.WebcamName, StringComparer.OrdinalIgnoreCase)))
             _settings.WebcamName = null;
-        if (CmbWebcamSize.SelectedIndex >= 0) _settings.WebcamWidth = RecorderArguments.WebcamWidths[CmbWebcamSize.SelectedIndex];
-        if (CmbWebcamCorner.SelectedIndex >= 0) _settings.WebcamCorner = WebcamCorners[CmbWebcamCorner.SelectedIndex];
+        if (CmbWebcamShape.SelectedIndex >= 0) _settings.WebcamShape = WebcamShapes[CmbWebcamShape.SelectedIndex];
+        _settings.WebcamMirror = ChkWebcamMirror.IsChecked ?? false;
         if (CmbWebcamBackground.SelectedIndex >= 0) _settings.WebcamBackground = WebcamBackgrounds[CmbWebcamBackground.SelectedIndex];
     }
 }
