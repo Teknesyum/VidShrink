@@ -111,6 +111,48 @@ public static class TimelineStrip
         return tiles;
     }
 
+    /// <summary>
+    /// Butun kaynaklarin anahtar karelerinin cizelge anlari, sirali ve tekil. Anahtar sozlugun kaynak
+    /// sirasi, deger o kaynagin sirali tick listesi.
+    /// </summary>
+    public static IReadOnlyList<long> AllKeyframes(EditTimeline timeline, IReadOnlyDictionary<int, IReadOnlyList<long>> sources)
+    {
+        ArgumentNullException.ThrowIfNull(timeline);
+        ArgumentNullException.ThrowIfNull(sources);
+        var times = new SortedSet<long>();
+        foreach (var (index, ticks) in sources)
+            foreach (var time in Keyframes(timeline, ticks, 0, timeline.Duration, index))
+                times.Add(time);
+        return times.ToArray();
+    }
+
+    /// <summary>
+    /// Sirali anlarda oynatma basindan sonraki (ileri) ya da onceki (geri) an; oynatma basinin
+    /// <paramref name="tolerance"/> kadar yakinindaki an atlanir. Yoksa <c>null</c>.
+    /// </summary>
+    public static long? NeighborKeyframe(IReadOnlyList<long> times, long playhead, bool forward, long tolerance)
+    {
+        ArgumentNullException.ThrowIfNull(times);
+        if (forward)
+        {
+            var i = LowerBound(times, playhead + tolerance + 1);
+            return i < times.Count ? times[i] : null;
+        }
+
+        var j = LowerBound(times, playhead - tolerance) - 1;
+        return j >= 0 ? times[j] : null;
+    }
+
+    /// <summary>Oynatma basinin <paramref name="tolerance"/> yakininda herhangi bir kaynagin anahtar karesi var mi.</summary>
+    public static bool OnKeyframe(EditTimeline timeline, IReadOnlyDictionary<int, IReadOnlyList<long>> sources, long playhead, long tolerance)
+    {
+        ArgumentNullException.ThrowIfNull(timeline);
+        ArgumentNullException.ThrowIfNull(sources);
+        foreach (var (index, ticks) in sources)
+            if (Keyframes(timeline, ticks, playhead - tolerance, playhead + tolerance, index).Count > 0) return true;
+        return false;
+    }
+
     private static int LowerBound(IReadOnlyList<long> sorted, long value)
     {
         var low = 0;

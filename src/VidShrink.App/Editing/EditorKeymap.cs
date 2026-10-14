@@ -43,7 +43,9 @@ internal enum EditorCommand
     ToolRazor,
     ToolRipple,
     Export,
-    AddText
+    AddText,
+    PrevKeyframe,
+    NextKeyframe
 }
 
 internal sealed record EditorKeyRow(Key Key, KeyModifiers Modifiers, EditorCommand Command, string LabelKey, string? Symbol = null, PlayerButton? Button = null)
@@ -122,6 +124,8 @@ internal static class EditorKeymap
         new(Key.Right, KeyModifiers.Shift, EditorCommand.Forward5, "editor.key.forward-5"),
         new(Key.Up, KeyModifiers.None, EditorCommand.PrevEdit, "editor.key.prev-edit"),
         new(Key.Down, KeyModifiers.None, EditorCommand.NextEdit, "editor.key.next-edit"),
+        new(Key.Left, KeyModifiers.Control, EditorCommand.PrevKeyframe, "editor.key.prev-keyframe"),
+        new(Key.Right, KeyModifiers.Control, EditorCommand.NextKeyframe, "editor.key.next-keyframe"),
         new(Key.Home, KeyModifiers.None, EditorCommand.GoToStart, "main.player.menu.tostart"),
         new(Key.End, KeyModifiers.None, EditorCommand.GoToEnd, "editor.to-end"),
         new(Key.I, KeyModifiers.None, EditorCommand.MarkIn, "editor.mark-in"),

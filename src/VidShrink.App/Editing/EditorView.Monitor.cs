@@ -73,6 +73,8 @@ internal partial class EditorView
         var fps = MonitorFps;
         if (!TxtTimecode.IsFocused) ShowTimecode();
         TxtDuration.Text = model is null ? string.Empty : Stamp(model.Duration, fps);
+        TxtOnKeyframe.IsVisible = model is not null
+            && TimelineStrip.OnKeyframe(model, Timeline.KeyframeSources(), Timeline.Playhead, Timeline.KeyframeTolerance);
         TxtTimecode.IsEnabled = model is not null;
         foreach (var button in new Button[] { BtnMarkIn, BtnMarkOut, BtnGoIn, BtnFrameBack, BtnPlay, BtnFrameForward, BtnGoOut, BtnExtract, BtnZoomFit })
             button.IsEnabled = model is not null;
