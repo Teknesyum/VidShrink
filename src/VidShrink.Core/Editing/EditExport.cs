@@ -50,6 +50,9 @@ public sealed record ExportPlan(
     /// <summary>Cizelge birden cok kaynaktan parca tasidigi icin kopyalama yolu birakilip Tam'a gecildi.</summary>
     public bool MergeForcedFull { get; init; }
 
+    /// <summary>Teslim ayarlari (cozunurluk, kare hizi, kodek, kalite, yalniz ses) varsayilandan farkli oldugu icin Tam'a gecildi.</summary>
+    public bool SettingsForcedFull { get; init; }
+
     /// <summary>Metin varsa <c>ass=</c> suzgecinin okudugu belge; kosucu calismadan once BOM'lu yazar.</summary>
     public string? SubtitlePath { get; init; }
 
@@ -223,9 +226,11 @@ public static class EditExport
     public static ExportPlan Build(
         EditTimeline timeline, MediaInfo info, IReadOnlyList<double> keyframes, double startTime,
         ExportMode mode, string outputPath, string workDirectory, long memoryBudgetBytes,
-        IReadOnlyList<SmartCutPoint>? cuts = null, Func<string, bool>? hasEncoder = null, bool dropMetadata = false)
+        IReadOnlyList<SmartCutPoint>? cuts = null, Func<string, bool>? hasEncoder = null, bool dropMetadata = false,
+        EditExportSettings? settings = null)
     {
         if (timeline.Clips.Count == 0) throw new ArgumentException("Cizelge bos", nameof(timeline));
+        settings ??= EditExportSettings.Default;
 
         var effective = mode;
         var anySpecial = timeline.Clips.Any(NeedsReencode);
@@ -237,7 +242,8 @@ public static class EditExport
         if (mode != ExportMode.Full && keyframes.Count == 0) effective = ExportMode.Full;
         var textForced = mode != ExportMode.Full && effective != ExportMode.Full && timeline.HasText;
         var effectsForced = mode != ExportMode.Full && effective != ExportMode.Full && timeline.HasEffects;
-        if (timeline.HasText || timeline.HasEffects) effective = ExportMode.Full;
+        var settingsForced = mode != ExportMode.Full && effective != ExportMode.Full && !timeline.HasText && !timeline.HasEffects && !settings.IsDefault;
+        if (timeline.HasText || timeline.HasEffects || !settings.IsDefault) effective = ExportMode.Full;
 
         var limit = ReverseLimitSeconds(info, memoryBudgetBytes);
         var over = ReverseOverLimit(timeline, info, memoryBudgetBytes);
@@ -245,7 +251,8 @@ public static class EditExport
         var motion = Enumerable.Range(0, timeline.Clips.Count).Where(i => NeedsReencode(timeline.Clips[i])).ToArray();
         var plan = effective switch
         {
-            ExportMode.Full => Full(timeline, info, mode, outputPath, workDirectory, limit, over),
+            ExportMode.Full when settings.AudioOnly => AudioOnly(timeline, info, mode, outputPath, workDirectory, limit, over, settings),
+            ExportMode.Full => Full(timeline, info, mode, outputPath, workDirectory, limit, over, settings),
             ExportMode.Smart => SmartSegmented(timeline, info, smart!, cuts!, keyframes, outputPath, workDirectory, limit, over),
             ExportMode.Fast when !anySpecial => FastDirect(timeline, info, keyframes, startTime, outputPath, workDirectory, limit, over),
             _ => Segmented(timeline, info, keyframes, outputPath, workDirectory, limit, over)
@@ -256,7 +263,8 @@ public static class EditExport
             MotionClips = motion,
             TextForcedFull = textForced,
             EffectsForcedFull = effectsForced,
-            AudioForcedFull = audioForced
+            AudioForcedFull = audioForced,
+            SettingsForcedFull = settingsForced
         };
     }
 
@@ -272,15 +280,16 @@ public static class EditExport
     public static ExportPlan Build(
         EditTimeline timeline, IReadOnlyDictionary<int, ExportSource> sources, ExportMode mode,
         string outputPath, string workDirectory, long memoryBudgetBytes,
-        Func<string, bool>? hasEncoder = null, bool dropMetadata = false)
+        Func<string, bool>? hasEncoder = null, bool dropMetadata = false, EditExportSettings? settings = null)
     {
         if (timeline.Clips.Count == 0) throw new ArgumentException("Cizelge bos", nameof(timeline));
         var used = UsedSources(timeline);
-        if (used.Count > 1) return Merge(timeline, sources, used, mode, outputPath, workDirectory, memoryBudgetBytes, dropMetadata);
+        if (used.Count > 1)
+            return Merge(timeline, sources, used, mode, outputPath, workDirectory, memoryBudgetBytes, dropMetadata, settings ?? EditExportSettings.Default);
 
         var only = SourceOf(sources, used[0]);
         return Build(timeline, only.Info, only.Keyframes, only.StartTime, mode, outputPath, workDirectory, memoryBudgetBytes,
-            only.Cuts, hasEncoder, dropMetadata);
+            only.Cuts, hasEncoder, dropMetadata, settings);
     }
 
     /// <summary>
@@ -290,7 +299,7 @@ public static class EditExport
     public static IReadOnlyList<ExportPlan> BuildSegments(
         EditTimeline timeline, IReadOnlyDictionary<int, ExportSource> sources, ExportMode mode,
         IReadOnlyList<string> outputPaths, IReadOnlyList<string> workDirectories, long memoryBudgetBytes,
-        Func<string, bool>? hasEncoder = null, bool dropMetadata = false)
+        Func<string, bool>? hasEncoder = null, bool dropMetadata = false, EditExportSettings? settings = null)
     {
         if (timeline.Clips.Count == 0) throw new ArgumentException("Cizelge bos", nameof(timeline));
         var used = UsedSources(timeline);
@@ -298,7 +307,7 @@ public static class EditExport
         {
             var only = SourceOf(sources, used[0]);
             return BuildSegments(timeline, only.Info, only.Keyframes, only.StartTime, mode, outputPaths, workDirectories, memoryBudgetBytes,
-                only.Cuts, hasEncoder, dropMetadata);
+                only.Cuts, hasEncoder, dropMetadata, settings);
         }
 
         if (outputPaths.Count != timeline.Clips.Count)
@@ -313,7 +322,7 @@ public static class EditExport
             var source = SourceOf(sources, timeline.Clips[i].Source);
             var piece = new EditTimeline(new[] { timeline.Clips[i] }, texts: SegmentTexts(timeline, i));
             var plan = Build(piece, source.Info, source.Keyframes, source.StartTime, mode, outputPaths[i], workDirectories[i], memoryBudgetBytes,
-                source.Cuts, hasEncoder, dropMetadata);
+                source.Cuts, hasEncoder, dropMetadata, settings);
             plans.Add(plan with
             {
                 MotionClips = plan.MotionClips.Select(_ => index).ToArray(),
@@ -331,14 +340,16 @@ public static class EditExport
 
     private static ExportPlan Merge(
         EditTimeline timeline, IReadOnlyDictionary<int, ExportSource> sources, IReadOnlyList<int> used, ExportMode requested,
-        string output, string work, long memoryBudgetBytes, bool dropMetadata)
+        string output, string work, long memoryBudgetBytes, bool dropMetadata, EditExportSettings settings)
     {
         var target = SourceOf(sources, sources.ContainsKey(0) ? 0 : used[0]).Info;
-        var canvas = (
-            Width: Math.Max(2, ClipFilters.DisplayWidth(target.Width, target.ParNum, target.ParDen) / 2 * 2),
-            Height: Math.Max(2, target.Height / 2 * 2));
-        var fps = Number(target.Fps > 0 ? target.Fps : 30);
+        var canvas = settings.HasSize
+            ? (Width: settings.Width, Height: settings.Height)
+            : (Width: Math.Max(2, ClipFilters.DisplayWidth(target.Width, target.ParNum, target.ParDen) / 2 * 2),
+                Height: Math.Max(2, target.Height / 2 * 2));
+        var fps = Number(settings.Fps > 0 ? settings.Fps : target.Fps > 0 ? target.Fps : 30);
         var audio = used.Any(s => SourceOf(sources, s).Info.HasAudio);
+        if (settings.AudioOnly) return MergeAudioOnly(timeline, sources, used, requested, output, work, memoryBudgetBytes, dropMetadata, settings, audio);
         var inputs = new Dictionary<int, int>();
         foreach (var s in used) inputs[s] = inputs.Count;
 
@@ -390,8 +401,8 @@ public static class EditExport
         foreach (var s in used) args.AddRange(new[] { "-i", SourceOf(sources, s).Info.FilePath });
         args.AddRange(new[] { "-filter_complex", graph.ToString(), "-map", "[vout]" });
         if (audio) args.AddRange(new[] { "-map", "[aout]" });
-        args.AddRange(new[] { "-c:v", FullVideoCodec, "-preset", "medium", "-crf", FullCrf, "-pix_fmt", "yuv420p" });
-        if (audio) args.AddRange(new[] { "-c:a", AudioCodec, "-b:a", "192k" });
+        args.AddRange(VideoEncode(settings));
+        if (audio) args.AddRange(new[] { "-c:a", AudioCodec, "-b:a", settings.AudioBitrate });
         args.AddRange(Faststart(output));
         if (dropMetadata) args.AddRange(StreamMapping.MetadataArguments(true, Array.Empty<string?>(), Array.Empty<string?>()));
         args.Add(output);
@@ -407,6 +418,95 @@ public static class EditExport
             FontFamilies = timeline.Texts.Select(t => t.FontName).Distinct(StringComparer.OrdinalIgnoreCase).ToArray()
         };
     }
+
+    private static ExportPlan MergeAudioOnly(
+        EditTimeline timeline, IReadOnlyDictionary<int, ExportSource> sources, IReadOnlyList<int> used, ExportMode requested,
+        string output, string work, long memoryBudgetBytes, bool dropMetadata, EditExportSettings settings, bool audio)
+    {
+        if (!audio) throw new EditExportNoAudioException();
+        var inputs = new Dictionary<int, int>();
+        foreach (var s in used) inputs[s] = inputs.Count;
+
+        var graph = new StringBuilder();
+        var joins = new StringBuilder();
+        var over = new List<int>();
+        var limit = used.Min(s => ReverseLimitSeconds(SourceOf(sources, s).Info, memoryBudgetBytes));
+        for (var i = 0; i < timeline.Clips.Count; i++)
+        {
+            var clip = timeline.Clips[i];
+            var info = SourceOf(sources, clip.Source).Info;
+            if (clip.Reversed && EditTime.ToSeconds(clip.SourceLength) > ReverseLimitSeconds(info, memoryBudgetBytes)) over.Add(i);
+            if (info.HasAudio)
+                graph.Append('[').Append(inputs[clip.Source].ToString(CultureInfo.InvariantCulture)).Append(":a]")
+                    .Append(AudioTrim(clip)).Append(',').Append(MergeAudioFormat);
+            else
+                graph.Append(MergeSilence).Append(",atrim=duration=").Append(Number(EditTime.ToSeconds(clip.TimelineLength)));
+            graph.Append("[a").Append(i).Append("];");
+            joins.Append("[a").Append(i).Append(']');
+        }
+
+        graph.Append(joins).Append("concat=n=").Append(timeline.Clips.Count).Append(":v=0:a=1[aout]");
+        var args = new List<string> { "-hide_banner", "-nostdin", "-y" };
+        foreach (var s in used) args.AddRange(new[] { "-i", SourceOf(sources, s).Info.FilePath });
+        args.AddRange(AudioOnlyTail(graph.ToString(), output, settings));
+        if (dropMetadata) args.AddRange(StreamMapping.MetadataArguments(true, Array.Empty<string?>(), Array.Empty<string?>()));
+        args.Add(output);
+
+        return new ExportPlan(requested, ExportMode.Full, new[] { new ExportStep(args, EditTime.ToSeconds(timeline.Duration)) },
+            over, limit, output, work)
+        {
+            MotionClips = Enumerable.Range(0, timeline.Clips.Count).Where(i => NeedsReencode(timeline.Clips[i])).ToArray(),
+            MergeForcedFull = requested != ExportMode.Full
+        };
+    }
+
+    /// <summary>
+    /// Yalniz ses teslimi: grafikte yalniz ses zincirleri, <c>concat=...:v=0:a=1</c>, <c>-vn</c>. Goruntu zinciri kurulmaz,
+    /// etiketli ama eslenmeyen bir cikis ffmpeg'de hata olurdu. Metin katmani ve goruntu ayarlari yok sayilir.
+    /// </summary>
+    private static ExportPlan AudioOnly(
+        EditTimeline timeline, MediaInfo info, ExportMode requested, string output, string work,
+        double limit, IReadOnlyList<int> over, EditExportSettings settings)
+    {
+        if (!info.HasAudio) throw new EditExportNoAudioException();
+        var graph = new StringBuilder();
+        var joins = new StringBuilder();
+        for (var i = 0; i < timeline.Clips.Count; i++)
+        {
+            graph.Append("[0:a]").Append(AudioTrim(timeline.Clips[i])).Append("[a").Append(i).Append("];");
+            joins.Append("[a").Append(i).Append(']');
+        }
+
+        graph.Append(joins).Append("concat=n=").Append(timeline.Clips.Count).Append(":v=0:a=1[aout]");
+        var args = new List<string> { "-hide_banner", "-nostdin", "-y", "-i", info.FilePath };
+        args.AddRange(AudioOnlyTail(graph.ToString(), output, settings));
+        args.Add(output);
+        return new ExportPlan(requested, ExportMode.Full, new[] { new ExportStep(args, EditTime.ToSeconds(timeline.Duration)) },
+            over, limit, output, work);
+    }
+
+    private static string AudioTrim(EditClip clip)
+        => "atrim=start=" + Number(EditTime.ToSeconds(clip.SourceStart)) + ":end=" + Number(EditTime.ToSeconds(clip.SourceEnd))
+            + ",asetpts=PTS-STARTPTS" + AudioMotion(clip) + Link(ClipFilters.Audio(clip.Effects, clip.TimelineLength));
+
+    private static IEnumerable<string> AudioOnlyTail(string graph, string output, EditExportSettings settings)
+    {
+        var args = new List<string>
+        {
+            "-filter_complex", graph, "-map", "[aout]", "-vn",
+            "-c:a", EditExportSettings.AudioOnlyCodec(output), "-b:a", settings.AudioBitrate
+        };
+        if (IsMp4Family(output) || string.Equals(Path.GetExtension(output), ".m4a", StringComparison.OrdinalIgnoreCase))
+            args.AddRange(new[] { "-movflags", "+faststart" });
+        return args;
+    }
+
+    private static IEnumerable<string> VideoEncode(EditExportSettings settings)
+        => new[]
+        {
+            "-c:v", settings.VideoCodec, "-preset", settings.Preset, "-crf", settings.Crf.ToString(CultureInfo.InvariantCulture),
+            "-pix_fmt", "yuv420p"
+        };
 
     /// <summary>
     /// Teslim dosyasini yazan son adima meta silme argumanlarini ekler; ara parcalara dokunmaz. Dizi
@@ -435,7 +535,8 @@ public static class EditExport
     public static IReadOnlyList<ExportPlan> BuildSegments(
         EditTimeline timeline, MediaInfo info, IReadOnlyList<double> keyframes, double startTime,
         ExportMode mode, IReadOnlyList<string> outputPaths, IReadOnlyList<string> workDirectories, long memoryBudgetBytes,
-        IReadOnlyList<SmartCutPoint>? cuts = null, Func<string, bool>? hasEncoder = null, bool dropMetadata = false)
+        IReadOnlyList<SmartCutPoint>? cuts = null, Func<string, bool>? hasEncoder = null, bool dropMetadata = false,
+        EditExportSettings? settings = null)
     {
         if (timeline.Clips.Count == 0) throw new ArgumentException("Cizelge bos", nameof(timeline));
         if (outputPaths.Count != timeline.Clips.Count)
@@ -443,19 +544,21 @@ public static class EditExport
         if (workDirectories.Count != timeline.Clips.Count)
             throw new ArgumentException("Her parcaya bir is klasoru gerekir", nameof(workDirectories));
 
-        var whole = Build(timeline, info, keyframes, startTime, mode, outputPaths[0], workDirectories[0], memoryBudgetBytes, cuts, hasEncoder);
+        var whole = Build(timeline, info, keyframes, startTime, mode, outputPaths[0], workDirectories[0], memoryBudgetBytes, cuts, hasEncoder,
+            settings: settings);
         var plans = new List<ExportPlan>(timeline.Clips.Count);
         for (var i = 0; i < timeline.Clips.Count; i++)
         {
             var index = i;
             var piece = new EditTimeline(new[] { timeline.Clips[i] }, texts: SegmentTexts(timeline, i));
-            var plan = Build(piece, info, keyframes, startTime, whole.Effective, outputPaths[i], workDirectories[i], memoryBudgetBytes, cuts, hasEncoder, dropMetadata);
+            var plan = Build(piece, info, keyframes, startTime, whole.Effective, outputPaths[i], workDirectories[i], memoryBudgetBytes, cuts, hasEncoder, dropMetadata, settings);
             plans.Add(plan with
             {
                 Requested = mode,
                 TextForcedFull = whole.TextForcedFull,
                 EffectsForcedFull = whole.EffectsForcedFull,
                 AudioForcedFull = whole.AudioForcedFull,
+                SettingsForcedFull = whole.SettingsForcedFull,
                 MotionClips = plan.MotionClips.Select(_ => index).ToArray(),
                 ReverseOverLimit = plan.ReverseOverLimit.Select(_ => index).ToArray()
             });
@@ -483,11 +586,12 @@ public static class EditExport
 
     private static ExportPlan Full(
         EditTimeline timeline, MediaInfo info, ExportMode requested, string output, string work,
-        double limit, IReadOnlyList<int> over)
+        double limit, IReadOnlyList<int> over, EditExportSettings settings)
     {
         var graph = new StringBuilder();
         var joins = new StringBuilder();
-        var canvas = ClipFilters.Canvas(timeline, info);
+        var canvas = settings.HasSize ? (settings.Width, settings.Height) : ClipFilters.Canvas(timeline, info);
+        var rate = settings.Fps > 0 ? ",fps=" + Number(settings.Fps) : string.Empty;
         for (var i = 0; i < timeline.Clips.Count; i++)
         {
             var clip = timeline.Clips[i];
@@ -496,6 +600,7 @@ public static class EditExport
             graph.Append("[0:v]trim=start=").Append(start).Append(":end=").Append(end).Append(",setpts=PTS-STARTPTS")
                 .Append(VideoMotion(clip, info))
                 .Append(Link(ClipFilters.Geometry(clip.Effects, info.Width, info.Height, info.ParNum, info.ParDen, canvas)))
+                .Append(rate)
                 .Append(Link(ClipFilters.VideoFades(clip.Effects, clip.TimelineLength)))
                 .Append("[v").Append(i).Append("];");
             joins.Append("[v").Append(i).Append(']');
@@ -520,8 +625,8 @@ public static class EditExport
 
         var args = new List<string> { "-hide_banner", "-nostdin", "-y", "-i", info.FilePath, "-filter_complex", graph.ToString(), "-map", "[vout]" };
         if (info.HasAudio) args.AddRange(new[] { "-map", "[aout]" });
-        args.AddRange(new[] { "-c:v", FullVideoCodec, "-preset", "medium", "-crf", FullCrf, "-pix_fmt", "yuv420p" });
-        if (info.HasAudio) args.AddRange(new[] { "-c:a", AudioCodec, "-b:a", "192k" });
+        args.AddRange(VideoEncode(settings));
+        if (info.HasAudio) args.AddRange(new[] { "-c:a", AudioCodec, "-b:a", settings.AudioBitrate });
         args.AddRange(Faststart(output));
         args.Add(output);
 

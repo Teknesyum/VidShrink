@@ -94,6 +94,42 @@
                         <TextBox x:Name="TxtPartName" Width="{StaticResource FieldWidth}" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.export.part-name}" ToolTip.Tip="{loc:Text editor.export.part-name.hint}"/>
                       </StackPanel>
                       <TextBlock x:Name="TxtPartNameError" Theme="{StaticResource StatusError}" TextWrapping="Wrap" MaxWidth="{StaticResource FieldWidth}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                      <Grid x:Name="ExportSettingsGrid" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}" RowSpacing="{StaticResource SpaceSm}">
+                        <TextBlock Grid.Row="0" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.preset}"/>
+                        <ComboBox x:Name="CmbExportPreset" Grid.Row="0" Grid.Column="1" MinWidth="{StaticResource EditorExportModeWidth}" AutomationProperties.Name="{loc:Text editor.export.preset}" SelectedIndex="0">
+                          <ComboBoxItem Content="{loc:Text editor.export.preset.custom}" Tag=""/>
+                          <ComboBoxItem Content="{loc:Text editor.export.preset.1080p}" Tag="1080p"/>
+                          <ComboBoxItem Content="{loc:Text editor.export.preset.720p}" Tag="720p"/>
+                          <ComboBoxItem Content="{loc:Text editor.export.preset.vertical}" Tag="vertical"/>
+                        </ComboBox>
+                        <TextBlock Grid.Row="1" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.resolution}"/>
+                        <ComboBox x:Name="CmbExportResolution" Grid.Row="1" Grid.Column="1" MinWidth="{StaticResource EditorExportModeWidth}" AutomationProperties.Name="{loc:Text editor.export.resolution}" SelectedIndex="0">
+                          <ComboBoxItem Content="{loc:Text editor.export.source}" Tag="0x0"/>
+                          <ComboBoxItem Content="1920 × 1080" Tag="1920x1080"/>
+                          <ComboBoxItem Content="1280 × 720" Tag="1280x720"/>
+                          <ComboBoxItem Content="1080 × 1920" Tag="1080x1920"/>
+                        </ComboBox>
+                        <TextBlock Grid.Row="2" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.fps}"/>
+                        <ComboBox x:Name="CmbExportFps" Grid.Row="2" Grid.Column="1" MinWidth="{StaticResource EditorExportModeWidth}" AutomationProperties.Name="{loc:Text editor.export.fps}" SelectedIndex="0">
+                          <ComboBoxItem Content="{loc:Text editor.export.source}" Tag="0"/>
+                        </ComboBox>
+                        <TextBlock Grid.Row="3" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.codec}"/>
+                        <ComboBox x:Name="CmbExportCodec" Grid.Row="3" Grid.Column="1" MinWidth="{StaticResource EditorExportModeWidth}" AutomationProperties.Name="{loc:Text editor.export.codec}"/>
+                        <TextBlock Grid.Row="4" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.quality}"/>
+                        <ComboBox x:Name="CmbExportQuality" Grid.Row="4" Grid.Column="1" MinWidth="{StaticResource EditorExportModeWidth}" AutomationProperties.Name="{loc:Text editor.export.quality}" SelectedIndex="0">
+                          <ComboBoxItem Content="{loc:Text editor.export.quality.high}"/>
+                          <ComboBoxItem Content="{loc:Text editor.export.quality.balanced}"/>
+                          <ComboBoxItem Content="{loc:Text editor.export.quality.small}"/>
+                        </ComboBox>
+                        <TextBlock Grid.Row="5" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.audio-bitrate}"/>
+                        <ComboBox x:Name="CmbExportAudioBitrate" Grid.Row="5" Grid.Column="1" MinWidth="{StaticResource EditorExportModeWidth}" AutomationProperties.Name="{loc:Text editor.export.audio-bitrate}"/>
+                        <CheckBox x:Name="ChkExportAudioOnly" Grid.Row="6" Grid.ColumnSpan="2" Theme="{StaticResource CheckStyle}" Content="{loc:Text editor.export.audio-only}" ToolTip.Tip="{loc:Text editor.export.audio-only.tip}"/>
+                      </Grid>
+                      <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                        <TextBox x:Name="TxtExportPresetName" Width="{StaticResource FieldWidth}" VerticalAlignment="Center" PlaceholderText="{loc:Text editor.export.preset.name}" AutomationProperties.Name="{loc:Text editor.export.preset.name}"/>
+                        <Button x:Name="BtnExportPresetSave" Theme="{StaticResource GhostButton}" VerticalAlignment="Center" Content="{loc:Text main.preset.save}"/>
+                      </StackPanel>
+                      <TextBlock x:Name="TxtExportPresetError" Theme="{StaticResource StatusError}" TextWrapping="Wrap" MaxWidth="{StaticResource FieldWidth}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                     </StackPanel>
                   </Flyout>
                 </Button.Flyout>

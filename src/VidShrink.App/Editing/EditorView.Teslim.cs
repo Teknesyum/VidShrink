@@ -57,7 +57,7 @@ internal partial class EditorView
 
     internal string ShareLinkText => ShareLinkRow.IsVisible ? TxtShareLink.Text ?? string.Empty : string.Empty;
 
-    internal string? DefaultOutput() => _source is { } source ? EditOutputName.For(source, OutputExists) : null;
+    internal string? DefaultOutput() => _source is { } source ? OutputName(source, OutputExists) : null;
 
     internal string? SavedPath
         => _exported is { } path && _model is { } model && _savedKey == SaveKey(model) && File.Exists(path) ? path : null;
@@ -138,6 +138,7 @@ internal partial class EditorView
             TxtPartNameError.Text = empty || AdlandirmaDeseni.ParcaHata(TxtPartName.Text) is null ? string.Empty : Strings.Get("editor.export.part-name.hint");
             if (empty || TxtPartNameError.Text.Length == 0) PartNamePatternChanged?.Invoke(PartNamePattern);
         };
+        InitExportSettings();
     }
 
     private void RefreshExport() => EnableExport(!Exporting);
@@ -163,7 +164,7 @@ internal partial class EditorView
         _pendingPlan = null;
     }
 
-    private string SaveKey(EditTimeline model) => Fingerprint(model) + "|" + SelectedExportMode + (ExportSeparately ? "|parts|" + PartNamePattern : string.Empty) + (DropMetadata ? "|meta" : string.Empty);
+    private string SaveKey(EditTimeline model) => Fingerprint(model) + "|" + SelectedExportMode + (ExportSeparately ? "|parts|" + PartNamePattern : string.Empty) + (DropMetadata ? "|meta" : string.Empty) + "|set|" + ExportSettings;
 
     internal async Task<bool> SaveAsync()
     {
@@ -180,7 +181,7 @@ internal partial class EditorView
             return await RunExportAsync(pending, _pendingKey).ConfigureAwait(true);
         }
 
-        var output = ExportSeparately ? EditOutputName.For(_source, _ => false) : DefaultOutput();
+        var output = ExportSeparately ? OutputName(_source, _ => false) : DefaultOutput();
         return output is not null && await ExportToAsync(output).ConfigureAwait(true);
     }
 
@@ -214,8 +215,13 @@ internal partial class EditorView
         try
         {
             plans = ExportSeparately
-                ? await EditExportRunner.PrepareSegmentsAsync(sources, snapshot, SelectedExportMode, output, ExportMemoryBudget(), OutputExists, DropMetadata, partPattern: PartNamePattern).ConfigureAwait(true)
-                : new[] { await EditExportRunner.PrepareAsync(sources, snapshot, SelectedExportMode, output, ExportMemoryBudget(), DropMetadata).ConfigureAwait(true) };
+                ? await EditExportRunner.PrepareSegmentsAsync(sources, snapshot, SelectedExportMode, output, ExportMemoryBudget(), OutputExists, DropMetadata, partPattern: PartNamePattern, settings: ExportSettings).ConfigureAwait(true)
+                : new[] { await EditExportRunner.PrepareAsync(sources, snapshot, SelectedExportMode, output, ExportMemoryBudget(), DropMetadata, settings: ExportSettings).ConfigureAwait(true) };
+        }
+        catch (EditExportNoAudioException)
+        {
+            Finish(false, Strings.Get(EditExportNoAudioException.LocaleKey));
+            return false;
         }
         catch (Exception ex) when (ex is IOException or InvalidOperationException or UnauthorizedAccessException or System.Text.Json.JsonException or System.ComponentModel.Win32Exception)
         {
@@ -392,6 +398,7 @@ internal partial class EditorView
         else if (plan.TextForcedFull) lines.Add(Strings.Get("editor.export.text-full"));
         else if (plan.EffectsForcedFull) lines.Add(Strings.Get("editor.export.effects-full"));
         else if (plan.AudioForcedFull) lines.Add(Strings.Get("editor.export.audio-full"));
+        else if (plan.SettingsForcedFull) lines.Add(Strings.Get("editor.export.settings-full"));
         else if (plan.FellBackToFull) lines.Add(Strings.Get("editor.export.fallback"));
         else if (plans.Any(p => p.Effective != ExportMode.Full) && motion.Length > 0)
             lines.Add(string.Format(Strings.Culture, Strings.Get("editor.export.reencoded"), ClipNumbers(motion)));
@@ -414,13 +421,16 @@ internal partial class EditorView
     {
         if (TopLevel.GetTopLevel(this)?.StorageProvider is not { } storage || _source is not { } source) return null;
         var suggested = Path.GetFileName(DefaultOutput() ?? source);
+        var audioOnly = ExportSettings.AudioOnly;
         var file = await storage.SaveFilePickerAsync(new FilePickerSaveOptions
         {
             Title = Strings.Get("editor.export.save-title"),
-            SuggestedFileName = Path.GetFileNameWithoutExtension(suggested) + ".mp4",
-            DefaultExtension = "mp4",
+            SuggestedFileName = Path.GetFileNameWithoutExtension(suggested) + (audioOnly ? ".m4a" : ".mp4"),
+            DefaultExtension = audioOnly ? "m4a" : "mp4",
             ShowOverwritePrompt = true,
-            FileTypeChoices = new[] { new FilePickerFileType("MP4") { Patterns = new[] { "*.mp4" } }, new FilePickerFileType("MKV") { Patterns = new[] { "*.mkv" } } }
+            FileTypeChoices = audioOnly
+                ? EditExportSettings.AudioOnlyExtensions.Select(e => new FilePickerFileType(e[1..].ToUpperInvariant()) { Patterns = new[] { "*" + e } }).ToArray()
+                : new[] { new FilePickerFileType("MP4") { Patterns = new[] { "*.mp4" } }, new FilePickerFileType("MKV") { Patterns = new[] { "*.mkv" } } }
         }).ConfigureAwait(true);
         return file?.TryGetLocalPath();
     }
