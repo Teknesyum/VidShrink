@@ -757,6 +757,7 @@
 
 
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceMd}" HorizontalAlignment="Right">
+                  <Button x:Name="BtnPauseRun" Content="{loc:Text main.action.pause-run}" Theme="{StaticResource GhostButton}" IsEnabled="False" IsVisible="False" Click="OnPauseRun"/>
                   <Button x:Name="BtnCancel" Content="{loc:Text main.action.cancel}" Theme="{StaticResource GhostButton}" IsEnabled="False" Click="OnCancel">
                     <Button.Styles>
                       <Style Selector="Button:disabled">

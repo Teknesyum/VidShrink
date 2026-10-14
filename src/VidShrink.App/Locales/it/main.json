@@ -50,6 +50,8 @@
 
   "main.action.browse": "Sfoglia",
   "main.action.cancel": "Annulla",
+  "main.action.pause-run": "Metti in pausa",
+  "main.action.resume-run": "Riprendi",
   "main.action.cancel.disabled-tip": "Nessun lavoro è ancora in corso",
   "main.action.shrink": "Riduci",
   "main.action.shrink.disabled-tip": "Carica prima un file video",
@@ -252,7 +254,8 @@
   "main.shrink-job.move-down": "Sposta giù",
   "main.shrink-job.pause": "Metti in pausa la coda",
   "main.shrink-job.resume": "Riprendi la coda",
-  "main.shrink-job.paused": "In pausa: il file corrente finisce, il successivo attende",
+  "main.shrink-job.paused": "In pausa: il file in corso è sospeso, il successivo attende",
+  "main.shrink-job.disk-paused": "In pausa: sull’unità di destinazione restano solo {0} MB liberi. Libera spazio, poi riprendi.",
   "main.shrink-job.when-done": "Al termine",
   "main.shrink-job.done.nothing": "Non fare nulla",
   "main.shrink-job.done.open-folder": "Apri la cartella di output",

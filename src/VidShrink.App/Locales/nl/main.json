@@ -50,6 +50,8 @@
 
   "main.action.browse": "Bladeren",
   "main.action.cancel": "Annuleren",
+  "main.action.pause-run": "Pauzeren",
+  "main.action.resume-run": "Hervatten",
   "main.action.cancel.disabled-tip": "Er loopt nog geen taak",
   "main.action.shrink": "Verkleinen",
   "main.action.shrink.disabled-tip": "Laad eerst een videobestand",
@@ -252,7 +254,8 @@
   "main.shrink-job.move-down": "Omlaag",
   "main.shrink-job.pause": "Wachtrij onderbreken",
   "main.shrink-job.resume": "Wachtrij hervatten",
-  "main.shrink-job.paused": "Onderbroken: het huidige bestand rondt af, het volgende wacht",
+  "main.shrink-job.paused": "Onderbroken: het lopende bestand staat stil, het volgende wacht",
+  "main.shrink-job.disk-paused": "Onderbroken: er is nog maar {0} MB vrij op het doelstation. Maak ruimte vrij en hervat.",
   "main.shrink-job.when-done": "Als het klaar is",
   "main.shrink-job.done.nothing": "Niets doen",
   "main.shrink-job.done.open-folder": "Uitvoermap openen",

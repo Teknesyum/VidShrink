@@ -50,6 +50,8 @@
 
   "main.action.browse": "Przeglądaj",
   "main.action.cancel": "Anuluj",
+  "main.action.pause-run": "Wstrzymaj",
+  "main.action.resume-run": "Wznów",
   "main.action.cancel.disabled-tip": "Żadne zadanie jeszcze nie trwa",
   "main.action.shrink": "Zmniejsz",
   "main.action.shrink.disabled-tip": "Najpierw wczytaj plik wideo",
@@ -252,7 +254,8 @@
   "main.shrink-job.move-down": "Przenieś niżej",
   "main.shrink-job.pause": "Wstrzymaj kolejkę",
   "main.shrink-job.resume": "Wznów kolejkę",
-  "main.shrink-job.paused": "Wstrzymano: bieżący plik zostanie dokończony, następny czeka",
+  "main.shrink-job.paused": "Wstrzymano: bieżący plik jest zatrzymany, następny czeka",
+  "main.shrink-job.disk-paused": "Wstrzymano: na dysku docelowym zostało tylko {0} MB wolnego miejsca. Zwolnij miejsce i wznów.",
   "main.shrink-job.when-done": "Po zakończeniu",
   "main.shrink-job.done.nothing": "Nic nie robić",
   "main.shrink-job.done.open-folder": "Otwórz folder wyjściowy",

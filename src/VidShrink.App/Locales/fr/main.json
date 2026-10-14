@@ -50,6 +50,8 @@
 
   "main.action.browse": "Parcourir",
   "main.action.cancel": "Annuler",
+  "main.action.pause-run": "Pause",
+  "main.action.resume-run": "Reprendre",
   "main.action.cancel.disabled-tip": "Aucune tâche n'est en cours pour le moment",
   "main.action.shrink": "Réduire",
   "main.action.shrink.disabled-tip": "Chargez d'abord un fichier vidéo",
@@ -252,7 +254,8 @@
   "main.shrink-job.move-down": "Descendre",
   "main.shrink-job.pause": "Mettre la file en pause",
   "main.shrink-job.resume": "Reprendre la file",
-  "main.shrink-job.paused": "En pause : le fichier en cours se termine, le suivant attend",
+  "main.shrink-job.paused": "En pause : le fichier en cours est suspendu, le suivant attend",
+  "main.shrink-job.disk-paused": "En pause : il ne reste que {0} Mo libres sur le lecteur de destination. Libérez de l’espace, puis reprenez.",
   "main.shrink-job.when-done": "Une fois terminé",
   "main.shrink-job.done.nothing": "Ne rien faire",
   "main.shrink-job.done.open-folder": "Ouvrir le dossier de sortie",

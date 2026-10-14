@@ -50,6 +50,8 @@
 
   "main.action.browse": "Vinjari",
   "main.action.cancel": "Ghairi",
+  "main.action.pause-run": "Sitisha",
+  "main.action.resume-run": "Endelea",
   "main.action.cancel.disabled-tip": "Hakuna kazi inayoendelea bado",
   "main.action.shrink": "Finyaza",
   "main.action.shrink.disabled-tip": "Pakia faili la video kwanza",
@@ -252,7 +254,8 @@
   "main.shrink-job.move-down": "Sogeza chini",
   "main.shrink-job.pause": "Simamisha foleni",
   "main.shrink-job.resume": "Endelea na foleni",
-  "main.shrink-job.paused": "Imesimamishwa: faili la sasa linakamilika, linalofuata linasubiri",
+  "main.shrink-job.paused": "Imesimamishwa: faili linaloendelea limesitishwa, linalofuata linasubiri",
+  "main.shrink-job.disk-paused": "Imesimamishwa: zimebaki MB {0} tu za nafasi kwenye diski lengwa. Toa nafasi, kisha endelea.",
   "main.shrink-job.when-done": "Ikikamilika",
   "main.shrink-job.done.nothing": "Usifanye chochote",
   "main.shrink-job.done.open-folder": "Fungua folda ya matokeo",

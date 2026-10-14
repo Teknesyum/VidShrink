@@ -50,6 +50,8 @@
 
   "main.action.browse": "Pregledaj",
   "main.action.cancel": "Odustani",
+  "main.action.pause-run": "Pauziraj",
+  "main.action.resume-run": "Nastavi",
   "main.action.cancel.disabled-tip": "Još nijedan zadatak nije u tijeku",
   "main.action.shrink": "Smanji",
   "main.action.shrink.disabled-tip": "Najprije učitajte video datoteku",
@@ -252,7 +254,8 @@
   "main.shrink-job.move-down": "Pomakni dolje",
   "main.shrink-job.pause": "Pauziraj red",
   "main.shrink-job.resume": "Nastavi red",
-  "main.shrink-job.paused": "Pauzirano: trenutna datoteka se dovršava, sljedeća čeka",
+  "main.shrink-job.paused": "Pauzirano: trenutna datoteka je zaustavljena, sljedeća čeka",
+  "main.shrink-job.disk-paused": "Pauzirano: na odredišnom pogonu preostalo je samo {0} MB slobodnog prostora. Oslobodite prostor pa nastavite.",
   "main.shrink-job.when-done": "Kad završi",
   "main.shrink-job.done.nothing": "Ne radi ništa",
   "main.shrink-job.done.open-folder": "Otvori izlaznu mapu",

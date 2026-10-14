@@ -50,6 +50,8 @@
 
   "main.action.browse": "찾아보기",
   "main.action.cancel": "취소",
+  "main.action.pause-run": "일시정지",
+  "main.action.resume-run": "재개",
   "main.action.cancel.disabled-tip": "아직 실행 중인 작업이 없습니다",
   "main.action.shrink": "축소",
   "main.action.shrink.disabled-tip": "먼저 동영상 파일을 불러오세요",
@@ -252,7 +254,8 @@
   "main.shrink-job.move-down": "아래로 이동",
   "main.shrink-job.pause": "대기열 일시 중지",
   "main.shrink-job.resume": "대기열 재개",
-  "main.shrink-job.paused": "일시 중지됨: 현재 파일이 끝나면 다음 파일이 대기합니다",
+  "main.shrink-job.paused": "일시 중지됨: 실행 중인 파일은 멈춰 있고 다음 파일은 대기합니다",
+  "main.shrink-job.disk-paused": "일시 중지됨: 대상 드라이브에 남은 여유 공간이 {0}MB뿐입니다. 공간을 확보한 뒤 재개하세요.",
   "main.shrink-job.when-done": "완료되면",
   "main.shrink-job.done.nothing": "아무 작업도 하지 않음",
   "main.shrink-job.done.open-folder": "출력 폴더 열기",

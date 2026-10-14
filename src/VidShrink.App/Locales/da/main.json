@@ -50,6 +50,8 @@
 
   "main.action.browse": "Gennemse",
   "main.action.cancel": "Annuller",
+  "main.action.pause-run": "Pause",
+  "main.action.resume-run": "Genoptag",
   "main.action.cancel.disabled-tip": "Der kører endnu ingen opgave",
   "main.action.shrink": "Krymp",
   "main.action.shrink.disabled-tip": "Indlæs en videofil først",
@@ -252,7 +254,8 @@
   "main.shrink-job.move-down": "Flyt ned",
   "main.shrink-job.pause": "Sæt køen på pause",
   "main.shrink-job.resume": "Genoptag køen",
-  "main.shrink-job.paused": "På pause: den nuværende fil færdiggøres, den næste venter",
+  "main.shrink-job.paused": "På pause: den aktuelle fil står stille, den næste venter",
+  "main.shrink-job.disk-paused": "På pause: der er kun {0} MB ledig plads tilbage på destinationsdrevet. Frigør plads, og genoptag.",
   "main.shrink-job.when-done": "Når færdig",
   "main.shrink-job.done.nothing": "Gør ingenting",
   "main.shrink-job.done.open-folder": "Åbn outputmappen",

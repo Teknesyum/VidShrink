@@ -50,6 +50,8 @@
 
   "main.action.browse": "Layari",
   "main.action.cancel": "Batal",
+  "main.action.pause-run": "Jeda",
+  "main.action.resume-run": "Sambung",
   "main.action.cancel.disabled-tip": "Belum ada tugas yang sedang berjalan",
   "main.action.shrink": "Kecilkan",
   "main.action.shrink.disabled-tip": "Muatkan fail video dahulu",
@@ -252,7 +254,8 @@
   "main.shrink-job.move-down": "Alih ke bawah",
   "main.shrink-job.pause": "Jeda baris gilir",
   "main.shrink-job.resume": "Sambung semula baris gilir",
-  "main.shrink-job.paused": "Dijeda: fail semasa selesai, yang berikutnya menunggu",
+  "main.shrink-job.paused": "Dijeda: fail yang sedang berjalan ditahan, yang berikutnya menunggu",
+  "main.shrink-job.disk-paused": "Dijeda: hanya tinggal {0} MB ruang kosong pada pemacu sasaran. Kosongkan ruang, kemudian sambung.",
   "main.shrink-job.when-done": "Selepas selesai",
   "main.shrink-job.done.nothing": "Jangan buat apa-apa",
   "main.shrink-job.done.open-folder": "Buka folder output",

@@ -50,6 +50,8 @@
 
   "main.action.browse": "Bläddra",
   "main.action.cancel": "Avbryt",
+  "main.action.pause-run": "Pausa",
+  "main.action.resume-run": "Återuppta",
   "main.action.cancel.disabled-tip": "Inget jobb körs ännu",
   "main.action.shrink": "Krymp",
   "main.action.shrink.disabled-tip": "Läs in en videofil först",
@@ -252,7 +254,8 @@
   "main.shrink-job.move-down": "Flytta ner",
   "main.shrink-job.pause": "Pausa kön",
   "main.shrink-job.resume": "Återuppta kön",
-  "main.shrink-job.paused": "Pausad: aktuell fil slutförs, nästa väntar",
+  "main.shrink-job.paused": "Pausad: den pågående filen står still, nästa väntar",
+  "main.shrink-job.disk-paused": "Pausad: bara {0} MB ledigt kvar på målenheten. Frigör utrymme och återuppta sedan.",
   "main.shrink-job.when-done": "Efter avslut",
   "main.shrink-job.done.nothing": "Gör ingenting",
   "main.shrink-job.done.open-folder": "Öppna utmatningsmappen",

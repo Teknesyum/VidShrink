@@ -135,6 +135,16 @@ public partial class ShrinkJobWindow : Window
     /// <summary>K6: koşan tek işi iptal eder; ötekiler ve sıra sürer.</summary>
     internal bool CancelJob(ShrinkRequest request) => _pump.Cancel(request);
 
+    /// <summary>SIK-P3: pencerenin bütün kodlamalarını askıya alan düğme; duraklat düğmesi bunu da çevirir.</summary>
+    internal EncodePause EncodePause { get; } = new();
+
+    /// <summary>Verilen yolun sürücüsündeki boş bayt; okunamazsa <c>null</c>. Testler sahtesini verir.</summary>
+    internal Func<string, long?> FreeSpace { get; set; } = path => DiskSpaceGuard.TryGetFreeBytes(path, out var free) ? free : null;
+
+    internal static readonly TimeSpan DiskCheckInterval = TimeSpan.FromSeconds(5);
+
+    private DispatcherTimer? _diskTimer;
+
     /// <summary>Koşan bir işin ekrandaki durumu; satırı bir kez kurulur, ilerleme yerinde yazılır.</summary>
     private sealed class AktifIs
     {
@@ -307,6 +317,8 @@ public partial class ShrinkJobWindow : Window
 
     internal bool Paused => _paused;
 
+    internal string PausedText => TxtPaused.Text ?? "";
+
     internal QueueEndChoice WhenDone
     {
         get => _whenDone;
@@ -348,6 +360,9 @@ public partial class ShrinkJobWindow : Window
 
         foreach (var request in _startup.Items) Accept(request);
         RestoreWatch();
+        _diskTimer = new DispatcherTimer { Interval = DiskCheckInterval };
+        _diskTimer.Tick += (_, _) => CheckDiskSpace();
+        _diskTimer.Start();
 
         if (_queue is null) return;
         try
@@ -393,16 +408,55 @@ public partial class ShrinkJobWindow : Window
     }
 
     /// <summary>
-    /// C1-2: duraklatılan kuyrukta koşan dosyalar biter, sıradaki başlamaz. Sürdürünce pompa yeniden açılır.
+    /// C1-2, SIK-P3: duraklatılan kuyrukta koşan kodlama askıya alınır, sıradaki başlamaz. Sürdürünce
+    /// askı kalkar ve pompa yeniden açılır.
     /// </summary>
-    internal void SetPaused(bool paused)
+    internal void SetPaused(bool paused) => SetPaused(paused, Say("main.shrink-job.paused"));
+
+    private void SetPaused(bool paused, string text)
     {
         _paused = paused;
         BtnPause.Content = Say(paused ? "main.shrink-job.resume" : "main.shrink-job.pause");
+        TxtPaused.Text = text;
         TxtPaused.IsVisible = paused;
+        if (paused) EncodePause.Pause();
+        else EncodePause.Resume();
         _pump.Paused = paused;
         RefreshPending();
     }
+
+    /// <summary>
+    /// SIK-P3: koşan işlerin çıktı sürücüsünde boş alan <see cref="DiskSpaceGuard.PauseBelowBytes"/>
+    /// altına inmişse kuyruk kendiliğinden duraklar. Okunamayan sürücü duraklatmaz.
+    /// </summary>
+    internal void CheckDiskSpace()
+    {
+        if (_paused) return;
+        foreach (var folder in _pump.Running.Select(OutputFolderFor).Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            if (FreeSpace(folder) is not long free || !DiskSpaceGuard.ShouldPause(free)) continue;
+            PauseForDisk(free);
+            return;
+        }
+    }
+
+    /// <summary>
+    /// SIK-P3: iş başlamadan çıktının sürücüsünde yer var mı. Yoksa kuyruk duraklar ve işin sonuç
+    /// satırı döner; varsa ya da sürücü okunamazsa <c>null</c>.
+    /// </summary>
+    internal string? SpaceBeforeStart(string output, double targetMb)
+    {
+        if (FreeSpace(output) is not long free || DiskSpaceGuard.HasEnoughSpace(free, targetMb)) return null;
+        PauseForDisk(free);
+        return Say("main.run.no-space", Megabayt.Oku(DiskSpaceGuard.RequiredBytes(targetMb)).ToString("0", Strings.CultureOf(_language)));
+    }
+
+    private void PauseForDisk(long freeBytes)
+        => SetPaused(true, Say("main.shrink-job.disk-paused", (long)Math.Floor(freeBytes / Megabayt.Bayt)));
+
+    private string OutputFolderFor(ShrinkRequest request)
+        => MainWindow.UsableFixedFolder(_appSettings.OutputFolderMode, _appSettings.OutputFolder)
+           ?? Path.GetDirectoryName(request.Path) ?? "";
 
     private void RefreshPending()
     {
@@ -648,12 +702,17 @@ public partial class ShrinkJobWindow : Window
                 UniqueOutputPath(request.Path, _appSettings, plan, targetMb, ExtensionFor(plan), taken));
             ayrilan = output;
             QueueWatch.MarkOwn(output);
+            if (SpaceBeforeStart(output, targetMb) is { } alanYok)
+            {
+                mesaj = alanYok;
+                return;
+            }
             yuva = await EncoderSlots.Shared.EnterAsync(plan.Codec, ct);
 
             var progress = new Progress<EncodeProgress>(step => ShowProgress(job, step));
             var soruAdi = ParallelLimit > ParallelJobs.Default ? Path.GetFileName(request.Path) : null;
 
-            var result = await new EncodeRunner().RunAsync(
+            var result = await new EncodeRunner { Pause = EncodePause }.RunAsync(
                 info, plan, output, targetMb, progress, ct, options.FillPolicy,
                 askBeforeRetry: (prompt, token) => AskOvershootAsync(soruAdi, prompt, token));
 
@@ -849,6 +908,7 @@ public partial class ShrinkJobWindow : Window
     {
         _closeTimer?.Stop();
         _countdown?.Stop();
+        _diskTimer?.Stop();
         StopWatch();
         _closed = true;
         _pump.CancelAll();

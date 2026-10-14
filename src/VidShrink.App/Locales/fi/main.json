@@ -50,6 +50,8 @@
 
   "main.action.browse": "Selaa",
   "main.action.cancel": "Peruuta",
+  "main.action.pause-run": "Keskeytä",
+  "main.action.resume-run": "Jatka",
   "main.action.cancel.disabled-tip": "Yhtään tehtävää ei ole vielä käynnissä",
   "main.action.shrink": "Pakkaa",
   "main.action.shrink.disabled-tip": "Lataa ensin videotiedosto",
@@ -252,7 +254,8 @@
   "main.shrink-job.move-down": "Siirrä alas",
   "main.shrink-job.pause": "Keskeytä jono",
   "main.shrink-job.resume": "Jatka jonoa",
-  "main.shrink-job.paused": "Keskeytetty: nykyinen tiedosto valmistuu, seuraava odottaa",
+  "main.shrink-job.paused": "Keskeytetty: käynnissä oleva tiedosto on pysäytetty, seuraava odottaa",
+  "main.shrink-job.disk-paused": "Keskeytetty: kohdeasemalla on vapaata tilaa enää {0} Mt. Vapauta tilaa ja jatka.",
   "main.shrink-job.when-done": "Kun valmis",
   "main.shrink-job.done.nothing": "Älä tee mitään",
   "main.shrink-job.done.open-folder": "Avaa tulostekansio",

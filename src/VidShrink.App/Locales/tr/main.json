@@ -50,6 +50,8 @@
 
   "main.action.browse": "Gözat",
   "main.action.cancel": "İptal",
+  "main.action.pause-run": "Duraklat",
+  "main.action.resume-run": "Sürdür",
   "main.action.cancel.disabled-tip": "Şu an çalışan bir iş yok",
   "main.action.shrink": "Küçült",
   "main.action.shrink.disabled-tip": "Önce bir video dosyası yükleyin",
@@ -252,7 +254,8 @@
   "main.shrink-job.move-down": "Aşağı al",
   "main.shrink-job.pause": "Sırayı duraklat",
   "main.shrink-job.resume": "Sırayı sürdür",
-  "main.shrink-job.paused": "Duraklatıldı: şimdiki dosya biter, sıradaki bekler",
+  "main.shrink-job.paused": "Duraklatıldı: koşan dosya bekletiliyor, sıradaki bekler",
+  "main.shrink-job.disk-paused": "Duraklatıldı: hedef sürücüde yalnız {0} MB boş alan kaldı. Yer açın, sonra sürdürün.",
   "main.shrink-job.when-done": "Bitince",
   "main.shrink-job.done.nothing": "Hiçbir şey yapma",
   "main.shrink-job.done.open-folder": "Çıktı klasörünü aç",

@@ -50,6 +50,8 @@
 
   "main.action.browse": "浏览",
   "main.action.cancel": "取消",
+  "main.action.pause-run": "暂停",
+  "main.action.resume-run": "继续",
   "main.action.cancel.disabled-tip": "目前没有正在运行的任务",
   "main.action.shrink": "压缩",
   "main.action.shrink.disabled-tip": "请先加载视频文件",
@@ -252,7 +254,8 @@
   "main.shrink-job.move-down": "下移",
   "main.shrink-job.pause": "暂停队列",
   "main.shrink-job.resume": "继续队列",
-  "main.shrink-job.paused": "已暂停：当前文件完成后，下一个文件等待",
+  "main.shrink-job.paused": "已暂停：正在处理的文件已挂起，下一个文件等待",
+  "main.shrink-job.disk-paused": "已暂停：目标驱动器仅剩 {0} MB 可用空间。请释放空间后继续。",
   "main.shrink-job.when-done": "完成后",
   "main.shrink-job.done.nothing": "不执行任何操作",
   "main.shrink-job.done.open-folder": "打开输出文件夹",

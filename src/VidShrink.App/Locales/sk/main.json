@@ -50,6 +50,8 @@
 
   "main.action.browse": "Prehľadávať",
   "main.action.cancel": "Zrušiť",
+  "main.action.pause-run": "Pozastaviť",
+  "main.action.resume-run": "Pokračovať",
   "main.action.cancel.disabled-tip": "Zatiaľ nebeží žiadna úloha",
   "main.action.shrink": "Zmenšiť",
   "main.action.shrink.disabled-tip": "Najprv načítajte video súbor",
@@ -252,7 +254,8 @@
   "main.shrink-job.move-down": "Presunúť nadol",
   "main.shrink-job.pause": "Pozastaviť rad",
   "main.shrink-job.resume": "Obnoviť rad",
-  "main.shrink-job.paused": "Pozastavené: aktuálny súbor sa dokončí, ďalší čaká",
+  "main.shrink-job.paused": "Pozastavené: bežiaci súbor stojí, ďalší čaká",
+  "main.shrink-job.disk-paused": "Pozastavené: na cieľovej jednotke zostáva len {0} MB voľného miesta. Uvoľnite miesto a pokračujte.",
   "main.shrink-job.when-done": "Po dokončení",
   "main.shrink-job.done.nothing": "Nerobiť nič",
   "main.shrink-job.done.open-folder": "Otvoriť výstupný priečinok",

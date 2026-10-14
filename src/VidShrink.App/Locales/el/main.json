@@ -50,6 +50,8 @@
 
   "main.action.browse": "Αναζήτηση",
   "main.action.cancel": "Ακύρωση",
+  "main.action.pause-run": "Παύση",
+  "main.action.resume-run": "Συνέχιση",
   "main.action.cancel.disabled-tip": "Δεν εκτελείται ακόμη καμία εργασία",
   "main.action.shrink": "Σμίκρυνση",
   "main.action.shrink.disabled-tip": "Φορτώστε πρώτα ένα αρχείο βίντεο",
@@ -252,7 +254,8 @@
   "main.shrink-job.move-down": "Μετακίνηση κάτω",
   "main.shrink-job.pause": "Παύση ουράς",
   "main.shrink-job.resume": "Συνέχιση ουράς",
-  "main.shrink-job.paused": "Σε παύση: το τρέχον αρχείο τελειώνει, το επόμενο περιμένει",
+  "main.shrink-job.paused": "Σε παύση: το τρέχον αρχείο έχει σταματήσει, το επόμενο περιμένει",
+  "main.shrink-job.disk-paused": "Σε παύση: απομένουν μόνο {0} MB ελεύθερα στη μονάδα προορισμού. Ελευθερώστε χώρο και συνεχίστε.",
   "main.shrink-job.when-done": "Όταν τελειώσει",
   "main.shrink-job.done.nothing": "Να μη γίνει τίποτα",
   "main.shrink-job.done.open-folder": "Άνοιγμα φακέλου εξόδου",

@@ -50,6 +50,8 @@
 
   "main.action.browse": "Tallózás",
   "main.action.cancel": "Mégse",
+  "main.action.pause-run": "Szünet",
+  "main.action.resume-run": "Folytatás",
   "main.action.cancel.disabled-tip": "Még nem fut feladat",
   "main.action.shrink": "Tömörítés",
   "main.action.shrink.disabled-tip": "Először töltsön be egy videofájlt",
@@ -252,7 +254,8 @@
   "main.shrink-job.move-down": "Lejjebb",
   "main.shrink-job.pause": "Sor szüneteltetése",
   "main.shrink-job.resume": "Sor folytatása",
-  "main.shrink-job.paused": "Szüneteltetve: a jelenlegi fájl befejeződik, a következő vár",
+  "main.shrink-job.paused": "Szüneteltetve: a futó fájl áll, a következő vár",
+  "main.shrink-job.disk-paused": "Szüneteltetve: a célmeghajtón már csak {0} MB szabad hely maradt. Szabadítson fel helyet, majd folytassa.",
   "main.shrink-job.when-done": "Ha kész",
   "main.shrink-job.done.nothing": "Ne csináljon semmit",
   "main.shrink-job.done.open-folder": "Kimeneti mappa megnyitása",

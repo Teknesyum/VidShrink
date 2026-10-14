@@ -4542,7 +4542,7 @@ public partial class MainWindow : Window
         var biten = new BitenIs(_info.FilePath, IsSonucu.Hatali);
         try
         {
-            SetRunning(true);
+            SetRunning(true, true);
             TxtResult.Text = "";
             ShowResultWarning(false);
             BtnReveal.IsVisible = false;
@@ -4551,7 +4551,7 @@ public partial class MainWindow : Window
             var progress = new Progress<EncodeProgress>(ShowEncodeProgress);
 
             var plan = ActivePlan;
-            var result = await ShrinkEngine.EncodeAsync(_info, plan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync, _sceneMap?.Map);
+            var result = await ShrinkEngine.EncodeAsync(_info, plan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync, _sceneMap?.Map, RunPause);
             _lastOutput = result.OutputPath;
             RefreshPreviewSource();
 
@@ -5016,18 +5016,42 @@ public partial class MainWindow : Window
 
     internal void ShowEncodeProgressForTest(EncodeProgress p)
     {
-        SetRunning(true);
+        SetRunning(true, true);
         ShowEncodeProgress(p);
     }
 
     internal void EndEncodeForTest() => SetRunning(false);
 
-    private void SetRunning(bool running)
+    /// <summary>SIK-P3: ana sekmede koşan kodlamayı askıya alan düğme; dönüştürme bunu kullanmaz.</summary>
+    internal EncodePause RunPause { get; } = new();
+
+    internal bool RunPauseEnabled => BtnPauseRun.IsVisible && BtnPauseRun.IsEnabled;
+
+    internal void ToggleRunPause()
+    {
+        if (!RunPauseEnabled) return;
+        if (RunPause.IsPaused) RunPause.Resume();
+        else RunPause.Pause();
+        ShowRunPause();
+    }
+
+    private void ShowRunPause()
+        => BtnPauseRun.Content = Say(RunPause.IsPaused ? "main.action.resume-run" : "main.action.pause-run");
+
+    private void OnPauseRun(object? sender, RoutedEventArgs e) => ToggleRunPause();
+
+    private void SetRunning(bool running, bool pausable = false)
     {
         BtnStart.IsEnabled = !running && _info is not null;
         BtnConvert.IsEnabled = !running && _info is not null;
         BtnCancel.IsEnabled = BtnConvertCancel.IsEnabled = running;
-        if (running) return;
+        BtnPauseRun.IsVisible = BtnPauseRun.IsEnabled = running && pausable;
+        if (!BtnPauseRun.IsEnabled) RunPause.Resume();
+        if (running)
+        {
+            ShowRunPause();
+            return;
+        }
         Preview.Controls.ClearEncode();
         SetStage(TxtStage, Say("main.output.idle"));
         SetStage(TxtConvertStage, Say("main.output.idle"));
