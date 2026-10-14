@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "Previše zahtjeva prema OpenSubtitles — pokušajte ponovno za trenutak",
   "player.subtitle.download.badlogin": "OpenSubtitles nije prihvatio prijavu",
   "player.subtitle.download.expired": "Veza za preuzimanje je istekla — pokušajte ponovno",
-  "player.subtitle.download.toofast.wait": "Previše zahtjeva prema OpenSubtitles — pokušajte ponovno za {0} s"
+  "player.subtitle.download.toofast.wait": "Previše zahtjeva prema OpenSubtitles — pokušajte ponovno za {0} s",
+  "player.subtitle.visibility": "Prikaži/sakrij titlove",
+  "player.subtitle.lineprev": "Prethodni redak titla",
+  "player.subtitle.linenext": "Sljedeći redak titla",
+  "player.subtitle.stepprev": "Uskladi titlove s prethodnim retkom",
+  "player.subtitle.stepnext": "Uskladi titlove sa sljedećim retkom",
+  "player.subtitle.copy": "Kopiraj tekst titla",
+  "player.subtitle.hidden": "Titlovi skriveni",
+  "player.subtitle.shown": "Titlovi prikazani",
+  "player.subtitle.copied": "Tekst titla kopiran"
 }

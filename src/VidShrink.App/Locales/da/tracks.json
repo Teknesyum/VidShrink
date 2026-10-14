@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "For mange anmodninger til OpenSubtitles — prøv igen om lidt",
   "player.subtitle.download.badlogin": "OpenSubtitles accepterede ikke login",
   "player.subtitle.download.expired": "Downloadlinket er udløbet — prøv igen",
-  "player.subtitle.download.toofast.wait": "For mange anmodninger til OpenSubtitles — prøv igen om {0} s"
+  "player.subtitle.download.toofast.wait": "For mange anmodninger til OpenSubtitles — prøv igen om {0} s",
+  "player.subtitle.visibility": "Vis/skjul undertekster",
+  "player.subtitle.lineprev": "Forrige undertekstlinje",
+  "player.subtitle.linenext": "Næste undertekstlinje",
+  "player.subtitle.stepprev": "Synkroniser undertekster med forrige linje",
+  "player.subtitle.stepnext": "Synkroniser undertekster med næste linje",
+  "player.subtitle.copy": "Kopiér undertekstens tekst",
+  "player.subtitle.hidden": "Undertekster skjult",
+  "player.subtitle.shown": "Undertekster vist",
+  "player.subtitle.copied": "Undertekstens tekst kopieret"
 }

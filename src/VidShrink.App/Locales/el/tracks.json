@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "Πολλά αιτήματα προς το OpenSubtitles — δοκιμάστε ξανά σε λίγο",
   "player.subtitle.download.badlogin": "Το OpenSubtitles δεν δέχτηκε τη σύνδεση",
   "player.subtitle.download.expired": "Ο σύνδεσμος λήψης έληξε — δοκιμάστε ξανά",
-  "player.subtitle.download.toofast.wait": "Πολλά αιτήματα προς το OpenSubtitles — δοκιμάστε ξανά σε {0} δ"
+  "player.subtitle.download.toofast.wait": "Πολλά αιτήματα προς το OpenSubtitles — δοκιμάστε ξανά σε {0} δ",
+  "player.subtitle.visibility": "Εμφάνιση/απόκρυψη υποτίτλων",
+  "player.subtitle.lineprev": "Προηγούμενη γραμμή υποτίτλων",
+  "player.subtitle.linenext": "Επόμενη γραμμή υποτίτλων",
+  "player.subtitle.stepprev": "Συγχρονισμός υποτίτλων με την προηγούμενη γραμμή",
+  "player.subtitle.stepnext": "Συγχρονισμός υποτίτλων με την επόμενη γραμμή",
+  "player.subtitle.copy": "Αντιγραφή κειμένου υποτίτλων",
+  "player.subtitle.hidden": "Οι υπότιτλοι αποκρύφθηκαν",
+  "player.subtitle.shown": "Οι υπότιτλοι εμφανίζονται",
+  "player.subtitle.copied": "Το κείμενο των υποτίτλων αντιγράφηκε"
 }

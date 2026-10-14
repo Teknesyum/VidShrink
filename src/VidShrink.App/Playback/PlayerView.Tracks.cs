@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using VidShrink.App.Localization;
@@ -102,6 +103,64 @@ internal partial class PlayerView
         _engine?.SetSubtitleDelay(_subtitles.SubtitleDelay);
         _trace.Add("subdelay " + Saat.Tani.Konum(seconds) + " -> " + Saat.Tani.Konum(_subtitles.SubtitleDelay));
         ShowOsd(Strings.Get("player.subtitle.delay", SubtitleOptions.Signed(_subtitles.SubtitleDelay)));
+    }
+
+    internal Func<TopLevel?, string, Task> SubtitleCopier { get; set; } =
+        (top, text) => top?.Clipboard is { } clipboard ? clipboard.SetTextAsync(text) : Task.CompletedTask;
+
+    private void ToggleSubtitleVisible()
+    {
+        _subtitles.ToggleVisible();
+        _engine?.SetSubtitleVisible(_subtitles.Visible);
+        _trace.Add("subvisible -> " + _subtitles.Visible);
+        ShowOsd(Strings.Get(_subtitles.Visible ? "player.subtitle.shown" : "player.subtitle.hidden"));
+    }
+
+    private void SeekSubtitleLine(bool backward)
+    {
+        var name = backward ? "subline -1 -> " : "subline 1 -> ";
+        if (_engine is not { IsOpen: true } engine || !engine.SeekSubtitle(backward))
+        {
+            _trace.Add(name + "no");
+            return;
+        }
+
+        _trackPaused = true;
+        _stall.Reset();
+        _trace.Add(name + "ok");
+    }
+
+    private void StepSubtitleLine(bool backward)
+    {
+        var name = backward ? "substep -1 -> " : "substep 1 -> ";
+        if (_engine is not { IsOpen: true } engine || !engine.StepSubtitle(backward))
+        {
+            _trace.Add(name + "no");
+            return;
+        }
+
+        _subtitles.SyncSubtitleDelay(engine.SubtitleDelaySeconds);
+        _trace.Add(name + Saat.Tani.Konum(_subtitles.SubtitleDelay));
+        ShowOsd(Strings.Get("player.subtitle.delay", SubtitleOptions.Signed(_subtitles.SubtitleDelay)));
+    }
+
+    private void CopySubtitleText()
+    {
+        if (_engine is not { IsOpen: true } engine)
+        {
+            _trace.Add("subcopy -> no");
+            return;
+        }
+
+        if (engine.SubtitleText is not { } text || string.IsNullOrWhiteSpace(text))
+        {
+            _trace.Add("subcopy -> empty");
+            return;
+        }
+
+        _ = SubtitleCopier(TopLevel.GetTopLevel(this), text);
+        _trace.Add("subcopy -> ok");
+        ShowOsd(Strings.Get("player.subtitle.copied"));
     }
 
     private void ShiftAudioDelay(double seconds)

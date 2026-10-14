@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "Pateikta per daug užklausų OpenSubtitles — bandykite dar kartą po kelių sekundžių",
   "player.subtitle.download.badlogin": "OpenSubtitles nepriėmė prisijungimo",
   "player.subtitle.download.expired": "Atsisiuntimo nuoroda nustojo veikti — bandykite dar kartą",
-  "player.subtitle.download.toofast.wait": "Pateikta per daug užklausų OpenSubtitles — bandykite dar kartą po {0} s"
+  "player.subtitle.download.toofast.wait": "Pateikta per daug užklausų OpenSubtitles — bandykite dar kartą po {0} s",
+  "player.subtitle.visibility": "Rodyti/slėpti subtitrus",
+  "player.subtitle.lineprev": "Ankstesnė subtitrų eilutė",
+  "player.subtitle.linenext": "Kita subtitrų eilutė",
+  "player.subtitle.stepprev": "Sinchronizuoti subtitrus su ankstesne eilute",
+  "player.subtitle.stepnext": "Sinchronizuoti subtitrus su kita eilute",
+  "player.subtitle.copy": "Kopijuoti subtitrų tekstą",
+  "player.subtitle.hidden": "Subtitrai paslėpti",
+  "player.subtitle.shown": "Subtitrai rodomi",
+  "player.subtitle.copied": "Subtitrų tekstas nukopijuotas"
 }

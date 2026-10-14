@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "Liian monta pyyntöä OpenSubtitlesille — yritä uudelleen hetken kuluttua",
   "player.subtitle.download.badlogin": "OpenSubtitles ei hyväksynyt kirjautumista",
   "player.subtitle.download.expired": "Latauslinkin voimassaolo päättyi — yritä uudelleen",
-  "player.subtitle.download.toofast.wait": "Liian monta pyyntöä OpenSubtitlesille — yritä uudelleen {0} s kuluttua"
+  "player.subtitle.download.toofast.wait": "Liian monta pyyntöä OpenSubtitlesille — yritä uudelleen {0} s kuluttua",
+  "player.subtitle.visibility": "Näytä/piilota tekstitys",
+  "player.subtitle.lineprev": "Edellinen tekstitysrivi",
+  "player.subtitle.linenext": "Seuraava tekstitysrivi",
+  "player.subtitle.stepprev": "Tahdista tekstitys edelliseen riviin",
+  "player.subtitle.stepnext": "Tahdista tekstitys seuraavaan riviin",
+  "player.subtitle.copy": "Kopioi tekstityksen teksti",
+  "player.subtitle.hidden": "Tekstitys piilotettu",
+  "player.subtitle.shown": "Tekstitys näkyvissä",
+  "player.subtitle.copied": "Tekstityksen teksti kopioitu"
 }

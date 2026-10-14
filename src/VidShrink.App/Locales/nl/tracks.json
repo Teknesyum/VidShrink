@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "Te veel verzoeken naar OpenSubtitles — probeer het straks opnieuw",
   "player.subtitle.download.badlogin": "OpenSubtitles heeft het aanmelden niet geaccepteerd",
   "player.subtitle.download.expired": "De downloadlink is verlopen — probeer het opnieuw",
-  "player.subtitle.download.toofast.wait": "Te veel verzoeken naar OpenSubtitles — probeer het over {0} s opnieuw"
+  "player.subtitle.download.toofast.wait": "Te veel verzoeken naar OpenSubtitles — probeer het over {0} s opnieuw",
+  "player.subtitle.visibility": "Ondertitels tonen/verbergen",
+  "player.subtitle.lineprev": "Vorige ondertitelregel",
+  "player.subtitle.linenext": "Volgende ondertitelregel",
+  "player.subtitle.stepprev": "Ondertitels synchroniseren met vorige regel",
+  "player.subtitle.stepnext": "Ondertitels synchroniseren met volgende regel",
+  "player.subtitle.copy": "Ondertiteltekst kopiëren",
+  "player.subtitle.hidden": "Ondertitels verborgen",
+  "player.subtitle.shown": "Ondertitels zichtbaar",
+  "player.subtitle.copied": "Ondertiteltekst gekopieerd"
 }

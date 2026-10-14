@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "Слишком много запросов к OpenSubtitles — повторите попытку через минуту",
   "player.subtitle.download.badlogin": "OpenSubtitles не принял вход",
   "player.subtitle.download.expired": "Ссылка для скачивания истекла — попробуйте снова",
-  "player.subtitle.download.toofast.wait": "Слишком много запросов к OpenSubtitles — повторите попытку через {0} с"
+  "player.subtitle.download.toofast.wait": "Слишком много запросов к OpenSubtitles — повторите попытку через {0} с",
+  "player.subtitle.visibility": "Показать/скрыть субтитры",
+  "player.subtitle.lineprev": "Предыдущая строка субтитров",
+  "player.subtitle.linenext": "Следующая строка субтитров",
+  "player.subtitle.stepprev": "Синхронизировать субтитры с предыдущей строкой",
+  "player.subtitle.stepnext": "Синхронизировать субтитры со следующей строкой",
+  "player.subtitle.copy": "Копировать текст субтитров",
+  "player.subtitle.hidden": "Субтитры скрыты",
+  "player.subtitle.shown": "Субтитры показаны",
+  "player.subtitle.copied": "Текст субтитров скопирован"
 }

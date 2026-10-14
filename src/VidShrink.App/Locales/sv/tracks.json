@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "För många förfrågningar till OpenSubtitles — försök igen om en stund",
   "player.subtitle.download.badlogin": "OpenSubtitles godtog inte inloggningen",
   "player.subtitle.download.expired": "Nedladdningslänken har gått ut — försök igen",
-  "player.subtitle.download.toofast.wait": "För många förfrågningar till OpenSubtitles — försök igen om {0} s"
+  "player.subtitle.download.toofast.wait": "För många förfrågningar till OpenSubtitles — försök igen om {0} s",
+  "player.subtitle.visibility": "Visa/dölj undertexter",
+  "player.subtitle.lineprev": "Föregående undertextrad",
+  "player.subtitle.linenext": "Nästa undertextrad",
+  "player.subtitle.stepprev": "Synka undertexter till föregående rad",
+  "player.subtitle.stepnext": "Synka undertexter till nästa rad",
+  "player.subtitle.copy": "Kopiera undertextens text",
+  "player.subtitle.hidden": "Undertexter dolda",
+  "player.subtitle.shown": "Undertexter visas",
+  "player.subtitle.copied": "Undertextens text kopierad"
 }

@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "OpenSubtitles-க்கு அதிக கோரிக்கைகள் அனுப்பப்பட்டன — சிறிது நேரத்தில் மீண்டும் முயற்சிக்கவும்",
   "player.subtitle.download.badlogin": "OpenSubtitles உள்நுழைவை ஏற்கவில்லை",
   "player.subtitle.download.expired": "பதிவிறக்க இணைப்பின் காலம் முடிந்துவிட்டது — மீண்டும் முயற்சிக்கவும்",
-  "player.subtitle.download.toofast.wait": "OpenSubtitles-க்கு அதிக கோரிக்கைகள் அனுப்பப்பட்டன — {0} வினாடிகளில் மீண்டும் முயற்சிக்கவும்"
+  "player.subtitle.download.toofast.wait": "OpenSubtitles-க்கு அதிக கோரிக்கைகள் அனுப்பப்பட்டன — {0} வினாடிகளில் மீண்டும் முயற்சிக்கவும்",
+  "player.subtitle.visibility": "வசனங்களைக் காட்டு/மறை",
+  "player.subtitle.lineprev": "முந்தைய வசன வரி",
+  "player.subtitle.linenext": "அடுத்த வசன வரி",
+  "player.subtitle.stepprev": "வசனங்களை முந்தைய வரியுடன் ஒத்திசை",
+  "player.subtitle.stepnext": "வசனங்களை அடுத்த வரியுடன் ஒத்திசை",
+  "player.subtitle.copy": "வசன உரையை நகலெடு",
+  "player.subtitle.hidden": "வசனங்கள் மறைக்கப்பட்டன",
+  "player.subtitle.shown": "வசனங்கள் காட்டப்படுகின்றன",
+  "player.subtitle.copied": "வசன உரை நகலெடுக்கப்பட்டது"
 }

@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "Đã gửi quá nhiều yêu cầu đến OpenSubtitles — hãy thử lại sau một chút",
   "player.subtitle.download.badlogin": "OpenSubtitles không chấp nhận việc đăng nhập",
   "player.subtitle.download.expired": "Liên kết tải xuống đã hết hạn — hãy thử lại",
-  "player.subtitle.download.toofast.wait": "Đã gửi quá nhiều yêu cầu đến OpenSubtitles — hãy thử lại sau {0} giây"
+  "player.subtitle.download.toofast.wait": "Đã gửi quá nhiều yêu cầu đến OpenSubtitles — hãy thử lại sau {0} giây",
+  "player.subtitle.visibility": "Hiện/ẩn phụ đề",
+  "player.subtitle.lineprev": "Dòng phụ đề trước",
+  "player.subtitle.linenext": "Dòng phụ đề tiếp theo",
+  "player.subtitle.stepprev": "Đồng bộ phụ đề với dòng trước",
+  "player.subtitle.stepnext": "Đồng bộ phụ đề với dòng tiếp theo",
+  "player.subtitle.copy": "Sao chép văn bản phụ đề",
+  "player.subtitle.hidden": "Đã ẩn phụ đề",
+  "player.subtitle.shown": "Đang hiện phụ đề",
+  "player.subtitle.copied": "Đã sao chép văn bản phụ đề"
 }

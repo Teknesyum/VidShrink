@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "Prea multe cereri către OpenSubtitles — încercați din nou într-o clipă",
   "player.subtitle.download.badlogin": "OpenSubtitles nu a acceptat conectarea",
   "player.subtitle.download.expired": "Linkul de descărcare a expirat — încercați din nou",
-  "player.subtitle.download.toofast.wait": "Prea multe cereri către OpenSubtitles — încercați din nou în {0} s"
+  "player.subtitle.download.toofast.wait": "Prea multe cereri către OpenSubtitles — încercați din nou în {0} s",
+  "player.subtitle.visibility": "Afișează/ascunde subtitrările",
+  "player.subtitle.lineprev": "Linia de subtitrare anterioară",
+  "player.subtitle.linenext": "Linia de subtitrare următoare",
+  "player.subtitle.stepprev": "Sincronizează subtitrările cu linia anterioară",
+  "player.subtitle.stepnext": "Sincronizează subtitrările cu linia următoare",
+  "player.subtitle.copy": "Copiază textul subtitrării",
+  "player.subtitle.hidden": "Subtitrări ascunse",
+  "player.subtitle.shown": "Subtitrări afișate",
+  "player.subtitle.copied": "Textul subtitrării a fost copiat"
 }

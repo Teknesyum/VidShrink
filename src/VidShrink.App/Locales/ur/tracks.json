@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "OpenSubtitles کو بہت زیادہ درخواستیں بھیجی گئیں — تھوڑی دیر میں دوبارہ کوشش کریں",
   "player.subtitle.download.badlogin": "OpenSubtitles نے سائن ان قبول نہیں کیا",
   "player.subtitle.download.expired": "ڈاؤن لوڈ لنک کی مدت ختم ہو گئی — دوبارہ کوشش کریں",
-  "player.subtitle.download.toofast.wait": "OpenSubtitles کو بہت زیادہ درخواستیں بھیجی گئیں — {0} سیکنڈ بعد دوبارہ کوشش کریں"
+  "player.subtitle.download.toofast.wait": "OpenSubtitles کو بہت زیادہ درخواستیں بھیجی گئیں — {0} سیکنڈ بعد دوبارہ کوشش کریں",
+  "player.subtitle.visibility": "سب ٹائٹل دکھائیں/چھپائیں",
+  "player.subtitle.lineprev": "پچھلی سب ٹائٹل لائن",
+  "player.subtitle.linenext": "اگلی سب ٹائٹل لائن",
+  "player.subtitle.stepprev": "سب ٹائٹل کو پچھلی لائن سے ملائیں",
+  "player.subtitle.stepnext": "سب ٹائٹل کو اگلی لائن سے ملائیں",
+  "player.subtitle.copy": "سب ٹائٹل کا متن کاپی کریں",
+  "player.subtitle.hidden": "سب ٹائٹل چھپ گئے",
+  "player.subtitle.shown": "سب ٹائٹل دکھائے جا رہے ہیں",
+  "player.subtitle.copied": "سب ٹائٹل کا متن کاپی ہو گیا"
 }

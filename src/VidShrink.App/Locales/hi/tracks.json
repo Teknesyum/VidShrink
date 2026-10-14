@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "OpenSubtitles को बहुत अधिक रिक्वेस्ट भेजी गईं — थोड़ी देर बाद फिर से कोशिश करें",
   "player.subtitle.download.badlogin": "OpenSubtitles ने साइन-इन स्वीकार नहीं किया",
   "player.subtitle.download.expired": "डाउनलोड लिंक की समय-सीमा समाप्त हो गई — फिर से प्रयास करें",
-  "player.subtitle.download.toofast.wait": "OpenSubtitles को बहुत अधिक रिक्वेस्ट भेजी गईं — {0} सेकंड बाद फिर से कोशिश करें"
+  "player.subtitle.download.toofast.wait": "OpenSubtitles को बहुत अधिक रिक्वेस्ट भेजी गईं — {0} सेकंड बाद फिर से कोशिश करें",
+  "player.subtitle.visibility": "उपशीर्षक दिखाएँ/छिपाएँ",
+  "player.subtitle.lineprev": "पिछली उपशीर्षक पंक्ति",
+  "player.subtitle.linenext": "अगली उपशीर्षक पंक्ति",
+  "player.subtitle.stepprev": "उपशीर्षक को पिछली पंक्ति से मिलाएँ",
+  "player.subtitle.stepnext": "उपशीर्षक को अगली पंक्ति से मिलाएँ",
+  "player.subtitle.copy": "उपशीर्षक का पाठ कॉपी करें",
+  "player.subtitle.hidden": "उपशीर्षक छिपे हुए हैं",
+  "player.subtitle.shown": "उपशीर्षक दिख रहे हैं",
+  "player.subtitle.copied": "उपशीर्षक का पाठ कॉपी किया गया"
 }

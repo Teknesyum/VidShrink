@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "Muitas solicitações para o OpenSubtitles — tente novamente em um instante",
   "player.subtitle.download.badlogin": "O OpenSubtitles não aceitou o login",
   "player.subtitle.download.expired": "O link de download expirou — tente novamente",
-  "player.subtitle.download.toofast.wait": "Muitas solicitações para o OpenSubtitles — tente novamente em {0} s"
+  "player.subtitle.download.toofast.wait": "Muitas solicitações para o OpenSubtitles — tente novamente em {0} s",
+  "player.subtitle.visibility": "Mostrar/ocultar legendas",
+  "player.subtitle.lineprev": "Linha de legenda anterior",
+  "player.subtitle.linenext": "Próxima linha de legenda",
+  "player.subtitle.stepprev": "Sincronizar legendas com a linha anterior",
+  "player.subtitle.stepnext": "Sincronizar legendas com a próxima linha",
+  "player.subtitle.copy": "Copiar texto da legenda",
+  "player.subtitle.hidden": "Legendas ocultas",
+  "player.subtitle.shown": "Legendas visíveis",
+  "player.subtitle.copied": "Texto da legenda copiado"
 }

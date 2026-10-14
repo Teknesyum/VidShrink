@@ -52,5 +52,14 @@
   "player.subtitle.download.toofast": "OpenSubtitles'a çok fazla istek gönderildi — birazdan tekrar deneyin",
   "player.subtitle.download.badlogin": "OpenSubtitles girişi kabul etmedi",
   "player.subtitle.download.expired": "İndirme bağlantısının süresi doldu — yeniden deneyin",
-  "player.subtitle.download.toofast.wait": "OpenSubtitles’a çok istek gitti — {0} sn sonra yeniden deneyin"
+  "player.subtitle.download.toofast.wait": "OpenSubtitles’a çok istek gitti — {0} sn sonra yeniden deneyin",
+  "player.subtitle.visibility": "Altyazıyı göster/gizle",
+  "player.subtitle.lineprev": "Önceki altyazı satırı",
+  "player.subtitle.linenext": "Sonraki altyazı satırı",
+  "player.subtitle.stepprev": "Altyazıyı önceki satıra eşle",
+  "player.subtitle.stepnext": "Altyazıyı sonraki satıra eşle",
+  "player.subtitle.copy": "Altyazı metnini kopyala",
+  "player.subtitle.hidden": "Altyazı gizlendi",
+  "player.subtitle.shown": "Altyazı gösteriliyor",
+  "player.subtitle.copied": "Altyazı metni kopyalandı"
 }
