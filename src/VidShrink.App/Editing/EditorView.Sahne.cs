@@ -44,6 +44,7 @@ internal partial class EditorView
             var cuts = await SceneScanner(source, EditTime.ToSeconds(duration), threshold, progress, cts.Token).ConfigureAwait(true);
             if (!ReferenceEquals(_silenceCts, cts) || !CurrentMedia.SamePath(source, _source)) return 0;
 
+            RememberScenes(source, cuts);
             var boundaries = SceneSplit.ToTicks(cuts);
             Apply(model => (split = model.SplitSource(boundaries, SceneSplit.MinPieceTicks)) > 0, -1);
             status = split > 0

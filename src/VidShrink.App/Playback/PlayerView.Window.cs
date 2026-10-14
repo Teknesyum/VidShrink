@@ -613,12 +613,14 @@ internal partial class PlayerView
     /// Basis denetim seridinden mi geliyor. Serit panonun ustunde duruyor ve panonun
     /// kendi tiklamasi oynatmayi duraklatiyor; seritteki dugmeye basmak o yolu
     /// tetiklemesin diye seridin butun icerigi ayriliyor. Zaman cubugu de seridin
-    /// icinde, yine de adiyla ayrica soruluyor: cubuk seritten cikarsa kural kalir.
+    /// icinde, yine de adiyla ayrica soruluyor: cubuk seritten cikarsa kural kalir. Bilgi
+    /// panosundaki "tum ayrintilar" dugmesi de ayni nedenle ayrilir.
     /// </summary>
     private bool IsSeekBarSource(object? source)
         => source is Visual visual
            && (ReferenceEquals(visual, SeekBar) || SeekBar.IsVisualAncestorOf(visual)
-               || ReferenceEquals(visual, StripBar) || StripBar.IsVisualAncestorOf(visual));
+               || ReferenceEquals(visual, StripBar) || StripBar.IsVisualAncestorOf(visual)
+               || ReferenceEquals(visual, BtnInfoDetails) || BtnInfoDetails.IsVisualAncestorOf(visual));
 
     private void OnSeekPressed(object? sender, PointerPressedEventArgs e)
     {
@@ -730,6 +732,7 @@ internal partial class PlayerView
     private void RefreshInfo()
     {
         if (TxtInfo is null || !_infoVisible) return;
+        BtnInfoDetails.IsVisible = DetailsPath is not null;
         var text = Describe(_engine?.Details, _engine?.Stats);
         if (TxtInfo.Text != text) TxtInfo.Text = text;
     }

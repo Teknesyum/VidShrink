@@ -1,0 +1,34 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:auto="using:Avalonia.Automation"
+        xmlns:loc="using:VidShrink.App.Localization"
+        x:Class="VidShrink.App.MediaInfoWindow"
+        Title="{loc:Text mediainfo.title}"
+        FontSize="{StaticResource FontSizeMd}" FontFamily="{StaticResource FontSans}"
+        Width="{StaticResource MediaInfoWindowWidth}" Height="{StaticResource MediaInfoWindowHeight}"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="{DynamicResource AppBg}"
+        auto:AutomationProperties.Name="{loc:Text mediainfo.title}">
+  <Grid RowDefinitions="Auto,2*,Auto,*,Auto,Auto" RowSpacing="{StaticResource SpaceSm}" Margin="{StaticResource WorkspaceMargin}">
+    <TextBlock x:Name="TxtFile" Theme="{StaticResource H3}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+      <SelectableTextBlock x:Name="TxtDetails" FontFamily="{StaticResource FontMono}" auto:AutomationProperties.Name="{loc:Text mediainfo.title}"/>
+    </ScrollViewer>
+    <WrapPanel Grid.Row="2" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
+      <TextBlock Text="{loc:Text mediainfo.audit.title}" Theme="{StaticResource Label}" VerticalAlignment="Center"/>
+      <Button x:Name="BtnScan" Theme="{StaticResource GhostButton}" Content="{loc:Text mediainfo.audit.scan}" IsEnabled="False"
+              ToolTip.Tip="{loc:Text mediainfo.audit.hint}" auto:AutomationProperties.Name="{loc:Text mediainfo.audit.scan}"/>
+      <Button x:Name="BtnScanCancel" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.cancel}" IsVisible="False"/>
+    </WrapPanel>
+    <ScrollViewer Grid.Row="3" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+      <SelectableTextBlock x:Name="TxtAudit" FontFamily="{StaticResource FontMono}" auto:AutomationProperties.Name="{loc:Text mediainfo.audit.title}"/>
+    </ScrollViewer>
+    <ProgressBar Grid.Row="4" x:Name="ScanProgress" Maximum="1" IsVisible="False"/>
+    <Grid Grid.Row="5" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
+      <TextBlock x:Name="TxtStatus" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+      <Button Grid.Column="1" x:Name="BtnCopy" Theme="{StaticResource GhostButton}" Content="{loc:Text mediainfo.copy}" IsEnabled="False"/>
+      <Button Grid.Column="2" x:Name="BtnSave" Theme="{StaticResource PrimaryButton}" Content="{loc:Text mediainfo.save}" IsEnabled="False"/>
+    </Grid>
+  </Grid>
+</Window>

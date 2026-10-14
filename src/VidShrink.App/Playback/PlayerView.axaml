@@ -138,7 +138,12 @@
             </StackPanel>
           </Border>
           <Border x:Name="InfoPanel" Theme="{StaticResource PlaybackBadge}" IsVisible="False">
-            <TextBlock x:Name="TxtInfo" Theme="{StaticResource PlaybackTimeText}"/>
+            <StackPanel Spacing="{StaticResource SpaceXs}">
+              <TextBlock x:Name="TxtInfo" Theme="{StaticResource PlaybackTimeText}"/>
+              <Button x:Name="BtnInfoDetails" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left"
+                      Content="{loc:Text mediainfo.open}" auto:AutomationProperties.Name="{loc:Text mediainfo.open}"
+                      Click="OnInfoDetails"/>
+            </StackPanel>
           </Border>
           <Border x:Name="DiagPanel"
                   Theme="{StaticResource PlaybackBadge}"

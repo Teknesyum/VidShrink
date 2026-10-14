@@ -1259,6 +1259,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, disa aktarim ayarlari ve on ayarlar (DZB-P2): on dokuz yeni <c>editor.export.*</c> anahtarindan 17 kol 7 dilde (en: source; es: audio-bitrate, codec, fps; hu: audio-only, source; ms: audio-bitrate, fps; pt: audio-bitrate, codec, fps, preset.name; ro: audio-bitrate, fps; sw: audio-bitrate, codec, fps), KOL dokumunden sayildi, tr girmiyor; olculen 3206 + 17 = 3223, en 311 + 1 = 312, tr 104.</para>
     /// <para>2026-10-14, tarama araliklarini tek tek yonetme (DZA-P3): bes yeni anahtardan 45 kol (<c>editor.silence.hint</c> 41 dilde, en ve tr dahil; <c>editor.silence.track</c>: es, pt; <c>editor.silence.padding-start</c> ve <c>.padding-end</c>: sw), kaldirilan <c>editor.silence.padding</c> 1 kol goturdu, KOL dokumunden sayildi: 3206 + 45 - 1 = 3250, en 312, tr 105.</para>
     /// <para>2026-10-14, klip gruplama ve pano (DZB-P4): alti yeni anahtardan (<c>editor.copy</c>, <c>.cut</c>, <c>.paste</c>, <c>.duplicate</c>, <c>.group</c>, <c>.ungroup</c>) 1 kol 1 dilde (paste: sv), KOL dokumunden sayildi, en ve tr girmiyor; 887cb448 agacinda olculen 3334 + 1 = 3335, en 322, tr 108.</para>
+    /// <para>2026-10-14, medya bilgisi ve denetim raporu (ARC-P2): 56 yeni <c>mediainfo.*</c> anahtarindan 82 kol 14 dilde (cs 1, en 2: failed, save; es 16, fr 6, hr 2, hu 1, id 1, lt 1, ms 4, pt 19, ro 12, sl 2, sr 4, sw 11), KOL dokumunden sayildi, tr girmiyor: 3334 + 82 = 3416, en 322 + 2 = 324, tr 108.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1284,8 +1285,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3335, toplam);
-        Assert.Equal(322, dilBasina["en"]);
+        Assert.Equal(3417, toplam);
+        Assert.Equal(324, dilBasina["en"]);
         Assert.Equal(108, dilBasina["tr"]);
     }
 
@@ -1523,6 +1524,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, disa aktarim ayarlari ve on ayarlar (DZB-P2): on dokuz yeni <c>editor.export.*</c> anahtari (preset, preset.custom/1080p/720p/vertical, preset.name, resolution, source, fps, codec, quality, quality.high/balanced/small, audio-bitrate, audio-only, audio-only.tip, audio-only.no-audio, settings-full), dusen yok; olculen 61963 + 43 x 19 = 62780. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, tarama araliklarini tek tek yonetme (DZA-P3): bes yeni <c>editor.silence.*</c> anahtari (<c>padding-start</c>, <c>padding-end</c>, <c>track</c>, <c>applied</c>, <c>hint</c>), <c>editor.silence.padding</c> dustu; 1441 + 5 - 1 = 1445, 43 x 1445 = 62135. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, klip gruplama ve pano (DZB-P4): alti yeni <c>editor.*</c> anahtari (copy, cut, paste, duplicate, group, ungroup), dusen yok; 887cb448 agacinda olculen 65188 + 43 x 6 = 65446. <c>kayip</c> 0.</para>
+    /// <para>2026-10-14, medya bilgisi ve denetim raporu (ARC-P2): 56 yeni <c>mediainfo.*</c> anahtari, dusen yok; olculen 65188 + 43 x 56 = 67596. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1550,7 +1552,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(65446, gezilen);
+        Assert.Equal(67854, gezilen);
         Assert.Empty(kayip);
     }
 

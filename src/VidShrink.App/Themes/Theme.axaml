@@ -327,6 +327,8 @@
   <StaticResource x:Key="PlaylistMaxHeight" ResourceKey="PlanPanelMaxHeight"/>
   <StaticResource x:Key="HistoryWindowWidth" ResourceKey="FieldWidth"/>
   <StaticResource x:Key="HistoryWindowHeight" ResourceKey="PlanPanelMaxHeight"/>
+  <StaticResource x:Key="MediaInfoWindowWidth" ResourceKey="TooltipMaxWidth"/>
+  <StaticResource x:Key="MediaInfoWindowHeight" ResourceKey="PlanPanelMaxHeight"/>
   <StaticResource x:Key="MenuShadowExtent" ResourceKey="Space2"/>
   <StaticResource x:Key="PlaylistMenuGap" ResourceKey="Space4"/>
   <x:Double x:Key="DropZoneMinHeight">144</x:Double>
