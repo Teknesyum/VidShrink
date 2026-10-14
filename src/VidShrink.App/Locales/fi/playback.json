@@ -77,6 +77,7 @@
   "playback.zoom.out": "Loitonna",
   "playback.zoom.in": "Lähennä",
   "player.menu.reveal": "Avaa tiedoston sijainti",
+  "player.menu.open-folder": "Avaa kansio",
   "player.menu.edit": "Muokkaa",
   "player.menu.view": "Kuva",
   "player.menu.playback": "Toisto",

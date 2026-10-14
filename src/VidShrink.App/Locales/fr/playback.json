@@ -77,6 +77,7 @@
   "playback.zoom.out": "Réduire le zoom",
   "playback.zoom.in": "Augmenter le zoom",
   "player.menu.reveal": "Ouvrir l'emplacement du fichier",
+  "player.menu.open-folder": "Ouvrir un dossier",
   "player.menu.edit": "Modifier",
   "player.menu.view": "Image",
   "player.menu.playback": "Lecture",

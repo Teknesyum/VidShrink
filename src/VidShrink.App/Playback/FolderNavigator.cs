@@ -37,6 +37,67 @@ internal static class FolderNavigator
         }
     }
 
+    private static readonly EnumerationOptions Visible = new()
+    {
+        AttributesToSkip = FileAttributes.Hidden | FileAttributes.System,
+        IgnoreInaccessible = true
+    };
+
+    internal static IReadOnlyList<string> Collect(IEnumerable<string> paths)
+    {
+        var files = new List<string>();
+        var folders = new List<string>();
+        foreach (var path in paths)
+        {
+            if (string.IsNullOrWhiteSpace(path) || MediaAddress.IsAddress(path)) continue;
+            string full;
+            try
+            {
+                full = Path.GetFullPath(path);
+            }
+            catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+            {
+                continue;
+            }
+
+            if (File.Exists(full)) files.Add(full);
+            else if (Directory.Exists(full)) folders.Add(Path.TrimEndingDirectorySeparator(full));
+        }
+
+        var result = new List<string>();
+        var seen = new HashSet<string>(PathComparer);
+        Gather(files, folders, result, seen);
+        return result;
+    }
+
+    private static void Gather(IEnumerable<string> files, IEnumerable<string> folders, List<string> result, HashSet<string> seen)
+    {
+        foreach (var file in files.OrderBy(path => Path.GetFileName(path), NaturalComparer.Instance))
+            if (IsPlayable(file) && seen.Add(file)) result.Add(file);
+
+        foreach (var folder in folders.OrderBy(path => Path.GetFileName(path), NaturalComparer.Instance))
+        {
+            if (!seen.Add(folder + Path.DirectorySeparatorChar)) continue;
+            try
+            {
+                var inner = Directory.EnumerateFiles(folder, "*", Visible).ToList();
+                var below = Directory.EnumerateDirectories(folder, "*", Visible)
+                    .Where(sub => !new DirectoryInfo(sub).Attributes.HasFlag(FileAttributes.ReparsePoint))
+                    .ToList();
+                Gather(inner, below, result, seen);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+            }
+        }
+    }
+
+    private static bool IsPlayable(string file)
+    {
+        var extension = Path.GetExtension(file);
+        return VideoExtensions.Contains(extension) || AudioExtensions.Contains(extension);
+    }
+
     internal static IReadOnlyList<string> Order(IReadOnlyList<string> files, bool shuffle, int seed)
     {
         if (!shuffle || files.Count < 2) return files;

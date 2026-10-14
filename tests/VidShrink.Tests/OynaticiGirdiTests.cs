@@ -497,6 +497,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
         Strings.Get("player.menu.loop"),
         Strings.Get("main.player.menu.chapters"),
         Strings.Get("player.tools.menu"),
+        Strings.Get("player.menu.open-folder"),
         Strings.Get("player.list.recent")
     };
 
@@ -516,6 +517,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
         Strings.Get(Keymap.Screenshot.LabelKey),
         Strings.Get(Keymap.CopyFrame.LabelKey),
         Strings.Get("player.tools.menu"),
+        Strings.Get("player.menu.open-folder"),
         Strings.Get("player.list.recent"),
         Strings.Get(Keymap.Settings.LabelKey)
     };
