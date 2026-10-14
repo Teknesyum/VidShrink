@@ -12,7 +12,8 @@ public sealed record PlaylistEntry(string Path, double? Seconds = null, string? 
 /// Çalma listesi dosyasını girdi listesine çevirir: m3u/m3u8 satırları, pls <c>FileN=</c>
 /// anahtarları, wpl <c>&lt;media src&gt;</c> ve asx/wax/wvx/wmx <c>&lt;ref href&gt;</c> öğeleri.
 /// Göreli yol listenin klasörüne göre çözülür, <c>file://</c> yerel yola döner, uzak adres
-/// olduğu gibi kalır. Yerel girdinin diskte olup olmadığına bakmaz; bunu çağıran eler.
+/// olduğu gibi kalır; yerel iç liste atılır, liste uzantılı uzak adres kalır. Yerel girdinin
+/// diskte olup olmadığına bakmaz; bunu çağıran eler.
 /// Yazma yalnız m3u8 biçimindedir (<see cref="Write"/>).
 /// </summary>
 public static partial class PlaylistFile
@@ -45,7 +46,7 @@ public static partial class PlaylistFile
         var entries = new List<string>();
         foreach (var entry in raw)
         {
-            if (Resolve(entry, folder) is { } resolved && !IsPlaylist(resolved) && seen.Add(resolved)) entries.Add(resolved);
+            if (Resolve(entry, folder) is { } resolved && (IsRemote(resolved) || !IsPlaylist(resolved)) && seen.Add(resolved)) entries.Add(resolved);
         }
 
         return entries;

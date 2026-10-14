@@ -11,6 +11,7 @@ namespace VidShrink.App.Playback;
 /// çalar; sonraki/önceki, sonda otomatik geçiş ve açılır liste klasör yerine kuyruğu izler.
 /// Kuyrukta olmayan bir dosya açılınca kuyruk düşer, oynatıcı klasör gezintisine döner.
 /// Liste mpv'ye verilmez: mpv'nin kendi listesi arayüzün yolunu ve kartını güncellemiyor.
+/// Uzak adres liste uzantılı olsa da (HLS, radyo pls) kuyruk kurmadan olduğu gibi mpv'ye gider.
 /// </summary>
 internal partial class PlayerView
 {
@@ -24,7 +25,7 @@ internal partial class PlayerView
 
     private string ResolveQueue(string path)
     {
-        if (PlaylistFile.IsPlaylist(path))
+        if (!MediaAddress.IsAddress(path) && PlaylistFile.IsPlaylist(path))
         {
             var entries = PlaylistFile.ReadPlayable(path);
             if (entries.Count == 0) throw new PlaybackOpenException(Path.GetFileName(path));
