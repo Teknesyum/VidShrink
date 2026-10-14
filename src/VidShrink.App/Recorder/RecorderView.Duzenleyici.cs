@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
@@ -81,6 +82,50 @@ internal partial class RecorderView
             {
                 if (_quiet == 0) SyncRegionEditor();
             };
+        BtnDrawMask.Click += async (_, _) => await DrawMaskAsync();
+        BtnClearMasks.Click += (_, _) => ClearMasks();
+        RefreshMasks();
+    }
+
+    /// <summary>
+    /// Gizlilik maskesi çizer: ana pencere küçülür, seçici serbest oranla açılır, çizilen
+    /// dikdörtgen masaüstü pikselinde maskelere eklenip hemen kaydedilir.
+    /// </summary>
+    internal async Task<bool> DrawMaskAsync()
+    {
+        if (_session is not null || CountingDown) return false;
+
+        var host = TopLevel.GetTopLevel(this) is Window { IsVisible: true } shown ? shown : null;
+        var state = host?.WindowState ?? WindowState.Normal;
+        if (host is not null) host.WindowState = WindowState.Minimized;
+
+        PixelRect? drawn = null;
+        try { drawn = await DrawRegion(null); }
+        finally
+        {
+            if (host is not null) host.WindowState = state;
+        }
+
+        if (drawn is not { } rect || !RegionDraw.Usable(rect)) return false;
+
+        _settings.PrivacyMasks.Add(new RecorderRegion(rect.X, rect.Y, rect.Width, rect.Height));
+        SaveChoicesIfChanged();
+        RefreshMasks();
+        return true;
+    }
+
+    private void ClearMasks()
+    {
+        if (_session is not null || CountingDown) return;
+        _settings.PrivacyMasks.Clear();
+        SaveChoicesIfChanged();
+        RefreshMasks();
+    }
+
+    private void RefreshMasks()
+    {
+        TxtMaskCount.Text = Say("recorder.mask.count", _settings.PrivacyMasks.Count);
+        BtnClearMasks.IsEnabled = _settings.PrivacyMasks.Count > 0;
     }
 
     /// <summary>Kutulardaki bölge; okunamıyorsa ya da kullanılamayacak kadar küçükse <c>null</c>.</summary>

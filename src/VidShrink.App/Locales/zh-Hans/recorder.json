@@ -256,5 +256,10 @@
   "recorder.region.hide": "隐藏边框 ({0})",
   "recorder.region.stop-close": "停止录制并关闭",
   "recorder.capture.fallback-unavailable": "快速捕获（Desktop Duplication）未能启动；正在使用 GDI 捕获录制，高于 30 fps 时可能丢帧。",
-  "recorder.capture.fallback-layout": "录制区域不在主显卡的单个显示器内；正在使用 GDI 捕获录制，高于 30 fps 时可能丢帧。"
+  "recorder.capture.fallback-layout": "录制区域不在主显卡的单个显示器内；正在使用 GDI 捕获录制，高于 30 fps 时可能丢帧。",
+  "recorder.mask.title": "隐私遮罩",
+  "recorder.mask.draw": "绘制遮罩",
+  "recorder.mask.draw-hint": "用鼠标拖选录制中需要模糊显示的区域；按 Esc 取消。",
+  "recorder.mask.clear": "移除遮罩",
+  "recorder.mask.count": "遮罩：{0}"
 }

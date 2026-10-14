@@ -256,5 +256,10 @@
   "recorder.region.hide": "Ascunde cadrul ({0})",
   "recorder.region.stop-close": "Oprește înregistrarea și închide",
   "recorder.capture.fallback-unavailable": "Captura rapidă (Desktop Duplication) nu a pornit; se înregistrează cu captura GDI, peste 30 fps pot lipsi cadre.",
-  "recorder.capture.fallback-layout": "Zona înregistrată nu se află pe un singur monitor al plăcii video principale; se înregistrează cu captura GDI, peste 30 fps pot lipsi cadre."
+  "recorder.capture.fallback-layout": "Zona înregistrată nu se află pe un singur monitor al plăcii video principale; se înregistrează cu captura GDI, peste 30 fps pot lipsi cadre.",
+  "recorder.mask.title": "Mască de confidențialitate",
+  "recorder.mask.draw": "Desenează mască",
+  "recorder.mask.draw-hint": "Trage cu mausul peste zona care trebuie să apară estompată în înregistrare; Esc anulează.",
+  "recorder.mask.clear": "Elimină măștile",
+  "recorder.mask.count": "Măști: {0}"
 }

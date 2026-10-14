@@ -256,5 +256,10 @@
   "recorder.region.hide": "إخفاء الإطار ({0})",
   "recorder.region.stop-close": "إيقاف التسجيل والإغلاق",
   "recorder.capture.fallback-unavailable": "لم يبدأ الالتقاط السريع (Desktop Duplication)؛ يجري التسجيل بالتقاط GDI، وقد تسقط إطارات فوق 30 إطارًا/ث.",
-  "recorder.capture.fallback-layout": "المنطقة المسجلة ليست على شاشة واحدة لبطاقة الرسومات الرئيسية؛ يجري التسجيل بالتقاط GDI، وقد تسقط إطارات فوق 30 إطارًا/ث."
+  "recorder.capture.fallback-layout": "المنطقة المسجلة ليست على شاشة واحدة لبطاقة الرسومات الرئيسية؛ يجري التسجيل بالتقاط GDI، وقد تسقط إطارات فوق 30 إطارًا/ث.",
+  "recorder.mask.title": "قناع الخصوصية",
+  "recorder.mask.draw": "ارسم قناعًا",
+  "recorder.mask.draw-hint": "اسحب بالماوس فوق المنطقة التي يجب أن تظهر ضبابية في التسجيل؛ Esc يلغي.",
+  "recorder.mask.clear": "أزل الأقنعة",
+  "recorder.mask.count": "الأقنعة: {0}"
 }

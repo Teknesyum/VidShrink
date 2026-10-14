@@ -256,5 +256,10 @@
   "recorder.region.hide": "ซ่อนกรอบ ({0})",
   "recorder.region.stop-close": "หยุดบันทึกและปิด",
   "recorder.capture.fallback-unavailable": "การจับภาพแบบเร็ว (Desktop Duplication) ไม่เริ่มทำงาน กำลังบันทึกด้วย GDI ซึ่งอาจเฟรมตกเมื่อเกิน 30 fps",
-  "recorder.capture.fallback-layout": "พื้นที่ที่บันทึกไม่ได้อยู่บนจอเดียวของการ์ดจอหลัก กำลังบันทึกด้วย GDI ซึ่งอาจเฟรมตกเมื่อเกิน 30 fps"
+  "recorder.capture.fallback-layout": "พื้นที่ที่บันทึกไม่ได้อยู่บนจอเดียวของการ์ดจอหลัก กำลังบันทึกด้วย GDI ซึ่งอาจเฟรมตกเมื่อเกิน 30 fps",
+  "recorder.mask.title": "มาสก์ความเป็นส่วนตัว",
+  "recorder.mask.draw": "วาดมาสก์",
+  "recorder.mask.draw-hint": "ลากเมาส์ครอบพื้นที่ที่ต้องการให้เบลอในการบันทึก กด Esc เพื่อยกเลิก",
+  "recorder.mask.clear": "ลบมาสก์",
+  "recorder.mask.count": "มาสก์: {0}"
 }

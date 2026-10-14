@@ -256,5 +256,10 @@
   "recorder.region.hide": "ফ্রেম লুকান ({0})",
   "recorder.region.stop-close": "রেকর্ডিং থামিয়ে বন্ধ করুন",
   "recorder.capture.fallback-unavailable": "দ্রুত ক্যাপচার (Desktop Duplication) চালু হয়নি; GDI ক্যাপচারে রেকর্ড হচ্ছে, 30 fps-এর বেশিতে ফ্রেম বাদ পড়তে পারে।",
-  "recorder.capture.fallback-layout": "রেকর্ড করা এলাকা প্রধান গ্রাফিক্স কার্ডের একটি মনিটরে নেই; GDI ক্যাপচারে রেকর্ড হচ্ছে, 30 fps-এর বেশিতে ফ্রেম বাদ পড়তে পারে।"
+  "recorder.capture.fallback-layout": "রেকর্ড করা এলাকা প্রধান গ্রাফিক্স কার্ডের একটি মনিটরে নেই; GDI ক্যাপচারে রেকর্ড হচ্ছে, 30 fps-এর বেশিতে ফ্রেম বাদ পড়তে পারে।",
+  "recorder.mask.title": "গোপনীয়তা মাস্ক",
+  "recorder.mask.draw": "মাস্ক আঁকুন",
+  "recorder.mask.draw-hint": "রেকর্ডিংয়ে যে অংশ ঝাপসা দেখাবে তার ওপর মাউস দিয়ে টানুন; Esc বাতিল করে।",
+  "recorder.mask.clear": "মাস্ক সরান",
+  "recorder.mask.count": "মাস্ক: {0}"
 }

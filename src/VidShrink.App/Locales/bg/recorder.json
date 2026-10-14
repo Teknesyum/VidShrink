@@ -256,5 +256,10 @@
   "recorder.region.hide": "Скрий рамката ({0})",
   "recorder.region.stop-close": "Спри записа и затвори",
   "recorder.capture.fallback-unavailable": "Бързото заснемане (Desktop Duplication) не се стартира; записва се с GDI, над 30 fps може да се губят кадри.",
-  "recorder.capture.fallback-layout": "Записваната област не е на един монитор на основната видеокарта; записва се с GDI, над 30 fps може да се губят кадри."
+  "recorder.capture.fallback-layout": "Записваната област не е на един монитор на основната видеокарта; записва се с GDI, над 30 fps може да се губят кадри.",
+  "recorder.mask.title": "Маска за поверителност",
+  "recorder.mask.draw": "Начертай маска",
+  "recorder.mask.draw-hint": "Плъзнете с мишката върху областта, която трябва да е размазана в записа; Esc отказва.",
+  "recorder.mask.clear": "Премахни маските",
+  "recorder.mask.count": "Маски: {0}"
 }

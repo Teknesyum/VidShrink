@@ -256,5 +256,10 @@
   "recorder.region.hide": "Hide frame ({0})",
   "recorder.region.stop-close": "Stop recording and close",
   "recorder.capture.fallback-unavailable": "Fast capture (Desktop Duplication) did not start; recording with GDI capture, which may drop frames above 30 fps.",
-  "recorder.capture.fallback-layout": "The recorded area is not on a single monitor of the main graphics card; recording with GDI capture, which may drop frames above 30 fps."
+  "recorder.capture.fallback-layout": "The recorded area is not on a single monitor of the main graphics card; recording with GDI capture, which may drop frames above 30 fps.",
+  "recorder.mask.title": "Privacy mask",
+  "recorder.mask.draw": "Draw mask",
+  "recorder.mask.draw-hint": "Drag with the mouse over the area that should appear blurred in the recording; Esc cancels.",
+  "recorder.mask.clear": "Remove masks",
+  "recorder.mask.count": "Masks: {0}"
 }

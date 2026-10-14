@@ -256,5 +256,10 @@
   "recorder.region.hide": "Keret elrejtése ({0})",
   "recorder.region.stop-close": "Felvétel leállítása és bezárás",
   "recorder.capture.fallback-unavailable": "A gyors rögzítés (Desktop Duplication) nem indult el; GDI-rögzítéssel megy a felvétel, 30 fps felett képkockák eshetnek ki.",
-  "recorder.capture.fallback-layout": "A rögzített terület nem a fő videokártya egyetlen monitorán van; GDI-rögzítéssel megy a felvétel, 30 fps felett képkockák eshetnek ki."
+  "recorder.capture.fallback-layout": "A rögzített terület nem a fő videokártya egyetlen monitorán van; GDI-rögzítéssel megy a felvétel, 30 fps felett képkockák eshetnek ki.",
+  "recorder.mask.title": "Adatvédelmi maszk",
+  "recorder.mask.draw": "Maszk rajzolása",
+  "recorder.mask.draw-hint": "Húzza az egeret a terület fölé, amely a felvételen elmosódva jelenjen meg; az Esc megszakítja.",
+  "recorder.mask.clear": "Maszkok eltávolítása",
+  "recorder.mask.count": "Maszkok: {0}"
 }

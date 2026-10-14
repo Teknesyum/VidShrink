@@ -256,5 +256,10 @@
   "recorder.region.hide": "Απόκρυψη πλαισίου ({0})",
   "recorder.region.stop-close": "Διακοπή εγγραφής και κλείσιμο",
   "recorder.capture.fallback-unavailable": "Η γρήγορη λήψη (Desktop Duplication) δεν ξεκίνησε· η εγγραφή γίνεται με λήψη GDI, πάνω από 30 fps μπορεί να χάνονται καρέ.",
-  "recorder.capture.fallback-layout": "Η περιοχή εγγραφής δεν βρίσκεται σε μία οθόνη της κύριας κάρτας γραφικών· η εγγραφή γίνεται με λήψη GDI, πάνω από 30 fps μπορεί να χάνονται καρέ."
+  "recorder.capture.fallback-layout": "Η περιοχή εγγραφής δεν βρίσκεται σε μία οθόνη της κύριας κάρτας γραφικών· η εγγραφή γίνεται με λήψη GDI, πάνω από 30 fps μπορεί να χάνονται καρέ.",
+  "recorder.mask.title": "Μάσκα απορρήτου",
+  "recorder.mask.draw": "Σχεδίαση μάσκας",
+  "recorder.mask.draw-hint": "Σύρετε με το ποντίκι πάνω από την περιοχή που πρέπει να φαίνεται θολή στην εγγραφή· το Esc ακυρώνει.",
+  "recorder.mask.clear": "Αφαίρεση μασκών",
+  "recorder.mask.count": "Μάσκες: {0}"
 }

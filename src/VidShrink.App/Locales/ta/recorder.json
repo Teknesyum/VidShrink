@@ -256,5 +256,10 @@
   "recorder.region.hide": "சட்டகத்தை மறை ({0})",
   "recorder.region.stop-close": "பதிவை நிறுத்தி மூடு",
   "recorder.capture.fallback-unavailable": "விரைவுப் பிடிப்பு (Desktop Duplication) தொடங்கவில்லை; GDI பிடிப்பில் பதிவாகிறது, 30 fps-க்கு மேல் சட்டகங்கள் விடுபடலாம்.",
-  "recorder.capture.fallback-layout": "பதிவாகும் பகுதி முதன்மை வரைகலை அட்டையின் ஒரே திரையில் இல்லை; GDI பிடிப்பில் பதிவாகிறது, 30 fps-க்கு மேல் சட்டகங்கள் விடுபடலாம்."
+  "recorder.capture.fallback-layout": "பதிவாகும் பகுதி முதன்மை வரைகலை அட்டையின் ஒரே திரையில் இல்லை; GDI பிடிப்பில் பதிவாகிறது, 30 fps-க்கு மேல் சட்டகங்கள் விடுபடலாம்.",
+  "recorder.mask.title": "தனியுரிமை மறைப்பு",
+  "recorder.mask.draw": "மறைப்பு வரையவும்",
+  "recorder.mask.draw-hint": "பதிவில் மங்கலாகத் தெரிய வேண்டிய பகுதியின் மேல் மவுஸால் இழுக்கவும்; Esc ரத்து செய்யும்.",
+  "recorder.mask.clear": "மறைப்புகளை நீக்கு",
+  "recorder.mask.count": "மறைப்புகள்: {0}"
 }

@@ -192,6 +192,12 @@ public sealed record RecorderRequest
     public RecorderRegion? WindowRegion { get; init; }
 
     /// <summary>
+    /// Gizlilik maskeleri, masaustu pikselinde. Yakalama alanina kirpilip kayda bulanik yakilir
+    /// (<see cref="RecorderArguments.MaskBoxes"/>); canli onizleme maskesizdir.
+    /// </summary>
+    public IReadOnlyList<RecorderRegion> PrivacyMasks { get; init; } = Array.Empty<RecorderRegion>();
+
+    /// <summary>
     /// Windows'ta yakalama yolu. <see cref="RecorderCapture.Ddagrab"/>'da pencere hedefi
     /// <see cref="WindowRegion"/>'dan (pencerenin istemci alani, masaustu pikselinde) kirpilir.
     /// </summary>
@@ -710,6 +716,7 @@ public static class RecorderArguments
         errors.AddRange(GifErrors(request));
         errors.AddRange(WebcamErrors(request));
         errors.AddRange(PreviewErrors(request));
+        errors.AddRange(MaskErrors(request));
 
         if (request.Target == RecorderTargetKind.Window)
             errors.AddRange(WindowErrors(request));
@@ -1509,10 +1516,85 @@ public static class RecorderArguments
         if (MacCrop(request) is { } region)
             links.Add($"crop={Number(region.Width)}:{Number(region.Height)}:{Number(region.X)}:{Number(region.Y)}");
 
+        var boxes = MaskBoxes(request);
+        for (var i = 0; i < boxes.Count; i++)
+        {
+            var box = boxes[i];
+            var radius = Math.Clamp(Math.Min(box.Width, box.Height) / 4 - 1, 1, MaskBlurRadius);
+            links.Add($"split[pm{i}][pb{i}];[pb{i}]crop={Number(box.Width)}:{Number(box.Height)}:{Number(box.X)}:{Number(box.Y)},"
+                + $"boxblur=luma_radius={Number(radius)}:luma_power={Number(MaskBlurPower)}[pk{i}];"
+                + $"[pm{i}][pk{i}]overlay={Number(box.X)}:{Number(box.Y)}:format=auto");
+        }
+
         if (request.Scale is { } scale)
             links.Add($"scale={Number(scale.Width)}:{Number(scale.Height)}");
 
         return links.Count == 0 ? null : string.Join(',', links);
+    }
+
+    /// <summary>Maskenin en buyuk bulanma yaricapi. Kucuk kutuda kisa kenarin dortte birinin bir eksigi: 4:2:0 renk duzleminde <c>boxblur</c> yaricapi kenarin yarisindan kesin kucuk ister.</summary>
+    public const int MaskBlurRadius = 20;
+
+    /// <summary>Bulanmanin kac kez uygulandigi.</summary>
+    public const int MaskBlurPower = 3;
+
+    /// <summary>Maskenin en kucuk kenari; daha kucugu bu boya buyutulur.</summary>
+    public const int MinMaskSize = 8;
+
+    /// <summary>
+    /// Maskelerin kare koordinati: yakalama alanina kirpilir, disa dogru ciftlenir, kenari
+    /// <see cref="MinMaskSize"/>'dan kucukse kare icinde kalacak bicimde buyutulur. Alanin
+    /// tamamen disindaki maske duser; alan bilinmiyorsa liste bostur.
+    /// </summary>
+    public static IReadOnlyList<RecorderRegion> MaskBoxes(RecorderRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        if (request.PrivacyMasks.Count == 0 || request.Target == RecorderTargetKind.Window
+            || CaptureArea(request) is not { } area)
+            return Array.Empty<RecorderRegion>();
+
+        var frameWidth = area.Width - area.Width % 2;
+        var frameHeight = area.Height - area.Height % 2;
+        var boxes = new List<RecorderRegion>();
+        foreach (var mask in request.PrivacyMasks)
+        {
+            if (mask.Width <= 0 || mask.Height <= 0) continue;
+            if (MaskSpan(mask.X - area.X, mask.Width, frameWidth) is not { } x) continue;
+            if (MaskSpan(mask.Y - area.Y, mask.Height, frameHeight) is not { } y) continue;
+            boxes.Add(new RecorderRegion(x.Start, y.Start, x.Length, y.Length));
+        }
+
+        return boxes;
+    }
+
+    private static (int Start, int Length)? MaskSpan(int start, int length, int frame)
+    {
+        if (frame < 2) return null;
+        var from = Math.Max(0, start);
+        var to = Math.Min(frame, start + length);
+        if (to <= from) return null;
+
+        from -= from % 2;
+        to = Math.Min(frame, to + to % 2);
+        var size = Math.Min(frame, MinMaskSize - MinMaskSize % 2);
+        if (to - from < size)
+        {
+            to = Math.Min(frame, from + size);
+            from = to - size;
+        }
+
+        return (from, to - from);
+    }
+
+    private static IEnumerable<string> MaskErrors(RecorderRequest request)
+    {
+        if (request.PrivacyMasks.Count == 0) yield break;
+        if (request.PrivacyMasks.Any(m => m.Width <= 0 || m.Height <= 0))
+            yield return "Every privacy mask must have a positive width and height.";
+        if (request.Target == RecorderTargetKind.Window)
+            yield return "A privacy mask needs a screen or region target; the window frame does not follow desktop pixels.";
+        else if (CaptureArea(request) is null)
+            yield return "The privacy mask cannot be placed because the capture area is unknown.";
     }
 
     private static string Size(RecorderRegion region) => $"{Number(region.Width)}x{Number(region.Height)}";

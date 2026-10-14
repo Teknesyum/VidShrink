@@ -256,5 +256,10 @@
   "recorder.region.hide": "Masquer le cadre ({0})",
   "recorder.region.stop-close": "Arrêter l'enregistrement et fermer",
   "recorder.capture.fallback-unavailable": "La capture rapide (Desktop Duplication) n'a pas démarré ; enregistrement avec la capture GDI, des images peuvent manquer au-delà de 30 i/s.",
-  "recorder.capture.fallback-layout": "La zone enregistrée n'est pas sur un seul écran de la carte graphique principale ; enregistrement avec la capture GDI, des images peuvent manquer au-delà de 30 i/s."
+  "recorder.capture.fallback-layout": "La zone enregistrée n'est pas sur un seul écran de la carte graphique principale ; enregistrement avec la capture GDI, des images peuvent manquer au-delà de 30 i/s.",
+  "recorder.mask.title": "Masque de confidentialité",
+  "recorder.mask.draw": "Dessiner un masque",
+  "recorder.mask.draw-hint": "Faites glisser la souris sur la zone qui doit apparaître floue dans l'enregistrement ; Échap annule.",
+  "recorder.mask.clear": "Supprimer les masques",
+  "recorder.mask.count": "Masques : {0}"
 }

@@ -256,5 +256,10 @@
   "recorder.region.hide": "Ẩn khung ({0})",
   "recorder.region.stop-close": "Dừng ghi và đóng",
   "recorder.capture.fallback-unavailable": "Chụp nhanh (Desktop Duplication) không khởi động được; đang ghi bằng GDI, trên 30 fps có thể rớt khung hình.",
-  "recorder.capture.fallback-layout": "Vùng ghi không nằm trên một màn hình của card đồ họa chính; đang ghi bằng GDI, trên 30 fps có thể rớt khung hình."
+  "recorder.capture.fallback-layout": "Vùng ghi không nằm trên một màn hình của card đồ họa chính; đang ghi bằng GDI, trên 30 fps có thể rớt khung hình.",
+  "recorder.mask.title": "Mặt nạ riêng tư",
+  "recorder.mask.draw": "Vẽ mặt nạ",
+  "recorder.mask.draw-hint": "Kéo chuột qua vùng cần làm mờ trong bản ghi; Esc để hủy.",
+  "recorder.mask.clear": "Xóa mặt nạ",
+  "recorder.mask.count": "Mặt nạ: {0}"
 }

@@ -256,5 +256,10 @@
   "recorder.region.hide": "Sakrij okvir ({0})",
   "recorder.region.stop-close": "Zaustavi snimanje i zatvori",
   "recorder.capture.fallback-unavailable": "Brzo snimanje (Desktop Duplication) nije pokrenuto; snima se putem GDI-ja, iznad 30 fps mogu ispasti sličice.",
-  "recorder.capture.fallback-layout": "Snimano područje nije na jednom monitoru glavne grafičke kartice; snima se putem GDI-ja, iznad 30 fps mogu ispasti sličice."
+  "recorder.capture.fallback-layout": "Snimano područje nije na jednom monitoru glavne grafičke kartice; snima se putem GDI-ja, iznad 30 fps mogu ispasti sličice.",
+  "recorder.mask.title": "Maska privatnosti",
+  "recorder.mask.draw": "Nacrtaj masku",
+  "recorder.mask.draw-hint": "Mišem povucite preko područja koje u snimci treba biti zamućeno; Esc odustaje.",
+  "recorder.mask.clear": "Ukloni maske",
+  "recorder.mask.count": "Maske: {0}"
 }

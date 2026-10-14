@@ -256,5 +256,10 @@
   "recorder.region.hide": "枠を隠す ({0})",
   "recorder.region.stop-close": "録画を停止して閉じる",
   "recorder.capture.fallback-unavailable": "高速キャプチャ (Desktop Duplication) を開始できませんでした。GDI キャプチャで録画中のため、30 fps を超えるとフレームが落ちることがあります。",
-  "recorder.capture.fallback-layout": "録画範囲がメイン GPU の 1 台のモニターに収まっていません。GDI キャプチャで録画中のため、30 fps を超えるとフレームが落ちることがあります。"
+  "recorder.capture.fallback-layout": "録画範囲がメイン GPU の 1 台のモニターに収まっていません。GDI キャプチャで録画中のため、30 fps を超えるとフレームが落ちることがあります。",
+  "recorder.mask.title": "プライバシーマスク",
+  "recorder.mask.draw": "マスクを描く",
+  "recorder.mask.draw-hint": "録画でぼかす範囲をマウスでドラッグして選択します。Esc で取り消し。",
+  "recorder.mask.clear": "マスクを削除",
+  "recorder.mask.count": "マスク: {0}"
 }

@@ -256,5 +256,10 @@
   "recorder.region.hide": "Ocultar marco ({0})",
   "recorder.region.stop-close": "Detener grabación y cerrar",
   "recorder.capture.fallback-unavailable": "La captura rápida (Desktop Duplication) no se inició; se graba con captura GDI, que puede perder fotogramas por encima de 30 fps.",
-  "recorder.capture.fallback-layout": "El área grabada no está en un solo monitor de la tarjeta gráfica principal; se graba con captura GDI, que puede perder fotogramas por encima de 30 fps."
+  "recorder.capture.fallback-layout": "El área grabada no está en un solo monitor de la tarjeta gráfica principal; se graba con captura GDI, que puede perder fotogramas por encima de 30 fps.",
+  "recorder.mask.title": "Máscara de privacidad",
+  "recorder.mask.draw": "Dibujar máscara",
+  "recorder.mask.draw-hint": "Arrastra con el ratón sobre la zona que debe verse desenfocada en la grabación; Esc cancela.",
+  "recorder.mask.clear": "Quitar máscaras",
+  "recorder.mask.count": "Máscaras: {0}"
 }
