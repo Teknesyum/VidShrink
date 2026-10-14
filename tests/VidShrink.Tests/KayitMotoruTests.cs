@@ -175,8 +175,37 @@ public sealed class KayitMotoruTests
             "/tmp/a.mov");
 
         Assert.Contains("-f avfoundation", Arg(args));
-        Assert.Contains("-i 2:none", Arg(args));
+        Assert.Equal("Capture screen 2:none", args[args.ToList().IndexOf("-i") + 1]);
         Assert.Contains("-capture_cursor 1", Arg(args));
+    }
+
+    /// <summary>
+    /// PLT-01: avfoundation ekranlari kameralardan sonra numaraliyor (<c>[kamera sayisi + i] Capture screen i</c>),
+    /// sira numarasi kameralı Mac'te kamerayi acar. Ad (<c>Capture screen N</c>) kamera sayisindan bagimsiz;
+    /// ekran, bolge ve pencere hedefi ayni girdiden gectigi icin ucunde de ad yazilir, yalin sayi hicbirinde yok.
+    /// </summary>
+    [Theory]
+    [InlineData(RecorderTargetKind.Screen, 0)]
+    [InlineData(RecorderTargetKind.Screen, 1)]
+    [InlineData(RecorderTargetKind.Region, 0)]
+    [InlineData(RecorderTargetKind.Window, 1)]
+    public void MacGirdisiEkraniAdlaVerir(RecorderTargetKind hedef, int ekran)
+    {
+        var istek = Ekran(RecorderPlatform.MacOs) with
+        {
+            Target = hedef,
+            ScreenIndex = ekran,
+            Container = RecorderContainer.Mov,
+            Region = hedef == RecorderTargetKind.Region ? new RecorderRegion(10, 30, 320, 240) : null,
+            WindowTitle = hedef == RecorderTargetKind.Window ? "Safari" : null,
+            WindowRegion = hedef == RecorderTargetKind.Window ? new RecorderRegion(200, 100, 640, 480) : null
+        };
+
+        var args = RecorderArguments.Build(istek, "/tmp/m.mov");
+        var girdi = args[args.ToList().IndexOf("-i") + 1];
+
+        Assert.Equal($"Capture screen {ekran}:none", girdi);
+        Assert.False(char.IsDigit(girdi[0]));
     }
 
     /// <summary>

@@ -1050,7 +1050,7 @@ public sealed class KayitFfmpegKoluTests
         var mac = RecorderArguments.Build(
             Istek(RecorderPlatform.MacOs) with { ScreenIndex = 1 }, "/tmp/a.mp4");
 
-        Assert.Contains("-i 1:none", Metin(mac));
+        Assert.Contains("-i Capture screen 1:none", Metin(mac));
         Assert.DoesNotContain("-offset_x", mac);
     }
 

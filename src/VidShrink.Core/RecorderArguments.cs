@@ -13,7 +13,7 @@ public enum RecorderPlatform
     /// <summary><c>gdigrab</c> ya da <c>ddagrab</c> (<see cref="RecorderCapture"/>): butun masaustu, pencere ya da ofsetli bolge.</summary>
     Windows,
 
-    /// <summary><c>avfoundation</c>: ekran ve cihaz indeksi; bolge girdi degil kirpma filtresi.</summary>
+    /// <summary><c>avfoundation</c>: ekran adi (<c>Capture screen N</c>); bolge girdi degil kirpma filtresi.</summary>
     MacOs,
 
     /// <summary><c>x11grab</c>: ekran adresi, <c>+x,y</c> ofseti ya da <c>-window_id</c>.</summary>
@@ -162,7 +162,7 @@ public sealed record RecorderRequest
     public bool ShowCursor { get; init; } = true;
 
     /// <summary>
-    /// macOS'ta <c>avfoundation</c> ekran indeksi, Linux'ta <see cref="Display"/> ile
+    /// macOS'ta <c>avfoundation</c> ekran adinin numarasi (<c>Capture screen N</c>), Linux'ta <see cref="Display"/> ile
     /// birlikte ekran numarasi. <c>gdigrab</c> ekran secmiyor: orada ekran secimi ofsetli
     /// bolgedir. Windows'ta sifirdan farkli indeks yalniz <see cref="Screens"/> o indeksi
     /// tasiyorsa kabul edilir, o zaman bolgeye cevrilir.
@@ -1463,8 +1463,16 @@ public static class RecorderArguments
         "-f", "avfoundation",
         "-framerate", Number(request.Fps),
         "-capture_cursor", Flag(request.ShowCursor),
-        "-i", $"{request.ScreenIndex}:none"
+        "-i", $"{MacScreenName(request.ScreenIndex)}:none"
     };
+
+    /// <summary>
+    /// avfoundation ekrani adla secilir: sira numarasinda ekranlar kameralardan sonra geliyor
+    /// (<c>[kamera sayisi + i] Capture screen i</c>), kameralı Mac'te <c>0</c> kamerayi acar. Ad
+    /// <c>Capture screen N</c> kamera sayisindan bagimsiz; ffmpeg <c>avfoundation.m</c> bunu
+    /// <c>sscanf(..., "Capture screen %d", ...)</c> ile okuyor (n4.0'dan beri).
+    /// </summary>
+    private static string MacScreenName(int screenIndex) => "Capture screen " + Number(screenIndex);
 
     private static IReadOnlyList<string> LinuxInput(RecorderRequest request)
     {
