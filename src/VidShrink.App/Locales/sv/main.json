@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Kön är klar. Färdiga: {0}, misslyckade: {1}.",
 
   "main.convert.title": "Konvertering",
+  "main.convert.preset.label": "Förinställning",
+  "main.convert.preset.placeholder": "Välj en förinställning",
+  "main.convert.preset.add.tip": "Sparar konverteringsinställningarna under ett namn. Hålls åtskilda från krympförinställningarna.",
   "main.convert.source-empty": "Läs in en källa under Krymp eller bläddra här.",
   "main.convert.browse": "Bläddra källa",
   "main.convert.container": "Behållare",

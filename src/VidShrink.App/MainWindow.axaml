@@ -1103,6 +1103,39 @@
                   <TextBlock Text="{loc:Text main.convert.title}" Theme="{StaticResource H2}"/>
                   <TextBlock x:Name="TxtConvertSource" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
                   <Button x:Name="BtnBrowseConvert" Content="{loc:Text main.convert.browse}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" Click="OnBrowseConvert"/>
+                  <StackPanel Spacing="{StaticResource SpaceXs}">
+                    <TextBlock Text="{loc:Text main.convert.preset.label}" Theme="{StaticResource Label}"/>
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
+                      <ComboBox x:Name="CmbConvertPreset" HorizontalAlignment="Stretch"
+                                PlaceholderText="{loc:Text main.convert.preset.placeholder}"
+                                AutomationProperties.Name="{loc:Text main.convert.preset.label}"
+                                SelectionChanged="OnConvertPresetChanged"/>
+                      <Button x:Name="BtnConvertPresetAdd" Grid.Column="1" Content="+" Theme="{StaticResource ChipButton}" Classes="eylem"
+                              AutomationProperties.Name="{loc:Text main.preset.add.name}">
+                        <ToolTip.Tip>
+                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.preset.add.tip}"/>
+                        </ToolTip.Tip>
+                        <Button.Flyout>
+                          <Flyout>
+                            <StackPanel Spacing="{StaticResource SpaceSm}" MinWidth="220">
+                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.preset.name.label}"/>
+                              <TextBox x:Name="TxtConvertPresetName" MaxLength="60"/>
+                              <TextBlock x:Name="TxtConvertPresetNotice" Theme="{StaticResource Hint}"
+                                         TextWrapping="Wrap" IsVisible="False"/>
+                              <Button x:Name="BtnConvertPresetSave" Content="{loc:Text main.preset.save}" Click="OnConvertPresetSave"/>
+                              <Border Theme="{StaticResource PanelRule}"/>
+                              <WrapPanel>
+                                <Button x:Name="BtnConvertPresetImport" Content="{loc:Text main.preset.import}" Theme="{StaticResource GhostButton}"
+                                        Margin="{StaticResource WrapItemMargin}" Click="OnConvertPresetImport"/>
+                                <Button x:Name="BtnConvertPresetExport" Content="{loc:Text main.preset.export}" Theme="{StaticResource GhostButton}"
+                                        Margin="{StaticResource WrapItemMargin}" Click="OnConvertPresetExport"/>
+                              </WrapPanel>
+                            </StackPanel>
+                          </Flyout>
+                        </Button.Flyout>
+                      </Button>
+                    </Grid>
+                  </StackPanel>
                   <Grid x:Name="ConvertForm" Grid.IsSharedSizeScope="True" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}" RowSpacing="{StaticResource SpaceLg}"
                         RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
                     <Grid.Styles>

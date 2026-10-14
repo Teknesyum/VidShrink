@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "வரிசை முடிந்தது. தயார்: {0}, தோல்வி: {1}.",
 
   "main.convert.title": "மாற்றம்",
+  "main.convert.preset.label": "முன்னமைவு",
+  "main.convert.preset.placeholder": "முன்னமைவைத் தேர்ந்தெடுக்கவும்",
+  "main.convert.preset.add.tip": "மாற்றும் அமைப்புகளை ஒரு பெயரில் சேமிக்கிறது. சுருக்கும் முன்னமைவுகளிலிருந்து தனியாக வைக்கப்படும்.",
   "main.convert.source-empty": "சுருக்கு தாவலில் மூலத்தை ஏற்றுங்கள் அல்லது இங்கே உலாவுங்கள்.",
   "main.convert.browse": "மூலத்தை உலாவு",
   "main.convert.container": "கொள்கலன்",

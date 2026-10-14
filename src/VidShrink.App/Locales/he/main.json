@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "התור הסתיים. מוכנים: {0}, נכשלו: {1}.",
 
   "main.convert.title": "המרה",
+  "main.convert.preset.label": "הגדרה קבועה",
+  "main.convert.preset.placeholder": "בחרו הגדרה קבועה",
+  "main.convert.preset.add.tip": "שומר את הגדרות ההמרה בשם. נשמרות בנפרד מההגדרות הקבועות של הכיווץ.",
   "main.convert.source-empty": "טען מקור בכיווץ או עיין כאן.",
   "main.convert.browse": "עיון במקור",
   "main.convert.container": "מכל",

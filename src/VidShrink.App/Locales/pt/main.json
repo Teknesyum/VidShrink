@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Fila concluída. Prontos: {0}, com falha: {1}.",
 
   "main.convert.title": "Conversão",
+  "main.convert.preset.label": "Predefinição",
+  "main.convert.preset.placeholder": "Escolha uma predefinição",
+  "main.convert.preset.add.tip": "Salva as configurações de conversão com um nome. Mantidas separadas das predefinições de Reduzir.",
   "main.convert.source-empty": "Carregue uma fonte em Reduzir ou procure aqui.",
   "main.convert.browse": "Procurar fonte",
   "main.convert.container": "Contêiner",

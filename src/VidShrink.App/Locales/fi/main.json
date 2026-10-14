@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Jono valmis. Valmiita: {0}, epäonnistuneita: {1}.",
 
   "main.convert.title": "Muunnos",
+  "main.convert.preset.label": "Esiasetus",
+  "main.convert.preset.placeholder": "Valitse esiasetus",
+  "main.convert.preset.add.tip": "Tallentaa muunnoksen asetukset nimellä. Säilytetään erillään pakkauksen esiasetuksista.",
   "main.convert.source-empty": "Lataa lähde Pakkaa-välilehdellä tai selaa tässä.",
   "main.convert.browse": "Selaa lähdettä",
   "main.convert.container": "Säiliö",

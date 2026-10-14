@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "คิวเสร็จแล้ว พร้อม: {0} ล้มเหลว: {1}",
 
   "main.convert.title": "การแปลง",
+  "main.convert.preset.label": "พรีเซ็ต",
+  "main.convert.preset.placeholder": "เลือกพรีเซ็ต",
+  "main.convert.preset.add.tip": "บันทึกการตั้งค่าการแปลงด้วยชื่อ เก็บแยกจากพรีเซ็ตการย่อ",
   "main.convert.source-empty": "โหลดต้นฉบับในแท็บย่อ หรือเรียกดูที่นี่",
   "main.convert.browse": "เรียกดูต้นฉบับ",
   "main.convert.container": "คอนเทนเนอร์",

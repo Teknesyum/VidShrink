@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Järjekord on valmis. Valmis: {0}, nurjunud: {1}.",
 
   "main.convert.title": "Teisendus",
+  "main.convert.preset.label": "Eelseadistus",
+  "main.convert.preset.placeholder": "Vali eelseadistus",
+  "main.convert.preset.add.tip": "Salvestab teisendamise seaded nimega. Hoitakse tihendamise eelseadistustest eraldi.",
   "main.convert.source-empty": "Laadi allikas Tihenda-vahekaardil või sirvi siin.",
   "main.convert.browse": "Sirvi allikat",
   "main.convert.container": "Konteiner",

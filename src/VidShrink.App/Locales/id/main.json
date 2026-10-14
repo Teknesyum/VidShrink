@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Antrean selesai. Siap: {0}, gagal: {1}.",
 
   "main.convert.title": "Konversi",
+  "main.convert.preset.label": "Prasetel",
+  "main.convert.preset.placeholder": "Pilih prasetel",
+  "main.convert.preset.add.tip": "Menyimpan pengaturan konversi dengan sebuah nama. Disimpan terpisah dari prasetel Perkecil.",
   "main.convert.source-empty": "Muat sumber di Perkecil atau telusuri di sini.",
   "main.convert.browse": "Telusuri sumber",
   "main.convert.container": "Kontainer",

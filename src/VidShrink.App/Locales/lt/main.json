@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Eilė baigta. Paruošta: {0}, nepavyko: {1}.",
 
   "main.convert.title": "Konvertavimas",
+  "main.convert.preset.label": "Nustatymų rinkinys",
+  "main.convert.preset.placeholder": "Pasirinkite rinkinį",
+  "main.convert.preset.add.tip": "Įrašo konvertavimo nustatymus su pavadinimu. Laikoma atskirai nuo mažinimo rinkinių.",
   "main.convert.source-empty": "Įkelkite šaltinį skirtuke Mažinti arba naršykite čia.",
   "main.convert.browse": "Naršyti šaltinį",
   "main.convert.container": "Konteineris",

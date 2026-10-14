@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Опашката приключи. Готови: {0}, неуспешни: {1}.",
 
   "main.convert.title": "Конвертиране",
+  "main.convert.preset.label": "Настройка",
+  "main.convert.preset.placeholder": "Изберете настройка",
+  "main.convert.preset.add.tip": "Запазва настройките за конвертиране под име. Пазят се отделно от настройките за свиване.",
   "main.convert.source-empty": "Заредете източник в „Свиване“ или изберете тук.",
   "main.convert.browse": "Избери източник",
   "main.convert.container": "Контейнер",

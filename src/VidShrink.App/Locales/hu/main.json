@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "A sor véget ért. Kész: {0}, sikertelen: {1}.",
 
   "main.convert.title": "Konvertálás",
+  "main.convert.preset.label": "Beállításkészlet",
+  "main.convert.preset.placeholder": "Válasszon beállításkészletet",
+  "main.convert.preset.add.tip": "Név alatt menti a konvertálás beállításait. A tömörítés beállításkészleteitől külön tárolódik.",
   "main.convert.source-empty": "Töltsön be forrást a Tömörítés lapon, vagy tallózzon itt.",
   "main.convert.browse": "Forrás tallózása",
   "main.convert.container": "Konténer",

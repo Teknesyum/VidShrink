@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Ред је завршен. Спремно: {0}, неуспело: {1}.",
 
   "main.convert.title": "Konverzija",
+  "main.convert.preset.label": "Podešavanje",
+  "main.convert.preset.placeholder": "Izaberite podešavanje",
+  "main.convert.preset.add.tip": "Čuva podešavanja konverzije pod imenom. Drže se odvojeno od podešavanja smanjivanja.",
   "main.convert.source-empty": "Učitajte izvor u Smanji ili pregledajte ovde.",
   "main.convert.browse": "Pregledaj izvor",
   "main.convert.container": "Kontejner",

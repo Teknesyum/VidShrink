@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Очередь завершена. Готово: {0}, с ошибкой: {1}.",
 
   "main.convert.title": "Конвертация",
+  "main.convert.preset.label": "Предустановка",
+  "main.convert.preset.placeholder": "Выберите предустановку",
+  "main.convert.preset.add.tip": "Сохраняет настройки конвертирования под именем. Хранятся отдельно от предустановок сжатия.",
   "main.convert.source-empty": "Загрузите источник во вкладке «Сжать» или выберите здесь.",
   "main.convert.browse": "Выбрать источник",
   "main.convert.container": "Контейнер",

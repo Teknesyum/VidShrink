@@ -596,3 +596,159 @@ public static class HandBrakePresetImport
         return builder.ToString().Trim('-');
     }
 }
+
+/// <summary>
+/// Dönüştür panelinin adlı ön ayarı (DON-05). Kırpma aralığı dosyaya bağlı olduğu için girmez.
+/// Etiket alanları paneldeki seçimlerin etiketidir: <see cref="Resolution"/> ve <see cref="Fps"/>
+/// için <c>source</c> kaynağı, <c>custom</c> yanındaki özel alanı; <see cref="AudioCodec"/> için
+/// <see cref="NoAudio"/> sesi düşürmeyi söyler.
+/// </summary>
+public sealed record ConversionPreset
+{
+    public const string NoAudio = "none";
+    public const string Source = "source";
+    public const string Custom = "custom";
+
+    public string Id { get; init; } = string.Empty;
+    public string? Name { get; init; }
+    public string Container { get; init; } = "mp4";
+    public string VideoCodec { get; init; } = "libx264";
+    public ConversionQualityMode QualityMode { get; init; } = ConversionQualityMode.Crf;
+    public int Quality { get; init; } = 23;
+    public string Resolution { get; init; } = Source;
+    public string? CustomResolution { get; init; }
+    public string Fps { get; init; } = Source;
+    public string? CustomFps { get; init; }
+    public string AudioCodec { get; init; } = "aac";
+    public int AudioBitrateK { get; init; } = 128;
+    public bool DropMetadata { get; init; }
+}
+
+/// <summary>
+/// Dönüştür ön ayarlarının dosyası (DON-05, DON-12). Biçim <see cref="PresetLibrary"/>'ninkiyle
+/// aynı (<c>schema</c>, <c>kind</c>, <c>presets</c>) ama <c>kind</c> farklı ve zorunlu; dosya da
+/// ayrı (<see cref="UserFileName"/>). Küçült dosyası buraya, bu dosya Küçült'e okunmaz.
+/// </summary>
+public static class ConversionPresetLibrary
+{
+    public const int SchemaVersion = 1;
+    public const string FileKind = "vidshrink-convert-presets";
+    public const string UserFileName = "convert-presets.json";
+
+    public static string DefaultUserPath
+    {
+        get
+        {
+            var folder = Path.GetDirectoryName(PresetLibrary.DefaultUserPath);
+            return Path.Combine(string.IsNullOrEmpty(folder) ? "." : folder, UserFileName);
+        }
+    }
+
+    public static IReadOnlyList<ConversionPreset> Parse(string json)
+    {
+        var documentOptions = new JsonDocumentOptions { CommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true };
+        JsonNode? root;
+        try
+        {
+            root = JsonNode.Parse(json, documentOptions: documentOptions);
+            if (root is JsonObject probe) _ = probe.Count;
+        }
+        catch (JsonException ex)
+        {
+            throw new PresetFileException(PresetFileError.NotJson, $"line {ex.LineNumber + 1}", ex);
+        }
+        catch (ArgumentException ex)
+        {
+            throw new PresetFileException(PresetFileError.NotJson, "duplicate key", ex);
+        }
+
+        if (root is not JsonObject obj || obj["presets"] is not JsonArray items)
+            throw new PresetFileException(PresetFileError.NotPresetFile, "presets");
+
+        if (obj["kind"] is not JsonValue kindValue || !kindValue.TryGetValue<string>(out var kind) ||
+            !string.Equals(kind, FileKind, StringComparison.Ordinal))
+            throw new PresetFileException(PresetFileError.NotPresetFile, "kind");
+
+        if (obj["schema"] is not JsonValue schemaValue || !schemaValue.TryGetValue<int>(out var schema))
+            throw new PresetFileException(PresetFileError.SchemaMissing, "schema");
+
+        if (schema > SchemaVersion)
+            throw new PresetFileException(PresetFileError.SchemaTooNew, schema.ToString(CultureInfo.InvariantCulture));
+
+        var list = new List<ConversionPreset>();
+        for (var i = 0; i < items.Count; i++)
+        {
+            ConversionPreset? preset;
+            try
+            {
+                preset = items[i].Deserialize<ConversionPreset>(PresetLibrary.Options);
+            }
+            catch (JsonException ex)
+            {
+                throw new PresetFileException(PresetFileError.InvalidValue, $"presets[{i}]{ex.Path?.TrimStart('$')}", ex);
+            }
+            catch (InvalidOperationException ex)
+            {
+                throw new PresetFileException(PresetFileError.InvalidValue, $"presets[{i}]", ex);
+            }
+
+            if (preset is null)
+                throw new PresetFileException(PresetFileError.InvalidValue, $"presets[{i}]");
+
+            Validate(preset, i);
+            list.Add(preset);
+        }
+
+        return list;
+    }
+
+    public static string Serialize(IEnumerable<ConversionPreset> presets)
+    {
+        var root = new JsonObject
+        {
+            ["schema"] = SchemaVersion,
+            ["kind"] = FileKind,
+            ["presets"] = JsonSerializer.SerializeToNode(presets.ToList(), PresetLibrary.Options)
+        };
+        return root.ToJsonString(PresetLibrary.Options);
+    }
+
+    public static void Export(IEnumerable<ConversionPreset> presets, string path)
+    {
+        var folder = Path.GetDirectoryName(Path.GetFullPath(path));
+        if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
+        File.WriteAllText(path, Serialize(presets), new UTF8Encoding(false));
+    }
+
+    public static IReadOnlyList<ConversionPreset> LoadUser(string? path = null)
+    {
+        path ??= DefaultUserPath;
+        return File.Exists(path) ? Parse(File.ReadAllText(path)) : Array.Empty<ConversionPreset>();
+    }
+
+    public static IReadOnlyList<ConversionPreset> SaveUser(ConversionPreset preset, string? path = null)
+    {
+        path ??= DefaultUserPath;
+        Validate(preset, 0);
+        var list = LoadUser(path)
+            .Where(existing => !string.Equals(existing.Id, preset.Id, StringComparison.OrdinalIgnoreCase))
+            .Append(preset)
+            .ToList();
+        Export(list, path);
+        return list;
+    }
+
+    private static void Validate(ConversionPreset preset, int index)
+    {
+        if (string.IsNullOrWhiteSpace(preset.Id))
+            throw new PresetFileException(PresetFileError.InvalidValue, $"presets[{index}].id");
+        if (string.IsNullOrWhiteSpace(preset.Container))
+            throw new PresetFileException(PresetFileError.InvalidValue, $"presets[{index}].container");
+        if (string.IsNullOrWhiteSpace(preset.VideoCodec))
+            throw new PresetFileException(PresetFileError.InvalidValue, $"presets[{index}].videoCodec");
+        if (preset.Quality <= 0)
+            throw new PresetFileException(PresetFileError.InvalidValue, $"presets[{index}].quality");
+        if (preset.AudioBitrateK <= 0)
+            throw new PresetFileException(PresetFileError.InvalidValue, $"presets[{index}].audioBitrateK");
+    }
+}

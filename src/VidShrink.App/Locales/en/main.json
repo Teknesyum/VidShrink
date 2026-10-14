@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Queue finished. Ready: {0}, failed: {1}.",
 
   "main.convert.title": "Conversion",
+  "main.convert.preset.label": "Preset",
+  "main.convert.preset.placeholder": "Choose a preset",
+  "main.convert.preset.add.tip": "Saves the Convert settings under a name. Kept separate from Shrink presets.",
   "main.convert.source-empty": "Load a source in Shrink or browse here.",
   "main.convert.browse": "Browse source",
   "main.convert.container": "Container",

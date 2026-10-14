@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "कतार पूरी हुई। तैयार: {0}, विफल: {1}।",
 
   "main.convert.title": "रूपांतरण",
+  "main.convert.preset.label": "प्रीसेट",
+  "main.convert.preset.placeholder": "प्रीसेट चुनें",
+  "main.convert.preset.add.tip": "बदलने की सेटिंग को एक नाम से सहेजता है। सिकोड़ने के प्रीसेट से अलग रखा जाता है।",
   "main.convert.source-empty": "सिकोड़ें में स्रोत लोड करें या यहाँ ब्राउज़ करें।",
   "main.convert.browse": "स्रोत ब्राउज़ करें",
   "main.convert.container": "कंटेनर",

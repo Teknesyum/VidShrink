@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "キューが完了しました。完了: {0}、失敗: {1}。",
 
   "main.convert.title": "変換",
+  "main.convert.preset.label": "プリセット",
+  "main.convert.preset.placeholder": "プリセットを選択",
+  "main.convert.preset.add.tip": "変換の設定に名前を付けて保存します。圧縮のプリセットとは別に保存されます。",
   "main.convert.source-empty": "圧縮タブでソースを読み込むか、ここで参照してください。",
   "main.convert.browse": "ソースを参照",
   "main.convert.container": "コンテナ",

@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Køen er ferdig. Klare: {0}, mislykket: {1}.",
 
   "main.convert.title": "Konvertering",
+  "main.convert.preset.label": "Forhåndsinnstilling",
+  "main.convert.preset.placeholder": "Velg en forhåndsinnstilling",
+  "main.convert.preset.add.tip": "Lagrer konverteringsinnstillingene under et navn. Holdes atskilt fra krympeinnstillingene.",
   "main.convert.source-empty": "Last inn en kilde i Krymp eller bla gjennom her.",
   "main.convert.browse": "Velg kilde",
   "main.convert.container": "Beholder",

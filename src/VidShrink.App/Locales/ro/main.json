@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Coada s-a terminat. Gata: {0}, eșuate: {1}.",
 
   "main.convert.title": "Conversie",
+  "main.convert.preset.label": "Presetare",
+  "main.convert.preset.placeholder": "Alegeți o presetare",
+  "main.convert.preset.add.tip": "Salvează setările de conversie sub un nume. Păstrate separat de presetările de micșorare.",
   "main.convert.source-empty": "Încarcă o sursă în Micșorare sau răsfoiește aici.",
   "main.convert.browse": "Răsfoiește sursa",
   "main.convert.container": "Container",

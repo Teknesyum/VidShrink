@@ -337,6 +337,9 @@
   "main.notify.queue-failed": "Warteschlange beendet. Fertig: {0}, fehlgeschlagen: {1}.",
 
   "main.convert.title": "Konvertierung",
+  "main.convert.preset.label": "Voreinstellung",
+  "main.convert.preset.placeholder": "Voreinstellung wählen",
+  "main.convert.preset.add.tip": "Speichert die Konvertierungseinstellungen unter einem Namen. Getrennt von den Verkleinern-Voreinstellungen gespeichert.",
   "main.convert.source-empty": "Laden Sie eine Quelle unter Verkleinern oder durchsuchen Sie hier.",
   "main.convert.browse": "Quelle durchsuchen",
   "main.convert.container": "Container",
