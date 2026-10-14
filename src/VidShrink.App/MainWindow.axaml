@@ -844,7 +844,7 @@
                             <TextBlock x:Name="TxtAdvAudioCodecNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
-                        <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
+                        <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
                           <TextBlock Text="{loc:Text main.audio.level.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                             <CheckBox x:Name="ChkAudioLoudnorm" Theme="{StaticResource CheckStyle}" IsChecked="False" VerticalAlignment="Bottom"
@@ -855,7 +855,15 @@
                               <ComboBox x:Name="CmbAudioGain"
                                         auto:AutomationProperties.Name="{loc:Text main.audio.gain}"/>
                             </StackPanel>
+                            <CheckBox x:Name="ChkAudioDenoise" Theme="{StaticResource CheckStyle}" IsChecked="False" VerticalAlignment="Bottom"
+                                      MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
+                                      Content="{loc:Text main.audio.denoise}"/>
+                            <Button x:Name="BtnMeasureLoudness" Theme="{StaticResource GhostButton}" Click="OnMeasureLoudness" VerticalAlignment="Bottom"
+                                    MinHeight="{StaticResource FieldMinHeight}" IsEnabled="False"
+                                    Padding="{StaticResource ButtonPaddingSm}" Content="{loc:Text main.audio.loudness.measure}"
+                                    auto:AutomationProperties.Name="{loc:Text main.audio.loudness.measure}"/>
                           </WrapPanel>
+                          <TextBlock x:Name="TxtLoudness" Grid.Row="2" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
                         </Grid>
                         <CheckBox x:Name="ChkAdvKeepTracks" Theme="{StaticResource CheckStyle}" IsChecked="False" Content="{loc:Text main.advanced.keep-tracks.label}"/>
                         <CheckBox x:Name="ChkAdvDropMetadata" Theme="{StaticResource CheckStyle}" IsChecked="False" HorizontalAlignment="Left" Content="{loc:Text main.advanced.drop-metadata.label}">

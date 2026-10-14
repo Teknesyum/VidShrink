@@ -119,6 +119,9 @@ public sealed record CliRequest
     /// <summary><c>--ses-normal</c>: yeniden kodlanan sese <c>loudnorm</c>.</summary>
     public bool AudioLoudnorm { get; init; }
 
+    /// <summary><c>--ses-temizle</c>: yeniden kodlanan sese gurultu suzgeci (<c>afftdn</c>).</summary>
+    public bool AudioDenoise { get; init; }
+
     /// <summary><c>--ses-kazanc</c>: yeniden kodlanan sese sabit kazanc, dB.</summary>
     public double? AudioGainDb { get; init; }
 
@@ -303,6 +306,7 @@ public sealed record CliRequest
         if (BurnFile is { } yakDosya) options.Filters = (options.Filters ?? VideoFilterOptions.Default) with { BurnFile = yakDosya };
         if (AudioCodec is { } sesKodek) options.AudioCodec = sesKodek;
         options.AudioLoudnorm = AudioLoudnorm;
+        options.AudioDenoise = AudioDenoise;
         options.AudioGainDb = AudioGainDb;
         options.AudioSampleRate = AudioSampleRate;
         options.AudioDrcScale = AudioDrcScale;
@@ -349,7 +353,7 @@ public static class CliParser
         "--profil", "--profile", "--profil-dosyasi", "--preset-file", "--kirp", "--crop", "--kirpma-kipi", "--crop-mode", "--tarama", "--scan",
         "--baslik", "--title", "--ana-icerik", "--main-feature", "--asgari-sure", "--min-duration",
         "--azami-sure", "--max-duration",
-        "--suzgec", "--filters", "--ses-kodek", "--audio-codec", "--ses-normal", "--loudnorm",
+        "--suzgec", "--filters", "--ses-kodek", "--audio-codec", "--ses-normal", "--loudnorm", "--ses-temizle", "--denoise",
         "--ses-kazanc", "--gain", "--altyazi", "--subtitle", "--yan-altyazi", "--sidecar-subtitles",
         "--yak", "--burn", "--yak-srt", "--srt-burn", "--yak-ass", "--ssa-burn", "--altyazi-tara", "--subtitle-scan",
         "--meta-yok", "--no-metadata",
@@ -525,6 +529,9 @@ public static class CliParser
                     };
                     if (secilen is null) return Fail("error.bad-audio-codec", sesKodek);
                     request = request with { AudioCodec = secilen };
+                    break;
+                case "--ses-temizle" or "--denoise" when command != CliCommand.Watch:
+                    request = request with { AudioDenoise = true };
                     break;
                 case "--ses-normal" or "--loudnorm" when command != CliCommand.Watch:
                     request = request with { AudioLoudnorm = true };

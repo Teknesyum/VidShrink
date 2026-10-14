@@ -1089,7 +1089,7 @@ public sealed class ManualOverrideTests
         "DeliveredContainer",
         "DropMetadata", "SubtitleLanguages", "FirstSubtitleOnly",
         "FrameRate", "MaxFps", "AudioSampleRate", "AudioDrcScale",
-        "EncoderThreads", "Priority"
+        "EncoderThreads", "Priority", "AudioDenoise"
     };
 
     [Fact]

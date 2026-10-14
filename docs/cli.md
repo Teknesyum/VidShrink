@@ -89,6 +89,7 @@ single spelling.
 | `--profil-dosyasi` | `--preset-file` |
 | `--ses-kodek` | `--audio-codec` |
 | `--ses-normal` | `--loudnorm` |
+| `--ses-temizle` | `--denoise` |
 | `--ses-kazanc` | `--gain` |
 | `--altyazi` | `--subtitle` |
 | `--yan-altyazi` | `--sidecar-subtitles` |

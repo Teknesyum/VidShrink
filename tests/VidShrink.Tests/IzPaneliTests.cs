@@ -347,6 +347,100 @@ public sealed class IzPaneliTests : IDisposable
         Assert.True(kuyruk.AudioLoudnorm);
     }
 
+    /// <summary>
+    /// ARC-P1: gürültü kutusu açıkken plana, kuyruğa ve argümandaki <c>-filter:a</c>'ya <c>afftdn</c> olarak geçer;
+    /// kapalıyken argümanda hiç yazılmaz (olumsuz kontrol).
+    /// </summary>
+    [Fact]
+    public void GurultuKutusuArgumandaGecer()
+    {
+        var (kapali, acik, kuyruk) = Pencerede(window =>
+        {
+            ShrinkJobWindow? batch = null;
+            try
+            {
+                window.LoadWithoutProbing("C:\\ornek\\film.mkv", Kaynak());
+                var ilk = window.PlanOptionsForTest();
+                window.ChkAudioDenoise.IsChecked = true;
+                var ikinci = window.PlanOptionsForTest();
+                batch = window.OpenBatch(new[] { "a.mp4", "b.mp4" });
+                return (ilk, ikinci, batch.OptionsFor(new ShrinkRequest(0, "a.mp4"), Kaynak("a.mp4")).Options);
+            }
+            finally { batch?.Close(); }
+        });
+
+        var info = Kaynak();
+        var acikArgs = FfmpegArguments.Build(info, PlanCalculator.Build(info, acik), "C:\\ornek\\cikti.mp4", 0, null);
+        var kapaliArgs = FfmpegArguments.Build(info, PlanCalculator.Build(info, kapali), "C:\\ornek\\cikti.mp4", 0, null);
+
+        Assert.False(kapali.AudioDenoise);
+        Assert.True(acik.AudioDenoise);
+        Assert.True(kuyruk.AudioDenoise);
+        Assert.Contains("afftdn", Sonraki(acikArgs, "-filter:a") ?? "", StringComparison.Ordinal);
+        Assert.DoesNotContain(kapaliArgs, arg => arg.Contains("afftdn", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// ARC-P1: yükseklik kaynak başına bir kez ölçülür ve LUFS ile gerçek tepe olarak yazılır; ölçüm bitince düğme
+    /// kapanır, yeni kaynak sonucu siler. Sessiz kaynakta düğme kapalı, ölçer hiç çağrılmaz.
+    /// </summary>
+    [Fact]
+    public void YukseklikBirKezOlculur()
+    {
+        var (bosta, sessiz, sonuc, sayac, yol, olcunce, yeniKaynakta, yeniDugme) = Pencerede(window =>
+        {
+            var sayi = 0;
+            string? olculen = null;
+            window.MeasureLoudness = (info, _) =>
+            {
+                sayi++;
+                olculen = info.FilePath;
+                return Task.FromResult<LoudnessReport?>(new LoudnessReport(-23.44, -1.04));
+            };
+            var ilk = window.BtnMeasureLoudness.IsEnabled;
+            window.LoadWithoutProbing("C:\\ornek\\sessiz.mkv", Kaynak("C:\\ornek\\sessiz.mkv") with { AudioCodec = null });
+            var s = window.BtnMeasureLoudness.IsEnabled;
+            window.LoadWithoutProbing("C:\\ornek\\film.mkv", Kaynak());
+            Tikla(window.BtnMeasureLoudness);
+            Dispatcher.UIThread.RunJobs();
+            var metin = window.LoudnessStatus;
+            var dugme = window.BtnMeasureLoudness.IsEnabled;
+            window.MeasureLoudnessAsync().GetAwaiter().GetResult();
+            var adet = sayi;
+            window.LoadWithoutProbing("C:\\ornek\\ikinci.mkv", Kaynak("C:\\ornek\\ikinci.mkv"));
+            return (ilk, s, metin, adet, olculen, dugme, window.LoudnessStatus, window.BtnMeasureLoudness.IsEnabled);
+        });
+
+        Assert.False(bosta);
+        Assert.False(sessiz);
+        Assert.Equal("Source loudness: -23.4 LUFS, true peak -1.0 dBTP.", sonuc);
+        Assert.Equal(1, sayac);
+        Assert.Equal("C:\\ornek\\film.mkv", yol);
+        Assert.False(olcunce);
+        Assert.Null(yeniKaynakta);
+        Assert.True(yeniDugme);
+    }
+
+    /// <summary>Ölçülemeyen yükseklik (ölçer <c>null</c> döner ya da atar) bir satırla söylenir, düğme açık kalır.</summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void YukseklikOlculemeyinceSoyler(bool atar)
+    {
+        var (durum, acik) = Pencerede(window =>
+        {
+            window.MeasureLoudness = (_, _) => atar
+                ? throw new InvalidOperationException("ffmpeg yok")
+                : Task.FromResult<LoudnessReport?>(null);
+            window.LoadWithoutProbing("C:\\ornek\\film.mkv", Kaynak());
+            window.MeasureLoudnessAsync().GetAwaiter().GetResult();
+            return (window.LoudnessStatus, window.BtnMeasureLoudness.IsEnabled);
+        });
+
+        Assert.Equal("The loudness could not be measured.", durum);
+        Assert.True(acik);
+    }
+
     /// <summary>Altyazı dosyası tanıma bırakma kolunun kapısıdır; video altyazı sayılmaz.</summary>
     [Theory]
     [InlineData("a.srt", true)]

@@ -134,6 +134,9 @@ public sealed class PlanOptions
     /// <summary>B1b: yeniden kodlanan sese <c>loudnorm</c> (EBU R128). Kopyalanan izde kurulamaz.</summary>
     public bool AudioLoudnorm { get; set; }
 
+    /// <summary>ARC-P1: yeniden kodlanan sese kaydedicinin gurultu suzgeci (<c>afftdn</c>). Kopyalanan izde kurulamaz.</summary>
+    public bool AudioDenoise { get; set; }
+
     /// <summary>B1b: yeniden kodlanan sese sabit kazanc, dB; <see cref="StreamMapping.MinGainDb"/>..<see cref="StreamMapping.MaxGainDb"/>.</summary>
     public double? AudioGainDb { get; set; }
 
@@ -591,7 +594,8 @@ public static class PlanCalculator
             SubtitleLanguages: options.SubtitleLanguages,
             FirstSubtitleOnly: options.FirstSubtitleOnly,
             AudioSampleRate: options.AudioSampleRate,
-            AudioDrcScale: options.AudioDrcScale);
+            AudioDrcScale: options.AudioDrcScale,
+            AudioDenoise: options.AudioDenoise);
         var audioPassthrough = options.LockedAudioKbps is null && options.AudioChannels == AudioChannelOverride.Auto && audioChannels is null;
         var container = options.DeliveredContainer is { } teslim && (teslim != OutputContainer.WebM || CodecModel.FitsWebM(codec))
             ? teslim
@@ -620,6 +624,7 @@ public static class PlanCalculator
             ScaleModulus = options.ScaleModulus,
             AudioCodec = options.AudioCodec,
             AudioLoudnorm = options.AudioLoudnorm,
+            AudioDenoise = options.AudioDenoise,
             AudioGainDb = options.AudioGainDb,
             ExternalSubtitles = options.ExternalSubtitles,
             DropMetadata = options.DropMetadata,
@@ -1023,6 +1028,7 @@ public static class PlanCalculator
         || options.LockedAudioKbps is not null
         || options.AudioChannels != AudioChannelOverride.Auto
         || options.AudioLoudnorm
+        || options.AudioDenoise
         || options.AudioGainDb is { } gain && gain != 0
         || options.ExternalSubtitles.Count > 0
         || options.DropMetadata
@@ -1269,6 +1275,7 @@ public static class PlanCalculator
         DetectedCrop = options.DetectedCrop,
         EncoderPath = options.EncoderPath,
         AudioLoudnorm = options.AudioLoudnorm,
+        AudioDenoise = options.AudioDenoise,
         AudioGainDb = options.AudioGainDb,
         ExternalSubtitles = options.ExternalSubtitles,
         DropMetadata = options.DropMetadata,
