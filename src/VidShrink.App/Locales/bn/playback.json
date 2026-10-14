@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "স্ক্রিনশট JPG হিসেবে সংরক্ষণ করুন",
   "player.view.keep-history": "ইতিহাস রাখুন",
   "player.view.resume": "যেখানে থেমেছিলাম সেখান থেকে চালান",
+  "player.view.pause-on-minimize": "ছোট করলে বিরতি দিন",
+  "player.view.topmost-while-playing": "শুধু চালানোর সময় সবার উপরে রাখুন",
   "player.view.state-aspect": "অনুপাত {0}",
   "player.view.state-rotate": "{0}° ঘোরানো হয়েছে",
   "player.view.state-mirror": "আয়না করা হয়েছে",

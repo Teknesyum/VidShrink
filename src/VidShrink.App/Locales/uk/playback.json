@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Зберігати знімки екрана у JPG",
   "player.view.keep-history": "Зберігати історію",
   "player.view.resume": "Продовжувати з місця зупинки",
+  "player.view.pause-on-minimize": "Пауза під час згортання",
+  "player.view.topmost-while-playing": "Поверх вікон лише під час відтворення",
   "player.view.state-aspect": "співвідношення {0}",
   "player.view.state-rotate": "повернуто на {0}°",
   "player.view.state-mirror": "відображено",

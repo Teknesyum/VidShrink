@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Shranjuj posnetke zaslona kot JPG",
   "player.view.keep-history": "Hrani zgodovino",
   "player.view.resume": "Nadaljuj, kjer sem končal",
+  "player.view.pause-on-minimize": "Začasno ustavi ob pomanjšanju",
+  "player.view.topmost-while-playing": "Ohrani na vrhu samo med predvajanjem",
   "player.view.state-aspect": "razmerje {0}",
   "player.view.state-rotate": "zavrteno za {0}°",
   "player.view.state-mirror": "zrcaljeno",

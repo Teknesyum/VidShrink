@@ -133,6 +133,7 @@ internal static class Program
         YerindeGuncelleme.OncekiSureciBekle();
         if (global::VidShrink.Launcher.UygulamaKlasoruKapisi.BaslaticiyaDevret(AppContext.BaseDirectory, args)) return 0;
         Task.Run(() => InPlaceUpdate.SweepRetired(AppContext.BaseDirectory));
+        Playback.UykuEngeli.SistemiBagla();
         var startup = StartupFor(args);
         if (startup is null) return RunMain(args);
 

@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Salvar capturas de tela como JPG",
   "player.view.keep-history": "Manter histórico",
   "player.view.resume": "Retomar de onde parei",
+  "player.view.pause-on-minimize": "Pausar ao minimizar",
+  "player.view.topmost-while-playing": "Manter no topo apenas durante a reprodução",
   "player.view.state-aspect": "proporção {0}",
   "player.view.state-rotate": "girado {0}°",
   "player.view.state-mirror": "espelhado",

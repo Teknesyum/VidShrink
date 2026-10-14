@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "اسکرین شاٹس JPG کے طور پر محفوظ کریں",
   "player.view.keep-history": "تاریخچہ محفوظ رکھیں",
   "player.view.resume": "جہاں چھوڑا تھا وہیں سے جاری رکھیں",
+  "player.view.pause-on-minimize": "چھوٹا کرنے پر روکیں",
+  "player.view.topmost-while-playing": "صرف چلاتے وقت اوپر رکھیں",
   "player.view.state-aspect": "تناسب {0}",
   "player.view.state-rotate": "{0}° گھمایا گیا",
   "player.view.state-mirror": "آئینہ شدہ",

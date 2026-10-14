@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "将截图保存为 JPG",
   "player.view.keep-history": "保留历史记录",
   "player.view.resume": "从上次停止处继续",
+  "player.view.pause-on-minimize": "最小化时暂停",
+  "player.view.topmost-while-playing": "仅在播放时置顶",
   "player.view.state-aspect": "宽高比 {0}",
   "player.view.state-rotate": "已旋转 {0}°",
   "player.view.state-mirror": "已镜像",

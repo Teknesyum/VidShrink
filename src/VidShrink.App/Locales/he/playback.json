@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "שמירת צילומי מסך כ-JPG",
   "player.view.keep-history": "שמירת היסטוריה",
   "player.view.resume": "המשך מהמקום שבו עצרתי",
+  "player.view.pause-on-minimize": "השהה בעת מזעור",
+  "player.view.topmost-while-playing": "השאר מעל רק בזמן ניגון",
   "player.view.state-aspect": "יחס {0}",
   "player.view.state-rotate": "סובב ב-{0}°",
   "player.view.state-mirror": "משוקף",

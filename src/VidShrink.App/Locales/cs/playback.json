@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Ukládat snímky obrazovky jako JPG",
   "player.view.keep-history": "Uchovávat historii",
   "player.view.resume": "Pokračovat tam, kde jsem skončil",
+  "player.view.pause-on-minimize": "Pozastavit při minimalizaci",
+  "player.view.topmost-while-playing": "Držet navrchu jen při přehrávání",
   "player.view.state-aspect": "poměr {0}",
   "player.view.state-rotate": "otočeno o {0}°",
   "player.view.state-mirror": "zrcadleno",

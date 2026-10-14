@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "스크린샷을 JPG로 저장",
   "player.view.keep-history": "기록 보관",
   "player.view.resume": "마지막 위치부터 이어 보기",
+  "player.view.pause-on-minimize": "최소화하면 일시 정지",
+  "player.view.topmost-while-playing": "재생 중에만 항상 위에 표시",
   "player.view.state-aspect": "비율 {0}",
   "player.view.state-rotate": "{0}° 회전됨",
   "player.view.state-mirror": "미러링됨",

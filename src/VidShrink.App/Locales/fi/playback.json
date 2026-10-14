@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Tallenna kuvakaappaukset JPG-muodossa",
   "player.view.keep-history": "Säilytä historia",
   "player.view.resume": "Jatka siitä, mihin jäin",
+  "player.view.pause-on-minimize": "Keskeytä pienennettäessä",
+  "player.view.topmost-while-playing": "Pidä päällimmäisenä vain toiston aikana",
   "player.view.state-aspect": "kuvasuhde {0}",
   "player.view.state-rotate": "kierretty {0}°",
   "player.view.state-mirror": "peilattu",

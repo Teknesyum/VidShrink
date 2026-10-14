@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Salvează capturile de ecran ca JPG",
   "player.view.keep-history": "Păstrează istoricul",
   "player.view.resume": "Reia de unde am rămas",
+  "player.view.pause-on-minimize": "Pauză la minimizare",
+  "player.view.topmost-while-playing": "Păstrează deasupra doar în timpul redării",
   "player.view.state-aspect": "raport {0}",
   "player.view.state-rotate": "rotit cu {0}°",
   "player.view.state-mirror": "oglindit",

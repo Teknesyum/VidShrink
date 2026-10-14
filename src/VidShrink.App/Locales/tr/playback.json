@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Ekran Görüntüsünü JPG Kaydet",
   "player.view.keep-history": "Geçmişi Tut",
   "player.view.resume": "Kaldığı Yerden Devam Et",
+  "player.view.pause-on-minimize": "Küçültünce Duraklat",
+  "player.view.topmost-while-playing": "Yalnız Oynatırken Üstte Tut",
   "player.view.state-aspect": "oran {0}",
   "player.view.state-rotate": "{0}° döndürüldü",
   "player.view.state-mirror": "aynalı",

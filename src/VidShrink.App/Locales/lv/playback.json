@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Saglabāt ekrānuzņēmumus JPG formātā",
   "player.view.keep-history": "Saglabāt vēsturi",
   "player.view.resume": "Turpināt no vietas, kur apstājos",
+  "player.view.pause-on-minimize": "Pauzēt, minimizējot",
+  "player.view.topmost-while-playing": "Turēt virspusē tikai atskaņošanas laikā",
   "player.view.state-aspect": "attiecība {0}",
   "player.view.state-rotate": "pagriezts par {0}°",
   "player.view.state-mirror": "spoguļattēls",

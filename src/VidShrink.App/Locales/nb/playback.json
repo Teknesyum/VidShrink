@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Lagre skjermbilder som JPG",
   "player.view.keep-history": "Behold historikk",
   "player.view.resume": "Fortsett der jeg slapp",
+  "player.view.pause-on-minimize": "Pause ved minimering",
+  "player.view.topmost-while-playing": "Hold øverst bare under avspilling",
   "player.view.state-aspect": "forhold {0}",
   "player.view.state-rotate": "rotert {0}°",
   "player.view.state-mirror": "speilet",
