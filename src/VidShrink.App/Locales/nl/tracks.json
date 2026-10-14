@@ -4,6 +4,8 @@
   "player.tracks.delay": "Audiovertraging {0} s",
   "player.tracks.delayreset": "Audiovertraging resetten",
   "player.tracks.none": "Geen audiospoor",
+  "player.tracks.output": "Audio-uitvoer",
+  "player.tracks.output-auto": "Automatisch",
   "player.tracks.item": "Spoor {0}",
   "player.subtitle.menu": "Ondertitels",
   "player.subtitle.off": "Uit",

@@ -4,6 +4,8 @@
   "player.tracks.delay": "Atraso de áudio {0} s",
   "player.tracks.delayreset": "Redefinir atraso de áudio",
   "player.tracks.none": "Sem faixa de áudio",
+  "player.tracks.output": "Saída de áudio",
+  "player.tracks.output-auto": "Automático",
   "player.tracks.item": "Faixa {0}",
   "player.subtitle.menu": "Legendas",
   "player.subtitle.off": "Desativado",

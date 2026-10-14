@@ -4,6 +4,8 @@
   "player.tracks.delay": "تأخير الصوت {0} ث",
   "player.tracks.delayreset": "إعادة ضبط تأخير الصوت",
   "player.tracks.none": "لا يوجد مسار صوتي",
+  "player.tracks.output": "مخرج الصوت",
+  "player.tracks.output-auto": "تلقائي",
   "player.tracks.item": "المسار {0}",
   "player.subtitle.menu": "الترجمة",
   "player.subtitle.off": "إيقاف",

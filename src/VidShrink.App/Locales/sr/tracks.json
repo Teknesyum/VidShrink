@@ -4,6 +4,8 @@
   "player.tracks.delay": "Audio kašnjenje {0} s",
   "player.tracks.delayreset": "Resetuj audio kašnjenje",
   "player.tracks.none": "Nema audio trake",
+  "player.tracks.output": "Аудио излаз",
+  "player.tracks.output-auto": "Аутоматски",
   "player.tracks.item": "Traka {0}",
   "player.subtitle.menu": "Titlovi",
   "player.subtitle.off": "Isključeno",

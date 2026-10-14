@@ -4,6 +4,8 @@
   "player.tracks.delay": "오디오 지연 {0}초",
   "player.tracks.delayreset": "오디오 지연 초기화",
   "player.tracks.none": "오디오 트랙 없음",
+  "player.tracks.output": "오디오 출력",
+  "player.tracks.output-auto": "자동",
   "player.tracks.item": "트랙 {0}",
   "player.subtitle.menu": "자막",
   "player.subtitle.off": "끄기",

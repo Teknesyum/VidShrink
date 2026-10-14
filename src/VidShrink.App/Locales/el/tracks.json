@@ -4,6 +4,8 @@
   "player.tracks.delay": "Καθυστέρηση ήχου {0} δ",
   "player.tracks.delayreset": "Επαναφορά καθυστέρησης ήχου",
   "player.tracks.none": "Κανένα κομμάτι ήχου",
+  "player.tracks.output": "Έξοδος ήχου",
+  "player.tracks.output-auto": "Αυτόματα",
   "player.tracks.item": "Κομμάτι {0}",
   "player.subtitle.menu": "Υπότιτλοι",
   "player.subtitle.off": "Ανενεργοί",

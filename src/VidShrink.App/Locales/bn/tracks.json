@@ -4,6 +4,8 @@
   "player.tracks.delay": "অডিও বিলম্ব {0} সে",
   "player.tracks.delayreset": "অডিও বিলম্ব রিসেট করুন",
   "player.tracks.none": "কোনো অডিও ট্র্যাক নেই",
+  "player.tracks.output": "অডিও আউটপুট",
+  "player.tracks.output-auto": "স্বয়ংক্রিয়",
   "player.tracks.item": "ট্র্যাক {0}",
   "player.subtitle.menu": "সাবটাইটেল",
   "player.subtitle.off": "বন্ধ",

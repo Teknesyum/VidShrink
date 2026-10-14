@@ -4,6 +4,8 @@
   "player.tracks.delay": "Garso vėlinimas {0} s",
   "player.tracks.delayreset": "Atstatyti garso vėlinimą",
   "player.tracks.none": "Nėra garso takelio",
+  "player.tracks.output": "Garso išvestis",
+  "player.tracks.output-auto": "Automatiškai",
   "player.tracks.item": "Takelis {0}",
   "player.subtitle.menu": "Subtitrai",
   "player.subtitle.off": "Išjungti",

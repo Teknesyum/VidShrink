@@ -4,6 +4,8 @@
   "player.tracks.delay": "Retraso de audio {0} s",
   "player.tracks.delayreset": "Restablecer retraso de audio",
   "player.tracks.none": "Sin pista de audio",
+  "player.tracks.output": "Salida de audio",
+  "player.tracks.output-auto": "Automático",
   "player.tracks.item": "Pista {0}",
   "player.subtitle.menu": "Subtítulos",
   "player.subtitle.off": "Desactivados",

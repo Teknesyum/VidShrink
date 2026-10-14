@@ -4,6 +4,8 @@
   "player.tracks.delay": "Kašnjenje zvuka {0} s",
   "player.tracks.delayreset": "Poništi kašnjenje zvuka",
   "player.tracks.none": "Nema zvučnog zapisa",
+  "player.tracks.output": "Audio izlaz",
+  "player.tracks.output-auto": "Automatski",
   "player.tracks.item": "Zapis {0}",
   "player.subtitle.menu": "Titlovi",
   "player.subtitle.off": "Isključeno",

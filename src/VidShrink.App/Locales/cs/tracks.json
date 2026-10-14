@@ -4,6 +4,8 @@
   "player.tracks.delay": "Zpoždění zvuku {0} s",
   "player.tracks.delayreset": "Obnovit zpoždění zvuku",
   "player.tracks.none": "Žádná zvuková stopa",
+  "player.tracks.output": "Zvukový výstup",
+  "player.tracks.output-auto": "Automaticky",
   "player.tracks.item": "Stopa {0}",
   "player.subtitle.menu": "Titulky",
   "player.subtitle.off": "Vypnuto",

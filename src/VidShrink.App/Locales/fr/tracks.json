@@ -4,6 +4,8 @@
   "player.tracks.delay": "Décalage audio {0} s",
   "player.tracks.delayreset": "Réinitialiser le décalage audio",
   "player.tracks.none": "Aucune piste audio",
+  "player.tracks.output": "Sortie audio",
+  "player.tracks.output-auto": "Automatique",
   "player.tracks.item": "Piste {0}",
   "player.subtitle.menu": "Sous-titres",
   "player.subtitle.off": "Désactivé",

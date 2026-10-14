@@ -4,6 +4,8 @@
   "player.tracks.delay": "Độ trễ âm thanh {0} giây",
   "player.tracks.delayreset": "Đặt lại độ trễ âm thanh",
   "player.tracks.none": "Không có track âm thanh",
+  "player.tracks.output": "Đầu ra âm thanh",
+  "player.tracks.output-auto": "Tự động",
   "player.tracks.item": "Track {0}",
   "player.subtitle.menu": "Phụ đề",
   "player.subtitle.off": "Tắt",

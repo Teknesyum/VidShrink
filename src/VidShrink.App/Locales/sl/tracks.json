@@ -4,6 +4,8 @@
   "player.tracks.delay": "Zvočni zamik {0} s",
   "player.tracks.delayreset": "Ponastavi zvočni zamik",
   "player.tracks.none": "Ni zvočne sledi",
+  "player.tracks.output": "Zvočni izhod",
+  "player.tracks.output-auto": "Samodejno",
   "player.tracks.item": "Sled {0}",
   "player.subtitle.menu": "Podnapisi",
   "player.subtitle.off": "Izklopljeno",

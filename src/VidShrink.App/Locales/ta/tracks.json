@@ -4,6 +4,8 @@
   "player.tracks.delay": "ஒலி தாமதம் {0} வி",
   "player.tracks.delayreset": "ஒலி தாமதத்தை மீட்டமை",
   "player.tracks.none": "ஒலி தட்டு இல்லை",
+  "player.tracks.output": "ஒலி வெளியீடு",
+  "player.tracks.output-auto": "தானியங்கு",
   "player.tracks.item": "தட்டு {0}",
   "player.subtitle.menu": "வசன வரிகள்",
   "player.subtitle.off": "ஆஃப்",

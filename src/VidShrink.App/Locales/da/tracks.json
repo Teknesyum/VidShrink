@@ -4,6 +4,8 @@
   "player.tracks.delay": "Lydforsinkelse {0} s",
   "player.tracks.delayreset": "Nulstil lydforsinkelse",
   "player.tracks.none": "Intet lydspor",
+  "player.tracks.output": "Lydudgang",
+  "player.tracks.output-auto": "Automatisk",
   "player.tracks.item": "Spor {0}",
   "player.subtitle.menu": "Undertekster",
   "player.subtitle.off": "Fra",

@@ -4,6 +4,8 @@
   "player.tracks.delay": "تأخیر صدا {0} ث",
   "player.tracks.delayreset": "بازنشانی تأخیر صدا",
   "player.tracks.none": "قطعه صوتی موجود نیست",
+  "player.tracks.output": "خروجی صدا",
+  "player.tracks.output-auto": "خودکار",
   "player.tracks.item": "قطعه {0}",
   "player.subtitle.menu": "زیرنویس‌ها",
   "player.subtitle.off": "خاموش",

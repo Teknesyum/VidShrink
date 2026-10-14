@@ -4,6 +4,8 @@
   "player.tracks.delay": "Äänen viive {0} s",
   "player.tracks.delayreset": "Nollaa äänen viive",
   "player.tracks.none": "Ei ääniraitaa",
+  "player.tracks.output": "Äänilähtö",
+  "player.tracks.output-auto": "Automaattinen",
   "player.tracks.item": "Raita {0}",
   "player.subtitle.menu": "Tekstitykset",
   "player.subtitle.off": "Pois",

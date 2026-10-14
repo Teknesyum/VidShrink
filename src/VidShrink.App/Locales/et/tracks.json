@@ -4,6 +4,8 @@
   "player.tracks.delay": "Heli hilistus {0} s",
   "player.tracks.delayreset": "Lähtesta heli hilistus",
   "player.tracks.none": "Heliriba puudub",
+  "player.tracks.output": "Heliväljund",
+  "player.tracks.output-auto": "Automaatne",
   "player.tracks.item": "Riba {0}",
   "player.subtitle.menu": "Subtiitrid",
   "player.subtitle.off": "Väljas",

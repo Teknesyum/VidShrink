@@ -121,6 +121,9 @@ internal partial class PlayerAdvancedPanel : UserControl
         Switches.Children.Add(Toggle("player.advanced.hardware", player.HardwareDecodingOn, player.ToggleHardwareDecoding));
         Switches.Children.Add(Toggle("player.advanced.normalize", player.Advanced.Sound.Normalize, player.ToggleNormalize));
         Switches.Children.Add(Toggle("player.advanced.boost", player.Advanced.Sound.Boost, player.ToggleBoost));
+        Switches.Children.Add(Toggle("player.advanced.passthrough", player.AudioOutput.Passthrough, player.ToggleAudioPassthrough));
+        Switches.Children.Add(Toggle("player.advanced.exclusive", player.AudioOutput.Exclusive, player.ToggleAudioExclusive));
+        Switches.Children.Add(Toggle("player.advanced.stereo", player.AudioOutput.Stereo, player.ToggleAudioStereo));
         Switches.Children.Add(Toggle("player.view.screenshot-jpg", player.Settings.ScreenshotFormat == ScreenshotFormat.Jpg, player.ToggleScreenshotJpg));
 
         var state = player.Advanced.State().Select(part => Strings.Get(PlayerView.StateKey(part))).ToList();

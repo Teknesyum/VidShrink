@@ -4,6 +4,8 @@
   "player.tracks.delay": "音声の遅延 {0} 秒",
   "player.tracks.delayreset": "音声の遅延をリセット",
   "player.tracks.none": "音声トラックなし",
+  "player.tracks.output": "音声出力",
+  "player.tracks.output-auto": "自動",
   "player.tracks.item": "トラック {0}",
   "player.subtitle.menu": "字幕",
   "player.subtitle.off": "オフ",

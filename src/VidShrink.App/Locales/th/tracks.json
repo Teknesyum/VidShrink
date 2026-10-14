@@ -4,6 +4,8 @@
   "player.tracks.delay": "หน่วงเสียง {0} วิ",
   "player.tracks.delayreset": "รีเซ็ตการหน่วงเสียง",
   "player.tracks.none": "ไม่มีแทร็กเสียง",
+  "player.tracks.output": "เอาต์พุตเสียง",
+  "player.tracks.output-auto": "อัตโนมัติ",
   "player.tracks.item": "แทร็ก {0}",
   "player.subtitle.menu": "คำบรรยาย",
   "player.subtitle.off": "ปิด",
