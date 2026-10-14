@@ -329,7 +329,8 @@ public sealed class OynaticiListeKaydetTests
                     Assert.Equal(Strings.Get("player.list.save"), satir.Header);
                     Assert.NotEqual("player.list.save", satir.Header);
                     Assert.True(satir.IsEnabled, "dolu listede kaydet satiri pasif");
-                    Assert.IsType<Separator>(ogeler[^2]);
+                    Assert.Equal("sort", Assert.IsType<MenuItem>(ogeler[^2]).Tag);
+                    Assert.IsType<Separator>(ogeler[^3]);
                 }
                 finally
                 {

@@ -332,14 +332,20 @@
            PlacementConstraintAdjustment="SlideX,SlideY,ResizeY"
            IsLightDismissEnabled="False">
       <Border x:Name="PlaylistPanel" Classes="playlist">
-        <ListBox x:Name="PlaylistList"
-                 Width="{StaticResource PlaylistWidth}"
-                 MaxHeight="{StaticResource PlaylistMaxHeight}"
-                 Background="Transparent"
-                 BorderThickness="0"
-                 SelectionMode="Single"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 ItemContainerTheme="{StaticResource PlaylistItem}"/>
+        <StackPanel Spacing="{StaticResource SpaceSm}">
+          <TextBox x:Name="PlaylistSearch"
+                   Width="{StaticResource PlaylistWidth}"
+                   PlaceholderText="{loc:Text player.list.search}"
+                   auto:AutomationProperties.Name="{loc:Text player.list.search}"/>
+          <ListBox x:Name="PlaylistList"
+                   Width="{StaticResource PlaylistWidth}"
+                   MaxHeight="{StaticResource PlaylistMaxHeight}"
+                   Background="Transparent"
+                   BorderThickness="0"
+                   SelectionMode="Single"
+                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                   ItemContainerTheme="{StaticResource PlaylistItem}"/>
+        </StackPanel>
       </Border>
     </Popup>
   </Grid>

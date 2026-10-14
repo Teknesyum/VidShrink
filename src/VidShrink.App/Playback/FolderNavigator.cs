@@ -112,6 +112,19 @@ internal static class FolderNavigator
         return order;
     }
 
+    internal static DateTime Modified(string path)
+    {
+        if (MediaAddress.IsAddress(path)) return DateTime.MinValue;
+        try
+        {
+            return File.Exists(path) ? File.GetLastWriteTimeUtc(path) : DateTime.MinValue;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            return DateTime.MinValue;
+        }
+    }
+
     internal static int IndexOf(IReadOnlyList<string> files, string current)
     {
         var full = PlayerView.IsAddress(current) ? current : Path.GetFullPath(current);

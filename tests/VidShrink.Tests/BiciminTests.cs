@@ -1251,6 +1251,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, EKB-P2 imlec vurgusu ve spot isigi: on bir yeni anahtardan 16 kol 9 dilde (en: option.cursor-highlight; da, nb: pointer.left-color, .right-color; es: pointer.highlight-color; fr: pointer.highlight-color, .size; pt: pointer.title, .highlight-color, .left-color, .right-color, .size; sw: pointer.highlight-color, .left-color, .right-color), KOL dokumunden sayildi: 3116 + 16 = 3132, en 303, tr 104.</para>
     /// <para>2026-10-14, ses cikisi ve cikis secenekleri (OYA-P4): bes yeni anahtardan (<c>player.advanced.passthrough</c>, <c>.exclusive</c>, <c>.stereo</c>, <c>player.tracks.output</c>, <c>.output-auto</c>) 13 kol 9 dilde (cs, en, it, pl, sk: stereo; es: passthrough, exclusive, stereo, output; pt: passthrough, exclusive, output; ro: passthrough), KOL dokumunden sayildi, tr girmiyor: 3206 + 13 = 3219, en 311 + 1 = 312, tr 104.</para>
     /// <para>2026-10-14, OYA-P3 uyku engeli ve pencere davranisi: iki yeni anahtardan 5 kol 3 dilde (en: pause-on-minimize, topmost-while-playing; it: ikisi; pt: topmost-while-playing), KOL dokumunden sayildi, tr girmiyor; olculen SAYIM toplam 3211, en 313, tr 104: 3206 + 5 = 3211, en 311 + 2 = 313, tr 104.</para>
+    /// <para>2026-10-14, liste penceresinde arama ve siralama (OYB-P3): yedi yeni anahtardan 7 kol 5 dilde (en ve tr: sort-name, sort-date; hr ve it: item.move-up; hu: search), KOL dokumunden sayildi; olculen 3206 + 7 = 3213, en 311 + 2 = 313, tr 104 + 2 = 106.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1276,9 +1277,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3240, toplam);
-        Assert.Equal(315, dilBasina["en"]);
-        Assert.Equal(104, dilBasina["tr"]);
+        Assert.Equal(3247, toplam);
+        Assert.Equal(317, dilBasina["en"]);
+        Assert.Equal(106, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1507,6 +1508,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, EKB-P2 imlec vurgusu ve spot isigi: on bir yeni anahtar (<c>recorder.option.cursor-highlight</c>, <c>.spotlight</c>, <c>recorder.pointer.title</c>, <c>.size</c>, <c>.size.small</c>, <c>.size.medium</c>, <c>.size.large</c>, <c>.highlight-color</c>, <c>.left-color</c>, <c>.right-color</c>, <c>.color</c>), dusen yok: 1390 + 11 = 1401, 43 x 1401 = 60243. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, ses cikisi ve cikis secenekleri (OYA-P4): bes yeni anahtar (<c>player.advanced.passthrough</c>, <c>.exclusive</c>, <c>.stereo</c>, <c>player.tracks.output</c>, <c>.output-auto</c>), dusen yok: 1441 + 5 = 1446, 43 x 1446 = 62178. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, OYA-P3 uyku engeli ve pencere davranisi: iki yeni anahtar (<c>player.view.pause-on-minimize</c>, <c>player.view.topmost-while-playing</c>), dusen yok; olculen SAYIM gezilen 62049: 1441 + 2 = 1443, 43 x 1443 = 62049. <c>kayip</c> 0.</para>
+    /// <para>2026-10-14, liste penceresinde arama ve siralama (OYB-P3): yedi yeni anahtar (<c>player.list.search</c>, <c>player.list.item.move-up</c>, <c>.move-down</c>, <c>player.list.sort</c>, <c>.sort-name</c>, <c>.sort-date</c>, <c>.sort-reverse</c>), dusen yok; olculen 61963 + 43 x 7 = 62264. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1534,7 +1536,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(62737, gezilen);
+        Assert.Equal(63038, gezilen);
         Assert.Empty(kayip);
     }
 

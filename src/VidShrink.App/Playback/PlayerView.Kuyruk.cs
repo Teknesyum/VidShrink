@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using VidShrink.Core;
 using VidShrink.Player;
 
@@ -74,6 +75,22 @@ internal partial class PlayerView
 
     internal bool RemoveFromList(string file) => EditQueue(file, QueueEdit.Remove, "remove ");
 
+    internal bool MoveUp(string file) => EditQueue(file, QueueEdit.MoveUp, "moveup ");
+
+    internal bool MoveDown(string file) => EditQueue(file, QueueEdit.MoveDown, "movedown ");
+
+    internal bool SortPlaylist(PlaylistSort sort)
+    {
+        if (_path is not { } current) return false;
+        Func<IReadOnlyList<string>, string, string, IReadOnlyList<string>?> edit = sort switch
+        {
+            PlaylistSort.Name => QueueEdit.SortByName,
+            PlaylistSort.Date => QueueEdit.SortByDate,
+            _ => QueueEdit.Reverse,
+        };
+        return EditQueue(current, edit, "sort " + sort.ToString().ToLowerInvariant() + " ");
+    }
+
     private bool EditQueue(string file, Func<IReadOnlyList<string>, string, string, IReadOnlyList<string>?> edit, string trace)
     {
         if (_path is not { } current) return false;
@@ -86,6 +103,13 @@ internal partial class PlayerView
 
     private string? StepFrom(string path, bool forward)
         => FolderNavigator.Step(NavigationList(path), path, forward, _settings.Repeat);
+}
+
+internal enum PlaylistSort
+{
+    Name,
+    Date,
+    Reverse,
 }
 
 internal static class QueueEdit
@@ -110,6 +134,33 @@ internal static class QueueEdit
     {
         if (Same(file, current) || FolderNavigator.IndexOf(list, file) < 0) return null;
         return Without(list, file);
+    }
+
+    internal static IReadOnlyList<string>? MoveUp(IReadOnlyList<string> list, string current, string file)
+        => Move(list, file, -1);
+
+    internal static IReadOnlyList<string>? MoveDown(IReadOnlyList<string> list, string current, string file)
+        => Move(list, file, 1);
+
+    internal static IReadOnlyList<string>? SortByName(IReadOnlyList<string> list, string current, string file)
+        => list.OrderBy(PlayerView.MediaName, FolderNavigator.NaturalComparer.Instance).ToList();
+
+    internal static IReadOnlyList<string>? SortByDate(IReadOnlyList<string> list, string current, string file)
+        => list.OrderByDescending(FolderNavigator.Modified)
+            .ThenBy(PlayerView.MediaName, FolderNavigator.NaturalComparer.Instance)
+            .ToList();
+
+    internal static IReadOnlyList<string>? Reverse(IReadOnlyList<string> list, string current, string file)
+        => list.Reverse().ToList();
+
+    private static IReadOnlyList<string>? Move(IReadOnlyList<string> list, string file, int step)
+    {
+        var index = FolderNavigator.IndexOf(list, file);
+        var target = index + step;
+        if (index < 0 || target < 0 || target >= list.Count) return null;
+        var moved = new List<string>(list);
+        (moved[index], moved[target]) = (moved[target], moved[index]);
+        return moved;
     }
 
     internal static bool Same(string file, string current) => FolderNavigator.IndexOf(new[] { file }, current) == 0;
