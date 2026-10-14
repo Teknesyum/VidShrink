@@ -180,6 +180,24 @@ public sealed class KayitMotoruTests
     }
 
     /// <summary>
+    /// PLT-P3: Mac'te tıklama işareti avfoundation'ın <c>-capture_mouse_clicks 1</c> seçeneğiyle girer ve
+    /// girdiden (<c>-i</c>) önce yazılır. Kapalıyken ya da Windows ve Linux'ta seçenek hiç yazılmaz.
+    /// </summary>
+    [Theory]
+    [InlineData(RecorderPlatform.MacOs, true, true)]
+    [InlineData(RecorderPlatform.MacOs, false, false)]
+    [InlineData(RecorderPlatform.Windows, true, false)]
+    [InlineData(RecorderPlatform.Linux, true, false)]
+    public void MacTiklamaIsaretiAvfoundationaGider(RecorderPlatform platform, bool tiklama, bool beklenen)
+    {
+        var args = RecorderArguments.Build(Ekran(platform) with { ShowClicks = tiklama }, "/tmp/t.mp4").ToList();
+
+        Assert.Equal(beklenen, Arg(args).Contains("-capture_mouse_clicks 1"));
+        Assert.Equal(beklenen, args.Contains("-capture_mouse_clicks"));
+        if (beklenen) Assert.True(args.IndexOf("-capture_mouse_clicks") < args.IndexOf("-i"));
+    }
+
+    /// <summary>
     /// PLT-01: avfoundation ekranlari kameralardan sonra numaraliyor (<c>[kamera sayisi + i] Capture screen i</c>),
     /// sira numarasi kameralı Mac'te kamerayi acar. Ad (<c>Capture screen N</c>) kamera sayisindan bagimsiz;
     /// ekran, bolge ve pencere hedefi ayni girdiden gectigi icin ucunde de ad yazilir, yalin sayi hicbirinde yok.

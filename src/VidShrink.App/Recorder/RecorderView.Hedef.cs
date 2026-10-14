@@ -164,6 +164,7 @@ internal partial class RecorderView
             Fps = fps,
             Quality = quality,
             ShowCursor = ChkCursor.IsChecked ?? false,
+            ShowClicks = ClicksInCapture,
             VideoCodec = CmbCodec.SelectedItem as string ?? RecorderArguments.DefaultVideoCodec,
             Preset = CmbPreset.SelectedItem as string ?? RecorderArguments.DefaultPreset,
             WindowTitle = string.IsNullOrWhiteSpace(TxtWindowTitle.Text) ? null : TxtWindowTitle.Text

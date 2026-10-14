@@ -113,6 +113,15 @@ internal partial class RecorderMini : Window
         }
     }
 
+    /// <summary>Platformda işlemeyen kutuları gizliyor: tıklama kendi kapısıyla, ses, tuş ve büyüteç kancayla.</summary>
+    internal void LimitOptions(bool clicks, bool hooks)
+    {
+        ChkShowClicks.IsVisible = clicks;
+        ChkClickSound.IsVisible = hooks;
+        ChkShowKeys.IsVisible = hooks;
+        ChkMagnifier.IsVisible = hooks;
+    }
+
     /// <summary>Şeridin yüzünü oturumun haline uyduruyor; hep üstte kalma da buradan sürülüyor.</summary>
     internal void Follow(RecorderState state, string elapsed, int countdown = 0)
     {

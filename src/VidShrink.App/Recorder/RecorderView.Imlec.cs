@@ -24,11 +24,11 @@ internal partial class RecorderView
             box.SelectionChanged += (_, _) => PersistChoices();
         foreach (var check in new[] { ChkCursorHighlight, ChkSpotlight, ChkShowClicks })
             check.IsCheckedChanged += (_, _) => RefreshPointerChoices();
-        RefreshPointerChoices();
+        RefreshInputBoxes();
     }
 
     private void RefreshPointerChoices() =>
-        PointerChoices.IsVisible = ChkCursorHighlight.IsChecked == true || ChkSpotlight.IsChecked == true || ChkShowClicks.IsChecked == true;
+        PointerChoices.IsVisible = ChkCursorHighlight.IsChecked == true || ChkSpotlight.IsChecked == true || (HooksAvailable && ChkShowClicks.IsChecked == true);
 
     private void RefreshPointerLabels()
     {

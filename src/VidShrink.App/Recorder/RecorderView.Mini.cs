@@ -166,6 +166,7 @@ internal partial class RecorderView
             ChkCursor.IsChecked ?? false,
             _session is not null || CountingDown,
             ChkMagnifier.IsChecked ?? false);
+        _mini.LimitOptions(ChkShowClicks.IsVisible, HooksAvailable);
     }
 
     internal RecorderMini? Mini => _mini;
