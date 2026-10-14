@@ -95,12 +95,19 @@ public static class EditExport
     }
 
     /// <summary>
-    /// Akilli kesimde yalniz aynen kopyalanan ses kodegi (<c>docs/olcumler/akilli-kesme-opus.md</c>):
-    /// kodlanan parca fazladan bir paket tasiyor ve birlesimde DTS geri gidiyor.
+    /// Akilli kesimde yalniz aynen kopyalanan ses kodekleri ve onlari tasiyan cikti kaplari. Opus
+    /// <c>docs/olcumler/akilli-kesme-opus.md</c>; AC-3, E-AC-3 ve MP3 <c>docs/olcumler/akilli-kesme-ses-kodekleri.md</c>
+    /// (uc kesimde ses-goruntu kaymasi bir kareden kucuk, kap listesi muxer'in kabul ettigi kadar). Bunlarin
+    /// kodlanan parcasi AAC olurdu ve kopyalanan parcayla ayni akista birlesmez; hiz ya da ters klip varsa Tam'a dusulur.
     /// </summary>
-    public const string CopyOnlyAudioCodec = "opus";
-
-    private static readonly string[] CopyOnlyAudioContainers = { ".mkv", ".mp4" };
+    public static readonly IReadOnlyDictionary<string, IReadOnlyList<string>> CopyOnlyAudio =
+        new Dictionary<string, IReadOnlyList<string>>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["opus"] = new[] { ".mkv", ".mp4" },
+            ["ac3"] = new[] { ".mkv", ".mp4", ".mov", ".m4v" },
+            ["eac3"] = new[] { ".mkv", ".mp4", ".mov" },
+            ["mp3"] = new[] { ".mkv", ".mp4", ".mov" }
+        };
 
     public const string SubtitleFileName = "text.ass";
 
@@ -130,14 +137,14 @@ public static class EditExport
         => cuts is { Count: > 0 } ? SmartCutCodec.Resolve(info, hasEncoder) : null;
 
     /// <summary>
-    /// Akilli kipin ses kapisi. Sessiz kaynak ve AAC her zaman gecer. Opus yalniz butun klipler duz
-    /// kopyalaniyorsa (hiz ya da ters klip yok) ve cikti kabi onu tasiyorsa (mkv, mp4) gecer.
+    /// Akilli kipin ses kapisi. Sessiz kaynak ve AAC her zaman gecer. <see cref="CopyOnlyAudio"/> kodekleri
+    /// yalniz butun klipler duz kopyalaniyorsa (hiz ya da ters klip yok) ve cikti kabi onu tasiyorsa gecer.
     /// </summary>
     public static bool SmartAudioCopies(MediaInfo info, bool motion, string outputPath)
     {
         if (AudioCopies(info)) return true;
-        if (!string.Equals(info.AudioCodec, CopyOnlyAudioCodec, StringComparison.OrdinalIgnoreCase)) return false;
-        return !motion && CopyOnlyAudioContainers.Contains(Path.GetExtension(outputPath), StringComparer.OrdinalIgnoreCase);
+        if (info.AudioCodec is not { } codec || !CopyOnlyAudio.TryGetValue(codec, out var containers)) return false;
+        return !motion && containers.Contains(Path.GetExtension(outputPath), StringComparer.OrdinalIgnoreCase);
     }
 
     private static bool AudioCopies(MediaInfo info)

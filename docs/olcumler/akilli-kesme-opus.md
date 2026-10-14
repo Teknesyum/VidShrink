@@ -32,9 +32,10 @@ Ses parçası akıllı kesimin kendi adımıyla kesildi: `-map 0:a:0 -vn -c copy
 
 `EditExport.SmartAudioCopies`: AAC eskisi gibi. Opus yalnız hız/ters klip yokken ve çıktı
 `.mkv` ya da `.mp4` iken Akıllı kipte kalır (ses aynen kopyalanır). Öteki her durumda
-(mp3, ac3, vorbis, flac; Opus + hız/ters; Opus + `.mov`/`.m4v`) teslim Tam kipe düşer ve
+(vorbis, flac; Opus + hız/ters; Opus + `.mov`/`.m4v`) teslim Tam kipe düşer ve
 `ExportPlan.AudioForcedFull` işaretlenir; düzenleyici `editor.export.audio-full` notunu yazar.
 WebM kaynak düzenleyicide `.mkv`'ye teslim edilir (`EditOutputName.Extension`).
+AC-3, E-AC-3 ve MP3 sonradan aynı kapıya girdi: `akilli-kesme-ses-kodekleri.md`.
 
 Hızlı kip (`SupportsSegments`) dokunulmadı, AAC'de kaldı.
 

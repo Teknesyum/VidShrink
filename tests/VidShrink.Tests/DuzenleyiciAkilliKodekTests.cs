@@ -197,7 +197,7 @@ public sealed class DuzenleyiciAkilliKodekTests
     [Fact]
     public void SesKopyalanamiyorsaYaDaSinirOkunmadiysaTamKipeDuser()
     {
-        foreach (var ses in new[] { "mp3", "ac3", "vorbis", "flac" })
+        foreach (var ses in new[] { "vorbis", "flac", "dts", "truehd", "pcm_s16le", "mp2" })
         {
             var dusen = Plan(Bilgi("vp9", ses: ses), "c.mkv");
             Assert.Equal(ExportMode.Full, dusen.Effective);
@@ -244,17 +244,61 @@ public sealed class DuzenleyiciAkilliKodekTests
         Assert.True(plan.AudioForcedFull);
     }
 
+    [Theory]
+    [InlineData("ac3", "c.mkv")]
+    [InlineData("ac3", "c.mp4")]
+    [InlineData("ac3", "c.mov")]
+    [InlineData("AC3", "c.m4v")]
+    [InlineData("eac3", "c.mkv")]
+    [InlineData("eac3", "c.mp4")]
+    [InlineData("eac3", "c.MOV")]
+    [InlineData("mp3", "c.mkv")]
+    [InlineData("mp3", "c.mp4")]
+    [InlineData("mp3", "c.mov")]
+    public void Ac3Eac3VeMp3SesDuzKesimdeAynenKopyalanirAkilliKipKalir(string ses, string cikti)
+    {
+        var plan = Plan(Bilgi("h264", ses: ses), cikti);
+
+        Assert.Equal(ExportMode.Smart, plan.Effective);
+        Assert.False(plan.AudioForcedFull);
+        Assert.False(plan.FellBackToFull);
+        var adim = Assert.Single(plan.Steps, s => s.Args.Contains("0:a:0")).Args;
+        Assert.Equal("copy", Deger(adim, "-c"));
+        Assert.Equal("mpegts", Deger(adim, "-f"));
+        Assert.EndsWith(".ts", adim[^1], StringComparison.Ordinal);
+        Assert.DoesNotContain(plan.Steps, s => s.Args.Contains("-c:a"));
+    }
+
+    [Theory]
+    [InlineData("eac3", "c.m4v")]
+    [InlineData("mp3", "c.m4v")]
+    [InlineData("ac3", "c.webm")]
+    [InlineData("eac3", "c.webm")]
+    [InlineData("mp3", "c.webm")]
+    [InlineData("ac3", "c.avi")]
+    public void Ac3Eac3VeMp3SesTasimayanKaptaTamKipeDuserNedeniSestir(string ses, string cikti)
+    {
+        var plan = Plan(Bilgi("h264", ses: ses), cikti);
+
+        Assert.Equal(ExportMode.Full, plan.Effective);
+        Assert.True(plan.AudioForcedFull);
+    }
+
     [Fact]
-    public void OpusSesHizYaDaTersKliptaTamKipeDuserAacKalir()
+    public void KopyalananSesHizYaDaTersKliptaTamKipeDuserAacKalir()
     {
         var hizli = new EditTimeline(new[] { new EditClip(S(1), S(3)), new EditClip(S(4), S(6), 2m) });
         var ters = new EditTimeline(new[] { new EditClip(S(1), S(3)), new EditClip(S(4), S(6), 1m, true) });
 
         foreach (var cizelge in new[] { hizli, ters })
         {
-            var opus = Plan(Bilgi("vp9", ses: "opus"), "c.mkv", cizelge: cizelge);
-            Assert.Equal(ExportMode.Full, opus.Effective);
-            Assert.True(opus.AudioForcedFull);
+            foreach (var ses in new[] { "opus", "ac3", "eac3", "mp3" })
+            {
+                var dusen = Plan(Bilgi("vp9", ses: ses), "c.mkv", cizelge: cizelge);
+                Assert.Equal(ExportMode.Full, dusen.Effective);
+                Assert.True(dusen.AudioForcedFull, ses);
+                Assert.Equal(ExportMode.Smart, Plan(Bilgi("vp9", ses: ses), "c.mkv").Effective);
+            }
 
             var aac = Plan(Bilgi("vp9", ses: "aac"), "c.mkv", cizelge: cizelge);
             Assert.Equal(ExportMode.Smart, aac.Effective);
@@ -279,7 +323,7 @@ public sealed class DuzenleyiciAkilliKodekTests
         Assert.False(hizli.AudioForcedFull);
 
         var parcalar = EditExport.BuildSegments(
-            new EditTimeline(new[] { new EditClip(S(1), S(3)), new EditClip(S(4), S(6)) }), Bilgi("vp9", ses: "mp3"), Kareler, 0,
+            new EditTimeline(new[] { new EditClip(S(1), S(3)), new EditClip(S(4), S(6)) }), Bilgi("vp9", ses: "vorbis"), Kareler, 0,
             ExportMode.Smart, new[] { "a.mkv", "b.mkv" }, new[] { "is1", "is2" }, 8 * Gb, Sinirlar(Kareler));
         Assert.All(parcalar, p => Assert.True(p.AudioForcedFull));
         Assert.All(parcalar, p => Assert.Equal(ExportMode.Full, p.Effective));
@@ -543,7 +587,8 @@ public sealed class DuzenleyiciAkilliKodekTests
     }
 
     private sealed record Kol(
-        string Ad, string Uzanti, string[] Kodlayici, string CiktiUzanti, bool Govde = true, string? Etiket = null, string Ses = "aac");
+        string Ad, string Uzanti, string[] Kodlayici, string CiktiUzanti, bool Govde = true, string? Etiket = null, string Ses = "aac",
+        string SesKodek = "opus", int PaketAlt = 199, int PaketUst = 201);
 
     private static (string Kodek, int Paket, double Sure) SesOku(string klasor, string dosya)
     {
@@ -609,9 +654,9 @@ public sealed class DuzenleyiciAkilliKodekTests
             _cikti.WriteLine($"akilli kesme kolu sesi: {kol.Ad} kaynak={kaynakSes.Kodek} cikti={ses.Kodek} paket={ses.Paket} sure={ses.Sure.ToString("0.000", CultureInfo.InvariantCulture)}");
             Assert.False(plan.AudioForcedFull);
             Assert.DoesNotContain(plan.Steps, s => s.Args.Contains("-c:a"));
-            Assert.Equal("opus", kaynakSes.Kodek);
+            Assert.Equal(kol.SesKodek, kaynakSes.Kodek);
             Assert.Equal(kaynakSes.Kodek, ses.Kodek);
-            Assert.InRange(ses.Paket, 199, 201);
+            Assert.InRange(ses.Paket, kol.PaketAlt, kol.PaketUst);
             Assert.InRange(ses.Sure, 4.0 - Kare, 4.0 + Kare);
         }
         finally
@@ -663,6 +708,20 @@ public sealed class DuzenleyiciAkilliKodekTests
     [AkilliKodekFact("libvpx-vp9", "libopus")]
     public Task CanliVp9OpusMp4CiktidaSesKopyalanirDortOlcutuGecer()
         => Olc(new Kol("vp9-opus-mp4", "webm", Vp9, "mp4", Ses: "libopus"));
+
+    private static readonly string[] X264 = { "-c:v", "libx264", "-pix_fmt", "yuv420p" };
+
+    [AkilliKodekFact("libx264", "ac3")]
+    public Task CanliH264Ac3MkvKaynaktaSesKopyalanirDortOlcutuGecer()
+        => Olc(new Kol("h264-ac3", "mkv", X264, "mkv", Ses: "ac3", SesKodek: "ac3", PaketAlt: 114, PaketUst: 116));
+
+    [AkilliKodekFact("libx264", "eac3")]
+    public Task CanliH264Eac3Mp4CiktidaSesKopyalanirDortOlcutuGecer()
+        => Olc(new Kol("h264-eac3", "mkv", X264, "mp4", Ses: "eac3", SesKodek: "eac3", PaketAlt: 114, PaketUst: 116));
+
+    [AkilliKodekFact("libx264", "libmp3lame")]
+    public Task CanliH264Mp3MovCiktidaSesKopyalanirDortOlcutuGecer()
+        => Olc(new Kol("h264-mp3", "mp4", X264, "mov", Ses: "libmp3lame", SesKodek: "mp3", PaketAlt: 152, PaketUst: 155));
 
     [AkilliKodekFact("libx264")]
     public async Task CanliHizDegisenKlipAkilliKipteKalirSureVeKareSayisiTutar()
