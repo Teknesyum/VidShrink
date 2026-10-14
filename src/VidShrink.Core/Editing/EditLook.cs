@@ -2,7 +2,7 @@ namespace VidShrink.Core.Editing;
 
 /// <summary>
 /// Onizlemenin klip ayarlari: parca basina geometri zinciri ve butun EDL icin sabit, zaman
-/// pencereli solma ve ses zincirleri. Tuval disa aktarimla aynidir.
+/// pencereli renk, solma ve ses zincirleri. Tuval disa aktarimla aynidir.
 /// </summary>
 public sealed class EditLook
 {

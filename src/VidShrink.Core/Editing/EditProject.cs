@@ -301,6 +301,10 @@ public sealed class EditProject
             writer.WriteBoolean("flipV", effects.FlipV);
             writer.WriteNumber("volumeDb", effects.VolumeDb);
             writer.WriteBoolean("muted", effects.Muted);
+            writer.WriteNumber("brightness", effects.Brightness);
+            writer.WriteNumber("contrast", effects.Contrast);
+            writer.WriteNumber("saturation", effects.Saturation);
+            writer.WriteNumber("temperature", effects.Temperature);
             writer.WriteNumber("fadeIn", effects.FadeIn);
             writer.WriteNumber("fadeOut", effects.FadeOut);
             writer.WriteEndObject();
@@ -332,6 +336,10 @@ public sealed class EditProject
             Muted = e.GetProperty("muted").GetBoolean(),
             FadeIn = e.GetProperty("fadeIn").GetInt64(),
             FadeOut = e.GetProperty("fadeOut").GetInt64(),
+            Brightness = e.TryGetProperty("brightness", out var brightness) ? brightness.GetDouble() : 0,
+            Contrast = e.TryGetProperty("contrast", out var contrast) ? contrast.GetDouble() : 1,
+            Saturation = e.TryGetProperty("saturation", out var saturation) ? saturation.GetDouble() : 1,
+            Temperature = e.TryGetProperty("temperature", out var temperature) ? temperature.GetInt32() : ClipEffects.NeutralTemperature,
         };
         return clip with { Effects = effects.Normalized() };
     }

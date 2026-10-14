@@ -3,14 +3,22 @@
 /// <summary>
 /// Klibin kaynak ustune uygulanan ayarlari: kaynak koordinatinda kesirli kirpma, saat yonunde
 /// 90 adimli dondurme, yatay ve dikey cevirme, desibel ses kazanci, sessize alma ve cizelge
-/// tick'inde giris/cikis solmasi. Sirasi sabittir: kirp, dondur, cevir.
+/// tick'inde giris/cikis solmasi, parlaklik, kontrast, doygunluk ve renk sicakligi. Sirasi sabittir:
+/// kirp, dondur, cevir, renk. Hazir gorunumler renk alanlarinin kayitli degerleridir.
 /// </summary>
 public sealed record ClipEffects
 {
     public const double MinVolumeDb = -60;
     public const double MaxVolumeDb = 20;
+    public const int NeutralTemperature = 6500;
+    public const int MinTemperature = 1000;
+    public const int MaxTemperature = 40000;
 
     public static ClipEffects None { get; } = new();
+
+    public static ClipEffects BlackWhite { get; } = new() { Saturation = 0 };
+
+    public static ClipEffects OldFilm { get; } = new() { Brightness = -0.05, Contrast = 1.1, Saturation = 0.35, Temperature = 4000 };
 
     public double CropLeft { get; init; }
 
@@ -34,15 +42,26 @@ public sealed record ClipEffects
 
     public long FadeOut { get; init; }
 
+    public double Brightness { get; init; }
+
+    public double Contrast { get; init; } = 1;
+
+    public double Saturation { get; init; } = 1;
+
+    public int Temperature { get; init; } = NeutralTemperature;
+
     public bool HasCrop => CropLeft > 0 || CropTop > 0 || CropRight > 0 || CropBottom > 0;
 
     public bool HasGeometry => HasCrop || Rotation != 0 || FlipH || FlipV;
 
     public bool HasAudio => Muted || VolumeDb != 0;
 
-    public bool IsNeutral => !HasGeometry && !HasAudio && FadeIn == 0 && FadeOut == 0;
+    public bool HasColor => Brightness != 0 || Contrast != 1 || Saturation != 1 || Temperature != NeutralTemperature;
 
-    /// <summary>Degerleri gecerli araliga ceker: kirpma kenarlari toplamda karenin %95'ini asmaz, aci 90'in katina iner.</summary>
+    public bool IsNeutral => !HasGeometry && !HasAudio && !HasColor && FadeIn == 0 && FadeOut == 0;
+
+    /// <summary>Degerleri gecerli araliga ceker: kirpma kenarlari toplamda karenin %95'ini asmaz, aci 90'in katina iner,
+    /// renk alanlari araliga kirpilip iki ondaliga yuvarlanir; sayi olmayan renk degeri notre doner.</summary>
     public ClipEffects Normalized()
     {
         static double Edge(double v) => double.IsFinite(v) ? Math.Clamp(v, 0, 0.95) : 0;
@@ -62,6 +81,10 @@ public sealed record ClipEffects
             VolumeDb = volume,
             FadeIn = Math.Max(0, FadeIn),
             FadeOut = Math.Max(0, FadeOut),
+            Brightness = Color(Brightness, 0, -1, 1),
+            Contrast = Color(Contrast, 1, 0, 2),
+            Saturation = Color(Saturation, 1, 0, 3),
+            Temperature = Math.Clamp(Temperature, MinTemperature, MaxTemperature),
         };
     }
 
@@ -111,6 +134,13 @@ public sealed record ClipEffects
         var vertical = (1 - source / target) / 2;
         return cleared with { CropTop = vertical, CropBottom = vertical };
     }
+
+    /// <summary>Yalniz renk alanlarini <paramref name="look"/>'tan alir; geometri, ses ve solma kalir.</summary>
+    public ClipEffects WithColor(ClipEffects look)
+        => this with { Brightness = look.Brightness, Contrast = look.Contrast, Saturation = look.Saturation, Temperature = look.Temperature };
+
+    private static double Color(double value, double neutral, double min, double max)
+        => double.IsFinite(value) ? Math.Round(Math.Clamp(value, min, max), 2) : neutral;
 
     private static int Even(double value) => Math.Max(0, (int)Math.Round(value / 2, MidpointRounding.AwayFromZero) * 2);
 

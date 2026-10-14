@@ -16,6 +16,10 @@ internal partial class EditorView
 {
     internal static readonly (int Num, int Den)[] CropPresets = { (0, 0), (16, 9), (9, 16), (1, 1), (4, 5), (4, 3) };
 
+    internal static readonly ClipEffects[] LookPresets = { ClipEffects.None, ClipEffects.BlackWhite, ClipEffects.OldFilm };
+
+    private static readonly string[] LookKeys = { "editor.clip.look.none", "editor.clip.look.bw", "editor.clip.look.old-film" };
+
     private bool _showingClip;
     private int _restyles;
 
@@ -29,6 +33,9 @@ internal partial class EditorView
             {
                 Content = num == 0 ? Strings.Get("editor.clip.crop.none") : num.ToString(CultureInfo.InvariantCulture) + ":" + den.ToString(CultureInfo.InvariantCulture)
             });
+
+        CmbClipLook.Items.Clear();
+        foreach (var key in LookKeys) CmbClipLook.Items.Add(new ComboBoxItem { Content = Strings.Get(key) });
 
         Timeline.SelectionChanged += ShowClipPanel;
         Timeline.TextSelectionChanged += ShowClipPanel;
@@ -44,6 +51,13 @@ internal partial class EditorView
         TxtClipFadeIn.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitClipFade(true));
         TxtClipFadeOut.LostFocus += (_, _) => CommitClipFade(false);
         TxtClipFadeOut.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitClipFade(false));
+        CmbClipLook.SelectionChanged += (_, _) => { if (_showingClip && CmbClipLook.SelectedIndex >= 0 && CmbClipLook.SelectedIndex < LookPresets.Length) SetClipEffects(e => e.WithColor(LookPresets[CmbClipLook.SelectedIndex])); };
+        foreach (var (box, field) in new[] { (TxtClipBrightness, ColorField.Brightness), (TxtClipContrast, ColorField.Contrast), (TxtClipSaturation, ColorField.Saturation), (TxtClipTemperature, ColorField.Temperature) })
+        {
+            box.LostFocus += (_, _) => CommitClipColor(box, field);
+            box.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitClipColor(box, field));
+        }
+
         TxtClipLabel.LostFocus += (_, _) => { if (_showingClip) CommitClipLabel(); };
         TxtClipLabel.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitClipLabel());
         ShowClipPanel();
@@ -143,6 +157,39 @@ internal partial class EditorView
         if (!SetClipEffects(e => fadeIn ? e with { FadeIn = ticks } : e with { FadeOut = ticks })) ShowClipPanel();
     }
 
+    private enum ColorField { Brightness, Contrast, Saturation, Temperature }
+
+    private void CommitClipColor(TextBox box, ColorField field)
+    {
+        if (!_showingClip) return;
+        var text = box.Text?.Trim();
+        if (string.IsNullOrEmpty(text)
+            || (!double.TryParse(text, NumberStyles.Float, Strings.Culture, out var value)
+                && !double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value))
+            || !double.IsFinite(value))
+        {
+            ShowClipPanel();
+            return;
+        }
+
+        var done = SetClipEffects(e => (field switch
+        {
+            ColorField.Brightness => e with { Brightness = value },
+            ColorField.Contrast => e with { Contrast = value },
+            ColorField.Saturation => e with { Saturation = value },
+            _ => e with { Temperature = (int)Math.Round(Math.Clamp(value, ClipEffects.MinTemperature, ClipEffects.MaxTemperature)) },
+        }).Normalized());
+        if (!done) ShowClipPanel();
+    }
+
+    /// <summary>Renk alanlarinin hangi hazir gorunume denk geldigi; elle ayarlanmissa -1.</summary>
+    internal static int LookPresetIndex(ClipEffects effects)
+    {
+        for (var i = 0; i < LookPresets.Length; i++)
+            if (effects.WithColor(LookPresets[i]) == effects) return i;
+        return -1;
+    }
+
     private void ShowClipPanel()
     {
         var index = ActiveIndex;
@@ -163,6 +210,11 @@ internal partial class EditorView
         TxtClipVolume.Text = effects.VolumeDb.ToString("0.#", Strings.Culture);
         TxtClipFadeIn.Text = EditTime.ToSeconds(effects.FadeIn).ToString("0.##", Strings.Culture);
         TxtClipFadeOut.Text = EditTime.ToSeconds(effects.FadeOut).ToString("0.##", Strings.Culture);
+        CmbClipLook.SelectedIndex = LookPresetIndex(effects);
+        TxtClipBrightness.Text = effects.Brightness.ToString("0.##", Strings.Culture);
+        TxtClipContrast.Text = effects.Contrast.ToString("0.##", Strings.Culture);
+        TxtClipSaturation.Text = effects.Saturation.ToString("0.##", Strings.Culture);
+        TxtClipTemperature.Text = effects.Temperature.ToString(CultureInfo.InvariantCulture);
         TxtClipLabel.Text = model.Clips[index].Label;
         ClipPanel.IsVisible = true;
         _showingClip = true;
