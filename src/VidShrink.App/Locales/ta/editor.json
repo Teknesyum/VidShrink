@@ -153,5 +153,8 @@
   "editor.export.audio-only": "ஒலியை மட்டும் ஏற்றுமதி செய்",
   "editor.export.audio-only.tip": "ஒலியை மட்டும் M4A (AAC) அல்லது MP3 கோப்பில் எழுதும். வீடியோ அமைப்புகளும் உரையும் புறக்கணிக்கப்படும்.",
   "editor.export.audio-only.no-audio": "காலவரிசையின் மூலங்களில் ஒலி இல்லை, ஏற்றுமதி செய்ய எதுவும் இல்லை.",
-  "editor.export.settings-full": "ஏற்றுமதி அமைப்புகளுக்கு மீண்டும் குறியாக்கம் தேவை; முழு பயன்முறைக்கு மாற்றப்பட்டது."
+  "editor.export.settings-full": "ஏற்றுமதி அமைப்புகளுக்கு மீண்டும் குறியாக்கம் தேவை; முழு பயன்முறைக்கு மாற்றப்பட்டது.",
+  "editor.export.audio-track": "ஒலித் தடம்",
+  "editor.export.audio-track.none": "ஒலி இல்லை",
+  "editor.monitor.audio-track": "ஒலித் தடத்தை மாற்று"
 }

@@ -153,5 +153,8 @@
   "editor.export.audio-only": "Csak a Hang Exportálása",
   "editor.export.audio-only.tip": "Csak a hangot írja M4A (AAC) vagy MP3 fájlba. A videobeállítások és a szöveg figyelmen kívül maradnak.",
   "editor.export.audio-only.no-audio": "Az idővonal forrásaiban nincs hang, nincs mit exportálni.",
-  "editor.export.settings-full": "Az exportálási beállítások újrakódolást igényelnek; Teljes módra váltva."
+  "editor.export.settings-full": "Az exportálási beállítások újrakódolást igényelnek; Teljes módra váltva.",
+  "editor.export.audio-track": "Hangsáv",
+  "editor.export.audio-track.none": "Nincs hang",
+  "editor.monitor.audio-track": "Hangsáv váltása"
 }

@@ -153,5 +153,8 @@
   "editor.export.audio-only": "Yalnız Sesi Dışa Aktar",
   "editor.export.audio-only.tip": "Yalnız sesi M4A (AAC) ya da MP3 dosyasına yazar. Görüntü ayarları ve metin yok sayılır.",
   "editor.export.audio-only.no-audio": "Çizelgenin kaynaklarında ses yok, dışa aktarılacak bir şey kalmadı.",
-  "editor.export.settings-full": "Dışa aktarma ayarları yeniden kodlama ister; Tam kipine geçildi."
+  "editor.export.settings-full": "Dışa aktarma ayarları yeniden kodlama ister; Tam kipine geçildi.",
+  "editor.export.audio-track": "Ses izi",
+  "editor.export.audio-track.none": "Ses yok",
+  "editor.monitor.audio-track": "Ses izini değiştir"
 }

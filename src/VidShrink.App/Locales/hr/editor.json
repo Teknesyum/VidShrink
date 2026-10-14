@@ -153,5 +153,8 @@
   "editor.export.audio-only": "Izvezi Samo Zvuk",
   "editor.export.audio-only.tip": "Zapisuje samo zvuk u datoteku M4A (AAC) ili MP3. Postavke slike i tekst se zanemaruju.",
   "editor.export.audio-only.no-audio": "Izvori vremenske crte nemaju zvuk, nema ničega za izvoz.",
-  "editor.export.settings-full": "Postavke izvoza zahtijevaju ponovno kodiranje; prebačeno na Puno."
+  "editor.export.settings-full": "Postavke izvoza zahtijevaju ponovno kodiranje; prebačeno na Puno.",
+  "editor.export.audio-track": "Zvučni zapis",
+  "editor.export.audio-track.none": "Bez zvuka",
+  "editor.monitor.audio-track": "Promijeni zvučni zapis"
 }

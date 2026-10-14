@@ -153,5 +153,8 @@
   "editor.export.audio-only": "Exportă Doar Sunetul",
   "editor.export.audio-only.tip": "Scrie doar sunetul într-un fișier M4A (AAC) sau MP3. Setările video și textul sunt ignorate.",
   "editor.export.audio-only.no-audio": "Sursele cronologiei nu au sunet, nu este nimic de exportat.",
-  "editor.export.settings-full": "Setările de export necesită recodare; s-a trecut la Complet."
+  "editor.export.settings-full": "Setările de export necesită recodare; s-a trecut la Complet.",
+  "editor.export.audio-track": "Pistă audio",
+  "editor.export.audio-track.none": "Fără sunet",
+  "editor.monitor.audio-track": "Schimbă pista audio"
 }

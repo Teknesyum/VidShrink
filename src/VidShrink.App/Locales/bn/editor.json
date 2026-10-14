@@ -153,5 +153,8 @@
   "editor.export.audio-only": "শুধু অডিও রপ্তানি করুন",
   "editor.export.audio-only.tip": "শুধু অডিও M4A (AAC) বা MP3 ফাইলে লেখে। ভিডিও সেটিং ও লেখা উপেক্ষা করা হয়।",
   "editor.export.audio-only.no-audio": "টাইমলাইনের উৎসগুলোতে অডিও নেই, রপ্তানি করার কিছু নেই।",
-  "editor.export.settings-full": "রপ্তানি সেটিংয়ে আবার এনকোড করা দরকার; পূর্ণ মোডে বদলানো হয়েছে।"
+  "editor.export.settings-full": "রপ্তানি সেটিংয়ে আবার এনকোড করা দরকার; পূর্ণ মোডে বদলানো হয়েছে।",
+  "editor.export.audio-track": "অডিও ট্র্যাক",
+  "editor.export.audio-track.none": "অডিও নেই",
+  "editor.monitor.audio-track": "অডিও ট্র্যাক বদলান"
 }

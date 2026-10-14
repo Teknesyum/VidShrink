@@ -153,5 +153,8 @@
   "editor.export.audio-only": "Eksportuoti Tik Garsą",
   "editor.export.audio-only.tip": "Įrašo tik garsą į M4A (AAC) arba MP3 failą. Vaizdo nuostatos ir tekstas nepaisomi.",
   "editor.export.audio-only.no-audio": "Laiko juostos šaltiniuose nėra garso, nėra ką eksportuoti.",
-  "editor.export.settings-full": "Eksporto nuostatoms reikia perkodavimo; perjungta į Visą."
+  "editor.export.settings-full": "Eksporto nuostatoms reikia perkodavimo; perjungta į Visą.",
+  "editor.export.audio-track": "Garso takelis",
+  "editor.export.audio-track.none": "Be garso",
+  "editor.monitor.audio-track": "Perjungti garso takelį"
 }

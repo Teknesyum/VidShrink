@@ -153,5 +153,8 @@
   "editor.export.audio-only": "Alleen Audio Exporteren",
   "editor.export.audio-only.tip": "Schrijft alleen het geluid naar een M4A- (AAC) of MP3-bestand. Video-instellingen en tekst worden genegeerd.",
   "editor.export.audio-only.no-audio": "De bronnen van de tijdlijn hebben geen geluid, er is niets om te exporteren.",
-  "editor.export.settings-full": "De exportinstellingen vereisen hercodering; overgeschakeld naar Volledig."
+  "editor.export.settings-full": "De exportinstellingen vereisen hercodering; overgeschakeld naar Volledig.",
+  "editor.export.audio-track": "Audiospoor",
+  "editor.export.audio-track.none": "Geen audio",
+  "editor.monitor.audio-track": "Audiospoor wisselen"
 }

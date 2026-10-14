@@ -45,8 +45,9 @@ public sealed class EditProject
     private static readonly UTF8Encoding Utf8 = new(false);
 
     private EditProject(SourceStamp source, long sourceDuration, IReadOnlyList<EditClip> clips, IReadOnlyList<TextLayer> texts, string? exportMode,
-        IReadOnlyList<ExtraSource> extraSources, IReadOnlyList<EditMarker> markers)
+        IReadOnlyList<ExtraSource> extraSources, IReadOnlyList<EditMarker> markers, int audioTrack)
     {
+        AudioTrack = audioTrack;
         Markers = markers;
         ExtraSources = extraSources;
         Source = source;
@@ -71,11 +72,14 @@ public sealed class EditProject
     /// <summary>Cizelgenin isaretcileri, ana gore sirali. Bos liste dosyaya yazilmaz.</summary>
     public IReadOnlyList<EditMarker> Markers { get; }
 
+    /// <summary>Teslime giden ses izi (<see cref="EditAudioTrack"/>). Varsayilan iz dosyaya yazilmaz.</summary>
+    public int AudioTrack { get; }
+
     /// <summary>
     /// <paramref name="extraSources"/> cizelgenin ek kaynaklariyla ayni sirada ve ayni sayida olmalidir.
     /// </summary>
     public static EditProject From(SourceStamp source, EditTimeline timeline, string? exportMode = null, IReadOnlyList<SourceStamp>? extraSources = null,
-        IReadOnlyList<EditMarker>? markers = null)
+        IReadOnlyList<EditMarker>? markers = null, int audioTrack = EditAudioTrack.Default)
     {
         ArgumentNullException.ThrowIfNull(source);
         ArgumentNullException.ThrowIfNull(timeline);
@@ -84,7 +88,8 @@ public sealed class EditProject
             throw new ArgumentException("Her ek kaynaga bir kimlik gerekir", nameof(extraSources));
         var duration = timeline.SourceDuration ?? timeline.Clips.Where(c => c.Source == 0).Select(c => c.SourceEnd).DefaultIfEmpty(1).Max();
         var extras = stamps.Select((stamp, i) => new ExtraSource(stamp, timeline.ExtraSources[i])).ToArray();
-        return new EditProject(source, duration, timeline.Clips.ToArray(), timeline.Texts.ToArray(), exportMode, extras, Sorted(markers ?? Array.Empty<EditMarker>()));
+        return new EditProject(source, duration, timeline.Clips.ToArray(), timeline.Texts.ToArray(), exportMode, extras, Sorted(markers ?? Array.Empty<EditMarker>()),
+            audioTrack);
     }
 
     /// <summary>
@@ -126,6 +131,7 @@ public sealed class EditProject
             }
 
             if (ExportMode is { Length: > 0 } mode) writer.WriteString("exportMode", mode);
+            if (AudioTrack != EditAudioTrack.Default) writer.WriteNumber("audioTrack", AudioTrack);
 
             writer.WriteStartArray("clips");
             foreach (var clip in Clips) WriteClip(writer, clip);
@@ -182,7 +188,9 @@ public sealed class EditProject
             var markers = root.TryGetProperty("markers", out var marks) ? Sorted(marks.EnumerateArray().Select(ReadMarker)) : Array.Empty<EditMarker>();
 
             _ = new EditTimeline(clips, duration, texts, extras.Select(e => e.Duration));
-            var project = new EditProject(stamp, duration, clips, texts, mode, extras, markers);
+            var track = root.TryGetProperty("audioTrack", out var trackValue) && trackValue.ValueKind == JsonValueKind.Number
+                && trackValue.TryGetInt32(out var parsed) ? parsed : EditAudioTrack.Default;
+            var project = new EditProject(stamp, duration, clips, texts, mode, extras, markers, track);
             return project.FitsIn(duration) ? project : null;
         }
         catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException or FormatException or ArgumentException or OverflowException)

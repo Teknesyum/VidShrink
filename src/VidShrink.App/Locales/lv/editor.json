@@ -153,5 +153,8 @@
   "editor.export.audio-only": "Eksportēt Tikai Skaņu",
   "editor.export.audio-only.tip": "Ieraksta tikai skaņu M4A (AAC) vai MP3 failā. Video iestatījumi un teksts tiek ignorēti.",
   "editor.export.audio-only.no-audio": "Laika joslas avotiem nav skaņas, nav ko eksportēt.",
-  "editor.export.settings-full": "Eksporta iestatījumiem nepieciešama pārkodēšana; pārslēgts uz Pilns."
+  "editor.export.settings-full": "Eksporta iestatījumiem nepieciešama pārkodēšana; pārslēgts uz Pilns.",
+  "editor.export.audio-track": "Audio celiņš",
+  "editor.export.audio-track.none": "Bez skaņas",
+  "editor.monitor.audio-track": "Pārslēgt audio celiņu"
 }

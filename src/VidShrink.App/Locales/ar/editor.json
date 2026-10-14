@@ -153,5 +153,8 @@
   "editor.export.audio-only": "تصدير الصوت فقط",
   "editor.export.audio-only.tip": "يكتب الصوت فقط في ملف M4A (AAC) أو MP3. يتم تجاهل إعدادات الفيديو والنص.",
   "editor.export.audio-only.no-audio": "مصادر المخطط الزمني لا تحتوي على صوت، لا يوجد ما يُصدَّر.",
-  "editor.export.settings-full": "إعدادات التصدير تتطلب إعادة الترميز؛ تم التبديل إلى الكامل."
+  "editor.export.settings-full": "إعدادات التصدير تتطلب إعادة الترميز؛ تم التبديل إلى الكامل.",
+  "editor.export.audio-track": "مسار الصوت",
+  "editor.export.audio-track.none": "بلا صوت",
+  "editor.monitor.audio-track": "تبديل مسار الصوت"
 }

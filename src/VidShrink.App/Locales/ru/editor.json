@@ -153,5 +153,8 @@
   "editor.export.audio-only": "Экспортировать Только Звук",
   "editor.export.audio-only.tip": "Записывает только звук в файл M4A (AAC) или MP3. Настройки видео и текст игнорируются.",
   "editor.export.audio-only.no-audio": "В источниках шкалы времени нет звука, экспортировать нечего.",
-  "editor.export.settings-full": "Настройки экспорта требуют перекодирования; выбран режим Полный."
+  "editor.export.settings-full": "Настройки экспорта требуют перекодирования; выбран режим Полный.",
+  "editor.export.audio-track": "Звуковая дорожка",
+  "editor.export.audio-track.none": "Без звука",
+  "editor.monitor.audio-track": "Сменить звуковую дорожку"
 }

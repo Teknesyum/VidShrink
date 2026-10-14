@@ -153,5 +153,8 @@
   "editor.export.audio-only": "केवल ऑडियो निर्यात करें",
   "editor.export.audio-only.tip": "केवल ऑडियो को M4A (AAC) या MP3 फ़ाइल में लिखता है। वीडियो सेटिंग और टेक्स्ट अनदेखे होते हैं।",
   "editor.export.audio-only.no-audio": "टाइमलाइन के स्रोतों में ऑडियो नहीं है, निर्यात करने को कुछ नहीं।",
-  "editor.export.settings-full": "निर्यात सेटिंग के लिए फिर से एन्कोड करना ज़रूरी है; पूर्ण पर बदला गया।"
+  "editor.export.settings-full": "निर्यात सेटिंग के लिए फिर से एन्कोड करना ज़रूरी है; पूर्ण पर बदला गया।",
+  "editor.export.audio-track": "ऑडियो ट्रैक",
+  "editor.export.audio-track.none": "ऑडियो नहीं",
+  "editor.monitor.audio-track": "ऑडियो ट्रैक बदलें"
 }

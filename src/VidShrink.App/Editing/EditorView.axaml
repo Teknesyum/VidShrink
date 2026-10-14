@@ -46,6 +46,12 @@
           </Button>
         </StackPanel>
         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="{StaticResource EditorTransportGap}" VerticalAlignment="Center">
+          <Button x:Name="BtnAudioTrack" Theme="{StaticResource PlaybackBarButton}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.monitor.audio-track}" ToolTip.Tip="{loc:Text editor.monitor.audio-track}">
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceXs}">
+              <Path x:Name="GlyphAudioTrack" Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" VerticalAlignment="Center" Data="{StaticResource IconVolume}" Fill="{Binding $parent[Button].Foreground}"/>
+              <TextBlock x:Name="TxtAudioTrack" VerticalAlignment="Center" Foreground="{Binding $parent[Button].Foreground}"/>
+            </StackPanel>
+          </Button>
           <TextBlock x:Name="TxtOnKeyframe" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.on-keyframe}" IsVisible="False"/>
           <TextBlock x:Name="TxtDuration" Theme="{StaticResource MonoValue}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.duration}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
         </StackPanel>
@@ -94,7 +100,7 @@
                         <TextBox x:Name="TxtPartName" Width="{StaticResource FieldWidth}" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.export.part-name}" ToolTip.Tip="{loc:Text editor.export.part-name.hint}"/>
                       </StackPanel>
                       <TextBlock x:Name="TxtPartNameError" Theme="{StaticResource StatusError}" TextWrapping="Wrap" MaxWidth="{StaticResource FieldWidth}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-                      <Grid x:Name="ExportSettingsGrid" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}" RowSpacing="{StaticResource SpaceSm}">
+                      <Grid x:Name="ExportSettingsGrid" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}" RowSpacing="{StaticResource SpaceSm}">
                         <TextBlock Grid.Row="0" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.preset}"/>
                         <ComboBox x:Name="CmbExportPreset" Grid.Row="0" Grid.Column="1" MinWidth="{StaticResource EditorExportModeWidth}" AutomationProperties.Name="{loc:Text editor.export.preset}" SelectedIndex="0">
                           <ComboBoxItem Content="{loc:Text editor.export.preset.custom}" Tag=""/>
@@ -124,6 +130,8 @@
                         <TextBlock Grid.Row="5" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.audio-bitrate}"/>
                         <ComboBox x:Name="CmbExportAudioBitrate" Grid.Row="5" Grid.Column="1" MinWidth="{StaticResource EditorExportModeWidth}" AutomationProperties.Name="{loc:Text editor.export.audio-bitrate}"/>
                         <CheckBox x:Name="ChkExportAudioOnly" Grid.Row="6" Grid.ColumnSpan="2" Theme="{StaticResource CheckStyle}" Content="{loc:Text editor.export.audio-only}" ToolTip.Tip="{loc:Text editor.export.audio-only.tip}"/>
+                        <TextBlock Grid.Row="7" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.audio-track}"/>
+                        <ComboBox x:Name="CmbExportAudioTrack" Grid.Row="7" Grid.Column="1" MinWidth="{StaticResource EditorExportModeWidth}" AutomationProperties.Name="{loc:Text editor.export.audio-track}"/>
                       </Grid>
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                         <TextBox x:Name="TxtExportPresetName" Width="{StaticResource FieldWidth}" VerticalAlignment="Center" PlaceholderText="{loc:Text editor.export.preset.name}" AutomationProperties.Name="{loc:Text editor.export.preset.name}"/>

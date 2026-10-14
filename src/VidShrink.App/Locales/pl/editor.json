@@ -153,5 +153,8 @@
   "editor.export.audio-only": "Eksportuj Tylko Dźwięk",
   "editor.export.audio-only.tip": "Zapisuje tylko dźwięk do pliku M4A (AAC) lub MP3. Ustawienia obrazu i tekst są pomijane.",
   "editor.export.audio-only.no-audio": "Źródła osi czasu nie mają dźwięku, nie ma czego eksportować.",
-  "editor.export.settings-full": "Ustawienia eksportu wymagają ponownego kodowania; przełączono na Pełny."
+  "editor.export.settings-full": "Ustawienia eksportu wymagają ponownego kodowania; przełączono na Pełny.",
+  "editor.export.audio-track": "Ścieżka dźwiękowa",
+  "editor.export.audio-track.none": "Bez dźwięku",
+  "editor.monitor.audio-track": "Przełącz ścieżkę dźwiękową"
 }

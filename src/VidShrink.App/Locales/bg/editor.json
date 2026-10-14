@@ -153,5 +153,8 @@
   "editor.export.audio-only": "Експортиране Само на Звука",
   "editor.export.audio-only.tip": "Записва само звука във файл M4A (AAC) или MP3. Настройките на видеото и текстът се пренебрегват.",
   "editor.export.audio-only.no-audio": "Източниците на времевата линия нямат звук, няма какво да се експортира.",
-  "editor.export.settings-full": "Настройките за експортиране изискват прекодиране; превключено на Пълно."
+  "editor.export.settings-full": "Настройките за експортиране изискват прекодиране; превключено на Пълно.",
+  "editor.export.audio-track": "Аудиопътечка",
+  "editor.export.audio-track.none": "Без звук",
+  "editor.monitor.audio-track": "Смяна на аудиопътечката"
 }

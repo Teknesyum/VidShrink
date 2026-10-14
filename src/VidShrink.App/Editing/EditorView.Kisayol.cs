@@ -203,8 +203,14 @@ internal partial class EditorView
 
     private void OnLanguageChanged(object? sender, EventArgs e)
     {
-        if (Avalonia.Threading.Dispatcher.UIThread.CheckAccess()) ShowGestures();
-        else Avalonia.Threading.Dispatcher.UIThread.Post(ShowGestures);
+        if (Avalonia.Threading.Dispatcher.UIThread.CheckAccess()) ShowLanguage();
+        else Avalonia.Threading.Dispatcher.UIThread.Post(ShowLanguage);
+    }
+
+    private void ShowLanguage()
+    {
+        ShowGestures();
+        SyncAudioTrackControls();
     }
 
     private void OnKey(object? sender, KeyEventArgs e)

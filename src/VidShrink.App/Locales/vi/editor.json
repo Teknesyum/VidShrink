@@ -153,5 +153,8 @@
   "editor.export.audio-only": "Chỉ Xuất Âm Thanh",
   "editor.export.audio-only.tip": "Chỉ ghi âm thanh vào tệp M4A (AAC) hoặc MP3. Cài đặt hình ảnh và văn bản bị bỏ qua.",
   "editor.export.audio-only.no-audio": "Các nguồn trên dòng thời gian không có âm thanh, không có gì để xuất.",
-  "editor.export.settings-full": "Cài đặt xuất cần mã hóa lại; đã chuyển sang Đầy đủ."
+  "editor.export.settings-full": "Cài đặt xuất cần mã hóa lại; đã chuyển sang Đầy đủ.",
+  "editor.export.audio-track": "Rãnh âm thanh",
+  "editor.export.audio-track.none": "Không có âm thanh",
+  "editor.monitor.audio-track": "Đổi rãnh âm thanh"
 }

@@ -153,5 +153,8 @@
   "editor.export.audio-only": "صرف آڈیو برآمد کریں",
   "editor.export.audio-only.tip": "صرف آواز کو M4A (AAC) یا MP3 فائل میں لکھتا ہے۔ ویڈیو کی ترتیبات اور متن نظرانداز ہوتے ہیں۔",
   "editor.export.audio-only.no-audio": "ٹائم لائن کے ماخذوں میں آواز نہیں، برآمد کرنے کو کچھ نہیں۔",
-  "editor.export.settings-full": "برآمد کی ترتیبات کو دوبارہ انکوڈنگ درکار ہے؛ مکمل پر منتقل کیا گیا۔"
+  "editor.export.settings-full": "برآمد کی ترتیبات کو دوبارہ انکوڈنگ درکار ہے؛ مکمل پر منتقل کیا گیا۔",
+  "editor.export.audio-track": "آڈیو ٹریک",
+  "editor.export.audio-track.none": "آڈیو نہیں",
+  "editor.monitor.audio-track": "آڈیو ٹریک بدلیں"
 }

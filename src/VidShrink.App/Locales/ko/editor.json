@@ -153,5 +153,8 @@
   "editor.export.audio-only": "오디오만 내보내기",
   "editor.export.audio-only.tip": "오디오만 M4A (AAC) 또는 MP3 파일로 씁니다. 영상 설정과 텍스트는 무시됩니다.",
   "editor.export.audio-only.no-audio": "타임라인의 소스에 오디오가 없어 내보낼 것이 없습니다.",
-  "editor.export.settings-full": "내보내기 설정에 다시 인코딩이 필요해 전체 모드로 바꿨습니다."
+  "editor.export.settings-full": "내보내기 설정에 다시 인코딩이 필요해 전체 모드로 바꿨습니다.",
+  "editor.export.audio-track": "오디오 트랙",
+  "editor.export.audio-track.none": "오디오 없음",
+  "editor.monitor.audio-track": "오디오 트랙 전환"
 }

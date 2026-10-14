@@ -153,5 +153,8 @@
   "editor.export.audio-only": "Export Audio Only",
   "editor.export.audio-only.tip": "Writes only the audio to an M4A (AAC) or MP3 file. Video settings and text are ignored.",
   "editor.export.audio-only.no-audio": "The timeline's sources have no audio, so there is nothing to export.",
-  "editor.export.settings-full": "Export settings need a re-encode; switched to Full."
+  "editor.export.settings-full": "Export settings need a re-encode; switched to Full.",
+  "editor.export.audio-track": "Audio track",
+  "editor.export.audio-track.none": "No audio",
+  "editor.monitor.audio-track": "Switch audio track"
 }

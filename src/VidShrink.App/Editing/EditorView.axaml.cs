@@ -143,6 +143,7 @@ internal partial class EditorView : UserControl
         ForgetSaved();
         ForgetSilence();
         ForgetSources();
+        ForgetAudioTracks();
         _source = path;
         _model = null;
         Timeline.Show(null);
@@ -160,6 +161,7 @@ internal partial class EditorView : UserControl
         }
 
         if (!CurrentMedia.SamePath(path, _source) || Preview.Engine is not { } engine || !(engine.DurationSeconds > 0)) return;
+        CaptureAudioTracks(engine);
         ShowTimeline(OpenedTimeline(path, EditTime.FromSeconds(engine.DurationSeconds), project), SourceFps(KnownInfo?.Invoke(path)?.Fps, engine.FramesPerSecond));
         var at = Math.Clamp(start, 0, _model!.Duration);
         Timeline.Playhead = at;
@@ -377,6 +379,7 @@ internal partial class EditorView : UserControl
         {
             await driver.OpenAsync().ConfigureAwait(true);
             if (!ReferenceEquals(_driver, driver)) return;
+            ApplyAudioTrack(engine);
             RefreshOverlay(reopened: true);
             Preview.RefreshDuration();
             await driver.SeekAsync(Math.Clamp(at, 0, model.Duration)).ConfigureAwait(true);

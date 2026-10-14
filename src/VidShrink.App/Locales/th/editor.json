@@ -153,5 +153,8 @@
   "editor.export.audio-only": "ส่งออกเฉพาะเสียง",
   "editor.export.audio-only.tip": "เขียนเฉพาะเสียงลงไฟล์ M4A (AAC) หรือ MP3 การตั้งค่าวิดีโอและข้อความจะถูกละเว้น",
   "editor.export.audio-only.no-audio": "แหล่งที่มาในไทม์ไลน์ไม่มีเสียง จึงไม่มีอะไรให้ส่งออก",
-  "editor.export.settings-full": "การตั้งค่าส่งออกต้องเข้ารหัสใหม่ จึงเปลี่ยนเป็นแบบเต็ม"
+  "editor.export.settings-full": "การตั้งค่าส่งออกต้องเข้ารหัสใหม่ จึงเปลี่ยนเป็นแบบเต็ม",
+  "editor.export.audio-track": "แทร็กเสียง",
+  "editor.export.audio-track.none": "ไม่มีเสียง",
+  "editor.monitor.audio-track": "สลับแทร็กเสียง"
 }

@@ -153,5 +153,8 @@
   "editor.export.audio-only": "Ekspordi Ainult Heli",
   "editor.export.audio-only.tip": "Kirjutab ainult heli M4A- (AAC) või MP3-faili. Video seaded ja tekst jäetakse kõrvale.",
   "editor.export.audio-only.no-audio": "Ajaskaala allikatel pole heli, pole midagi eksportida.",
-  "editor.export.settings-full": "Ekspordiseaded nõuavad ümberkodeerimist; lülitati režiimile Täielik."
+  "editor.export.settings-full": "Ekspordiseaded nõuavad ümberkodeerimist; lülitati režiimile Täielik.",
+  "editor.export.audio-track": "Heliriba",
+  "editor.export.audio-track.none": "Heli puudub",
+  "editor.monitor.audio-track": "Vaheta heliriba"
 }

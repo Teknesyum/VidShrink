@@ -153,5 +153,8 @@
   "editor.export.audio-only": "Exportar Solo el Audio",
   "editor.export.audio-only.tip": "Escribe solo el audio en un archivo M4A (AAC) o MP3. Se ignoran los ajustes de vídeo y el texto.",
   "editor.export.audio-only.no-audio": "Las fuentes de la línea de tiempo no tienen audio, no hay nada que exportar.",
-  "editor.export.settings-full": "Los ajustes de exportación requieren recodificar; se cambió a Completo."
+  "editor.export.settings-full": "Los ajustes de exportación requieren recodificar; se cambió a Completo.",
+  "editor.export.audio-track": "Pista de audio",
+  "editor.export.audio-track.none": "Sin audio",
+  "editor.monitor.audio-track": "Cambiar pista de audio"
 }
