@@ -1,0 +1,72 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:VidShrink.App.Localization"
+        x:Class="VidShrink.App.ConvertQueueWindow"
+        Title="VidShrink"
+        Width="{StaticResource TipMaxWidth}"
+        SizeToContent="Height"
+        CanResize="False" CanMaximize="False"
+        ShowInTaskbar="True"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource AppBg}"
+        ExtendClientAreaToDecorationsHint="True"
+        WindowDecorations="BorderOnly"
+        ExtendClientAreaTitleBarHeightHint="-1"
+        FontFamily="{StaticResource FontSans}" FontSize="{StaticResource FontSizeMd}"
+        Foreground="{StaticResource TextBody}">
+
+  <Border x:Name="QueueShell"
+          Background="{StaticResource PanelSurface}"
+          BorderBrush="{StaticResource NeonBlueBorder}"
+          BorderThickness="{StaticResource BorderThin}"
+          CornerRadius="{StaticResource RadiusPanel}"
+          Padding="{StaticResource PanelPadding}">
+    <StackPanel Spacing="{StaticResource SpaceMd}">
+
+      <TextBlock x:Name="TxtHeadline"
+                 FontSize="{StaticResource FontSizeMd}"
+                 TextWrapping="Wrap"/>
+
+      <ProgressBar x:Name="Progress"
+                   Minimum="0" Maximum="1"
+                   Height="{StaticResource ProgressBarHeight}"/>
+
+      <Grid ColumnDefinitions="Auto,*">
+        <TextBlock Grid.Column="0"
+                   Text="{loc:Text main.output.stage}"
+                   FontSize="{StaticResource FontSizeSm}"
+                   Foreground="{StaticResource TextBody}"
+                   Margin="{StaticResource ChipMargin}"/>
+        <TextBlock Grid.Column="1" x:Name="TxtStage"
+                   FontSize="{StaticResource FontSizeSm}"
+                   TextTrimming="CharacterEllipsis"
+                   ToolTip.Tip="{Binding $self.Text}"/>
+      </Grid>
+
+      <ScrollViewer MaxHeight="{StaticResource DropDownMaxHeight}"
+                    HorizontalScrollBarVisibility="Disabled">
+        <StackPanel x:Name="ItemList" Spacing="{StaticResource SpaceXs}"/>
+      </ScrollViewer>
+
+      <TextBlock x:Name="TxtSummary"
+                 FontSize="{StaticResource FontSizeSm}"
+                 FontWeight="SemiBold"
+                 TextWrapping="Wrap"
+                 IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+      <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
+        <Button Theme="{StaticResource GhostButton}" x:Name="BtnStart"
+                Content="{loc:Text main.action.convert}"
+                Padding="{StaticResource ButtonPaddingSm}"/>
+        <Button Theme="{StaticResource GhostButton}" x:Name="BtnReveal"
+                Content="{loc:Text main.action.show-in-folder}"
+                Padding="{StaticResource ButtonPaddingSm}"
+                IsVisible="False"/>
+        <Button Theme="{StaticResource GhostButton}" x:Name="BtnCancel"
+                Content="{loc:Text main.action.cancel}"
+                Padding="{StaticResource ButtonPaddingSm}"/>
+      </WrapPanel>
+
+    </StackPanel>
+  </Border>
+</Window>

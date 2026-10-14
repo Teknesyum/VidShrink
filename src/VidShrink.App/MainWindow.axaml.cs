@@ -3248,7 +3248,7 @@ public partial class MainWindow : Window
 
     private async void OnBrowse(object? sender, RoutedEventArgs e) => await BrowseAsync(true);
 
-    private async void OnBrowseConvert(object? sender, RoutedEventArgs e) => await BrowseAsync(false);
+    private async void OnBrowseConvert(object? sender, RoutedEventArgs e) => await BrowseAsync(true);
 
     /// <summary>
     /// Seçici dikişi; argüman çoklu seçimin açık olup olmadığı. Ölçüm sahte yol listesini buraya
@@ -3263,8 +3263,14 @@ public partial class MainWindow : Window
     internal Action<IReadOnlyList<string>>? BatchOpener { get; set; }
 
     /// <summary>
-    /// "Gözat": Küçült sekmesinde seçici çoklu seçime açık, Dönüştür sekmesinde tek seçimli (orada
-    /// kuyruk yok). Tek dosya eskisi gibi süzülmeden bu pencereye yüklenir; birden çok dosya bırakmanın
+    /// DON-P6 kuyruk dikişi: Dönüştür sekmesi açıkken birden çok dosya buraya gider. Ölçüm yolları
+    /// okur; üretimde <see cref="OpenConvertBatch"/> penceresi gösterilir.
+    /// </summary>
+    internal Action<IReadOnlyList<string>>? ConvertBatchOpener { get; set; }
+
+    /// <summary>
+    /// "Gözat": seçici iki sekmede de çoklu seçime açık; Dönüştür sekmesinin çoklu seçimi kendi
+    /// kuyruğuna (<see cref="OpenConvertBatch"/>) gider. Tek dosya eskisi gibi süzülmeden bu pencereye yüklenir; birden çok dosya bırakmanın
     /// süzgecinden (<see cref="DroppedMedia.Collect(IEnumerable{string})"/>) geçip bırakmayla aynı
     /// kola (<see cref="OpenSourcesAsync"/>) gider. İş koşarken seçici açılmaz.
     /// </summary>
@@ -3298,13 +3304,23 @@ public partial class MainWindow : Window
 
     /// <summary>
     /// Bırakmanın ve Gözat'ın ortak kolu: tek dosya bu pencereye yüklenir, birden çok video kuyruk
-    /// penceresine gider. Süzgeçten bir ya da sıfır video çıkan çoklu seçim hiçbir şey açmaz.
+    /// penceresine gider (Dönüştür sekmesindeyse Dönüştür kuyruğuna). Süzgeçten bir ya da sıfır video çıkan çoklu seçim hiçbir şey açmaz.
     /// </summary>
     internal async Task OpenSourcesAsync(string? file, IReadOnlyList<string> batch)
     {
         if (file is not null) await LoadAsync(file);
+        else if (batch.Count > 1 && TabConvert.IsSelected) (ConvertBatchOpener ?? (paths => OpenConvertBatch(paths).Show()))(batch);
         else if (batch.Count > 1) (BatchOpener ?? (paths => OpenBatch(paths).Show()))(batch);
     }
+
+    /// <summary>
+    /// DON-P6: Dönüştür'ün toplu kuyruğu. Ortak ayar panelin o anki seçimleri, dosya başına seçilecekler
+    /// kayıtlı Dönüştür ön ayarları; ikisi de <see cref="ConversionPreset"/>.
+    /// </summary>
+    internal ConvertQueueWindow OpenConvertBatch(IReadOnlyList<string> paths)
+        => new(paths, CurrentConvertPreset(""), _convertPresets.ToList(),
+            HdrPolicyIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve,
+            UsableFixedFolder(OutputFolderModeIndex, TxtOutputFolder.Text));
 
     private void OnDragOver(object? sender, DragEventArgs e)
     {
@@ -4742,6 +4758,9 @@ public partial class MainWindow : Window
         _ => OvershootChoice.TrimEnd
     });
 
+    /// <summary>Panelin planı; toplu kuyruğun ön ayardan kurduğu planla eşdeğerliği bununla ölçülür.</summary>
+    internal ConversionPlan CurrentConversionPlan() => ReadConversionPlan();
+
     private ConversionPlan ReadConversionPlan()
     {
         var container = SelectedTag(CmbContainer) ?? ConversionDefaults.Container;
@@ -4775,7 +4794,7 @@ public partial class MainWindow : Window
         }
 
         var audio = SelectedTag(CmbConvertAudio);
-        if (new ConversionPlan { Container = container }.AudioOnly) audio = AudioCodecForAudioContainer(container);
+        if (new ConversionPlan { Container = container }.AudioOnly) audio = ConversionPresetPlan.AudioCodecForAudioContainer(container);
 
         return new ConversionPlan
         {
@@ -4796,14 +4815,6 @@ public partial class MainWindow : Window
             DropMetadata = ChkConvertDropMetadata.IsChecked == true
         };
     }
-
-    private static string AudioCodecForAudioContainer(string container) => container switch
-    {
-        "mp3" => "libmp3lame",
-        "wav" => "pcm_s16le",
-        "flac" => "flac",
-        _ => "aac"
-    };
 
     private static TimeSpan? ParseTime(string? text)
         => string.IsNullOrWhiteSpace(text)

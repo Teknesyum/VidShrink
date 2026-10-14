@@ -1138,7 +1138,7 @@
           </ScrollViewer>
         </TabItem>
 
-        <TabItem Header="{loc:Text main.tab.convert}" izi:AcilisIsareti.Ad="xaml-donusturme" Tag="{StaticResource IconConvert}" Theme="{StaticResource NeonTabItem}">
+        <TabItem x:Name="TabConvert" Header="{loc:Text main.tab.convert}" izi:AcilisIsareti.Ad="xaml-donusturme" Tag="{StaticResource IconConvert}" Theme="{StaticResource NeonTabItem}">
           <ScrollViewer x:Name="PageConvert" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <Grid Margin="{StaticResource PageMargin}" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceXl}">
 
