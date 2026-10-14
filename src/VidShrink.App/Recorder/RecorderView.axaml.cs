@@ -119,6 +119,7 @@ internal partial class RecorderView : UserControl
         {
             RefreshTargetLabels();
             RefreshSeciciLabels();
+            RefreshMasks();
             RefreshAudioBoxes();
             RefreshCountdownLabels();
             RefreshFinishLabels();

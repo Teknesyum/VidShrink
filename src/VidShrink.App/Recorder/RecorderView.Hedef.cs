@@ -176,6 +176,7 @@ internal partial class RecorderView
             Container = _settings.Container,
             ScreenIndex = target == RecorderTargetKind.Screen ? ChosenScreen : 0,
             Screens = Monitors(),
+            PrivacyMasks = _settings.PrivacyMasks.ToArray(),
             Scale = _settings.Scale,
             KeyframeSeconds = _settings.KeyframeSeconds,
             Profile = string.IsNullOrWhiteSpace(_settings.Profile) ? null : _settings.Profile,

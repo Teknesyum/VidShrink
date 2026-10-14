@@ -267,5 +267,10 @@
   "recorder.region.hide": "Ficha fremu ({0})",
   "recorder.region.stop-close": "Simamisha kurekodi na ufunge",
   "recorder.capture.fallback-unavailable": "Unaswaji wa haraka (Desktop Duplication) haukuanza; inarekodi kwa unaswaji wa GDI, fremu zinaweza kupotea zaidi ya fps 30.",
-  "recorder.capture.fallback-layout": "Eneo linalorekodiwa haliko kwenye skrini moja ya kadi kuu ya michoro; inarekodi kwa unaswaji wa GDI, fremu zinaweza kupotea zaidi ya fps 30."
+  "recorder.capture.fallback-layout": "Eneo linalorekodiwa haliko kwenye skrini moja ya kadi kuu ya michoro; inarekodi kwa unaswaji wa GDI, fremu zinaweza kupotea zaidi ya fps 30.",
+  "recorder.mask.title": "Kinyago cha faragha",
+  "recorder.mask.draw": "Chora kinyago",
+  "recorder.mask.draw-hint": "Buruta kwa panya juu ya eneo linalopaswa kuonekana na ukungu kwenye rekodi; Esc hughairi.",
+  "recorder.mask.clear": "Ondoa vinyago",
+  "recorder.mask.count": "Vinyago: {0}"
 }

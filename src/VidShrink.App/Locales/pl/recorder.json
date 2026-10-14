@@ -267,5 +267,10 @@
   "recorder.region.hide": "Ukryj ramkę ({0})",
   "recorder.region.stop-close": "Zatrzymaj nagrywanie i zamknij",
   "recorder.capture.fallback-unavailable": "Szybkie przechwytywanie (Desktop Duplication) nie uruchomiło się; nagrywanie przez GDI, powyżej 30 kl./s mogą wypadać klatki.",
-  "recorder.capture.fallback-layout": "Nagrywany obszar nie leży na jednym monitorze głównej karty graficznej; nagrywanie przez GDI, powyżej 30 kl./s mogą wypadać klatki."
+  "recorder.capture.fallback-layout": "Nagrywany obszar nie leży na jednym monitorze głównej karty graficznej; nagrywanie przez GDI, powyżej 30 kl./s mogą wypadać klatki.",
+  "recorder.mask.title": "Maska prywatności",
+  "recorder.mask.draw": "Rysuj maskę",
+  "recorder.mask.draw-hint": "Przeciągnij myszą po obszarze, który ma być rozmyty w nagraniu; Esc anuluje.",
+  "recorder.mask.clear": "Usuń maski",
+  "recorder.mask.count": "Maski: {0}"
 }

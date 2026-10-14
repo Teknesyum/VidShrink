@@ -267,5 +267,10 @@
   "recorder.region.hide": "Rahmen ausblenden ({0})",
   "recorder.region.stop-close": "Aufnahme beenden und schließen",
   "recorder.capture.fallback-unavailable": "Schnelle Aufnahme (Desktop Duplication) ließ sich nicht starten; es wird mit GDI aufgenommen, über 30 fps können Bilder fehlen.",
-  "recorder.capture.fallback-layout": "Der Aufnahmebereich liegt nicht auf einem einzigen Monitor der Hauptgrafikkarte; es wird mit GDI aufgenommen, über 30 fps können Bilder fehlen."
+  "recorder.capture.fallback-layout": "Der Aufnahmebereich liegt nicht auf einem einzigen Monitor der Hauptgrafikkarte; es wird mit GDI aufgenommen, über 30 fps können Bilder fehlen.",
+  "recorder.mask.title": "Datenschutzmaske",
+  "recorder.mask.draw": "Maske zeichnen",
+  "recorder.mask.draw-hint": "Ziehe mit der Maus über den Bereich, der in der Aufnahme unscharf erscheinen soll; Esc bricht ab.",
+  "recorder.mask.clear": "Masken entfernen",
+  "recorder.mask.count": "Masken: {0}"
 }

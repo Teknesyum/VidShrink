@@ -195,6 +195,9 @@ internal sealed class RecorderSettings
     /// <summary>Gürültü bastırma (<c>afftdn</c>) açık mı.</summary>
     internal bool AudioNoiseSuppression { get; set; }
 
+    /// <summary>Gizlilik maskeleri, masaüstü pikselinde; kayda bulanık yakılır.</summary>
+    internal List<RecorderRegion> PrivacyMasks { get; set; } = new();
+
     /// <summary>
     /// Kullanıcının seçtiği ses filtreleri. Hiçbiri açık değilse
     /// <see cref="AudioFilterOptions.None"/> dönüyor ve grafik hiç kurulmuyor.
@@ -314,6 +317,11 @@ internal sealed class RecorderSettings
             settings.AudioGainDb = (double?)root["audioGainDb"] ?? 0;
             settings.AudioNoiseGate = (bool?)root["audioNoiseGate"] ?? false;
             settings.AudioNoiseSuppression = (bool?)root["audioNoiseSuppression"] ?? false;
+            if (root["privacyMasks"] is JsonArray masks)
+                foreach (var mask in masks.OfType<JsonObject>())
+                    if ((int?)mask["x"] is { } mx && (int?)mask["y"] is { } my
+                        && (int?)mask["width"] is { } mw && mw > 0 && (int?)mask["height"] is { } mh && mh > 0)
+                        settings.PrivacyMasks.Add(new RecorderRegion(mx, my, mw, mh));
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or FormatException)
         {
@@ -422,6 +430,18 @@ internal sealed class RecorderSettings
                 writer.WriteString("audioLayout", AudioLayout.ToString());
                 writer.WriteNumber("audioGainDb", AudioGainDb);
                 writer.WriteBoolean("audioNoiseGate", AudioNoiseGate);
+                writer.WriteStartArray("privacyMasks");
+                foreach (var mask in PrivacyMasks)
+                {
+                    writer.WriteStartObject();
+                    writer.WriteNumber("x", mask.X);
+                    writer.WriteNumber("y", mask.Y);
+                    writer.WriteNumber("width", mask.Width);
+                    writer.WriteNumber("height", mask.Height);
+                    writer.WriteEndObject();
+                }
+
+                writer.WriteEndArray();
                 writer.WriteBoolean("audioNoiseSuppression", AudioNoiseSuppression);
                 writer.WriteEndObject();
             }

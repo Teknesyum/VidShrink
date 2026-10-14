@@ -505,6 +505,24 @@
                        TextWrapping="Wrap"
                        IsVisible="{Binding #RowRegion.IsVisible}"/>
 
+            <StackPanel Spacing="{StaticResource SpaceSm}">
+              <TextBlock Text="{loc:Text recorder.mask.title}" Theme="{StaticResource Label}"/>
+              <WrapPanel ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
+                <Button x:Name="BtnDrawMask"
+                        Theme="{StaticResource GhostButton}"
+                        Content="{loc:Text recorder.mask.draw}"
+                        ToolTip.Tip="{loc:Text recorder.mask.draw-hint}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.mask.draw}"/>
+                <Button x:Name="BtnClearMasks"
+                        Theme="{StaticResource GhostButton}"
+                        Content="{loc:Text recorder.mask.clear}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.mask.clear}"/>
+                <TextBlock x:Name="TxtMaskCount"
+                           Theme="{StaticResource Hint}"
+                           VerticalAlignment="Center"/>
+              </WrapPanel>
+            </StackPanel>
+
             <izi:SutunIzgara MaxColumns="2" Uniform="True"
                              ColumnSpacing="{StaticResource SpaceMd}"
                              RowSpacing="{StaticResource SpaceMd}">

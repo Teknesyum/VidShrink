@@ -267,5 +267,10 @@
   "recorder.region.hide": "Skryť rámik ({0})",
   "recorder.region.stop-close": "Zastaviť nahrávanie a zavrieť",
   "recorder.capture.fallback-unavailable": "Rýchle snímanie (Desktop Duplication) sa nespustilo; nahráva sa cez GDI, nad 30 fps môžu vypadávať snímky.",
-  "recorder.capture.fallback-layout": "Nahrávaná oblasť neleží na jedinom monitore hlavnej grafickej karty; nahráva sa cez GDI, nad 30 fps môžu vypadávať snímky."
+  "recorder.capture.fallback-layout": "Nahrávaná oblasť neleží na jedinom monitore hlavnej grafickej karty; nahráva sa cez GDI, nad 30 fps môžu vypadávať snímky.",
+  "recorder.mask.title": "Maska súkromia",
+  "recorder.mask.draw": "Nakresliť masku",
+  "recorder.mask.draw-hint": "Potiahnite myšou cez oblasť, ktorá má byť v nahrávke rozmazaná; Esc zruší.",
+  "recorder.mask.clear": "Odstrániť masky",
+  "recorder.mask.count": "Masky: {0}"
 }

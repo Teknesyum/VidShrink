@@ -267,5 +267,10 @@
   "recorder.region.hide": "فریم چھپائیں ({0})",
   "recorder.region.stop-close": "ریکارڈنگ روکیں اور بند کریں",
   "recorder.capture.fallback-unavailable": "تیز کیپچر (Desktop Duplication) شروع نہیں ہوا؛ ریکارڈنگ GDI کیپچر سے ہو رہی ہے، 30 fps سے اوپر فریم گر سکتے ہیں۔",
-  "recorder.capture.fallback-layout": "ریکارڈ ہونے والا حصہ مرکزی گرافکس کارڈ کے ایک ہی مانیٹر پر نہیں ہے؛ ریکارڈنگ GDI کیپچر سے ہو رہی ہے، 30 fps سے اوپر فریم گر سکتے ہیں۔"
+  "recorder.capture.fallback-layout": "ریکارڈ ہونے والا حصہ مرکزی گرافکس کارڈ کے ایک ہی مانیٹر پر نہیں ہے؛ ریکارڈنگ GDI کیپچر سے ہو رہی ہے، 30 fps سے اوپر فریم گر سکتے ہیں۔",
+  "recorder.mask.title": "رازداری ماسک",
+  "recorder.mask.draw": "ماسک بنائیں",
+  "recorder.mask.draw-hint": "ماؤس سے اس حصے پر گھسیٹیں جو ریکارڈنگ میں دھندلا دکھائی دے؛ Esc منسوخ کرتا ہے۔",
+  "recorder.mask.clear": "ماسک ہٹائیں",
+  "recorder.mask.count": "ماسک: {0}"
 }

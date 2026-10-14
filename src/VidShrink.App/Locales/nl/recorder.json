@@ -267,5 +267,10 @@
   "recorder.region.hide": "Kader verbergen ({0})",
   "recorder.region.stop-close": "Opname stoppen en sluiten",
   "recorder.capture.fallback-unavailable": "Snelle opname (Desktop Duplication) startte niet; er wordt opgenomen met GDI, boven 30 fps kunnen beelden wegvallen.",
-  "recorder.capture.fallback-layout": "Het opnamegebied ligt niet op één monitor van de hoofdvideokaart; er wordt opgenomen met GDI, boven 30 fps kunnen beelden wegvallen."
+  "recorder.capture.fallback-layout": "Het opnamegebied ligt niet op één monitor van de hoofdvideokaart; er wordt opgenomen met GDI, boven 30 fps kunnen beelden wegvallen.",
+  "recorder.mask.title": "Privacymasker",
+  "recorder.mask.draw": "Masker tekenen",
+  "recorder.mask.draw-hint": "Sleep met de muis over het gebied dat in de opname vervaagd moet zijn; Esc annuleert.",
+  "recorder.mask.clear": "Maskers verwijderen",
+  "recorder.mask.count": "Maskers: {0}"
 }

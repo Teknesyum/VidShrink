@@ -267,5 +267,10 @@
   "recorder.region.hide": "Скрыть рамку ({0})",
   "recorder.region.stop-close": "Остановить запись и закрыть",
   "recorder.capture.fallback-unavailable": "Быстрый захват (Desktop Duplication) не запустился; запись идёт через GDI, выше 30 кадр/с возможны пропуски кадров.",
-  "recorder.capture.fallback-layout": "Записываемая область не находится на одном мониторе основной видеокарты; запись идёт через GDI, выше 30 кадр/с возможны пропуски кадров."
+  "recorder.capture.fallback-layout": "Записываемая область не находится на одном мониторе основной видеокарты; запись идёт через GDI, выше 30 кадр/с возможны пропуски кадров.",
+  "recorder.mask.title": "Маска конфиденциальности",
+  "recorder.mask.draw": "Нарисовать маску",
+  "recorder.mask.draw-hint": "Проведите мышью по области, которая должна быть размыта в записи; Esc отменяет.",
+  "recorder.mask.clear": "Удалить маски",
+  "recorder.mask.count": "Маски: {0}"
 }

@@ -267,5 +267,10 @@
   "recorder.region.hide": "Skjul ramme ({0})",
   "recorder.region.stop-close": "Stop optagelse og luk",
   "recorder.capture.fallback-unavailable": "Hurtig optagelse (Desktop Duplication) startede ikke; der optages med GDI, over 30 fps kan billeder gå tabt.",
-  "recorder.capture.fallback-layout": "Optagelsesområdet ligger ikke på én skærm på hovedgrafikkortet; der optages med GDI, over 30 fps kan billeder gå tabt."
+  "recorder.capture.fallback-layout": "Optagelsesområdet ligger ikke på én skærm på hovedgrafikkortet; der optages med GDI, over 30 fps kan billeder gå tabt.",
+  "recorder.mask.title": "Privatlivsmaske",
+  "recorder.mask.draw": "Tegn maske",
+  "recorder.mask.draw-hint": "Træk med musen hen over det område, der skal være sløret i optagelsen; Esc annullerer.",
+  "recorder.mask.clear": "Fjern masker",
+  "recorder.mask.count": "Masker: {0}"
 }

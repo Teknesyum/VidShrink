@@ -267,5 +267,10 @@
   "recorder.region.hide": "Skjul ramme ({0})",
   "recorder.region.stop-close": "Stopp opptak og lukk",
   "recorder.capture.fallback-unavailable": "Rask opptak (Desktop Duplication) startet ikke; tar opp med GDI, over 30 fps kan bilder falle ut.",
-  "recorder.capture.fallback-layout": "Opptaksområdet ligger ikke på én skjerm på hovedskjermkortet; tar opp med GDI, over 30 fps kan bilder falle ut."
+  "recorder.capture.fallback-layout": "Opptaksområdet ligger ikke på én skjerm på hovedskjermkortet; tar opp med GDI, over 30 fps kan bilder falle ut.",
+  "recorder.mask.title": "Personvernmaske",
+  "recorder.mask.draw": "Tegn maske",
+  "recorder.mask.draw-hint": "Dra med musen over området som skal vises uskarpt i opptaket; Esc avbryter.",
+  "recorder.mask.clear": "Fjern masker",
+  "recorder.mask.count": "Masker: {0}"
 }

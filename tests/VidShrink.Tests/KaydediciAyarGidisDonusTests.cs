@@ -45,8 +45,12 @@ public sealed class KaydediciAyarGidisDonusTests
         if (tur == typeof(int)) return (int)(varsayilan ?? 0) + 7;
         if (tur == typeof(double)) return (double)(varsayilan ?? 0d) + 7.5;
         if (tur.IsEnum) return Enum.GetValues(tur).Cast<object>().Last(v => !Equals(v, varsayilan));
+        if (tur == typeof(List<RecorderRegion>)) return new List<RecorderRegion> { new(11, 22, 33, 44), new(-5, 6, 70, 80) };
         throw new InvalidOperationException($"{ozellik.Name} icin deger ureticisi yok: {tur.Name}");
     }
+
+    private static bool Ayni(object? a, object? b)
+        => a is List<RecorderRegion> x && b is List<RecorderRegion> y ? x.SequenceEqual(y) : Equals(a, b);
 
     [Fact]
     public void HerAyarDiskeGidipAyniDonerDegisir()
@@ -68,11 +72,11 @@ public sealed class KaydediciAyarGidisDonusTests
             var anahtarlar = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(dosya))!.AsObject().Count;
             Assert.Equal(ozellikler.Count, anahtarlar);
             var kayip = ozellikler
-                .Where(o => !Equals(o.GetValue(yazilan), o.GetValue(okunan)))
+                .Where(o => !Ayni(o.GetValue(yazilan), o.GetValue(okunan)))
                 .Select(o => $"{o.Name}: yazilan {o.GetValue(yazilan)}, okunan {o.GetValue(okunan)}")
                 .ToList();
             Assert.Empty(kayip);
-            Assert.All(ozellikler, o => Assert.NotEqual(o.GetValue(varsayilan), o.GetValue(okunan)));
+            Assert.All(ozellikler, o => Assert.False(Ayni(o.GetValue(varsayilan), o.GetValue(okunan)), o.Name));
         }
         finally
         {

@@ -267,5 +267,10 @@
   "recorder.region.hide": "Skrij okvir ({0})",
   "recorder.region.stop-close": "Ustavi snemanje in zapri",
   "recorder.capture.fallback-unavailable": "Hitri zajem (Desktop Duplication) se ni zagnal; snema se z zajemom GDI, nad 30 fps lahko izpade kakšna sličica.",
-  "recorder.capture.fallback-layout": "Snemano območje ni na enem samem zaslonu glavne grafične kartice; snema se z zajemom GDI, nad 30 fps lahko izpade kakšna sličica."
+  "recorder.capture.fallback-layout": "Snemano območje ni na enem samem zaslonu glavne grafične kartice; snema se z zajemom GDI, nad 30 fps lahko izpade kakšna sličica.",
+  "recorder.mask.title": "Maska zasebnosti",
+  "recorder.mask.draw": "Nariši masko",
+  "recorder.mask.draw-hint": "Z miško povlecite čez območje, ki naj bo v posnetku zamegljeno; Esc prekliče.",
+  "recorder.mask.clear": "Odstrani maske",
+  "recorder.mask.count": "Maske: {0}"
 }

@@ -267,5 +267,10 @@
   "recorder.region.hide": "Slėpti rėmelį ({0})",
   "recorder.region.stop-close": "Stabdyti įrašymą ir uždaryti",
   "recorder.capture.fallback-unavailable": "Greitas fiksavimas (Desktop Duplication) nepasileido; įrašoma GDI fiksavimu, virš 30 fps gali dingti kadrai.",
-  "recorder.capture.fallback-layout": "Įrašoma sritis nėra viename pagrindinės vaizdo plokštės monitoriuje; įrašoma GDI fiksavimu, virš 30 fps gali dingti kadrai."
+  "recorder.capture.fallback-layout": "Įrašoma sritis nėra viename pagrindinės vaizdo plokštės monitoriuje; įrašoma GDI fiksavimu, virš 30 fps gali dingti kadrai.",
+  "recorder.mask.title": "Privatumo kaukė",
+  "recorder.mask.draw": "Piešti kaukę",
+  "recorder.mask.draw-hint": "Pele pertempkite per sritį, kuri įraše turi būti sulieta; Esc atšaukia.",
+  "recorder.mask.clear": "Pašalinti kaukes",
+  "recorder.mask.count": "Kaukės: {0}"
 }

@@ -267,5 +267,10 @@
   "recorder.region.hide": "Сховати рамку ({0})",
   "recorder.region.stop-close": "Зупинити запис і закрити",
   "recorder.capture.fallback-unavailable": "Швидке захоплення (Desktop Duplication) не запустилося; запис іде через GDI, понад 30 кадр/с можливі пропуски кадрів.",
-  "recorder.capture.fallback-layout": "Записувана область не на одному моніторі основної відеокарти; запис іде через GDI, понад 30 кадр/с можливі пропуски кадрів."
+  "recorder.capture.fallback-layout": "Записувана область не на одному моніторі основної відеокарти; запис іде через GDI, понад 30 кадр/с можливі пропуски кадрів.",
+  "recorder.mask.title": "Маска конфіденційності",
+  "recorder.mask.draw": "Намалювати маску",
+  "recorder.mask.draw-hint": "Проведіть мишею по області, яка має бути розмитою в записі; Esc скасовує.",
+  "recorder.mask.clear": "Видалити маски",
+  "recorder.mask.count": "Маски: {0}"
 }
