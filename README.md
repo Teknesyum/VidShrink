@@ -23,7 +23,7 @@ drive with the mouse.
 
 The other tabs take over when a video needs work. Shrink it under an upload limit, convert
 it, record the screen, or cut it on a timeline. Nothing leaves your machine unless you
-ask — see [Privacy](#code-signing-policy).
+ask — see [Privacy](#privacy).
 
 ## Install
 
@@ -50,8 +50,8 @@ Three ways, in this order.
    powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=3072; Set-Variable ProgressPreference SilentlyContinue; Set-Location ([IO.Path]::GetTempPath()); irm https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe -OutFile VidShrink-Setup.exe; .\VidShrink-Setup.exe"
    ```
 
-Until releases are signed, a PC with Smart App Control turned on blocks VidShrink whichever
-way it is installed.
+Releases are not code-signed, so a PC with Smart App Control turned on blocks VidShrink
+whichever way it is installed.
 
 **Uninstall.** `VidShrink-Setup.exe --uninstall` removes the shortcuts, the right-click
 entries, the Open With registration and the install folder.
@@ -71,11 +71,11 @@ curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vi
 <details>
 <summary>Requirements, what the installer downloads, and the PowerShell script</summary>
 
-Every release builds four targets from one version number: `win-x64`, `osx-arm64`,
-`osx-x64`, `linux-x64`. Besides the system above you need `ffmpeg` and `ffprobe`. FFmpeg and
-libmpv never travel in a release; the installer downloads them against pinned SHA-256
-digests on Windows and prints your package manager's command elsewhere. Windows releases are
-signed under the [Code Signing Policy](#code-signing-policy) once the certificate is issued.
+Every release builds six targets from one version number: `win-x64`, `win-arm64`,
+`osx-arm64`, `osx-x64`, `linux-x64`, `linux-arm64`. Besides the system above you need
+`ffmpeg` and `ffprobe`. FFmpeg and libmpv never travel in a release; the installer
+downloads them against pinned SHA-256 digests on Windows and prints your package manager's
+command elsewhere.
 
 On Windows the `Install-VidShrink.ps1` script does the same install, and downloads FFmpeg
 from the pinned archive when WinGet is missing:
@@ -404,22 +404,13 @@ neither and links no GPL code into itself ([`docs/kurulum.md`](docs/kurulum.md))
 Third-party material distributed inside the source tree — the Fluent UI System Icons the
 icon set is cut from (MIT) — is listed in [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
 
-## Code Signing Policy
+## Privacy
 
-Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by
-[SignPath Foundation](https://signpath.org). The application is pending; until it is
-approved, Windows releases ship unsigned.
-
-**Privacy.** This program will not transfer any information to other networked systems
-unless specifically requested by the user or the person installing or operating it.
+This program will not transfer any information to other networked systems unless
+specifically requested by the user or the person installing or operating it.
 
 <details>
-<summary>Who approves a signature, and every request the app can make</summary>
-
-- Committers, reviewers and approvers: [Teknesyum](https://github.com/Teknesyum)
-
-Only artifacts built from this repository by GitHub Actions are signed, and every signing
-request is approved by hand. Everyone on the team signs in with multi-factor authentication.
+<summary>Every request the app can make</summary>
 
 The requests it can make, what triggers each, and whose privacy policy applies:
 

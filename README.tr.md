@@ -23,7 +23,7 @@ pencerenin arkasında.
 
 Öteki sekmeler videoyla iş yapılacağında devreye giriyor. Yükleme sınırının altına
 küçültün, dönüştürün, ekranı kaydedin ya da zaman çizelgesinde kesin. Siz istemedikçe
-makinenizden hiçbir şey çıkmıyor — bkz. [Gizlilik](#kod-imzalama-politikasi).
+makinenizden hiçbir şey çıkmıyor — bkz. [Gizlilik](#gizlilik).
 
 ## Kurulum
 
@@ -51,8 +51,8 @@ koşan bir Linux masaüstü.
    powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=3072; Set-Variable ProgressPreference SilentlyContinue; Set-Location ([IO.Path]::GetTempPath()); irm https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe -OutFile VidShrink-Setup.exe; .\VidShrink-Setup.exe"
    ```
 
-Sürümler imzalanana kadar Akıllı Uygulama Denetimi açık olan bir bilgisayar VidShrink'i
-hangi yolla kurulursa kurulsun engeller.
+Sürümler kod imzalı değil; bu yüzden Akıllı Uygulama Denetimi açık olan bir bilgisayar
+VidShrink'i hangi yolla kurulursa kurulsun engeller.
 
 **Kaldırma.** `VidShrink-Setup.exe --uninstall` kısayolları, sağ tık girdilerini, Birlikte aç
 kaydını ve kurulum klasörünü siliyor.
@@ -72,11 +72,10 @@ curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vi
 <details>
 <summary>Gerekenler, kurucunun indirdikleri ve PowerShell betiği</summary>
 
-Her sürüm tek bir sürüm numarasından dört hedef üretiyor: `win-x64`, `osx-arm64`, `osx-x64`,
-`linux-x64`. Yukarıdaki sistemin yanında `ffmpeg` ve `ffprobe` gerekiyor. FFmpeg ve libmpv
+Her sürüm tek bir sürüm numarasından altı hedef üretiyor: `win-x64`, `win-arm64`,
+`osx-arm64`, `osx-x64`, `linux-x64`, `linux-arm64`. Yukarıdaki sistemin yanında `ffmpeg` ve `ffprobe` gerekiyor. FFmpeg ve libmpv
 sürümle birlikte gelmiyor; kurucu bunları Windows'ta pinlenmiş SHA-256 özetlerine karşı
-indiriyor, diğerlerinde paket yöneticinizin komutunu yazıyor. Windows sürümleri, sertifika
-verildiğinde [Kod İmzalama Politikası](#kod-imzalama-politikasi) altında imzalanıyor.
+indiriyor, diğerlerinde paket yöneticinizin komutunu yazıyor.
 
 Windows'ta `Install-VidShrink.ps1` betiği aynı kurulumu yapar; WinGet yoksa
 FFmpeg'i pinlenmiş arşivden indirir:
@@ -408,24 +407,15 @@ dağıtmaz ve içine GPL kodu bağlamaz ([`docs/kurulum.tr.md`](docs/kurulum.tr.
 Kaynak ağacının içinde dağıtılan üçüncü taraf malzeme — simge takımının kesildiği Fluent UI
 System Icons (MIT) — [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md) dosyasında.
 
-<a id="kod-imzalama-politikasi"></a>
+<a id="gizlilik"></a>
 
-## Kod İmzalama Politikası
+## Gizlilik
 
-Ücretsiz kod imzalama [SignPath.io](https://about.signpath.io) tarafından, sertifika
-[SignPath Foundation](https://signpath.org) tarafından sağlanır. Başvuru değerlendirmede;
-onaylanana kadar Windows sürümleri imzasız çıkar.
-
-**Gizlilik.** Bu program, kullanıcı ya da onu kuran veya çalıştıran kişi özellikle
+Bu program, kullanıcı ya da onu kuran veya çalıştıran kişi özellikle
 istemedikçe başka ağ sistemlerine bilgi aktarmaz.
 
 <details>
-<summary>İmzayı kim onaylar, uygulamanın yapabildiği her istek</summary>
-
-- Kod yazan, gözden geçiren ve onaylayan: [Teknesyum](https://github.com/Teknesyum)
-
-Yalnız bu depodan GitHub Actions'ın derlediği dosyalar imzalanır; her imza isteği elle
-onaylanır. Ekipteki herkes çok aşamalı doğrulamayla oturum açar.
+<summary>Uygulamanın yapabildiği her istek</summary>
 
 Yapabildiği istekler, her birini neyin başlattığı ve o anda kimin gizlilik politikasının
 geçerli olduğu:
