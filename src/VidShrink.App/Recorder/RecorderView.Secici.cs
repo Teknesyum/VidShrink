@@ -23,7 +23,17 @@ internal partial class RecorderView
 
     internal Func<IReadOnlyList<(ScreenBounds Bounds, double Scale)>>? ScaledScreens { get; set; }
 
-    internal RecorderPlatform CapturePlatform { get; set; } = HostPlatform;
+    private RecorderPlatform _capturePlatform = HostPlatform;
+
+    internal RecorderPlatform CapturePlatform
+    {
+        get => _capturePlatform;
+        set
+        {
+            _capturePlatform = value;
+            RefreshInputBoxes();
+        }
+    }
 
     private IReadOnlyList<(ScreenBounds Bounds, double Scale)> MonitorScales()
     {

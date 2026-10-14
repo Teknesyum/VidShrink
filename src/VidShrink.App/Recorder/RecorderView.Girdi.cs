@@ -1,6 +1,7 @@
 using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using VidShrink.Core;
 
 namespace VidShrink.App.Recorder;
 
@@ -31,7 +32,28 @@ internal partial class RecorderView
 
     internal bool InputActive { get; private set; }
 
-    private bool WantsClicks => _settings.ShowClicks || _settings.ClickSound;
+    /// <summary>Tıklama, tıklama sesi, tuş ve büyüteç Windows kancasıyla çalışıyor; öteki platformda kutular gizli, kayıtlı ayar işe geçmez.</summary>
+    private bool HooksAvailable => CapturePlatform == RecorderPlatform.Windows;
+
+    private bool ShowClicksOn => HooksAvailable && _settings.ShowClicks;
+
+    private bool ClickSoundOn => HooksAvailable && _settings.ClickSound;
+
+    private bool ShowKeysOn => HooksAvailable && _settings.ShowKeys;
+
+    private bool MagnifierOn => HooksAvailable && _settings.ShowMagnifier;
+
+    private bool WantsClicks => ShowClicksOn || ClickSoundOn;
+
+    internal void RefreshInputBoxes()
+    {
+        ChkShowClicks.IsVisible = HooksAvailable;
+        ChkClickSound.IsVisible = HooksAvailable;
+        ChkShowKeys.IsVisible = HooksAvailable;
+        ChkMagnifier.IsVisible = HooksAvailable;
+        RefreshPointerChoices();
+        RefreshMini();
+    }
 
     private bool WantsPointer => _settings.CursorHighlight || _settings.Spotlight;
 
@@ -47,12 +69,12 @@ internal partial class RecorderView
 
     internal void SyncInput(bool recording)
     {
-        var lens = recording && _settings.ShowMagnifier;
+        var lens = recording && MagnifierOn;
         if (lens && !Magnifier.Running) Magnifier.Start();
         else if (!lens && Magnifier.Running) Magnifier.Stop();
 
-        var wanted = recording && (WantsClicks || WantsPointer || _settings.ShowKeys);
-        var mode = (WantsClicks, _settings.ShowKeys, CurrentPointerStyle);
+        var wanted = recording && (WantsClicks || WantsPointer || ShowKeysOn);
+        var mode = (WantsClicks, ShowKeys: ShowKeysOn, CurrentPointerStyle);
         if (wanted == InputActive && (!wanted || mode == _inputMode)) return;
 
         if (InputActive)
@@ -74,8 +96,8 @@ internal partial class RecorderView
     internal void OnInputClick(PixelPoint point, PointerButton button)
     {
         if (!InputActive) return;
-        if (_settings.ClickSound) ClickSound.Play();
-        if (_settings.ShowClicks && (_frameRegion is not { } region || region.Contains(point))) InputOverlay.Ring(point, button);
+        if (ClickSoundOn) ClickSound.Play();
+        if (ShowClicksOn &&(_frameRegion is not { } region || region.Contains(point))) InputOverlay.Ring(point, button);
     }
 
     internal void OnInputMove(PixelPoint point)
@@ -86,7 +108,7 @@ internal partial class RecorderView
 
     internal void OnInputKey(uint virtualKey, bool down)
     {
-        if (!InputActive || !_settings.ShowKeys) return;
+        if (!InputActive || !ShowKeysOn) return;
         if (_keys.Feed(virtualKey, down) is not { } text) return;
         InputOverlay.Keys(text, _frameRegion ?? CaptionFallback());
     }
