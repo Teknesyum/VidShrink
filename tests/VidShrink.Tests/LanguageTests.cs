@@ -97,8 +97,8 @@ public sealed class LanguageTests : IDisposable
         "H.264", "H.265", "VP9", "AV1", "AAC", "Opus", "PCM",
         "ProRes 422 Proxy", "ProRes 422 LT", "ProRes 422", "ProRes 422 HQ", "ProRes 4444",
         "DNxHR LB", "DNxHR SQ", "DNxHR HQ", "DNxHR HQX", "DNxHR 444",
-        "H.264 NVENC", "H.265 NVENC", "AV1 NVENC", "H.264 QSV", "H.265 QSV", "AV1 QSV",
-        "H.264 AMF", "H.265 AMF", "AV1 AMF",
+        "H.264 Nvidia", "H.265 Nvidia", "AV1 Nvidia", "H.264 Intel", "H.265 Intel", "AV1 Intel",
+        "H.264 AMD", "H.265 AMD", "AV1 AMD",
         "T"
     };
 

@@ -1159,15 +1159,15 @@
                         <ComboBoxItem Content="H.265" Tag="libx265"/>
                         <ComboBoxItem Content="VP9" Tag="libvpx-vp9"/>
                         <ComboBoxItem Content="AV1" Tag="libsvtav1"/>
-                        <ComboBoxItem Content="H.264 NVENC" Tag="h264_nvenc" IsVisible="False"/>
-                        <ComboBoxItem Content="H.265 NVENC" Tag="hevc_nvenc" IsVisible="False"/>
-                        <ComboBoxItem Content="AV1 NVENC" Tag="av1_nvenc" IsVisible="False"/>
-                        <ComboBoxItem Content="H.264 QSV" Tag="h264_qsv" IsVisible="False"/>
-                        <ComboBoxItem Content="H.265 QSV" Tag="hevc_qsv" IsVisible="False"/>
-                        <ComboBoxItem Content="AV1 QSV" Tag="av1_qsv" IsVisible="False"/>
-                        <ComboBoxItem Content="H.264 AMF" Tag="h264_amf" IsVisible="False"/>
-                        <ComboBoxItem Content="H.265 AMF" Tag="hevc_amf" IsVisible="False"/>
-                        <ComboBoxItem Content="AV1 AMF" Tag="av1_amf" IsVisible="False"/>
+                        <ComboBoxItem Content="H.264 Nvidia" Tag="h264_nvenc" IsVisible="False"/>
+                        <ComboBoxItem Content="H.265 Nvidia" Tag="hevc_nvenc" IsVisible="False"/>
+                        <ComboBoxItem Content="AV1 Nvidia" Tag="av1_nvenc" IsVisible="False"/>
+                        <ComboBoxItem Content="H.264 Intel" Tag="h264_qsv" IsVisible="False"/>
+                        <ComboBoxItem Content="H.265 Intel" Tag="hevc_qsv" IsVisible="False"/>
+                        <ComboBoxItem Content="AV1 Intel" Tag="av1_qsv" IsVisible="False"/>
+                        <ComboBoxItem Content="H.264 AMD" Tag="h264_amf" IsVisible="False"/>
+                        <ComboBoxItem Content="H.265 AMD" Tag="hevc_amf" IsVisible="False"/>
+                        <ComboBoxItem Content="AV1 AMD" Tag="av1_amf" IsVisible="False"/>
                         <ComboBoxItem Content="{loc:Text main.convert.copy}" Tag="copy"/>
                         <ComboBoxItem Content="ProRes 422 Proxy" Tag="prores_ks:proxy"/>
                         <ComboBoxItem Content="ProRes 422 LT" Tag="prores_ks:lt"/>
