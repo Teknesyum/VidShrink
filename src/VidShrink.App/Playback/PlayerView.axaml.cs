@@ -77,6 +77,7 @@ internal partial class PlayerView : UserControl
         InitTools();
         InitFare();
         InitPlaylist();
+        InitUyku();
 
         RefreshState();
     }
@@ -503,6 +504,8 @@ internal partial class PlayerView : UserControl
         items.Add(Switch(Strings.Get("player.view.screenshot-jpg"), Settings.ScreenshotFormat == ScreenshotFormat.Jpg, ToggleScreenshotJpg));
         items.Add(Switch(Strings.Get("player.view.keep-history"), Settings.KeepHistory, ToggleKeepHistory));
         items.Add(Switch(Strings.Get("player.view.resume"), Settings.Resume, ToggleResume));
+        items.Add(Switch(Strings.Get("player.view.pause-on-minimize"), Settings.PauseOnMinimize, TogglePauseOnMinimize));
+        items.Add(Switch(Strings.Get("player.view.topmost-while-playing"), Settings.TopmostWhilePlaying, ToggleTopmostWhilePlaying));
         items.Add(AdvancedMenu());
         items.Add(ShortcutsMenu());
         return items;
@@ -575,6 +578,12 @@ internal partial class PlayerView : UserControl
     internal void TogglePlay() => TogglePlay(true);
 
     private void TogglePlay(bool feedback)
+    {
+        TogglePlayCore(feedback);
+        OynatmaDurumunuYansit();
+    }
+
+    private void TogglePlayCore(bool feedback)
     {
         if (!_playing && _engine is { EndReached: true } && PlayFromEnd()) return;
         _playing = !_playing;
@@ -900,6 +909,7 @@ internal partial class PlayerView : UserControl
 
     internal void RefreshState()
     {
+        OynatmaDurumunuYansit();
         if (TxtState is null) return;
         TxtState.Text = Strings.Get(
             "main.player.state",
@@ -941,5 +951,6 @@ internal partial class PlayerView : UserControl
         _path = null;
         _playing = false;
         _trackPaused = false;
+        OynatmaDurumunuYansit();
     }
 }

@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Αποθήκευση στιγμιότυπων ως JPG",
   "player.view.keep-history": "Διατήρηση ιστορικού",
   "player.view.resume": "Συνέχεια από εκεί που σταμάτησα",
+  "player.view.pause-on-minimize": "Παύση κατά την ελαχιστοποίηση",
+  "player.view.topmost-while-playing": "Πάντα μπροστά μόνο κατά την αναπαραγωγή",
   "player.view.state-aspect": "αναλογία {0}",
   "player.view.state-rotate": "περιστροφή κατά {0}°",
   "player.view.state-mirror": "σε καθρέφτισμα",

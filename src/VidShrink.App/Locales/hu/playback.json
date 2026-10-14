@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Képernyőképek mentése JPG-ként",
   "player.view.keep-history": "Előzmények megőrzése",
   "player.view.resume": "Folytatás ott, ahol abbahagytam",
+  "player.view.pause-on-minimize": "Szüneteltetés kis méretre állításkor",
+  "player.view.topmost-while-playing": "Felül tartás csak lejátszás közben",
   "player.view.state-aspect": "képarány {0}",
   "player.view.state-rotate": "{0}°-kal elforgatva",
   "player.view.state-mirror": "tükrözve",

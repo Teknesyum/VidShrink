@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Screenshots als JPG speichern",
   "player.view.keep-history": "Verlauf speichern",
   "player.view.resume": "Dort fortsetzen, wo ich aufgehört habe",
+  "player.view.pause-on-minimize": "Bei Minimieren pausieren",
+  "player.view.topmost-while-playing": "Nur während der Wiedergabe im Vordergrund",
   "player.view.state-aspect": "Seitenverhältnis {0}",
   "player.view.state-rotate": "um {0}° gedreht",
   "player.view.state-mirror": "gespiegelt",

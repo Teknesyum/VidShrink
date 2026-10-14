@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Simpan tangkapan layar sebagai JPG",
   "player.view.keep-history": "Simpan riwayat",
   "player.view.resume": "Lanjutkan dari terakhir ditonton",
+  "player.view.pause-on-minimize": "Jeda saat diminimalkan",
+  "player.view.topmost-while-playing": "Tetap di atas hanya saat diputar",
   "player.view.state-aspect": "rasio {0}",
   "player.view.state-rotate": "diputar {0}°",
   "player.view.state-mirror": "dicerminkan",

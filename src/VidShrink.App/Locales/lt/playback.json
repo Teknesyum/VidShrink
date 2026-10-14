@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Saugoti ekrano nuotraukas JPG formatu",
   "player.view.keep-history": "Saugoti istoriją",
   "player.view.resume": "Tęsti nuo ten, kur baigiau",
+  "player.view.pause-on-minimize": "Pristabdyti sumažinus",
+  "player.view.topmost-while-playing": "Laikyti viršuje tik grojant",
   "player.view.state-aspect": "santykis {0}",
   "player.view.state-rotate": "pasukta {0}°",
   "player.view.state-mirror": "apverstas vaizdas",

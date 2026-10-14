@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Schermafbeeldingen opslaan als JPG",
   "player.view.keep-history": "Geschiedenis bijhouden",
   "player.view.resume": "Verdergaan waar ik was gebleven",
+  "player.view.pause-on-minimize": "Pauzeren bij minimaliseren",
+  "player.view.topmost-while-playing": "Alleen tijdens afspelen bovenop houden",
   "player.view.state-aspect": "beeldverhouding {0}",
   "player.view.state-rotate": "{0}° gedraaid",
   "player.view.state-mirror": "gespiegeld",

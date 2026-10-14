@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "ذخیره اسکرین‌شات‌ها به‌صورت JPG",
   "player.view.keep-history": "نگه‌داشتن تاریخچه",
   "player.view.resume": "ادامه از جایی که ماندم",
+  "player.view.pause-on-minimize": "توقف هنگام کوچک‌کردن",
+  "player.view.topmost-while-playing": "فقط هنگام پخش در بالا نگه دار",
   "player.view.state-aspect": "نسبت {0}",
   "player.view.state-rotate": "چرخانده‌شده {0}°",
   "player.view.state-mirror": "قرینه‌شده",

@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "स्क्रीनशॉट JPG के रूप में सहेजें",
   "player.view.keep-history": "इतिहास रखें",
   "player.view.resume": "जहाँ छोड़ा था वहीं से जारी रखें",
+  "player.view.pause-on-minimize": "छोटा करने पर रोकें",
+  "player.view.topmost-while-playing": "केवल चलाते समय सबसे ऊपर रखें",
   "player.view.state-aspect": "अनुपात {0}",
   "player.view.state-rotate": "{0}° घुमाया गया",
   "player.view.state-mirror": "मिरर किया गया",

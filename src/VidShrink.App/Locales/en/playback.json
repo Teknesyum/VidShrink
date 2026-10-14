@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Save Screenshots as JPG",
   "player.view.keep-history": "Keep History",
   "player.view.resume": "Resume Where I Left Off",
+  "player.view.pause-on-minimize": "Pause When Minimized",
+  "player.view.topmost-while-playing": "Keep On Top Only While Playing",
   "player.view.state-aspect": "aspect {0}",
   "player.view.state-rotate": "rotated {0}°",
   "player.view.state-mirror": "mirrored",

@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Чувај снимке екрана као JPG",
   "player.view.keep-history": "Čuvaj istoriju",
   "player.view.resume": "Nastavi gde sam stao",
+  "player.view.pause-on-minimize": "Pauziraj pri minimizovanju",
+  "player.view.topmost-while-playing": "Drži na vrhu samo tokom reprodukcije",
   "player.view.state-aspect": "однос {0}",
   "player.view.state-rotate": "ротирано за {0}°",
   "player.view.state-mirror": "изврнуто",

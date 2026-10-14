@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Lưu ảnh chụp màn hình dạng JPG",
   "player.view.keep-history": "Lưu lịch sử",
   "player.view.resume": "Tiếp tục từ chỗ đã dừng",
+  "player.view.pause-on-minimize": "Tạm dừng khi thu nhỏ",
+  "player.view.topmost-while-playing": "Chỉ giữ trên cùng khi đang phát",
   "player.view.state-aspect": "tỷ lệ {0}",
   "player.view.state-rotate": "đã xoay {0}°",
   "player.view.state-mirror": "đã lật gương",

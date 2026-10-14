@@ -64,6 +64,10 @@ internal sealed class PlayerSettings
 
     internal bool Resume { get; set; } = true;
 
+    internal bool PauseOnMinimize { get; set; }
+
+    internal bool TopmostWhilePlaying { get; set; }
+
     internal static PlayerSettings Load(string? file)
     {
         var settings = new PlayerSettings();
@@ -87,6 +91,8 @@ internal sealed class PlayerSettings
             settings.Muted = (bool?)root["muted"] ?? false;
             settings.KeepHistory = (bool?)root["keepHistory"] ?? true;
             settings.Resume = (bool?)root["resume"] ?? true;
+            settings.PauseOnMinimize = (bool?)root["pauseOnMinimize"] ?? false;
+            settings.TopmostWhilePlaying = (bool?)root["topmostWhilePlaying"] ?? false;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or FormatException)
         {
@@ -123,6 +129,8 @@ internal sealed class PlayerSettings
                 writer.WriteBoolean("muted", Muted);
                 writer.WriteBoolean("keepHistory", KeepHistory);
                 writer.WriteBoolean("resume", Resume);
+                writer.WriteBoolean("pauseOnMinimize", PauseOnMinimize);
+                writer.WriteBoolean("topmostWhilePlaying", TopmostWhilePlaying);
                 writer.WriteEndObject();
             }
             File.Move(temp, file, true);

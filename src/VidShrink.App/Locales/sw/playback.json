@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Hifadhi picha za skrini kama JPG",
   "player.view.keep-history": "Hifadhi historia",
   "player.view.resume": "Endelea nilipoishia",
+  "player.view.pause-on-minimize": "Sitisha ukipunguza dirisha",
+  "player.view.topmost-while-playing": "Weka juu wakati wa kucheza tu",
   "player.view.state-aspect": "uwiano {0}",
   "player.view.state-rotate": "imezungushwa {0}°",
   "player.view.state-mirror": "kioo",
