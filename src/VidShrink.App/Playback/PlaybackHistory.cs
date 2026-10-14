@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,8 @@ using VidShrink.Core;
 using System.Text.Json.Nodes;
 
 namespace VidShrink.App.Playback;
+
+internal sealed record HistoryRow(string Path, DateTimeOffset Seen, double Position);
 
 internal sealed class PlaybackHistory
 {
@@ -24,6 +27,36 @@ internal sealed class PlaybackHistory
     private readonly Dictionary<string, Entry> _entries = new(PathComparer);
 
     internal int Count => _entries.Count;
+
+    internal Func<long> Now { get; set; } = () => DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+    /// <summary>Geçmiş penceresinin satırları: en son izlenen başta, adres ve yalnız yer imi taşıyan kayıt yok. Arama dosya adında ve yolda, büyük-küçük harf ayırmadan.</summary>
+    internal IReadOnlyList<HistoryRow> Rows(string? search)
+    {
+        var text = search?.Trim() ?? "";
+        var compare = CultureInfo.CurrentCulture.CompareInfo;
+        return _entries
+            .Where(pair => pair.Value.Seen > 0 && !MediaAddress.IsAddress(pair.Key))
+            .Where(pair => text.Length == 0 || compare.IndexOf(pair.Key, text, CompareOptions.IgnoreCase) >= 0)
+            .OrderByDescending(pair => pair.Value.Seen)
+            .Select(pair => new HistoryRow(pair.Key, DateTimeOffset.FromUnixTimeMilliseconds((long)pair.Value.Seen), pair.Value.Position))
+            .ToList();
+    }
+
+    /// <summary>İzleme kaydını ve kaldığı yeri siler; yer imi kullanıcının kendi kaydı olduğu için kalır, ama dosya geçmişte görünmez.</summary>
+    internal void Clear()
+    {
+        foreach (var key in _entries.Where(pair => pair.Value.Bookmarks.Count == 0).Select(pair => pair.Key).ToList())
+            _entries.Remove(key);
+        foreach (var entry in _entries.Values)
+        {
+            entry.Seen = 0;
+            entry.Position = 0;
+            entry.Size = -1;
+            entry.Modified = -1;
+            entry.Duration = double.NaN;
+        }
+    }
 
     internal static PlaybackHistory Load(string? file)
     {
@@ -182,7 +215,7 @@ internal sealed class PlaybackHistory
             _entries[key] = entry;
         }
 
-        entry.Seen = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        entry.Seen = Now();
         return entry;
     }
 

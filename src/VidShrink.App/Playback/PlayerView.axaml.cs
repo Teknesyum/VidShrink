@@ -489,6 +489,8 @@ internal partial class PlayerView : UserControl
         folder.Click += OnPickScreenshotFolder;
         items.Add(folder);
         items.Add(Switch(Strings.Get("player.view.screenshot-jpg"), Settings.ScreenshotFormat == ScreenshotFormat.Jpg, ToggleScreenshotJpg));
+        items.Add(Switch(Strings.Get("player.view.keep-history"), Settings.KeepHistory, ToggleKeepHistory));
+        items.Add(Switch(Strings.Get("player.view.resume"), Settings.Resume, ToggleResume));
         items.Add(AdvancedMenu());
         items.Add(ShortcutsMenu());
         return items;
@@ -762,7 +764,7 @@ internal partial class PlayerView : UserControl
         ShowMediaTitle(path);
         StartWatchdog();
         StartRender();
-        var resume = HistoryPath is null ? 0 : _history.ResumeFor(path, engine.DurationSeconds);
+        var resume = HistoryPath is null || !Settings.Resume ? 0 : _history.ResumeFor(path, engine.DurationSeconds);
         _seek.GoTo(resume);
         if (resume > 0) _trace.Add("resume -> " + Saat.Tani.Konum(resume));
         if (!_playing) TogglePlay(false);
@@ -782,7 +784,7 @@ internal partial class PlayerView : UserControl
 
     private void SaveHistory(bool finished)
     {
-        if (_path is not { } path || HistoryPath?.Invoke() is not { } file) return;
+        if (_path is not { } path || HistoryPath?.Invoke() is not { } file || !Settings.KeepHistory) return;
         _history.Remember(path, CurrentPosition(), finished, _seek.Duration);
         _history.Save(file);
     }
