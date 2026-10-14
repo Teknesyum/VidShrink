@@ -659,6 +659,57 @@
           </StackPanel>
         </Border>
 
+        <Border x:Name="PanelPointer" Theme="{StaticResource Panel}">
+          <StackPanel Spacing="{StaticResource SpaceSm}">
+            <TextBlock Text="{loc:Text recorder.pointer.title}" Theme="{StaticResource H2}"/>
+
+            <izi:SutunIzgara MaxColumns="2" Uniform="True"
+                             ColumnSpacing="{StaticResource SpaceMd}"
+                             RowSpacing="{StaticResource SpaceSm}">
+              <CheckBox x:Name="ChkCursorHighlight"
+                        Theme="{StaticResource CheckStyle}"
+                        Content="{loc:Text recorder.option.cursor-highlight}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.option.cursor-highlight}"/>
+              <CheckBox x:Name="ChkSpotlight"
+                        Theme="{StaticResource CheckStyle}"
+                        Content="{loc:Text recorder.option.spotlight}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.option.spotlight}"/>
+            </izi:SutunIzgara>
+
+            <izi:SutunIzgara x:Name="PointerChoices" MaxColumns="2" Uniform="True"
+                             ColumnSpacing="{StaticResource SpaceMd}"
+                             RowSpacing="{StaticResource SpaceSm}">
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.pointer.size}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbPointerSize"
+                          HorizontalAlignment="Stretch"
+                          auto:AutomationProperties.Name="{loc:Text recorder.pointer.size}"/>
+              </StackPanel>
+
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.pointer.highlight-color}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbHighlightColor"
+                          HorizontalAlignment="Stretch"
+                          auto:AutomationProperties.Name="{loc:Text recorder.pointer.highlight-color}"/>
+              </StackPanel>
+
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.pointer.left-color}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbLeftClickColor"
+                          HorizontalAlignment="Stretch"
+                          auto:AutomationProperties.Name="{loc:Text recorder.pointer.left-color}"/>
+              </StackPanel>
+
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.pointer.right-color}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbRightClickColor"
+                          HorizontalAlignment="Stretch"
+                          auto:AutomationProperties.Name="{loc:Text recorder.pointer.right-color}"/>
+              </StackPanel>
+            </izi:SutunIzgara>
+          </StackPanel>
+        </Border>
+
         <!-- Ses girdisi. Liste ffmpeg'in kendisinden geliyor; cihazsız makinede kutular
              yalnız "sessiz" öğesiyle açılıyor ve kayıt sessiz sürüyor. -->
         <Border x:Name="PanelAudio" Theme="{StaticResource Panel}">

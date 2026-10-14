@@ -70,6 +70,7 @@ internal partial class RecorderView
     {
         var advanced = AdvancedMode;
         PanelOptions.IsVisible = advanced;
+        PanelPointer.IsVisible = advanced;
         PanelAdvanced.IsVisible = advanced;
         ApplyReplayVisibility();
         KartYerlesimi();
@@ -86,13 +87,15 @@ internal partial class RecorderView
         var gelismis = AdvancedMode;
         var otomatik = gelismis && AutoMode;
         var ucSutun = _darDuvar && otomatik;
-        Diz(CardsLeft, ucSutun ? new Control[] { PanelTarget, PanelWebcam }
+        Diz(CardsLeft, ucSutun ? new Control[] { PanelTarget, PanelWebcam, PanelPointer }
             : gelismis ? new Control[] { PanelTarget, PanelAudio } : new Control[] { PanelTarget });
         Diz(CardsMiddle, ucSutun ? new Control[] { PanelOptions, PanelReplay }
+            : gelismis && _darDuvar ? new Control[] { PanelOptions, PanelPointer }
             : gelismis ? new Control[] { PanelOptions } : new Control[] { PanelOptions, PanelAudio });
         Diz(CardsRight, ucSutun ? new Control[] { PanelAdvanced, PanelAudio }
             : otomatik ? new Control[] { PanelAdvanced, PanelReplay } : new Control[] { PanelAdvanced, PanelReplay, PanelWebcam });
-        Diz(CardsExtra, otomatik && !ucSutun ? new Control[] { PanelWebcam, PanelEncoding } : new Control[] { PanelEncoding });
+        Diz(CardsExtra, otomatik && !ucSutun ? new Control[] { PanelWebcam, PanelEncoding, PanelPointer }
+            : _darDuvar && gelismis ? new Control[] { PanelEncoding } : new Control[] { PanelEncoding, PanelPointer });
         KartSutunlari();
     }
 

@@ -75,6 +75,18 @@ internal sealed class RecorderSettings
 
     internal bool ShowMagnifier { get; set; }
 
+    internal bool CursorHighlight { get; set; }
+
+    internal bool Spotlight { get; set; }
+
+    internal PointerRingSize PointerSize { get; set; } = PointerStyle.Default.Size;
+
+    internal PointerColor HighlightColor { get; set; } = PointerStyle.Default.HighlightColor;
+
+    internal PointerColor LeftClickColor { get; set; } = PointerStyle.Default.LeftColor;
+
+    internal PointerColor RightClickColor { get; set; } = PointerStyle.Default.RightColor;
+
     internal bool LivePreview { get; set; }
 
     internal int ReplaySeconds { get; set; } = ReplayBuffer.DefaultSeconds;
@@ -252,6 +264,12 @@ internal sealed class RecorderSettings
             settings.ClickSound = (bool?)root["clickSound"] ?? false;
             settings.ShowKeys = (bool?)root["showKeys"] ?? false;
             settings.ShowMagnifier = (bool?)root["showMagnifier"] ?? false;
+            settings.CursorHighlight = (bool?)root["cursorHighlight"] ?? false;
+            settings.Spotlight = (bool?)root["spotlight"] ?? false;
+            if (Enum.TryParse<PointerRingSize>((string?)root["pointerSize"], true, out var pointerSize) && Enum.IsDefined(pointerSize)) settings.PointerSize = pointerSize;
+            if (Enum.TryParse<PointerColor>((string?)root["highlightColor"], true, out var highlightColor) && Enum.IsDefined(highlightColor)) settings.HighlightColor = highlightColor;
+            if (Enum.TryParse<PointerColor>((string?)root["leftClickColor"], true, out var leftClickColor) && Enum.IsDefined(leftClickColor)) settings.LeftClickColor = leftClickColor;
+            if (Enum.TryParse<PointerColor>((string?)root["rightClickColor"], true, out var rightClickColor) && Enum.IsDefined(rightClickColor)) settings.RightClickColor = rightClickColor;
             settings.LivePreview = (bool?)root["livePreview"] ?? false;
             if ((int?)root["replaySeconds"] is { } replay && Array.IndexOf(ReplayBuffer.SecondsChoices, replay) >= 0) settings.ReplaySeconds = replay;
             if (RecorderHotkeys.Read((string?)root["hotkeys"]) is { } hotkeys) settings.Hotkeys = RecorderHotkeys.Write(hotkeys);
@@ -348,6 +366,12 @@ internal sealed class RecorderSettings
                 writer.WriteBoolean("clickSound", ClickSound);
                 writer.WriteBoolean("showKeys", ShowKeys);
                 writer.WriteBoolean("showMagnifier", ShowMagnifier);
+                writer.WriteBoolean("cursorHighlight", CursorHighlight);
+                writer.WriteBoolean("spotlight", Spotlight);
+                writer.WriteString("pointerSize", PointerSize.ToString());
+                writer.WriteString("highlightColor", HighlightColor.ToString());
+                writer.WriteString("leftClickColor", LeftClickColor.ToString());
+                writer.WriteString("rightClickColor", RightClickColor.ToString());
                 writer.WriteBoolean("livePreview", LivePreview);
                 writer.WriteNumber("replaySeconds", ReplaySeconds);
                 writer.WriteString("hotkeys", Hotkeys);

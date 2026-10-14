@@ -1688,7 +1688,7 @@
                 </StackPanel>
               </Border>
 
-              <Border x:Name="DiagnosticLogPanel" izi:KartDuvari.Sutun="0" Theme="{StaticResource Panel}">
+              <Border x:Name="DiagnosticLogPanel" izi:KartDuvari.Sutun="1" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceSm}">
                   <TextBlock Text="{loc:Text settings.log.title}" Theme="{StaticResource H2}"/>
                   <TextBlock Text="{loc:Text settings.log.hint}" Theme="{StaticResource Caption}" TextWrapping="Wrap"/>
@@ -1759,7 +1759,7 @@
                 </StackPanel>
               </Border>
 
-              <Border x:Name="ShellMenuPanel" izi:KartDuvari.Sutun="3" Theme="{StaticResource Panel}">
+              <Border x:Name="ShellMenuPanel" izi:KartDuvari.Sutun="2" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <TextBlock Text="{loc:Text settings-tab.shell-menu.title}" Theme="{StaticResource H2}"/>
                   <StackPanel Spacing="{StaticResource SpaceSm}">
@@ -1776,7 +1776,7 @@
                 </StackPanel>
               </Border>
 
-              <Border x:Name="SubtitleSettingsPanel" izi:KartDuvari.Sutun="2" Theme="{StaticResource Panel}">
+              <Border x:Name="SubtitleSettingsPanel" izi:KartDuvari.Sutun="3" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <TextBlock Text="{loc:Text main.subtitles.label}" Theme="{StaticResource H2}"/>
                   <StackPanel Spacing="{StaticResource SpaceSm}">
@@ -1824,7 +1824,7 @@
                 </StackPanel>
               </Border>
 
-              <Border x:Name="UpdatePanel" izi:KartDuvari.Sutun="2" Theme="{StaticResource Panel}">
+              <Border x:Name="UpdatePanel" izi:KartDuvari.Sutun="0" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <TextBlock Text="{loc:Text settings.update.title}" Theme="{StaticResource H2}"/>
                   <StackPanel x:Name="AutoUpdateRow" Orientation="Horizontal">
@@ -1841,7 +1841,7 @@
 
               <editing:EditorShortcutsPanel x:Name="EditorShortcutsPanel" izi:KartDuvari.Sutun="2" IsOpen="False"/>
 
-              <playback:PlayerShortcutsPanel x:Name="PlayerShortcutsPanel" izi:KartDuvari.Sutun="2" IsOpen="False"/>
+              <playback:PlayerShortcutsPanel x:Name="PlayerShortcutsPanel" izi:KartDuvari.Sutun="3" IsOpen="False"/>
 
               <Border x:Name="AboutPanel" izi:KartDuvari.Sutun="3" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
@@ -1879,7 +1879,7 @@
                 </StackPanel>
               </Border>
 
-              <Border x:Name="SharePanel" izi:KartDuvari.Sutun="1" Theme="{StaticResource Panel}">
+              <Border x:Name="SharePanel" izi:KartDuvari.Sutun="2" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{loc:Text settings.share.title}" Theme="{StaticResource H2}"/>
@@ -1923,7 +1923,7 @@
                 </StackPanel>
               </Border>
 
-              <Border x:Name="ResetSettingsPanel" izi:KartDuvari.Sutun="3" Theme="{StaticResource Panel}">
+              <Border x:Name="ResetSettingsPanel" izi:KartDuvari.Sutun="1" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
                     <Button x:Name="BtnExportSettings"
@@ -1934,14 +1934,13 @@
                             Content="{loc:Text settings.backup.import}"
                             Theme="{StaticResource GhostButton}"
                             Click="OnImportSettings"/>
+                    <Button x:Name="BtnResetSettings"
+                            Content="{loc:Text settings.reset-all}"
+                            Theme="{StaticResource GhostButton}"
+                            Click="OnResetSettings"/>
                   </WrapPanel>
                   <TextBlock x:Name="TxtSettingsBackup" Theme="{StaticResource Body}" TextWrapping="Wrap"
                              IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-                  <Button x:Name="BtnResetSettings"
-                          Content="{loc:Text settings.reset-all}"
-                          Theme="{StaticResource GhostButton}"
-                          HorizontalAlignment="Left"
-                          Click="OnResetSettings"/>
                   <StackPanel x:Name="ResetSettingsConfirm" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceSm}">
                     <TextBlock x:Name="TxtResetSettingsConfirm" Text="{loc:Text settings.reset-confirm}" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
                     <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">

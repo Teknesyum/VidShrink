@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Media;
 using VidShrink.App.Recorder;
 using VidShrink.Core;
 using Xunit;
@@ -37,13 +38,15 @@ public sealed class KaydediciGirdiTests
     private sealed class SahteKanca : IInputHooks
     {
         public List<string> Cagrilar { get; } = new();
-        public Action<PixelPoint>? Tik;
+        public Action<PixelPoint, PointerButton>? Tik;
+        public Action<PixelPoint>? Hareket;
         public Action<uint, bool>? Tus;
 
-        public bool Start(bool clicks, bool keys, Action<PixelPoint> clicked, Action<uint, bool> key)
+        public bool Start(bool clicks, bool moves, bool keys, Action<PixelPoint, PointerButton> clicked, Action<PixelPoint> moved, Action<uint, bool> key)
         {
-            Cagrilar.Add($"basla fare={clicks} klavye={keys}");
+            Cagrilar.Add($"basla fare={clicks} klavye={keys}" + (moves ? " hareket=True" : ""));
             Tik = clicked;
+            Hareket = moved;
             Tus = key;
             return true;
         }
@@ -54,8 +57,14 @@ public sealed class KaydediciGirdiTests
     private sealed class SahteBindirme : IInputOverlay
     {
         public List<string> Cagrilar { get; } = new();
+        public PointerStyle? Stil;
 
-        public void Ring(PixelPoint point) => Cagrilar.Add($"halka {point.X},{point.Y}");
+        public void Style(PointerStyle style) => Stil = style;
+
+        public void Ring(PixelPoint point, PointerButton button)
+            => Cagrilar.Add($"halka {point.X},{point.Y}" + (button == PointerButton.Left ? "" : " " + button));
+
+        public void Pointer(PixelPoint point, PixelRect area) => Cagrilar.Add($"imlec {point.X},{point.Y}");
 
         public void Keys(string text, PixelRect region) => Cagrilar.Add($"tus {text}");
 
@@ -135,17 +144,17 @@ public sealed class KaydediciGirdiTests
             var ses = new SahteSes();
             var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true, InputHooks = kanca, InputOverlay = bindirme, ClickSound = ses };
             var kutular = (Bul<CheckBox>(view, "ChkShowClicks").IsChecked, Bul<CheckBox>(view, "ChkClickSound").IsChecked, Bul<CheckBox>(view, "ChkShowKeys").IsChecked);
-            view.OnInputClick(new PixelPoint(5, 5));
+            view.OnInputClick(new PixelPoint(5, 5), PointerButton.Left);
             view.SyncInput(false);
             var oturumsuz = kanca.Cagrilar.Count;
             view.SyncInput(true);
-            kanca.Tik!(new PixelPoint(300, 200));
+            kanca.Tik!(new PixelPoint(300, 200), PointerButton.Left);
             kanca.Tus!(0xA2, true);
             kanca.Tus!(0x43, true);
             kanca.Tus!(0xA2, false);
             var sesKapaliyken = ses.Calinan;
             view.SyncInput(false);
-            kanca.Tik!(new PixelPoint(1, 1));
+            kanca.Tik!(new PixelPoint(1, 1), PointerButton.Left);
 
             var sesli = new RecorderView(ayarYolu) { SkipAutoMeasure = true };
             Bul<CheckBox>(sesli, "ChkShowClicks").IsChecked = false;
@@ -156,7 +165,7 @@ public sealed class KaydediciGirdiTests
             var sesSayac = new SahteSes();
             var yalnizSes = new RecorderView(ayarYolu) { SkipAutoMeasure = true, InputHooks = sesKanca, InputOverlay = sesBindirme, ClickSound = sesSayac };
             yalnizSes.SyncInput(true);
-            sesKanca.Tik!(new PixelPoint(10, 10));
+            sesKanca.Tik!(new PixelPoint(10, 10), PointerButton.Right);
             sesKanca.Tus!(0x41, true);
             yalnizSes.SyncInput(false);
 
@@ -224,7 +233,7 @@ public sealed class KaydediciGirdiTests
             var yaziSaat = Stopwatch.StartNew();
             bindirme.Keys("Ctrl + S", bolge);
             var halkaSaat = Stopwatch.StartNew();
-            bindirme.Ring(new PixelPoint(300, 200));
+            bindirme.Ring(new PixelPoint(300, 200), PointerButton.Left);
             var halka = bindirme.RingWindow!;
             var yazi = bindirme.CaptionWindow!;
             var olcek = halka.RenderScaling;
@@ -263,6 +272,170 @@ public sealed class KaydediciGirdiTests
         Kapat("girdi-bindirme.txt");
     }
 
+    [Fact]
+    public void FareMesajiDugmeyeCevrilir()
+    {
+        Assert.Equal(PointerButton.Left, Win32InputHooks.ButtonOf(0x0201));
+        Assert.Equal(PointerButton.Right, Win32InputHooks.ButtonOf(0x0204));
+        Assert.Equal(PointerButton.Middle, Win32InputHooks.ButtonOf(0x0207));
+        Assert.Null(Win32InputHooks.ButtonOf(0x0200));
+        Assert.Null(Win32InputHooks.ButtonOf(0x0202));
+        Assert.Equal(new PixelPoint(-1920, 1079), Win32InputHooks.Unpack(Win32InputHooks.Pack(-1920, 1079)));
+    }
+
+    [Fact]
+    public void ImlecVurgusuVeSpotIsigiAyardanKancayaVeBindirmeyeGecer()
+    {
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            var duzKanca = new SahteKanca();
+            var duzBindirme = new SahteBindirme();
+            var duz = new RecorderView(ayarYolu) { SkipAutoMeasure = true, InputHooks = duzKanca, InputOverlay = duzBindirme, ClickSound = new SahteSes() };
+            Bul<CheckBox>(duz, "ChkShowClicks").IsChecked = true;
+            duz.SyncInput(true);
+            duzKanca.Hareket?.Invoke(new PixelPoint(5, 5));
+            duzKanca.Tik!(new PixelPoint(7, 7), PointerButton.Right);
+            duz.SyncInput(false);
+
+            Bul<CheckBox>(duz, "ChkCursorHighlight").IsChecked = true;
+            Bul<CheckBox>(duz, "ChkSpotlight").IsChecked = true;
+            Bul<ComboBox>(duz, "CmbPointerSize").SelectedIndex = (int)PointerRingSize.Large;
+            Bul<ComboBox>(duz, "CmbHighlightColor").SelectedIndex = (int)PointerColor.Pink;
+            Bul<ComboBox>(duz, "CmbLeftClickColor").SelectedIndex = (int)PointerColor.Green;
+            Bul<ComboBox>(duz, "CmbRightClickColor").SelectedIndex = (int)PointerColor.Purple;
+            var dosya = string.Join(" ", new[] { "cursorHighlight", "spotlight", "pointerSize", "highlightColor", "leftClickColor", "rightClickColor" }.Select(k => Dosyada(ayarYolu, k)));
+
+            var kanca = new SahteKanca();
+            var bindirme = new SahteBindirme();
+            var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true, InputHooks = kanca, InputOverlay = bindirme, ClickSound = new SahteSes() };
+            var secimler = (Bul<ComboBox>(view, "CmbPointerSize").SelectedIndex, Bul<ComboBox>(view, "CmbHighlightColor").SelectedIndex, Bul<ComboBox>(view, "CmbLeftClickColor").SelectedIndex, Bul<ComboBox>(view, "CmbRightClickColor").SelectedIndex);
+            view.SyncInput(true);
+            kanca.Hareket!(new PixelPoint(300, 200));
+            kanca.Hareket!(new PixelPoint(320, 240));
+            kanca.Tik!(new PixelPoint(320, 240), PointerButton.Left);
+            kanca.Tik!(new PixelPoint(330, 250), PointerButton.Right);
+            view.SyncInput(false);
+
+            return (duzKanca: duzKanca.Cagrilar, duzBindirme: duzBindirme.Cagrilar, dosya, secimler, kanca: kanca.Cagrilar, bindirme: bindirme.Cagrilar, stil: bindirme.Stil);
+        }));
+
+        File.WriteAllLines(Path.Combine(Kanit, "imlec-vurgusu.txt"), new[]
+        {
+            $"vurgusuz: kanca={string.Join(" | ", olcu.duzKanca)} bindirme={string.Join(" | ", olcu.duzBindirme)}",
+            $"json: {olcu.dosya}",
+            $"yeni gorunum secimleri={olcu.secimler} stil={olcu.stil}",
+            $"vurgulu: kanca={string.Join(" | ", olcu.kanca)} bindirme={string.Join(" | ", olcu.bindirme)}"
+        });
+
+        Assert.Equal(new[] { "basla fare=True klavye=False", "dur" }, olcu.duzKanca);
+        Assert.Equal(new[] { "halka 7,7 Right", "gizle" }, olcu.duzBindirme);
+        Assert.Equal("true true \"Large\" \"Pink\" \"Green\" \"Purple\"", olcu.dosya);
+        Assert.Equal(((int)PointerRingSize.Large, (int)PointerColor.Pink, (int)PointerColor.Green, (int)PointerColor.Purple), olcu.secimler);
+        Assert.Equal(new PointerStyle(true, true, PointerRingSize.Large, PointerColor.Pink, PointerColor.Green, PointerColor.Purple), olcu.stil);
+        Assert.Equal(new[] { "basla fare=True klavye=False hareket=True", "dur" }, olcu.kanca);
+        Assert.Equal(new[] { "imlec 300,200", "imlec 320,240", "halka 320,240", "halka 330,250 Right", "gizle" }, olcu.bindirme);
+
+        Kapat("imlec-vurgusu.txt");
+    }
+
+    [Fact]
+    public void ImlecSecimleriYalnizVurguYaDaTiklamaAcikkenGorunur()
+    {
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true, InputHooks = new SahteKanca(), InputOverlay = new SahteBindirme(), ClickSound = new SahteSes() };
+            var secimler = Bul<Control>(view, "PointerChoices");
+            var izler = new List<bool> { secimler.IsVisible };
+            foreach (var ad in new[] { "ChkCursorHighlight", "ChkSpotlight", "ChkShowClicks" })
+            {
+                var kutu = Bul<CheckBox>(view, ad);
+                kutu.IsChecked = true;
+                izler.Add(secimler.IsVisible);
+                kutu.IsChecked = false;
+                izler.Add(secimler.IsVisible);
+            }
+
+            Bul<CheckBox>(view, "ChkSpotlight").IsChecked = true;
+            var yeni = new RecorderView(ayarYolu) { SkipAutoMeasure = true, InputHooks = new SahteKanca(), InputOverlay = new SahteBindirme(), ClickSound = new SahteSes() };
+            izler.Add(Bul<Control>(yeni, "PointerChoices").IsVisible);
+            return izler;
+        }));
+
+        Assert.Equal(new[] { false, true, false, true, false, true, false, true }, olcu);
+    }
+
+    [Fact]
+    public void GercekImlecHalkasiHareketiIzlerTiklamaRengiDugmeyeGore()
+    {
+        var olcu = AppHost.Run(() =>
+        {
+            var bindirme = new RecorderInputOverlay();
+            bindirme.Style(new PointerStyle(true, true, PointerRingSize.Large, PointerColor.Pink, PointerColor.Ember, PointerColor.Blue));
+            Color Renk(object? firca) => firca is ISolidColorBrush b ? b.Color : default;
+            Color Kaynak(string ad) => Application.Current!.TryFindResource(ad, out var v) ? Renk(v) : default;
+
+            bindirme.Ring(new PixelPoint(300, 200), PointerButton.Left);
+            var sol = Renk(bindirme.RingWindow!.Stroke);
+            bindirme.Ring(new PixelPoint(300, 200), PointerButton.Right);
+            var sag = Renk(bindirme.RingWindow!.Stroke);
+            bindirme.Ring(new PixelPoint(300, 200), PointerButton.Middle);
+            var orta = Renk(bindirme.RingWindow!.Stroke);
+
+            var alan = new PixelRect(100, 100, 640, 480);
+            bindirme.Pointer(new PixelPoint(300, 200), alan);
+            var imlec = bindirme.PointerWindow!;
+            var spot = bindirme.SpotlightWindow!;
+            var olcek = imlec.RenderScaling;
+            var ilk = (acik: imlec.IsVisible, konum: imlec.Position, gen: imlec.Width, renk: Renk(imlec.Stroke), spotAcik: spot.IsVisible, spotKonum: spot.Position, delik: spot.Hole);
+            var ilkDelikDolu = spot.Dims(spot.Hole);
+            var koseDolu = spot.Dims(new Point(1, 1));
+            bindirme.Pointer(new PixelPoint(500, 400), alan);
+            var ikinci = (acik: imlec.IsVisible, konum: imlec.Position, delik: spot.Hole);
+            var eskiDelikDolu = spot.Dims(ilk.delik);
+            var yeniDelikDolu = spot.Dims(spot.Hole);
+            bindirme.Pointer(new PixelPoint(50, 50), alan);
+            var disarida = (imlec.IsVisible, spot.IsVisible);
+            bindirme.Pointer(new PixelPoint(400, 300), alan);
+            var geri = (imlec.IsVisible, spot.IsVisible);
+            bindirme.Hide();
+            return (sol, sag, orta, ember: Kaynak("NeonEmber"), blue: Kaynak("NeonBlue"), pink: Kaynak("NeonPink"), ilk, ilkDelikDolu, koseDolu, ikinci, eskiDelikDolu, yeniDelikDolu, disarida, geri, olcek, kapandi: bindirme.PointerWindow is null && bindirme.SpotlightWindow is null);
+        });
+
+        File.WriteAllLines(Path.Combine(Kanit, "imlec-bindirme.txt"), new[]
+        {
+            $"tik rengi sol={olcu.sol} sag={olcu.sag} orta={olcu.orta} | NeonEmber={olcu.ember} NeonBlue={olcu.blue}",
+            $"imlec 300,200: acik={olcu.ilk.acik} konum={olcu.ilk.konum} genislik={olcu.ilk.gen} renk={olcu.ilk.renk} (NeonPink={olcu.pink})",
+            $"spot: acik={olcu.ilk.spotAcik} konum={olcu.ilk.spotKonum} delik={olcu.ilk.delik} delik dolu={olcu.ilkDelikDolu} kose dolu={olcu.koseDolu}",
+            $"imlec 500,400: acik={olcu.ikinci.acik} konum={olcu.ikinci.konum} delik={olcu.ikinci.delik} eski delik dolu={olcu.eskiDelikDolu} yeni delik dolu={olcu.yeniDelikDolu}",
+            $"alan disi imlec/spot acik={olcu.disarida} geri={olcu.geri} olcek={olcu.olcek}"
+        });
+
+        var cap = (int)Math.Ceiling(72 * olcu.olcek);
+        Assert.NotEqual(olcu.sol, olcu.sag);
+        Assert.Equal(olcu.ember, olcu.sol);
+        Assert.Equal(olcu.blue, olcu.sag);
+        Assert.Equal(olcu.ember, olcu.orta);
+        Assert.True(olcu.ilk.acik);
+        Assert.Equal(72, olcu.ilk.gen);
+        Assert.Equal(olcu.pink, olcu.ilk.renk);
+        Assert.Equal(new PixelPoint(300 - cap / 2, 200 - cap / 2), olcu.ilk.konum);
+        Assert.True(olcu.ikinci.acik);
+        Assert.Equal(new PixelPoint(500 - cap / 2, 400 - cap / 2), olcu.ikinci.konum);
+        Assert.True(olcu.ilk.spotAcik);
+        Assert.Equal(new PixelPoint(100, 100), olcu.ilk.spotKonum);
+        Assert.Equal(new Point(200 / olcu.olcek, 100 / olcu.olcek), olcu.ilk.delik);
+        Assert.Equal(new Point(400 / olcu.olcek, 300 / olcu.olcek), olcu.ikinci.delik);
+        Assert.False(olcu.ilkDelikDolu);
+        Assert.True(olcu.koseDolu);
+        Assert.True(olcu.eskiDelikDolu);
+        Assert.False(olcu.yeniDelikDolu);
+        Assert.Equal((false, false), olcu.disarida);
+        Assert.Equal((true, true), olcu.geri);
+        Assert.True(olcu.kapandi);
+
+        Kapat("imlec-bindirme.txt");
+    }
+
     [KayitFact]
     public void KayitBaslayincaKancaKurulurBolgeDisiTiklamaHalkaVermez()
     {
@@ -291,8 +464,8 @@ public sealed class KaydediciGirdiTests
             while (!basla.IsCompleted && saat.ElapsedMilliseconds < 15000) Bekle(20);
             var oturum = view.HasSession;
             var kayitta = string.Join(" | ", kanca.Cagrilar);
-            kanca.Tik?.Invoke(new PixelPoint(100, 100));
-            kanca.Tik?.Invoke(new PixelPoint(900, 700));
+            kanca.Tik?.Invoke(new PixelPoint(100, 100), PointerButton.Left);
+            kanca.Tik?.Invoke(new PixelPoint(900, 700), PointerButton.Left);
             Bekle(800);
             var iptal = view.RunHotkeyAsync(HotkeyAction.Discard);
             saat.Restart();

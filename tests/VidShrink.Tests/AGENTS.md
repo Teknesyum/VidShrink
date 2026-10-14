@@ -77,6 +77,7 @@ hata. Testle yakalanmaz, yalnız aynı bayraklarla derlenerek görülür.
 - `KaydediciGirdiTests.cs` — paket 2, tıklama halkası, tıklama sesi, tuş gösterimi: `KeyText`/`KeyTracker`, bellek
   WAV'ı, bindirme yeri; sahte `IInputHooks`/`IInputOverlay`/`IClickSound` ile kutu → json → kanca, kapalı kutu kanca
   kurmaz; gerçek halka ve tuş penceresi açılıp süresinde kapanır. Gerçek düşük seviye kanca testte kurulmaz.
+  İmleç vurgusu ve spot ışığı (EKB-P2): hareket halkayı taşır, sol/sağ tık ayrı palet rengi, seçimler json'a ve kancaya gider, renk/boyut kutuları yalnız vurgu, spot ya da tıklama açıkken görünür. Üç mutasyon 1/12'şer kırmızı.
   Canlı kol (`KayitBaslayinca…`) bir geniş yerel koşumda bir kez düştü, kök nedeni bulunamadı (tek başına 10/10 yeşil); düşerse `.calisma/paket-2/girdi-canli.txt` kalır, silmeden oku.
 - `KaydediciKameraTests.cs` — paket 2, webcam bindirmesi ve imleç büyüteci: dshow girdisi, `overlay` grafiği ses ve
   ölçekle tek `-filter_complex`, dört köşe, geçersiz aygıt/genişlik/köşe reddi; sahte `CameraSource` ile kutu → json →
