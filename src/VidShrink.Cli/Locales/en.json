@@ -151,6 +151,7 @@
   "error.burn-style-needs-burn": "--yak-yazi-tipi, --yak-boyut and --yak-kutu style a burned subtitle; give --yak, --yak-srt, --yak-ass or --altyazi-tara too.",
   "error.scan-burn-conflict": "--altyazi-tara picks the subtitle to burn itself; it cannot be combined with --yak, --yak-srt or --yak-ass.",
   "error.no-libass": "This ffmpeg build has no subtitles filter (built without libass); subtitles cannot be burned into the picture.",
+  "error.no-afftdn": "This ffmpeg build has no afftdn filter; --ses-temizle (--denoise) cannot be used.",
   "error.burn-file-encoding": "The character encoding of the subtitle file to burn could not be worked out; save the file as UTF-8 and try again: {0}",
   "error.bad-subtitle-lang": "Subtitle languages are two or three letter codes separated by commas: {0}",
   "result.attempts-delivered": "Attempts:  {0} (delivered: attempt {1})",

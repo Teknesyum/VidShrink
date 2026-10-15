@@ -47,6 +47,7 @@ public partial class MainWindow
         InitializeConvertBurnUi();
         RefreshSubtitleList();
         RefreshAudioFileList();
+        RefreshAudioDenoise();
         YukseklikDurumu();
     }
 
@@ -112,6 +113,11 @@ public partial class MainWindow
     internal bool TextBurnAvailable
         => _encoders is not VidShrink.Ffmpeg.EncoderCapabilities { Loaded: true } loaded || loaded.HasFilter(VideoFilterChain.BurnFilterName);
 
+    internal bool AudioDenoiseAvailable
+        => _encoders is not VidShrink.Ffmpeg.EncoderCapabilities { Loaded: true } loaded || loaded.HasFilter(AudioCaptureArguments.NoiseSuppressionFilterName);
+
+    private void RefreshAudioDenoise() => ChkAudioDenoise.IsVisible = AudioDenoiseAvailable;
+
     /// <summary>Seçilen yakma izi, kaynağın altyazıları içinde 0 tabanlı sıra; seçim yoksa <c>null</c>.</summary>
     internal int? BurnChoice
     {
@@ -125,7 +131,7 @@ public partial class MainWindow
     private void ApplyTrackOptions(PlanOptions options)
     {
         options.AudioLoudnorm = ChkAudioLoudnorm.IsChecked == true;
-        options.AudioDenoise = ChkAudioDenoise.IsChecked == true;
+        options.AudioDenoise = AudioDenoiseAvailable && ChkAudioDenoise.IsChecked == true;
         var gain = CmbAudioGain.SelectedIndex;
         options.AudioGainDb = gain >= 0 && gain < GainCandidates.Length && GainCandidates[gain] != 0 ? GainCandidates[gain] : null;
         options.ExternalSubtitles = _externalSubtitles.ToList();

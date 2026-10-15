@@ -226,6 +226,80 @@ public sealed class YakmaBicimiTests
     }
 
     [Fact]
+    public void IkinciKaynaktaMetinIziYenidenSecilinceStilVarsayilanda()
+    {
+        var sonuc = AppHost.Run(() =>
+        {
+            var window = new MainWindow();
+            try
+            {
+                window.LoadWithoutProbing("C:\\ornek\\film.mkv", PencereKaynagi());
+                window.CmbBurnSubtitle.SelectedIndex = 2;
+                window.CmbBurnFont.SelectedIndex = MainWindow.BurnFontChoices.ToList().IndexOf("Arial") + 1;
+                window.CmbBurnSize.SelectedIndex = MainWindow.BurnSizeCandidates.ToList().IndexOf(32) + 1;
+                window.ChkBurnBox.IsChecked = true;
+                var dolu = window.PlanOptionsForTest().Filters;
+                window.LoadWithoutProbing("C:\\ornek\\ikinci.mkv", PencereKaynagi() with { FilePath = "C:\\ornek\\ikinci.mkv" });
+                window.CmbBurnSubtitle.SelectedIndex = 2;
+                var yeni = window.PlanOptionsForTest().Filters;
+                return (dolu, yeni, window.CmbBurnFont.SelectedIndex, window.CmbBurnSize.SelectedIndex, window.ChkBurnBox.IsChecked == true);
+            }
+            finally { window.Close(); }
+        });
+
+        Assert.Equal("Arial", sonuc.dolu.BurnFont);
+        Assert.Equal(32, sonuc.dolu.BurnFontSize);
+        Assert.True(sonuc.dolu.BurnBox);
+        Assert.Equal(1, sonuc.yeni.BurnSubtitle);
+        Assert.Null(sonuc.yeni.BurnFont);
+        Assert.Null(sonuc.yeni.BurnFontSize);
+        Assert.False(sonuc.yeni.BurnBox);
+        Assert.Equal(0, sonuc.Item3);
+        Assert.Equal(0, sonuc.Item4);
+        Assert.False(sonuc.Item5);
+    }
+
+    [Fact]
+    public void KuyrukBicimAlanlariniTasimaz()
+    {
+        var sonuc = AppHost.Run(() =>
+        {
+            var window = new MainWindow();
+            ShrinkJobWindow? batch = null;
+            try
+            {
+                window.LoadWithoutProbing("C:\\ornek\\film.mkv", PencereKaynagi());
+                window.CmbBurnSubtitle.SelectedIndex = 2;
+                window.CmbBurnFont.SelectedIndex = MainWindow.BurnFontChoices.ToList().IndexOf("Arial") + 1;
+                window.CmbBurnSize.SelectedIndex = MainWindow.BurnSizeCandidates.ToList().IndexOf(32) + 1;
+                window.ChkBurnBox.IsChecked = true;
+                var tek = window.PlanOptionsForTest().Filters;
+                batch = window.OpenBatch(new[] { "a.mp4", "b.mp4" });
+                return (tek, batch.OptionsFor(new ShrinkRequest(0, "a.mp4"), PencereKaynagi() with { FilePath = "a.mp4" }).Options);
+            }
+            finally
+            {
+                batch?.Close();
+                window.Close();
+            }
+        });
+
+        Assert.Equal("Arial", sonuc.tek.BurnFont);
+        Assert.True(sonuc.tek.BurnBox);
+        var kuyruk = sonuc.Item2.Filters;
+        Assert.Null(kuyruk.BurnSubtitle);
+        Assert.Null(kuyruk.BurnFont);
+        Assert.Null(kuyruk.BurnFontSize);
+        Assert.False(kuyruk.BurnBox);
+        var info = PencereKaynagi();
+        var plan = PlanCalculator.Build(info, sonuc.Item2);
+        Assert.DoesNotContain("force_style", string.Join(' ', FfmpegArguments.Build(info, plan, "c.mp4", 0, null)));
+        Assert.Null(plan.Filters.BurnFont);
+        Assert.Null(plan.Filters.BurnFontSize);
+        Assert.False(plan.Filters.BurnBox);
+    }
+
+    [Fact]
     public void AnahtarlarButunDillerde()
     {
         var anahtarlar = new[] { "main.subtitles.style.font", "main.subtitles.style.size", "main.subtitles.style.box", "main.subtitles.style.default" };
