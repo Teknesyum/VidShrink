@@ -129,6 +129,12 @@ public sealed record ConversionPlan
     /// <summary>GIF döngü sayısı (<c>-loop</c>): -1 bir kez oynar, 0 sonsuz, N kez tekrar; <c>null</c> yazılmaz (sonsuz).</summary>
     public int? GifLoop { get; init; }
 
+    /// <summary>
+    /// Kullanıcının ek ffmpeg argümanları (<see cref="CustomArguments"/>); komutta çıktı yolundan hemen önce yer alır.
+    /// GIF'in palet geçişine girmez.
+    /// </summary>
+    public IReadOnlyList<string> ExtraArgs { get; init; } = Array.Empty<string>();
+
     /// <summary>GIF titreme yöntemi (<c>paletteuse=dither</c>); <c>null</c> <c>sierra2_4a</c>.</summary>
     public string? GifDither { get; init; }
 }

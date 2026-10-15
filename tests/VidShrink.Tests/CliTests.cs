@@ -474,7 +474,7 @@ public sealed class CliTests
         Availability = () => throw new InvalidOperationException("availability must not run")
     };
 
-    private const int BeklenenTakmaAdSayisi = 56;
+    private const int BeklenenTakmaAdSayisi = 57;
 
     /// <summary>
     /// <para>Ingilizce takma adlar iki CLI belgesinde (<c>docs/cli.md</c>, <c>docs/cli.tr.md</c>) yaziliydi diye degil, <b>kaynaktan
@@ -495,6 +495,7 @@ public sealed class CliTests
     /// <para>DAG-P2 (donustur, profil disa aktarma) bes cift ekledi: <c>--kap</c>/<c>--container</c>, <c>--bit-hizi</c>/<c>--bitrate</c>,
     /// <c>--cozunurluk</c>/<c>--resolution</c>, <c>--ses-bit-hizi</c>/<c>--audio-bitrate</c>, <c>--disa-aktar</c>/<c>--export</c>; sayim 51 → 56.
     /// <c>donustur</c> kollari <c>CliConvert.cs</c>'te durdugu icin o dosyanin <c>case</c> kollari da taranir.</para>
+    /// <para>Later 62 (ek arguman) bir cift ekledi: <c>--ek-arguman</c>/<c>--extra-args</c>; sayim 56 → 57.</para>
     /// <para>Belgelerin "hepsi" demesi de veriyle pimli: takma adi olmayan uzun anahtarlar
     /// (<c>--json</c>, <c>--vmaf</c>) kaynaktan cikarilip cumlede istisna olarak araniyor.</para>
     /// </summary>

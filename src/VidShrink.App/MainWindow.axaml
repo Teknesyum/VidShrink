@@ -1619,6 +1619,15 @@
                       <CheckBox x:Name="ChkConvertLetterbox" Theme="{StaticResource CheckStyle}" IsChecked="False" IsEnabled="False" VerticalAlignment="Center"
                                 MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
                                 Content="{loc:Text main.convert.letterbox}"/>
+                      <StackPanel Spacing="{StaticResource SpaceXs}">
+                        <TextBlock Text="{loc:Text main.convert.extra-args}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                        <TextBox x:Name="TxtConvertExtraArgs" MinWidth="{StaticResource SliderMinWidth}" MaxWidth="{StaticResource FieldWidth}" FlowDirection="LeftToRight"
+                                 auto:AutomationProperties.Name="{loc:Text main.convert.extra-args}">
+                          <ToolTip.Tip>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.extra-args.tip}"/>
+                          </ToolTip.Tip>
+                        </TextBox>
+                      </StackPanel>
                     </WrapPanel>
                   </StackPanel>
                 </StackPanel>

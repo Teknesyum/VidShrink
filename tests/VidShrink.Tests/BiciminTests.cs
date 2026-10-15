@@ -1340,7 +1340,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3733, toplam);
+        Assert.Equal(3738, toplam);
         Assert.Equal(361, dilBasina["en"]);
         Assert.Equal(120, dilBasina["tr"]);
     }
@@ -1607,6 +1607,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, later 86 birlesmesinden sonra: metin konumu anahtarlarinin kaymasi main'in uzerine toplandi, dusen yok; olculen toplam 3721 + 8 = 3729, en 361, tr 119, gezilen 77357 + 602 = 77959.</para>
     /// <para>2026-10-15, later 64 birlesmesinden sonra: kaydedici ses anahtarlarinin kaymasi main'in uzerine toplandi, dusen yok; olculen toplam 3729 + 3 = 3732, en 361, tr 119, gezilen 77959 + 172 = 78131.</para>
     /// <para>2026-10-15, later 61 birlesmesinden sonra: arsiv kodegi ve GIF anahtarlarinin kaymasi main'in uzerine toplandi, dusen yok; olculen toplam 3732 + 1 = 3733, en 361, tr 119 + 1 = 120, gezilen 78131 + 473 = 78604.</para>
+    /// <para>2026-10-15, ek arguman (later 62): bes yeni <c>main.convert.extra-args*</c> anahtari, dusen yok; olculen toplam 3733 + 5 = 3738, en 361, tr 120, gezilen 78604 + 215 = 78819.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1634,7 +1635,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(78604, gezilen);
+        Assert.Equal(78819, gezilen);
         Assert.Empty(kayip);
     }
 

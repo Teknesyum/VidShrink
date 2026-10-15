@@ -301,7 +301,7 @@ public partial class MainWindow : Window
         Watch(CmbConvertBurnSize, SelectingItemsControl.SelectedIndexProperty, OnConvertChanged);
         Watch(CmbConvertBurnColor, SelectingItemsControl.SelectedIndexProperty, OnConvertChanged);
         Watch(ChkConvertBurnBox, ToggleButton.IsCheckedProperty, OnConvertChanged);
-        foreach (var field in new[] { TxtCustomResolution, TxtCustomFps, TxtAudioBitrate, TxtTrimStart, TxtTrimEnd })
+        foreach (var field in new[] { TxtCustomResolution, TxtCustomFps, TxtAudioBitrate, TxtTrimStart, TxtTrimEnd, TxtConvertExtraArgs })
             Watch(field, TextBox.TextProperty, OnConvertChanged);
         InitializeConvertFilterUi();
 
@@ -4860,9 +4860,18 @@ public partial class MainWindow : Window
             TargetBytes = _sequence is null ? GifPalette.TargetFor(_info ?? _sesKaynagi, container, ParseTargetMb()) : null,
             GifLoop = container == "gif" ? ConvertAudioNumber(CmbConvertGifLoop) : null,
             GifColors = container == "gif" ? ConvertAudioNumber(CmbConvertGifColors) : null,
-            GifDither = container == "gif" && SelectedTag(CmbConvertGifDither) is { Length: > 0 } dither ? dither : null
+            GifDither = container == "gif" && SelectedTag(CmbConvertGifDither) is { Length: > 0 } dither ? dither : null,
+            ExtraArgs = CustomArguments.Parse(TxtConvertExtraArgs.Text).Arguments
         };
     }
+
+    private static string? ExtraArgsError(CustomArgumentResult extra) => extra.Problem switch
+    {
+        CustomArgumentProblem.UnclosedQuote => Say("main.convert.extra-args.quote"),
+        CustomArgumentProblem.Forbidden => Say("main.convert.extra-args.forbidden", extra.Offender),
+        CustomArgumentProblem.StrayValue => Say("main.convert.extra-args.stray", extra.Offender),
+        _ => null
+    };
 
     private static TimeSpan? ParseTime(string? text)
         => string.IsNullOrWhiteSpace(text)
@@ -4941,6 +4950,7 @@ public partial class MainWindow : Window
         var errors = ConversionArguments.Validate(info, plan).Select(message => LanguageCatalog.Validation(message)).ToList();
         if (plan.Start == TimeSpan.MinValue || plan.End == TimeSpan.MinValue)
             errors.Add(LanguageCatalog.Validation(LanguageCatalog.TrimFormatError));
+        if (ExtraArgsError(CustomArguments.Parse(TxtConvertExtraArgs.Text)) is { } extraError) errors.Add(extraError);
 
         var output = CommandOutputPath(plan, ConversionOutputPath(info, plan));
         RefreshConvertSubtitleState(plan);

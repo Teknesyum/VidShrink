@@ -146,6 +146,17 @@ public static class CliConvert
                 case "--meta-yok" or "--no-metadata":
                     preset = preset with { DropMetadata = true };
                     break;
+                case "--ek-arguman" or "--extra-args":
+                    if (!CliParser.TryValue(args, ref i, out var ek)) return CliParser.Fail("error.missing-value", arg);
+                    var extra = CustomArguments.Parse(ek);
+                    switch (extra.Problem)
+                    {
+                        case CustomArgumentProblem.UnclosedQuote: return CliParser.Fail("error.extra-args-quote", ek);
+                        case CustomArgumentProblem.Forbidden: return CliParser.Fail("error.extra-args-forbidden", extra.Offender);
+                        case CustomArgumentProblem.StrayValue: return CliParser.Fail("error.extra-args-stray", extra.Offender);
+                    }
+                    request = request with { ExtraArguments = request.ExtraArguments.Concat(extra.Arguments).ToList() };
+                    break;
                 case "--cikti" or "--output" or "-o":
                     if (!CliParser.TryValue(args, ref i, out var output)) return CliParser.Fail("error.missing-value", arg);
                     request = request with { Output = output };
@@ -209,7 +220,8 @@ public static class CliConvert
         => request.Conversion!.ToPlan() with
         {
             Start = request.TrimStartSeconds is { } start ? TimeSpan.FromSeconds(start) : null,
-            End = request.TrimEndSeconds is { } end ? TimeSpan.FromSeconds(end) : null
+            End = request.TrimEndSeconds is { } end ? TimeSpan.FromSeconds(end) : null,
+            ExtraArgs = request.ExtraArguments
         };
 
     /// <summary>

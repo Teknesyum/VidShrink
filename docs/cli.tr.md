@@ -123,6 +123,7 @@ bunların tek yazımı var.
 | `--cozunurluk` | `--resolution` |
 | `--ses-bit-hizi` | `--audio-bitrate` |
 | `--disa-aktar` | `--export` |
+| `--ek-arguman` | `--extra-args` |
 
 Çıkış kodları: bantta `0`, bandın altında `2` (kalite doyduğu için daha küçük dosya
 saklandı), boy tavanı aşıldığında `3` (en küçük sonuç yine yazılıyor; JSON `output` ve
@@ -205,7 +206,9 @@ mp4), `--kodek <kodek>` (h264, hevc, vp9, av1, prores, dnxhr, `copy` ya da `libx
 da `--bit-hizi <kbit/sn>` (ikisi birden değil), `--cozunurluk kaynak|<yükseklik>|<G>x<Y>`,
 `--kare-hizi kaynak|<fps>`, `--ses-kodek <kodek>` (aac, opus, mp3, pcm, flac, ac3, eac3,
 `copy`, `yok`), `--ses-bit-hizi <kbit/sn>`, `--kes <aralık>`, `--meta-yok`, `--cikti <yol>`,
-`--json`. Sekmenin reddedeceği bileşim (kabın taşımadığı ses kodeği, tek sayılı boyut) aynı
+`--ek-arguman "<seçenekler>"` (çıktı yolundan hemen önce yazılan ek ffmpeg seçenekleri; tırnak
+boşluğu korur, bayrak tekrarlanınca eklenir; `-i`, `-y`, `-n`, `-f`, `-progress`, `-`, `--` ve
+ikinci çıktı olacak başıboş değer `64` ile reddedilir), `--json`. Sekmenin reddedeceği bileşim (kabın taşımadığı ses kodeği, tek sayılı boyut) aynı
 gerekçeyle ve `64` çıkış koduyla reddediliyor; yerel ffmpeg'de kodlayıcısı olmayan kap `1`
 veriyor.
 

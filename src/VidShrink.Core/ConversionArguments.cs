@@ -127,6 +127,8 @@ public static class ConversionArguments
         var errors = Validate(info, plan);
         plan = ResolveVideo(info, ResolveAudio(info, plan));
         if (errors.Count > 0) throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
+        if (CustomArguments.Check(plan.ExtraArgs) is { Ok: false } extra)
+            throw new ArgumentException($"Rejected extra argument: {extra.Offender ?? extra.Problem.ToString()}", nameof(plan));
         if (WritesIntermediate(plan) && IntermediateCodecs.Find(plan.VideoCodec, plan.VideoProfile) is null)
             throw new ArgumentException($"Unsupported {plan.VideoCodec} profile: {plan.VideoProfile ?? "none"}", nameof(plan));
         var a = new List<string> { "-hide_banner", "-y" };
@@ -161,6 +163,7 @@ public static class ConversionArguments
             AddAudio(a, info, plan);
             a.AddRange(MetadataArgs(info, plan, subtitles));
             if (plan.EndAtShortest && AddedAudio(plan) is not null) a.Add("-shortest");
+            a.AddRange(plan.ExtraArgs);
             a.Add(outputPath);
             return a;
         }
@@ -180,6 +183,7 @@ public static class ConversionArguments
                     : $"{string.Join(',', filters)}[x];[x][1:v]{use}";
                 a.AddRange(new[] { "-i", palettePath, "-lavfi", graph });
                 if (plan.GifLoop is { } loop) a.AddRange(new[] { "-loop", loop.ToString(CultureInfo.InvariantCulture) });
+                a.AddRange(plan.ExtraArgs);
                 a.Add(outputPath);
             }
             return a;
@@ -190,6 +194,7 @@ public static class ConversionArguments
             if (filters.Count > 0) a.AddRange(new[] { "-vf", string.Join(',', filters) });
             a.AddRange(AnimatedImageArgs(plan));
             a.AddRange(MetadataArgs(info, plan));
+            a.AddRange(plan.ExtraArgs);
             a.Add(outputPath);
             return a;
         }
@@ -198,6 +203,7 @@ public static class ConversionArguments
         {
             if (filters.Count > 0) a.AddRange(new[] { "-vf", string.Join(',', filters) });
             a.AddRange(ImageOutputArgs(plan));
+            a.AddRange(plan.ExtraArgs);
             a.Add(outputPath);
             return a;
         }
@@ -254,6 +260,7 @@ public static class ConversionArguments
         if (dolbyVision && plan.Container is "mp4" or "mov") a.AddRange(HdrResolver.Mp4DolbyVisionArgs);
         a.AddRange(MetadataArgs(info, plan, subtitles));
         if (plan.EndAtShortest && AddedAudio(plan) is not null) a.Add("-shortest");
+        a.AddRange(plan.ExtraArgs);
         a.Add(outputPath);
         return a;
     }
