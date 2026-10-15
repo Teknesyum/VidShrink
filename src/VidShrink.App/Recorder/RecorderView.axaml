@@ -953,6 +953,11 @@
                 <TextBox x:Name="TxtBuffer" auto:AutomationProperties.Name="{loc:Text recorder.advanced.buffer}"/>
               </StackPanel>
             </izi:SutunIzgara>
+            <CheckBox x:Name="ChkHdrToSdr"
+                      Theme="{StaticResource CheckStyle}"
+                      Content="{loc:Text recorder.advanced.hdr-to-sdr}"
+                      ToolTip.Tip="{loc:Text recorder.advanced.hdr-to-sdr-hint}"
+                      auto:AutomationProperties.Name="{loc:Text recorder.advanced.hdr-to-sdr}"/>
           </StackPanel>
         </Border>
       </StackPanel>

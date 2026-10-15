@@ -46,6 +46,7 @@ internal partial class RecorderView
         TxtAudioGain.Text = _settings.AudioGainDb.ToString("0.##", CultureInfo.InvariantCulture);
         ChkNoiseGate.IsChecked = _settings.AudioNoiseGate;
         ChkNoiseSuppression.IsChecked = _settings.AudioNoiseSuppression;
+        ChkHdrToSdr.IsChecked = _settings.HdrToSdr;
 
         RefreshAdvancedLabels();
 
@@ -240,6 +241,7 @@ internal partial class RecorderView
         _settings.AudioLayout = SelectedAudioLayout;
         _settings.AudioNoiseGate = ChkNoiseGate.IsChecked ?? false;
         _settings.AudioNoiseSuppression = ChkNoiseSuppression.IsChecked ?? false;
+        _settings.HdrToSdr = ChkHdrToSdr.IsChecked ?? false;
         return true;
     }
 

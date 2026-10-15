@@ -51,6 +51,7 @@ internal partial class RecorderView
 
         var chosen = RecorderArguments.ChooseCapture(candidate, works, out var reason);
         if (notify && reason != DdagrabFallback.None) ShowNotice(Say(FallbackKey(reason)));
+        else if (notify && RecorderArguments.HdrLost(chosen)) ShowNotice(Say("recorder.capture.hdr-lost"));
         return chosen;
     }
 

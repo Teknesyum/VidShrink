@@ -181,6 +181,9 @@ internal sealed class RecorderSettings
     /// <summary>Renk aralığı; boş bırakılırsa yazılmıyor.</summary>
     internal string? ColorRange { get; set; }
 
+    /// <summary>HDR ekranda kaydı SDR'ye çevir; varsayılan kapalı, kayıt HDR kalır.</summary>
+    internal bool HdrToSdr { get; set; }
+
     /// <summary>Kaydın kendiliğinden duracağı süre, saniye. Sıfır sınır yok demek.</summary>
     internal double MaxDurationSeconds { get; set; }
 
@@ -326,6 +329,7 @@ internal sealed class RecorderSettings
             if ((string?)root["pixelFormat"] is { Length: > 0 } pixelFormat) settings.PixelFormat = RecorderArguments.StoredPixelFormat(pixelFormat);
             settings.ColorSpace = (string?)root["colorSpace"];
             settings.ColorRange = (string?)root["colorRange"];
+            settings.HdrToSdr = (bool?)root["hdrToSdr"] ?? false;
             settings.MaxDurationSeconds = (double?)root["maxDurationSeconds"] ?? 0;
             settings.SplitSeconds = (double?)root["splitSeconds"] ?? 0;
             settings.SplitMegabytes = (double?)root["splitMegabytes"] ?? 0;
@@ -443,6 +447,7 @@ internal sealed class RecorderSettings
                 else writer.WriteString("colorSpace", ColorSpace);
                 if (ColorRange is null) writer.WriteNull("colorRange");
                 else writer.WriteString("colorRange", ColorRange);
+                writer.WriteBoolean("hdrToSdr", HdrToSdr);
                 writer.WriteNumber("maxDurationSeconds", MaxDurationSeconds);
                 writer.WriteNumber("splitSeconds", SplitSeconds);
                 writer.WriteNumber("splitMegabytes", SplitMegabytes);
