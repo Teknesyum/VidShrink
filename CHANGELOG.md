@@ -30,6 +30,7 @@ ship as part of it.
   `--denoise` stops with a clear error instead of failing the encode.
 - A queued job no longer carries the burned-in subtitle font, size and box settings of the
   previous source.
+- The recorder also hides its noise-suppression box when ffmpeg has no `afftdn` filter.
 - Settings no longer needs scrolling at full screen: the "Follow Recording" note moved into
   its tooltip.
 

@@ -395,6 +395,7 @@ public partial class MainWindow
         ApplyFastGpuTip();
         KapSecenekleriniYokla();
         RefreshAudioDenoise();
+        _recorderPane?.ApplyNoiseSuppressionProbe(AudioDenoiseAvailable);
         var textBurn = TextBurnAvailable;
         if (textBurn != _textBurnOffered)
         {

@@ -70,6 +70,32 @@ public sealed class GurultuSuzgeciYoklamaTests
         Assert.Equal((true, true), sonuc.var_);
     }
 
+    [Fact]
+    public void SuzgecYokkenKaydedicininKutusuDaGizlenir()
+    {
+        var sonuc = AppHost.Run(() =>
+        {
+            var window = new MainWindow();
+            try
+            {
+                window.ApplyHardwareVerdict(Yoklama(false), false, HardwareVerdict.NotProbed);
+                var kutu = window.RecorderPaneForTest.ChkNoiseSuppression;
+                var sonradanAcilan = kutu.IsVisible;
+                window.ApplyHardwareVerdict(Yoklama(true), false, HardwareVerdict.NotProbed);
+                kutu.IsChecked = true;
+                var var_ = (kutu.IsVisible, kutu.IsChecked);
+                window.ApplyHardwareVerdict(Yoklama(false), false, HardwareVerdict.NotProbed);
+                var yok = (kutu.IsVisible, kutu.IsChecked);
+                return (sonradanAcilan, var_, yok);
+            }
+            finally { window.Close(); }
+        });
+
+        Assert.False(sonuc.sonradanAcilan);
+        Assert.Equal((true, (bool?)true), sonuc.var_);
+        Assert.Equal((false, (bool?)false), sonuc.yok);
+    }
+
     private static string Klasor
     {
         get

@@ -37,6 +37,7 @@ public partial class MainWindow
             _recorderPane.OpenInEditor = path => OpenInEditorAsync(path);
             _recorderPane.RecordingDelivered = FollowRecordingAsync;
             _recorderPane.ShrinkForFinish = ShrinkForFinishAsync;
+            _recorderPane.ApplyNoiseSuppressionProbe(AudioDenoiseAvailable);
             PageRecorder.Content = _recorderPane;
             return _recorderPane;
         }

@@ -55,6 +55,16 @@ internal partial class RecorderView
         ApplyRateRows();
     }
 
+    /// <summary>
+    /// ffmpeg derlemesinde <c>afftdn</c> yoksa gürültü bastırma kutusu gizlenir ve işareti kalkar; yoksa kayıt süzgeç
+    /// bulunamadığı için açılmıyordu. Yoklama okunamadıysa kutu görünür kalır.
+    /// </summary>
+    internal void ApplyNoiseSuppressionProbe(bool available)
+    {
+        ChkNoiseSuppression.IsVisible = available;
+        if (!available) ChkNoiseSuppression.IsChecked = false;
+    }
+
     private static string Blank(double value)
         => value > 0 ? value.ToString("0.##", CultureInfo.InvariantCulture) : string.Empty;
 
