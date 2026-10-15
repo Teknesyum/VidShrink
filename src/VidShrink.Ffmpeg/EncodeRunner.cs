@@ -698,14 +698,41 @@ public sealed class EncodeRunner
                 }
                 finally { TryDelete(palettePath); }
             }
+            else if (plan.ImageSequenceOutput && !plan.SingleFrame)
+            {
+                Directory.CreateDirectory(partialPath);
+                var pattern = ConversionArguments.SequenceOutputPattern(partialPath, Path.GetFileName(outputPath), plan.Container);
+                await RunCommandAsync(ConversionArguments.Build(info, plan, pattern, availability: EncoderCapabilities.Instance), duration, progress, "converting", 0, 1, ct);
+                Directory.Move(partialPath, outputPath);
+                var bytes = new DirectoryInfo(outputPath).EnumerateFiles().Sum(file => file.Length);
+                return new ConversionResult(outputPath, Megabayt.Oku(bytes));
+            }
             else
                 await RunCommandAsync(ConversionArguments.Build(info, plan, partialPath, availability: EncoderCapabilities.Instance), duration, progress, "converting", 0, 1, ct);
 
             File.Move(partialPath, outputPath, overwrite: true);
             return new ConversionResult(outputPath, Megabayt.Oku(new FileInfo(outputPath).Length));
         }
-        catch (OperationCanceledException) { TryDelete(partialPath); throw; }
-        catch { TryDelete(partialPath); throw; }
+        catch (OperationCanceledException) { TryDelete(partialPath); TryDeleteFolder(partialPath); throw; }
+        catch { TryDelete(partialPath); TryDeleteFolder(partialPath); throw; }
+    }
+
+    /// <summary>
+    /// Resim dizisi çıktısının klasörü: kaynak adıyla, çakışmada <c>_2</c>, <c>_3</c> eklenir. Var olan dosya ya da klasör ezilmez.
+    /// </summary>
+    public static string SequenceOutputFolder(string sourcePath, string? outputDirectory = null)
+    {
+        var dir = outputDirectory ?? Path.GetDirectoryName(sourcePath) ?? "";
+        var stem = Path.GetFileNameWithoutExtension(sourcePath) + "_" + "frames";
+        var candidate = Path.Combine(dir, stem);
+        for (var index = 2; Directory.Exists(candidate) || File.Exists(candidate); index++)
+            candidate = Path.Combine(dir, stem + "_" + index.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        return candidate;
+    }
+
+    private static void TryDeleteFolder(string path)
+    {
+        try { if (Directory.Exists(path)) Directory.Delete(path, true); } catch { }
     }
 
     /// <summary>

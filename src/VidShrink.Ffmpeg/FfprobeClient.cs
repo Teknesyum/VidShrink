@@ -201,6 +201,43 @@ public static class FfprobeClient
         return rows?.GroupBy(row => row.Index).ToDictionary(group => group.Key, group => group.Count());
     }
 
+    /// <summary>Tek resmin ölçüsü ve kodeği; resim dizisinin ilk karesi buradan okunur. ffprobe düşerse <c>null</c>.</summary>
+    public static async Task<ImageSequenceFrame?> ProbeFrameAsync(string filePath, CancellationToken ct = default)
+    {
+        var args = new[]
+        {
+            "-hide_banner", "-v", "error", "-select_streams", "v:0",
+            "-show_entries", "stream=width,height,codec_name,pix_fmt", "-of", "json", filePath
+        };
+        try
+        {
+            using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffprobe, args) };
+            process.Start();
+            var stderrTask = process.StandardError.ReadToEndAsync(ct);
+            var stdout = await process.StandardOutput.ReadToEndAsync(ct);
+            await stderrTask;
+            await process.WaitForExitAsync(ct);
+            if (process.ExitCode != 0) return null;
+
+            using var doc = JsonDocument.Parse(stdout);
+            if (!doc.RootElement.TryGetProperty("streams", out var streams)) return null;
+            foreach (var stream in streams.EnumerateArray())
+            {
+                var width = stream.TryGetProperty("width", out var w) && w.TryGetInt32(out var wv) ? wv : 0;
+                var height = stream.TryGetProperty("height", out var h) && h.TryGetInt32(out var hv) ? hv : 0;
+                if (width <= 0 || height <= 0) continue;
+                var codec = stream.TryGetProperty("codec_name", out var c) ? c.GetString() ?? "" : "";
+                var pix = stream.TryGetProperty("pix_fmt", out var p) ? p.GetString() : null;
+                return new ImageSequenceFrame(width, height, codec, pix);
+            }
+            return null;
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception or JsonException)
+        {
+            return null;
+        }
+    }
+
     private static async Task<Dictionary<int, long>?> PacketTotalsAsync(string filePath, string select, string? readIntervals, CancellationToken ct)
     {
         var rows = await PacketRowsAsync(filePath, select, readIntervals, ct);

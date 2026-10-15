@@ -405,6 +405,7 @@ internal static class LanguageCatalog
             ["Frame rate must be greater than zero."] = "main.validation.fps-zero",
             ["Stream copy cannot change resolution or frame rate."] = "main.validation.copy-fixed",
             ["GIF requires video encoding and cannot use stream copy."] = "main.validation.gif-copy",
+            ["Image sequence output requires video encoding and cannot use stream copy."] = "main.validation.sequence-copy",
             ["The source has no audio stream to copy."] = "main.validation.no-audio-copy",
             ["The source has no audio stream to extract."] = "main.validation.no-audio-extract",
             ["The trim end must come after the trim start."] = "main.validation.trim-order"

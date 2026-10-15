@@ -42,6 +42,12 @@ public sealed class ConversionPlan
     public bool Gif => Container == "gif";
     public bool AnimatedImage => Container is "webp" or "avif";
 
-    /// <summary>Çıktı ses akışı taşıyor mu. GIF ve hareketli görsel taşımaz; ses seçimi orada okunmaz.</summary>
-    public bool CarriesAudio => !Gif && !AnimatedImage;
+    /// <summary>PNG ya da JPEG dizisi: kareler bir klasöre numaralı yazılır.</summary>
+    public bool ImageSequenceOutput => Container is "png" or "jpg";
+
+    /// <summary>Resim dizisi çıktısında yalnız ilk kare tek dosyaya yazılır. Öteki kaplarda okunmaz.</summary>
+    public bool SingleFrame { get; init; }
+
+    /// <summary>Çıktı ses akışı taşıyor mu. GIF, hareketli görsel ve resim dizisi taşımaz; ses seçimi orada okunmaz.</summary>
+    public bool CarriesAudio => !Gif && !AnimatedImage && !ImageSequenceOutput;
 }
