@@ -7,6 +7,120 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.17] - 2026-10-15
+
+### Added
+
+- The Convert tab gains most of what Shrink already had. Subtitle tracks are listed and carried
+  into the output, external `.srt`/`.ass` files can be added, and a text track can be saved to a
+  file with "Save to File"; image subtitles (PGS, VobSub) that the chosen container cannot carry
+  are dropped with a note that says to choose MKV. A subtitle can be burned into the picture, with
+  font, size, colour (white, yellow, cyan, green) and a background box. Audio tracks are chosen
+  from a checkbox list, and an external audio file can replace the source audio or be added as a
+  further track, with "End at the Shorter One". Hardware encoders (Nvidia, Intel, AMD; H.264,
+  H.265, AV1) appear in the codec list when the probe shows they work, and the codec choice is
+  now saved by name. Convert presets have their own named list, saved with the file and
+  importable and exportable. Dropping or choosing several files in the Convert tab opens a batch
+  queue with one shared setting and a setting per file.
+- Convert reads more kinds of input and writes more kinds of output. A numbered image folder
+  becomes a video (the frame rate is asked; images after a gap in the numbering are left out),
+  and PNG sequence, JPEG sequence and "Single frame" outputs write the frames to a folder or one
+  file. Audio files (mp3, flac, wav and so on) open in Convert, which then offers audio containers
+  only; Shrink says the file belongs in Convert. A GIF source lowers frame rate, width and colour
+  count until the output fits under the target size.
+- Convert audio options: Opus, OGG, AIFF and AC3 audio containers; AC3 and E-AC3 encoders; "Normalize
+  Loudness" (`loudnorm`), channels (source, stereo, mono) and sample rate (source, 44100, 48000
+  Hz). Choosing any of the three turns the audio copy off. In an audio container the source audio
+  is extracted without re-encoding when it fits the container (M4A takes AAC and ALAC this way);
+  MP4 now copies AC3, E-AC3 and Opus audio.
+- Shrink: "Reduce background noise" (`afftdn`) and "Measure loudness" (EBU R128 source loudness
+  and true peak) in the audio section; an external audio file can be added or can replace the
+  source audio; the burned subtitle takes a font, size and background box. "Keep the Source File's
+  Dates" gives the output the source's creation and modification dates (off by default). Output
+  names accept `{saat}`, `{bithizi}`, `{karehizi}`, `{klasor}` and `{sayac}`. A failed job in the
+  job window has "Queue again". Before the finished file is delivered its length is checked
+  against the source; a file that cannot be read or is clearly too short is reported and the file
+  already at the target is left alone.
+- Shrink queue controls: a Pause / Resume button suspends the running encode, and the queue pauses
+  by itself when the target drive runs low on space. Settings gains "Encoding Priority" (Normal,
+  Below Normal, Low), "Encoder Threads" (honoured by x264 and VP9 only) and "Keep the Computer
+  Awake While Encoding". An unfinished queue is saved and comes back paused at the next start. The
+  command line gains `--oncelik`, `--is-parcacigi`, `--ses-temizle`, `--ses-dosyasi`,
+  `--ses-degistir`, `--yak-yazi-tipi`, `--yak-boyut` and `--yak-kutu`.
+- Editor: a track panel in the export box picks the audio track (or "All tracks"), and the monitor
+  has a button to switch the audio track being heard. Lossless cuts now carry every audio track by
+  default. Chapters: "Write Chapters From Clips" names a chapter after each clip's label; when off,
+  the source's chapters are kept and shifted to follow the cuts. Auto split (equal parts, fixed
+  duration or target size), part-name patterns, marker names and a scene threshold. Silence cuts
+  take lead and tail padding and an audio track, and every detected range can be clicked to cut,
+  keep or speed it up. Clip copy, cut, paste, duplicate and grouping. Per-clip brightness, contrast,
+  saturation and temperature, with "Black and white" and "Old film" looks. Transitions between clips
+  (Dissolve, Wipe, Slide, Iris, 0.1 to 5 s; encoded in Full mode only). Text gains font, bold,
+  italic, outline, shadow and a background box. Export settings: presets (1080p, 720p, vertical,
+  your own), resolution, frame rate, codec, quality, audio bitrate, and "Export Audio Only"
+  (M4A or MP3). Fast mode warns how early each cut starts, and "Previous keyframe" and "Next
+  keyframe" commands show whether the playhead is on a keyframe.
+- The recorder's cursor can be highlighted with a ring (three sizes, colours for left and right
+  click) and a spotlight. A privacy mask blurs rectangles you draw. The camera can be a rectangle,
+  rounded rectangle or circle, mirrored, and placed and sized freely by dragging it in the region
+  editor. The key caption can show shortcuts only (plain letters and digits stay out of the
+  recording) and has a position, size and duration. When a recording ends a result card slides in
+  at the corner, with the file ready to drag into another app and a "Don't Show Again" button. A
+  low-disk warning shows while recording, and an unfinished `.yakalama.mkv` found in the output
+  folder can be recovered with "Recover". On an HDR display the recording stays 10-bit HDR10
+  unless "Convert to SDR on an HDR display" is on (Windows `ddagrab` path); if the encoder or
+  format cannot carry HDR the status line says the recording continues in SDR. The mini strip has
+  a new three-group layout. On macOS the click marker uses `-capture_mouse_clicks`.
+- Player: the volume and mute are remembered; the OSD names the audio track, subtitle track and
+  chapter, and a Chapters menu lists them. Each file remembers its audio track, subtitle track,
+  second subtitle, both delays and speed. Seek steps (1, 10, 60 and 300 s by default) are
+  adjustable, and Ctrl+G opens "Go to time". Several files can be dropped at once, and "Open
+  folder" is in the menu. The playlist window has search, sorting, move up and down, and shows the
+  place and length kept for each row. A watch history window with search, "Keep History", "Resume
+  Where I Left Off" and "Clear history". Subtitles: previous and next line, sync to the previous or
+  next line, hide, copy the text, subfolder search, `.sup` and `.idx` files. Audio output device
+  choice, passthrough (Dolby, DTS), exclusive output and downmix to stereo. The computer is kept
+  awake while a video plays (Windows and macOS), the cursor hides after the mouse stops, the player
+  can pause when minimized, and "Keep On Top Only While Playing". The audio and subtitle language
+  can be picked in the interface language when a file opens, with forced subtitles turned on
+  automatically, and interlaced frames are deinterlaced automatically.
+- Media information window ("All Details" in Shrink and the player): every stream, chapter and
+  attachment of a file, with copy and "Save As Text". Its audit report lists silences, black frames
+  and scene changes with timecodes; the editor's scan panel saves the same list.
+- Settings: "Follow System Theme" switches between a light and a dark palette you pick, and "Turn
+  Off Animations" (the system's reduce-motion setting is followed on macOS and Linux). The window
+  position and size are remembered, and a window left on a removed monitor opens at the default
+  place. "Export Settings" and "Import Settings" write and read a settings package; a settings
+  file that cannot be read is replaced by the last good backup and the broken file is kept beside
+  it. A portable copy (a `VidShrink.portable` file beside the exe) keeps everything in a `data`
+  folder, does not update itself and opens the download page from the update button. Languages
+  that have not been reviewed by a person are marked "machine translated" in the language picker.
+
+### Changed
+
+- Hardware encoder names in the Convert codec list use the vendor ("H.264 Nvidia", "H.265 Intel",
+  "AV1 AMD") instead of the encoder name.
+- The editor's smart mode now also copies AC-3 (MKV, MP4, MOV, M4V), E-AC-3 and MP3 (MKV, MP4,
+  MOV) audio instead of falling back to a full re-encode, as it already did for Opus; with a speed
+  change or a reversed clip it still falls back to Full.
+- The player keeps watch history for 365 days instead of the last 200 files (files with bookmarks
+  are always kept), and resuming a file is no longer limited to the five most recent.
+- Outside Windows the recorder hides the click sound, key caption and magnifier checkboxes, which
+  only work with the Windows input hook, and a saved setting for them no longer takes effect. The
+  click checkbox stays on macOS only, where it uses `-capture_mouse_clicks`; the cursor highlight
+  boxes are still shown on those platforms.
+
+### Fixed
+
+- On a Mac with a camera, recording the screen could open the camera: the screen is now chosen by
+  the name `Capture screen N`, which does not depend on the number of cameras. Checked by
+  argument tests only; it was not run on a Mac.
+- An address that ends in a playlist extension (an HLS stream, a radio `.pls`) is handed to the
+  player engine as it is, instead of being unpacked as a local playlist.
+- The recorder page no longer needs scrolling at a window width of 1024 px.
+- The command line no longer prints a "no audio" note when an external audio file is added to a
+  silent source.
+
 ## [1.2.16] - 2026-10-13
 
 ### Fixed
