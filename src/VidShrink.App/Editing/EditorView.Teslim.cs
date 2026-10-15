@@ -227,6 +227,7 @@ internal partial class EditorView
         if (_model is not { Clips.Count: > 0 } model || _source is null || Exporting) return false;
         var sources = SourcePaths;
         var snapshot = new EditTimeline(model.Clips.ToArray(), texts: model.Texts.ToArray());
+        snapshot.SetMusic(model.Music);
         var key = SaveKey(snapshot);
         _pendingPlan = null;
         _exported = null;
