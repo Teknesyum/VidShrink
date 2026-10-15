@@ -103,6 +103,7 @@ internal static class Keymap
     internal static readonly PlayerAction BookmarkAdd = new(PlayerCommandKind.BookmarkAdd, 0, "main.player.menu.bookmarkadd");
     internal static readonly PlayerAction BookmarkNext = new(PlayerCommandKind.BookmarkNext, 1, "main.player.menu.bookmarknext");
     internal static readonly PlayerAction BookmarkPrevious = new(PlayerCommandKind.BookmarkNext, -1, "main.player.menu.bookmarkprev");
+    internal static readonly PlayerAction BookmarkList = new(PlayerCommandKind.BookmarkList, 0, "player.bookmarks.list");
     internal static readonly PlayerAction NextChapter = new(PlayerCommandKind.ChapterStep, 1, "main.player.menu.chapternext");
     internal static readonly PlayerAction PreviousChapter = new(PlayerCommandKind.ChapterStep, -1, "main.player.menu.chapterprev");
     internal static readonly PlayerAction OpenMenu = new(PlayerCommandKind.ContextMenu, 0, "main.player.menu.open");
@@ -177,6 +178,7 @@ internal static class Keymap
         new(PlayerInput.OnKey(Key.B), BookmarkNext),
         new(PlayerInput.OnKey(Key.PageDown, KeyModifiers.Shift), BookmarkNext),
         new(PlayerInput.OnKey(Key.PageUp, KeyModifiers.Shift), BookmarkPrevious),
+        new(PlayerInput.OnKey(Key.B, KeyModifiers.Control), BookmarkList),
         new(PlayerInput.OnKey(Key.PageDown, KeyModifiers.Control), NextChapter),
         new(PlayerInput.OnKey(Key.PageUp, KeyModifiers.Control), PreviousChapter),
         new(PlayerInput.OnKey(Key.A), SubtitleOptions.AudioCycle),
@@ -270,7 +272,7 @@ internal static class Keymap
     internal static readonly IReadOnlyList<PlayerAction?> LoopMenu = new[]
     {
         LoopStart, LoopEnd, LoopClear, null,
-        BookmarkAdd, BookmarkNext, BookmarkPrevious
+        BookmarkAdd, BookmarkNext, BookmarkPrevious, BookmarkList
     };
 
     internal static readonly IReadOnlyList<PlayerAction> MenuActions = MenuTop

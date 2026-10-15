@@ -11,7 +11,11 @@ using System.Text.Json.Nodes;
 
 namespace VidShrink.App.Playback;
 
-internal sealed record HistoryRow(string Path, DateTimeOffset Seen, double Position);
+/// <summary>Geçmiş penceresinin satırı; <c>HasBookmarks</c> satırın yanına yer imi simgesini koyar.</summary>
+internal sealed record HistoryRow(string Path, DateTimeOffset Seen, double Position, bool HasBookmarks = false);
+
+/// <summary>OYB-15: dosyadaki bir yer imi; ad isteğe bağlı, adsız eski kayıt <c>null</c> adla okunur.</summary>
+internal sealed record Bookmark(double Seconds, string? Name);
 
 /// <summary>Dosya başına hatırlanan seçimler: ses izi, altyazı izi, ikincil altyazı (0 kapalı), iki gecikme ve hız.</summary>
 internal sealed record TrackMemory(long Audio, long Subtitle, long SecondarySubtitle, double SubtitleDelay, double AudioDelay, double Speed);
@@ -42,7 +46,7 @@ internal sealed class PlaybackHistory
             .Where(pair => pair.Value.Seen > 0 && !MediaAddress.IsAddress(pair.Key))
             .Where(pair => text.Length == 0 || compare.IndexOf(pair.Key, text, CompareOptions.IgnoreCase) >= 0)
             .OrderByDescending(pair => pair.Value.Seen)
-            .Select(pair => new HistoryRow(pair.Key, DateTimeOffset.FromUnixTimeMilliseconds((long)pair.Value.Seen), pair.Value.Position))
+            .Select(pair => new HistoryRow(pair.Key, DateTimeOffset.FromUnixTimeMilliseconds((long)pair.Value.Seen), pair.Value.Position, pair.Value.Bookmarks.Count > 0))
             .ToList();
     }
 
@@ -86,12 +90,9 @@ internal sealed class PlaybackHistory
 
                 if (item["bookmarks"] is JsonArray marks)
                     foreach (var mark in marks)
-                    {
-                        var at = Read(mark);
-                        if (double.IsFinite(at) && at >= 0) entry.Bookmarks.Add(at);
-                    }
+                        if (ReadBookmark(mark) is { } bookmark) entry.Bookmarks.Add(bookmark);
 
-                entry.Bookmarks.Sort();
+                entry.Bookmarks.Sort(BySeconds);
                 if (item["tracks"] is JsonObject tracks) entry.Tracks = ReadTracks(tracks);
                 history._entries[media] = entry;
             }
@@ -139,7 +140,19 @@ internal sealed class PlaybackHistory
                     }
 
                     writer.WriteStartArray("bookmarks");
-                    foreach (var mark in entry.Bookmarks) writer.WriteNumberValue(Math.Round(mark, 3));
+                    foreach (var mark in entry.Bookmarks)
+                    {
+                        if (mark.Name is null)
+                        {
+                            writer.WriteNumberValue(Math.Round(mark.Seconds, 3));
+                            continue;
+                        }
+
+                        writer.WriteStartObject();
+                        writer.WriteNumber("at", Math.Round(mark.Seconds, 3));
+                        writer.WriteString("name", mark.Name);
+                        writer.WriteEndObject();
+                    }
                     writer.WriteEndArray();
                     writer.WriteEndObject();
                 }
@@ -202,16 +215,50 @@ internal sealed class PlaybackHistory
         => _entries.TryGetValue(Normalize(media), out var entry) && entry.Seen > 0 ? (entry.Position, entry.Duration) : null;
 
     internal IReadOnlyList<double> Bookmarks(string media)
-        => _entries.TryGetValue(Normalize(media), out var entry) ? entry.Bookmarks.ToArray() : Array.Empty<double>();
+        => _entries.TryGetValue(Normalize(media), out var entry) ? entry.Bookmarks.Select(mark => mark.Seconds).ToArray() : Array.Empty<double>();
 
-    internal bool AddBookmark(string media, double atSeconds)
+    /// <summary>OYB-15: dosyanın yer imleri adlarıyla, zamana göre sıralı.</summary>
+    internal IReadOnlyList<Bookmark> NamedBookmarks(string media)
+        => _entries.TryGetValue(Normalize(media), out var entry) ? entry.Bookmarks.ToArray() : Array.Empty<Bookmark>();
+
+    internal bool AddBookmark(string media, double atSeconds, string? name = null)
     {
         if (!double.IsFinite(atSeconds) || atSeconds < 0) return false;
         var entry = Touch(media);
-        if (entry.Bookmarks.Any(mark => Math.Abs(mark - atSeconds) < BookmarkMergeSeconds)) return false;
-        entry.Bookmarks.Add(atSeconds);
-        entry.Bookmarks.Sort();
+        if (entry.Bookmarks.Any(mark => Math.Abs(mark.Seconds - atSeconds) < BookmarkMergeSeconds)) return false;
+        entry.Bookmarks.Add(new Bookmark(atSeconds, CleanName(name)));
+        entry.Bookmarks.Sort(BySeconds);
         return true;
+    }
+
+    /// <summary>OYB-15: yer imine ad verir; boş ad adı kaldırır. Yer imi yoksa false.</summary>
+    internal bool RenameBookmark(string media, double atSeconds, string? name)
+    {
+        if (!_entries.TryGetValue(Normalize(media), out var entry)) return false;
+        var index = entry.Bookmarks.FindIndex(mark => Math.Abs(mark.Seconds - atSeconds) < BookmarkMergeSeconds);
+        if (index < 0) return false;
+        entry.Bookmarks[index] = entry.Bookmarks[index] with { Name = CleanName(name) };
+        return true;
+    }
+
+    /// <summary>OYB-15: tek yer imini siler; izleme kaydı ve öteki yer imleri kalır.</summary>
+    internal bool RemoveBookmark(string media, double atSeconds)
+    {
+        if (!_entries.TryGetValue(Normalize(media), out var entry)) return false;
+        return entry.Bookmarks.RemoveAll(mark => Math.Abs(mark.Seconds - atSeconds) < BookmarkMergeSeconds) > 0;
+    }
+
+    private static string? CleanName(string? name) => string.IsNullOrWhiteSpace(name) ? null : name.Trim();
+
+    private static int BySeconds(Bookmark left, Bookmark right) => left.Seconds.CompareTo(right.Seconds);
+
+    private static Bookmark? ReadBookmark(JsonNode? node)
+    {
+        var at = node is JsonObject item ? Read(item["at"]) : node is JsonValue ? Read(node) : double.NaN;
+        if (!double.IsFinite(at) || at < 0) return null;
+        string? name = null;
+        if (node is JsonObject named && named["name"] is JsonValue value && value.TryGetValue<string>(out var text)) name = CleanName(text);
+        return new Bookmark(at, name);
     }
 
     internal double? NextBookmark(string media, double afterSeconds)
@@ -290,7 +337,7 @@ internal sealed class PlaybackHistory
 
         internal double Seen { get; set; }
 
-        internal List<double> Bookmarks { get; } = new();
+        internal List<Bookmark> Bookmarks { get; } = new();
 
         internal TrackMemory? Tracks { get; set; }
     }

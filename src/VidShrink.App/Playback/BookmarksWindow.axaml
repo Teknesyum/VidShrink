@@ -1,0 +1,25 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:auto="using:Avalonia.Automation"
+        xmlns:loc="using:VidShrink.App.Localization"
+        x:Class="VidShrink.App.Playback.BookmarksWindow"
+        Title="{loc:Text player.bookmarks.title}"
+        FontSize="{StaticResource FontSizeMd}" FontFamily="{StaticResource FontSans}"
+        Width="{StaticResource HistoryWindowWidth}" Height="{StaticResource HistoryWindowHeight}"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="{DynamicResource AppBg}"
+        auto:AutomationProperties.Name="{loc:Text player.bookmarks.title}">
+  <Grid RowDefinitions="*,Auto,Auto,Auto" RowSpacing="{StaticResource SpaceSm}" Margin="{StaticResource WorkspaceMargin}">
+    <ListBox x:Name="Rows" SelectionMode="Single" auto:AutomationProperties.Name="{loc:Text player.bookmarks.title}"/>
+    <TextBlock x:Name="TxtEmpty" Text="{loc:Text player.bookmarks.empty}" Theme="{StaticResource Hint}"
+               HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="False"/>
+    <TextBlock Grid.Row="1" Text="{loc:Text player.bookmarks.name}" Theme="{StaticResource Hint}"/>
+    <TextBox Grid.Row="2" x:Name="NameBox" auto:AutomationProperties.Name="{loc:Text player.bookmarks.name}"/>
+    <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" HorizontalAlignment="Right">
+      <Button x:Name="BtnDelete" Content="{loc:Text player.bookmarks.delete}" Theme="{StaticResource GhostButton}" Click="OnDelete"/>
+      <Button x:Name="BtnRename" Content="{loc:Text player.bookmarks.rename}" Theme="{StaticResource GhostButton}" Click="OnRename"/>
+      <Button x:Name="BtnGo" Content="{loc:Text player.bookmarks.go}" Theme="{StaticResource PrimaryButton}" Click="OnGo"/>
+    </StackPanel>
+  </Grid>
+</Window>

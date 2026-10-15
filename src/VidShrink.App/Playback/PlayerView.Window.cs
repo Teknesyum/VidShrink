@@ -27,6 +27,7 @@ internal partial class PlayerView
     private readonly int _shuffleSeed = Environment.TickCount;
     private PlayerSettings _settings = new();
     private RecentFiles _recent = new();
+    private Favorites _favorites = new();
     private string? _settingsFolder;
     private bool _settingsRead;
     private bool _topmost;
@@ -62,6 +63,15 @@ internal partial class PlayerView
         {
             EnsureSettings();
             return _recent;
+        }
+    }
+
+    internal Favorites FavoriteItems
+    {
+        get
+        {
+            EnsureSettings();
+            return _favorites;
         }
     }
 
@@ -456,6 +466,7 @@ internal partial class PlayerView
         _settingsFolder = folder;
         _settings = PlayerSettings.Load(SettingsFile());
         _recent = RecentFiles.Load(RecentFile());
+        _favorites = Favorites.Load(FavoritesFile());
         if (folder is not null) Keymap.Steps = _settings.SeekSteps;
     }
 
@@ -468,6 +479,8 @@ internal partial class PlayerView
     private string? SettingsFile() => SettingsFolder() is { } folder ? Path.Combine(folder, PlayerSettings.FileName) : null;
 
     private string? RecentFile() => SettingsFolder() is { } folder ? Path.Combine(folder, RecentFiles.FileName) : null;
+
+    private string? FavoritesFile() => SettingsFolder() is { } folder ? Path.Combine(folder, Favorites.FileName) : null;
 
     private bool? ToggleState(PlayerAction action)
     {
@@ -504,6 +517,86 @@ internal partial class PlayerView
         clear.Click += (_, _) => ClearHistory();
         recent.Items.Add(clear);
         return recent;
+    }
+
+    /// <summary>OYB-16: sık kullanılanlar alt menüsü; açık dosyayı ya da klasörünü ekler, listede varsa çıkarır.</summary>
+    internal MenuItem FavoritesMenu()
+    {
+        EnsureSettings();
+        var menu = new MenuItem { Header = Strings.Get("player.favorites.title") };
+        var items = _favorites.Items;
+        if (items.Count == 0) menu.Items.Add(new MenuItem { Header = Strings.Get("player.favorites.empty"), IsEnabled = false });
+        foreach (var item in items)
+        {
+            var row = new MenuItem { Header = new TextBlock { Text = FavoriteName(item) }, Tag = item };
+            ToolTip.SetTip(row, item);
+            row.Click += (_, _) => OpenFavorite(item);
+            menu.Items.Add(row);
+        }
+
+        menu.Items.Add(new Separator());
+        var file = _path;
+        var fileOn = file is not null && _favorites.Contains(file);
+        var fileRow = new MenuItem
+        {
+            Header = Strings.Get(fileOn ? "player.favorites.remove-file" : "player.favorites.add-file"),
+            IsEnabled = file is not null
+        };
+        fileRow.Click += (_, _) => ToggleFavorite(file);
+        menu.Items.Add(fileRow);
+
+        var folder = file is not null && !IsAddress(file) ? Path.GetDirectoryName(Path.GetFullPath(file)) : null;
+        var folderOn = folder is not null && _favorites.Contains(folder);
+        var folderRow = new MenuItem
+        {
+            Header = Strings.Get(folderOn ? "player.favorites.remove-folder" : "player.favorites.add-folder"),
+            IsEnabled = folder is not null
+        };
+        folderRow.Click += (_, _) => ToggleFavorite(folder);
+        menu.Items.Add(folderRow);
+        return menu;
+    }
+
+    private static string FavoriteName(string item)
+    {
+        if (IsAddress(item)) return MediaAddress.Name(item);
+        var name = Path.GetFileName(item.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+        return name.Length == 0 ? item : name;
+    }
+
+    /// <summary>Listede yoksa ekler, varsa çıkarır; kayıt hemen diske yazılır.</summary>
+    internal bool ToggleFavorite(string? item)
+    {
+        EnsureSettings();
+        if (Favorites.Normalize(item) is not { } key) return false;
+        var added = !_favorites.Contains(key);
+        if (added) _favorites.Add(key);
+        else _favorites.Remove(key);
+        _favorites.Save(FavoritesFile());
+        _trace.Add("favorite -> " + (added ? "add " : "remove ") + Favorites.KindOf(key));
+        return added;
+    }
+
+    internal bool OpenFavorite(string item)
+    {
+        EnsureSettings();
+        switch (Favorites.KindOf(item))
+        {
+            case FavoriteKind.Address:
+                return OpenAddress(item);
+            case FavoriteKind.Folder:
+                return OpenFolder(item);
+        }
+
+        if (!File.Exists(item))
+        {
+            _notice = Strings.Get("player.list.missing");
+            RefreshState();
+            return false;
+        }
+
+        _navigation = OpenQuietlyAsync(item);
+        return true;
     }
 
     private void OnRecentRow(object? sender, RoutedEventArgs e)

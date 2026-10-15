@@ -90,14 +90,14 @@ public sealed class OynaticiGecmisPenceresiTests : IDisposable
         File.WriteAllText(yol, "{\"shuffle\": true}");
         var eski = PlayerSettings.Load(yol);
         Assert.True(eski.KeepHistory);
-        Assert.True(eski.Resume);
+        Assert.Equal(ResumeMode.On, eski.Resume);
 
         eski.KeepHistory = false;
-        eski.Resume = false;
+        eski.Resume = ResumeMode.Off;
         eski.Save(yol);
         var geri = PlayerSettings.Load(yol);
         Assert.False(geri.KeepHistory);
-        Assert.False(geri.Resume);
+        Assert.Equal(ResumeMode.Off, geri.Resume);
     }
 
     [Fact]
@@ -204,15 +204,15 @@ public sealed class OynaticiGecmisPenceresiTests : IDisposable
     }
 
     [Theory]
-    [InlineData(true, 30.0)]
-    [InlineData(false, 0.0)]
-    public void DevamAnahtariKonumaUyar(bool devam, double beklenen)
+    [InlineData("On", 30.0)]
+    [InlineData("Off", 0.0)]
+    public void DevamAnahtariKonumaUyar(string devam, double beklenen)
     {
         var dosya = Dosya("devam.mp4");
         var onceki = new PlaybackHistory();
         onceki.Remember(dosya, 30, false, 600);
         onceki.Save(GecmisYolu);
-        new PlayerSettings { Resume = devam }.Save(Path.Combine(_klasor, PlayerSettings.FileName));
+        new PlayerSettings { Resume = Enum.Parse<ResumeMode>(devam) }.Save(Path.Combine(_klasor, PlayerSettings.FileName));
 
         var konum = AppHost.Run(() =>
         {
