@@ -21,7 +21,11 @@ public partial class MainWindow
     {
         if (!OtomatikKirpmaAcik || _info is not { } info) return null;
         if (_kirpmaIsi is not null && _kirpmaYolu == info.FilePath) return _kirpmaIsi;
+        return KirpmaIsiniBaslat(info);
+    }
 
+    private Task<CropRect?> KirpmaIsiniBaslat(MediaInfo info)
+    {
         _kirpmaCts?.Cancel();
         var cts = new CancellationTokenSource();
         _kirpmaCts = cts;

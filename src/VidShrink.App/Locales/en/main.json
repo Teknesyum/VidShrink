@@ -1,4 +1,4 @@
-{
+﻿{
 
   "main.chip.archive.tip": "• The archive chip has no size ceiling.\n• The engine spends bits up to visually lossless quality and stops there.\n• While this chip is on, the number in the target box does not build the plan.\n• The file does get smaller, but the source decides how much, not you.\n• If you have to fit somewhere, pick one of the chips that names an MB figure.\n• Touching the target brings the size ceiling back.",
   "main.derivation.size": "Target {0} MB",
@@ -432,6 +432,15 @@
   "main.convert-queue.summary": "{0} done, {1} failed, {2} cancelled.",
   "main.convert.note.webp-bitrate-ignored": "WebP has no bitrate mode: the bitrate value is ignored and the encoder's default quality is used.",
   "main.convert.note.gif-target": "GIF source: frame rate, width and colour count are lowered until the output fits under the target size from Shrink.",
+  "main.convert.scaler": "Scaling method",
+  "main.convert.scaler.bicubic": "Bicubic",
+  "main.convert.scaler.bilinear": "Bilinear",
+  "main.convert.scaler.neighbor": "Nearest neighbor",
+  "main.convert.fps-mode": "Frame rate mode",
+  "main.convert.fps-mode.constant": "Constant",
+  "main.convert.fps-mode.variable": "Variable",
+  "main.convert.letterbox": "Keep Aspect Ratio with Black Bars",
+  "main.convert.note.filters-reencode": "Picture filters are on: the video is re-encoded instead of copied.",
 
   "main.stage.encoding": "Encoding",
   "main.stage.converting": "Converting",

@@ -9,7 +9,7 @@ public static class ConversionArguments
 
     public static IReadOnlyList<string> Validate(MediaInfo info, ConversionPlan plan)
     {
-        plan = ResolveAudio(info, plan);
+        plan = ResolveVideo(info, ResolveAudio(info, plan));
         var errors = new List<string>();
         if (plan.Start is { } startValue && startValue < TimeSpan.Zero) errors.Add("Start time cannot be negative.");
         if (plan.End is { } endValue && endValue <= TimeSpan.Zero) errors.Add("End time must be greater than zero.");
@@ -62,11 +62,9 @@ public static class ConversionArguments
                     errors.Add($"The {processed} audio encoder does not support {rate.ToString(CultureInfo.InvariantCulture)} Hz.");
             }
         }
-        if (plan.BurnSubtitle is not null)
-        {
-            if (plan.AudioOnly || plan.Gif || plan.AnimatedImage || plan.ImageSequenceOutput || plan.VideoCodec == "copy") errors.Add("Burning subtitles requires video encoding.");
-            errors.AddRange(VideoFilterChain.Validate(info, plan.BurnOptions));
-        }
+        if (plan.BurnSubtitle is not null && (plan.AudioOnly || plan.Gif || plan.AnimatedImage || plan.ImageSequenceOutput || plan.VideoCodec == "copy"))
+            errors.Add("Burning subtitles requires video encoding.");
+        if (plan.BurnSubtitle is not null || !plan.AudioOnly) errors.AddRange(VideoFilterChain.Validate(info, plan.BurnOptions));
         return errors;
     }
 
@@ -92,9 +90,11 @@ public static class ConversionArguments
     /// Planın sessizce yok saydığı seçimler. Ölçüm <c>docs/olcumler/webp-bit-hizi.md</c>:
     /// <c>libwebp_anim</c> <c>-b:v</c> değerini okumuyor, çıktı bayt bayt aynı kalıyor.
     /// </summary>
-    public static IReadOnlyList<ConversionNote> Notes(ConversionPlan plan)
+    public static IReadOnlyList<ConversionNote> Notes(ConversionPlan plan, MediaInfo? info = null)
     {
         var notes = new List<ConversionNote>();
+        if (info is not null && plan.VideoCodec == "copy" && FiltersVideo(info, plan))
+            notes.Add(ConversionNote.FiltersReencode);
         if (plan.Container == "webp" && plan.QualityMode == ConversionQualityMode.Bitrate)
             notes.Add(ConversionNote.WebpBitrateIgnored);
         if (plan.Gif && plan.TargetBytes > 0)
@@ -109,7 +109,7 @@ public static class ConversionArguments
     public static IReadOnlyList<string> Build(MediaInfo info, ConversionPlan plan, string outputPath, string? palettePath = null, IEncoderAvailability? availability = null)
     {
         var errors = Validate(info, plan);
-        plan = ResolveAudio(info, plan);
+        plan = ResolveVideo(info, ResolveAudio(info, plan));
         if (errors.Count > 0) throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
         if (WritesIntermediate(plan) && IntermediateCodecs.Find(plan.VideoCodec, plan.VideoProfile) is null)
             throw new ArgumentException($"Unsupported {plan.VideoCodec} profile: {plan.VideoProfile ?? "none"}", nameof(plan));
@@ -149,7 +149,8 @@ public static class ConversionArguments
             return a;
         }
 
-        var filters = VideoFilters(info, plan);
+        var (before, after) = VideoFilters(info, plan);
+        var filters = before.Concat(after).ToList();
         var dolbyVision = false;
         if (plan.Gif)
         {
@@ -193,13 +194,13 @@ public static class ConversionArguments
             var hdr = HdrResolver.Resolve(info, plan.HdrPolicy, plan.VideoCodec, availability,
                 dolbyVisionCarriable: FfmpegArguments.SupportsRateLimits(plan.VideoCodec) is false);
             dolbyVision = hdr.DolbyVisionCarried;
-            if (!string.IsNullOrEmpty(hdr.VideoFilter)) filters.Add(hdr.VideoFilter);
+            if (!string.IsNullOrEmpty(hdr.VideoFilter)) after.Add(hdr.VideoFilter);
             var pixelFormat = CodecModel.OutputPixelFormat(plan.VideoCodec, hdr.PixelFormat);
-            filters.AddRange(CodecModel.UploadFilters(plan.VideoCodec, pixelFormat));
-            if (VideoFilterChain.BurnFilter(info, plan.BurnOptions, plan.Start?.TotalSeconds ?? 0) is { } burn) filters.Insert(0, burn);
+            after.AddRange(CodecModel.UploadFilters(plan.VideoCodec, pixelFormat));
+            if (VideoFilterChain.BurnFilter(info, plan.BurnOptions, plan.Start?.TotalSeconds ?? 0) is { } burn) before.Add(burn);
             if (burnsImage)
-                a.AddRange(new[] { "-filter_complex", VideoFilterChain.OverlayGraph(info, plan.BurnOptions, "0:" + VideoIndex(info), Array.Empty<string>(), filters)! });
-            else if (filters.Count > 0) a.AddRange(new[] { "-vf", string.Join(',', filters) });
+                a.AddRange(new[] { "-filter_complex", VideoFilterChain.OverlayGraph(info, plan.BurnOptions, "0:" + VideoIndex(info), before, after)! });
+            else if (before.Count + after.Count > 0) a.AddRange(new[] { "-vf", string.Join(',', before.Concat(after)) });
 
             a.AddRange(new[] { "-c:v", plan.VideoCodec });
             if (IntermediateCodecs.Find(plan.VideoCodec, plan.VideoProfile) is { } intermediate)
@@ -213,6 +214,8 @@ public static class ConversionArguments
                 if (CodecModel.TakesPixelFormatFlag(plan.VideoCodec))
                     a.AddRange(new[] { "-pix_fmt", pixelFormat });
             }
+            var rate = plan.Fps ?? info.Fps;
+            a.AddRange(VideoFilterChain.FrameRateArgs(plan.FrameRate, rate, rate));
             if (hdr.ColorArgs.Count > 0) a.AddRange(hdr.ColorArgs);
             if (dolbyVision) a.AddRange(HdrResolver.DolbyVisionArgs);
         }
@@ -462,16 +465,58 @@ public static class ConversionArguments
             ? video.Index.ToString(CultureInfo.InvariantCulture)
             : "v:0";
 
-    private static List<string> VideoFilters(MediaInfo info, ConversionPlan plan)
+    /// <summary>
+    /// Dönüştür'ün görüntü süzgeçleri iki parça: ölçekten önceki görüntü süzgeçleri (Küçült'ün sırası)
+    /// ve ölçek, kare pikseli, kare hızı. Resim altyazı bindirmesi ikisinin arasına girer.
+    /// </summary>
+    private static (List<string> Before, List<string> After) VideoFilters(MediaInfo info, ConversionPlan plan)
     {
-        var filters = new List<string>();
-        if (plan.Width is { } width && plan.Height is { } height) filters.Add($"scale={width}:{height}:flags=lanczos");
-        else if (plan.Height is { } h && info.IsAnamorphic) filters.Add($"scale=trunc(iw*sar*{h}/ih/2)*2:{h}:flags=lanczos");
-        else if (plan.Height is { } h2) filters.Add($"scale=-2:{h2}:flags=lanczos");
-        else if (info.IsAnamorphic) filters.Add("scale=trunc(iw*sar/2)*2:ih:flags=lanczos");
-        if (info.IsAnamorphic) filters.Add(VideoFilterChain.SquarePixelFilter);
-        if (plan.Fps is { } fps && Math.Abs(fps - info.Fps) > 0.01) filters.Add($"fps={fps.ToString("0.###", CultureInfo.InvariantCulture)}");
-        return filters;
+        var before = VideoFilterChain.PictureFilters(info, plan.Filters);
+        var after = new List<string>();
+        var flags = VideoFilterChain.ScaleFlags(plan.Filters.Scaler);
+        if (plan.PadsToFrame)
+        {
+            if (info.IsAnamorphic)
+            {
+                after.Add($"scale=trunc(iw*sar/2)*2:ih:flags={flags}");
+                after.Add(VideoFilterChain.SquarePixelFilter);
+            }
+            after.AddRange(VideoFilterChain.LetterboxFilters(plan.Width!.Value, plan.Height!.Value, plan.Filters.Scaler));
+        }
+        else
+        {
+            if (plan.Width is { } width && plan.Height is { } height) after.Add($"scale={width}:{height}:flags={flags}");
+            else if (plan.Height is { } h && info.IsAnamorphic) after.Add($"scale=trunc(iw*sar*{h}/ih/2)*2:{h}:flags={flags}");
+            else if (plan.Height is { } h2) after.Add($"scale=-2:{h2}:flags={flags}");
+            else if (info.IsAnamorphic) after.Add($"scale=trunc(iw*sar/2)*2:ih:flags={flags}");
+            if (info.IsAnamorphic) after.Add(VideoFilterChain.SquarePixelFilter);
+        }
+        if (plan.FrameRate != FrameRateMode.Peak && plan.Fps is { } fps && Math.Abs(fps - info.Fps) > 0.01)
+            after.Add($"fps={fps.ToString("0.###", CultureInfo.InvariantCulture)}");
+        return (before, after);
+    }
+
+    /// <summary>
+    /// Plan görüntüye dokunan bir seçim taşıyor mu: görüntü süzgeci, kare hızı kipi ya da çerçeveye
+    /// sığdırma. Ses, GIF, hareketli görsel ve görüntü dizisi kendi kodlayıcısıyla yazdığı için sayılmaz.
+    /// </summary>
+    public static bool FiltersVideo(MediaInfo info, ConversionPlan plan)
+        => !plan.AudioOnly && !plan.Gif && !plan.AnimatedImage && !plan.ImageSequenceOutput
+           && (plan.Filters.ChangesPictureFor(info) || plan.FrameRate != FrameRateMode.Auto || plan.PadsToFrame);
+
+    /// <summary>
+    /// Akış kopyası süzgeç taşıyamaz; görüntüye dokunan seçim varsa kopya kabın kendi kodlayıcısına
+    /// döner: WebM'de VP9, MXF'te DNxHR HQ, öteki kaplarda x264.
+    /// </summary>
+    public static ConversionPlan ResolveVideo(MediaInfo info, ConversionPlan plan)
+    {
+        if (plan.VideoCodec != "copy" || !FiltersVideo(info, plan)) return plan;
+        return plan.Container switch
+        {
+            "webm" => plan with { VideoCodec = "libvpx-vp9" },
+            "mxf" => plan with { VideoCodec = IntermediateCodecs.DnxHr, VideoProfile = "dnxhr_hq" },
+            _ => plan with { VideoCodec = "libx264" }
+        };
     }
 
     private static void AddAudio(List<string> args, MediaInfo info, ConversionPlan plan)

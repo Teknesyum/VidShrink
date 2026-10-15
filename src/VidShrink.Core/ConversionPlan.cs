@@ -2,7 +2,7 @@
 
 public enum ConversionQualityMode { Crf, Bitrate }
 
-public enum ConversionNote { WebpBitrateIgnored, GifFitsTarget }
+public enum ConversionNote { WebpBitrateIgnored, GifFitsTarget, FiltersReencode }
 
 public sealed record ConversionPlan
 {
@@ -85,10 +85,25 @@ public sealed record ConversionPlan
     /// <summary>Yakilan metin izin arkasina opak kutu; resim izde okunmaz.</summary>
     public bool BurnBox { get; init; }
 
+    /// <summary>Dönüştür'ün süzgeç varsayılanı: Küçült'ünkiyle aynı, yalnız tarama çözme kapalı başlar.</summary>
+    public static readonly VideoFilterOptions DefaultFilters = VideoFilterOptions.Default with { Deinterlace = DeinterlaceMode.Off };
+
+    /// <summary>Görüntü süzgeçleri Küçült'ün seçenekleriyle ve aynı zincirden; yakma alanları burada okunmaz.</summary>
+    public VideoFilterOptions Filters { get; init; } = DefaultFilters;
+
+    /// <summary>Genişlik ve yükseklik birlikte verilmişse görüntü en-boyu korunarak sığdırılır, kalan siyah bantla doldurulur.</summary>
+    public bool Letterbox { get; init; }
+
+    /// <summary>Kare hızı kipi: sabit <c>cfr</c>, değişken tavanlı <c>vfr</c>; otomatik bugünkü komut.</summary>
+    public FrameRateMode FrameRate { get; init; } = FrameRateMode.Auto;
+
+    /// <summary>Dolgu yalnız iki boyut birlikte verilince okunur.</summary>
+    public bool PadsToFrame => Letterbox && Width is not null && Height is not null;
+
     /// <summary>Kucultmenin suzgec secenekleri olarak yakma; iz secilmemisse bicem de bos.</summary>
     public VideoFilterOptions BurnOptions => BurnSubtitle is null
-        ? VideoFilterOptions.Default
-        : VideoFilterOptions.Default with { BurnSubtitle = BurnSubtitle, BurnFont = BurnFont, BurnFontSize = BurnFontSize, BurnColor = BurnColor, BurnBox = BurnBox };
+        ? Filters with { BurnSubtitle = null, BurnFile = null }
+        : Filters with { BurnSubtitle = BurnSubtitle, BurnFile = null, BurnFont = BurnFont, BurnFontSize = BurnFontSize, BurnColor = BurnColor, BurnBox = BurnBox };
     public bool AudioOnly => Container is "mp3" or "m4a" or "wav" or "flac" or "opus" or "ogg" or "aiff" or "ac3";
     public bool Gif => Container == "gif";
     public bool AnimatedImage => Container is "webp" or "avif";

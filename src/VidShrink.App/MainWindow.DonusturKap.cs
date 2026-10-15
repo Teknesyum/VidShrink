@@ -28,6 +28,7 @@ public partial class MainWindow
     {
         ConversionNote.WebpBitrateIgnored => "main.convert.note.webp-bitrate-ignored",
         ConversionNote.GifFitsTarget => "main.convert.note.gif-target",
+        ConversionNote.FiltersReencode => "main.convert.note.filters-reencode",
         _ => "main.convert.ready"
     };
 
