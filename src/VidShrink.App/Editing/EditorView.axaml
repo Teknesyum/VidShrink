@@ -14,7 +14,8 @@
     <GridSplitter x:Name="PreviewSplitter" Grid.Row="1" Theme="{StaticResource PlanSplitter}" ResizeDirection="Rows"/>
     <editing:EditorScrollViewer x:Name="LowerScroll" Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
     <StackPanel>
-      <Grid x:Name="MonitorBar" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource EditorTransportGap}" Margin="{StaticResource PageMargin}" AutomationProperties.Name="{loc:Text editor.monitor}">
+      <Border Background="{StaticResource Surface}" CornerRadius="{StaticResource RadiusPanel}" Margin="{StaticResource PageMargin}">
+      <Grid x:Name="MonitorBar" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource EditorTransportGap}" AutomationProperties.Name="{loc:Text editor.monitor}">
         <TextBox x:Name="TxtTimecode" Grid.Column="0" Width="{StaticResource EditorTimecodeWidth}" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.timecode}"/>
         <StackPanel x:Name="Transport" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="{StaticResource EditorTransportGap}">
           <Button x:Name="BtnMarkIn" Theme="{StaticResource PlaybackBarButton}" AutomationProperties.Name="{loc:Text editor.mark-in}">
@@ -56,6 +57,7 @@
           <TextBlock x:Name="TxtDuration" Theme="{StaticResource MonoValue}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.duration}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
         </StackPanel>
       </Grid>
+      </Border>
       <Border Theme="{StaticResource Panel}" Background="{StaticResource Surface}" Margin="{StaticResource PageMargin}">
         <StackPanel Spacing="{StaticResource SpaceSm}">
           <WrapPanel x:Name="Strip" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">

@@ -302,11 +302,13 @@
                       </StackPanel>
                     </Panel>
 
-                    <Grid x:Name="SourceCard" IsVisible="False" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+                    <DockPanel x:Name="SourceCard" IsVisible="False" HorizontalSpacing="{StaticResource SpaceMd}">
+                      <WrapPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
+                        <Button x:Name="BtnMediaDetails" Content="{loc:Text mediainfo.open}" Theme="{StaticResource GhostButton}" Click="OnMediaDetails"/>
+                        <Button Content="{loc:Text main.action.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowse"/>
+                      </WrapPanel>
                       <TextBlock x:Name="TxtFileName" Theme="{StaticResource Body}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip.Tip="{Binding $self.Text}"/>
-                      <Button Grid.Column="1" x:Name="BtnMediaDetails" Content="{loc:Text mediainfo.open}" Theme="{StaticResource GhostButton}" Click="OnMediaDetails"/>
-                      <Button Grid.Column="2" Content="{loc:Text main.action.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowse"/>
-                    </Grid>
+                    </DockPanel>
 
                     <TextBlock x:Name="TxtSourceStatus" Classes="reveal" Theme="{StaticResource StatusError}" IsVisible="False"/>
 
@@ -1678,7 +1680,13 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <ComboBox x:Name="CmbLanguage" HorizontalAlignment="Stretch"/>
+                      <ComboBox x:Name="CmbLanguage" HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
+                          <DataTemplate x:DataType="x:String">
+                            <TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding}"/>
+                          </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                      </ComboBox>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Spacing="{StaticResource SpaceSm}">
                       <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">

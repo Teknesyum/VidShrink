@@ -174,7 +174,7 @@
   "main.convert.audio-tracks": "Audio tracks",
   "main.convert.audio-tracks.none": "The source has no audio tracks.",
   "main.convert.audio-tracks.not-carried": "This container does not carry audio.",
-  "main.convert.audio-external.shortest": "End at the shorter one",
+  "main.convert.audio-external.shortest": "End at the Shorter One",
   "main.audio.level.label": "Audio level",
   "main.audio.loudnorm": "Normalize loudness (EBU R128)",
   "main.audio.gain": "Gain",

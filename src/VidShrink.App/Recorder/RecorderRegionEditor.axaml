@@ -28,8 +28,7 @@
             IsVisible="False"
             IsHitTestVisible="False"
             BorderBrush="{DynamicResource NeonBlue}"/>
-    <Border x:Name="CameraGrip" Classes="snap" IsVisible="False" IsHitTestVisible="False"
-            Width="{StaticResource RecorderRegionHandle}" Height="{StaticResource RecorderRegionHandle}"/>
+    <Border x:Name="CameraGrip" Classes="grip" IsVisible="False" IsHitTestVisible="False"/>
     <Border x:Name="SnapX" Classes="snap" IsVisible="False" IsHitTestVisible="False"/>
     <Border x:Name="SnapY" Classes="snap" IsVisible="False" IsHitTestVisible="False"/>
     <Border x:Name="Toolbar"
