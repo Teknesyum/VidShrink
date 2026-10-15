@@ -232,6 +232,7 @@ public sealed class GorselGozTests
         public void Reveal(string path) { }
         public void Sleep() { }
         public void PowerOff() { }
+        public void Quit() { }
     }
 
     [GorselGozTheory]

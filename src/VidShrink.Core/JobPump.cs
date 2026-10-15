@@ -90,6 +90,19 @@ public sealed class JobPump<T> where T : class
         return true;
     }
 
+    /// <summary>SIK-P7: bekleyen işi sırasını bozmadan yenisiyle değiştirir; iş kuyruktan çıkmaz.</summary>
+    public bool ReplacePending(T current, T replacement)
+    {
+        lock (_gate)
+        {
+            var index = _pending.FindIndex(job => ReferenceEquals(job, current));
+            if (index < 0) return false;
+            _pending[index] = replacement;
+        }
+        Changed?.Invoke();
+        return true;
+    }
+
     /// <summary>Koşan tek işi iptal eder; ötekilere ve sıraya dokunmaz.</summary>
     public bool Cancel(T job)
     {

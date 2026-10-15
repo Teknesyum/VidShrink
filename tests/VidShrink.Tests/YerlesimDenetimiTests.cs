@@ -484,6 +484,7 @@ public sealed class YerlesimDenetimiTests
         public void Reveal(string path) { }
         public void Sleep() { }
         public void PowerOff() { }
+        public void Quit() { }
     }
 
     public static TheoryData<string> DilKollari()

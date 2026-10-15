@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using VidShrink.Core;
 
@@ -60,6 +60,9 @@ public sealed class AppSettings
 
     /// <summary>İş bitince, pencere önde değilse haber ver. Alanı olmayan eski dosya açık okunur.</summary>
     public bool NotifyWhenDone { get; set; } = true;
+
+    /// <summary>SIK-P7: kuyruk bitince sistem sesi çal. Varsayılan kapalı.</summary>
+    public bool FinishSound { get; set; }
 
     /// <summary>SIK-P2: kodlama sürerken sistem uyumaz, ekran kapanabilir. Alanı olmayan eski dosya açık okunur.</summary>
     public bool PreventSleepWhileEncoding { get; set; } = true;
@@ -182,6 +185,7 @@ public sealed class AppSettings
             ReadBool(root, "advancedDefaultOpen", value => settings.AdvancedDefaultOpen = value);
             ReadBool(root, "followRecording", value => settings.FollowRecording = value);
             ReadBool(root, "notifyWhenDone", value => settings.NotifyWhenDone = value);
+            ReadBool(root, "finishSound", value => settings.FinishSound = value);
             ReadBool(root, "preventSleepWhileEncoding", value => settings.PreventSleepWhileEncoding = value);
             ReadBool(root, "keepSourceDates", value => settings.KeepSourceDates = value);
             ReadInt(root, "parallelJobs", value => settings.ParallelJobs = Math.Max(VidShrink.Core.ParallelJobs.Default, value));
@@ -279,6 +283,7 @@ public sealed class AppSettings
         root["advancedDefaultOpen"] = AdvancedDefaultOpen;
         root["followRecording"] = FollowRecording;
         root["notifyWhenDone"] = NotifyWhenDone;
+        root["finishSound"] = FinishSound;
         root["preventSleepWhileEncoding"] = PreventSleepWhileEncoding;
         root["keepSourceDates"] = KeepSourceDates;
         root["parallelJobs"] = ParallelJobs;

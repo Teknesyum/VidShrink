@@ -36,6 +36,7 @@ public sealed class UykuEngellemeTests
         public void Reveal(string path) => _defter.Olaylar.Add("reveal");
         public void Sleep() => _defter.Olaylar.Add("sleep");
         public void PowerOff() => _defter.Olaylar.Add("power-off");
+        public void Quit() => _defter.Olaylar.Add("quit");
     }
 
     private sealed class SahteKosum

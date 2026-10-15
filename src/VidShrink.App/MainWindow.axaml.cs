@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
@@ -317,6 +317,7 @@ public partial class MainWindow : Window
         Watch(ChkAdvancedDefaultOpen, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkFollowRecording, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkNotifyWhenDone, ToggleButton.IsCheckedProperty, SaveAppSettings);
+        Watch(ChkFinishSound, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkPreventSleep, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkKeepDates, ToggleButton.IsCheckedProperty, SaveAppSettings);
         CmbParallelJobs.ItemsSource = ParallelJobChoices(Environment.ProcessorCount);
@@ -1622,6 +1623,7 @@ public partial class MainWindow : Window
             AdvancedDefaultOpen = ChkAdvancedDefaultOpen.IsChecked == true,
             FollowRecording = ChkFollowRecording.IsChecked == true,
             NotifyWhenDone = ChkNotifyWhenDone.IsChecked == true,
+            FinishSound = ChkFinishSound.IsChecked == true,
             PreventSleepWhileEncoding = ChkPreventSleep.IsChecked == true,
             KeepSourceDates = ChkKeepDates.IsChecked == true,
             ParallelJobs = Math.Max(0, CmbParallelJobs.SelectedIndex) + 1,
@@ -1686,6 +1688,7 @@ public partial class MainWindow : Window
             if (settings.AdvancedDefaultOpen) ExpandAdvanced();
             ChkFollowRecording.IsChecked = settings.FollowRecording;
             ChkNotifyWhenDone.IsChecked = settings.NotifyWhenDone;
+            ChkFinishSound.IsChecked = settings.FinishSound;
             ChkPreventSleep.IsChecked = settings.PreventSleepWhileEncoding;
             ChkKeepDates.IsChecked = settings.KeepSourceDates;
             CmbParallelJobs.SelectedIndex = ParallelJobs.Clamp(settings.ParallelJobs, Environment.ProcessorCount) - 1;
@@ -5013,8 +5016,12 @@ public partial class MainWindow : Window
     {
         var karar = IsBittiBildirimi.Karar(new[] { biten }, PencereEtkin(), ChkNotifyWhenDone.IsChecked == true,
             (key, args) => string.Format(Strings.Culture, Say(key), args));
+        if (IsBittiBildirimi.SesKarari(new[] { biten }, ChkFinishSound.IsChecked == true) is bool hata) Ses.Cal(hata);
         if (karar is not null) Bildirim.Bildir(this, karar);
     }
+
+    /// <summary>Bitiş sesinin yüzü; test konağında sessiz olan gelir.</summary>
+    internal IBitisSesi Ses { get; set; } = IsBittiBildirimi.VarsayilanSes();
 
     private string DescribeFailure(Exception ex)
     {
