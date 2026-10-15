@@ -54,6 +54,29 @@ public sealed record ConversionPlan
 
     /// <summary>Ek <c>-i</c> girdisi olarak baglanan .srt/.ass dosyalari.</summary>
     public IReadOnlyList<ExternalSubtitle> ExternalSubtitles { get; init; } = Array.Empty<ExternalSubtitle>();
+
+    /// <summary>
+    /// Goruntuye yakilan kaynak altyazi izi (0 tabanli altyazi sirasi); yakilan iz yumusak altyazi
+    /// olarak cikmaz. Metin izi <c>subtitles</c> suzgeciyle, resim izi bindirme grafigiyle yazilir.
+    /// </summary>
+    public int? BurnSubtitle { get; init; }
+
+    /// <summary>Yakilan metin izin yazi tipi; resim izde okunmaz.</summary>
+    public string? BurnFont { get; init; }
+
+    /// <summary>Yakilan metin izin boyutu (libass olcegi); resim izde okunmaz.</summary>
+    public int? BurnFontSize { get; init; }
+
+    /// <summary>Yakilan metin izin rengi, <c>RRGGBB</c>; resim izde okunmaz.</summary>
+    public string? BurnColor { get; init; }
+
+    /// <summary>Yakilan metin izin arkasina opak kutu; resim izde okunmaz.</summary>
+    public bool BurnBox { get; init; }
+
+    /// <summary>Kucultmenin suzgec secenekleri olarak yakma; iz secilmemisse bicem de bos.</summary>
+    public VideoFilterOptions BurnOptions => BurnSubtitle is null
+        ? VideoFilterOptions.Default
+        : VideoFilterOptions.Default with { BurnSubtitle = BurnSubtitle, BurnFont = BurnFont, BurnFontSize = BurnFontSize, BurnColor = BurnColor, BurnBox = BurnBox };
     public bool AudioOnly => Container is "mp3" or "m4a" or "wav" or "flac";
     public bool Gif => Container == "gif";
     public bool AnimatedImage => Container is "webp" or "avif";
