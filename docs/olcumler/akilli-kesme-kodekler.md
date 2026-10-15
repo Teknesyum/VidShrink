@@ -71,9 +71,39 @@ Elle kurulan düzenek silindi; aynı komutları `tests/VidShrink.Tests/Duzenleyi
 | mpeg2 `-bf 2` mp4 / mkv | 4,000 | 242 / 156 bayt | 96/96 | 0 / 18,35 | kaldı |
 | mpeg2 `-bf 0` mp4 | 4,000 | 0 | 96/96 | 72 / 46,50 | geçti |
 
+## MPEG-2 (DZA-P12, 2026-10-15)
+
+`bench smart-mpeg2` (`tools/VidShrink.Bench/AkilliMpeg2.cs`), ffmpeg 9.0. Kaynak 8 sn 320x240 24 kare/sn
+lavfi `testsrc2` + AAC, `mpeg2video -b:v 2M -bf 2 -g 24`; üç kesimli çizelge (0,5-3, 3,5-5,75, 6,25-7,5),
+beklenen 144 kare, dikişler 60 ve 114. Her çıktı karesi kaynaktaki karşılığıyla PSNR'la ölçülür;
+"dikiş" sütunu birleşim noktalarının iki yanındaki üç karenin en düşüğü. Eşik 30 dB.
+
+| Kol (kaynak → çıktı) | Adım / gövde kopyası | Kare / paket | Süre | Kare hızı | Alan | Çözme hatası | Birebir | En düşük / dikiş PSNR | Sonuç |
+|---|---|---|---|---|---|---|---|---|---|
+| kapalı GOP mkv → mkv | 13 / 3 | 144/144 | 5,999 | 24/1 | progressive | 0 | 110 | 41,13 / 41,43 | geçti |
+| kapalı GOP mp4 → mp4 | 13 / 3 | 144/144 | 6,000 | 24/1 | progressive | 0 | 110 | 41,13 / 41,43 | geçti |
+| kapalı GOP ts → mkv | 13 / 3 | 144/144 | 6,000 | 24/1 | progressive | 0 | 110 | 41,13 / 41,43 | geçti |
+| taramalı tff mkv → mkv | 13 / 3 | 144/144 | 5,999 | 24/1 | tt (kaynak tb okunur) | 0 | 110 | 41,13 / 41,46 | geçti |
+| taramalı bff ts → mp4 | 13 / 3 | 144/144 | 6,000 | 24/1 | bb | 0 | 110 | 41,13 / 41,46 | geçti |
+| açık GOP mp4 → mp4 | 7 / 0 | 144/144 | 6,000 | 24/1 | progressive | 0 | 0 | 41,50 / 41,50 | geçti |
+
+Aynı ölçüm kuyruk kenarının liste süresi tam kareye yuvarlanmadan önce iki TS kolunda kaldı:
+süre 5,980, çözme stderr'i 119 bayt ("non monotonically increasing dts"), bff kolunda çıktı 48/1.
+TS kaynakta görüntü kabın başından 23,2 ms geç başlıyor; anahtar kareler kesim ızgarasına oturmuyor ve
+kesimden anahtar kareye (baş) ya da anahtar kareden kesime (kuyruk) yazılan liste süresi kodlanan
+kare sayısıyla tutmuyordu. Baş kenar aşağı, kuyruk kenar yukarı tam kareye yuvarlanır.
+
+Kodlayıcı kuralı: 8 bit `yuv420p`, Main → `-profile:v 4`, Simple → `-profile:v 5 -bf 0`;
+bit hızı kaynağınkinden (ses düşülerek, 200k altında `-q:v 2`), taramalı kaynakta `+ildct+ilme`
+ve alan sırası kaynaktan; kare hızı `-r` ile verilmez, kenar kaynaktan miras alır. Ara parça `mpegts`.
+TS kaynakta kenar önceki anahtar kareden aranır ve `trim` süzgeciyle kesilir: girdi tarafı `-ss`
+TS'de hedefi bir kare aşıyordu. Açık GOP'lu MPEG-2 kaynakta temiz sınır yok, klipler baştan sona kodlanır
+(birebir 0); kip Akıllı kalır.
+
 ## Kapı Kararı
 
-**Girer:** `h264`, `hevc`, `av1`, `vp9` — 8 bit `yuv420p` ve 10 bit `yuv420p10le`.
+**Girer:** `h264`, `hevc`, `av1`, `vp9` — 8 bit `yuv420p` ve 10 bit `yuv420p10le`; `mpeg2video` 8 bit
+`yuv420p`, Main ve Simple profil, taramalı kaynak dahil (yukarıdaki MPEG-2 bölümü).
 
 **Girmez, Tam kipe düşer:**
 
@@ -81,9 +111,8 @@ Elle kurulan düzenek silindi; aynı komutları `tests/VidShrink.Tests/Duzenleyi
   akış başlığı tutmuyor; çözücü gövdeyi kenarın başlığıyla çözüp bozuk kare veriyor, B kareli
   kolda hata basıyor. Tek geçen kol B karesiz ve aynı kodlayıcıdan çıkan kaynak; kaynağın
   hangi kodlayıcıdan çıktığı dosyadan güvenle okunamaz.
-- MPEG-2. Yalnız B karesiz kol geçti; B kareli iki kolda çözme hatası ve bozuk gövde.
 - Ölçülmeyen her kodek (ProRes, uydurma ad, boş ad).
-- 4:2:2, 4:4:4, 12 bit, `yuvj420p`, taramalı kaynak ve profili piksel biçimiyle uyuşmayan
+- 4:2:2, 4:4:4, 12 bit, `yuvj420p`, MPEG-2 dışında taramalı kaynak ve profili piksel biçimiyle uyuşmayan
   kaynak (örn. `High` + 10 bit). 10 bit hiçbir kolda 8 bite indirilmez.
 - Kodlayıcısı bu ffmpeg derlemesinde olmayan kodek (`libx264`, `libx265`, `libsvtav1`,
   `libvpx-vp9`). Arayüzde mevcut "Tam kipe düşüldü" notu çıkar, yeni metin yok.
