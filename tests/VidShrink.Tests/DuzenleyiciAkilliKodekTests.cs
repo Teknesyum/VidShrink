@@ -515,6 +515,45 @@ public sealed class DuzenleyiciAkilliKodekTests
         Assert.DoesNotContain("\nduration 0.99\n", plan.Steps[^1].ListContent, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Girdi tarafi <c>-ss</c> ile <c>-t</c>, sureyi kesim anindan degil ilk tutulan kareden sayiyor: 1,01'de
+    /// baslayan kenar 1,0333'teki kareden 0,9733 sn surup 2'deki anahtar kareyi de kodluyordu, govde ayni
+    /// kareyle basladi. Sure kodlanan tam kare sayisindan yarim kare eksik verilir. TS kolunda <c>trim</c> sureyi
+    /// kesimden sayar, orada sure degismez.
+    /// </summary>
+    [Fact]
+    public void KareArasindanBaslayanBasKenarIlkKaredenSayilanSureyleAnahtarKareyeVarmaz()
+    {
+        var cizelge = new EditTimeline(new[] { new EditClip(S(1.01), S(7)) });
+
+        var mp4 = Plan(Bilgi(), cizelge: cizelge);
+        Assert.Equal("1.01", Deger(mp4.Steps[0].Args, "-ss"));
+        Assert.Equal("0.95", Deger(mp4.Steps[0].Args, "-t"));
+
+        var ts = Plan(Bilgi("mpeg2video", kap: "mpegts", gecikme: 2), "c.mkv", cizelge: cizelge);
+        Assert.Equal("setpts=PTS-STARTPTS,trim=start=1.01:duration=0.973333,setpts=PTS-STARTPTS", Deger(ts.Steps[0].Args, "-vf"));
+    }
+
+    [Theory]
+    [InlineData("progressive")]
+    [InlineData("tt")]
+    [InlineData("tb")]
+    [InlineData("bb")]
+    [InlineData("bt")]
+    public void BirlesimKaynaginAlanSirasiniYazar(string alan)
+    {
+        var birlesim = Plan(Bilgi("hevc", alan: alan)).Steps[^1].Args;
+
+        Assert.Equal(alan, Deger(birlesim, "-field_order:v"));
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("unknown")]
+    [InlineData("uydurma")]
+    public void BilinmeyenAlanSirasiBirlesimeYazilmaz(string? alan)
+        => Assert.DoesNotContain("-field_order:v", Plan(Bilgi("hevc", alan: alan)).Steps[^1].Args);
+
     [Fact]
     public void KareArasindaBitenKuyrukKenarListedeKodlananKareSayisiKadarSurer()
     {
@@ -769,10 +808,10 @@ public sealed class DuzenleyiciAkilliKodekTests
             Assert.Equal(kaynakBilgi["profile"], olcu["profile"]);
             Assert.Equal(kaynakBilgi["pix_fmt"], olcu["pix_fmt"]);
             Assert.Equal(kaynakBilgi["r_frame_rate"], olcu["r_frame_rate"]);
+            Assert.Equal(kaynakBilgi.GetValueOrDefault("field_order"), olcu.GetValueOrDefault("field_order"));
             if (kol.Alan is not null)
             {
                 Assert.Equal(kol.Alan, kaynakBilgi["field_order"]);
-                Assert.Contains(olcu["field_order"], new[] { "tt", "bb", "tb", "bt" });
                 var kaynakAlan = Alanlar(klasor, kaynak);
                 var ciktiAlan = Alanlar(klasor, cikti);
                 _cikti.WriteLine($"akilli kesme kolu alanlari: {kol.Ad} kaynak={string.Join("", kaynakAlan.Distinct())} cikti={string.Join("", ciktiAlan.Distinct())} kare={ciktiAlan.Count}");
@@ -920,6 +959,66 @@ public sealed class DuzenleyiciAkilliKodekTests
             Sil(klasor);
         }
     }
+
+    /// <summary>
+    /// 0,52–4,47 sn kesimi iki kenarda da kare arasina duser. Olculen: mp4 ve mkv kaynakta 95 yerine 96 kare,
+    /// birlesimde "Non-monotonic DTS", cozmede "non monotonically increasing dts"; bas kenar govdenin ilk
+    /// karesini de kodluyordu. TS kolu ayni kesimde dogruydu, gerilemeye karsi pimlenir.
+    /// </summary>
+    private async Task OlcKareDisi(string ad, string uzanti, string[] kodlayici, string ciktiUzanti)
+    {
+        var klasor = Klasor(ad);
+        Sil(klasor);
+        Directory.CreateDirectory(klasor);
+        try
+        {
+            var kaynak = Kaynak(klasor, uzanti, kodlayici);
+            var cikti = Path.Combine(klasor, "cikti." + ciktiUzanti);
+            var cizelge = new EditTimeline(new[] { new EditClip(S(0.52), S(4.47)) });
+
+            var plan = IkiIzlekli(await EditExportRunner.PrepareAsync(new[] { kaynak }, cizelge, ExportMode.Smart, cikti, 8 * Gb));
+            Assert.Equal(ExportMode.Smart, plan.Effective);
+            Assert.Single(plan.Steps, s => s.Args.Contains("-frames:v"));
+            await EditExportRunner.RunAsync(plan, null);
+
+            var olcu = Oku(klasor, cikti, true, out var probeHata);
+            var (_, paketler, _) = Kos("ffprobe", klasor, "-v", "error", "-select_streams", "v:0", "-show_entries", "packet=pts_time,dts_time", "-of", "csv=p=0", cikti);
+            var satirlar = paketler.Split('\n').Select(s => s.Trim().Split(',')).Where(s => s.Length >= 2).ToArray();
+            static double? Zaman(string s) => double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out var d) ? d : null;
+            var dts = satirlar.Select(s => Zaman(s[1])).OfType<double>().ToArray();
+            var pts = satirlar.Select(s => Zaman(s[0])).OfType<double>().OrderBy(d => d).ToArray();
+            var geri = Enumerable.Range(1, Math.Max(dts.Length - 1, 0)).Count(i => dts[i] <= dts[i - 1]);
+            var yakin = Enumerable.Range(1, Math.Max(pts.Length - 1, 0)).Count(i => pts[i] - pts[i - 1] < Kare / 2);
+            var (cozKod, _, cozHata) = Kos("ffmpeg", klasor, "-hide_banner", "-nostdin", "-v", "error", "-threads", "2", "-i", cikti, "-f", "null", "-");
+            _cikti.WriteLine($"kare disi kesim kolu kostu: {ad} kare={olcu["nb_read_frames"]} paket={olcu["nb_read_packets"]} pts={pts.Length} dts={dts.Length} geri={geri} yakin={yakin} sure={olcu["duration"]}");
+
+            Assert.Equal(string.Empty, probeHata.Trim());
+            Assert.Equal(0, cozKod);
+            Assert.Equal(string.Empty, cozHata.Trim());
+            Assert.Equal("95", olcu["nb_read_frames"]);
+            Assert.Equal("95", olcu["nb_read_packets"]);
+            Assert.Equal(95, pts.Length);
+            Assert.Equal(0, yakin);
+            Assert.Equal(0, geri);
+            Assert.InRange(double.Parse(olcu["duration"], CultureInfo.InvariantCulture), 3.95 - Kare, 3.95 + Kare);
+        }
+        finally
+        {
+            Sil(klasor);
+        }
+    }
+
+    [AkilliKodekFact("libx264")]
+    public Task CanliH264KareArasiKesimdeKareTekrarlanmazDtsArtar()
+        => OlcKareDisi("kare-disi-h264", "mp4", X264, "mp4");
+
+    [AkilliKodekFact("libx265")]
+    public Task CanliHevcMatroskadaKareArasiKesimdeKareTekrarlanmazDtsArtar()
+        => OlcKareDisi("kare-disi-hevc-mkv", "mkv", new[] { "-c:v", "libx265", "-x265-params", X265, "-pix_fmt", "yuv420p" }, "mkv");
+
+    [AkilliKodekFact("libx264")]
+    public Task CanliH264TsKaynaktaKareArasiKesimdeKareTekrarlanmazDtsArtar()
+        => OlcKareDisi("kare-disi-h264-ts", "ts", X264, "mp4");
 
     [AkilliKodekFact("mpeg4")]
     public async Task CanliMpeg4KaynakTamKipeDuser()

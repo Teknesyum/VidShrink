@@ -100,6 +100,41 @@ TS kaynakta kenar önceki anahtar kareden aranır ve `trim` süzgeciyle kesilir:
 TS'de hedefi bir kare aşıyordu. Açık GOP'lu MPEG-2 kaynakta temiz sınır yok, klipler baştan sona kodlanır
 (birebir 0); kip Akıllı kalır.
 
+## Kare Arası Kesim (158, 2026-10-15)
+
+ffmpeg 9.0, 6 sn 320x240 24 kare/sn lavfi `testsrc2` + AAC, `-g 24`, `-threads 2`. Kesim 0,52–4,47 sn
+(iki ucu da kare arasında), beklenen 95 kare. Aynı kaynak 0,5–4,5 kesimde her kolda 96 kare, temiz.
+
+| Kol (kaynak → çıktı) | Önce: kare / yinelenen pts / çözme stderr'i | Sonra |
+|---|---|---|
+| h264 mp4 → mp4 | 96 / 1 / "non monotonically increasing dts" | 95 / 0 / boş |
+| hevc mkv → mkv | 96 / 1 / aynı | 95 / 0 / boş |
+| hevc hvc1 mp4 → mp4 | 96 / 1 / aynı | ölçülmedi (aynı kol) |
+| mpeg2 taramalı mkv → mkv | 96 / 1 / aynı | ölçülmedi (aynı kol) |
+| h264 ts → mp4 | 95 / 0 / boş | 95 / 0 / boş |
+| hevc açık GOP mp4 → mp4 (klip tümüyle kodlanır) | 95 / 0 / boş | değişmedi |
+
+Neden: TS dışı kolda baş kenar `-ss <kesim> -t <süre>` ile kodlanıyor; ffmpeg girdi `-t`'sini kesim
+anından değil ilk tutulan kareden sayıyor. 0,52'de ilk kare 0,5417, süre 0,4592: kenar 1,0009'a kadar
+uzayıp 1,0'daki anahtar kareyi de kodladı (12 kare; kaynakla PSNR'la eşlenince 13–24), gövde aynı
+kareyle başladı. Düzeltme: TS dışında `-t` = listedeki tam kare süresi − yarım kare. TS kolunda `trim`
+süreyi kesimden sayar; aynı düzeltme orada `bb` taramalı TS kolunu kırdı, uygulanmaz.
+
+Klibi tümüyle kodlayan kolda (`EditExport.SmartSegmented`, temiz sınır yok) liste süresi kesim süresi
+(3,95), kodlanan 95 kare 3,9583 sn tutuyor. Liste kare süresinden kısa kaldığı için sonraki parça son
+karenin üstüne binmiyor; ölçümde yinelenen pts ve çözme hatası yok. Yuvarlanmadı: yukarı yuvarlamak
+klip başına 8 ms'yi sesin önüne kaydırır.
+
+TS kaynakta girdi `-ss`: ses kopyası (`AudioCopy`) ve gövde kopyası (`SmartCopy`) çıktı paketleri
+kaynakla boyut dizisinden eşlendi. Ses mp4, mkv ve ts kaynakta kabın başlangıcına göre aynı pakette
+başlıyor (0,5 kesimde 0,511, 0,52 kesimde 0,534 sn — kesimden sonraki ilk AAC paketi); gövde 1,0232'deki
+anahtar kareden başlıyor. Bir kare taşma görülmedi.
+
+Alan sırası: HEVC kaynak `progressive`, çıktı `unknown` okunuyordu; taramalı tff mkv kaynak `tb`,
+çıktı `tt`. Ara TS parçalarda alan sırası bilgisi kayboluyor. Birleşim kaynağın bilinen alan sırasını
+`-field_order:v` ile yazar (kopyada uygulandığı mkv, mp4, mov'da ölçüldü); kare başı bayraklar
+değişmez. Canlı kollar çıktının alan sırasını kaynağınkiyle eşit pimler.
+
 ## Kapı Kararı
 
 **Girer:** `h264`, `hevc`, `av1`, `vp9` — 8 bit `yuv420p` ve 10 bit `yuv420p10le`; `mpeg2video` 8 bit
@@ -147,7 +182,6 @@ Taban 47/47 yeşil. Her satırda üretim kodu bozuldu, kırmızı görüldü, el
 
 ## Doğrulanmayanlar
 
-- Kare sınırına denk gelmeyen kesim başlangıcında bir kareden kısa kayma.
 - Bütünüyle açık GOP'lu kaynakta klip baştan sona kodlanır ama kip "Akıllı" görünür.
 - Renk meta verisinin (birincil renkler, aktarım eğrisi, HDR yan verisi) baş ile gövdede eşitliği.
 - `hvc1` etiketli çıktının Apple oynatıcılarındaki davranışı; bant içi dizi başlığı taşımayan AV1.
