@@ -64,7 +64,7 @@ internal partial class RecorderView
 
     /// <summary>Sisteme kaydedilen atamalar: bas konuş kutusu kapalıyken onun tuşu kaydedilmez, başka uygulamada serbest kalır.</summary>
     private IReadOnlyList<HotkeyBinding> Registered(IReadOnlyList<HotkeyBinding> bindings)
-        => ChkPushToTalk.IsChecked == true ? bindings : bindings.Where(b => b.Action != HotkeyAction.PushToTalk).ToList();
+        => bindings.Where(b => RecorderHotkeys.IsAssigned(b) && (ChkPushToTalk.IsChecked == true || b.Action != HotkeyAction.PushToTalk)).ToList();
 
     private void InitKisayol()
     {

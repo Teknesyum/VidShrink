@@ -74,7 +74,7 @@ internal static class RecorderHotkeys
     internal static HotkeyAction? ActionOf(Key key, KeyModifiers modifiers) => ActionOf(All, key, modifiers);
 
     internal static HotkeyAction? ActionOf(IReadOnlyList<HotkeyBinding> bindings, Key key, KeyModifiers modifiers)
-        => bindings.FirstOrDefault(b => b.Key == key && b.Modifiers == Clean(modifiers))?.Action;
+        => bindings.FirstOrDefault(b => IsAssigned(b) && b.Key == key && b.Modifiers == Clean(modifiers))?.Action;
 
     internal static HotkeyBinding Of(IReadOnlyList<HotkeyBinding> bindings, HotkeyAction action)
         => bindings.First(b => b.Action == action);
@@ -82,7 +82,12 @@ internal static class RecorderHotkeys
     internal static KeyModifiers Clean(KeyModifiers modifiers)
         => modifiers & (KeyModifiers.Control | KeyModifiers.Shift | KeyModifiers.Alt);
 
-    internal static bool Same(HotkeyBinding a, HotkeyBinding b) => a.Key == b.Key && a.Modifiers == b.Modifiers;
+    internal static bool Same(HotkeyBinding a, HotkeyBinding b) => IsAssigned(a) && a.Key == b.Key && a.Modifiers == b.Modifiers;
+
+    /// <summary>Tuşu olmayan bağ: eski ayardaki atamayla çakışan yeni eylem böyle kalır, genel kısayola kaydedilmez.</summary>
+    internal static HotkeyBinding Unassigned(HotkeyAction action) => new(action, Key.None, 0);
+
+    internal static bool IsAssigned(HotkeyBinding binding) => binding.Key != Key.None;
 
     /// <summary>
     /// Genel kısayola çevrilebilen tuşların sanal tuş kodu. Küme kapalı: işlev tuşları, harfler,
@@ -115,7 +120,8 @@ internal static class RecorderHotkeys
         return bare || (clean & (KeyModifiers.Control | KeyModifiers.Alt)) != 0 ? new HotkeyBinding(action, key, code, clean) : null;
     }
 
-    internal static string Gesture(HotkeyBinding binding) => Keymap.Gesture(PlayerInput.OnKey(binding.Key, binding.Modifiers));
+    internal static string Gesture(HotkeyBinding binding)
+        => IsAssigned(binding) ? Keymap.Gesture(PlayerInput.OnKey(binding.Key, binding.Modifiers)) : string.Empty;
 
     internal static string Names(IEnumerable<HotkeyBinding> bindings)
         => string.Join(", ", bindings.Select(Gesture));
@@ -128,8 +134,8 @@ internal static class RecorderHotkeys
     /// Ayardaki yazımı bağlara çevirir. Eksik, tanınmayan ya da iki eyleme aynı tuşu veren yazım
     /// <c>null</c> döner; çağıran varsayılana düşer. Eski sürümün <see cref="LegacyCount"/> eylemli
     /// ile <see cref="All"/> arasındaki her eylem sayılı yazımı geçerlidir: atamalar korunur,
-    /// sonradan eklenen eylem varsayılan tuşunu alır; o tuş eski atamalardan birindeyse yazım
-    /// yine <c>null</c> döner.
+    /// sonradan eklenen eylem varsayılan tuşunu alır; o tuş eski atamalardan birindeyse yalnız o eylem
+    /// atanmamış kalır, öteki atamalar korunur. Atanmamış eylem <c>0:None</c> yazılır ve öyle okunur.
     /// </summary>
     internal static IReadOnlyList<HotkeyBinding>? Read(string? text)
     {
@@ -140,6 +146,11 @@ internal static class RecorderHotkeys
         for (var i = 0; i < parts.Length; i++)
         {
             var pair = parts[i].Split(':', 2);
+            if (pair is ["0", nameof(Key.None)] && i >= LegacyCount)
+            {
+                bindings.Add(Unassigned(All[i].Action));
+                continue;
+            }
             if (pair.Length != 2
                 || !int.TryParse(pair[0], NumberStyles.None, CultureInfo.InvariantCulture, out var modifiers)
                 || !Enum.TryParse<Key>(pair[1], false, out var key) || !Enum.IsDefined(key)
@@ -151,10 +162,7 @@ internal static class RecorderHotkeys
         }
 
         foreach (var added in All.Skip(bindings.Count))
-        {
-            if (bindings.Any(b => Same(b, added))) return null;
-            bindings.Add(added);
-        }
+            bindings.Add(bindings.Any(b => Same(b, added)) ? Unassigned(added.Action) : added);
 
         return bindings;
     }

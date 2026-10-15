@@ -474,7 +474,8 @@ public sealed class KaydediciKisayolAtamaTests
         Assert.Equal<HotkeyBinding>(baglar, okunan!);
         Assert.Equal("0:F7,0:F8,0:F9,0:F10,0:F11,0:F6,2:F5", RecorderHotkeys.Write(RecorderHotkeys.All));
         Assert.Equal<HotkeyBinding>(RecorderHotkeys.All, RecorderHotkeys.Read("0:F7,0:F8,0:F9,0:F10,0:F11")!);
-        Assert.Null(RecorderHotkeys.Read("0:F7,0:F6,0:F9,0:F10,0:F11"));
+        Assert.False(RecorderHotkeys.IsAssigned(RecorderHotkeys.Of(RecorderHotkeys.Read("0:F7,0:F6,0:F9,0:F10,0:F11")!, HotkeyAction.Chapter)));
+        Assert.Equal(Key.F6, RecorderHotkeys.Of(RecorderHotkeys.Read("0:F7,0:F6,0:F9,0:F10,0:F11")!, HotkeyAction.Stop).Key);
         Assert.Equal<HotkeyBinding>(RecorderHotkeys.All, RecorderHotkeys.Read(RecorderHotkeys.Write(RecorderHotkeys.All))!);
         Assert.Null(RecorderHotkeys.Read(null));
         Assert.Null(RecorderHotkeys.Read("0:F7,0:F8,0:F9,0:F10,0:F11,0:F6,2:F5,0:F12"));

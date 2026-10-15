@@ -644,7 +644,10 @@ public sealed class KayitBolumIsaretiTests
         Assert.Equal(RecorderHotkeys.All.Count, eski.Count);
         Assert.Equal(Key.F1, RecorderHotkeys.Of(eski, HotkeyAction.Toggle).Key);
         Assert.Equal(Key.F6, RecorderHotkeys.Of(eski, HotkeyAction.Chapter).Key);
-        Assert.Null(RecorderHotkeys.Read("0:F1,0:F2,0:F3,0:F4,0:F6"));
+        var cakisan = RecorderHotkeys.Read("0:F1,0:F2,0:F3,0:F4,0:F6")!;
+        Assert.Equal(Key.F6, RecorderHotkeys.Of(cakisan, HotkeyAction.ReplaySave).Key);
+        Assert.False(RecorderHotkeys.IsAssigned(RecorderHotkeys.Of(cakisan, HotkeyAction.Chapter)));
+        Assert.Equal(RecorderHotkeys.Of(RecorderHotkeys.All, HotkeyAction.PushToTalk), RecorderHotkeys.Of(cakisan, HotkeyAction.PushToTalk));
         Assert.Null(RecorderHotkeys.Read("0:F1,0:F2,0:F3,0:F4"));
     }
 
