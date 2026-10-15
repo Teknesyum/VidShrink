@@ -89,36 +89,45 @@ public sealed class OynaticiKareTabloTests
     [Fact]
     public void KareVeTabloAyarlariYazilirOkunurSinirlanir()
     {
-        var dosya = Path.Combine(AracKanit.Gecici("kare-ayar"), ToolsOptions.FileName);
-        var ayar = new ToolsOptions();
-        ayar.UseFrameSeconds(2.5);
-        ayar.UseSheetGrid(5, 3);
-        ayar.UseSheetWidth(241);
-        ayar.Save(dosya);
+        var klasor = AracKanit.Gecici("kare-ayar");
+        try
+        {
+            var dosya = Path.Combine(klasor, ToolsOptions.FileName);
+            var ayar = new ToolsOptions();
+            ayar.UseFrameSeconds(2.5);
+            ayar.UseSheetGrid(5, 3);
+            ayar.UseSheetWidth(241);
+            ayar.Save(dosya);
 
-        var okunan = ToolsOptions.Load(dosya);
-        Assert.Equal(2.5, okunan.FrameSeconds);
-        Assert.Equal(5, okunan.SheetColumns);
-        Assert.Equal(3, okunan.SheetRows);
-        Assert.Equal(242, okunan.SheetWidth);
-        Assert.Contains("frames=2.5 sheet=5x3/242", okunan.Describe(), StringComparison.Ordinal);
+            var okunan = ToolsOptions.Load(dosya);
+            Assert.Equal(2.5, okunan.FrameSeconds);
+            Assert.Equal(5, okunan.SheetColumns);
+            Assert.Equal(3, okunan.SheetRows);
+            Assert.Equal(242, okunan.SheetWidth);
+            Assert.Contains("frames=2.5 sheet=5x3/242", okunan.Describe(), StringComparison.Ordinal);
 
-        okunan.Reset();
-        Assert.Equal(ToolsOptions.DefaultFrameSeconds, okunan.FrameSeconds);
-        Assert.Equal(ToolsOptions.DefaultSheetColumns, okunan.SheetColumns);
-        Assert.Equal(ToolsOptions.DefaultSheetRows, okunan.SheetRows);
-        Assert.Equal(ToolsOptions.DefaultSheetWidth, okunan.SheetWidth);
+            okunan.Reset();
+            Assert.Equal(ToolsOptions.DefaultFrameSeconds, okunan.FrameSeconds);
+            Assert.Equal(ToolsOptions.DefaultSheetColumns, okunan.SheetColumns);
+            Assert.Equal(ToolsOptions.DefaultSheetRows, okunan.SheetRows);
+            Assert.Equal(ToolsOptions.DefaultSheetWidth, okunan.SheetWidth);
 
-        var sinir = new ToolsOptions();
-        sinir.UseFrameSeconds(0.01);
-        sinir.UseSheetGrid(0, 99);
-        sinir.UseSheetWidth(5000);
-        Assert.Equal(ToolsOptions.MinimumFrameSeconds, sinir.FrameSeconds);
-        Assert.Equal(ToolsOptions.MinimumSheetCells, sinir.SheetColumns);
-        Assert.Equal(ToolsOptions.MaximumSheetCells, sinir.SheetRows);
-        Assert.Equal(ToolsOptions.MaximumSheetWidth, sinir.SheetWidth);
-        sinir.UseFrameSeconds(double.NaN);
-        Assert.Equal(ToolsOptions.DefaultFrameSeconds, sinir.FrameSeconds);
+            var sinir = new ToolsOptions();
+            sinir.UseFrameSeconds(0.01);
+            sinir.UseSheetGrid(0, 99);
+            sinir.UseSheetWidth(5000);
+            Assert.Equal(ToolsOptions.MinimumFrameSeconds, sinir.FrameSeconds);
+            Assert.Equal(ToolsOptions.MinimumSheetCells, sinir.SheetColumns);
+            Assert.Equal(ToolsOptions.MaximumSheetCells, sinir.SheetRows);
+            Assert.Equal(ToolsOptions.MaximumSheetWidth, sinir.SheetWidth);
+            sinir.UseFrameSeconds(double.NaN);
+            Assert.Equal(ToolsOptions.DefaultFrameSeconds, sinir.FrameSeconds);
+        }
+        finally
+        {
+            Directory.Delete(klasor, recursive: true);
+        }
+        Assert.False(Directory.Exists(klasor));
     }
 
     [Fact]
@@ -147,44 +156,52 @@ public sealed class OynaticiKareTabloTests
     {
         var clip = MotorKlipleri.Kucuk;
         var klasor = AracKanit.Gecici("kare-tablo");
-        var body = new StringBuilder();
+        try
+        {
+            var body = new StringBuilder();
 
-        var kareKlasoru = Path.Combine(klasor, "kucuk_frames");
-        var kareSonuc = await FrameExport.RunAsync(new FrameRequest(clip, kareKlasoru, 4, 4, FrameKind.Frames, IntervalSeconds: 1));
-        var kareler = Directory.Exists(kareKlasoru) ? Directory.GetFiles(kareKlasoru, "*.png").OrderBy(f => f, StringComparer.Ordinal).ToList() : new List<string>();
-        var ilkKare = kareler.Count > 0 ? GorunumKanit.Boyut(kareler[0]) : (0, 0);
-        body.AppendLine($"kareler -> ok {kareSonuc.Ok}, sayi {kareSonuc.Count}, dosya {kareler.Count}: {string.Join(", ", kareler.Select(Path.GetFileName))}, ilk {ilkKare.Item1}x{ilkKare.Item2}");
+            var kareKlasoru = Path.Combine(klasor, "kucuk_frames");
+            var kareSonuc = await FrameExport.RunAsync(new FrameRequest(clip, kareKlasoru, 4, 4, FrameKind.Frames, IntervalSeconds: 1));
+            var kareler = Directory.Exists(kareKlasoru) ? Directory.GetFiles(kareKlasoru, "*.png").OrderBy(f => f, StringComparer.Ordinal).ToList() : new List<string>();
+            var ilkKare = kareler.Count > 0 ? GorunumKanit.Boyut(kareler[0]) : (0, 0);
+            body.AppendLine($"kareler -> ok {kareSonuc.Ok}, sayi {kareSonuc.Count}, dosya {kareler.Count}: {string.Join(", ", kareler.Select(Path.GetFileName))}, ilk {ilkKare.Item1}x{ilkKare.Item2}");
 
-        var tabloHedef = Path.Combine(klasor, "kucuk_sheet.png");
-        var tabloSonuc = await FrameExport.RunAsync(new FrameRequest(clip, tabloHedef, 0, 4, FrameKind.Sheet, Columns: 3, Rows: 2, CellWidth: 160,
-            Header: FrameExport.Header(clip, 0, 4, 3, 2)));
-        var tablo = File.Exists(tabloHedef) ? GorunumKanit.Boyut(tabloHedef) : (0, 0);
-        body.AppendLine($"tablo -> ok {tabloSonuc.Ok}, {tablo.Item1}x{tablo.Item2}, baslik dosyasi kaldi mi {File.Exists(tabloHedef + ".txt")}, hata '{tabloSonuc.Error}'");
+            var tabloHedef = Path.Combine(klasor, "kucuk_sheet.png");
+            var tabloSonuc = await FrameExport.RunAsync(new FrameRequest(clip, tabloHedef, 0, 4, FrameKind.Sheet, Columns: 3, Rows: 2, CellWidth: 160,
+                Header: FrameExport.Header(clip, 0, 4, 3, 2)));
+            var tablo = File.Exists(tabloHedef) ? GorunumKanit.Boyut(tabloHedef) : (0, 0);
+            body.AppendLine($"tablo -> ok {tabloSonuc.Ok}, {tablo.Item1}x{tablo.Item2}, baslik dosyasi kaldi mi {File.Exists(tabloHedef + ".txt")}, hata '{tabloSonuc.Error}'");
 
-        var kotuKlasor = Path.Combine(klasor, "olmaz_frames");
-        var kotuSonuc = await FrameExport.RunAsync(new FrameRequest(clip, kotuKlasor, 4, 0, FrameKind.Frames));
-        body.AppendLine($"NEGATIF sifir sureli aralik -> ok {kotuSonuc.Ok}, klasor {Directory.Exists(kotuKlasor)}");
+            var kotuKlasor = Path.Combine(klasor, "olmaz_frames");
+            var kotuSonuc = await FrameExport.RunAsync(new FrameRequest(clip, kotuKlasor, 4, 0, FrameKind.Frames));
+            body.AppendLine($"NEGATIF sifir sureli aralik -> ok {kotuSonuc.Ok}, klasor {Directory.Exists(kotuKlasor)}");
 
-        var yokSonuc = await FrameExport.RunAsync(new FrameRequest(Path.Combine(klasor, "yok.mp4"), Path.Combine(klasor, "yok_sheet.png"), 0, 4, FrameKind.Sheet, Header: "yok"));
-        body.AppendLine($"NEGATIF olmayan kaynak -> ok {yokSonuc.Ok}, dosya {File.Exists(Path.Combine(klasor, "yok_sheet.png"))}, baslik {File.Exists(Path.Combine(klasor, "yok_sheet.png.txt"))}");
+            var yokSonuc = await FrameExport.RunAsync(new FrameRequest(Path.Combine(klasor, "yok.mp4"), Path.Combine(klasor, "yok_sheet.png"), 0, 4, FrameKind.Sheet, Header: "yok"));
+            body.AppendLine($"NEGATIF olmayan kaynak -> ok {yokSonuc.Ok}, dosya {File.Exists(Path.Combine(klasor, "yok_sheet.png"))}, baslik {File.Exists(Path.Combine(klasor, "yok_sheet.png.txt"))}");
 
-        AracKanit.Write("kare-tablo.txt", body.ToString());
+            AracKanit.Write("kare-tablo.txt", body.ToString());
 
-        Assert.True(kareSonuc.Ok, kareSonuc.Error);
-        Assert.Equal(FrameExport.FrameCount(4, 1), kareler.Count);
-        Assert.Equal(kareler.Count, kareSonuc.Count);
-        Assert.Equal((320, 180), ilkKare);
-        Assert.EndsWith("kucuk_frames_0001.png", kareler[0], StringComparison.Ordinal);
+            Assert.True(kareSonuc.Ok, kareSonuc.Error);
+            Assert.Equal(FrameExport.FrameCount(4, 1), kareler.Count);
+            Assert.Equal(kareler.Count, kareSonuc.Count);
+            Assert.Equal((320, 180), ilkKare);
+            Assert.EndsWith("kucuk_frames_0001.png", kareler[0], StringComparison.Ordinal);
 
-        Assert.True(tabloSonuc.Ok, tabloSonuc.Error);
-        Assert.Equal(FrameExport.SheetSize(3, 2, 160), tablo);
-        Assert.False(File.Exists(tabloHedef + ".txt"));
+            Assert.True(tabloSonuc.Ok, tabloSonuc.Error);
+            Assert.Equal(FrameExport.SheetSize(3, 2, 160), tablo);
+            Assert.False(File.Exists(tabloHedef + ".txt"));
 
-        Assert.False(kotuSonuc.Ok);
-        Assert.False(Directory.Exists(kotuKlasor));
-        Assert.False(yokSonuc.Ok);
-        Assert.False(File.Exists(Path.Combine(klasor, "yok_sheet.png")));
-        Assert.False(File.Exists(Path.Combine(klasor, "yok_sheet.png.txt")));
-        AracKanit.Kapat("kare-tablo.txt");
+            Assert.False(kotuSonuc.Ok);
+            Assert.False(Directory.Exists(kotuKlasor));
+            Assert.False(yokSonuc.Ok);
+            Assert.False(File.Exists(Path.Combine(klasor, "yok_sheet.png")));
+            Assert.False(File.Exists(Path.Combine(klasor, "yok_sheet.png.txt")));
+            AracKanit.Kapat("kare-tablo.txt");
+        }
+        finally
+        {
+            Directory.Delete(klasor, recursive: true);
+        }
+        Assert.False(Directory.Exists(klasor));
     }
 }

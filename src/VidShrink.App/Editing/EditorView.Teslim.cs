@@ -439,7 +439,7 @@ internal partial class EditorView
 
     internal static string Fingerprint(EditTimeline model)
         => string.Join(";", model.Clips.Select(c => $"{c.Source}:{c.SourceStart}-{c.SourceEnd}-{c.Speed}-{c.Reversed}-{c.Effects}-{c.Transition}"))
-           + "|" + string.Join(";", model.Texts.Select(t => $"{t.Start}-{t.End}-{t.Size}-{t.Color}-{t.Bold}-{t.Italic}-{t.FontName}-{t.FadeIn}-{t.FadeOut}-{t.MotionIn}:{t.MotionInLength}-{t.MotionOut}:{t.MotionOutLength}-"
+           + "|" + string.Join(";", model.Texts.Select(t => $"{t.Start}-{t.End}-{t.Size}-{t.Color}-{t.Bold}-{t.Italic}-{t.FontName}-{t.FadeIn}-{t.FadeOut}-{t.MotionIn}:{t.MotionInLength}-{t.MotionOut}:{t.MotionOutLength}-{t.Outline}:{t.Shadow}:{t.Box}-"
                + string.Join(",", t.Keyframes.Select(k => $"{k.Offset}:{k.X}:{k.Y}")) + "-" + t.Text.Length + ":" + t.Text))
            + "|" + model.Music;
 

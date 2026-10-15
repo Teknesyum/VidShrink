@@ -297,6 +297,24 @@ public sealed class DuzenleyiciMuzikTests
         Assert.NotEqual(gecissiz, EditorView.Fingerprint(cizelge));
     }
 
+    /// <summary>Metnin kenar, golge ve kutu ayari degisince kaydetme anahtari da degisir; yoksa teslim onbellegi bayat kalir.</summary>
+    [Fact]
+    public void KaydetmeAnahtariMetinKenarGolgeVeKutuylaDegisir()
+    {
+        var cizelge = IkiKlip();
+        var metin = new TextLayer("a", 0, S(1));
+        cizelge.AddText(metin);
+        var once = EditorView.Fingerprint(cizelge);
+
+        foreach (var degisik in new[] { metin with { Outline = 3 }, metin with { Shadow = 2.5 }, metin with { Box = true } })
+        {
+            Assert.True(cizelge.UpdateText(0, degisik));
+            Assert.NotEqual(once, EditorView.Fingerprint(cizelge));
+            Assert.True(cizelge.UpdateText(0, metin));
+            Assert.Equal(once, EditorView.Fingerprint(cizelge));
+        }
+    }
+
     [Theory]
     [InlineData(ExportMode.Fast, true)]
     [InlineData(ExportMode.Smart, true)]

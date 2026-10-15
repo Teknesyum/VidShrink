@@ -148,6 +148,9 @@ public sealed class CliKayitTests : IDisposable
             a.AudioGainDb = 3;
             a.AudioNoiseGate = true;
             a.AudioNoiseSuppression = true;
+            a.AudioCompressor = true;
+            a.AudioLimiter = true;
+            a.AudioCodec = RecorderArguments.OpusAudioCodec;
             a.PrivacyMasks = new List<RecorderRegion> { new(1, 2, 30, 40) };
         });
         var pencere = RecorderSettings.Load(dosya);
@@ -300,6 +303,33 @@ public sealed class CliKayitTests : IDisposable
         Assert.Null(plan.Request.Webcam);
         Assert.Equal(new[] { "Kayıp Hoparlör", "Kayıp Kamera" }, plan.Notes.Select(n => n.Argument));
         Assert.All(plan.Notes, n => Assert.Equal("record.device-missing", n.Key));
+    }
+
+    /// <summary>Pencerenin ses kodeği, sıkıştırıcı ve sınırlayıcı seçimi komutun kaydına da girer; kap Opus taşımıyorsa AAC kalır.</summary>
+    [Fact]
+    public void SesKodegiSikistiriciVeSinirlayiciKayitliAyardanGelir()
+    {
+        var mikrofon = new AudioCaptureDevice("Mikrofon (USB)", CaptureBackend.DirectShow, AudioSourceRole.Microphone);
+        var ayar = CliRecordSettings.Load(AyarYaz(a =>
+        {
+            a.ManualMode = true;
+            a.Container = RecorderContainer.Mkv;
+            a.MicrophoneName = "Mikrofon (USB)";
+            a.AudioCompressor = true;
+            a.AudioLimiter = true;
+            a.AudioCodec = RecorderArguments.OpusAudioCodec;
+        }));
+
+        var istek = Kur(Ayristir("kaydet"), ayar, Makine(ses: new[] { mikrofon })).Request;
+        var args = string.Join(' ', RecorderArguments.Build(istek, Path.Combine(_klasor, "a.mkv")));
+
+        Assert.Equal(RecorderArguments.OpusAudioCodec, istek.AudioCodec);
+        Assert.Contains("acompressor", args, StringComparison.Ordinal);
+        Assert.Contains("alimiter", args, StringComparison.Ordinal);
+        Assert.Contains(RecorderArguments.OpusAudioCodec, args, StringComparison.Ordinal);
+
+        var mov = Kur(Ayristir("kaydet", "--cikti", Path.Combine(_klasor, "b.mov")), ayar, Makine(ses: new[] { mikrofon })).Request;
+        Assert.Equal(RecorderArguments.DefaultAudioCodec, mov.AudioCodec);
     }
 
     [Fact]

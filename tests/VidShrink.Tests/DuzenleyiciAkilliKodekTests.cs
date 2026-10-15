@@ -582,6 +582,20 @@ public sealed class DuzenleyiciAkilliKodekTests
         Assert.DoesNotContain("\nduration 0.769231\n", liste, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Temiz govdesi olmayan klip butunuyle kodlanir; liste suresi kodlanan kare sayisindan yazilir:
+    /// 0,98 sn 30 kare/sn'de 29 kare, 0,966667 sn. Ham sure (0,98) sonraki parcayi kaydirir.
+    /// </summary>
+    [Fact]
+    public void ButunuyleKodlananKlipListedeKareSayisiKadarSurer()
+    {
+        var plan = Plan(Bilgi(), cizelge: new EditTimeline(new[] { new EditClip(S(1.01), S(1.99)), new EditClip(S(2), S(4)) }));
+        var liste = plan.Steps[^1].ListContent;
+
+        Assert.Contains("\nduration 0.966667\nfile", liste, StringComparison.Ordinal);
+        Assert.DoesNotContain("\nduration 0.98\n", liste, StringComparison.Ordinal);
+    }
+
     [Fact]
     public void TsKaynaktaKenarOncekiAnahtarKaredenAranirCiktidaKesilir()
     {

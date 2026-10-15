@@ -329,6 +329,8 @@ public partial class MainWindow : Window
         Watch(ChkAdvKeepTracks, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkAdvDropMetadata, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkConvertDropMetadata, ToggleButton.IsCheckedProperty, SaveAppSettings);
+        foreach (var box in new[] { CmbConvertGifLoop, CmbConvertGifColors, CmbConvertGifDither })
+            Watch(box, SelectingItemsControl.SelectedIndexProperty, SaveAppSettings);
         Watch(RbFfmpegManual, ToggleButton.IsCheckedProperty, OnFfmpegPathModeChanged);
         Watch(TxtFfmpegPath, TextBox.TextProperty, OnFfmpegPathTextChanged);
         Watch(TxtOpenSubtitlesKey, TextBox.TextProperty, SaveAppSettings);
@@ -1615,6 +1617,9 @@ public partial class MainWindow : Window
             AdvKeepTracks = ChkAdvKeepTracks.IsChecked == true,
             AdvDropMetadata = ChkAdvDropMetadata.IsChecked == true,
             ConvertDropMetadata = ChkConvertDropMetadata.IsChecked == true,
+            ConvertGifLoop = SelectedTag(CmbConvertGifLoop) ?? "",
+            ConvertGifColors = SelectedTag(CmbConvertGifColors) ?? "",
+            ConvertGifDither = SelectedTag(CmbConvertGifDither) ?? "",
             EditorDropMetadata = _editorPane?.DropMetadata ?? _editorDropMetadata,
             EditorClipChapters = _editorPane?.ClipChapters ?? _editorClipChapters,
             EditorPartNamePattern = _editorPartNamePattern,
@@ -1668,6 +1673,9 @@ public partial class MainWindow : Window
             ChkAdvKeepTracks.IsChecked = settings.AdvKeepTracks;
             ChkAdvDropMetadata.IsChecked = settings.AdvDropMetadata;
             ChkConvertDropMetadata.IsChecked = settings.ConvertDropMetadata;
+            SelectByTag(CmbConvertGifLoop, settings.ConvertGifLoop);
+            SelectByTag(CmbConvertGifColors, settings.ConvertGifColors);
+            SelectByTag(CmbConvertGifDither, settings.ConvertGifDither);
             _editorDropMetadata = settings.EditorDropMetadata;
             if (_editorPane is not null) _editorPane.DropMetadata = settings.EditorDropMetadata;
             _editorClipChapters = settings.EditorClipChapters;
