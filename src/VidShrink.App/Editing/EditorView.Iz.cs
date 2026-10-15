@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Media;
@@ -105,7 +104,7 @@ internal partial class EditorView
         BtnAudioTrack.IsVisible = _audioTracks.Count > 1;
         TxtAudioTrack.Text = _audioTrack < 0
             ? string.Empty
-            : (_audioTrack + 1).ToString(CultureInfo.CurrentCulture) + "/" + _audioTracks.Count.ToString(CultureInfo.CurrentCulture);
+            : (_audioTrack + 1).ToString(Strings.Culture) + "/" + _audioTracks.Count.ToString(Strings.Culture);
         if (this.TryFindResource(_audioTrack < 0 ? "IconVolumeMute" : "IconVolume", out var glyph) && glyph is Geometry geometry)
             GlyphAudioTrack.Data = geometry;
     }

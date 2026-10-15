@@ -416,6 +416,20 @@ public sealed class LocalizationTests : IDisposable
             $"kümesinde yok; ölçü kör kalmış:\n  " + string.Join("\n  ", lost));
     }
 
+    [Fact]
+    public void MedyaDokumununAlanAdlariKapaliKumede()
+    {
+        var kaynak = File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.Core", "MediaReport.cs"));
+        var govde = kaynak[kaynak.IndexOf("public static IReadOnlyList<ReportSection> Build", StringComparison.Ordinal)..];
+        var yazilan = new SortedSet<string>(StringComparer.Ordinal);
+        foreach (Match bulunan in Regex.Matches(govde, "new(?:ReportField)?\\(\"([a-z0-9-]+)\"")) yazilan.Add(bulunan.Groups[1].Value);
+        foreach (Match bulunan in Regex.Matches(govde, "\"(yes|no)\"")) yazilan.Add(bulunan.Groups[1].Value);
+
+        Assert.True(yazilan.Count > 25, $"Kaynak taraması {yazilan.Count} alan buldu; ölçü kör kalmış.");
+        var eksik = yazilan.Except(VidShrink.Core.MediaReport.FieldKeys, StringComparer.Ordinal).ToArray();
+        Assert.True(eksik.Length == 0, "MediaReport.FieldKeys'te olmayan alan: " + string.Join(", ", eksik));
+    }
+
     private static readonly string[] KnownDead = Array.Empty<string>();
 
     /// <summary>
@@ -445,6 +459,8 @@ public sealed class LocalizationTests : IDisposable
         foreach (var note in Enum.GetValues<VidShrink.Core.StreamNote>()) all.Add(VidShrink.App.MainWindow.StreamNoteKey(note));
         foreach (var outcome in Enum.GetValues<VidShrink.Core.ForeignAudioOutcome>()) all.Add(VidShrink.App.MainWindow.SubtitleScanKey(new VidShrink.Core.ForeignAudioPick(outcome)));
         foreach (var target in VidShrink.Core.ShellIntegration.QuickShrinkMenu) all.Add(target.LabelKey);
+        foreach (var field in VidShrink.Core.MediaReport.FieldKeys) all.Add("mediainfo.field." + field);
+        foreach (var section in VidShrink.Core.MediaReport.SectionKeys) all.Add("mediainfo.section." + section);
 
         return all;
     }
