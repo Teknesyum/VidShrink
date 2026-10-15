@@ -67,6 +67,8 @@ internal static class KeyText
 
     internal static bool IsModifier(uint vk) => IsCtrl(vk) || IsShift(vk) || IsAlt(vk) || IsWin(vk);
 
+    internal static bool IsFunction(uint vk) => vk is >= 0x70 and <= 0x87;
+
     internal static string? Name(uint vk) => vk switch
     {
         >= 0x30 and <= 0x39 or >= 0x41 and <= 0x5A => ((char)vk).ToString(),
@@ -87,7 +89,11 @@ internal static class KeyText
     }
 }
 
-internal sealed class KeyTracker
+/// <summary>
+/// <paramref name="shortcutsOnly"/> açıkken yalnız Ctrl, Alt ya da Win ile basılan tuş ve işlev
+/// tuşu yazıya döner; düz yazılan metin, parola da, kayda girmez.
+/// </summary>
+internal sealed class KeyTracker(bool shortcutsOnly = false)
 {
     private readonly HashSet<uint> _held = new();
 
@@ -101,7 +107,9 @@ internal sealed class KeyTracker
         }
 
         if (!down) return null;
-        return KeyText.Format(vk, Held(KeyText.IsCtrl), Held(KeyText.IsShift), Held(KeyText.IsAlt), Held(KeyText.IsWin));
+        bool ctrl = Held(KeyText.IsCtrl), alt = Held(KeyText.IsAlt), win = Held(KeyText.IsWin);
+        if (shortcutsOnly && !ctrl && !alt && !win && !KeyText.IsFunction(vk)) return null;
+        return KeyText.Format(vk, ctrl, Held(KeyText.IsShift), alt, win);
     }
 
     private bool Held(Func<uint, bool> kind)

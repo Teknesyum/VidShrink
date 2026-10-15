@@ -171,9 +171,10 @@ public sealed class KaydediciMiniYakalamaTests
     }
 
     /// <summary>
-    /// Çağrı tek yerde: üç pencere <c>CaptureAffinity.Exclude</c>'dan geçer, P/Invoke bildirimi
+    /// Çağrı tek yerde: dört pencere <c>CaptureAffinity.Exclude</c>'dan geçer, P/Invoke bildirimi
     /// yalnız <c>CaptureAffinity.cs</c>'te durur. Kayda girmesi istenen bindirmeler (tıklama
-    /// halkası, tuş yazısı, büyüteç) çağrıyı yapmaz.
+    /// halkası, tuş yazısı, büyüteç) çağrıyı yapmaz. Sonuç kartı bilerek dışlanır: köşede
+    /// açıkken başlayan bir sonraki kayda girmesin.
     /// </summary>
     [Fact]
     public void CagriTekYerdeVeBindirmelerDisinda()
@@ -183,7 +184,7 @@ public sealed class KaydediciMiniYakalamaTests
 
         Assert.Equal(new[] { "CaptureAffinity.cs" },
             kaynaklar.Where(k => k.Value.Contains("extern bool SetWindowDisplayAffinity")).Select(k => k.Key).ToArray());
-        Assert.Equal(new[] { "RecorderFrame.axaml.cs", "RecorderMini.axaml.cs", "RecorderRegionEditor.axaml.cs" },
+        Assert.Equal(new[] { "RecorderFrame.axaml.cs", "RecorderMini.axaml.cs", "RecorderRegionEditor.axaml.cs", "RecorderResultCard.axaml.cs" },
             kaynaklar.Where(k => k.Value.Contains("CaptureAffinity.Exclude(")).Select(k => k.Key).OrderBy(a => a, StringComparer.Ordinal).ToArray());
     }
 }

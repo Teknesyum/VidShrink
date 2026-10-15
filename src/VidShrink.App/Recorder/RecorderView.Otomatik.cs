@@ -72,6 +72,7 @@ internal partial class RecorderView
         PanelOptions.IsVisible = advanced;
         PanelAdvanced.IsVisible = advanced;
         ChkOpenFolder.IsVisible = advanced;
+        ChkResultCard.IsVisible = advanced;
         ApplyReplayVisibility();
         KartYerlesimi();
     }

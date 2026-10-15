@@ -106,9 +106,10 @@ public enum RecorderCapture
 /// ffmpeg'in varsayilan D3D11 aygitinin (ilk ekran karti) bir DXGI cikisi. <c>ddagrab</c>
 /// ekrani <see cref="Index"/> ile seciyor (<c>output_idx</c>); bu sira Avalonia'nin ekran
 /// sirasiyla ayni degil, bu yuzden eslesme masaustu koordinatindan yapiliyor. Dondurulmus
-/// cikis listeye girmez.
+/// cikis listeye girmez. <see cref="Hdr"/>: Windows bu cikisi HDR10 renk uzayinda
+/// (<c>DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020</c>) suruyor.
 /// </summary>
-public sealed record DdaOutput(int Index, int X, int Y, int Width, int Height);
+public sealed record DdaOutput(int Index, int X, int Y, int Width, int Height, bool Hdr = false);
 
 /// <summary>
 /// <c>ddagrab</c> yerine <c>gdigrab</c>'a dusulmesinin sebebi. <see cref="None"/> disindaki
@@ -208,6 +209,13 @@ public sealed record RecorderRequest
 
     /// <summary><c>ddagrab</c>'in secebildigi cikislar. Bossa <see cref="RecorderCapture.Ddagrab"/> kabul edilmez.</summary>
     public IReadOnlyList<DdaOutput> DdaOutputs { get; init; } = Array.Empty<DdaOutput>();
+
+    /// <summary>
+    /// HDR ekranda kaydi SDR'ye cevir. Varsayilan <c>false</c>: HDR cikista kayit 10 bit HDR10
+    /// kalir (<see cref="RecorderArguments.HdrCapture"/>); acikken kare bugunku gibi 8 bit
+    /// <c>bgra</c> iner ve donusumu Windows yapar.
+    /// </summary>
+    public bool HdrToSdr { get; init; }
 
     /// <summary>Bolge kaydinda dikdortgen.</summary>
     public RecorderRegion? Region { get; init; }
@@ -1245,7 +1253,74 @@ public static class RecorderArguments
         var source = $"ddagrab=output_idx={Number(output.Index)}:framerate={Number(request.Fps)}:draw_mouse={Flag(request.ShowCursor)}";
         if (local.X != 0 || local.Y != 0 || local.Width != output.Width || local.Height != output.Height)
             source += $":offset_x={Number(local.X)}:offset_y={Number(local.Y)}:video_size={Size(local)}";
+        if (HdrCapture(request))
+            return new[] { "-f", "lavfi", "-i", source + ":output_fmt=10bit,hwdownload,format=x2bgr10," + HdrFrameChain };
         return new[] { "-f", "lavfi", "-i", source + ",hwdownload,format=bgra" };
+    }
+
+    /// <summary>
+    /// HDR karenin bellekteki yolu. <c>ddagrab</c>'in 10 bit cikisi BT.2020 + PQ'lu RGB; matris
+    /// BT.2020 ile acikca YUV'a cevrilir, yoksa sonraki suzgecler ffmpeg'in varsayilan BT.601
+    /// donusumunu kuruyor. <c>setparams</c> olmadan kodlayicinin <c>-color_trc</c>/<c>-color_primaries</c>
+    /// secenekleri ffmpeg 9.0'da dosyaya "unknown" yaziliyordu (<c>docs/olcumler/kaydedici-hdr.md</c>).
+    /// </summary>
+    internal const string HdrFrameChain =
+        "scale=out_color_matrix=bt2020:out_range=tv,format=yuv444p10le,"
+        + "setparams=color_primaries=bt2020:color_trc=smpte2084:colorspace=bt2020nc:range=tv";
+
+    /// <summary>
+    /// Kayit HDR10 olarak mi yakalanacak: <c>ddagrab</c> kolu, hedef cikis HDR, SDR'ye cevirme
+    /// kapali, kap GIF degil ve kodlayici 10 bit bir bicim aliyor. HDR olmayan cikista hep
+    /// <c>false</c>: davranis degismez.
+    /// </summary>
+    public static bool HdrCapture(RecorderRequest request)
+        => HdrDisplay(request) && !request.HdrToSdr && HdrPixelFormat(request) is not null;
+
+    /// <summary>
+    /// Ekran HDR, SDR'ye cevirme istenmedi ama kayit HDR kalamiyor (kodlayici 10 bit almiyor ya da
+    /// kap GIF). Cagiran bunu kullaniciya soyler; sessiz dusus yok.
+    /// </summary>
+    public static bool HdrLost(RecorderRequest request)
+        => HdrDisplay(request) && !request.HdrToSdr && HdrPixelFormat(request) is null;
+
+    private static bool HdrDisplay(RecorderRequest request)
+        => request.Platform == RecorderPlatform.Windows
+           && request.Capture == RecorderCapture.Ddagrab
+           && DdagrabTarget(request) is { Output.Hdr: true };
+
+    private static string? HdrPixelFormat(RecorderRequest request)
+    {
+        if (request.Container == RecorderContainer.Gif) return null;
+        var formats = PixelFormatsFor(request.VideoCodec);
+        var wanted = (request.PixelFormat ?? string.Empty).ToLowerInvariant() switch
+        {
+            "yuv422p" or "yuv422p10le" => "yuv422p10le",
+            "yuv444p" or "yuv444p10le" => "yuv444p10le",
+            _ => "yuv420p10le"
+        };
+        if (formats.Contains(wanted, StringComparer.Ordinal)) return wanted;
+        return formats.Contains("yuv420p10le", StringComparer.Ordinal) ? "yuv420p10le" : null;
+    }
+
+    /// <summary>
+    /// HDR kaydin profili: kullanicinin 8 bit profili 10 bit karsiligina cekilir, yoksa
+    /// kodlayici acilmiyor (libx264 "high" + 10 bit).
+    /// </summary>
+    private static string? HdrProfile(RecorderRequest request, string pixelFormat)
+    {
+        var profile = request.Profile;
+        if (string.IsNullOrWhiteSpace(profile)) return profile;
+        var allowed = ProfilesFor(request.VideoCodec);
+        if (ReferenceEquals(allowed, Vp9Profiles)) return Vp9ProfileFor(pixelFormat);
+        if (ReferenceEquals(allowed, HevcProfiles)) return profile == "main" ? "main10" : profile;
+        if (!ReferenceEquals(allowed, H264Profiles)) return profile;
+        return pixelFormat switch
+        {
+            "yuv420p10le" when profile is "baseline" or "main" or "high" => "high10",
+            "yuv422p10le" when profile is not "high422" and not "high444" => "high422",
+            "yuv444p10le" => "high444",
+            _ => profile
+        };
     }
 
     private static IEnumerable<string> WindowErrors(RecorderRequest request) => request.Platform switch
@@ -1507,13 +1582,21 @@ public static class RecorderArguments
         var a = new List<string>();
         if (request.KeyframeSeconds > 0)
             a.AddRange(new[] { "-g", Number(Math.Max(1, request.KeyframeSeconds * request.Fps)) });
-        if (!string.IsNullOrWhiteSpace(request.Profile)) a.AddRange(new[] { "-profile:v", request.Profile! });
+        var profile = HdrCapture(request) ? HdrProfile(request, HdrPixelFormat(request)!) : request.Profile;
+        if (!string.IsNullOrWhiteSpace(profile)) a.AddRange(new[] { "-profile:v", profile! });
         if (!string.IsNullOrWhiteSpace(request.Tune)) a.AddRange(new[] { "-tune", request.Tune! });
         return a;
     }
 
     private static IReadOnlyList<string> ColourArgs(RecorderRequest request)
     {
+        if (HdrCapture(request))
+            return new[]
+            {
+                "-pix_fmt", PixelFormatArgument(request.VideoCodec, HdrPixelFormat(request)!),
+                "-color_primaries", "bt2020", "-color_trc", "smpte2084", "-colorspace", "bt2020nc", "-color_range", "tv"
+            };
+
         var a = new List<string> { "-pix_fmt", PixelFormatArgument(request.VideoCodec, request.PixelFormat) };
         if (!string.IsNullOrWhiteSpace(request.ColorSpace)) a.AddRange(new[] { "-colorspace", request.ColorSpace! });
         if (!string.IsNullOrWhiteSpace(request.ColorRange)) a.AddRange(new[] { "-color_range", request.ColorRange! });

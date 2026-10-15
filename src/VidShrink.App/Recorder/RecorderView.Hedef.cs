@@ -195,6 +195,7 @@ internal partial class RecorderView
             PixelFormat = _settings.PixelFormat,
             ColorSpace = string.IsNullOrWhiteSpace(_settings.ColorSpace) ? null : _settings.ColorSpace,
             ColorRange = string.IsNullOrWhiteSpace(_settings.ColorRange) ? null : _settings.ColorRange,
+            HdrToSdr = _settings.HdrToSdr,
             MaxDuration = _settings.MaxDuration,
             Split = _settings.Split
         };

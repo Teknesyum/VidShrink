@@ -65,6 +65,8 @@ internal sealed class RecorderSettings
 
     internal bool OpenFolderWhenDone { get; set; }
 
+    internal bool ShowResultCard { get; set; } = true;
+
     internal RecorderFinishAction FinishAction { get; set; } = RecorderFinishAction.Nothing;
 
     internal bool ShowClicks { get; set; }
@@ -72,6 +74,11 @@ internal sealed class RecorderSettings
     internal bool ClickSound { get; set; }
 
     internal bool ShowKeys { get; set; }
+
+    /// <summary>Varsayılan açık: tuş gösterimi yalnız kısayolları yazar, yazılan parola kayda girmez.</summary>
+    internal bool KeysShortcutsOnly { get; set; } = true;
+
+    internal KeyCaptionStyle KeyCaption { get; set; } = KeyCaptionStyle.Default;
 
     internal bool ShowMagnifier { get; set; }
 
@@ -181,6 +188,9 @@ internal sealed class RecorderSettings
     /// <summary>Renk aralığı; boş bırakılırsa yazılmıyor.</summary>
     internal string? ColorRange { get; set; }
 
+    /// <summary>HDR ekranda kaydı SDR'ye çevir; varsayılan kapalı, kayıt HDR kalır.</summary>
+    internal bool HdrToSdr { get; set; }
+
     /// <summary>Kaydın kendiliğinden duracağı süre, saniye. Sıfır sınır yok demek.</summary>
     internal double MaxDurationSeconds { get; set; }
 
@@ -269,10 +279,17 @@ internal sealed class RecorderSettings
             if ((double?)root["quality"] is { } quality) settings.Quality = quality;
             settings.ShowCursor = (bool?)root["showCursor"] ?? true;
             settings.OpenFolderWhenDone = (bool?)root["openFolderWhenDone"] ?? false;
+            settings.ShowResultCard = (bool?)root["showResultCard"] ?? true;
             if (Enum.TryParse<RecorderFinishAction>((string?)root["finishAction"], true, out var finish) && Enum.IsDefined(finish)) settings.FinishAction = finish;
             settings.ShowClicks = (bool?)root["showClicks"] ?? false;
             settings.ClickSound = (bool?)root["clickSound"] ?? false;
             settings.ShowKeys = (bool?)root["showKeys"] ?? false;
+            settings.KeysShortcutsOnly = (bool?)root["keysShortcutsOnly"] ?? true;
+            var caption = KeyCaptionStyle.Default;
+            if (Enum.TryParse<KeyCaptionPlace>((string?)root["keyCaptionPlace"], true, out var captionPlace) && Enum.IsDefined(captionPlace)) caption = caption with { Place = captionPlace };
+            if (Enum.TryParse<KeyCaptionSize>((string?)root["keyCaptionSize"], true, out var captionSize) && Enum.IsDefined(captionSize)) caption = caption with { Size = captionSize };
+            if (Enum.TryParse<KeyCaptionHold>((string?)root["keyCaptionHold"], true, out var captionHold) && Enum.IsDefined(captionHold)) caption = caption with { Hold = captionHold };
+            settings.KeyCaption = caption;
             settings.ShowMagnifier = (bool?)root["showMagnifier"] ?? false;
             settings.CursorHighlight = (bool?)root["cursorHighlight"] ?? false;
             settings.Spotlight = (bool?)root["spotlight"] ?? false;
@@ -326,6 +343,7 @@ internal sealed class RecorderSettings
             if ((string?)root["pixelFormat"] is { Length: > 0 } pixelFormat) settings.PixelFormat = RecorderArguments.StoredPixelFormat(pixelFormat);
             settings.ColorSpace = (string?)root["colorSpace"];
             settings.ColorRange = (string?)root["colorRange"];
+            settings.HdrToSdr = (bool?)root["hdrToSdr"] ?? false;
             settings.MaxDurationSeconds = (double?)root["maxDurationSeconds"] ?? 0;
             settings.SplitSeconds = (double?)root["splitSeconds"] ?? 0;
             settings.SplitMegabytes = (double?)root["splitMegabytes"] ?? 0;
@@ -385,10 +403,15 @@ internal sealed class RecorderSettings
                 writer.WriteNumber("quality", Quality);
                 writer.WriteBoolean("showCursor", ShowCursor);
                 writer.WriteBoolean("openFolderWhenDone", OpenFolderWhenDone);
+                writer.WriteBoolean("showResultCard", ShowResultCard);
                 writer.WriteString("finishAction", FinishAction.ToString());
                 writer.WriteBoolean("showClicks", ShowClicks);
                 writer.WriteBoolean("clickSound", ClickSound);
                 writer.WriteBoolean("showKeys", ShowKeys);
+                writer.WriteBoolean("keysShortcutsOnly", KeysShortcutsOnly);
+                writer.WriteString("keyCaptionPlace", KeyCaption.Place.ToString());
+                writer.WriteString("keyCaptionSize", KeyCaption.Size.ToString());
+                writer.WriteString("keyCaptionHold", KeyCaption.Hold.ToString());
                 writer.WriteBoolean("showMagnifier", ShowMagnifier);
                 writer.WriteBoolean("cursorHighlight", CursorHighlight);
                 writer.WriteBoolean("spotlight", Spotlight);
@@ -443,6 +466,7 @@ internal sealed class RecorderSettings
                 else writer.WriteString("colorSpace", ColorSpace);
                 if (ColorRange is null) writer.WriteNull("colorRange");
                 else writer.WriteString("colorRange", ColorRange);
+                writer.WriteBoolean("hdrToSdr", HdrToSdr);
                 writer.WriteNumber("maxDurationSeconds", MaxDurationSeconds);
                 writer.WriteNumber("splitSeconds", SplitSeconds);
                 writer.WriteNumber("splitMegabytes", SplitMegabytes);

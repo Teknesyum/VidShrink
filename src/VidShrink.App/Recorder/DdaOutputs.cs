@@ -50,7 +50,7 @@ internal static class DdaOutputs
                         if (desc.Rotation != RotationUnspecified && desc.Rotation != RotationIdentity) continue;
                         var width = desc.Right - desc.Left;
                         var height = desc.Bottom - desc.Top;
-                        if (width > 1 && height > 1) found.Add(new DdaOutput((int)index, desc.Left, desc.Top, width, height));
+                        if (width > 1 && height > 1) found.Add(new DdaOutput((int)index, desc.Left, desc.Top, width, height, IsHdr(output)));
                     }
                     finally { Marshal.ReleaseComObject(output); }
                 }
@@ -60,6 +60,27 @@ internal static class DdaOutputs
         finally { Marshal.ReleaseComObject(factory); }
 
         return found;
+    }
+
+    /// <summary>
+    /// <c>DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020</c>: Windows'un "HDR kullan" acikken
+    /// cikisi surdugu renk uzayi. SDR cikis 0'dir (<c>RGB_FULL_G22_NONE_P709</c>).
+    /// </summary>
+    internal const int HdrColorSpace = 12;
+
+    internal static bool IsHdrColorSpace(int colorSpace) => colorSpace == HdrColorSpace;
+
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+    private static bool IsHdr(IDxgiOutput output)
+    {
+        try
+        {
+            return output is IDxgiOutput6 six && six.GetDesc1(out var desc) >= 0 && IsHdrColorSpace(desc.ColorSpace);
+        }
+        catch (Exception ex) when (ex is COMException or InvalidCastException)
+        {
+            return false;
+        }
     }
 
     [DllImport("dxgi.dll")]
@@ -113,5 +134,64 @@ internal static class DdaOutputs
 
         [PreserveSig]
         int GetDesc(out OutputDesc desc);
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    private struct OutputDesc1
+    {
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+        public string DeviceName;
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+        public int AttachedToDesktop;
+        public int Rotation;
+        public IntPtr Monitor;
+        public uint BitsPerColor;
+        public int ColorSpace;
+        public float RedX;
+        public float RedY;
+        public float GreenX;
+        public float GreenY;
+        public float BlueX;
+        public float BlueY;
+        public float WhiteX;
+        public float WhiteY;
+        public float MinLuminance;
+        public float MaxLuminance;
+        public float MaxFullFrameLuminance;
+    }
+
+    [ComImport, Guid("068346e8-aaec-4b84-add7-137f513f77a1"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    private interface IDxgiOutput6
+    {
+        void SetPrivateData();
+        void SetPrivateDataInterface();
+        void GetPrivateData();
+        void GetParent();
+        void GetDesc();
+        void GetDisplayModeList();
+        void FindClosestMatchingMode();
+        void WaitForVBlank();
+        void TakeOwnership();
+        void ReleaseOwnership();
+        void GetGammaControlCapabilities();
+        void SetGammaControl();
+        void GetGammaControl();
+        void SetDisplaySurface();
+        void GetDisplaySurfaceData();
+        void GetFrameStatistics();
+        void GetDisplayModeList1();
+        void FindClosestMatchingMode1();
+        void GetDisplaySurfaceData1();
+        void DuplicateOutput();
+        void SupportsOverlays();
+        void CheckOverlaySupport();
+        void CheckOverlayColorSpaceSupport();
+        void DuplicateOutput1();
+
+        [PreserveSig]
+        int GetDesc1(out OutputDesc1 desc);
     }
 }

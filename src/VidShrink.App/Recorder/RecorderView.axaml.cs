@@ -68,6 +68,7 @@ internal partial class RecorderView : UserControl
         InitSerit();
         InitGeriSayim();
         InitBitince();
+        InitSonucKarti();
         InitTampon();
         InitMini();
         InitImlec();

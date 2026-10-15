@@ -14,6 +14,10 @@ namespace VidShrink.Tests;
 /// bir degerle diske yazilir, yeni bir nesneye okunur ve ozellik ozellik karsilastirilir. Ozellik
 /// listesi yansimayla toplaniyor; yeni eklenen bir ayar <c>ToJson</c> ya da <c>Load</c>'da
 /// unutulursa bu olcu kirmizi olur.
+/// <para>
+/// 2026-10-15: <c>KeyCaption</c> diske uc anahtarla yazilir (<c>keyCaptionPlace</c>, <c>keyCaptionSize</c>,
+/// <c>keyCaptionHold</c>); anahtar sayisi ozellik basina bir yerine <c>CokAnahtarli</c>'daki sayiyla toplanir.
+/// </para>
 /// </summary>
 public sealed class KaydediciAyarGidisDonusTests
 {
@@ -32,6 +36,11 @@ public sealed class KaydediciAyarGidisDonusTests
         ["Hotkeys"] = "2:F1,2:F2,2:F3,2:F4,2:F5,2:F6"
     };
 
+    private static readonly Dictionary<string, int> CokAnahtarli = new()
+    {
+        ["KeyCaption"] = 3
+    };
+
     internal static IReadOnlyList<PropertyInfo> Ozellikler() => typeof(RecorderSettings)
         .GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
         .Where(p => p.CanRead && p.CanWrite && p.GetIndexParameters().Length == 0)
@@ -48,6 +57,7 @@ public sealed class KaydediciAyarGidisDonusTests
         if (tur == typeof(double)) return (double)(varsayilan ?? 0d) + 7.5;
         if (tur.IsEnum) return Enum.GetValues(tur).Cast<object>().Last(v => !Equals(v, varsayilan));
         if (tur == typeof(List<RecorderRegion>)) return new List<RecorderRegion> { new(11, 22, 33, 44), new(-5, 6, 70, 80) };
+        if (tur == typeof(KeyCaptionStyle)) return new KeyCaptionStyle(KeyCaptionPlace.Top, KeyCaptionSize.Large, KeyCaptionHold.Long);
         throw new InvalidOperationException($"{ozellik.Name} icin deger ureticisi yok: {tur.Name}");
     }
 
@@ -72,7 +82,7 @@ public sealed class KaydediciAyarGidisDonusTests
             var okunan = RecorderSettings.Load(dosya);
 
             var anahtarlar = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(dosya))!.AsObject().Count;
-            Assert.Equal(ozellikler.Count, anahtarlar);
+            Assert.Equal(ozellikler.Sum(o => CokAnahtarli.GetValueOrDefault(o.Name, 1)), anahtarlar);
             var kayip = ozellikler
                 .Where(o => !Ayni(o.GetValue(yazilan), o.GetValue(okunan)))
                 .Select(o => $"{o.Name}: yazilan {o.GetValue(yazilan)}, okunan {o.GetValue(okunan)}")
