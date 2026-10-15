@@ -58,7 +58,7 @@ public static class CliCompletion
     {
         "--kap", "--container", "--kodek", "--codec", "--crf", "--bit-hizi", "--bitrate", "--cozunurluk", "--resolution",
         "--kare-hizi", "--fps", "--ses-kodek", "--audio-codec", "--ses-bit-hizi", "--audio-bitrate", "--kes", "--cut",
-        "--cikti", "--output", "-o"
+        "--cikti", "--output", "-o", "--ek-arguman", "--extra-args"
     };
 
     private static readonly string[] ExportValues = { "--disa-aktar", "--export", "--profil", "--profile" };

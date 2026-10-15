@@ -203,6 +203,9 @@ public sealed record CliRequest
     /// <summary><c>donustur</c>: Dönüştür panelinin seçimleri, panelin ön ayar biçiminde; plan <see cref="ConversionPresetPlan.ToPlan"/> ile kurulur.</summary>
     public ConversionPreset? Conversion { get; init; }
 
+    /// <summary><c>donustur --ek-arguman</c>: <see cref="CustomArguments"/> ile bölünmüş ek ffmpeg argümanları; çıktı yolundan önce yazılır.</summary>
+    public IReadOnlyList<string> ExtraArguments { get; init; } = Array.Empty<string>();
+
     /// <summary><c>profiller --disa-aktar</c>: profillerin yazılacağı dosya.</summary>
     public string? ExportPath { get; init; }
 

@@ -121,6 +121,7 @@ single spelling.
 | `--cozunurluk` | `--resolution` |
 | `--ses-bit-hizi` | `--audio-bitrate` |
 | `--disa-aktar` | `--export` |
+| `--ek-arguman` | `--extra-args` |
 
 Exit codes: `0` in band, `2` under the band (quality saturated, the smaller file kept), `3`
 size ceiling exceeded (the smallest result is still written; JSON carries `output` and `overTarget: true`), `1` error, `64` wrong usage, `130` cancelled.
@@ -200,7 +201,9 @@ name such as `libx264`, `h264_nvenc`, `prores_ks:hq`), `--crf <n>` (inside the c
 range) or `--bit-hizi <kbit/s>` (not both), `--cozunurluk source|<height>|<W>x<H>`,
 `--kare-hizi source|<fps>`, `--ses-kodek <codec>` (aac, opus, mp3, pcm, flac, ac3, eac3,
 `copy`, `none`), `--ses-bit-hizi <kbit/s>`, `--kes <range>`, `--meta-yok`, `--cikti <path>`,
-`--json`. A combination the tab would refuse (an audio codec the container cannot carry, an
+`--ek-arguman "<options>"` (extra ffmpeg options written just before the output path; quotes
+keep spaces, repeating the flag appends; `-i`, `-y`, `-n`, `-f`, `-progress`, `-`, `--` and a
+bare value that would become a second output are refused with `64`), `--json`. A combination the tab would refuse (an audio codec the container cannot carry, an
 odd size) is refused with the same reason and exit code `64`; a container whose encoder the
 local ffmpeg lacks gives `1`.
 
