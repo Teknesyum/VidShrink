@@ -211,6 +211,7 @@ public partial class MainWindow : Window
         _motionReduced = !AnimationsAllowed();
         if (_motionReduced) Classes.Add("reduced-motion");
         ApplyStartupSize();
+        PencereKonumunuIzle();
         PreparePanelEntrance();
 
         DragDrop.SetAllowDrop(this, true);
@@ -709,6 +710,7 @@ public partial class MainWindow : Window
             if (WindowState == WindowState.FullScreen) WindowDecorationsTheme = SessizPencereBasligi.Tema;
             else ClearValue(WindowDecorationsThemeProperty);
         }
+        if (change.Property == ClientSizeProperty) NormalKonumuAl();
         if (!_controlsReady) return;
         if (change.Property == WindowStateProperty)
         {
@@ -726,6 +728,7 @@ public partial class MainWindow : Window
         _cts?.Cancel();
         // Kaynak burada kapanır: pencere kapanırken öksüz ffmpeg kalmaz.
         _preview?.Dispose();
+        PencereKonumunuKaydet();
         base.OnClosing(e);
     }
 
@@ -3146,16 +3149,8 @@ public partial class MainWindow : Window
     {
         if (_settingsSyncing || _syncing) return;
         if (PlanPanelRow.Height.GridUnitType != GridUnitType.Pixel) return;
-        try
-        {
-            var json = $"{{\"planPanelHeight\":{PlanPanelRow.Height.Value.ToString(CultureInfo.InvariantCulture)}}}";
-            Directory.CreateDirectory(Path.GetDirectoryName(SplitterSettingsPath)!);
-            File.WriteAllText(SplitterSettingsPath, json);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            TxtSystemStatus.Text = $"{Say("settings.error.save")}: {ex.Message}";
-        }
+        var height = PlanPanelRow.Height.Value;
+        LayoutYaz(kok => kok["planPanelHeight"] = height);
     }
 
     private void RestoreSplitterSettings()
