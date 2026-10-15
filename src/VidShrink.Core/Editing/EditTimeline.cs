@@ -666,6 +666,49 @@ public sealed class EditTimeline
         return true;
     }
 
+    /// <summary>Ilk klipten sonraki en az bir klibin gecisi var; teslim o zaman Tam kipte kodlanir.</summary>
+    public bool HasTransitions => _clips.Skip(1).Any(c => c.Transition is not null);
+
+    /// <summary>
+    /// Secili kliplerin onceki klipten gecisini yazar; <c>null</c> gecisi kaldirir ve klipler kesme ile birlesir. Tek adimda
+    /// geri alinir; hicbir klip degismezse <c>false</c> doner ve gecmise adim yazilmaz.
+    /// </summary>
+    public bool SetTransition(IReadOnlyList<int> indices, ClipTransition? transition)
+    {
+        ArgumentNullException.ThrowIfNull(indices);
+        var order = indices.Distinct().OrderBy(i => i).ToList();
+        foreach (var index in order) CheckIndex(index);
+
+        var steps = new List<IEditCommand>();
+        foreach (var index in order)
+        {
+            var before = _clips[index];
+            if (before.Transition == transition) continue;
+            var step = new ReplaceCommand(index, before, before with { Transition = transition });
+            step.Apply(_clips);
+            steps.Add(step);
+        }
+
+        if (steps.Count == 0) return false;
+        Record(new CompositeCommand(steps));
+        return true;
+    }
+
+    /// <summary>
+    /// <paramref name="index"/>'teki klibin onceki klibe binme suresi: ilk klipte ya da gecissiz klipte 0, yoksa istenen sure
+    /// iki klibin kisasinin yarisina kirpilir; boylece bir klip iki yanindaki gecisle tamamen yutulmaz.
+    /// </summary>
+    public long TransitionLength(int index)
+    {
+        CheckIndex(index);
+        if (index == 0 || _clips[index].Transition is not { } transition) return 0;
+        var limit = Math.Min(_clips[index - 1].TimelineLength, _clips[index].TimelineLength) / 2;
+        return Math.Max(0, Math.Min(transition.Duration, limit));
+    }
+
+    /// <summary>Butun gecislerin binme suresi toplami; teslimin suresi <see cref="Duration"/> eksi bu degerdir.</summary>
+    public long TransitionOverlap => Enumerable.Range(0, _clips.Count).Sum(TransitionLength);
+
     /// <summary>
     /// T1 izinin metin klipleri, eklenme sirasiyla; sonraki klip ustte cizilir. Zamanlari
     /// cizelge zamanidir, klip silmek ya da kaydirmak metni tasimaz.

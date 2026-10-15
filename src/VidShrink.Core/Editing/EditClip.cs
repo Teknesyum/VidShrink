@@ -74,6 +74,9 @@ public sealed record EditClip
     /// <summary>Parcanin grup kimligi; ayni kimligi tasiyan parcalar birlikte tasinir ve silinir. Gruplanmamis parca <c>null</c>.</summary>
     public int? Group { get; init; }
 
+    /// <summary>Onceki klipten bu klibe gecis; ilk klipte ya da <c>null</c> iken klipler kesme ile birlesir. Bolmede bas tarafta kalir.</summary>
+    public ClipTransition? Transition { get; init; }
+
     public static string? NormalizeLabel(string? label) => string.IsNullOrWhiteSpace(label) ? null : label.Trim();
 
     public long SourceLength => SourceEnd - SourceStart;
@@ -107,9 +110,9 @@ public sealed record EditClip
         return Math.Min(CeilDiv(consumed * 100, Hundredths), TimelineLength - 1);
     }
 
-    internal EditClip WithMotion(decimal speed, bool reversed) => new(SourceStart, SourceEnd, speed, reversed) { Effects = Effects, Source = Source, Label = Label, Group = Group };
+    internal EditClip WithMotion(decimal speed, bool reversed) => new(SourceStart, SourceEnd, speed, reversed) { Effects = Effects, Source = Source, Label = Label, Group = Group, Transition = Transition };
 
-    internal EditClip WithRange(long sourceStart, long sourceEnd) => new(sourceStart, sourceEnd, Speed, Reversed) { Effects = Effects, Source = Source, Label = Label, Group = Group };
+    internal EditClip WithRange(long sourceStart, long sourceEnd) => new(sourceStart, sourceEnd, Speed, Reversed) { Effects = Effects, Source = Source, Label = Label, Group = Group, Transition = Transition };
 
     internal (EditClip First, EditClip Second)? SplitAt(long offset)
     {
@@ -119,8 +122,8 @@ public sealed record EditClip
         var head = Effects with { FadeOut = 0 };
         var tail = Effects with { FadeIn = 0 };
         return Reversed
-            ? (new EditClip(SourceEnd - consumed, SourceEnd, Speed, true) { Effects = head, Source = Source, Label = Label, Group = Group }, new EditClip(SourceStart, SourceEnd - consumed, Speed, true) { Effects = tail, Source = Source, Label = Label, Group = Group })
-            : (new EditClip(SourceStart, SourceStart + consumed, Speed, false) { Effects = head, Source = Source, Label = Label, Group = Group }, new EditClip(SourceStart + consumed, SourceEnd, Speed, false) { Effects = tail, Source = Source, Label = Label, Group = Group });
+            ? (new EditClip(SourceEnd - consumed, SourceEnd, Speed, true) { Effects = head, Source = Source, Label = Label, Group = Group, Transition = Transition }, new EditClip(SourceStart, SourceEnd - consumed, Speed, true) { Effects = tail, Source = Source, Label = Label, Group = Group })
+            : (new EditClip(SourceStart, SourceStart + consumed, Speed, false) { Effects = head, Source = Source, Label = Label, Group = Group, Transition = Transition }, new EditClip(SourceStart + consumed, SourceEnd, Speed, false) { Effects = tail, Source = Source, Label = Label, Group = Group });
     }
 
     /// <summary>
@@ -184,7 +187,7 @@ public sealed record EditClip
             var effects = Effects;
             if (i > 0) effects = effects with { FadeIn = 0 };
             if (i < kept.Count - 1) effects = effects with { FadeOut = 0 };
-            pieces[i] = new EditClip(kept[i].Start, kept[i].End, kept[i].Fast ? fastSpeed : Speed, Reversed) { Effects = effects, Source = Source, Label = Label, Group = Group };
+            pieces[i] = new EditClip(kept[i].Start, kept[i].End, kept[i].Fast ? fastSpeed : Speed, Reversed) { Effects = effects, Source = Source, Label = Label, Group = Group, Transition = i == 0 ? Transition : null };
         }
 
         return pieces;

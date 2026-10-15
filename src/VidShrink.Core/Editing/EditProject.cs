@@ -297,6 +297,14 @@ public sealed class EditProject
         if (clip.Source != 0) writer.WriteNumber("source", clip.Source);
         if (clip.Label is { } label) writer.WriteString("label", label);
         if (clip.Group is { } group) writer.WriteNumber("group", group);
+        if (clip.Transition is { } transition)
+        {
+            writer.WriteStartObject("transition");
+            writer.WriteString("kind", ClipTransition.Key(transition.Kind));
+            writer.WriteNumber("duration", transition.Duration);
+            writer.WriteEndObject();
+        }
+
         var effects = clip.Effects;
         if (!effects.IsNeutral)
         {
@@ -322,6 +330,10 @@ public sealed class EditProject
         writer.WriteEndObject();
     }
 
+    private static ClipTransition ReadTransition(JsonElement item)
+        => new(ClipTransition.FromKey(item.GetProperty("kind").GetString()) ?? throw new FormatException("Bilinmeyen gecis turu"),
+            item.GetProperty("duration").GetInt64());
+
     private static EditClip ReadClip(JsonElement item)
     {
         var clip = new EditClip(item.GetProperty("start").GetInt64(), item.GetProperty("end").GetInt64(),
@@ -330,6 +342,7 @@ public sealed class EditProject
             Source = item.TryGetProperty("source", out var source) ? source.GetInt32() : 0,
             Label = item.TryGetProperty("label", out var label) ? label.GetString() : null,
             Group = item.TryGetProperty("group", out var group) ? group.GetInt32() : null,
+            Transition = item.TryGetProperty("transition", out var transition) ? ReadTransition(transition) : null,
         };
         if (!item.TryGetProperty("effects", out var e)) return clip;
 

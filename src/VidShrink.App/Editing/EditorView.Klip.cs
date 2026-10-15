@@ -20,6 +20,8 @@ internal partial class EditorView
 
     private static readonly string[] LookKeys = { "editor.clip.look.none", "editor.clip.look.bw", "editor.clip.look.old-film" };
 
+    internal static readonly TransitionKind?[] TransitionChoices = { null, TransitionKind.Dissolve, TransitionKind.Wipe, TransitionKind.Slide, TransitionKind.Iris };
+
     private bool _showingClip;
     private int _restyles;
 
@@ -36,6 +38,10 @@ internal partial class EditorView
 
         CmbClipLook.Items.Clear();
         foreach (var key in LookKeys) CmbClipLook.Items.Add(new ComboBoxItem { Content = Strings.Get(key) });
+
+        CmbClipTransition.Items.Clear();
+        foreach (var kind in TransitionChoices)
+            CmbClipTransition.Items.Add(new ComboBoxItem { Content = Strings.Get(kind is { } k ? "editor.clip.transition." + ClipTransition.Key(k) : "editor.clip.transition.none") });
 
         Timeline.SelectionChanged += ShowClipPanel;
         Timeline.TextSelectionChanged += ShowClipPanel;
@@ -58,6 +64,10 @@ internal partial class EditorView
             box.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitClipColor(box, field));
         }
 
+        CmbClipTransition.SelectionChanged += (_, _) => { if (_showingClip && CmbClipTransition.SelectedIndex >= 0) CommitClipTransition(); };
+        TxtClipTransition.LostFocus += (_, _) => { if (_showingClip) CommitClipTransition(); };
+        TxtClipTransition.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitClipTransition());
+
         TxtClipLabel.LostFocus += (_, _) => { if (_showingClip) CommitClipLabel(); };
         TxtClipLabel.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitClipLabel());
         ShowClipPanel();
@@ -72,6 +82,35 @@ internal partial class EditorView
         var targets = ClipTargets();
         if (targets.Count == 0) return false;
         var done = Apply(model => model.SetLabel(targets, text), -1);
+        if (!done) ShowClipPanel();
+        return done;
+    }
+
+    /// <summary>
+    /// Secili kliplere onceki klipten gecisi yazar: tur kutusundan, sure metin kutusundan (bos ya da okunamazsa varsayilan,
+    /// sinir disindaysa 0,1-5 sn araligina kirpilir). "Yok" gecisi kaldirir. Tek geri alma adimi.
+    /// </summary>
+    internal bool CommitClipTransition()
+    {
+        if (_model is null || !_showingClip) return false;
+        var choice = CmbClipTransition.SelectedIndex;
+        if (choice < 0 || choice >= TransitionChoices.Length) return false;
+        ClipTransition? transition = null;
+        if (TransitionChoices[choice] is { } kind)
+        {
+            var text = TxtClipTransition.Text?.Trim();
+            var seconds = ClipTransition.DefaultSeconds;
+            if (!string.IsNullOrEmpty(text)
+                && (double.TryParse(text, NumberStyles.Float, Strings.Culture, out var parsed)
+                    || double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out parsed))
+                && double.IsFinite(parsed))
+                seconds = Math.Clamp(Math.Round(parsed, 2), ClipTransition.MinSeconds, ClipTransition.MaxSeconds);
+            transition = new ClipTransition(kind, EditTime.FromSeconds(seconds));
+        }
+
+        var targets = ClipTargets();
+        if (targets.Count == 0) return false;
+        var done = Apply(model => model.SetTransition(targets, transition), -1);
         if (!done) ShowClipPanel();
         return done;
     }
@@ -216,6 +255,10 @@ internal partial class EditorView
         TxtClipSaturation.Text = effects.Saturation.ToString("0.##", Strings.Culture);
         TxtClipTemperature.Text = effects.Temperature.ToString(CultureInfo.InvariantCulture);
         TxtClipLabel.Text = model.Clips[index].Label;
+        var transition = model.Clips[index].Transition;
+        CmbClipTransition.SelectedIndex = transition is null ? 0 : Array.IndexOf(TransitionChoices, transition.Kind);
+        TxtClipTransition.Text = (transition is null ? ClipTransition.DefaultSeconds : EditTime.ToSeconds(transition.Duration)).ToString("0.##", Strings.Culture);
+        TxtClipTransition.IsEnabled = transition is not null;
         ClipPanel.IsVisible = true;
         _showingClip = true;
     }
@@ -269,5 +312,5 @@ internal partial class EditorView
 
     private static bool SameCuts(IReadOnlyList<EditClip> before, IReadOnlyList<EditClip> after)
         => before.Count == after.Count
-           && before.Zip(after).All(p => p.First with { Effects = ClipEffects.None } == p.Second with { Effects = ClipEffects.None });
+           && before.Zip(after).All(p => p.First with { Effects = ClipEffects.None, Transition = null } == p.Second with { Effects = ClipEffects.None, Transition = null });
 }
