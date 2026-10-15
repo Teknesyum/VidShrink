@@ -7,6 +7,28 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.19] - 2026-10-15
+
+### Added
+
+- Player subtitle style: bold and italic, "Override Styled Subtitles" for ASS files and "Hide
+  Hearing-Impaired Notes"; "Include Subtitles in Screenshots" keeps the subtitle in a saved frame.
+- About: "Check Now" checks for updates on demand and shows how the last check ended, plus Release
+  Notes, Licenses and Privacy. Settings gains a Diagnostics section that copies the log, shows it
+  in its folder or saves a zip package with a system summary for a bug report; nothing is sent.
+- Convert video filters: crop, rotate, deinterlace and noise reduction; constant or variable
+  frame rate; scaling method and keeping the aspect ratio with black bars.
+- Queue: a queue can start at a set time, a waiting job can be edited before it runs, the queue
+  can play a sound when it finishes, and "Quit the App" joins the after-queue actions.
+
+### Fixed
+
+- The last-check line in About was empty until the window finished loading.
+- Shrink hides the noise-reduction box when the ffmpeg build has no `afftdn` filter, and the CLI's
+  `--denoise` stops with a clear error instead of failing the encode.
+- A queued job no longer carries the burned-in subtitle font, size and box settings of the
+  previous source.
+
 ## [1.2.18] - 2026-10-15
 
 The `v1.2.17` tag was cut before the winget and Scoop manifests were updated, so its release did

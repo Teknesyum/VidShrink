@@ -10,14 +10,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 **Dalga 2 — Karar Gerekmez, Küçük İş Öncelik 2 Ya Da Orta İş Öncelik 1**
 
-## 32. Kamera Biçimi Ve Konumu
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P5 · Kaydedici · iş orta · öncelik 1 · karar gerekmez
-
-- Satırlar (EKB-P5): EKB-06 Kamera biçimi; EKB-16 Kamera serbest konum ve boyut; EKB-17 Kamera aynası. [Tablo](piyasa/2026-10-13/kaydedici-sunum-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/RecorderArguments.cs, src/VidShrink.App/Recorder/RecorderView.Kamera.cs, src/VidShrink.App/Recorder/RecorderSettings.cs, src/VidShrink.App/Recorder/RecorderView.axaml, src/VidShrink.App/Locales/
-- Plan: Kamera zincirine ayna için `hflip` (yatay çevirme süzgeci), daire ve yuvarlak köşe için saydamlık maskesi eklenir (RecorderArguments.cs:937-945). Dört köşe ve dört hazır genişlik yerine oran olarak saklanan serbest konum ve boyut gelir; kamera karesi bölge düzenleyicisinde sürüklenir. `KaydediciKameraTests` argümanı, lavfi bileşik karesi köşe pikselinin saydam kaldığını ve kameranın istenen yere oturduğunu ölçer.
-
 ## 34. Medya Bilgisi Ve Denetim Raporu
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · ARC-P2 · Bizde Olmayan Araçlar · iş orta · öncelik 1 · karar gerekmez
@@ -861,15 +853,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Kanıt: uzak bir `.pls` adresi açılınca başlıkta yayının adı yerine dosya adı ("radyo.pls") görünüyor.
 - Plan: Adres listeyse başlık, mpv'nin `media-title` değerini ya da listenin `Title1` satırını alır; ikisi de yoksa bugünkü gibi dosya adı. Yerel 127.0.0.1 sunucusuyla başlık testi.
 
-## 157. Gürültü Temizleme Süzgeci Yokken Kutu
-
-14 Ekim 2026 · Dalga 1 yapımında görüldü (ARC-P1) · Küçült · iş küçük · öncelik 2 · karar gerekmez
-
-- Kanıt: ajan raporu, `afftdn` içermeyen bir ffmpeg kullanılırsa gürültü kutusunun gizlenmediğini söylüyor; kutu açılırsa kodlama düşer. Kodda doğrulandı: `afftdn` için yoklama yok (`MainWindow.Izler.cs:90` kutuyu doğrudan plana yazıyor); kaydedicinin gürültü kutusu da aynı durumda.
-- Plan: Süzgeç yoklaması (`-filters`) kodlayıcı yoklamasının yanına girer; `afftdn` yoksa kutu gizlenir, CLI bayrağı açık bir hata verir.
-
-**Dalga 2 Yan Bulguları — Karar Gerekmez, Küçük İş**
-
 ## 158. Akıllı Kipte Kare Sınırı Dışı Kesim
 
 14 Ekim 2026 · Dalga 2 yapımında görüldü (DZA-P4) · Düzenleyici · iş küçük · öncelik 2 · karar gerekmez
@@ -884,16 +867,3 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Kanıt: ajan raporu, yer imi taşıyan dosyaların geçmiş penceresinde ayrıca işaretlenmediğini ve devam ayarında "açılışta sor" kipinin olmadığını söylüyor. Kodda doğrulanmadı.
 - Plan: Geçmiş penceresinde yer imi olan satıra simge; devam ayarına üçüncü seçenek olarak "sor". İki kol için pencere testi.
 
-## 160. Yakma Biçimi Sıfırlama Testi Ve Kuyruktaki Biçim Alanları
-
-14 Ekim 2026 · Dalga 2 yapımında görüldü (SIK-P5) · Küçült · iş küçük · öncelik 2 · karar gerekmez
-
-- Kanıt: `ResetBurnStyle()` çağrısı (`src/VidShrink.App/MainWindow.Izler.cs:170`) kaldırılınca 21 testin hepsi yeşil kaldı; yeni kaynakta seçimin sıfırlandığını ölçen test yok. Ayrıca kuyruğa taşınan işte `BurnSubtitle` boşaltılıyor (`src/VidShrink.App/MainWindow.axaml.cs:3346`) ama `BurnFont`, `BurnFontSize`, `BurnBox` kalıyor; yakma olmadığı için etkisiz.
-- Plan: İkinci kaynak açan arayüz testi seçimin varsayılana döndüğünü pimler; kuyruk kolunda üç biçim alanı da boşaltılır ve plan testi bunu okur.
-
-## 161. İmleç Vurgusu Kutularını Kancasız Platformda Gizleme
-
-14 Ekim 2026 · Dalga 2 yapımında görüldü (PLT-P2) · Kaydedici · iş küçük · öncelik 2 · karar gerekmez
-
-- Kanıt: "İmleci Vurgula" ve "Spot Işığı" Windows kancasına bağlı; Windows dışında boş kanca kuruluyor (`src/VidShrink.App/Recorder/RecorderView.Girdi.cs:21`), iki ayar `:63`'te okunuyor. Kutular (`RecorderView.axaml:637`, `:641`) yine de görünüyor.
-- Plan: PLT-P2'nin `HooksAvailable` kapısına bu iki kutu ve boyut/renk seçimleri de bağlanır; `KaydediciPlatformKutuTests` Linux ve Mac kolunda görünmezliği ölçer.
