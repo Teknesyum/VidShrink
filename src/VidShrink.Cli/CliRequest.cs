@@ -3,7 +3,7 @@ using VidShrink.Core;
 
 namespace VidShrink.Cli;
 
-public enum CliCommand { Help, Version, Shrink, Plan, Watch, Gunluk, Profiller }
+public enum CliCommand { Help, Version, Shrink, Plan, Watch, Gunluk, Profiller, Convert, Completion }
 
 public enum CliCodec { Auto, H264, Hevc, Av1, Vp9 }
 
@@ -193,6 +193,18 @@ public sealed record CliRequest
 
     /// <summary><c>--is-parcacigi</c>: siniri dinleyen kodlayiciya yazilan <c>-threads</c>; digerlerinde yok sayilir.</summary>
     public int? EncoderThreads { get; init; }
+
+    /// <summary><c>donustur</c>: Dönüştür panelinin seçimleri, panelin ön ayar biçiminde; plan <see cref="ConversionPresetPlan.ToPlan"/> ile kurulur.</summary>
+    public ConversionPreset? Conversion { get; init; }
+
+    /// <summary><c>profiller --disa-aktar</c>: profillerin yazılacağı dosya.</summary>
+    public string? ExportPath { get; init; }
+
+    /// <summary><c>profiller --disa-aktar</c> ile verilen <c>--profil</c> kimlikleri; boşsa kullanıcının bütün profilleri.</summary>
+    public IReadOnlyList<string> ExportIds { get; init; } = Array.Empty<string>();
+
+    /// <summary><c>tamamlama</c>: betiği basılacak kabuk (<see cref="CliCompletion.Shells"/>).</summary>
+    public string? Shell { get; init; }
 
     /// <summary>
     /// <see cref="SubtitleFiles"/> ve <see cref="SidecarSubtitles"/>'in diskten cozulmus hali;
@@ -403,7 +415,13 @@ public static class CliParser
         if (head is "--gunluk" or "--log" or "gunluk")
             return Success(new CliRequest { Command = CliCommand.Gunluk });
         if (head is "profiller" or "presets" or "--profiller" or "--presets")
-            return Success(new CliRequest { Command = CliCommand.Profiller });
+            return ParseProfiller(args);
+        if (head is "tamamlama" or "completion")
+            return args.Count == 2 && CliCompletion.TryShell(args[1], out var kabuk)
+                ? Success(new CliRequest { Command = CliCommand.Completion, Shell = kabuk })
+                : Fail("error.bad-shell", args.Count > 1 ? args[1] : "-");
+        if (head is "donustur" or "convert")
+            return CliConvert.Parse(args);
 
         var command = head switch
         {
@@ -721,6 +739,35 @@ public static class CliParser
         return Success(request);
     }
 
+    /// <summary>
+    /// <c>profiller</c>: listeler; <c>--disa-aktar DOSYA</c> verilince profilleri çekirdeğin
+    /// <see cref="PresetLibrary.Export"/>'u ile dosyaya yazar. <c>--profil</c> yalnız dışa aktarmada anlamlı.
+    /// </summary>
+    private static CliParseResult ParseProfiller(IReadOnlyList<string> args)
+    {
+        var request = new CliRequest { Command = CliCommand.Profiller };
+        for (var i = 1; i < args.Count; i++)
+        {
+            var arg = args[i];
+            switch (arg)
+            {
+                case "--disa-aktar" or "--export":
+                    if (!TryValue(args, ref i, out var dosya)) return Fail("error.missing-value", arg);
+                    request = request with { ExportPath = dosya };
+                    break;
+                case "--profil" or "--profile":
+                    if (!TryValue(args, ref i, out var kimlik)) return Fail("error.missing-value", arg);
+                    request = request with { ExportIds = request.ExportIds.Append(kimlik).ToList() };
+                    break;
+                default:
+                    return Fail(arg.StartsWith('-') && arg.Length > 1 ? "error.unknown-option" : "error.extra-input", arg);
+            }
+        }
+
+        if (request.ExportIds.Count > 0 && request.ExportPath is null) return Fail("error.export-needs-file", null);
+        return Success(request);
+    }
+
     public static bool TryParseSize(string text, out double mb)
     {
         mb = 0;
@@ -794,7 +841,7 @@ public static class CliParser
         };
     }
 
-    private static bool TryParseNumber(string text, out double value)
+    internal static bool TryParseNumber(string text, out double value)
         => double.TryParse(text.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out value)
            && double.IsFinite(value);
 
@@ -802,7 +849,7 @@ public static class CliParser
     /// <c>BAS-SON</c> kesiti. Uclar saniye (<c>12.5</c>) ya da saat gosterimi (<c>1:23</c>,
     /// <c>1:02:03</c>) olabilir; son uc bos birakilirsa (<c>10-</c>) kaynagin sonuna kadar.
     /// </summary>
-    private static bool TryParseRange(string text, out double? start, out double? end,
+    internal static bool TryParseRange(string text, out double? start, out double? end,
         out double? startFrame, out double? endFrame)
     {
         start = null;
@@ -872,7 +919,7 @@ public static class CliParser
         return true;
     }
 
-    private static bool TryValue(IReadOnlyList<string> args, ref int index, out string value)
+    internal static bool TryValue(IReadOnlyList<string> args, ref int index, out string value)
     {
         value = "";
         if (index + 1 >= args.Count) return false;
@@ -881,7 +928,7 @@ public static class CliParser
         return true;
     }
 
-    private static CliParseResult Success(CliRequest request) => new(request, null, null);
+    internal static CliParseResult Success(CliRequest request) => new(request, null, null);
 
-    private static CliParseResult Fail(string key, string? argument) => new(null, key, argument);
+    internal static CliParseResult Fail(string key, string? argument) => new(null, key, argument);
 }

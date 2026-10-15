@@ -118,6 +118,11 @@ bunların tek yazımı var.
 | `--oncelik` | `--priority` |
 | `--is-parcacigi` | `--threads` |
 | `--dil` | `--lang` |
+| `--kap` | `--container` |
+| `--bit-hizi` | `--bitrate` |
+| `--cozunurluk` | `--resolution` |
+| `--ses-bit-hizi` | `--audio-bitrate` |
+| `--disa-aktar` | `--export` |
 
 Çıkış kodları: bantta `0`, bandın altında `2` (kalite doyduğu için daha küçük dosya
 saklandı), boy tavanı aşıldığında `3` (en küçük sonuç yine yazılıyor; JSON `output` ve
@@ -178,3 +183,71 @@ yeni dosya olarak görüp küçültüyor.
 Çıkış kodları: bittiğinde `0`, `--bir-kez` bitip en az bir dosya başarısız olduğunda ya da
 ad çakışması yüzünden atlandığında `4`, hatada `1`, yanlış kullanımda `64`, Ctrl+C ile
 durdurulduğunda `130`. `--bir-kez` sonunda kaç dosyanın atlandığı bir özet satırında yazıyor.
+
+## Dönüştür
+
+`donustur` (`convert`) penceresiz Dönüştür sekmesi: aynı argüman üreticisi
+(`ConversionArguments`), aynı kodek ve kap kümesi, aynı çıktı adı (kaynağın yanında
+`<ad>_converted.<uzantı>`). Aynı ayarla komut satırı ve sekme aynı ffmpeg komutunu
+yazıyor; bir test ikisini karşılaştırıyor.
+
+```bash
+vidshrink donustur clip.mov --kap mp4 --kodek hevc --crf 24
+vidshrink donustur clip.mp4 -o clip.webm --kodek vp9 --bit-hizi 2000
+vidshrink donustur clip.mp4 --kap gif --cozunurluk 480 --kare-hizi 15
+vidshrink donustur clip.mkv --kap mp3 --ses-bit-hizi 192 --json
+```
+
+Anahtarlar: `--kap <kap>` (mp4, mkv, webm, mov, avi, gif, mp3, m4a, wav, flac, webp, avif,
+mxf, png, jpg, opus, ogg, aiff, ac3; verilmezse `--cikti` uzantısı belirliyor, o da yoksa
+mp4), `--kodek <kodek>` (h264, hevc, vp9, av1, prores, dnxhr, `copy` ya da `libx264`,
+`h264_nvenc`, `prores_ks:hq` gibi kodlayıcı adı), `--crf <n>` (kodeğin kendi aralığında) ya
+da `--bit-hizi <kbit/sn>` (ikisi birden değil), `--cozunurluk kaynak|<yükseklik>|<G>x<Y>`,
+`--kare-hizi kaynak|<fps>`, `--ses-kodek <kodek>` (aac, opus, mp3, pcm, flac, ac3, eac3,
+`copy`, `yok`), `--ses-bit-hizi <kbit/sn>`, `--kes <aralık>`, `--meta-yok`, `--cikti <yol>`,
+`--json`. Sekmenin reddedeceği bileşim (kabın taşımadığı ses kodeği, tek sayılı boyut) aynı
+gerekçeyle ve `64` çıkış koduyla reddediliyor; yerel ffmpeg'de kodlayıcısı olmayan kap `1`
+veriyor.
+
+Komut satırı sekmenin GIF'ten GIF'e boyut hedefini, ses izi seçimini ve harici ses dosyasını
+taşımıyor.
+
+## NDJSON İlerleme
+
+`--json` verilince stderr ilerlemesi de NDJSON oluyor, satır başına bir sıkışık nesne;
+`kucult`, `plan` ve `donustur` için. stdout'taki sonuç nesnesi değişmiyor. `izle`de dosya
+başına ilerleme satırları aynı biçimde; izleyicinin kendi olay satırları metin kalıyor.
+
+```json
+{"type":"stage","stage":"probe"}
+{"type":"progress","percent":42,"fraction":0.4213,"stage":"pass 1/2","remainingSeconds":12.5}
+```
+
+`stage` satırları adımı söylüyor (`probe`, `crop`, `measure`, `calibrate` vb.); `progress`
+satırları yalnız yüzde ya da aşama değişince tekrarlanıyor, `remainingSeconds` bilinmezken
+`null`.
+
+## Ön Ayarları Dışa Aktarma
+
+`profiller --disa-aktar <dosya>` kendi ön ayarlarınızı uygulamanın "İçe aktar"ının okuduğu
+bir JSON dosyasına yazıyor (`PresetLibrary.Export`). `--profil <kimlik ya da ad>`
+(tekrarlanabilir) bir kısmını seçiyor; verilmezse hepsi yazılıyor. Gömülü ön ayarlar her
+kopyada zaten var ve dışa aktarılmıyor; birini istemek de bilinmeyen ad da `64` veriyor.
+
+```bash
+vidshrink profiller --disa-aktar profiller.json
+vidshrink profiller --disa-aktar discord.json --profil "Discord klibi"
+```
+
+## Kabuk Tamamlama
+
+`tamamlama <kabuk>` (`completion`) `bash`, `zsh`, `fish` ya da `powershell` (`pwsh`) için
+tamamlama betiği yazdırıyor. Komutları, anahtarları ve kapalı kümeli anahtarların
+değerlerini (kodek, kap, profil, dil) tamamlıyor.
+
+```bash
+source <(vidshrink tamamlama bash)                              # ~/.bashrc
+source <(vidshrink tamamlama zsh)                               # ~/.zshrc
+vidshrink tamamlama fish | source                               # ~/.config/fish/config.fish
+vidshrink tamamlama powershell | Out-String | Invoke-Expression # $PROFILE
+```
