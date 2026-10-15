@@ -476,6 +476,7 @@ internal partial class EditorView : UserControl
         var hasClip = model is not null && selected >= 0 && selected < model.Clips.Count;
         BtnSplit.IsEnabled = model is not null;
         BtnAddSource.IsEnabled = model is not null && !Exporting;
+        RefreshMedia();
         var chosen = Timeline.SelectedIndices.Count;
         _canDelete = model is { Clips.Count: > 0 } && chosen > 0 && (Timeline.AllSelected || chosen < model.Clips.Count);
         BtnUndo.IsEnabled = model?.CanUndo ?? false;
@@ -501,14 +502,21 @@ internal partial class EditorView : UserControl
 
     private void OnDragOver(object? sender, DragEventArgs e)
     {
-        e.DragEffects = DroppedFiles(e).Count > 0 ? DragDropEffects.Copy : DragDropEffects.None;
+        e.DragEffects = PoolSource(e) is not null ? (_model is null ? DragDropEffects.None : DragDropEffects.Copy)
+            : DroppedFiles(e).Count > 0 ? DragDropEffects.Copy : DragDropEffects.None;
         e.Handled = true;
     }
 
     private void OnDrop(object? sender, DragEventArgs e)
     {
-        var files = DroppedFiles(e);
         e.Handled = true;
+        if (PoolSource(e) is { } source)
+        {
+            DropOnTimeline(e, source);
+            return;
+        }
+
+        var files = DroppedFiles(e);
         if (files.Count > 0) _ = TakeFilesAsync(files);
     }
 

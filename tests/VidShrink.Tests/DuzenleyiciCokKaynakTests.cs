@@ -17,7 +17,7 @@ namespace VidShrink.Tests;
 /// yazan <see cref="EdlPreview"/>, birden cok kaynagi tek adimda yeniden kodlayan
 /// <see cref="EditExport.Build(EditTimeline, IReadOnlyDictionary{int, ExportSource}, ExportMode, string, string, long, Func{string, bool}?, bool, EditExportSettings?)"/>,
 /// surum 1 proje dosyasinin acilmasi, surum 2 gidis donusu, arayuzde kaynak ekleme ve kapanista
-/// butun kaynaklarin taramasinin iptali. Canli kol 2 sn'lik iki kaynagi tek surecle birlestirir.
+/// butun kaynaklarin taramasinin iptali, medya havuzundan araya ekleme ve ustune yazma. Canli kol 2 sn'lik iki kaynagi tek surecle birlestirir.
 /// Kanit <c>.calisma/worktree-agent-a319bef524e550188/cok-kaynak-*</c>, test siler.
 /// </summary>
 public sealed class DuzenleyiciCokKaynakTests
@@ -621,9 +621,130 @@ public sealed class DuzenleyiciCokKaynakTests
     }
 
     [Fact]
+    public void ArayaEklemeSonrakiKlipleriIterTekAdimdaGeriAlinir()
+    {
+        var model = IkiKaynak();
+
+        Assert.Equal(1, model.PlaceSource(1, S(3), overwrite: false));
+        Assert.Equal(new[] { 0, 1, 0, 1 }, model.Clips.Select(k => k.Source));
+        Assert.Equal(new EditClip(0, S(3)), model.Clips[0]);
+        Assert.Equal(new EditClip(0, S(4)) { Source = 1 }, model.Clips[1]);
+        Assert.Equal(new EditClip(S(3), S(10)), model.Clips[2]);
+        Assert.Equal(S(18), model.Duration);
+        Assert.Equal(S(7), model.ClipStart(2));
+        Assert.Equal(S(14), model.ClipStart(3));
+
+        Assert.True(model.Undo());
+        Assert.Equal(new[] { 0, 1 }, model.Clips.Select(k => k.Source));
+        Assert.Equal(S(14), model.Duration);
+
+        Assert.Equal(2, model.PlaceSource(0, S(14), overwrite: false));
+        Assert.Equal(S(24), model.Duration);
+        Assert.Equal(new[] { 0, 1, 0 }, model.Clips.Select(k => k.Source));
+    }
+
+    [Fact]
+    public void UstuneYazmaAyniSureyiSilipYerineKoyar()
+    {
+        var model = IkiKaynak();
+
+        Assert.Equal(1, model.PlaceSource(1, S(3), overwrite: true));
+        Assert.Equal(new[] { 0, 1, 0, 1 }, model.Clips.Select(k => k.Source));
+        Assert.Equal(new EditClip(0, S(3)), model.Clips[0]);
+        Assert.Equal(new EditClip(0, S(4)) { Source = 1 }, model.Clips[1]);
+        Assert.Equal(new EditClip(S(7), S(10)), model.Clips[2]);
+        Assert.Equal(S(14), model.Duration);
+        Assert.Equal(S(7), model.ClipStart(2));
+
+        Assert.True(model.Undo());
+        Assert.Equal(new[] { new EditClip(0, S(10)), new EditClip(0, S(4)) { Source = 1 } }, model.Clips);
+        Assert.True(model.Redo());
+        Assert.Equal(S(14), model.Duration);
+        Assert.True(model.Undo());
+
+        Assert.Equal(2, model.PlaceSource(1, S(12), overwrite: true));
+        Assert.Equal(new EditClip(0, S(2)) { Source = 1 }, model.Clips[1]);
+        Assert.Equal(S(16), model.Duration);
+    }
+
+    [Fact]
+    public void BilinmeyenKaynakYerlesmezAnDisariTasarsaReddedilir()
+    {
+        var model = IkiKaynak();
+        var adim = model.CanUndo;
+
+        Assert.Equal(-1, model.PlaceSource(5, S(1), overwrite: false));
+        Assert.Equal(-1, model.PlaceSource(-1, S(1), overwrite: true));
+        Assert.Equal(2, model.Clips.Count);
+        Assert.Equal(adim, model.CanUndo);
+        Assert.ThrowsAny<ArgumentException>(() => model.PlaceSource(1, S(15), overwrite: false));
+        Assert.ThrowsAny<ArgumentException>(() => model.PlaceSource(1, -1, overwrite: true));
+    }
+
+    [Fact]
+    public void HavuzKaynaklariListelerBirakilanKlipKipineGoreYerlesir()
+    {
+        var klasor = Klasor("havuz");
+        try
+        {
+            var a = Sahte(klasor, "a.mp4");
+            var b = Sahte(klasor, "b.mp4");
+
+            AppHost.Run(() =>
+            {
+                var view = Gorunum(yol => new MediaInfo
+                {
+                    FilePath = yol, FileSizeBytes = 16, DurationSeconds = yol == b ? 30 : 600,
+                    Width = 320, Height = 240, Fps = 30, VideoCodec = "h264", TotalBitrateBps = 1
+                });
+                var pencere = new Window { Width = 900, Height = 600, Content = view };
+                pencere.Show();
+                try
+                {
+                    Assert.Empty(view.MediaItems);
+                    Assert.False(view.PlaceFromPool(0, 0));
+
+                    Bekle(view, view.OpenSourceAsync(a));
+                    Assert.True(Bekle(view, view.AddSourceAsync(b)));
+                    Assert.Equal(new[] { "a.mp4", "b.mp4" }, view.MediaItems);
+                    Assert.Equal(2, view.LstMedia.ItemCount);
+                    Assert.False(view.PlaceOverwrite);
+
+                    Assert.True(view.PlaceFromPool(1, S(100)));
+                    Assert.Equal(new[] { 0, 1, 0, 1 }, view.Model!.Clips.Select(k => k.Source));
+                    Assert.Equal(S(660), view.Model.Duration);
+                    Assert.Equal(S(130), view.Model.ClipStart(2));
+                    Assert.Equal(1, view.TimelineView.SelectedIndex);
+                    Assert.True(view.Undo());
+
+                    view.PlaceOverwrite = true;
+                    Assert.Equal(1, view.CmbPlaceMode.SelectedIndex);
+                    Assert.True(view.PlaceFromPool(1, S(100)));
+                    Assert.Equal(new[] { 0, 1, 0, 1 }, view.Model.Clips.Select(k => k.Source));
+                    Assert.Equal(S(630), view.Model.Duration);
+                    Assert.Equal(new EditClip(S(130), S(600)), view.Model.Clips[2]);
+                    Assert.False(view.PlaceFromPool(7, S(1)));
+
+                    view.ShowMediaPanel(true);
+                    Assert.True(view.MediaPanel.IsVisible);
+                    Assert.True(view.BtnMedia.IsChecked);
+                }
+                finally
+                {
+                    DuzenleyiciKapanis.Kapat(pencere, view);
+                }
+            });
+        }
+        finally
+        {
+            Kapat(klasor);
+        }
+    }
+
+    [Fact]
     public void CokKaynakMetinleri42DildeVar()
     {
-        var anahtarlar = new[] { "editor.source.add", "editor.source.failed", "editor.export.merge-full" };
+        var anahtarlar = new[] { "editor.source.add", "editor.source.failed", "editor.export.merge-full", "editor.media.open", "editor.media.mode", "editor.media.insert", "editor.media.overwrite", "editor.media.tip" };
 
         Assert.Equal(42, Locales.Languages.Count);
         foreach (var dil in Locales.Languages)

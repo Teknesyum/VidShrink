@@ -313,6 +313,43 @@ public sealed class EditTimeline
         if (start == end) return false;
 
         var steps = new List<IEditCommand>();
+        if (!CutRange(start, end, steps)) return false;
+
+        Record(new CompositeCommand(steps));
+        return true;
+    }
+
+    /// <summary>
+    /// Kaynagin tamamini <paramref name="at"/> anina tek parca olarak koyar. Araya eklemede sonraki
+    /// parcalar kaynagin suresi kadar iter; ustune yazmada o anda baslayan ayni sure silinir ve yerine
+    /// konur, cizelge ancak sonu tasarsa uzar. Tek adimda geri alinir. Konan parcanin sirasini
+    /// dondurur; kaynak bu cizelgede yoksa <c>-1</c> doner ve adim yazilmaz.
+    /// </summary>
+    public int PlaceSource(int source, long at, bool overwrite)
+    {
+        if (at < 0 || at > Duration)
+            throw new ArgumentOutOfRangeException(nameof(at), at, "An cizelgenin disinda");
+        if (source < 0 || DurationOf(source) is not { } length) return -1;
+
+        var steps = new List<IEditCommand>();
+        if (overwrite) CutRange(at, Math.Min(at + length, Duration), steps);
+        if (PlanSplit(at, out var boundary) is { } split)
+        {
+            split.Apply(_clips);
+            steps.Add(split);
+        }
+
+        var insert = new InsertCommand(boundary, new EditClip(0, length) { Source = source });
+        insert.Apply(_clips);
+        steps.Add(insert);
+        Record(new CompositeCommand(steps));
+        return boundary;
+    }
+
+    private bool CutRange(long start, long end, List<IEditCommand> steps)
+    {
+        if (start == end) return false;
+        var mark = steps.Count;
         var endSplit = PlanSplit(end, out var last);
         if (endSplit is not null)
         {
@@ -330,7 +367,8 @@ public sealed class EditTimeline
 
         if (first >= last)
         {
-            for (var i = steps.Count - 1; i >= 0; i--) steps[i].Revert(_clips);
+            for (var i = steps.Count - 1; i >= mark; i--) steps[i].Revert(_clips);
+            steps.RemoveRange(mark, steps.Count - mark);
             return false;
         }
 
@@ -341,7 +379,6 @@ public sealed class EditTimeline
             steps.Add(remove);
         }
 
-        Record(new CompositeCommand(steps));
         return true;
     }
 
