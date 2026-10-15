@@ -63,7 +63,9 @@ public partial class MainWindow
         var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), ColumnSpacing = TokenOf("SpaceXs") };
         var name = track.Title ?? track.Language;
         var label = (name is null ? $"#{ordinal + 1}" : $"#{ordinal + 1} {name}") + " · " + track.Codec;
-        var check = new CheckBox { Content = label, IsChecked = true, VerticalAlignment = VerticalAlignment.Center };
+        var text = new TextBlock { Text = label, TextWrapping = Avalonia.Media.TextWrapping.Wrap };
+        if (this.FindResource("Body") is Avalonia.Styling.ControlTheme body) text.Theme = body;
+        var check = new CheckBox { Content = text, IsChecked = true, VerticalAlignment = VerticalAlignment.Center };
         if (this.FindResource("CheckStyle") is Avalonia.Styling.ControlTheme checkStyle) check.Theme = checkStyle;
         AutomationProperties.SetName(check, label);
         check.IsCheckedChanged += (_, _) => RefreshConversion();
