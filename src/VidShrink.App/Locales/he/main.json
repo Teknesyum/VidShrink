@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "הסרת פסים",
   "main.advanced.filters.gray": "גווני אפור",
   "main.advanced.filters.autocrop": "חיתוך פסים שחורים",
+  "main.advanced.filters.manualcrop": "חיתוך ידני",
+  "main.advanced.filters.manualcrop.tip": "• גררו את המסגרת בתצוגה המקדימה כדי לבחור את האזור שנשאר.\n• כשזה פעיל, חיתוך פסים שחורים כבוי.",
   "main.advanced.filters.spec": "מפרט (חיתוך, ריפוד ועוד)",
   "main.advanced.codec-lock.label": "נעילת קודק",
 

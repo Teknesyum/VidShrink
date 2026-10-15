@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Khử sọc",
   "main.advanced.filters.gray": "Thang độ xám",
   "main.advanced.filters.autocrop": "Cắt viền đen",
+  "main.advanced.filters.manualcrop": "Cắt thủ công",
+  "main.advanced.filters.manualcrop.tip": "• Kéo khung trên bản xem trước để chọn vùng giữ lại.\n• Khi bật, cắt viền đen sẽ tắt.",
   "main.advanced.filters.spec": "Đặc tả (cắt, đệm và các mục khác)",
   "main.advanced.codec-lock.label": "Khóa codec",
 

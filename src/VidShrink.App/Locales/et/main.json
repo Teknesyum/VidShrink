@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Triibueemaldus",
   "main.advanced.filters.gray": "Halltoonid",
   "main.advanced.filters.autocrop": "Kärbi mustad ribad",
+  "main.advanced.filters.manualcrop": "Käsitsi kärpimine",
+  "main.advanced.filters.manualcrop.tip": "• Lohistage eelvaates kasti, et valida alles jääv ala.\n• Kui see on sees, on mustade ribade kärpimine väljas.",
   "main.advanced.filters.spec": "Spetsifikatsioon (kärpimine, veeris jne)",
   "main.advanced.codec-lock.label": "Koodeki lukk",
 

@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "بینڈنگ ہٹائیں",
   "main.advanced.filters.gray": "گرے اسکیل",
   "main.advanced.filters.autocrop": "سیاہ پٹیاں تراشیں",
+  "main.advanced.filters.manualcrop": "دستی تراش",
+  "main.advanced.filters.manualcrop.tip": "• باقی رہنے والا حصہ چننے کے لیے پیش منظر پر خانہ کھینچیں۔\n• آن ہونے پر سیاہ پٹیاں تراشنا بند رہتا ہے۔",
   "main.advanced.filters.spec": "وضاحت (کراپ، پیڈ وژیرہ)",
   "main.advanced.codec-lock.label": "کوڈیک لاک",
 

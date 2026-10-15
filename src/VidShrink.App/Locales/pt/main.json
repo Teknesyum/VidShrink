@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Remover banding",
   "main.advanced.filters.gray": "Escala de cinza",
   "main.advanced.filters.autocrop": "Cortar barras pretas",
+  "main.advanced.filters.manualcrop": "Corte manual",
+  "main.advanced.filters.manualcrop.tip": "• Arraste a caixa na pré-visualização para escolher a área mantida.\n• Enquanto ativo, o corte de barras pretas fica desligado.",
   "main.advanced.filters.spec": "Especificação (corte, margem etc.)",
   "main.advanced.codec-lock.label": "Travar codec",
 

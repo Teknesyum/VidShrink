@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Усунути смугастість",
   "main.advanced.filters.gray": "Відтінки сірого",
   "main.advanced.filters.autocrop": "Обрізати чорні смуги",
+  "main.advanced.filters.manualcrop": "Ручне обрізання",
+  "main.advanced.filters.manualcrop.tip": "• Перетягніть рамку в попередньому перегляді, щоб вибрати область, що лишається.\n• Поки ввімкнено, обрізання чорних смуг вимкнене.",
   "main.advanced.filters.spec": "Специфікація (обрізка, поля тощо)",
   "main.advanced.codec-lock.label": "Фіксація кодека",
 

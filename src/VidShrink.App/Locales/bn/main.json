@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "ব্যান্ডিং সরান",
   "main.advanced.filters.gray": "গ্রেস্কেল",
   "main.advanced.filters.autocrop": "কালো পট্টি ছাঁটুন",
+  "main.advanced.filters.manualcrop": "নিজে ছাঁটুন",
+  "main.advanced.filters.manualcrop.tip": "• যে অংশ থাকবে তা বাছতে প্রিভিউতে আয়তক্ষেত্রটি টানুন।\n• চালু থাকলে কালো পট্টি ছাঁটা বন্ধ থাকে।",
   "main.advanced.filters.spec": "বিবরণ (ক্রপ, প্যাড ইত্যাদি)",
   "main.advanced.codec-lock.label": "কোডেক লক",
 

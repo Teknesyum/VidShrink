@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Устранить полосность",
   "main.advanced.filters.gray": "Оттенки серого",
   "main.advanced.filters.autocrop": "Обрезать чёрные полосы",
+  "main.advanced.filters.manualcrop": "Ручная обрезка",
+  "main.advanced.filters.manualcrop.tip": "• Перетащите рамку в превью, чтобы выбрать оставляемую область.\n• Пока включено, обрезка чёрных полос выключена.",
   "main.advanced.filters.spec": "Спецификация (обрезка, поля и др.)",
   "main.advanced.codec-lock.label": "Фиксация кодека",
 

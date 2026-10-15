@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Dryžių šalinimas",
   "main.advanced.filters.gray": "Pilkumo skalė",
   "main.advanced.filters.autocrop": "Apkirpti juodas juostas",
+  "main.advanced.filters.manualcrop": "Rankinis apkirpimas",
+  "main.advanced.filters.manualcrop.tip": "• Vilkite rėmelį peržiūroje, kad pasirinktumėte paliekamą sritį.\n• Kol įjungta, juodų juostų apkirpimas išjungtas.",
   "main.advanced.filters.spec": "Specifikacija (apkarpymas, paraštės ir kt.)",
   "main.advanced.codec-lock.label": "Kodeko fiksavimas",
 

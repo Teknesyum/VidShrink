@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "ลบแบนดี้ง",
   "main.advanced.filters.gray": "สเกลสีเทา",
   "main.advanced.filters.autocrop": "ครอปแถบดำ",
+  "main.advanced.filters.manualcrop": "ครอปเอง",
+  "main.advanced.filters.manualcrop.tip": "• ลากกรอบบนภาพตัวอย่างเพื่อเลือกส่วนที่จะเก็บไว้\n• ขณะเปิดอยู่ การครอปแถบดำจะปิด",
   "main.advanced.filters.spec": "ข้อกำหนด (ครอบตัด ขอบ ฯลฯ)",
   "main.advanced.codec-lock.label": "ล็อกโคเดก",
 

@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "バンディング除去",
   "main.advanced.filters.gray": "グレースケール",
   "main.advanced.filters.autocrop": "黒帯をクロップ",
+  "main.advanced.filters.manualcrop": "手動クロップ",
+  "main.advanced.filters.manualcrop.tip": "• プレビュー上の枠をドラッグして残す範囲を選びます。\n• オンの間は黒帯のクロップがオフになります。",
   "main.advanced.filters.spec": "仕様(クロップ、パッドなど)",
   "main.advanced.codec-lock.label": "コーデック固定",
 

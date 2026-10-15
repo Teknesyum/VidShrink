@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Entbändern",
   "main.advanced.filters.gray": "Graustufen",
   "main.advanced.filters.autocrop": "Schwarze Balken zuschneiden",
+  "main.advanced.filters.manualcrop": "Manuell zuschneiden",
+  "main.advanced.filters.manualcrop.tip": "• Ziehen Sie den Rahmen in der Vorschau, um den bleibenden Bereich zu wählen.\n• Solange aktiv, ist das Zuschneiden schwarzer Balken aus.",
   "main.advanced.filters.spec": "Spezifikation (Zuschnitt, Rand usw.)",
   "main.advanced.codec-lock.label": "Codec-Sperre",
 

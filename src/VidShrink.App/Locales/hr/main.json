@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Debanding",
   "main.advanced.filters.gray": "Sivi tonovi",
   "main.advanced.filters.autocrop": "Obreži crne trake",
+  "main.advanced.filters.manualcrop": "Ručno obrezivanje",
+  "main.advanced.filters.manualcrop.tip": "• Povucite okvir u pregledu da odaberete dio koji ostaje.\n• Dok je uključeno, obrezivanje crnih traka je isključeno.",
   "main.advanced.filters.spec": "Specifikacija (izrezivanje, rubovi itd.)",
   "main.advanced.codec-lock.label": "Zaključaj kodek",
 

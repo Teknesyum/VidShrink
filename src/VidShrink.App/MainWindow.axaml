@@ -1137,6 +1137,11 @@
                               <CheckBox x:Name="ChkFltDeband" Theme="{StaticResource CheckStyle}" Content="{loc:Text main.advanced.filters.deband}"/>
                               <CheckBox x:Name="ChkFltGray" Theme="{StaticResource CheckStyle}" Content="{loc:Text main.advanced.filters.gray}"/>
                               <CheckBox x:Name="ChkFltAutoCrop" Theme="{StaticResource CheckStyle}" Content="{loc:Text main.advanced.filters.autocrop}"/>
+                              <CheckBox x:Name="ChkFltManualCrop" Theme="{StaticResource CheckStyle}" Content="{loc:Text main.advanced.filters.manualcrop}">
+                                <ToolTip.Tip>
+                                  <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.advanced.filters.manualcrop.tip}"/>
+                                </ToolTip.Tip>
+                              </CheckBox>
                             </izi:SutunIzgara>
                             <StackPanel Spacing="{StaticResource SpaceXs}">
                               <TextBlock Text="{loc:Text main.advanced.filters.spec}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>

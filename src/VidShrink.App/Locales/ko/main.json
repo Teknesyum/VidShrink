@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "밴딩 제거",
   "main.advanced.filters.gray": "그레이스케일",
   "main.advanced.filters.autocrop": "검은 여백 자르기",
+  "main.advanced.filters.manualcrop": "직접 자르기",
+  "main.advanced.filters.manualcrop.tip": "• 미리보기에서 상자를 끌어 남길 영역을 고르세요.\n• 켜져 있는 동안 검은 여백 자르기는 꺼집니다.",
   "main.advanced.filters.spec": "사양(자르기, 패딩 등)",
   "main.advanced.codec-lock.label": "코덱 고정",
 

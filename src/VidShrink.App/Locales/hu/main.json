@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Sávmentesítés",
   "main.advanced.filters.gray": "Szürkeárnyalat",
   "main.advanced.filters.autocrop": "Fekete sávok levágása",
+  "main.advanced.filters.manualcrop": "Kézi vágás",
+  "main.advanced.filters.manualcrop.tip": "• Húzza a keretet az előnézeten a megmaradó terület kiválasztásához.\n• Amíg be van kapcsolva, a fekete sávok levágása ki van kapcsolva.",
   "main.advanced.filters.spec": "Megadás (vágás, kitöltés stb.)",
   "main.advanced.codec-lock.label": "Kodekzár",
 

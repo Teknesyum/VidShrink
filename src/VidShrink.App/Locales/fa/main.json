@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "حذف نوار‌بندی",
   "main.advanced.filters.gray": "مقیاس خاکستری",
   "main.advanced.filters.autocrop": "برش نوارهای سیاه",
+  "main.advanced.filters.manualcrop": "برش دستی",
+  "main.advanced.filters.manualcrop.tip": "• کادر را روی پیش‌نمایش بکشید تا ناحیه‌ای که می‌ماند را انتخاب کنید.\n• تا وقتی روشن است، برش نوارهای سیاه خاموش است.",
   "main.advanced.filters.spec": "مشخصات (برش، حاشیه و موارد دیگر)",
   "main.advanced.codec-lock.label": "قفل کدک",
 

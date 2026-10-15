@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Usuń pasmowość",
   "main.advanced.filters.gray": "Skala szarości",
   "main.advanced.filters.autocrop": "Przytnij czarne pasy",
+  "main.advanced.filters.manualcrop": "Ręczne przycięcie",
+  "main.advanced.filters.manualcrop.tip": "• Przeciągnij ramkę w podglądzie, aby wybrać zachowany obszar.\n• Gdy jest włączone, przycinanie czarnych pasów jest wyłączone.",
   "main.advanced.filters.spec": "Specyfikacja (kadr, margines itd.)",
   "main.advanced.codec-lock.label": "Blokada kodeka",
 

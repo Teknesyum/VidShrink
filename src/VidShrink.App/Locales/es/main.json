@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Quitar bandas",
   "main.advanced.filters.gray": "Escala de grises",
   "main.advanced.filters.autocrop": "Recortar bandas negras",
+  "main.advanced.filters.manualcrop": "Recorte manual",
+  "main.advanced.filters.manualcrop.tip": "• Arrastre el recuadro en la vista previa para elegir la zona que se conserva.\n• Mientras está activo, el recorte de bandas negras se desactiva.",
   "main.advanced.filters.spec": "Especificación (recorte, relleno y demás)",
   "main.advanced.codec-lock.label": "Bloqueo de códec",
 

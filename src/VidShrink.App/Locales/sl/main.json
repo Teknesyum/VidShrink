@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Debanding",
   "main.advanced.filters.gray": "Sivinska lestvica",
   "main.advanced.filters.autocrop": "Obreži črne pasove",
+  "main.advanced.filters.manualcrop": "Ročno obrezovanje",
+  "main.advanced.filters.manualcrop.tip": "• Povlecite okvir v predogledu, da izberete del, ki ostane.\n• Ko je vklopljeno, je obrezovanje črnih pasov izklopljeno.",
   "main.advanced.filters.spec": "Specifikacija (obreži, robovi itd.)",
   "main.advanced.codec-lock.label": "Zaklep kodeka",
 

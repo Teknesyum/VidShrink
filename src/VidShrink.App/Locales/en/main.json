@@ -1,4 +1,4 @@
-﻿{
+{
 
   "main.chip.archive.tip": "• The archive chip has no size ceiling.\n• The engine spends bits up to visually lossless quality and stops there.\n• While this chip is on, the number in the target box does not build the plan.\n• The file does get smaller, but the source decides how much, not you.\n• If you have to fit somewhere, pick one of the chips that names an MB figure.\n• Touching the target brings the size ceiling back.",
   "main.derivation.size": "Target {0} MB",
@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Deband",
   "main.advanced.filters.gray": "Grayscale",
   "main.advanced.filters.autocrop": "Crop black bars",
+  "main.advanced.filters.manualcrop": "Manual crop",
+  "main.advanced.filters.manualcrop.tip": "• Drag the box on the preview to pick the area to keep.\n• While on, black bar cropping is off.",
   "main.advanced.filters.spec": "Specification (crop, pad and the rest)",
   "main.advanced.codec-lock.label": "Codec lock",
 

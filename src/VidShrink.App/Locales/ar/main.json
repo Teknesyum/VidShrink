@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "إزالة التبند",
   "main.advanced.filters.gray": "تدرج الرمادي",
   "main.advanced.filters.autocrop": "قص الأشرطة السوداء",
+  "main.advanced.filters.manualcrop": "قص يدوي",
+  "main.advanced.filters.manualcrop.tip": "• اسحب المستطيل على المعاينة لاختيار المنطقة التي تبقى.\n• أثناء التفعيل يتوقف قص الأشرطة السوداء.",
   "main.advanced.filters.spec": "المواصفة (قص، حشو وأخرى)",
   "main.advanced.codec-lock.label": "قفل الترميز",
 

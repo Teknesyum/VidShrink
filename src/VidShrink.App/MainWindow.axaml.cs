@@ -304,6 +304,7 @@ public partial class MainWindow : Window
         foreach (var field in new[] { TxtCustomResolution, TxtCustomFps, TxtAudioBitrate, TxtTrimStart, TxtTrimEnd, TxtConvertExtraArgs })
             Watch(field, TextBox.TextProperty, OnConvertChanged);
         InitializeConvertFilterUi();
+        InitializeManualCropUi();
 
         Watch(ChkAutoUpdate, ToggleButton.IsCheckedProperty, OnAutoUpdateChanged);
         foreach (var radio in new[] { RbTrimEnd, RbTrimStart, RbTrimBoth })
@@ -2481,7 +2482,7 @@ public partial class MainWindow : Window
 
         options.LockedCodec = AdvancedText(CmbAdvCodecLock);
 
-        options.Filters = OtomatikKirpma.Uygula(SuzgecOku(out _), OtomatikKirpmaAcik, KirpmaSonucu());
+        options.Filters = KirpmalariUygula(SuzgecOku(out _));
         ApplyTrackOptions(options);
     }
 

@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Ondoa banding",
   "main.advanced.filters.gray": "Kiwango cha kijivu",
   "main.advanced.filters.autocrop": "Punguza mikanda myeusi",
+  "main.advanced.filters.manualcrop": "Punguza kwa mkono",
+  "main.advanced.filters.manualcrop.tip": "• Buruta kisanduku kwenye onyesho la awali kuchagua eneo linalobaki.\n• Ikiwa imewashwa, kupunguza mikanda myeusi kumezimwa.",
   "main.advanced.filters.spec": "Vipimo (kupunguza, pedi na mengine)",
   "main.advanced.codec-lock.label": "Kufuli ya kodeki",
 

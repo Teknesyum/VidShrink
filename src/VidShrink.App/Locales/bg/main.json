@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Премахни ленти",
   "main.advanced.filters.gray": "Скала на сивото",
   "main.advanced.filters.autocrop": "Изрязване на черните ленти",
+  "main.advanced.filters.manualcrop": "Ръчно изрязване",
+  "main.advanced.filters.manualcrop.tip": "• Плъзнете рамката в прегледа, за да изберете оставащата част.\n• Докато е включено, изрязването на черни ленти е изключено.",
   "main.advanced.filters.spec": "Спецификация (изрязване, поле и др.)",
   "main.advanced.codec-lock.label": "Заключване на кодека",
 

@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Odpruhování",
   "main.advanced.filters.gray": "Stupně šedi",
   "main.advanced.filters.autocrop": "Oříznout černé pruhy",
+  "main.advanced.filters.manualcrop": "Ruční ořez",
+  "main.advanced.filters.manualcrop.tip": "• Tažením rámečku v náhledu vyberte oblast, která zůstane.\n• Když je zapnuto, ořez černých pruhů je vypnutý.",
   "main.advanced.filters.spec": "Specifikace (oříznutí, okraje aj.)",
   "main.advanced.codec-lock.label": "Zámek kodeku",
 
