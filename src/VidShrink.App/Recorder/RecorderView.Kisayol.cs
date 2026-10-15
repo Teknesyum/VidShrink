@@ -28,10 +28,12 @@ internal partial class RecorderView
 
     internal IGlobalHotkeys GlobalHotkeys
     {
-        get => _globalHotkeys ??= OperatingSystem.IsWindows()
-            && Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime
-                ? new Win32GlobalHotkeys()
-                : new NoGlobalHotkeys();
+        get => _globalHotkeys ??= GlobalHotkeyPlatforms.Create(GlobalHotkeyPlatforms.Pick(
+            OperatingSystem.IsWindows(),
+            OperatingSystem.IsMacOS(),
+            OperatingSystem.IsLinux(),
+            Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime,
+            Environment.GetEnvironmentVariable));
         set => _globalHotkeys = value;
     }
 

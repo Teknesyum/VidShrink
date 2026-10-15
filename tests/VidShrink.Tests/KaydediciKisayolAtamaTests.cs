@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -537,5 +539,215 @@ public sealed class KaydediciKisayolAtamaTests
             Assert.DoesNotContain("F11", metin["recorder.replay.running"]);
             Assert.DoesNotContain("F9", metin["recorder.region.hide"]);
         }
+    }
+
+    public static TheoryData<bool, bool, bool, bool, string, string> PlatformSecimleri => new()
+    {
+        { true, false, false, true, "", "Windows" },
+        { true, false, false, false, "", "None" },
+        { false, true, false, true, "", "Mac" },
+        { false, true, false, false, "", "None" },
+        { false, false, true, true, "DISPLAY=:0", "X11" },
+        { false, false, true, true, "DISPLAY=:0;XDG_SESSION_TYPE=x11", "X11" },
+        { false, false, true, true, "DISPLAY=:0;XDG_SESSION_TYPE=wayland", "None" },
+        { false, false, true, true, "DISPLAY=:0;WAYLAND_DISPLAY=wayland-0;XDG_SESSION_TYPE=wayland", "None" },
+        { false, false, true, true, "WAYLAND_DISPLAY=wayland-0", "None" },
+        { false, false, true, true, "", "None" },
+        { false, false, true, false, "DISPLAY=:0", "None" },
+        { false, false, false, true, "DISPLAY=:0", "None" }
+    };
+
+    [Theory]
+    [MemberData(nameof(PlatformSecimleri))]
+    public void PlatformaGoreKancaSecilir(bool windows, bool mac, bool linux, bool masaustu, string ortam, string beklenen)
+    {
+        var degerler = ortam.Split(';', StringSplitOptions.RemoveEmptyEntries)
+            .Select(p => p.Split('=', 2))
+            .ToDictionary(p => p[0], p => p[1]);
+
+        Assert.Equal(Enum.Parse<HotkeyPlatform>(beklenen), GlobalHotkeyPlatforms.Pick(windows, mac, linux, masaustu, ad => degerler.GetValueOrDefault(ad)));
+    }
+
+    [Fact]
+    public void SecilenPlatformKendiKancasiniKurar()
+    {
+        Assert.IsType<Win32GlobalHotkeys>(GlobalHotkeyPlatforms.Create(HotkeyPlatform.Windows));
+        Assert.IsType<MacGlobalHotkeys>(GlobalHotkeyPlatforms.Create(HotkeyPlatform.Mac));
+        Assert.IsType<X11GlobalHotkeys>(GlobalHotkeyPlatforms.Create(HotkeyPlatform.X11));
+        Assert.IsType<NoGlobalHotkeys>(GlobalHotkeyPlatforms.Create(HotkeyPlatform.None));
+    }
+
+    [Theory]
+    [InlineData(Key.A, 0x00u)]
+    [InlineData(Key.K, 0x28u)]
+    [InlineData(Key.Z, 0x06u)]
+    [InlineData(Key.D0, 0x1Du)]
+    [InlineData(Key.D5, 0x17u)]
+    [InlineData(Key.NumPad8, 0x5Bu)]
+    [InlineData(Key.F1, 0x7Au)]
+    [InlineData(Key.F6, 0x61u)]
+    [InlineData(Key.F7, 0x62u)]
+    [InlineData(Key.F8, 0x64u)]
+    [InlineData(Key.F9, 0x65u)]
+    [InlineData(Key.F10, 0x6Du)]
+    [InlineData(Key.F11, 0x67u)]
+    [InlineData(Key.F20, 0x5Au)]
+    [InlineData(Key.Home, 0x73u)]
+    [InlineData(Key.PageDown, 0x79u)]
+    [InlineData(Key.Insert, 0x72u)]
+    public void MacTusKoduCarbonTablosundanGelir(Key tus, uint kod)
+        => Assert.Equal(kod, MacGlobalHotkeys.KeyCode(tus));
+
+    [Theory]
+    [InlineData(Key.F21)]
+    [InlineData(Key.F24)]
+    [InlineData(Key.Pause)]
+    [InlineData(Key.Escape)]
+    public void MacteKarsiligiOlmayanTusKodVermez(Key tus)
+        => Assert.Null(MacGlobalHotkeys.KeyCode(tus));
+
+    [Theory]
+    [InlineData(Key.A, 0x61u)]
+    [InlineData(Key.K, 0x6Bu)]
+    [InlineData(Key.D7, 0x37u)]
+    [InlineData(Key.NumPad3, 0xFFB3u)]
+    [InlineData(Key.F1, 0xFFBEu)]
+    [InlineData(Key.F7, 0xFFC4u)]
+    [InlineData(Key.F24, 0xFFD5u)]
+    [InlineData(Key.Home, 0xFF50u)]
+    [InlineData(Key.PageUp, 0xFF55u)]
+    [InlineData(Key.PageDown, 0xFF56u)]
+    [InlineData(Key.End, 0xFF57u)]
+    [InlineData(Key.Insert, 0xFF63u)]
+    [InlineData(Key.Pause, 0xFF13u)]
+    [InlineData(Key.Escape, null)]
+    public void X11TusSembolu(Key tus, uint? sembol)
+        => Assert.Equal(sembol, (uint?)X11GlobalHotkeys.Keysym(tus));
+
+    [Fact]
+    public void AtanabilirHerTusunPlatformKoduTekildir()
+    {
+        var tuslar = Enum.GetValues<Key>().Distinct().Where(k => RecorderHotkeys.VirtualKeyOf(k) is not null).ToList();
+        var mac = tuslar.Select(MacGlobalHotkeys.KeyCode).Where(k => k is not null).ToList();
+        var x11 = tuslar.Select(X11GlobalHotkeys.Keysym).ToList();
+
+        Assert.Equal(76, tuslar.Count);
+        Assert.Equal(71, mac.Count);
+        Assert.Equal(mac.Count, mac.Distinct().Count());
+        Assert.All(x11, k => Assert.NotNull(k));
+        Assert.Equal(x11.Count, x11.Distinct().Count());
+        Assert.All(RecorderHotkeys.All, b => Assert.NotNull(MacGlobalHotkeys.KeyCode(b.Key)));
+    }
+
+    [Fact]
+    public void DegistiricilerMacVeX11BayraginaCevrilir()
+    {
+        Assert.Equal(0u, MacGlobalHotkeys.Flags(KeyModifiers.None));
+        Assert.Equal(0x1000u, MacGlobalHotkeys.Flags(KeyModifiers.Control));
+        Assert.Equal(0x0800u, MacGlobalHotkeys.Flags(KeyModifiers.Alt));
+        Assert.Equal(0x0200u, MacGlobalHotkeys.Flags(KeyModifiers.Shift));
+        Assert.Equal(0x1A00u, MacGlobalHotkeys.Flags(KeyModifiers.Alt | KeyModifiers.Control | KeyModifiers.Shift));
+        Assert.Equal(0u, MacGlobalHotkeys.Flags(KeyModifiers.Meta));
+
+        Assert.Equal(0u, X11GlobalHotkeys.Mask(KeyModifiers.None));
+        Assert.Equal(1u, X11GlobalHotkeys.Mask(KeyModifiers.Shift));
+        Assert.Equal(4u, X11GlobalHotkeys.Mask(KeyModifiers.Control));
+        Assert.Equal(8u, X11GlobalHotkeys.Mask(KeyModifiers.Alt));
+        Assert.Equal(13u, X11GlobalHotkeys.Mask(KeyModifiers.Alt | KeyModifiers.Control | KeyModifiers.Shift));
+        Assert.Equal(0u, X11GlobalHotkeys.Mask(KeyModifiers.Meta));
+        Assert.Equal(new uint[] { 0, 2, 16, 18 }, X11GlobalHotkeys.LockVariants);
+    }
+
+    [Fact]
+    public void X11TusOlayiKilitTuslariAyiklanarakOkunur()
+    {
+        var olay = new nint[24];
+        olay[0] = 2;
+        var kodVeDurum = (76L << 32) | (4 | 2 | 16);
+        olay[10] = (nint)kodVeDurum;
+
+        var (tur, durum, kod) = X11GlobalHotkeys.ParseKey(olay);
+
+        Assert.Equal(2, tur);
+        Assert.Equal(22u, durum);
+        Assert.Equal(76u, kod);
+        Assert.Equal(4u, X11GlobalHotkeys.Clean(durum));
+        Assert.Equal(13u, X11GlobalHotkeys.Clean(0xFFu));
+        Assert.Equal(192, Marshal.SizeOf<nint>() * olay.Length);
+    }
+
+    [Fact]
+    public void X11BasiliTutulanTusBirKezSayilir()
+    {
+        var basili = new HashSet<uint>();
+
+        Assert.True(X11GlobalHotkeys.Pressed(basili, 2, 76));
+        Assert.False(X11GlobalHotkeys.Pressed(basili, 2, 76));
+        Assert.True(X11GlobalHotkeys.Pressed(basili, 2, 77));
+        Assert.False(X11GlobalHotkeys.Pressed(basili, 3, 76));
+        Assert.True(X11GlobalHotkeys.Pressed(basili, 2, 76));
+        Assert.False(X11GlobalHotkeys.Pressed(basili, 4, 78));
+    }
+
+    [Fact]
+    public void CarbonYapilariVeSabitleriPinli()
+    {
+        Assert.Equal(8, Marshal.SizeOf<MacGlobalHotkeys.EventHotKeyId>());
+        Assert.Equal(8, Marshal.SizeOf<MacGlobalHotkeys.EventTypeSpec>());
+        Assert.Equal(0x6B657962u, MacGlobalHotkeys.KeyboardClass);
+        Assert.Equal(5u, MacGlobalHotkeys.HotKeyPressed);
+        Assert.Equal(0x2D2D2D2Du, MacGlobalHotkeys.DirectObject);
+        Assert.Equal(0x686B6964u, MacGlobalHotkeys.HotKeyIdType);
+        Assert.Equal(0x5653484Bu, MacGlobalHotkeys.Signature);
+    }
+
+    private static string Imza(MethodInfo yontem)
+        => yontem.ReturnType.Name + " " + yontem.Name + "(" + string.Join(", ", yontem.GetParameters().Select(p => p.ParameterType.Name)) + ")";
+
+    private static List<string> Yerliler(Type tur)
+        => tur.GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
+            .Select(y => (Yontem: y, Oznitelik: y.GetCustomAttribute<DllImportAttribute>()))
+            .Where(y => y.Oznitelik is not null)
+            .Select(y => y.Oznitelik!.Value + " " + Imza(y.Yontem))
+            .Order(StringComparer.Ordinal)
+            .ToList();
+
+    [Fact]
+    public void MacCarbonImzalariPinli()
+    {
+        const string carbon = "/System/Library/Frameworks/Carbon.framework/Carbon ";
+        string[] beklenen =
+        [
+            carbon + "Int32 GetEventParameter(IntPtr, UInt32, UInt32, IntPtr, UIntPtr, IntPtr, EventHotKeyId&)",
+            carbon + "Int32 InstallEventHandler(IntPtr, IntPtr, UIntPtr, EventTypeSpec[], IntPtr, IntPtr&)",
+            carbon + "Int32 RegisterEventHotKey(UInt32, UInt32, EventHotKeyId, IntPtr, UInt32, IntPtr&)",
+            carbon + "Int32 RemoveEventHandler(IntPtr)",
+            carbon + "Int32 UnregisterEventHotKey(IntPtr)",
+            carbon + "IntPtr GetApplicationEventTarget()"
+        ];
+
+        Assert.Equal(beklenen.Order(StringComparer.Ordinal), Yerliler(typeof(MacGlobalHotkeys)));
+    }
+
+    [Fact]
+    public void X11TusYakalamaImzalariPinli()
+    {
+        const string x11 = "libX11.so.6 ";
+        string[] beklenen =
+        [
+            x11 + "Byte XKeysymToKeycode(IntPtr, UIntPtr)",
+            x11 + "Int32 XCloseDisplay(IntPtr)",
+            x11 + "Int32 XGrabKey(IntPtr, Int32, UInt32, IntPtr, Boolean, Int32, Int32)",
+            x11 + "Int32 XkbSetDetectableAutoRepeat(IntPtr, Boolean, IntPtr)",
+            x11 + "Int32 XNextEvent(IntPtr, IntPtr[])",
+            x11 + "Int32 XPending(IntPtr)",
+            x11 + "Int32 XSync(IntPtr, Boolean)",
+            x11 + "Int32 XUngrabKey(IntPtr, Int32, UInt32, IntPtr)",
+            x11 + "IntPtr XDefaultRootWindow(IntPtr)",
+            x11 + "IntPtr XOpenDisplay(IntPtr)",
+            x11 + "IntPtr XSetErrorHandler(IntPtr)"
+        ];
+
+        Assert.Equal(beklenen.Order(StringComparer.Ordinal), Yerliler(typeof(X11GlobalHotkeys)));
     }
 }
