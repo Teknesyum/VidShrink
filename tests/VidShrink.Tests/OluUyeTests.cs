@@ -730,6 +730,8 @@ public sealed class OluUyeTests
     /// sekiz satir ekledi (1681 -> 1689). Deger degismedi, yeri degisti.</para>
     /// <para><b>15 Ekim 2026:</b> tasinabilir kip (AYR-P8) <c>CanSelfUpdateAt</c> ile dort satir ekledi, ayar
     /// yolunu <c>PortableMode</c>a tasiyip uc satir sildi (210 -> 214, 1689 -> 1690). Deger degismedi, yeri degisti.</para>
+    /// <para><b>16 Ekim 2026:</b> <c>UpdateSettings.Save</c> bilinmeyen anahtarlari korumak icin <c>System.Text.Json.Nodes</c>
+    /// using satiri ve birlestiren yazim ekledi (214 -> 215, 1690 -> 1717). Deger degismedi, yeri degisti.</para>
     /// </summary>
     [Fact]
     public void NitelenmemisOkumaGoruluyor()
@@ -738,8 +740,8 @@ public sealed class OluUyeTests
 
         foreach (var (ad, dosya, satir) in new[]
                  {
-                     ("UpdateCheck.ManifestTimeout", "src/VidShrink.Core/UpdateCheck.cs", 214),
-                     ("MacUpdate.DownloadTimeout", "src/VidShrink.Core/UpdateCheck.cs", 1690),
+                     ("UpdateCheck.ManifestTimeout", "src/VidShrink.Core/UpdateCheck.cs", 215),
+                     ("MacUpdate.DownloadTimeout", "src/VidShrink.Core/UpdateCheck.cs", 1717),
                      ("DeveloperUnlock.Window", "src/VidShrink.Core/DeveloperUnlock.cs", 22)
                  })
         {
