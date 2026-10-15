@@ -57,6 +57,15 @@
                                  8 DIP boşluk; kayıtta düz.
       RecorderRegionToolbarPadding <- FocusRingScalar (2). Kenarda yalnız klavye odak
                                  halkasının sığacağı pay.
+
+    Kayıt bitince köşede açılan sonuç kartı.
+
+      RecorderResultCardThumbWidth  <- PlaybackThumbnailWidth (128). Oynatıcının önizleme
+                                 karesiyle aynı küçük resim; ikinci bir boyut üretilmiyor.
+      RecorderResultCardThumbHeight <- PlaybackThumbnailHeight (72), genişliğin 16:9'u.
+      RecorderResultCardGap   <- SpaceLg (16). Kartın çalışma alanının köşesinden uzaklığı.
+      RecorderResultCardHold  <- 6 sn. Kart bu süre sonunda kendiliğinden kapanır; imleç
+                                 üstündeyken kapanmaz, imleç çıkınca süre baştan sayılır.
   -->
 
   <Thickness x:Key="RecorderStripPadding">16,8</Thickness>
@@ -105,5 +114,9 @@
   <x:Double x:Key="RecorderMagnifierZoom">2</x:Double>
   <x:Double x:Key="RecorderMagnifierGap">24</x:Double>
   <sys:TimeSpan x:Key="RecorderMagnifierInterval">00:00:00.0333333</sys:TimeSpan>
+  <StaticResource x:Key="RecorderResultCardThumbWidth" ResourceKey="PlaybackThumbnailWidth"/>
+  <StaticResource x:Key="RecorderResultCardThumbHeight" ResourceKey="PlaybackThumbnailHeight"/>
+  <StaticResource x:Key="RecorderResultCardGap" ResourceKey="SpaceLg"/>
+  <sys:TimeSpan x:Key="RecorderResultCardHold">00:00:06</sys:TimeSpan>
 
 </ResourceDictionary>

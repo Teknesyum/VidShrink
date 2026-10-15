@@ -544,6 +544,10 @@
                       Theme="{StaticResource CheckStyle}"
                       Content="{loc:Text recorder.output.open-when-done}"
                       auto:AutomationProperties.Name="{loc:Text recorder.output.open-when-done}"/>
+            <CheckBox x:Name="ChkResultCard"
+                      Theme="{StaticResource CheckStyle}"
+                      Content="{loc:Text recorder.card.show}"
+                      auto:AutomationProperties.Name="{loc:Text recorder.card.show}"/>
           </StackPanel>
         </Border>
       </StackPanel>

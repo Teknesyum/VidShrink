@@ -1264,6 +1264,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, iz secim paneli (DZA-P5): uc yeni anahtardan (<c>editor.export.audio-track</c>, <c>.none</c>, <c>editor.monitor.audio-track</c>) 6 kol 4 dilde (es: export ve monitor; fr: monitor; lt: none; pt: export ve monitor), KOL dokumunden sayildi, en ve tr girmiyor: taban pimi 3334 + 6 = 3340, en 322, tr 108.</para>
     /// <para>2026-10-15, HDR yakalama (EKA-P15): uc yeni anahtardan (<c>recorder.advanced.hdr-to-sdr</c>, <c>.hdr-to-sdr-hint</c>, <c>recorder.capture.hdr-lost</c>) yalniz <c>recorder.advanced.hdr-to-sdr</c> 9 dilde kola giriyor (cs, de, en, es, it, pl, pt, sk, sw), KOL dokumunden sayildi, tr girmiyor: taban pimi 3411 + 9 = 3420, en 324 + 1 = 325, tr 108.</para>
     /// <para>2026-10-15, tus gosterimi suzgeci (EKB-P1): on bir yeni <c>recorder.keys.*</c> anahtarindan 5 satir kola giriyor (hr <c>.place.top</c>; it <c>.place.bottom</c>, <c>.place.top</c>, <c>.title</c>; pt <c>.size</c>), KOL dokumunden sayildi, en ve tr girmiyor: taban pimi 3420 + 5 = 3425, en 325, tr 108.</para>
+    /// <para>2026-10-15, kayan sonuc karti (EKB-P14): dort yeni <c>recorder.card.*</c> anahtarindan 14 satir kola giriyor (en <c>.show</c>; es, fr, hu <c>.show</c> ve <c>.never</c>; hr, sl, sr, tr <c>.never</c>; nl, pt, sw <c>.show</c>), KOL dokumunden sayildi: taban pimi 3425 + 14 = 3439, en 325 + 1 = 326, tr 108 + 1 = 109.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1289,9 +1290,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3425, toplam);
-        Assert.Equal(325, dilBasina["en"]);
-        Assert.Equal(108, dilBasina["tr"]);
+        Assert.Equal(3439, toplam);
+        Assert.Equal(326, dilBasina["en"]);
+        Assert.Equal(109, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1533,6 +1534,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, iz secim paneli (DZA-P5): uc yeni anahtar (<c>editor.export.audio-track</c>, <c>.none</c>, <c>editor.monitor.audio-track</c>), dusen yok; taban pimi 65188 + 43 x 3 = 65317. <c>kayip</c> 0.</para>
     /// <para>2026-10-15, HDR yakalama (EKA-P15): uc yeni anahtar (<c>recorder.advanced.hdr-to-sdr</c>, <c>.hdr-to-sdr-hint</c>, <c>recorder.capture.hdr-lost</c>), dusen yok; taban pimi 67897 + 43 x 3 = 68026. <c>kayip</c> 0.</para>
     /// <para>2026-10-15, tus gosterimi suzgeci (EKB-P1): on bir yeni <c>recorder.keys.*</c> anahtari, dusen yok; taban pimi 68026 + 43 x 11 = 68499.</para>
+    /// <para>2026-10-15, kayan sonuc karti (EKB-P14): dort yeni <c>recorder.card.*</c> anahtari, dusen yok; taban pimi 68499 + 43 x 4 = 68671.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1560,7 +1562,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(68499, gezilen);
+        Assert.Equal(68671, gezilen);
         Assert.Empty(kayip);
     }
 

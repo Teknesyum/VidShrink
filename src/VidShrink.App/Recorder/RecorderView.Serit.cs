@@ -288,6 +288,7 @@ internal partial class RecorderView
         if (_settings.OpenFolderWhenDone && Delivered() is { } done) RevealFolder(done);
         if (result.Ok && !result.Partial && Delivered() is { } finished && RecordingDelivered is { } follow) _ = follow(finished);
         StartFinishAction(result);
+        ShowResultCard(result);
     }
 
     internal Func<string, Task>? RecordingDelivered { get; set; }
