@@ -267,7 +267,7 @@ public static class SetupRunner
     }
 
     private static bool SamePath(string? a, string b) =>
-        !string.IsNullOrEmpty(a) && string.Equals(Path.GetFullPath(a), Path.GetFullPath(b), StringComparison.OrdinalIgnoreCase);
+        PathEquality.Same(a, b, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Ayarlar'daki kaldırma kaydı ve isteğe bağlı PATH girdisi. Gerçek köke yalnız kurucu yazar;

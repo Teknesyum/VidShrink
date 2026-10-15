@@ -1,4 +1,4 @@
-using System.Runtime.Versioning;
+﻿using System.Runtime.Versioning;
 using System.Text;
 using Microsoft.Win32;
 
@@ -118,7 +118,7 @@ public static class UninstallEntry
         }
 
         var copy = SetupCopy(options.LocalAppData);
-        if (!string.Equals(Path.GetFullPath(source), Path.GetFullPath(copy), StringComparison.OrdinalIgnoreCase))
+        if (!PathEquality.Same(source, copy, StringComparison.OrdinalIgnoreCase))
         {
             try
             {
