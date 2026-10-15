@@ -315,6 +315,7 @@ public sealed class LanguageTests : IDisposable
         "Stream copy cannot change resolution or frame rate.",
         "GIF requires video encoding and cannot use stream copy.",
         "Image sequence output requires video encoding and cannot use stream copy.",
+        "Burning subtitles requires video encoding.",
         "The source has no audio stream to copy.",
         "The source has no audio stream to extract.",
         "The source has no video stream; choose an audio container.",

@@ -297,6 +297,11 @@ public partial class MainWindow : Window
         Watch(ChkConvertSingleFrame, ToggleButton.IsCheckedProperty, OnConvertChanged);
         Watch(ChkConvertAudioReplace, ToggleButton.IsCheckedProperty, OnConvertChanged);
         Watch(ChkConvertAudioShortest, ToggleButton.IsCheckedProperty, OnConvertChanged);
+        Watch(CmbConvertBurn, SelectingItemsControl.SelectedIndexProperty, OnConvertBurnChanged);
+        Watch(CmbConvertBurnFont, SelectingItemsControl.SelectedIndexProperty, OnConvertChanged);
+        Watch(CmbConvertBurnSize, SelectingItemsControl.SelectedIndexProperty, OnConvertChanged);
+        Watch(CmbConvertBurnColor, SelectingItemsControl.SelectedIndexProperty, OnConvertChanged);
+        Watch(ChkConvertBurnBox, ToggleButton.IsCheckedProperty, OnConvertChanged);
         foreach (var field in new[] { TxtCustomResolution, TxtCustomFps, TxtAudioBitrate, TxtTrimStart, TxtTrimEnd })
             Watch(field, TextBox.TextProperty, OnConvertChanged);
 
@@ -3631,6 +3636,7 @@ public partial class MainWindow : Window
         if (_titleSyncing || _probed is null) return;
         _info = SecilenBaslikleUygula(_probed);
         RefreshBurnChoices();
+        RefreshConvertBurnChoices();
         ShowInfo(_info);
         Recalculate();
         RefreshConversion();
@@ -4834,6 +4840,11 @@ public partial class MainWindow : Window
             EndAtShortest = ChkConvertAudioShortest.IsChecked == true,
             ExternalSubtitles = _convertSubtitles.ToList(),
             SingleFrame = ChkConvertSingleFrame.IsChecked == true,
+            BurnSubtitle = ConvertBurnChoice,
+            BurnFont = ConvertBurnsText ? ConvertBurnFont : null,
+            BurnFontSize = ConvertBurnsText ? ConvertBurnFontSize : null,
+            BurnColor = ConvertBurnsText ? ConvertBurnColor : null,
+            BurnBox = ConvertBurnsText && ChkConvertBurnBox.IsChecked == true,
             TargetBytes = _sequence is null ? GifPalette.TargetFor(_info ?? _sesKaynagi, container, ParseTargetMb()) : null
         };
     }

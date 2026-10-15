@@ -25,6 +25,94 @@ public partial class MainWindow
 {
     private readonly List<ExternalSubtitle> _convertSubtitles = new();
     private readonly List<CheckBox> _convertTrackChecks = new();
+    private readonly List<int> _convertBurnChoices = new();
+
+    internal static readonly string[] BurnColorChoices = { "FFFFFF", "FFFF00", "00FFFF", "00FF00" };
+
+    private static readonly string[] BurnColorKeys =
+    {
+        "main.subtitles.style.color.white", "main.subtitles.style.color.yellow",
+        "main.subtitles.style.color.cyan", "main.subtitles.style.color.green"
+    };
+
+    /// <summary>DON-P3: Dönüştür'de görüntüye gömülen iz, kaynağın altyazıları içinde 0 tabanlı sıra; seçim yoksa <c>null</c>.</summary>
+    internal int? ConvertBurnChoice
+    {
+        get
+        {
+            var index = CmbConvertBurn.SelectedIndex - 1;
+            return index >= 0 && index < _convertBurnChoices.Count ? _convertBurnChoices[index] : null;
+        }
+    }
+
+    private bool ConvertBurnsText
+    {
+        get
+        {
+            if (ConvertBurnChoice is not int burn || _info is not { } info) return false;
+            var subtitles = info.Streams.Where(stream => stream.Kind == StreamKind.Subtitle).ToList();
+            return burn < subtitles.Count && StreamMapping.IsTextSubtitle(subtitles[burn].Codec);
+        }
+    }
+
+    private string? ConvertBurnFont
+        => CmbConvertBurnFont.SelectedIndex is var i && i >= 1 && i <= BurnFontChoices.Count ? BurnFontChoices[i - 1] : null;
+
+    private int? ConvertBurnFontSize
+        => CmbConvertBurnSize.SelectedIndex is var i && i >= 1 && i <= BurnSizeCandidates.Length ? BurnSizeCandidates[i - 1] : null;
+
+    private string? ConvertBurnColor
+        => CmbConvertBurnColor.SelectedIndex is var i && i >= 1 && i <= BurnColorChoices.Length ? BurnColorChoices[i - 1] : null;
+
+    private void InitializeConvertBurnUi()
+    {
+        var font = CmbConvertBurnFont.SelectedIndex;
+        CmbConvertBurnFont.ItemsSource = new[] { Say("main.subtitles.style.default") }.Concat(BurnFontChoices).ToList();
+        CmbConvertBurnFont.SelectedIndex = Math.Max(font, 0);
+        var size = CmbConvertBurnSize.SelectedIndex;
+        CmbConvertBurnSize.ItemsSource = new[] { Say("main.subtitles.style.default") }
+            .Concat(BurnSizeCandidates.Select(v => v.ToString(System.Globalization.CultureInfo.InvariantCulture))).ToList();
+        CmbConvertBurnSize.SelectedIndex = Math.Max(size, 0);
+        var color = CmbConvertBurnColor.SelectedIndex;
+        CmbConvertBurnColor.ItemsSource = new[] { Say("main.subtitles.style.default") }.Concat(BurnColorKeys.Select(Say)).ToList();
+        CmbConvertBurnColor.SelectedIndex = Math.Max(color, 0);
+        RefreshConvertBurnChoices();
+    }
+
+    /// <summary>
+    /// Küçült'ün yakma listesiyle aynı kural: metin izi yalnız ffmpeg'de <c>subtitles</c> süzgeci varsa
+    /// (yoklama okunamadıysa da) girer, görüntü izi (PGS, VOBSUB, DVB) bindirmeyle her zaman.
+    /// </summary>
+    private void RefreshConvertBurnChoices()
+    {
+        var chosen = ConvertBurnChoice;
+        _convertBurnChoices.Clear();
+        var items = new List<string> { Say("main.subtitles.burn.off") };
+        if (_info is { } info)
+        {
+            var textBurn = TextBurnAvailable;
+            var subtitles = info.Streams.Where(stream => stream.Kind == StreamKind.Subtitle).ToList();
+            for (var i = 0; i < subtitles.Count; i++)
+            {
+                var text = StreamMapping.IsTextSubtitle(subtitles[i].Codec);
+                if (text ? !textBurn : !StreamMapping.IsImageSubtitle(subtitles[i].Codec)) continue;
+                _convertBurnChoices.Add(i);
+                var label = subtitles[i].Title ?? subtitles[i].Language;
+                items.Add(label is null ? $"#{i + 1}" : $"#{i + 1} {label}");
+            }
+        }
+        CmbConvertBurn.ItemsSource = items;
+        var at = chosen is int c ? _convertBurnChoices.IndexOf(c) : -1;
+        CmbConvertBurn.SelectedIndex = at + 1;
+        CmbConvertBurn.IsEnabled = _convertBurnChoices.Count > 0;
+        ConvertBurnStylePanel.IsVisible = ConvertBurnsText;
+    }
+
+    private void OnConvertBurnChanged()
+    {
+        ConvertBurnStylePanel.IsVisible = ConvertBurnsText;
+        OnConvertChanged();
+    }
 
     /// <summary>Altyazı çıkarma komutu; testler sahtesini verir.</summary>
     internal Func<MediaInfo, int, string, CancellationToken, Task> SubtitleExtractor { get; set; }
@@ -45,6 +133,12 @@ public partial class MainWindow
     {
         _convertSubtitles.Clear();
         _convertTrackChecks.Clear();
+        CmbConvertBurn.SelectedIndex = 0;
+        CmbConvertBurnFont.SelectedIndex = 0;
+        CmbConvertBurnSize.SelectedIndex = 0;
+        CmbConvertBurnColor.SelectedIndex = 0;
+        ChkConvertBurnBox.IsChecked = false;
+        RefreshConvertBurnChoices();
         ConvertSubtitleTracks.Children.Clear();
         TxtConvertSubtitleResult.Text = "";
         TxtConvertSubtitleResult.IsVisible = false;

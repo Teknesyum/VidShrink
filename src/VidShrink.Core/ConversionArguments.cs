@@ -38,7 +38,7 @@ public static class ConversionArguments
         {
             var copied = plan.ExternalAudio is { Replace: true } ? Array.Empty<string?>()
                 : plan.AudioTracks is null
-                ? plan.ExternalAudio is not null && !info.HasAudio ? Array.Empty<string?>() : new[] { info.AudioCodec }
+                ? plan.ExternalAudio is not null && !info.HasAudio ? Array.Empty<string?>() : new[] { AutoAudio(info)?.Codec ?? info.AudioCodec }
                 : SourceAudio(info, plan).Select(stream => (string?)stream.Codec).Distinct().ToArray();
             foreach (var codec in copied.Where(codec => !AudioCopyCompatible(plan.Container, codec)))
                 errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support copying the source {codec} audio stream.");
@@ -50,6 +50,11 @@ public static class ConversionArguments
                 errors.Add($"The {plan.Container.ToUpperInvariant()} container carries only one audio track.");
             if (selected == 0 && plan.AudioOnly && info.HasAudio)
                 errors.Add("No audio track is selected.");
+        }
+        if (plan.BurnSubtitle is not null)
+        {
+            if (plan.AudioOnly || plan.Gif || plan.AnimatedImage || plan.ImageSequenceOutput || plan.VideoCodec == "copy") errors.Add("Burning subtitles requires video encoding.");
+            errors.AddRange(VideoFilterChain.Validate(info, plan.BurnOptions));
         }
         return errors;
     }
@@ -107,6 +112,8 @@ public static class ConversionArguments
             a.AddRange(new[] { "-i", external.Path });
         }
         var subtitles = MapsStreams(info, plan) ? Subtitles(info, plan) : null;
+        var burnsImage = encodesVideo && VideoFilterChain.ImageBurnStream(info, plan.BurnOptions) is not null;
+        if (burnsImage) subtitles ??= new List<SubtitleTrack>();
         foreach (var track in subtitles ?? new List<SubtitleTrack>())
         {
             if (track.InputPath is null) continue;
@@ -118,7 +125,7 @@ public static class ConversionArguments
             var trimSeconds = end.TotalSeconds - (plan.Start?.TotalSeconds ?? 0);
             a.AddRange(new[] { "-t", FormatTime(TimeSpan.FromSeconds(trimSeconds)) });
         }
-        if (subtitles is not null) a.AddRange(MapArguments(info, plan, subtitles));
+        if (subtitles is not null) a.AddRange(MapArguments(info, plan, subtitles, burnsImage));
 
         if (plan.AudioOnly)
         {
@@ -177,7 +184,10 @@ public static class ConversionArguments
             if (!string.IsNullOrEmpty(hdr.VideoFilter)) filters.Add(hdr.VideoFilter);
             var pixelFormat = CodecModel.OutputPixelFormat(plan.VideoCodec, hdr.PixelFormat);
             filters.AddRange(CodecModel.UploadFilters(plan.VideoCodec, pixelFormat));
-            if (filters.Count > 0) a.AddRange(new[] { "-vf", string.Join(',', filters) });
+            if (VideoFilterChain.BurnFilter(info, plan.BurnOptions, plan.Start?.TotalSeconds ?? 0) is { } burn) filters.Insert(0, burn);
+            if (burnsImage)
+                a.AddRange(new[] { "-filter_complex", VideoFilterChain.OverlayGraph(info, plan.BurnOptions, "0:" + VideoIndex(info), Array.Empty<string>(), filters)! });
+            else if (filters.Count > 0) a.AddRange(new[] { "-vf", string.Join(',', filters) });
 
             a.AddRange(new[] { "-c:v", plan.VideoCodec });
             if (IntermediateCodecs.Find(plan.VideoCodec, plan.VideoProfile) is { } intermediate)
@@ -329,7 +339,7 @@ public static class ConversionArguments
     public static List<SubtitleTrack> Subtitles(MediaInfo info, ConversionPlan plan, List<StreamNote>? notes = null)
     {
         if (SubtitleContainer(plan) is not { } container) return new List<SubtitleTrack>();
-        var request = new StreamRequest(ExternalSubtitles: plan.ExternalSubtitles);
+        var request = new StreamRequest(ExternalSubtitles: plan.ExternalSubtitles, BurnedSubtitle: plan.BurnSubtitle);
         return StreamMapping.SubtitleTracks(info, request, container, AddedAudio(plan) is null ? 0 : 1, notes ?? new List<StreamNote>(),
             AutoAudio(info)?.Language, plan.SubtitleTracks);
     }
@@ -337,13 +347,13 @@ public static class ConversionArguments
     /// <summary>
     /// Acik akis secimi: ilk video (ses kabinda yok), secilen sesler ya da secim yokken ffmpeg'in <c>-map</c>'siz
     /// sececegi ses (<see cref="AutoAudio"/>), sonra altyazilar. Secimsiz planda ses esleme yazilinca degismez.
+    /// Resim altyazi yakilirken video bindirme grafiginin ciktisidir.
     /// </summary>
-    private static IReadOnlyList<string> MapArguments(MediaInfo info, ConversionPlan plan, IReadOnlyList<SubtitleTrack> subtitles)
+    private static IReadOnlyList<string> MapArguments(MediaInfo info, ConversionPlan plan, IReadOnlyList<SubtitleTrack> subtitles, bool burnsImage)
     {
         var a = new List<string>();
-        var video = info.Streams.FirstOrDefault(stream => stream.Kind == StreamKind.Video && !stream.IsAttachedPicture);
         if (!plan.AudioOnly)
-            a.AddRange(new[] { "-map", video is null ? "0:v:0" : "0:" + video.Index.ToString(CultureInfo.InvariantCulture) });
+            a.AddRange(new[] { "-map", burnsImage ? VideoFilterChain.OverlayOutput : "0:" + VideoIndex(info) });
         if (plan.AudioTracks is not null || plan.ExternalAudio is { Replace: true })
             foreach (var stream in SourceAudio(info, plan))
                 a.AddRange(new[] { "-map", "0:" + stream.Index.ToString(CultureInfo.InvariantCulture) });
@@ -414,6 +424,11 @@ public static class ConversionArguments
 
         return best;
     }
+
+    private static string VideoIndex(MediaInfo info)
+        => info.Streams.FirstOrDefault(stream => stream.Kind == StreamKind.Video && !stream.IsAttachedPicture) is { } video
+            ? video.Index.ToString(CultureInfo.InvariantCulture)
+            : "v:0";
 
     private static List<string> VideoFilters(MediaInfo info, ConversionPlan plan)
     {

@@ -107,6 +107,12 @@ public sealed record VideoFilterOptions
     /// </summary>
     public bool BurnBox { get; init; }
 
+    /// <summary>
+    /// Yakilan metin altyazinin rengi, alti haneli <c>RRGGBB</c> (<c>force_style</c>
+    /// <c>PrimaryColour</c>; ASS sirasi <c>&amp;H00BBGGRR</c>). Bos birakilinca libass'in beyazi kalir.
+    /// </summary>
+    public string? BurnColor { get; init; }
+
     public bool ChangesPicture =>
         Deinterlace == DeinterlaceMode.On
         || Detelecine
@@ -239,6 +245,7 @@ public static class VideoFilterChain
         }
         if (options.BurnFont is { } font && !IsBurnFontName(font)) problems.Add("burn style: font name has characters the filter cannot carry");
         if (options.BurnFontSize is int size && (size < BurnFontSizeMin || size > BurnFontSizeMax)) problems.Add("burn style: font size must be 6 to 200");
+        if (options.BurnColor is { } color && !IsBurnColor(color)) problems.Add("burn style: color must be RRGGBB");
         return problems;
     }
 
@@ -246,15 +253,20 @@ public static class VideoFilterChain
         => name is { Length: > 0 } && name.Trim().Length > 0
         && name.All(c => char.IsLetterOrDigit(c) || c is ' ' or '-' or '_' or '.');
 
+    public static bool IsBurnColor(string? color)
+        => color is { Length: 6 } && color.All(Uri.IsHexDigit);
+
     /// <summary>
     /// Yakma seciminin <c>force_style</c> metni: dolu alanlar sirayla <c>FontName</c>,
-    /// <c>FontSize</c>, <c>BorderStyle=3</c>. Hicbiri secili degilse <c>null</c>.
+    /// <c>FontSize</c>, <c>PrimaryColour</c>, <c>BorderStyle=3</c>. Hicbiri secili degilse <c>null</c>.
     /// </summary>
     public static string? BurnStyle(VideoFilterOptions options)
     {
         var parts = new List<string>();
         if (options.BurnFont is { Length: > 0 } font) parts.Add("FontName=" + font);
         if (options.BurnFontSize is int size) parts.Add("FontSize=" + size.ToString(CultureInfo.InvariantCulture));
+        if (options.BurnColor is { } color && IsBurnColor(color))
+            parts.Add("PrimaryColour=&H00" + (color[4..6] + color[2..4] + color[0..2]).ToUpperInvariant());
         if (options.BurnBox) parts.Add("BorderStyle=3");
         return parts.Count == 0 ? null : string.Join(",", parts);
     }
@@ -322,9 +334,17 @@ public static class VideoFilterChain
     /// </summary>
     public static string? OverlayGraph(MediaInfo info, EncodePlan plan, string videoMap)
     {
-        var options = plan.Filters ?? VideoFilterOptions.Default;
-        if (ImageBurnStream(info, options) is not { } subtitle) return null;
         var (before, after) = Split(info, plan);
+        return OverlayGraph(info, plan.Filters ?? VideoFilterOptions.Default, videoMap, before, after);
+    }
+
+    /// <summary>
+    /// Ayni grafik, suzgec listeleri disaridan: bindirmeden onceki <paramref name="before"/> ve
+    /// sonraki <paramref name="after"/>. Donustur kendi olcek ve kare hizi listesini sonraya verir.
+    /// </summary>
+    public static string? OverlayGraph(MediaInfo info, VideoFilterOptions options, string videoMap, IReadOnlyList<string> before, IReadOnlyList<string> after)
+    {
+        if (ImageBurnStream(info, options) is not { } subtitle) return null;
         var width = PlannedSource(info, options).Width.ToString(CultureInfo.InvariantCulture);
         var video = "[" + videoMap + "]";
         var graph = new System.Text.StringBuilder();

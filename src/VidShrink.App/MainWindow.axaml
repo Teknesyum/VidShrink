@@ -1512,6 +1512,38 @@
                             MinHeight="{StaticResource FieldMinHeight}"
                             Padding="{StaticResource ButtonPaddingSm}" Content="{loc:Text main.subtitles.add}"/>
                     <StackPanel x:Name="ConvertSubtitleList" Spacing="{StaticResource SpaceXs}" IsVisible="False"/>
+                    <StackPanel Spacing="{StaticResource SpaceXs}" HorizontalAlignment="Left">
+                      <TextBlock Text="{loc:Text main.subtitles.burn}" Theme="{StaticResource Hint}"/>
+                      <ComboBox x:Name="CmbConvertBurn"
+                                auto:AutomationProperties.Name="{loc:Text main.subtitles.burn}">
+                        <ComboBox.ItemTemplate>
+                          <DataTemplate x:DataType="x:String">
+                            <TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding}"/>
+                          </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                      </ComboBox>
+                    </StackPanel>
+                    <WrapPanel x:Name="ConvertBurnStylePanel" IsVisible="False" HorizontalAlignment="Left"
+                               ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                      <StackPanel Spacing="{StaticResource SpaceXs}" VerticalAlignment="Bottom">
+                        <TextBlock Text="{loc:Text main.subtitles.style.font}" Theme="{StaticResource Hint}"/>
+                        <ComboBox x:Name="CmbConvertBurnFont"
+                                  auto:AutomationProperties.Name="{loc:Text main.subtitles.style.font}"/>
+                      </StackPanel>
+                      <StackPanel Spacing="{StaticResource SpaceXs}" VerticalAlignment="Bottom">
+                        <TextBlock Text="{loc:Text main.subtitles.style.size}" Theme="{StaticResource Hint}"/>
+                        <ComboBox x:Name="CmbConvertBurnSize"
+                                  auto:AutomationProperties.Name="{loc:Text main.subtitles.style.size}"/>
+                      </StackPanel>
+                      <StackPanel Spacing="{StaticResource SpaceXs}" VerticalAlignment="Bottom">
+                        <TextBlock Text="{loc:Text main.subtitles.style.color}" Theme="{StaticResource Hint}"/>
+                        <ComboBox x:Name="CmbConvertBurnColor"
+                                  auto:AutomationProperties.Name="{loc:Text main.subtitles.style.color}"/>
+                      </StackPanel>
+                      <CheckBox x:Name="ChkConvertBurnBox" Theme="{StaticResource CheckStyle}" VerticalAlignment="Bottom"
+                                MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
+                                Content="{loc:Text main.subtitles.style.box}"/>
+                    </WrapPanel>
                     <TextBlock x:Name="TxtConvertSubtitleResult" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"
                                auto:AutomationProperties.LiveSetting="Polite"/>
                   </StackPanel>

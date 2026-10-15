@@ -44,6 +44,7 @@ public partial class MainWindow
             .Concat(BurnSizeCandidates.Select(s => s.ToString(CultureInfo.InvariantCulture))).ToList();
         CmbBurnSize.SelectedIndex = Math.Max(size, 0);
         RefreshBurnChoices();
+        InitializeConvertBurnUi();
         RefreshSubtitleList();
         RefreshAudioFileList();
         YukseklikDurumu();
