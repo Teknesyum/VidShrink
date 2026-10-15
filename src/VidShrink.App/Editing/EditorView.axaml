@@ -204,6 +204,12 @@
               <TextBox x:Name="TxtClipFadeOut" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.fade-out}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.transition}"/>
+              <ComboBox x:Name="CmbClipTransition" MinWidth="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.transition}"/>
+              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.transition.duration}"/>
+              <TextBox x:Name="TxtClipTransition" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.transition.duration}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
               <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.label}"/>
               <TextBox x:Name="TxtClipLabel" Width="{StaticResource FieldWidthSm}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.label}"/>
             </StackPanel>

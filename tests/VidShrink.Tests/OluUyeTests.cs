@@ -615,6 +615,8 @@ public sealed class OluUyeTests
             "Plan notlarinin son kolu. PlanCalculator.AddStreamNotes yedi notu adiyla yaziyor, TrueHD/DTS cumlesi '_' kolunda; ayri bir kol ayni cumleyi verirdi."),
         new("TrackAction.Encode", "varsayilan-kol", Legitimate,
             "Iki degerli iz eyleminin varsayilani. Argumanlar 'action == TrackAction.Copy' diye soruyor; Encode o kosulun else'i."),
+        new("TransitionKind.Dissolve", "varsayilan-kol", Legitimate,
+            "Gecis turunun varsayilani. ClipTransition.XfadeName ve Key Wipe, Slide ve Iris'i adiyla yazip '_' koluna erimeyi (fade, dissolve) veriyor; ayri bir kol ayni degeri verirdi. Arayuz ve FromKey Dissolve'u adiyla da yaziyor."),
         new("WebcamBackground.Keep", "varsayilan-kol", Legitimate,
             "Kamera arka planinin varsayilani. RecorderArguments ve RecorderView.BackgroundKey Static ile Green'i adiyla yazip '_' koluna dokunulmamis goruntuyu veriyor; ayri bir kol ayni degeri verirdi."),
         new("WebcamCorner.BottomRight", "varsayilan-kol", Legitimate,

@@ -16,7 +16,12 @@ public sealed record ExportStep(IReadOnlyList<string> Args, double DurationSecon
     public string? AudioListPath { get; init; }
 
     public string? AudioListContent { get; init; }
+
+    /// <summary>Ikinci ve sonraki ses izlerinin ve altyazinin concat listeleri; kosucu adimdan once yazar.</summary>
+    public IReadOnlyList<ExportList> ExtraLists { get; init; } = Array.Empty<ExportList>();
 }
+
+public sealed record ExportList(string Path, string Content);
 
 /// <summary>Bir kaynagin teslim icin okunmus hali: akis bilgisi, anahtar kareler ve akilli kesim sinirlari.</summary>
 public sealed record ExportSource(MediaInfo Info, IReadOnlyList<double> Keyframes, double StartTime, IReadOnlyList<SmartCutPoint>? Cuts = null);
@@ -52,6 +57,12 @@ public sealed record ExportPlan(
 
     /// <summary>Teslim ayarlari (cozunurluk, kare hizi, kodek, kalite, yalniz ses) varsayilandan farkli oldugu icin Tam'a gecildi.</summary>
     public bool SettingsForcedFull { get; init; }
+
+    /// <summary>Kliplerin arasinda capraz gecis oldugu icin <c>-c copy</c> yolu birakilip Tam'a gecildi.</summary>
+    public bool TransitionsForcedFull { get; init; }
+
+    /// <summary>Cizelgede muzik izi oldugu icin <c>-c copy</c> yolu birakilip Tam'a gecildi.</summary>
+    public bool MusicForcedFull { get; init; }
 
     /// <summary>Metin varsa <c>ass=</c> suzgecinin okudugu belge; kosucu calismadan once BOM'lu yazar.</summary>
     public string? SubtitlePath { get; init; }
@@ -116,6 +127,7 @@ public static class EditExport
 
     public const string VideoListName = "list.ffconcat";
     public const string AudioListName = "audio.ffconcat";
+    public const string SubtitleListName = "subtitle.ffconcat";
 
     private const double SeekNudgeSeconds = 0.001;
 
@@ -231,22 +243,28 @@ public static class EditExport
     {
         if (timeline.Clips.Count == 0) throw new ArgumentException("Cizelge bos", nameof(timeline));
         settings ??= EditExportSettings.Default;
-        var track = EditAudioTrack.Resolve(info, audioTrack);
-        var language = EditAudioTrack.Language(info, audioTrack);
+        var whole = info;
+        var tracks = EditAudioTrack.Tracks(info, audioTrack);
+        var languages = tracks.Select(t => EditAudioTrack.Streams(whole).ElementAtOrDefault(t)?.Language).ToArray();
         info = EditAudioTrack.Select(info, audioTrack);
+        bool EachTrack(Func<MediaInfo, bool> test) => test(info) && tracks.All(t => test(EditAudioTrack.Select(whole, t)));
 
         var effective = mode;
         var anySpecial = timeline.Clips.Any(NeedsReencode);
         var smart = mode == ExportMode.Smart ? SmartEncoding(info, cuts, hasEncoder) : null;
-        var audioForced = smart is not null && keyframes.Count > 0 && !SmartAudioCopies(info, anySpecial, outputPath);
+        var audioForced = smart is not null && keyframes.Count > 0 && !EachTrack(t => SmartAudioCopies(t, anySpecial, outputPath));
         if (audioForced) smart = null;
         if (mode == ExportMode.Smart && smart is null) effective = ExportMode.Full;
-        if (mode == ExportMode.Fast && anySpecial && !SupportsSegments(info)) effective = ExportMode.Full;
+        if (mode == ExportMode.Fast && anySpecial && !EachTrack(SupportsSegments)) effective = ExportMode.Full;
         if (mode != ExportMode.Full && keyframes.Count == 0) effective = ExportMode.Full;
         var textForced = mode != ExportMode.Full && effective != ExportMode.Full && timeline.HasText;
         var effectsForced = mode != ExportMode.Full && effective != ExportMode.Full && timeline.HasEffects;
         var settingsForced = mode != ExportMode.Full && effective != ExportMode.Full && !timeline.HasText && !timeline.HasEffects && !settings.IsDefault;
-        if (timeline.HasText || timeline.HasEffects || !settings.IsDefault) effective = ExportMode.Full;
+        var transitionsForced = mode != ExportMode.Full && effective != ExportMode.Full && !timeline.HasText && !timeline.HasEffects && settings.IsDefault
+            && timeline.HasTransitions;
+        var musicForced = mode != ExportMode.Full && effective != ExportMode.Full && !timeline.HasText && !timeline.HasEffects && settings.IsDefault
+            && !timeline.HasTransitions && timeline.HasMusic;
+        if (timeline.HasText || timeline.HasEffects || !settings.IsDefault || timeline.HasTransitions || timeline.HasMusic) effective = ExportMode.Full;
 
         var limit = ReverseLimitSeconds(info, memoryBudgetBytes);
         var over = ReverseOverLimit(timeline, info, memoryBudgetBytes);
@@ -254,21 +272,75 @@ public static class EditExport
         var motion = Enumerable.Range(0, timeline.Clips.Count).Where(i => NeedsReencode(timeline.Clips[i])).ToArray();
         var plan = effective switch
         {
-            ExportMode.Full when settings.AudioOnly => AudioOnly(timeline, info, mode, outputPath, workDirectory, limit, over, settings, track),
-            ExportMode.Full => Full(timeline, info, mode, outputPath, workDirectory, limit, over, settings, track),
-            ExportMode.Smart => SmartSegmented(timeline, info, smart!, cuts!, keyframes, outputPath, workDirectory, limit, over, track),
-            ExportMode.Fast when !anySpecial => FastDirect(timeline, info, keyframes, startTime, outputPath, workDirectory, limit, over, track),
-            _ => Segmented(timeline, info, keyframes, outputPath, workDirectory, limit, over, track)
+            ExportMode.Full when settings.AudioOnly => AudioOnly(timeline, info, mode, outputPath, workDirectory, limit, over, settings,
+                tracks.Count > 0 ? tracks[0] : EditAudioTrack.First),
+            ExportMode.Full => Full(timeline, info, mode, outputPath, workDirectory, limit, over, settings, tracks),
+            ExportMode.Smart => SmartSegmented(timeline, info, smart!, cuts!, keyframes, outputPath, workDirectory, limit, over, tracks),
+            ExportMode.Fast when !anySpecial => FastDirect(timeline, info, keyframes, startTime, outputPath, workDirectory, limit, over, tracks),
+            _ => Segmented(timeline, info, keyframes, outputPath, workDirectory, limit, over, tracks)
         };
-        if (dropMetadata) plan = plan with { Steps = WithoutMetadata(plan.Steps, info, language) };
+        var subtitles = audioTrack == EditAudioTrack.All && motion.Length == 0 && !timeline.HasTransitions && !(effective == ExportMode.Full && settings.AudioOnly)
+            ? CarriedSubtitles(whole, outputPath)
+            : Array.Empty<(int Position, SourceStream Stream)>();
+        if (subtitles.Count > 0) plan = WithSubtitles(plan, timeline, whole, subtitles, outputPath, workDirectory);
+        if (timeline.Music is { } music) plan = WithMusic(plan, music, settings, outputPath);
+        if (settings.AudioOnly && effective == ExportMode.Full) languages = languages.Take(1).ToArray();
+        if (dropMetadata)
+            plan = plan with { Steps = WithoutMetadata(plan.Steps, info, languages, subtitles.Select(s => s.Stream.Language).ToArray()) };
         return plan with
         {
             MotionClips = motion,
             TextForcedFull = textForced,
             EffectsForcedFull = effectsForced,
             AudioForcedFull = audioForced,
-            SettingsForcedFull = settingsForced
+            SettingsForcedFull = settingsForced,
+            TransitionsForcedFull = transitionsForced,
+            MusicForcedFull = musicForced
         };
+    }
+
+    /// <summary>
+    /// Muzik izini son adima ekler: dosya son girdinin ardina <c>-i</c> olarak girer, grafige
+    /// <c>volume</c> + ortak bicim + <c>adelay</c> + <c>apad</c> + <c>atrim</c> zinciri baglanir. Kaynak sesi varsa ilk ses cikisi
+    /// (<c>[aout]</c>) muzikle <c>amix</c> (<c>duration=first</c>, <c>normalize=0</c>; iki duzey oldugu gibi toplanir) ile karisip
+    /// <c>[amix]</c> olarak eslenir; yoksa muzik tek basina ses izi olur. Ikinci ve sonraki ses izlerine dokunulmaz.
+    /// </summary>
+    private static ExportPlan WithMusic(ExportPlan plan, EditMusic music, EditExportSettings settings, string output)
+    {
+        var last = plan.Steps[^1];
+        var args = last.Args.ToList();
+        var index = args.Count(a => a == "-i");
+        var input = args.LastIndexOf("-i") + 2;
+        args.InsertRange(input, new[] { "-i", music.Path });
+        var graphAt = args.IndexOf("-filter_complex") + 1;
+        if (graphAt <= 0) throw new InvalidOperationException("Muzik yalniz suzgec grafigi kuran adima eklenir");
+        var duration = Number(last.DurationSeconds);
+        var chain = new StringBuilder(";[").Append(index.ToString(CultureInfo.InvariantCulture)).Append(":a:0]volume=")
+            .Append(music.LevelDb.ToString("0.0", CultureInfo.InvariantCulture)).Append("dB,").Append(MergeAudioFormat)
+            .Append(",adelay=").Append(Math.Round(EditTime.ToSeconds(music.Start) * 1000).ToString(CultureInfo.InvariantCulture)).Append(":all=1")
+            .Append(",apad,atrim=duration=").Append(duration).Append(",asetpts=PTS-STARTPTS[mus]");
+        var mapped = MapIndex(args, "[aout]");
+        if (mapped >= 0)
+        {
+            chain.Append(";[aout]").Append(MergeAudioFormat).Append("[asrc];[asrc][mus]amix=inputs=2:duration=first:dropout_transition=0:normalize=0[amix]");
+            args[mapped] = "[amix]";
+        }
+        else
+        {
+            var video = MapIndex(args, "[vout]");
+            args.InsertRange(video >= 0 ? video + 1 : graphAt + 1, new[] { "-map", "[mus]" });
+            args.InsertRange(args.Count - 1, new[] { "-c:a", settings.AudioOnly ? EditExportSettings.AudioOnlyCodec(output) : AudioCodec, "-b:a", settings.AudioBitrate });
+        }
+
+        args[graphAt] += chain.ToString();
+        return plan with { Steps = plan.Steps.Take(plan.Steps.Count - 1).Append(last with { Args = args }).ToArray() };
+    }
+
+    private static int MapIndex(IReadOnlyList<string> args, string label)
+    {
+        for (var i = 1; i < args.Count; i++)
+            if (args[i] == label && args[i - 1] == "-map") return i;
+        return -1;
     }
 
     /// <summary>Cizelgedeki parcalarin geldigi kaynaklarin siralari, kucukten buyuge.</summary>
@@ -289,8 +361,11 @@ public static class EditExport
         if (timeline.Clips.Count == 0) throw new ArgumentException("Cizelge bos", nameof(timeline));
         var used = UsedSources(timeline);
         if (used.Count > 1)
-            return Merge(timeline, WithTrack(sources, audioTrack, out var track), used, mode, outputPath, workDirectory, memoryBudgetBytes, dropMetadata,
+        {
+            var merged = Merge(timeline, WithTrack(sources, audioTrack, out var track), used, mode, outputPath, workDirectory, memoryBudgetBytes, dropMetadata,
                 settings ?? EditExportSettings.Default, track);
+            return timeline.Music is { } music ? WithMusic(merged, music, settings ?? EditExportSettings.Default, outputPath) : merged;
+        }
 
         var only = SourceOf(sources, used[0]);
         return Build(timeline, only.Info, only.Keyframes, only.StartTime, mode, outputPath, workDirectory, memoryBudgetBytes,
@@ -346,7 +421,8 @@ public static class EditExport
 
     private static IReadOnlyDictionary<int, ExportSource> WithTrack(IReadOnlyDictionary<int, ExportSource> sources, int audioTrack, out int track)
     {
-        track = EditAudioTrack.Default;
+        track = EditAudioTrack.First;
+        if (audioTrack == EditAudioTrack.All) audioTrack = EditAudioTrack.First;
         if (!sources.TryGetValue(0, out var first)) return sources;
         track = EditAudioTrack.Resolve(first.Info, audioTrack);
         var copy = sources.ToDictionary(pair => pair.Key, pair => pair.Value);
@@ -358,6 +434,72 @@ public static class EditExport
         => track > 0 ? "[" + input + ":a:" + track.ToString(CultureInfo.InvariantCulture) + "]" : "[" + input + ":a]";
 
     private static string AudioStream(int track) => "0:a:" + Math.Max(track, 0).ToString(CultureInfo.InvariantCulture);
+
+    private static string AudioOutput(int position) => position == 0 ? "[aout]" : "[aout" + position.ToString(CultureInfo.InvariantCulture) + "]";
+
+    private static IEnumerable<string> AudioMaps(MediaInfo info, IReadOnlyList<int> tracks)
+        => info.HasAudio ? tracks.SelectMany(t => new[] { "-map", AudioStream(t) }) : Array.Empty<string>();
+
+    /// <summary>
+    /// Cikti kabinin tasiyabildigi altyazi izleri, kaynaktaki altyazi sirasiyla (<c>0:s:N</c>): MKV metin ve goruntu
+    /// altyazisini, MP4 ailesi yalniz metni (<c>mov_text</c>'e cevrilerek) tasir; WebM ve digerleri hicbirini.
+    /// </summary>
+    private static IReadOnlyList<(int Position, SourceStream Stream)> CarriedSubtitles(MediaInfo info, string output)
+    {
+        var mkv = string.Equals(Path.GetExtension(output), ".mkv", StringComparison.OrdinalIgnoreCase);
+        var mp4 = IsMp4Family(output);
+        return info.Streams.Where(s => s.Kind == StreamKind.Subtitle)
+            .Select((stream, position) => (Position: position, Stream: stream))
+            .Where(s => StreamMapping.IsTextSubtitle(s.Stream.Codec) ? mkv || mp4 : mkv && StreamMapping.IsImageSubtitle(s.Stream.Codec))
+            .ToArray();
+    }
+
+    /// <summary>
+    /// Altyazi izlerini teslime ekler. Her klip icin altyazilar ayri bir MKV parcasina kesilir; parcanin basi
+    /// teslimdeki klip basidir (Hizli kipte anahtar kareye cekilen bas), suresi teslimdeki klip suresidir. Parcalar
+    /// sureli bir concat listesiyle son adima ek girdi olarak verilir. <c>-copypriorss 0</c> kesimden once baslayan
+    /// olayi birakir. <c>mov_text</c> parcada SRT'ye cevrilir; MP4 ailesine <c>mov_text</c> olarak yazilir.
+    /// </summary>
+    private static ExportPlan WithSubtitles(
+        ExportPlan plan, EditTimeline timeline, MediaInfo info, IReadOnlyList<(int Position, SourceStream Stream)> subtitles,
+        string output, string work)
+    {
+        var steps = new List<ExportStep>();
+        var list = new StringBuilder("ffconcat version 1.0\n");
+        for (var i = 0; i < timeline.Clips.Count; i++)
+        {
+            var clip = timeline.Clips[i];
+            var lead = i < plan.KeyframeLeads.Count ? plan.KeyframeLeads[i] : 0;
+            var start = Math.Max(0, EditTime.ToSeconds(clip.SourceStart) - lead);
+            var length = EditTime.ToSeconds(clip.SourceEnd) - start;
+            var part = Path.Combine(work, "s" + i.ToString("D4", CultureInfo.InvariantCulture) + ".mkv");
+            var args = new List<string> { "-hide_banner", "-nostdin", "-y" };
+            if (start > 0) args.AddRange(new[] { "-ss", Number(start) });
+            args.AddRange(new[] { "-t", Number(length), "-i", info.FilePath });
+            foreach (var (position, _) in subtitles) args.AddRange(new[] { "-map", "0:s:" + position.ToString(CultureInfo.InvariantCulture) });
+            args.AddRange(new[] { "-c:s", "copy" });
+            for (var k = 0; k < subtitles.Count; k++)
+                if (string.Equals(subtitles[k].Stream.Codec, "mov_text", StringComparison.OrdinalIgnoreCase))
+                    args.AddRange(new[] { "-c:s:" + k.ToString(CultureInfo.InvariantCulture), "srt" });
+            args.AddRange(new[] { "-copypriorss", "0", "-f", "matroska", part });
+            steps.Add(new ExportStep(args, 0));
+            list.Append("file ").Append(Quote(part)).Append("\nduration ").Append(Number(length)).Append('\n');
+        }
+
+        var listPath = Path.Combine(work, SubtitleListName);
+        var last = plan.Steps[^1];
+        var input = last.Args.ToList().LastIndexOf("-i") + 2;
+        var index = last.Args.Count(a => a == "-i");
+        var joined = last.Args.Take(input)
+            .Concat(new[] { "-f", "concat", "-safe", "0", "-i", listPath })
+            .Concat(last.Args.Skip(input).Take(last.Args.Count - input - 1))
+            .Concat(new[] { "-map", index.ToString(CultureInfo.InvariantCulture) + ":s", "-c:s", IsMp4Family(output) ? "mov_text" : "copy" })
+            .Append(last.Args[^1])
+            .ToArray();
+        steps.InsertRange(0, plan.Steps.Take(plan.Steps.Count - 1));
+        steps.Add(last with { Args = joined, ExtraLists = last.ExtraLists.Append(new ExportList(listPath, list.ToString())).ToArray() });
+        return plan with { Steps = steps };
+    }
 
     private static ExportPlan Merge(
         EditTimeline timeline, IReadOnlyDictionary<int, ExportSource> sources, IReadOnlyList<int> used, ExportMode requested,
@@ -378,6 +520,7 @@ public static class EditExport
         var joins = new StringBuilder();
         var over = new List<int>();
         var limit = used.Min(s => ReverseLimitSeconds(SourceOf(sources, s).Info, memoryBudgetBytes));
+        var transitions = timeline.HasTransitions;
         for (var i = 0; i < timeline.Clips.Count; i++)
         {
             var clip = timeline.Clips[i];
@@ -393,12 +536,13 @@ public static class EditExport
                 .Append(Link(ClipFilters.Color(clip.Effects)))
                 .Append(",fps=").Append(fps).Append(",format=yuv420p")
                 .Append(Link(ClipFilters.VideoFades(clip.Effects, clip.TimelineLength)))
+                .Append(transitions ? ",settb=AVTB" : string.Empty)
                 .Append("[v").Append(i).Append("];");
             joins.Append("[v").Append(i).Append(']');
             if (!audio) continue;
 
             if (info.HasAudio)
-                graph.Append(AudioInput(input, clip.Source == 0 ? track : EditAudioTrack.Default))
+                graph.Append(AudioInput(input, clip.Source == 0 ? track : EditAudioTrack.First))
                     .Append("atrim=start=").Append(start).Append(":end=").Append(end).Append(",asetpts=PTS-STARTPTS")
                     .Append(AudioMotion(clip)).Append(Link(ClipFilters.Audio(clip.Effects, clip.TimelineLength)))
                     .Append(',').Append(MergeAudioFormat);
@@ -408,8 +552,11 @@ public static class EditExport
             joins.Append("[a").Append(i).Append(']');
         }
 
-        graph.Append(joins).Append("concat=n=").Append(timeline.Clips.Count).Append(":v=1:a=").Append(audio ? 1 : 0)
-            .Append(timeline.HasText ? "[vcat]" : "[vout]").Append(audio ? "[aout]" : string.Empty);
+        if (transitions)
+            graph.Append(TransitionChain(timeline, audio ? 1 : 0, timeline.HasText ? "[vcat]" : "[vout]"));
+        else
+            graph.Append(joins).Append("concat=n=").Append(timeline.Clips.Count).Append(":v=1:a=").Append(audio ? 1 : 0)
+                .Append(timeline.HasText ? "[vcat]" : "[vout]").Append(audio ? "[aout]" : string.Empty);
 
         string? subtitle = null;
         string? fonts = null;
@@ -430,7 +577,7 @@ public static class EditExport
         if (dropMetadata) args.AddRange(StreamMapping.MetadataArguments(true, Array.Empty<string?>(), Array.Empty<string?>()));
         args.Add(output);
 
-        return new ExportPlan(requested, ExportMode.Full, new[] { new ExportStep(args, EditTime.ToSeconds(timeline.Duration)) },
+        return new ExportPlan(requested, ExportMode.Full, new[] { new ExportStep(args, EditTime.ToSeconds(timeline.Duration - timeline.TransitionOverlap)) },
             over, limit, output, work)
         {
             MotionClips = Enumerable.Range(0, timeline.Clips.Count).Where(i => NeedsReencode(timeline.Clips[i])).ToArray(),
@@ -460,7 +607,7 @@ public static class EditExport
             var info = SourceOf(sources, clip.Source).Info;
             if (clip.Reversed && EditTime.ToSeconds(clip.SourceLength) > ReverseLimitSeconds(info, memoryBudgetBytes)) over.Add(i);
             if (info.HasAudio)
-                graph.Append(AudioInput(inputs[clip.Source].ToString(CultureInfo.InvariantCulture), clip.Source == 0 ? track : EditAudioTrack.Default))
+                graph.Append(AudioInput(inputs[clip.Source].ToString(CultureInfo.InvariantCulture), clip.Source == 0 ? track : EditAudioTrack.First))
                     .Append(AudioTrim(clip)).Append(',').Append(MergeAudioFormat);
             else
                 graph.Append(MergeSilence).Append(",atrim=duration=").Append(Number(EditTime.ToSeconds(clip.TimelineLength)));
@@ -533,15 +680,16 @@ public static class EditExport
 
     /// <summary>
     /// Teslim dosyasini yazan son adima meta silme argumanlarini ekler; ara parcalara dokunmaz. Dizi
-    /// kucultmeyle ayni kaynaktan (<see cref="StreamMapping.MetadataArguments"/>). Teslim tek ses izi tasir;
-    /// dil teslime secilen izden (<see cref="EditAudioTrack"/>) yazilir. Duzenleyici kendi basina etiket ya da bolum yazmaz.
+    /// kucultmeyle ayni kaynaktan (<see cref="StreamMapping.MetadataArguments"/>). Diller teslime giden izlerden
+    /// (<see cref="EditAudioTrack"/>) cikti sirasiyla yazilir. Duzenleyici kendi basina etiket ya da bolum yazmaz.
     /// </summary>
-    private static IReadOnlyList<ExportStep> WithoutMetadata(IReadOnlyList<ExportStep> steps, MediaInfo info, string? language)
+    private static IReadOnlyList<ExportStep> WithoutMetadata(
+        IReadOnlyList<ExportStep> steps, MediaInfo info, IReadOnlyList<string?> languages, IReadOnlyList<string?> subtitleLanguages)
     {
         var last = steps[^1];
-        var audio = info.HasAudio ? new[] { language } : Array.Empty<string?>();
+        var audio = info.HasAudio ? languages : Array.Empty<string?>();
         var args = last.Args.Take(last.Args.Count - 1)
-            .Concat(StreamMapping.MetadataArguments(true, audio, Array.Empty<string?>()))
+            .Concat(StreamMapping.MetadataArguments(true, audio, subtitleLanguages))
             .Append(last.Args[^1])
             .ToArray();
         return steps.Take(steps.Count - 1).Append(last with { Args = args }).ToArray();
@@ -582,6 +730,7 @@ public static class EditExport
                 EffectsForcedFull = whole.EffectsForcedFull,
                 AudioForcedFull = whole.AudioForcedFull,
                 SettingsForcedFull = whole.SettingsForcedFull,
+                TransitionsForcedFull = whole.TransitionsForcedFull,
                 MotionClips = plan.MotionClips.Select(_ => index).ToArray(),
                 ReverseOverLimit = plan.ReverseOverLimit.Select(_ => index).ToArray()
             });
@@ -609,12 +758,15 @@ public static class EditExport
 
     private static ExportPlan Full(
         EditTimeline timeline, MediaInfo info, ExportMode requested, string output, string work,
-        double limit, IReadOnlyList<int> over, EditExportSettings settings, int track)
+        double limit, IReadOnlyList<int> over, EditExportSettings settings, IReadOnlyList<int> tracks)
     {
         var graph = new StringBuilder();
         var joins = new StringBuilder();
+        var audio = info.HasAudio ? tracks.Count : 0;
         var canvas = settings.HasSize ? (settings.Width, settings.Height) : ClipFilters.Canvas(timeline, info);
         var rate = settings.Fps > 0 ? ",fps=" + Number(settings.Fps) : string.Empty;
+        var transitions = timeline.HasTransitions;
+        var blend = transitions ? TransitionInputTail(settings, info) : string.Empty;
         for (var i = 0; i < timeline.Clips.Count; i++)
         {
             var clip = timeline.Clips[i];
@@ -626,17 +778,29 @@ public static class EditExport
                 .Append(Link(ClipFilters.Color(clip.Effects)))
                 .Append(rate)
                 .Append(Link(ClipFilters.VideoFades(clip.Effects, clip.TimelineLength)))
+                .Append(blend)
                 .Append("[v").Append(i).Append("];");
             joins.Append("[v").Append(i).Append(']');
-            if (!info.HasAudio) continue;
-            graph.Append(AudioInput("0", track)).Append("atrim=start=").Append(start).Append(":end=").Append(end).Append(",asetpts=PTS-STARTPTS")
-                .Append(AudioMotion(clip)).Append(Link(ClipFilters.Audio(clip.Effects, clip.TimelineLength)))
-                .Append("[a").Append(i).Append("];");
-            joins.Append("[a").Append(i).Append(']');
+            for (var p = 0; p < audio; p++)
+            {
+                var label = "[a" + i.ToString(CultureInfo.InvariantCulture) + (p == 0 ? string.Empty : "_" + p.ToString(CultureInfo.InvariantCulture)) + "]";
+                graph.Append(AudioInput("0", tracks[p])).Append("atrim=start=").Append(start).Append(":end=").Append(end).Append(",asetpts=PTS-STARTPTS")
+                    .Append(AudioMotion(clip)).Append(Link(ClipFilters.Audio(clip.Effects, clip.TimelineLength)))
+                    .Append(label).Append(';');
+                joins.Append(label);
+            }
         }
 
-        graph.Append(joins).Append("concat=n=").Append(timeline.Clips.Count).Append(":v=1:a=").Append(info.HasAudio ? 1 : 0)
-            .Append(timeline.HasText ? "[vcat]" : "[vout]").Append(info.HasAudio ? "[aout]" : string.Empty);
+        if (transitions)
+        {
+            graph.Append(TransitionChain(timeline, audio, timeline.HasText ? "[vcat]" : "[vout]"));
+        }
+        else
+        {
+            graph.Append(joins).Append("concat=n=").Append(timeline.Clips.Count).Append(":v=1:a=").Append(audio)
+                .Append(timeline.HasText ? "[vcat]" : "[vout]");
+            for (var p = 0; p < audio; p++) graph.Append(AudioOutput(p));
+        }
 
         string? subtitle = null;
         string? fonts = null;
@@ -648,13 +812,13 @@ public static class EditExport
         }
 
         var args = new List<string> { "-hide_banner", "-nostdin", "-y", "-i", info.FilePath, "-filter_complex", graph.ToString(), "-map", "[vout]" };
-        if (info.HasAudio) args.AddRange(new[] { "-map", "[aout]" });
+        for (var p = 0; p < audio; p++) args.AddRange(new[] { "-map", AudioOutput(p) });
         args.AddRange(VideoEncode(settings));
-        if (info.HasAudio) args.AddRange(new[] { "-c:a", AudioCodec, "-b:a", settings.AudioBitrate });
+        if (audio > 0) args.AddRange(new[] { "-c:a", AudioCodec, "-b:a", settings.AudioBitrate });
         args.AddRange(Faststart(output));
         args.Add(output);
 
-        var expected = EditTime.ToSeconds(timeline.Duration);
+        var expected = EditTime.ToSeconds(timeline.Duration - timeline.TransitionOverlap);
         return new ExportPlan(requested, ExportMode.Full, new[] { new ExportStep(args, expected) },
             over, limit, output, work)
         {
@@ -664,6 +828,61 @@ public static class EditExport
             FontFamilies = timeline.Texts.Select(t => t.FontName).Distinct(StringComparer.OrdinalIgnoreCase).ToArray()
         };
     }
+
+    /// <summary>
+    /// Gecisli cizelgede her klip zincirinin sonu: <c>xfade</c> iki girdinin kare hizini, piksel bicimini ve zaman tabanini ayni
+    /// ister. Kare hizi teslim ayarindan, yoksa kaynaktan (bilinmiyorsa 30).
+    /// </summary>
+    private static string TransitionInputTail(EditExportSettings settings, MediaInfo info)
+        => (settings.Fps > 0 ? string.Empty : ",fps=" + Number(info.Fps > 0 ? info.Fps : 30)) + ",format=yuv420p,settb=AVTB";
+
+    /// <summary>
+    /// Klipleri soldan saga ikiser birlestiren zincir. Gecisli komsuda goruntu <c>xfade</c>, ses <c>acrossfade</c> ile
+    /// <see cref="EditTimeline.TransitionLength"/> kadar ust uste biner; <c>offset</c> o ana dek birlesen uzunluk eksi gecis
+    /// suresidir. Gecissiz komsu <c>concat=n=2</c> ile kesme olarak eklenir.
+    /// </summary>
+    private static string TransitionChain(EditTimeline timeline, int audio, string videoOut)
+    {
+        var text = new StringBuilder();
+        var last = timeline.Clips.Count - 1;
+        var video = "[v0]";
+        var sounds = Enumerable.Range(0, audio).Select(p => AudioLabel(0, p)).ToArray();
+        var length = timeline.Clips[0].TimelineLength;
+        for (var k = 1; k <= last; k++)
+        {
+            var overlap = timeline.TransitionLength(k);
+            var nextVideo = k == last ? videoOut : "[x" + k.ToString(CultureInfo.InvariantCulture) + "]";
+            text.Append(video).Append("[v").Append(k).Append(']');
+            if (overlap > 0)
+            {
+                text.Append("xfade=transition=").Append(ClipTransition.XfadeName(timeline.Clips[k].Transition!.Kind))
+                    .Append(":duration=").Append(Number(EditTime.ToSeconds(overlap)))
+                    .Append(":offset=").Append(Number(EditTime.ToSeconds(length - overlap)));
+            }
+            else
+            {
+                text.Append("concat=n=2:v=1:a=0");
+            }
+
+            text.Append(nextVideo).Append(';');
+            video = nextVideo;
+            for (var p = 0; p < audio; p++)
+            {
+                var nextSound = k == last ? AudioOutput(p) : "[y" + k.ToString(CultureInfo.InvariantCulture) + "_" + p.ToString(CultureInfo.InvariantCulture) + "]";
+                text.Append(sounds[p]).Append(AudioLabel(k, p))
+                    .Append(overlap > 0 ? "acrossfade=d=" + Number(EditTime.ToSeconds(overlap)) : "concat=n=2:v=0:a=1")
+                    .Append(nextSound).Append(';');
+                sounds[p] = nextSound;
+            }
+
+            length += timeline.Clips[k].TimelineLength - overlap;
+        }
+
+        return text.ToString(0, text.Length - 1);
+    }
+
+    private static string AudioLabel(int clip, int position)
+        => "[a" + clip.ToString(CultureInfo.InvariantCulture) + (position == 0 ? string.Empty : "_" + position.ToString(CultureInfo.InvariantCulture)) + "]";
 
     /// <summary>
     /// <c>ass=filename='...':fontsdir='...'</c>. Yollar <see cref="VideoFilterChain.FilterPath"/> ile
@@ -678,7 +897,7 @@ public static class EditExport
 
     private static ExportPlan FastDirect(
         EditTimeline timeline, MediaInfo info, IReadOnlyList<double> keyframes, double startTime, string output, string work,
-        double limit, IReadOnlyList<int> over, int track)
+        double limit, IReadOnlyList<int> over, IReadOnlyList<int> tracks)
     {
         var list = new StringBuilder("ffconcat version 1.0\n");
         var leads = new List<double>(timeline.Clips.Count);
@@ -697,7 +916,7 @@ public static class EditExport
 
         var listPath = Path.Combine(work, VideoListName);
         var args = new List<string> { "-hide_banner", "-nostdin", "-y", "-f", "concat", "-safe", "0", "-i", listPath, "-map", "0:v:0" };
-        if (info.HasAudio) args.AddRange(new[] { "-map", AudioStream(track) });
+        args.AddRange(AudioMaps(info, tracks));
         args.AddRange(new[] { "-c", "copy" });
         args.AddRange(Faststart(output));
         args.Add(output);
@@ -708,7 +927,7 @@ public static class EditExport
 
     private static ExportPlan Segmented(
         EditTimeline timeline, MediaInfo info, IReadOnlyList<double> keyframes,
-        string output, string work, double limit, IReadOnlyList<int> over, int track)
+        string output, string work, double limit, IReadOnlyList<int> over, IReadOnlyList<int> tracks)
     {
         var steps = new List<ExportStep>();
         var segments = new List<string>();
@@ -723,7 +942,7 @@ public static class EditExport
             if (NeedsReencode(clip))
             {
                 var length = EditTime.ToSeconds(clip.TimelineLength);
-                steps.Add(Encode(info, start, end - start, VideoMotion(clip, info), AudioMotion(clip), Segment(work, segments), track));
+                steps.Add(Encode(info, start, end - start, VideoMotion(clip, info), AudioMotion(clip), Segment(work, segments), tracks));
                 expected += length;
                 leads.Add(0);
                 continue;
@@ -731,7 +950,7 @@ public static class EditExport
 
             var inpoint = KeyframeAtOrBefore(keyframes, start);
             leads.Add(start - inpoint);
-            steps.Add(Copy(info, inpoint, end - inpoint, Segment(work, segments), track));
+            steps.Add(Copy(info, inpoint, end - inpoint, Segment(work, segments), tracks));
             expected += end - inpoint;
         }
 
@@ -739,7 +958,8 @@ public static class EditExport
         foreach (var segment in segments) list.Append("file ").Append(Quote(segment)).Append('\n');
         var listPath = Path.Combine(work, VideoListName);
         var join = new List<string> { "-hide_banner", "-nostdin", "-y", "-f", "concat", "-safe", "0", "-i", listPath, "-map", "0:v:0" };
-        if (info.HasAudio) join.AddRange(new[] { "-map", "0:a:0" });
+        if (info.HasAudio)
+            for (var p = 0; p < tracks.Count; p++) join.AddRange(new[] { "-map", "0:a:" + p.ToString(CultureInfo.InvariantCulture) });
         join.AddRange(new[] { "-c", "copy" });
         join.AddRange(Faststart(output));
         join.Add(output);
@@ -757,13 +977,14 @@ public static class EditExport
     /// </summary>
     private static ExportPlan SmartSegmented(
         EditTimeline timeline, MediaInfo info, SmartCutEncoding encoding, IReadOnlyList<SmartCutPoint> cuts,
-        IReadOnlyList<double> keyframes, string output, string work, double limit, IReadOnlyList<int> over, int track)
+        IReadOnlyList<double> keyframes, string output, string work, double limit, IReadOnlyList<int> over, IReadOnlyList<int> tracks)
     {
         var steps = new List<ExportStep>();
         var video = new StringBuilder("ffconcat version 1.0\n");
-        var audio = new StringBuilder("ffconcat version 1.0\n");
+        var count = info.HasAudio ? tracks.Count : 0;
+        var audio = Enumerable.Range(0, Math.Max(count, 1)).Select(_ => new StringBuilder("ffconcat version 1.0\n")).ToArray();
         var videoParts = 0;
-        var audioParts = 0;
+        var audioParts = new int[audio.Length];
         var nudge = SmartCutCodec.CopySeekNudge(info);
         double expected = 0;
 
@@ -774,10 +995,11 @@ public static class EditExport
             return path;
         }
 
-        string AudioPart(double length)
+        string AudioPart(int p, double length)
         {
-            var path = Path.Combine(work, "a" + (audioParts++).ToString("D4", CultureInfo.InvariantCulture) + ".ts");
-            audio.Append("file ").Append(Quote(path)).Append("\nduration ").Append(Number(length)).Append('\n');
+            var prefix = p == 0 ? "a" : "a" + p.ToString(CultureInfo.InvariantCulture) + "_";
+            var path = Path.Combine(work, prefix + (audioParts[p]++).ToString("D4", CultureInfo.InvariantCulture) + ".ts");
+            audio[p].Append("file ").Append(Quote(path)).Append("\nduration ").Append(Number(length)).Append('\n');
             return path;
         }
 
@@ -790,7 +1012,7 @@ public static class EditExport
             {
                 var length = EditTime.ToSeconds(clip.TimelineLength);
                 steps.Add(SmartEncode(info, encoding, start, end - start, VideoMotion(clip, info), VideoPart(length)));
-                if (info.HasAudio) steps.Add(AudioEncode(info, start, end - start, AudioMotion(clip), AudioPart(length), track));
+                for (var p = 0; p < count; p++) steps.Add(AudioEncode(info, start, end - start, AudioMotion(clip), AudioPart(p, length), tracks[p]));
                 expected += length;
                 continue;
             }
@@ -806,24 +1028,27 @@ public static class EditExport
                 steps.Add(SmartEncode(info, encoding, start, end - start, string.Empty, VideoPart(end - start)));
             }
 
-            if (info.HasAudio) steps.Add(AudioCopy(info, start, end - start, AudioPart(end - start), track));
+            for (var p = 0; p < count; p++) steps.Add(AudioCopy(info, start, end - start, AudioPart(p, end - start), tracks[p]));
             expected += end - start;
         }
 
         var videoList = Path.Combine(work, VideoListName);
-        var audioList = Path.Combine(work, AudioListName);
+        var audioLists = Enumerable.Range(0, count)
+            .Select(p => Path.Combine(work, p == 0 ? AudioListName : "audio" + p.ToString(CultureInfo.InvariantCulture) + ".ffconcat"))
+            .ToArray();
         var join = new List<string> { "-hide_banner", "-nostdin", "-y", "-f", "concat", "-safe", "0", "-i", videoList };
-        if (info.HasAudio) join.AddRange(new[] { "-f", "concat", "-safe", "0", "-i", audioList });
+        foreach (var list in audioLists) join.AddRange(new[] { "-f", "concat", "-safe", "0", "-i", list });
         join.AddRange(new[] { "-map", "0:v:0" });
-        if (info.HasAudio) join.AddRange(new[] { "-map", "1:a:0" });
+        for (var p = 0; p < count; p++) join.AddRange(new[] { "-map", (p + 1).ToString(CultureInfo.InvariantCulture) + ":a:0" });
         join.AddRange(new[] { "-c", "copy" });
         if (encoding.OutputTag is { } tag && IsMp4Family(output)) join.AddRange(new[] { "-tag:v", tag });
         join.AddRange(Faststart(output));
         join.Add(output);
         steps.Add(new ExportStep(join, expected, videoList, video.ToString())
         {
-            AudioListPath = info.HasAudio ? audioList : null,
-            AudioListContent = info.HasAudio ? audio.ToString() : null
+            AudioListPath = count > 0 ? audioLists[0] : null,
+            AudioListContent = count > 0 ? audio[0].ToString() : null,
+            ExtraLists = Enumerable.Range(1, Math.Max(count - 1, 0)).Select(p => new ExportList(audioLists[p], audio[p].ToString())).ToArray()
         });
 
         return new ExportPlan(ExportMode.Smart, ExportMode.Smart, steps, over, limit, output, work);
@@ -901,22 +1126,22 @@ public static class EditExport
         return new ExportStep(args, length);
     }
 
-    private static ExportStep Copy(MediaInfo info, double start, double length, string target, int track)
+    private static ExportStep Copy(MediaInfo info, double start, double length, string target, IReadOnlyList<int> tracks)
     {
         var args = new List<string> { "-hide_banner", "-nostdin", "-y" };
         if (start > 0) args.AddRange(new[] { "-ss", Number(start + SeekNudgeSeconds) });
         args.AddRange(new[] { "-i", info.FilePath, "-t", Number(length), "-map", "0:v:0" });
-        if (info.HasAudio) args.AddRange(new[] { "-map", AudioStream(track) });
+        args.AddRange(AudioMaps(info, tracks));
         args.AddRange(new[] { "-c", "copy", "-avoid_negative_ts", "make_zero", "-f", "mpegts", target });
         return new ExportStep(args, length);
     }
 
-    private static ExportStep Encode(MediaInfo info, double start, double length, string videoMotion, string audioMotion, string target, int track)
+    private static ExportStep Encode(MediaInfo info, double start, double length, string videoMotion, string audioMotion, string target, IReadOnlyList<int> tracks)
     {
         var args = new List<string> { "-hide_banner", "-nostdin", "-y" };
         if (start > 0) args.AddRange(new[] { "-ss", Number(start) });
         args.AddRange(new[] { "-t", Number(length), "-i", info.FilePath, "-map", "0:v:0" });
-        if (info.HasAudio) args.AddRange(new[] { "-map", AudioStream(track) });
+        args.AddRange(AudioMaps(info, tracks));
         args.AddRange(new[] { "-vf", "setpts=PTS-STARTPTS" + videoMotion });
         if (info.HasAudio) args.AddRange(new[] { "-af", "asetpts=PTS-STARTPTS" + audioMotion });
         args.AddRange(new[] { "-c:v", MatchingEncoders[info.VideoCodec], "-preset", "medium", "-crf", FullCrf });

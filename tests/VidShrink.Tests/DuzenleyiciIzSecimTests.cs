@@ -23,7 +23,7 @@ namespace VidShrink.Tests;
 
 /// <summary>
 /// DZA-P5, duzenleyici teslimindeki ses izi secimi (<see cref="EditAudioTrack"/>, <c>EditExport.Build(audioTrack)</c>):
-/// varsayilan iz bugunku argumanlari harfi harfine yazar, secilen iz her kipte <c>0:a:N</c> olur (birlestirme listesi
+/// ilk iz (DZA-P7 oncesinin varsayilani) eski argumanlari harfi harfine yazar, secilen iz her kipte <c>0:a:N</c> olur (birlestirme listesi
 /// <c>0:a:0</c> kalir), "Ses yok" ses eslemesini kaldirir, akilli kapisi ve meta dili secilen izden okunur, ek kaynakli
 /// birlestirmede yalniz ilk kaynagin izi degisir; secim projeye yazilir. Canli kol iki ses izli 2 sn 320x240 kaynagi
 /// (<c>-threads 2</c>) teslim edip ffprobe ile iz sayisini ve kanal sayisini okur. Kanit
@@ -82,7 +82,7 @@ public sealed class DuzenleyiciIzSecimTests
     private static ExportPlan VarsayilanPlan(ExportMode kip, EditTimeline? cizelge = null, MediaInfo? bilgi = null, string cikti = "c.mkv",
         bool meta = false, EditExportSettings? ayar = null)
         => EditExport.Build(cizelge ?? IkiKlip(), bilgi ?? Bilgi(), Kareler, 0, kip, cikti, "is", 8 * Gb,
-            DuzenleyiciAkilliKodekTests.Sinirlar(Kareler), _ => true, meta, ayar);
+            DuzenleyiciAkilliKodekTests.Sinirlar(Kareler), _ => true, meta, ayar, EditAudioTrack.First);
 
     private static IEnumerable<string> Hepsi(ExportPlan plan) => plan.Steps.SelectMany(s => s.Args);
 
@@ -103,7 +103,7 @@ public sealed class DuzenleyiciIzSecimTests
         var ayar = yalnizSes ? EditExportSettings.Default with { AudioOnly = true } : null;
 
         var eski = VarsayilanPlan(kip, cizelge, ayar: ayar, meta: true);
-        var sifir = Plan(kip, EditAudioTrack.Default, cizelge, ayar: ayar, meta: true);
+        var sifir = Plan(kip, EditAudioTrack.First, cizelge, ayar: ayar, meta: true);
         var disari = Plan(kip, 7, cizelge, ayar: ayar, meta: true);
 
         Assert.Equal(Hepsi(eski), Hepsi(sifir));
@@ -267,7 +267,11 @@ public sealed class DuzenleyiciIzSecimTests
 
         var plan = EditExport.Build(cizelge, kaynaklar, ExportMode.Full, "c.mkv", "is", 8 * Gb, audioTrack: 1);
 
-        Assert.Contains("[0:a]atrim", Deger(plan.Steps[0].Args, "-filter_complex"));
+        var varsayilan = EditExport.Build(cizelge, kaynaklar, ExportMode.Full, "c.mkv", "is", 8 * Gb);
+
+        Assert.Equal(varsayilan.Steps[^1].Args, plan.Steps[^1].Args);
+        Assert.Contains("[0:a:1]atrim", Deger(plan.Steps[^1].Args, "-filter_complex"));
+        Assert.Contains("[aout1]", plan.Steps[^1].Args);
     }
 
     [Fact]
@@ -288,7 +292,7 @@ public sealed class DuzenleyiciIzSecimTests
 
         Assert.Equal(new[] { "aac", "ac3" }, izler.Select(i => i.Codec));
         Assert.Equal(1, EditAudioTrack.Resolve(Bilgi(), 1));
-        Assert.Equal(EditAudioTrack.Default, EditAudioTrack.Resolve(Bilgi(), 2));
+        Assert.Equal(EditAudioTrack.First, EditAudioTrack.Resolve(Bilgi(), 2));
         Assert.Equal(EditAudioTrack.None, EditAudioTrack.Resolve(Bilgi() with { AudioCodec = null }, 1));
         Assert.Equal("ac3", EditAudioTrack.Select(Bilgi(), 1).AudioCodec);
         Assert.Equal(6, EditAudioTrack.Select(Bilgi(), 1).AudioChannels);
@@ -340,7 +344,7 @@ public sealed class DuzenleyiciIzSecimTests
                  {
                      (ExportMode.Full, 1, "tam.mkv", "2"),
                      (ExportMode.Fast, 1, "hizli.mkv", "2"),
-                     (ExportMode.Full, EditAudioTrack.Default, "varsayilan.mkv", "1"),
+                     (ExportMode.Full, EditAudioTrack.First, "varsayilan.mkv", "1"),
                      (ExportMode.Full, EditAudioTrack.None, "sessiz.mkv", "")
                  })
         {
@@ -395,7 +399,7 @@ public sealed class DuzenleyiciIzSecimTests
 }
 
 /// <summary>
-/// DZA-P5 arayuz kolu, sahte <c>IzMotoru</c> ile (iki ses izi, mpv kimlikleri 1 ve 2): teslim kutusu izleri ve
+/// DZA-P5 arayuz kolu, sahte <c>IzMotoru</c> ile (iki ses izi, mpv kimlikleri 1 ve 2): teslim kutusu "Tum izler"i, izleri ve
 /// "Ses yok"u listeler, monitor dugmesi yalniz birden cok izde gorunur ve oynaticiya sonraki izin kimligini yazar,
 /// onizleme yeniden yuklenince (kesim) secim motora yeniden verilir, secim teslim anahtarini degistirir, projeye
 /// yazilip yeni gorunumde geri gelir, "Ses yok" motora 0 yazar. Teslimin secimi <c>-map</c>'e indirdigi
@@ -445,8 +449,9 @@ public sealed class DuzenleyiciIzSecimArayuzTests
             Assert.Equal(2, view.AudioTracks.Count);
             Assert.Equal(EditAudioTrack.Default, view.SelectedAudioTrack);
             var ogeler = view.CmbExportAudioTrack.ItemsSource!.Cast<object>().Select(o => o.ToString()).ToArray();
-            Assert.Equal(3, ogeler.Length);
-            Assert.Equal(Strings.Get("editor.export.audio-track.none"), ogeler[2]);
+            Assert.Equal(4, ogeler.Length);
+            Assert.Equal(Strings.Get("editor.export.audio-track.all"), ogeler[0]);
+            Assert.Equal(Strings.Get("editor.export.audio-track.none"), ogeler[3]);
             Assert.Equal(0, view.CmbExportAudioTrack.SelectedIndex);
             Assert.True(view.CmbExportAudioTrack.IsEnabled);
             Assert.True(view.BtnAudioTrack.IsVisible);
@@ -457,7 +462,7 @@ public sealed class DuzenleyiciIzSecimArayuzTests
             view.BtnAudioTrack.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
             Assert.Equal(1, view.SelectedAudioTrack);
             Assert.Equal(new long[] { 2 }, motor.Yazilan);
-            Assert.Equal(1, view.CmbExportAudioTrack.SelectedIndex);
+            Assert.Equal(2, view.CmbExportAudioTrack.SelectedIndex);
             Assert.Equal("2/2", view.TxtAudioTrack.Text);
             Assert.NotEqual(ilkAnahtar, Anahtar(view));
 
@@ -474,7 +479,7 @@ public sealed class DuzenleyiciIzSecimArayuzTests
             Assert.Equal(new long[] { 1 }, motor.Yazilan);
 
             motor.Yazilan.Clear();
-            view.CmbExportAudioTrack.SelectedIndex = 2;
+            view.CmbExportAudioTrack.SelectedIndex = 3;
             Assert.Equal(EditAudioTrack.None, view.SelectedAudioTrack);
             Assert.Equal(new long[] { 0 }, motor.Yazilan);
             Assert.Equal(string.Empty, view.TxtAudioTrack.Text);
@@ -482,6 +487,13 @@ public sealed class DuzenleyiciIzSecimArayuzTests
 
             view.CycleAudioTrack();
             Assert.Equal(0, view.SelectedAudioTrack);
+
+            motor.Yazilan.Clear();
+            view.CmbExportAudioTrack.SelectedIndex = 0;
+            Assert.Equal(EditAudioTrack.All, view.SelectedAudioTrack);
+            Assert.Equal(new long[] { 1 }, motor.Yazilan);
+            Assert.Equal("1/2", view.TxtAudioTrack.Text);
+            Assert.Contains("|aud|-2", Anahtar(view));
         });
         Kapat(klasor);
     }
@@ -499,7 +511,7 @@ public sealed class DuzenleyiciIzSecimArayuzTests
                 Assert.Single(sahne.View.AudioTracks);
                 Assert.False(sahne.View.BtnAudioTrack.IsVisible);
                 Assert.True(sahne.View.CmbExportAudioTrack.IsEnabled);
-                Assert.Equal(2, sahne.View.CmbExportAudioTrack.ItemCount);
+                Assert.Equal(3, sahne.View.CmbExportAudioTrack.ItemCount);
                 sahne.View.CycleAudioTrack();
                 Assert.Equal(EditAudioTrack.Default, sahne.View.SelectedAudioTrack);
             }
@@ -538,7 +550,7 @@ public sealed class DuzenleyiciIzSecimArayuzTests
             {
                 ikinci.Ac(dosya);
                 Assert.Equal(1, ikinci.View.SelectedAudioTrack);
-                Assert.Equal(1, ikinci.View.CmbExportAudioTrack.SelectedIndex);
+                Assert.Equal(2, ikinci.View.CmbExportAudioTrack.SelectedIndex);
                 Assert.True(ikinci.Bekle(() => ikinci.Motor!.Yazilan.Count > 0 && ikinci.Motor.Yazilan[^1] == 2), "geri gelen secim motora yazilmadi");
             }
 

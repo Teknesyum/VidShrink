@@ -453,6 +453,8 @@ public sealed class LocalizationTests : IDisposable
         }
         foreach (var kind in Enum.GetValues<VidShrink.Core.StreamKind>())
             all.Add("mediainfo.section." + kind.ToString().ToLowerInvariant());
+        foreach (var transition in Enum.GetValues<VidShrink.Core.Editing.TransitionKind>())
+            all.Add("editor.clip.transition." + VidShrink.Core.Editing.ClipTransition.Key(transition));
 
         return all;
     }
