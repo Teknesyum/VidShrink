@@ -748,15 +748,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Sahibin kararı: İmleç kayda yakılmak yerine ayrı veri olarak tutulsun mu; EKB-P9'da kayıt sonrası yol seçilmeden bu paket başlamaz.
 - Plan: Kayıt imleçsiz alınır, imleç izi EKB-P9'un yan dosyasından okunur. İz yumuşatılır, imleç seçilen boyutta yeniden çizilip `overlay` ile bindirilir; hızlı geçişlere kare karıştırma (`tmix`) ile bulanıklık eklenir. Yumuşatma saf fonksiyon olarak, imlecin karedeki yeri lavfi ile ölçülür.
 
-## 116. Kamera Arka Planı
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P11 · Kaydedici · iş büyük · öncelik 1 · karar sahibin
-
-- Satırlar (EKB-P11): EKB-07 Kamera arka planı. [Tablo](piyasa/2026-10-13/kaydedici-sunum-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/RecorderArguments.cs, src/VidShrink.App/Recorder/RecorderView.Kamera.cs, src/VidShrink.App/Recorder/RecorderSettings.cs, tools/, src/VidShrink.App/Locales/
-- Sahibin kararı: Kişiyi arka plandan ayıran model ve onu çalıştıran kitaplık uygulamayla dağıtılsın ya da ilk kullanımda indirilsin mi.
-- Plan: Kamera karesi kişi ayırma modelinden geçirilir (rakipler ONNX Runtime adlı model çalıştırma kitaplığını kullanıyor), çıkan maske ile arka plan bulanıklaştırılır, silinir ya da değiştirilir. Bugünkü sabit arka plan farkı ve yeşil perde seçenekleri yanında kalır (RecorderArguments.cs:926-935). Model ve kitaplık libmpv gibi sha256 özetiyle indirilir. Önce modelin boyutu ve kare hızı `tools/VidShrink.Bench` ile ölçülür, karar o sayıya göre verilir.
-
 ## 117. Taşınabilir Kip Ve Güncelleme Kanalı
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · AYR-P8 · Ayarlar Ve Kabuk · iş büyük · öncelik 1 · karar sahibin
@@ -774,15 +765,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: yeni packaging/flatpak/, packaging/appimage/, .github/workflows/release.yml, src/VidShrink.Core/UpdateCheck.cs, install-vidshrink.sh
 - Sahibin kararı: Flathub'a uygulama başvurusu yapılsın mı (sahibin hesabından; ffmpeg ve libmpv paketin içinde gelir) ve yayına AppImage eklensin mi.
 - Plan: Flatpak bildirimi (uygulamanın nasıl derleneceğini ve hangi izinlerle çalışacağını söyleyen dosya) yazılır; ffmpeg ve libmpv Flathub çalışma ortamından ya da bildirimde kaynaktan derlenerek gelir, uygulama kimliği, tanıtım dosyası ve simge eklenir. Paketin içinde kendini güncelleme kapatılır, güncellemeyi Flathub yapar. AppImage aynı yayın çıktısından `release.yml` içinde üretilir ve sha256 listesine girer. Doğrulama: CI'da paketi kurup küçültme ve oynatma denemesi; AppImage için temiz bir Ubuntu koşucusunda açılış.
-
-## 119. Dosya Dönüştürme Ve Ölçüm Araçları
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · ARC-P6 · Bizde Olmayan Araçlar · iş büyük · öncelik 1 · karar sahibin
-
-- Satırlar (ARC-P6): ARC-21 Altyazı dosyası dönüştürme ve kaydırma; ARC-11 Görüntü dönüştürücü; ARC-02 İki dosya kalite ölçer; ARC-06 Kare sağlaması. [Tablo](piyasa/2026-10-13/eksik-araclar-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/SubtitleCharset.cs, src/VidShrink.Core/StreamMapping.cs, src/VidShrink.Core/ConversionArguments.cs, src/VidShrink.Ffmpeg/QualityMeter.cs, src/VidShrink.App/Playback/ComparisonPanel.axaml.cs, src/VidShrink.Cli/CliRequest.cs, src/VidShrink.App/MainWindow.axaml
-- Sahibin kararı: Araçlar sekmesi açılsın mı, yoksa en yakın sekmeye mi konsun
-- Plan: Dört araç da aynı kalıpta (dosya seç, ayarla, çalıştır) ve iki ayrı teslime bölünür: dosya dönüştürme (ARC-21, ARC-11) ve ölçüm (ARC-02, ARC-06). Dönüştürmede ffmpeg altyazıyı SRT, ASS ve VTT arasında çevirir, bütün satırlar verilen süre kadar kaydırılır, kodlama var olan okuyucuyla (SubtitleCharset) UTF-8'e alınır, oynatıcıdaki gecikme "dosyaya yaz" ile aynı yola bağlanır; fotoğrafta ffmpeg'in resim kodlayıcılarıyla toplu biçim ve boyut değişimi yapılır. Ölçümde motor hazır (`QualityMeter.MeasureAsync` iki serbest yol alıyor): iki dosyanın seçildiği ekran puanları ve kare kare VMAF grafiğini gösterir, yanına kare özetlerini karşılaştıran "birebir aynı mı" denetimi (framemd5) gelir, komut satırına Bench'teki `measure` komutunun eşi eklenir. Sahip "en yakın sekme" derse dönüştürme Dönüştür'e yeni kaynak türü, ölçüm Küçült'ün karşılaştırma paneline "başka dosya seç" olarak girer; doğrulama: altyazıda gidiş dönüşte satır sayısı ve zamanlar korunur, aynı dosya kendisiyle ölçülünce en yüksek puan ve eşit kare özeti çıkar.
 
 ## 120. Tepsiye Küçültme
 
@@ -820,15 +802,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Sahibin kararı: libvvenc içeren bir ffmpeg derlemesi dağıtılsın mı ve oynatma desteği bu kadar darken VVC kodek listesine girsin mi?
 - Plan: Önce dağıtılan ffmpeg'de libvvenc (VVC kodlayan açık kaynak kitaplık) var mı diye yoklanır; yoksa iş derleme kararında bekler. Varsa kodek izin listesine eklenir (`src/VidShrink.Core/PlanParser.cs:13`), hız ön ayarları ve boyut verimi ölçülerek yazılır, kodek seçiminde çoğu aygıtta oynamadığı uyarısıyla gösterilir. Doğrulama: argüman testi ve ölçüm aracıyla hedef boyut bandının tuttuğunun ölçülmesi. Dönüştür sekmesindeki DON-33 ile aynı iştir.
 
-## 124. Model Tabanlı Gürültü Bastırma
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · EKA-P11 · Kaydedici · iş orta · öncelik 2 · karar sahibin
-
-- Satırlar (EKA-P11): EKA-14 Model tabanlı gürültü bastırma. [Tablo](piyasa/2026-10-13/kaydedici-yakalama-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/AudioCaptureArguments.cs, src/VidShrink.App/Recorder/RecorderView.Ses.cs, Install-VidShrink.ps1 ve öbür kurucular
-- Sahibin kararı: Gürültü bastırma modeli (RNNoise dosyası) kurulum paketine girsin mi.
-- Plan: ffmpeg'in `arnndn` süzgeci (konuşmayı gürültüden ayırmak için eğitilmiş küçük bir modelle çalışan süzgeç) bugünkü `afftdn` seçeneğinin yanına üçüncü kademe olarak eklenir; model dosyası kurulumla gelir. Önce pinli ffmpeg derlemesinde süzgecin açık olduğu ve model dosyasının lisansı doğrulanır. Ölçü: argüman testi ve gürültülü örnek kayıtta önce ile sonra dinleme.
-
 ## 125. Kayan Sonuç Kartı
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P14 · Kaydedici · iş orta · öncelik 2 · karar sahibin
@@ -855,33 +828,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.App/Localization/Strings.cs, src/VidShrink.App/Locales/, README.md, .github/workflows/
 - Sahibin kararı: 42 dil sözü nasıl sunulsun: gözden geçmemiş diller listede işaretlensin mi ve bir çeviri sitesinde proje hesabı açılsın mı?
 - Plan: Önce küçük adım olan AYR-25: insan gözünden geçmiş diller bir listede tutulur, öteki diller dil seçicide işaretlenir. Sonra AYR-04: sahibin seçtiği çeviri sitesi (Weblate, Crowdin ya da Transifex) depodaki `Locales` klasörüne bağlanır ve README'deki katkı yolu oraya çevrilir. Doğrulama: işaretli dil listesinin testi ve siteden gelen ilk deneme çevirisinin dizgi tamlığı testinden geçmesi.
-
-## 128. Ön Sürüm Güncelleme Kanalı
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DAG-P7 · Dağıtım Ve Otomasyon · iş orta · öncelik 2 · karar sahibin
-
-- Satırlar (DAG-P7): DAG-24 Güncelleme kanalı. [Tablo](piyasa/2026-10-13/dagitim-otomasyon-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/UpdateCheck.cs, src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/Locales/, .github/workflows/release.yml
-- Sahibin kararı: ön sürüm yayımlansın mı ve Ayarlar'a kanal seçimi eklensin mi; sürüm kesme düzeni değişir.
-- Plan: `release.yml` ekli etiketleri GitHub'da ön sürüm olarak yayımlar; kararlı kanal bunları görmez. Ayarlar'daki Güncelleme kartına kararlı ve ön sürüm seçimi gelir, varsayılan kararlı kalır; `UpdateCheck` seçili kanala göre en yeni sürümü seçer (ek ayrıştırması hazır). Ön sürümden kararlıya dönüş ve sessiz güncellemenin düşüş sayacı iki kanalda da test edilir. Aynı eksik komşu tabloda AYR-09; tek iş olarak yapılır.
-
-## 129. Altyazı Çevirisi
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · ARC-P8 · Bizde Olmayan Araçlar · iş orta · öncelik 2 · karar sahibin
-
-- Satırlar (ARC-P8): ARC-23 Altyazı çevirisi. [Tablo](piyasa/2026-10-13/eksik-araclar-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/Subtitles/, src/VidShrink.App/MainWindow.axaml.cs
-- Sahibin kararı: altyazı metnini çevrimiçi çeviri hizmetine ya da yerel dil modeline veren araç ürüne girsin mi
-- Plan: Altyazı dosyası satır satır okunur, metin seçilen çeviri hizmetine gönderilir, zamanlar korunarak yeni dosya yazılır. Hizmet seçimi ve anahtar kullanıcıdan alınır; gönderilen şey yalnız altyazı metnidir ve bu ekranda açıkça yazılır. Sahip yerel dil modelini seçerse iş ARC-P11'in ortak zeminine (çalışma zamanı ve model indirme) bağlanır. Doğrulama: sahte hizmetle satır sayısının ve zamanların değişmediği, biçem etiketlerinin bozulmadığı sınanır.
-
-## 130. Logo Ve Damga Silme
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · ARC-P9 · Bizde Olmayan Araçlar · iş orta · öncelik 2 · karar sahibin
-
-- Satırlar (ARC-P9): ARC-33 Logo ve filigran silme. [Tablo](piyasa/2026-10-13/eksik-araclar-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/VideoFilterChain.cs, src/VidShrink.App/MainWindow.axaml
-- Sahibin kararı: başkasının logosunu ya da filigranını silmeye yarayan araç ürüne girsin mi
-- Plan: Küçült'ün gelişmiş görüntü süzgeçlerine "bölge kapat" eklenir: kullanıcı önizlemede bir dikdörtgen çizer, ffmpeg'in delogo süzgeci o bölgeyi çevresinden doldurur. Kendiliğinden logo bulma yapılmaz. Doğrulama: argüman sınaması ve üretilmiş örnekte bölge dışındaki piksellerin değişmediği.
 
 ## 131. macOS İzin Akışı
 
@@ -1009,15 +955,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Sahibin kararı: Oyun sürecine kanca atan ayrı bir yakalama yolu yapılsın mı, yoksa ekran kaydı yolu ölçülüp yeterli mi sayılsın.
 - Plan: İlk adım ölçümdür: tam ekran bir oyunun bugünkü hızlı yolla kaydı hiç ölçülmedi. Kayıt düzgünse iş küçülür: sihirbazdaki "Oyun" seçimi (`RecorderWizard.cs:5`) oyunun bulunduğu ekranı kendiliğinden hedef alır ve satır kapanır. Kayıt bozuksa kanca yolu (oyunun içine girip çizdiği kareyi oradan alan yöntem) sahibin kararına çıkar; hile koruması olan oyunlarda risk taşır. Ölçüm `tools/VidShrink.Bench` ile alınır ve `docs/olcumler/` altına yazılır.
 
-## 145. Özel Hedef Ve Kendi Bulutun
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P16 · Kaydedici · iş büyük · öncelik 2 · karar sahibin
-
-- Satırlar (EKB-P16): EKB-28 Özel yükleme hedefi; EKB-29 Kendi bulut depona yükleme. [Tablo](piyasa/2026-10-13/kaydedici-sunum-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/Share/, src/VidShrink.App/Share/, src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.App/Locales/
-- Sahibin kararı: Kullanıcının girdiği sunucu adresi ve erişim anahtarı uygulamada saklansın mı, bulut hesabına tarayıcıdan giriş eklensin mi.
-- Plan: Önce hedef tablosuna arayüzden satır ekleme gelir: adres, alan adları, isteğe bağlı anahtar; tablo bugün yalnız elle JSON düzenleyerek genişliyor (ShareTargets.cs:188-229, IShareProvider.cs:60-80). Ardından S3 uyumlu depo (Amazon'un dosya deposu protokolü, başka servisler de konuşur) için yeni sağlayıcı yazılır; Google Drive tarayıcıdan giriş istediği için en sona kalır. Anahtar işletim sisteminin korumalı deposunda tutulur. Sağlayıcılar sahte taşıyıcıyla, ağa çıkmadan ölçülür.
-
 ## 146. Girdi Efektleri Mac Ve Linux
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P17 · Kaydedici · iş büyük · öncelik 2 · karar sahibin
@@ -1035,15 +972,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.App/Themes/Theme.axaml, src/VidShrink.App/Themes/PaletteCatalog.cs, src/VidShrink.App/Themes/Palette/, src/VidShrink.App/MainWindow.axaml
 - Sahibin kararı: "Renk yalnız paletten, ölçü yalnız belirteçten" kuralına sistemin karşıtlık ve yazı boyutu ayarları için istisna açılsın mı?
 - Plan: Önce AYR-13: sistem yüksek karşıtlık istediğinde seçilecek bir yüksek karşıtlıklı palet eklenir ve geçiş `PaletteCatalog.Use` üstünden yapılır. Sonra AYR-12: yazı boyutu belirteçlerine tek bir ölçek çarpanı bağlanır, Ayarlar'a yazı boyutu seçimi konur ve en küçük pencere boyutunda taşma her sekmede ölçülür. Doğrulama: karşıtlık oranı ölçümü ve pinli yerleşim ölçülerinin her ölçekte yeniden koşulması.
-
-## 148. İlk Açılış Karşılaması Ve Kılavuz
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · AYR-P12 · Ayarlar Ve Kabuk · iş büyük · öncelik 2 · karar sahibin
-
-- Satırlar (AYR-P12): AYR-23 İlk Açılış Karşılaması; AYR-24 Kullanım Kılavuzu. [Tablo](piyasa/2026-10-13/ayarlar-kabuk-dogrulanmis.md)
-- Dokunacağı yer: docs/kullanim.md, docs/kullanim.tr.md, src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/MainWindow.axaml.cs, README.md
-- Sahibin kararı: Yeni kullanıcıya yardım nasıl sunulsun: ilk açılışta bir karşılama ekranı ve dillerde sürdürülen çevrimiçi kılavuz sitesi açılsın mı?
-- Plan: Önce AYR-24: depodaki iki dilli kullanım belgesi sekme sekme tamamlanır ve sahibin seçtiği yerde site olarak yayımlanır. Sonra AYR-23: ilk açılışta bir kez görünen, beş işi gösteren ve kılavuza bağlanan kısa karşılama eklenir; kapatılınca bir daha çıkmaz. Doğrulama: karşılamanın yalnız ilk açılışta göründüğünün testi ve belgedeki her ekran görüntüsünün güncel sürümden alınması.
 
 ## 149. Tam Paket Ve Çevrimdışı Kurucu
 
@@ -1063,15 +991,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Sahibin kararı: ücretli Apple geliştirici üyeliği alınsın mı; alınırsa dmg yayımlanır ve Homebrew için kendi tap depomuz açılır.
 - Plan: `macos-app-bundle.sh` ad-hoc imza yerine Developer ID ile imzalar ve paketi noterlemeye gönderir (noterleme: Apple'ın paketi tarayıp onay damgası vermesi); libmpv ve öteki kitaplıklar da imzalanır. İmzalı paketten sürükle bırak dmg üretilir ve yayına eklenir. Homebrew ana dizini en az 75 yıldız, sahibin kendi başvurusunda 225 yıldız arıyor ve bizde 12 var; bu yüzden cask (Homebrew'un hazır uygulama tarifi) kendi tap depomuzda (projeye ait Homebrew paket deposu) yayımlanır ve `release.yml` her sürümde sürüm ile sha256'yı tazeler. Doğrulama: CI'da Gatekeeper ve damga denetimi, temiz Mac'te tarayıcıdan indirip çift tıkla açma elle.
 
-## 151. Microsoft Store Paketi
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DAG-P11 · Dağıtım Ve Otomasyon · iş büyük · öncelik 2 · karar sahibin
-
-- Satırlar (DAG-P11): DAG-03 Microsoft Store paketi. [Tablo](piyasa/2026-10-13/dagitim-otomasyon-dogrulanmis.md)
-- Dokunacağı yer: yeni packaging/msix/, .github/workflows/release.yml, src/VidShrink.Core/UpdateCheck.cs, src/VidShrink.Core/Setup/
-- Sahibin kararı: Microsoft Store geliştirici hesabı açılsın mı ve uygulama MSIX olarak mağazaya girsin mi.
-- Plan: Mağazanın exe yolu imzalı, sessiz ve çevrimdışı kurucu ister; bizim kurucu indirici olduğu için o yol DAG-P6, DAG-P1 ve DAG-P9 bitmeden kapalı. MSIX yolunda paketi Microsoft imzalar: uygulama, ffmpeg ve libmpv tek pakete girer, dosya ilişkisi ve sağ tık menüsü paket bildirimine taşınır, kurulum kökü yazılamaz olduğu için kendini güncelleme kapatılır. Önce DAG-P9 kararı gerekir. Doğrulama: paket sertifika aracı, mağaza ön incelemesi ve yerelde kurup beş sekmenin açılışı.
-
 ## 152. Betik Ve Eklenti Arabirimi
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · DAG-P12 · Dağıtım Ve Otomasyon · iş büyük · öncelik 2 · karar sahibin
@@ -1080,27 +999,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.Core/, src/VidShrink.App/, yeni docs/ sayfası
 - Sahibin kararı: uygulamaya betik motoru (yeni bağımlılık) eklensin ve sürümler arası korunacak bir eklenti arabirimi sözü verilsin mi.
 - Plan: DAG-P4'ten önce başlanmaz: dış süreçten gelen komut kanalı, eklenti isteklerinin kumanda ve otomasyon kısmını bağımlılık eklemeden karşılar. Evet denirse ilk adım dar tutulur: kullanıcı klasöründeki betikler oynatıcı ve kuyruk olaylarına abone olur ve komut kanalındaki komutları çağırır; arayüze parça ekleyen eklenti sonraya kalır. Betik dili ve motoru kararın parçasıdır. Doğrulama: örnek betikle olay ve komut testi, betik hatasının uygulamayı düşürmediğinin testi.
-
-## 153. Yapay Zekâ Araçları
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · ARC-P11 = DON-P15 · Bizde Olmayan Araçlar · iş büyük · öncelik 2 · karar sahibin
-
-- Satırlar (ARC-P11): ARC-25 Vokal ve enstrüman ayırma; ARC-27 Yapay zekâ ile çözünürlük büyütme; ARC-29 Arka plan silme; ARC-30 Kendiliğinden yeniden kadraj; ARC-31 Yüz bulanıklaştırma. [Tablo](piyasa/2026-10-13/eksik-araclar-dogrulanmis.md)
-- Satırlar (DON-P15): DON-32 Yapay zekâ ile büyütme. [Tablo](piyasa/2026-10-13/donustur-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/Setup/, src/VidShrink.Ffmpeg/, src/VidShrink.Core/ConversionArguments.cs, Install-VidShrink.ps1
-- Sahibin kararı: yapay zekâ araçları için yeni çalışma zamanı ve yüzlerce MB model indirmesi kabul edilsin mi
-- Plan: Önce ortak zemin: modeli koşturan çalışma zamanı ve model dosyalarını ilk kullanımda sha256'lı indiren yol (libmpv'nin indiği yolun eşi). Sonra araç araç, her biri ayrı teslim: büyütme (ARC-27) pilot olur, ardından vokal ayırma (ARC-25), arka plan silme (ARC-29), yeniden kadraj (ARC-30) ve yüz bulanıklaştırma (ARC-31). Sahip "evet" derse bu paket beş pakete bölünür. Doğrulama: model yokken aracın görünmediği, indirme özetinin tuttuğu, kısa örnekte çıktı çözünürlüğünün beklenene eşit olduğu.
-
-## 154. Kendi Sekmesini İsteyen Araçlar
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · ARC-P12 · Bizde Olmayan Araçlar · iş büyük · öncelik 2 · karar sahibin
-
-- Satırlar (ARC-P12): ARC-18 Yinelenen video bulucu; ARC-22 Altyazı düzenleyici. [Tablo](piyasa/2026-10-13/eksik-araclar-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/MainWindow.axaml, src/VidShrink.Core/Subtitles/, src/VidShrink.Core/Editing/AudioPeaks.cs
-- Sahibin kararı: kendi sekmesini isteyen araç ürüne girsin mi
-- Plan: Yinelenen video bulucu: klasördeki her videodan birkaç karenin özeti ffmpeg ile çıkarılır, yakın özetler gruplanır, kullanıcı hangisini sileceğini seçer. Altyazı düzenleyici: satır listesi, metin ve zaman düzenleme, düzenleyicinin dalga biçimi verisi üstünde hizalama. Sahip "evet" derse iki pakete bölünür; altyazı düzenleyicinin hafif hali DZB-62'de zaten yazılı. Doğrulama: aynı videonun yeniden kodlanmış kopyası aynı gruba düşer; düzenlenen altyazı geri okununca aynı satırları verir.
-
-**Dalga 1 Yan Bulguları — Karar Gerekmez, Küçük İş**
 
 ## 155. macOS'ta Bölge Kaydı Seçili Ekrandan
 
