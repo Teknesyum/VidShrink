@@ -7,6 +7,88 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.17] - 2026-10-15
+
+### Added
+
+- The Convert tab covers many more inputs and outputs. NVENC, QuickSync and AMF hardware encoders
+  (H.264, HEVC, AV1) appear in the codec list when the machine has them, and a saved choice
+  follows the encoder by name. Audio-only files and GIFs can be opened and converted (a GIF can
+  be fitted under a target size), and a folder of numbered images opens as one source and can be
+  written out as a PNG or JPEG sequence or a single frame. A subtitle section lists the source's
+  subtitle tracks, saves any of them to a file, carries them into the output where the container
+  allows and says so when image subtitles are dropped, and can burn subtitles into the picture
+  with a choice of colour. An audio-track section picks which audio tracks go into the output,
+  and an external audio file can be added or can replace the source audio.
+- Batch conversion in the Convert tab: several files form a queue, each with the shared setting or
+  its own, and a summary at the end counts done, failed and cancelled files. Named Convert
+  presets can be saved and also exported to and imported from a file.
+- The Shrink tab can add an external audio file next to or in place of the source audio (also
+  `--audio-file` and `--replace-audio` on the command line), reduce background noise, and measure
+  and show the source's loudness and true peak. Burned-in subtitles get a font, size and
+  background-box choice. A running encode can be paused and resumed, and it pauses by itself when
+  the target drive is nearly full. An unfinished queue is restored on start-up in a paused state.
+- A "Media Information" window, opened with "All Details" on the Shrink source card and in the
+  player's info panel, lists every stream and chapter that ffprobe reads, can copy or save the
+  report as text, and has an audit scan that lists silences, black frames and scene changes with
+  timecodes. The editor's scan panel can save the same list.
+- Settings gains "Encoding Priority" (Normal, Below Normal, Low) and "Encoder Threads", an option
+  to keep the computer awake while encoding, settings export and import as one package, and a
+  backup of the settings file: an unreadable file is set aside, the last good copy is loaded and
+  a warning bar says so. The window position and size are remembered. A portable mode (a
+  `VidShrink.portable` file next to the exe) keeps all data in the app folder and turns off
+  self-update; a portable zip is now published for Windows. The language picker marks machine-
+  translated languages.
+- The editor can split a clip automatically into equal parts, parts of a fixed duration or parts
+  of a target size, with part and marker name patterns and a scene threshold. Silence-scan ranges
+  are managed one by one (click to cycle cut, keep and speed up), with separate lead and tail
+  padding and a choice of audio track. Text layers gain font, bold, italic, fade in and out,
+  outline, shadow and a background box; clips gain brightness, contrast, saturation and
+  temperature, plus Black and white and Old film looks; transitions (dissolve, wipe, slide, iris)
+  join clips; a music track can be mixed in; clips can be grouped and copied, cut, pasted and
+  duplicated inside the editor; and export settings (resolution, frame rate, codec, quality,
+  audio bitrate), built-in and user presets, and audio-only export to M4A or MP3 are available.
+  Lossless cutting now carries every audio track by default and the delivery box picks the audio
+  track; the monitor can switch tracks. Fast mode reports how early each cut starts, and the
+  editor has previous and next keyframe commands and an on-keyframe indicator. Smart mode copies
+  AC-3, E-AC-3 and MP3 audio unchanged.
+- The recorder gains cursor highlight and spotlight with size and colour choices, a privacy mask
+  that blurs rectangles you draw in the recording, key captions limited to shortcuts so typed
+  text stays out of the recording (with position, size and duration), a camera overlay shape
+  (rectangle, rounded or circle), mirroring and free placement by dragging in the region editor,
+  and a result card that slides in when a recording ends and lets you drag the file into another
+  app. On an HDR display recordings now stay 10-bit HDR10, with an option to convert to SDR. On
+  macOS the click marker works with avfoundation.
+- The player remembers the volume and mute state, shows a badge for track, delay, A-B point and
+  chapter changes, and lists chapter names. Dropping several files or folders queues every
+  playable file in natural order, and the menu has "Open folder". A watch history window can be
+  searched and cleared, history keeping and resuming are settings, and the 200-entry limit is
+  gone. The playlist window can search, sort and reorder, and shows the resume position and
+  duration of each row. Subtitle lines can be skipped, synced to the previous or next line,
+  hidden and copied, and `Subs` or `Subtitles` subfolders and `.sup` and `.idx` files are found.
+  Other additions: audio output device, passthrough, exclusive output and stereo downmix; blocking
+  sleep, hiding the cursor when the mouse is still, pausing when minimised and staying on top only
+  while playing; and opening the audio track and subtitles in the interface language, with forced
+  subtitles chosen automatically and deinterlacing applied automatically.
+
+### Changed
+
+- The recorder's mini strip has a three-group layout with fixed stop and pause buttons, the timer
+  in the middle and the options and enlarge buttons at the end.
+
+### Fixed
+
+- On macOS the recorder named the screen by index, which opened a camera instead on Macs that have
+  one; the screen is now selected by name.
+- A playlist address ending in a list extension is handed to the player instead of being dropped
+  from the queue.
+- The recorder no longer needs a page scroll at a 1024 px window height, and the Settings and
+  Convert tabs fit without scrolling. The language picker wraps a long machine-translation note
+  instead of cutting off the selected name, and the recorder's camera handle and the Shrink source
+  card buttons were fixed.
+- Silent-source encodes with an external audio file no longer show a "no audio" note on the
+  command line.
+
 ## [1.2.16] - 2026-10-13
 
 ### Fixed
