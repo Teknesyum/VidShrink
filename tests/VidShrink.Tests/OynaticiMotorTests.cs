@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -77,9 +77,11 @@ internal static class MotorKlipleri
         "-x265-params", "keyint=120:min-keyint=120:scenecut=0:log-level=error", "-tag:v", "hvc1",
         "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "128k", "-ac", "1", "-shortest");
 
-    private static string Hazirla(string name, params string[] args)
+    private static string Hazirla(string name, params string[] args) => Hazirla(MotorKanit.Folder, name, UretimTavaniMs, args);
+
+    internal static string Hazirla(string folder, string name, int tavanMs, params string[] args)
     {
-        var path = Path.Combine(MotorKanit.Folder, name);
+        var path = Path.Combine(folder, name);
         if (File.Exists(path) && new FileInfo(path).Length > 0) return path;
 
         Assert.True(ToolLocator.IsAvailable(out var missing), $"klip uretimi icin {missing} gerekli; bu test ffmpeg olmadan kirmizi kalir");
@@ -100,17 +102,49 @@ internal static class MotorKlipleri
         using var process = Process.Start(psi)!;
         var stdout = process.StandardOutput.ReadToEndAsync();
         var stderr = process.StandardError.ReadToEndAsync();
-        if (!process.WaitForExit(UretimTavaniMs))
+        if (!process.WaitForExit(tavanMs))
         {
-            try { process.Kill(true); } catch { }
-            throw new TimeoutException($"klip uretimi {UretimTavaniMs} ms icinde bitmedi: {name}");
+            try { process.Kill(true); process.WaitForExit(5_000); } catch { }
+            ParcayiSil(partial);
+            throw new TimeoutException($"klip uretimi {tavanMs} ms icinde bitmedi: {name}");
         }
 
         stdout.GetAwaiter().GetResult();
         var log = stderr.GetAwaiter().GetResult();
+        if (process.ExitCode != 0) ParcayiSil(partial);
         Assert.True(process.ExitCode == 0, $"ffmpeg {name} uretemedi (kod {process.ExitCode}): {log[Math.Max(0, log.Length - 600)..]}");
         File.Move(partial, path, true);
         return path;
+    }
+
+    private static void ParcayiSil(string partial)
+    {
+        try { File.Delete(partial); } catch (IOException) { } catch (UnauthorizedAccessException) { }
+    }
+}
+
+/// <summary>
+/// Klip üretimi düşünce <c>.part.mp4</c> geride kalmaz. Düşüş gerçek ffmpeg'den gelir:
+/// baseline profili 4:4:4'ü reddeder, ffmpeg çıkış dosyasını açtıktan sonra -22 ile çıkar
+/// ve 0 baytlık parçayı bırakır.
+/// </summary>
+public sealed class MotorKlipleriTests
+{
+    [Fact]
+    public void DusenUretimParcaDosyasiBirakmaz()
+    {
+        var folder = Path.Combine(GirdiKanit.Root, ".calisma", "motor-klipleri-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(folder);
+        try
+        {
+            Assert.ThrowsAny<Exception>(() => MotorKlipleri.Hazirla(folder, "dusen.mp4", 60_000,
+                "-f", "lavfi", "-i", "testsrc2=size=64x64:rate=5:duration=1",
+                "-c:v", "libx264", "-threads", "2", "-profile:v", "baseline", "-pix_fmt", "yuv444p"));
+
+            Assert.False(File.Exists(Path.Combine(folder, "dusen.mp4.part.mp4")), "dusen uretim .part.mp4 birakti");
+            Assert.False(File.Exists(Path.Combine(folder, "dusen.mp4")));
+        }
+        finally { Directory.Delete(folder, true); }
     }
 }
 

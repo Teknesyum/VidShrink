@@ -66,6 +66,56 @@ public sealed class SettingsTests
     }
 
     /// <summary>
+    /// <see cref="UpdateSettings.Save"/> aynı dosyayı paylaşan öteki yazıcıların anahtarlarını
+    /// (AppSettings, izleme, dosya ilişkilendirme) silmez; yalnız kendi anahtarlarını yazar.
+    /// </summary>
+    [Fact]
+    public void SaveKeepsKeysItDoesNotOwn()
+    {
+        var file = SettingsFile();
+        try
+        {
+            File.WriteAllText(file, """{ "theme": "Gece", "watchFolder": "C:\\izle", "nested": { "a": [1, 2] }, "targetMb": 3 }""");
+            var settings = UpdateSettings.Load(file);
+            settings.TargetMb = 25;
+            settings.Save(file);
+
+            using var document = JsonDocument.Parse(File.ReadAllText(file));
+            var root = document.RootElement;
+            Assert.Equal("Gece", root.GetProperty("theme").GetString());
+            Assert.Equal("C:\\izle", root.GetProperty("watchFolder").GetString());
+            Assert.Equal(2, root.GetProperty("nested").GetProperty("a")[1].GetInt32());
+            Assert.Equal(25, root.GetProperty("targetMb").GetDouble());
+        }
+        finally { if (File.Exists(file)) File.Delete(file); }
+    }
+
+    /// <summary>
+    /// Boşaltılan isteğe bağlı alan (dil, hızlı GPU kararı, kodek adı) birleştirmede eski
+    /// değeriyle dosyada kalmaz.
+    /// </summary>
+    [Fact]
+    public void SaveDropsClearedOptionalKeys()
+    {
+        var file = SettingsFile();
+        try
+        {
+            File.WriteAllText(file, """{ "language": "de", "fastGpu": true, "convertCodecName": "hevc_nvenc" }""");
+            var settings = UpdateSettings.Load(file);
+            settings.Language = null;
+            settings.FastGpu = null;
+            settings.ConvertCodecName = "";
+            settings.Save(file);
+
+            var loaded = UpdateSettings.Load(file);
+            Assert.Null(loaded.Language);
+            Assert.Null(loaded.FastGpu);
+            Assert.Null(loaded.ConvertCodecName);
+        }
+        finally { if (File.Exists(file)) File.Delete(file); }
+    }
+
+    /// <summary>
     /// Son kol <c>InvariantGlobalization</c> kararının ölçüsü. O kip açıkken
     /// <c>CultureInfo.CurrentUICulture.Name</c> boş dizgedir; <c>MainWindow.axaml.cs:532</c>
     /// oraya boş dizge verir ve kaydedilmiş dili olmayan kullanıcı 42 yerelleştirme

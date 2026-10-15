@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace VidShrink.Core;
 
@@ -579,47 +580,73 @@ public sealed class UpdateSettings
         if (root.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String) apply(value.GetString() ?? "");
     }
 
+    /// <summary>
+    /// Var olan dosyayı okuyup yalnız kendi anahtarlarını üstüne yazar; aynı dosyayı paylaşan
+    /// AppSettings, izleme ve dosya ilişkilendirme anahtarları silinmez. Boşaltılan isteğe bağlı
+    /// alanın anahtarı kaldırılır.
+    /// </summary>
     public void Save(string? path = null)
     {
         var file = path ?? DefaultPath;
         var folder = Path.GetDirectoryName(file);
         if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
 
+        var root = ReadRoot(file);
+        root["autoUpdate"] = AutoUpdate;
+        root[AutoUpdateDefaultMarker] = true;
+        SetOrRemove(root, "fastGpu", FastGpu is { } fastGpu ? JsonValue.Create(fastGpu) : null);
+        SetOrRemove(root, "language", string.IsNullOrWhiteSpace(Language) ? null : JsonValue.Create(Language));
+        root["targetMb"] = TargetMb;
+        root["qualityTarget"] = QualityTarget;
+        root["intent"] = Intent;
+        root["chipSizeCapped"] = ChipSizeCapped;
+        root["codec"] = Codec;
+        root["mayLowerResolution"] = MayLowerResolution;
+        root["fixedResolution"] = FixedResolution;
+        root["whatsAppCompatible"] = WhatsAppCompatible;
+        root["mayLowerFps"] = MayLowerFps;
+        root["fillPolicy"] = FillPolicy;
+        root["hdrPolicy"] = HdrPolicy;
+        root["qualityMode"] = QualityMode;
+        root["qualityValue"] = QualityValue;
+        root["container"] = Container;
+        root["convertCodec"] = ConvertCodec;
+        SetOrRemove(root, "convertCodecName", string.IsNullOrWhiteSpace(ConvertCodecName) ? null : JsonValue.Create(ConvertCodecName));
+        root["resolution"] = Resolution;
+        root["customResolution"] = CustomResolution;
+        root["convertFps"] = ConvertFps;
+        root["customFps"] = CustomFps;
+        root["convertAudio"] = ConvertAudio;
+        root["audioBitrate"] = AudioBitrate;
+        root["trimStart"] = TrimStart;
+        root["trimEnd"] = TrimEnd;
+        root["shareTarget"] = ShareTarget;
+        root["shareRetention"] = ShareRetention;
+
         using var stream = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.None);
         using var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true });
-        writer.WriteStartObject();
-        writer.WriteBoolean("autoUpdate", AutoUpdate);
-        writer.WriteBoolean(AutoUpdateDefaultMarker, true);
-        if (FastGpu.HasValue) writer.WriteBoolean("fastGpu", FastGpu.Value);
-        if (!string.IsNullOrWhiteSpace(Language)) writer.WriteString("language", Language);
-        writer.WriteNumber("targetMb", TargetMb);
-        writer.WriteNumber("qualityTarget", QualityTarget);
-        writer.WriteNumber("intent", Intent);
-        writer.WriteBoolean("chipSizeCapped", ChipSizeCapped);
-        writer.WriteNumber("codec", Codec);
-        writer.WriteBoolean("mayLowerResolution", MayLowerResolution);
-        writer.WriteNumber("fixedResolution", FixedResolution);
-        writer.WriteBoolean("whatsAppCompatible", WhatsAppCompatible);
-        writer.WriteBoolean("mayLowerFps", MayLowerFps);
-        writer.WriteNumber("fillPolicy", FillPolicy);
-        writer.WriteNumber("hdrPolicy", HdrPolicy);
-        writer.WriteNumber("qualityMode", QualityMode);
-        writer.WriteNumber("qualityValue", QualityValue);
-        writer.WriteNumber("container", Container);
-        writer.WriteNumber("convertCodec", ConvertCodec);
-        if (!string.IsNullOrWhiteSpace(ConvertCodecName)) writer.WriteString("convertCodecName", ConvertCodecName);
-        writer.WriteNumber("resolution", Resolution);
-        writer.WriteString("customResolution", CustomResolution);
-        writer.WriteNumber("convertFps", ConvertFps);
-        writer.WriteString("customFps", CustomFps);
-        writer.WriteNumber("convertAudio", ConvertAudio);
-        writer.WriteString("audioBitrate", AudioBitrate);
-        writer.WriteString("trimStart", TrimStart);
-        writer.WriteString("trimEnd", TrimEnd);
-        writer.WriteNumber("shareTarget", ShareTarget);
-        writer.WriteNumber("shareRetention", ShareRetention);
-        writer.WriteEndObject();
+        root.WriteTo(writer);
         writer.Flush();
+    }
+
+    private static JsonObject ReadRoot(string file)
+    {
+        try
+        {
+            return File.Exists(file) && JsonNode.Parse(File.ReadAllText(file)) is JsonObject existing
+                ? existing
+                : new JsonObject();
+        }
+        catch (Exception exception) when (exception is JsonException or IOException or UnauthorizedAccessException)
+        {
+            return new JsonObject();
+        }
+    }
+
+    private static void SetOrRemove(JsonObject root, string name, JsonNode? value)
+    {
+        if (value is null) root.Remove(name);
+        else root[name] = value;
     }
 
     public static void Delete(string? path = null)
