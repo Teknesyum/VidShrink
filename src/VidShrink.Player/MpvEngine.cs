@@ -327,7 +327,8 @@ public sealed partial class MpvEngine : IPlaybackEngine
                     GetProperty($"track-list/{i}/title"),
                     GetProperty($"track-list/{i}/lang"),
                     GetProperty($"track-list/{i}/external") == "yes",
-                    GetProperty($"track-list/{i}/selected") == "yes"));
+                    GetProperty($"track-list/{i}/selected") == "yes",
+                    GetProperty($"track-list/{i}/forced") == "yes"));
             }
 
             return tracks;

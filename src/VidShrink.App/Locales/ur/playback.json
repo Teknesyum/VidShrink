@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "اسکرین شاٹس JPG کے طور پر محفوظ کریں",
   "player.view.keep-history": "تاریخچہ محفوظ رکھیں",
   "player.view.resume": "جہاں چھوڑا تھا وہیں سے جاری رکھیں",
+  "player.view.audio-language": "انٹرفیس کی زبان میں آڈیو منتخب کریں",
+  "player.view.subtitle-language": "انٹرفیس کی زبان میں سب ٹائٹل آن کریں",
   "player.view.pause-on-minimize": "چھوٹا کرنے پر روکیں",
   "player.view.topmost-while-playing": "صرف چلاتے وقت اوپر رکھیں",
   "player.view.state-aspect": "تناسب {0}",

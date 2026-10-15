@@ -28,7 +28,7 @@ public enum PlaybackTrackKind
     Subtitle
 }
 
-public sealed record PlaybackTrack(long Id, PlaybackTrackKind Kind, string? Title, string? Language, bool External, bool Selected);
+public sealed record PlaybackTrack(long Id, PlaybackTrackKind Kind, string? Title, string? Language, bool External, bool Selected, bool Forced = false);
 
 public sealed record MediaTags(string? Title, string? Artist, string? Album)
 {

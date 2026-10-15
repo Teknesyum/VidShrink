@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Сохранять снимки экрана в JPG",
   "player.view.keep-history": "Сохранять историю",
   "player.view.resume": "Продолжать с места остановки",
+  "player.view.audio-language": "Выбирать звук на языке интерфейса",
+  "player.view.subtitle-language": "Включать субтитры на языке интерфейса",
   "player.view.pause-on-minimize": "Пауза при сворачивании",
   "player.view.topmost-while-playing": "Поверх окон только во время воспроизведения",
   "player.view.state-aspect": "соотношение {0}",

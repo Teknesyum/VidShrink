@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Save Screenshots as JPG",
   "player.view.keep-history": "Keep History",
   "player.view.resume": "Resume Where I Left Off",
+  "player.view.audio-language": "Pick Audio in the Interface Language",
+  "player.view.subtitle-language": "Turn On Subtitles in the Interface Language",
   "player.view.pause-on-minimize": "Pause When Minimized",
   "player.view.topmost-while-playing": "Keep On Top Only While Playing",
   "player.view.state-aspect": "aspect {0}",

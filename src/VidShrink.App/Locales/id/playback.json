@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Simpan tangkapan layar sebagai JPG",
   "player.view.keep-history": "Simpan riwayat",
   "player.view.resume": "Lanjutkan dari terakhir ditonton",
+  "player.view.audio-language": "Pilih audio dalam bahasa antarmuka",
+  "player.view.subtitle-language": "Aktifkan subtitle dalam bahasa antarmuka",
   "player.view.pause-on-minimize": "Jeda saat diminimalkan",
   "player.view.topmost-while-playing": "Tetap di atas hanya saat diputar",
   "player.view.state-aspect": "rasio {0}",

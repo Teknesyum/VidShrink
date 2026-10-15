@@ -15,11 +15,10 @@ internal sealed record HistoryRow(string Path, DateTimeOffset Seen, double Posit
 
 internal sealed class PlaybackHistory
 {
-    internal const int Capacity = 200;
+    internal const int MaxAgeDays = 365;
     internal const double MinimumResumeSeconds = 1;
     internal const double EndMarginSeconds = 1;
     internal const double BookmarkMergeSeconds = 0.5;
-    internal const int ResumeRecent = 5;
     internal const double DurationToleranceSeconds = 0.5;
 
     private static readonly StringComparer PathComparer =
@@ -113,7 +112,8 @@ internal sealed class PlaybackHistory
             {
                 writer.WriteStartObject();
                 writer.WriteStartObject("files");
-                foreach (var (media, entry) in _entries.OrderByDescending(pair => pair.Value.Seen).Take(Capacity))
+                var oldest = Now() - MaxAgeDays * 24d * 60 * 60 * 1000;
+                foreach (var (media, entry) in _entries.Where(pair => pair.Value.Bookmarks.Count > 0 || pair.Value.Seen >= oldest).OrderByDescending(pair => pair.Value.Seen))
                 {
                     writer.WriteStartObject(media);
                     writer.WriteNumber("position", Math.Round(entry.Position, 3));
@@ -138,7 +138,6 @@ internal sealed class PlaybackHistory
     internal double ResumeFor(string media, double durationSeconds)
     {
         if (!_entries.TryGetValue(Normalize(media), out var entry)) return 0;
-        if (_entries.Values.Count(other => other.Seen > entry.Seen) >= ResumeRecent) return 0;
         if (!SameFile(media, durationSeconds, entry)) return 0;
         var at = entry.Position;
         if (!double.IsFinite(at) || at < MinimumResumeSeconds) return 0;

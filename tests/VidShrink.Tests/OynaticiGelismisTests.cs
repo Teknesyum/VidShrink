@@ -70,16 +70,22 @@ public sealed class OynaticiGelismisTests
 
             body.AppendLine("zincir: " + (motor.GetProperty("vf") ?? ""));
 
+            body.AppendLine("acilis deinterlace: " + motor.GetProperty("deinterlace"));
+            Assert.Equal("auto", motor.GetProperty("deinterlace"));
+            Assert.False(motor.Picture.Deinterlace);
+
             view.ToggleDeinterlace();
             DenetimSurucu.Wait(view, 0.2);
             body.AppendLine("deinterlace: " + motor.GetProperty("deinterlace"));
             Assert.True(motor.Picture.Deinterlace);
+            Assert.Equal("yes", motor.GetProperty("deinterlace"));
 
             view.ResetPicture();
             DenetimSurucu.Wait(view, 0.2);
             var sifirlanan = motor.Picture;
             body.AppendLine("sifirlama sonrasi: " + sifirlanan);
             Assert.Equal(PictureAdjust.Neutral, sifirlanan);
+            Assert.Equal("auto", motor.GetProperty("deinterlace"));
             Assert.Equal("", (motor.GetProperty("vf") ?? "").Trim());
 
             window.Close();

@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "שמירת צילומי מסך כ-JPG",
   "player.view.keep-history": "שמירת היסטוריה",
   "player.view.resume": "המשך מהמקום שבו עצרתי",
+  "player.view.audio-language": "בחירת שמע בשפת הממשק",
+  "player.view.subtitle-language": "הפעלת כתוביות בשפת הממשק",
   "player.view.pause-on-minimize": "השהה בעת מזעור",
   "player.view.topmost-while-playing": "השאר מעל רק בזמן ניגון",
   "player.view.state-aspect": "יחס {0}",

@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Spremaj snimke zaslona kao JPG",
   "player.view.keep-history": "Čuvaj povijest",
   "player.view.resume": "Nastavi gdje sam stao",
+  "player.view.audio-language": "Odaberi zvuk na jeziku sučelja",
+  "player.view.subtitle-language": "Uključi titlove na jeziku sučelja",
   "player.view.pause-on-minimize": "Pauziraj pri minimiziranju",
   "player.view.topmost-while-playing": "Drži na vrhu samo tijekom reprodukcije",
   "player.view.state-aspect": "format {0}",
