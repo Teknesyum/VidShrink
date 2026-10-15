@@ -161,6 +161,7 @@
   "editor.group": "Grupiši",
   "editor.ungroup": "Razgrupiši",
   "editor.export.audio-track": "Звучни запис",
+  "editor.export.audio-track.all": "Сви записи",
   "editor.export.audio-track.none": "Без звука",
   "editor.monitor.audio-track": "Промени звучни запис"
 }

@@ -161,6 +161,7 @@
   "editor.group": "Gruppera",
   "editor.ungroup": "Dela upp grupp",
   "editor.export.audio-track": "Ljudspår",
+  "editor.export.audio-track.all": "Alla spår",
   "editor.export.audio-track.none": "Inget ljud",
   "editor.monitor.audio-track": "Byt ljudspår"
 }

@@ -161,6 +161,7 @@
   "editor.group": "Seskupit",
   "editor.ungroup": "Zrušit seskupení",
   "editor.export.audio-track": "Zvuková stopa",
+  "editor.export.audio-track.all": "Všechny stopy",
   "editor.export.audio-track.none": "Bez zvuku",
   "editor.monitor.audio-track": "Přepnout zvukovou stopu"
 }

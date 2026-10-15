@@ -161,6 +161,7 @@
   "editor.group": "Rühmita",
   "editor.ungroup": "Tühista rühmitus",
   "editor.export.audio-track": "Heliriba",
+  "editor.export.audio-track.all": "Kõik rajad",
   "editor.export.audio-track.none": "Heli puudub",
   "editor.monitor.audio-track": "Vaheta heliriba"
 }

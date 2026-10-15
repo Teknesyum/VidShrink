@@ -161,6 +161,7 @@
   "editor.group": "समूह बनाएँ",
   "editor.ungroup": "समूह हटाएँ",
   "editor.export.audio-track": "ऑडियो ट्रैक",
+  "editor.export.audio-track.all": "सभी ट्रैक",
   "editor.export.audio-track.none": "ऑडियो नहीं",
   "editor.monitor.audio-track": "ऑडियो ट्रैक बदलें"
 }

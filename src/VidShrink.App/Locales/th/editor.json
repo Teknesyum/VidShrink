@@ -161,6 +161,7 @@
   "editor.group": "จัดกลุ่ม",
   "editor.ungroup": "ยกเลิกกลุ่ม",
   "editor.export.audio-track": "แทร็กเสียง",
+  "editor.export.audio-track.all": "ทุกแทร็ก",
   "editor.export.audio-track.none": "ไม่มีเสียง",
   "editor.monitor.audio-track": "สลับแทร็กเสียง"
 }

@@ -161,6 +161,7 @@
   "editor.group": "Групиране",
   "editor.ungroup": "Разгрупиране",
   "editor.export.audio-track": "Аудиопътечка",
+  "editor.export.audio-track.all": "Всички пътечки",
   "editor.export.audio-track.none": "Без звук",
   "editor.monitor.audio-track": "Смяна на аудиопътечката"
 }

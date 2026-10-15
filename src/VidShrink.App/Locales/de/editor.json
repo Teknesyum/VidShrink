@@ -161,6 +161,7 @@
   "editor.group": "Gruppieren",
   "editor.ungroup": "Gruppierung aufheben",
   "editor.export.audio-track": "Tonspur",
+  "editor.export.audio-track.all": "Alle Spuren",
   "editor.export.audio-track.none": "Kein Ton",
   "editor.monitor.audio-track": "Tonspur wechseln"
 }

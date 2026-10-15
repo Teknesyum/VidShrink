@@ -161,6 +161,7 @@
   "editor.group": "গ্রুপ করুন",
   "editor.ungroup": "গ্রুপ ভাঙুন",
   "editor.export.audio-track": "অডিও ট্র্যাক",
+  "editor.export.audio-track.all": "সব ট্র্যাক",
   "editor.export.audio-track.none": "অডিও নেই",
   "editor.monitor.audio-track": "অডিও ট্র্যাক বদলান"
 }

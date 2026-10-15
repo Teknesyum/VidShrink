@@ -161,6 +161,7 @@
   "editor.group": "Grupiraj",
   "editor.ungroup": "Razgrupiraj",
   "editor.export.audio-track": "Zvučni zapis",
+  "editor.export.audio-track.all": "Svi zapisi",
   "editor.export.audio-track.none": "Bez zvuka",
   "editor.monitor.audio-track": "Promijeni zvučni zapis"
 }

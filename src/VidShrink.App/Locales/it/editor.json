@@ -161,6 +161,7 @@
   "editor.group": "Raggruppa",
   "editor.ungroup": "Separa",
   "editor.export.audio-track": "Traccia audio",
+  "editor.export.audio-track.all": "Tutte le tracce",
   "editor.export.audio-track.none": "Nessun audio",
   "editor.monitor.audio-track": "Cambia traccia audio"
 }

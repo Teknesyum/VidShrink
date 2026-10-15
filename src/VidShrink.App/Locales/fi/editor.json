@@ -161,6 +161,7 @@
   "editor.group": "Ryhmitä",
   "editor.ungroup": "Pura ryhmitys",
   "editor.export.audio-track": "Ääniraita",
+  "editor.export.audio-track.all": "Kaikki raidat",
   "editor.export.audio-track.none": "Ei ääntä",
   "editor.monitor.audio-track": "Vaihda ääniraitaa"
 }

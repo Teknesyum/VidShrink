@@ -161,6 +161,7 @@
   "editor.group": "Grupuj",
   "editor.ungroup": "Rozgrupuj",
   "editor.export.audio-track": "Ścieżka dźwiękowa",
+  "editor.export.audio-track.all": "Wszystkie ścieżki",
   "editor.export.audio-track.none": "Bez dźwięku",
   "editor.monitor.audio-track": "Przełącz ścieżkę dźwiękową"
 }

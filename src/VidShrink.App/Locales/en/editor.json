@@ -161,6 +161,7 @@
   "editor.group": "Group",
   "editor.ungroup": "Ungroup",
   "editor.export.audio-track": "Audio track",
+  "editor.export.audio-track.all": "All tracks",
   "editor.export.audio-track.none": "No audio",
   "editor.monitor.audio-track": "Switch audio track"
 }

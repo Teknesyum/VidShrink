@@ -161,6 +161,7 @@
   "editor.group": "Ομαδοποίηση",
   "editor.ungroup": "Κατάργηση ομαδοποίησης",
   "editor.export.audio-track": "Κομμάτι ήχου",
+  "editor.export.audio-track.all": "Όλα τα κομμάτια",
   "editor.export.audio-track.none": "Χωρίς ήχο",
   "editor.monitor.audio-track": "Αλλαγή κομματιού ήχου"
 }

@@ -161,6 +161,7 @@
   "editor.group": "קיבוץ",
   "editor.ungroup": "ביטול קיבוץ",
   "editor.export.audio-track": "רצועת שמע",
+  "editor.export.audio-track.all": "כל הרצועות",
   "editor.export.audio-track.none": "ללא שמע",
   "editor.monitor.audio-track": "החלפת רצועת שמע"
 }

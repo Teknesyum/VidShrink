@@ -161,6 +161,7 @@
   "editor.group": "تجميع",
   "editor.ungroup": "فك التجميع",
   "editor.export.audio-track": "مسار الصوت",
+  "editor.export.audio-track.all": "كل المسارات",
   "editor.export.audio-track.none": "بلا صوت",
   "editor.monitor.audio-track": "تبديل مسار الصوت"
 }

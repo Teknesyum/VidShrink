@@ -161,6 +161,7 @@
   "editor.group": "Grupla",
   "editor.ungroup": "Grubu Çöz",
   "editor.export.audio-track": "Ses izi",
+  "editor.export.audio-track.all": "Tüm izler",
   "editor.export.audio-track.none": "Ses yok",
   "editor.monitor.audio-track": "Ses izini değiştir"
 }

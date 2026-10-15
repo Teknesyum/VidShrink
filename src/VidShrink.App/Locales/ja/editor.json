@@ -161,6 +161,7 @@
   "editor.group": "グループ化",
   "editor.ungroup": "グループ解除",
   "editor.export.audio-track": "音声トラック",
+  "editor.export.audio-track.all": "すべてのトラック",
   "editor.export.audio-track.none": "音声なし",
   "editor.monitor.audio-track": "音声トラックを切り替え"
 }

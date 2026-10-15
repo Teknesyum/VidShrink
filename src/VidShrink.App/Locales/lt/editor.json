@@ -161,6 +161,7 @@
   "editor.group": "Grupuoti",
   "editor.ungroup": "Išgrupuoti",
   "editor.export.audio-track": "Garso takelis",
+  "editor.export.audio-track.all": "Visi takeliai",
   "editor.export.audio-track.none": "Be garso",
   "editor.monitor.audio-track": "Perjungti garso takelį"
 }

@@ -161,6 +161,7 @@
   "editor.group": "گروپ بنائیں",
   "editor.ungroup": "گروپ ختم کریں",
   "editor.export.audio-track": "آڈیو ٹریک",
+  "editor.export.audio-track.all": "تمام ٹریک",
   "editor.export.audio-track.none": "آڈیو نہیں",
   "editor.monitor.audio-track": "آڈیو ٹریک بدلیں"
 }

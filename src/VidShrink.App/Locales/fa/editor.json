@@ -161,6 +161,7 @@
   "editor.group": "گروه‌بندی",
   "editor.ungroup": "لغو گروه‌بندی",
   "editor.export.audio-track": "ترک صدا",
+  "editor.export.audio-track.all": "همه ترک‌ها",
   "editor.export.audio-track.none": "بدون صدا",
   "editor.monitor.audio-track": "تغییر ترک صدا"
 }

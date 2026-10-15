@@ -161,6 +161,7 @@
   "editor.group": "Panga kikundi",
   "editor.ungroup": "Vunja kikundi",
   "editor.export.audio-track": "Wimbo wa sauti",
+  "editor.export.audio-track.all": "Nyimbo zote",
   "editor.export.audio-track.none": "Hakuna sauti",
   "editor.monitor.audio-track": "Badilisha wimbo wa sauti"
 }

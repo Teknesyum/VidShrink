@@ -161,6 +161,7 @@
   "editor.group": "Agrupar",
   "editor.ungroup": "Desagrupar",
   "editor.export.audio-track": "Faixa de áudio",
+  "editor.export.audio-track.all": "Todas as faixas",
   "editor.export.audio-track.none": "Sem áudio",
   "editor.monitor.audio-track": "Trocar faixa de áudio"
 }

@@ -161,6 +161,7 @@
   "editor.group": "Сгруппировать",
   "editor.ungroup": "Разгруппировать",
   "editor.export.audio-track": "Звуковая дорожка",
+  "editor.export.audio-track.all": "Все дорожки",
   "editor.export.audio-track.none": "Без звука",
   "editor.monitor.audio-track": "Сменить звуковую дорожку"
 }

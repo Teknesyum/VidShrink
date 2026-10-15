@@ -161,6 +161,7 @@
   "editor.group": "Združi v skupino",
   "editor.ungroup": "Razdruži",
   "editor.export.audio-track": "Zvočni posnetek",
+  "editor.export.audio-track.all": "Vsi posnetki",
   "editor.export.audio-track.none": "Brez zvoka",
   "editor.monitor.audio-track": "Preklopi zvočni posnetek"
 }

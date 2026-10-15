@@ -147,6 +147,7 @@ public static class EditExportRunner
             {
                 if (step.ListPath is { } list) await File.WriteAllTextAsync(list, step.ListContent ?? string.Empty, ct).ConfigureAwait(false);
                 if (step.AudioListPath is { } audio) await File.WriteAllTextAsync(audio, step.AudioListContent ?? string.Empty, ct).ConfigureAwait(false);
+                foreach (var extra in step.ExtraLists) await File.WriteAllTextAsync(extra.Path, extra.Content, ct).ConfigureAwait(false);
                 var from = done / total;
                 done += step.DurationSeconds;
                 await EncodeRunner.RunCommandAsync(step.Args, Math.Max(0.001, step.DurationSeconds), progress, Stage,
