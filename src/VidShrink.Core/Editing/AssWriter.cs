@@ -149,9 +149,13 @@ public static class AssWriter
 
     private static IEnumerable<Line> Lines(TextLayer text, EdlPreview? preview)
     {
-        var cuts = new List<long> { 0 };
+        var inner = new SortedSet<long>();
         foreach (var k in text.Keyframes)
-            if (k.Offset > 0 && k.Offset < text.Length) cuts.Add(k.Offset);
+            if (k.Offset > 0 && k.Offset < text.Length) inner.Add(k.Offset);
+        foreach (var cut in text.MotionCuts())
+            if (cut > 0 && cut < text.Length) inner.Add(cut);
+        var cuts = new List<long> { 0 };
+        cuts.AddRange(inner);
         cuts.Add(text.Length);
 
         for (var i = 0; i + 1 < cuts.Count; i++)
@@ -200,7 +204,16 @@ public static class AssWriter
         tags.Append('}');
 
         return "Dialogue: " + index.ToString(CultureInfo.InvariantCulture) + "," + Timestamp(line.Start) + "," + Timestamp(line.End)
-               + ",T" + index.ToString(CultureInfo.InvariantCulture) + ",,0,0,0,," + tags + Escape(text.Text) + "\n";
+               + ",T" + index.ToString(CultureInfo.InvariantCulture) + ",,0,0,0,," + tags + Revealed(text, text.RevealedAt((line.From + line.To) / 2)) + "\n";
+    }
+
+    /// <summary>Daktilo metni: gorunmeyen kuyruk yerini korusun diye tam saydam yazilir, satir kaymaz.</summary>
+    private static string Revealed(TextLayer text, int shown)
+    {
+        var info = new StringInfo(text.Text);
+        if (shown >= info.LengthInTextElements) return Escape(text.Text);
+        var head = info.SubstringByTextElements(0, shown);
+        return Escape(head) + "{\\alpha&HFF&}" + Escape(text.Text[head.Length..]);
     }
 
     private static string Fade(TextLayer text, Line line)

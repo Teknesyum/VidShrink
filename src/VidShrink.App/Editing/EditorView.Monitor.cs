@@ -72,6 +72,7 @@ internal partial class EditorView
         var model = _model;
         var fps = MonitorFps;
         if (!TxtTimecode.IsFocused) ShowTimecode();
+        ShowTextPosition();
         TxtDuration.Text = model is null ? string.Empty : Stamp(model.Duration, fps);
         TxtOnKeyframe.IsVisible = model is not null
             && TimelineStrip.OnKeyframe(model, Timeline.KeyframeSources(), Timeline.Playhead, Timeline.KeyframeTolerance);

@@ -415,6 +415,18 @@ public sealed class EditProject
         if (text.Outline is { } outline) writer.WriteNumber("outline", outline);
         writer.WriteNumber("shadow", text.Shadow);
         writer.WriteBoolean("box", text.Box);
+        if (text.MotionIn != TextMotion.None || text.MotionInLength != 0)
+        {
+            writer.WriteString("motionIn", text.MotionIn.ToString().ToLowerInvariant());
+            writer.WriteNumber("motionInLength", text.MotionInLength);
+        }
+
+        if (text.MotionOut != TextMotion.None || text.MotionOutLength != 0)
+        {
+            writer.WriteString("motionOut", text.MotionOut.ToString().ToLowerInvariant());
+            writer.WriteNumber("motionOutLength", text.MotionOutLength);
+        }
+
         writer.WriteStartArray("keyframes");
         foreach (var key in text.Keyframes)
         {
@@ -443,12 +455,24 @@ public sealed class EditProject
             Outline = item.TryGetProperty("outline", out var outline) && outline.ValueKind != JsonValueKind.Null ? outline.GetDouble() : null,
             Shadow = item.TryGetProperty("shadow", out var shadow) ? shadow.GetDouble() : 0,
             Box = item.TryGetProperty("box", out var box) && box.GetBoolean(),
+            MotionIn = item.TryGetProperty("motionIn", out var motionIn) ? Motion(motionIn) : TextMotion.None,
+            MotionInLength = item.TryGetProperty("motionInLength", out var inLength) ? inLength.GetInt64() : 0,
+            MotionOut = item.TryGetProperty("motionOut", out var motionOut) ? Motion(motionOut) : TextMotion.None,
+            MotionOutLength = item.TryGetProperty("motionOutLength", out var outLength) ? outLength.GetInt64() : 0,
             Keyframes = item.GetProperty("keyframes").EnumerateArray()
                 .Select(k => new TextKeyframe(k.GetProperty("offset").GetInt64(), k.GetProperty("x").GetDouble(), k.GetProperty("y").GetDouble()))
                 .ToArray(),
         };
         text.Validate();
         return text;
+    }
+
+    private static TextMotion Motion(JsonElement value)
+    {
+        var name = value.GetString();
+        foreach (var motion in Enum.GetValues<TextMotion>())
+            if (string.Equals(motion.ToString(), name, StringComparison.OrdinalIgnoreCase)) return motion;
+        throw new FormatException("Bilinmeyen metin hareketi: " + name);
     }
 }
 

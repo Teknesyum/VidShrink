@@ -190,6 +190,23 @@
               <TextBox x:Name="TxtTextShadow" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.text.shadow}"/>
               <ToggleButton x:Name="BtnTextBox" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.text.box}" AutomationProperties.Name="{loc:Text editor.text.box}"/>
             </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <TextBlock x:Name="LblTextX" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.x}"/>
+              <TextBox x:Name="TxtTextX" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.text.x}"/>
+              <TextBlock x:Name="LblTextY" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.y}"/>
+              <TextBox x:Name="TxtTextY" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.text.y}"/>
+              <ToggleButton x:Name="BtnTextKeyframe" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.text.keyframe}" ToolTip.Tip="{loc:Text editor.text.keyframe.tip}" AutomationProperties.Name="{loc:Text editor.text.keyframe}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <TextBlock x:Name="LblTextMotionIn" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.motion-in}"/>
+              <ComboBox x:Name="CmbTextMotionIn" MinWidth="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" ToolTip.Tip="{loc:Text editor.text.motion.tip}" AutomationProperties.Name="{loc:Text editor.text.motion-in}"/>
+              <TextBox x:Name="TxtTextMotionIn" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" ToolTip.Tip="{loc:Text editor.text.motion.duration}" AutomationProperties.Name="{loc:Text editor.text.motion.duration}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <TextBlock x:Name="LblTextMotionOut" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.motion-out}"/>
+              <ComboBox x:Name="CmbTextMotionOut" MinWidth="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" ToolTip.Tip="{loc:Text editor.text.motion.tip}" AutomationProperties.Name="{loc:Text editor.text.motion-out}"/>
+              <TextBox x:Name="TxtTextMotionOut" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" ToolTip.Tip="{loc:Text editor.text.motion.duration}" AutomationProperties.Name="{loc:Text editor.text.motion.duration}"/>
+            </StackPanel>
           </WrapPanel>
           <WrapPanel x:Name="ClipPanel" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.clip.panel}">
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">

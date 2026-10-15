@@ -835,6 +835,246 @@ public sealed class DuzenleyiciMetinTests
             KanitKapanisi.Kapat(Kanit, "metin-bicim");
         }
     }
+
+    private static string[] Olaylar(string belge) => belge.Split('\n').Where(s => s.StartsWith("Dialogue: ", StringComparison.Ordinal)).ToArray();
+
+    private static void Yakin((double X, double Y) beklenen, (double X, double Y) olcum)
+    {
+        Assert.Equal(beklenen.X, olcum.X, 6);
+        Assert.Equal(beklenen.Y, olcum.Y, 6);
+    }
+
+    [Fact]
+    public void KonumTekKareyiTasirAnahtarKareliyeOynatmaAnindaYazar()
+    {
+        var duran = new TextLayer("k", 0, S(4));
+        Assert.Equal(new[] { new TextKeyframe(0, 0.2, 0.9) }, duran.WithPositionAt(S(2), 0.2, 0.9).Keyframes);
+        Assert.False(duran.HasKeyframeNear(0, 0));
+
+        var kareli = duran.WithKeyframeAt(S(2));
+        Assert.Equal(new[] { new TextKeyframe(0, 0.5, 0.5), new TextKeyframe(S(2), 0.5, 0.5) }, kareli.Keyframes);
+        Assert.True(kareli.HasKeyframeNear(S(2), 0));
+        Assert.False(kareli.HasKeyframeNear(S(2) + 10, 9));
+        Assert.True(kareli.HasKeyframeNear(S(2) + 10, 10));
+
+        var yeni = kareli.WithPositionAt(S(2), 0.8, 0.5);
+        Assert.Equal(new[] { new TextKeyframe(0, 0.5, 0.5), new TextKeyframe(S(2), 0.8, 0.5) }, yeni.Keyframes);
+        Yakin((0.65, 0.5), yeni.PositionAt(S(1)));
+        Assert.Contains("{\\an5\\move(160,120,256,120)}", Olaylar(AssWriter.Write(new[] { yeni }, 320, 240))[0]);
+
+        var araya = yeni.WithPositionAt(S(1), 0.5, 0.1);
+        araya.Validate();
+        Assert.Equal(new[] { 0, S(1), S(2) }, araya.Keyframes.Select(k => k.Offset));
+        Assert.Equal(yeni, araya.WithoutKeyframeNear(S(1), 0));
+        Assert.Equal(araya, araya.WithoutKeyframeNear(S(1) + 5, 4));
+
+        Assert.Equal(S(4), yeni.WithPositionAt(S(99), 0.1, 0.1).Keyframes[^1].Offset);
+        Assert.Equal(new TextKeyframe(0, 0.1, 0.1), yeni.WithPositionAt(-S(1), 0.1, 0.1).Keyframes[0]);
+
+        Assert.Equal(duran, duran.WithoutKeyframeNear(0, 0));
+        Assert.Equal(new[] { new TextKeyframe(0, 0.5, 0.5), new TextKeyframe(S(4), 0.5, 0.5) }, duran.WithKeyframeAt(0).Keyframes);
+        Assert.Equal(kareli, kareli.WithKeyframeAt(S(2)));
+    }
+
+    [Fact]
+    public void KayarakGirisVeCikisMoveYazar()
+    {
+        var kayan = new TextLayer("s", 0, S(2)) { MotionIn = TextMotion.Left, MotionInLength = S(0.5), MotionOut = TextMotion.Bottom, MotionOutLength = S(0.5) };
+        var olaylar = Olaylar(AssWriter.Write(new[] { kayan }, 320, 240));
+        Assert.Equal(3, olaylar.Length);
+        Assert.Contains(",0:00:00.00,0:00:00.50,", olaylar[0]);
+        Assert.Contains("{\\an5\\move(-160,120,160,120)}", olaylar[0]);
+        Assert.Contains(",0:00:00.50,0:00:01.50,", olaylar[1]);
+        Assert.Contains("{\\an5\\pos(160,120)}", olaylar[1]);
+        Assert.Contains(",0:00:01.50,0:00:02.00,", olaylar[2]);
+        Assert.Contains("{\\an5\\move(160,120,160,360)}", olaylar[2]);
+        Yakin((0, 0.5), kayan.PositionAt(S(0.25)));
+        Yakin((0.5, 0.5), kayan.KeyframePositionAt(S(0.25)));
+
+        var sag = kayan with { MotionIn = TextMotion.Right, MotionOut = TextMotion.Top };
+        var sagOlay = Olaylar(AssWriter.Write(new[] { sag }, 320, 240));
+        Assert.Contains("\\move(480,120,160,120)", sagOlay[0]);
+        Assert.Contains("\\move(160,120,160,-120)", sagOlay[2]);
+
+        var hareketsiz = new TextLayer("s", 0, S(2)) { MotionInLength = S(0.5), MotionOutLength = S(0.5) };
+        var tek = Assert.Single(Olaylar(AssWriter.Write(new[] { hareketsiz }, 320, 240)));
+        Assert.Contains("{\\an5\\pos(160,120)}", tek);
+
+        var onizleme = new EdlPreview(new[] { "a.mp4" }, EditTimeline.FromSource(S(10)));
+        Assert.Equal(AssWriter.Write(new[] { kayan }, 320, 240), AssWriter.WritePreview(new[] { kayan }, 320, 240, onizleme));
+
+        kayan.Validate();
+        Assert.Throws<ArgumentOutOfRangeException>(() => (kayan with { MotionInLength = S(1.6) }).Validate());
+        Assert.Throws<ArgumentOutOfRangeException>(() => (kayan with { MotionOutLength = -1 }).Validate());
+        Assert.Throws<ArgumentOutOfRangeException>(() => (kayan with { MotionIn = (TextMotion)99 }).Validate());
+
+        var kirpik = kayan.TrimmedTo(0, S(0.75));
+        Assert.Equal(S(0.5), kirpik.MotionInLength);
+        Assert.Equal(S(0.25), kirpik.MotionOutLength);
+        Assert.Equal(new[] { new TextKeyframe(0, 0.5, 0.5) }, kirpik.Keyframes);
+
+        Assert.NotEqual(kayan, kayan with { MotionIn = TextMotion.Right });
+        Assert.NotEqual(kayan, kayan with { MotionOutLength = S(0.4) });
+        Assert.Equal(kayan.GetHashCode(), (kayan with { }).GetHashCode());
+    }
+
+    [Fact]
+    public void DaktiloHarfHarfYazarVeSiler()
+    {
+        const string gizli = "{\\alpha&HFF&}";
+        var yazan = new TextLayer("abc", 0, S(3)) { MotionIn = TextMotion.Typewriter, MotionInLength = S(0.3), MotionOut = TextMotion.Typewriter, MotionOutLength = S(0.3) };
+        var olaylar = Olaylar(AssWriter.Write(new[] { yazan }, 320, 240));
+        var metinler = olaylar.Select(o => o[(o.IndexOf("(160,120)}", StringComparison.Ordinal) + 10)..]).ToArray();
+        Assert.Equal(new[] { "a" + gizli + "bc", "ab" + gizli + "c", "abc", "abc", "abc", "ab" + gizli + "c", "a" + gizli + "bc" }, metinler);
+        Assert.Contains(",0:00:00.00,0:00:00.10,", olaylar[0]);
+        Assert.Contains(",0:00:00.10,0:00:00.20,", olaylar[1]);
+        Assert.Contains(",0:00:02.90,0:00:03.00,", olaylar[^1]);
+        Assert.Equal(1, yazan.RevealedAt(0));
+        Assert.Equal(3, yazan.RevealedAt(S(1.5)));
+        Assert.Equal(1, yazan.RevealedAt(S(2.95)));
+
+        var birlesik = new TextLayer("éx", 0, S(1)) { MotionIn = TextMotion.Typewriter, MotionInLength = S(0.2) };
+        var ilk = Olaylar(AssWriter.Write(new[] { birlesik }, 320, 240))[0];
+        Assert.EndsWith("}é" + gizli + "x", ilk);
+
+        var kacisli = new TextLayer("{x", 0, S(1)) { MotionIn = TextMotion.Typewriter, MotionInLength = S(0.2) };
+        Assert.EndsWith("}\\{" + gizli + "x", Olaylar(AssWriter.Write(new[] { kacisli }, 320, 240))[0]);
+
+        var duz = new TextLayer("abc", 0, S(3));
+        Assert.DoesNotContain(gizli, AssWriter.Write(new[] { duz }, 320, 240));
+    }
+
+    [Fact]
+    public void HareketProjeKaydindaKalirEskiProjeHareketsizAcilir()
+    {
+        var eski = EditProject.Parse(EskiProje(string.Empty))!.Texts[0];
+        Assert.Equal(TextMotion.None, eski.MotionIn);
+        Assert.Equal(TextMotion.None, eski.MotionOut);
+        Assert.Equal(0, eski.MotionInLength);
+
+        var zaman = EditTimeline.FromSource(S(10));
+        zaman.AddText(new TextLayer("h", 0, S(2))
+        {
+            MotionIn = TextMotion.Typewriter, MotionInLength = S(0.5), MotionOut = TextMotion.Right, MotionOutLength = S(0.25),
+            Keyframes = new[] { new TextKeyframe(0, 0.1, 0.2), new TextKeyframe(S(1), 0.9, 0.8) }
+        });
+        var okunan = EditProject.Parse(EditProject.From(new SourceStamp("a.mp4", 1, 1), zaman).ToJson());
+        Assert.NotNull(okunan);
+        Assert.Equal(zaman.Texts, okunan!.Texts);
+
+        Assert.Equal(TextMotion.Left, EditProject.Parse(EskiProje(",\"motionIn\":\"left\",\"motionInLength\":" + S(0.5)))!.Texts[0].MotionIn);
+        Assert.Null(EditProject.Parse(EskiProje(",\"motionIn\":\"zikzak\"")));
+        Assert.Null(EditProject.Parse(EskiProje(",\"motionIn\":\"left\",\"motionInLength\":" + S(5))));
+    }
+
+    [Fact]
+    public void ArayuzKonumSuruklemeVeHazirHareketModeliYazar()
+    {
+        var klasor = Path.Combine(Kanit, "metin-konum");
+        Directory.CreateDirectory(klasor);
+        var dosya = Path.Combine(klasor, "kaynak.mp4");
+        File.WriteAllBytes(dosya, new byte[16]);
+        try
+        {
+            AppHost.Run(() =>
+            {
+                var motor = new KatmanMotoru();
+                var view = new EditorView
+                {
+                    KnownInfo = yol => new MediaInfo { FilePath = yol, FileSizeBytes = 16, DurationSeconds = 600, Width = 320, Height = 240, Fps = 30, VideoCodec = "h264", TotalBitrateBps = 1 }
+                };
+                view.Player.EngineFactory = () => motor;
+                view.OverlayRoot = Path.Combine(klasor, "katman");
+                var pencere = new Window { Width = 900, Height = 600, Content = view };
+                pencere.Show();
+                try
+                {
+                    var acilis = view.OpenSourceAsync(dosya);
+                    DenetimSurucu.Pump(view.Player, () => acilis.IsCompleted, 10);
+                    acilis.GetAwaiter().GetResult();
+                    Assert.True(Bas(view, Key.T));
+                    var model = view.Model!;
+                    TextLayer Metin() => model.Texts[0];
+                    Assert.True(view.UpdateSelectedText(t => t with { Text = "Yazi" }));
+
+                    Assert.Equal("50", view.TxtTextX.Text);
+                    Assert.Equal("50", view.TxtTextY.Text);
+                    Assert.False(view.BtnTextKeyframe.IsChecked);
+                    Gir(view.TxtTextX, "25");
+                    Assert.Equal(new[] { new TextKeyframe(0, 0.25, 0.5) }, Metin().Keyframes);
+                    Assert.Contains("\\pos(80,120)", File.ReadAllText(view.OverlayPath));
+                    Gir(view.TxtTextY, "abc");
+                    Assert.Equal(new[] { new TextKeyframe(0, 0.25, 0.5) }, Metin().Keyframes);
+                    Assert.Equal("50", view.TxtTextY.Text);
+                    Gir(view.TxtTextY, "150");
+                    Assert.Equal(1.0, Metin().Keyframes[0].Y);
+                    Gir(view.TxtTextY, "50");
+
+                    view.TimelineView.Playhead = S(2);
+                    view.RefreshMonitor();
+                    Tikla(view.BtnTextKeyframe, true);
+                    Assert.Equal(new[] { new TextKeyframe(0, 0.25, 0.5), new TextKeyframe(S(2), 0.25, 0.5) }, Metin().Keyframes);
+                    Assert.True(view.BtnTextKeyframe.IsChecked);
+
+                    Assert.False(view.BeginTextDrag(0.9, 0.9));
+                    Assert.True(view.BeginTextDrag(0.27, 0.5));
+                    Assert.True(view.DragTextTo(0.77, 0.25));
+                    Assert.Equal(new TextKeyframe(S(2), 0.25, 0.5), Metin().Keyframes[1]);
+                    Assert.Contains("\\move(80,120,240,60)", File.ReadAllText(view.OverlayPath));
+                    Assert.True(view.EndTextDrag());
+                    Assert.Equal(new TextKeyframe(S(2), 0.75, 0.25), Metin().Keyframes[1]);
+                    Assert.Equal("75", view.TxtTextX.Text);
+                    Assert.False(view.EndTextDrag());
+
+                    view.TimelineView.Playhead = S(1);
+                    view.RefreshMonitor();
+                    Assert.Equal("50", view.TxtTextX.Text);
+                    Assert.False(view.BtnTextKeyframe.IsChecked);
+
+                    Assert.True(view.Undo());
+                    Assert.Equal(new TextKeyframe(S(2), 0.25, 0.5), Metin().Keyframes[1]);
+
+                    view.TimelineView.Playhead = S(2);
+                    view.RefreshMonitor();
+                    Tikla(view.BtnTextKeyframe, false);
+                    Assert.Equal(new[] { new TextKeyframe(0, 0.25, 0.5) }, Metin().Keyframes);
+
+                    Assert.Equal(6, view.CmbTextMotionIn.ItemCount);
+                    Assert.Equal(0, view.CmbTextMotionIn.SelectedIndex);
+                    Assert.False(view.TxtTextMotionIn.IsEnabled);
+                    view.CmbTextMotionIn.SelectedIndex = (int)TextMotion.Left;
+                    Assert.Equal(TextMotion.Left, Metin().MotionIn);
+                    Assert.Equal(S(0.5), Metin().MotionInLength);
+                    Assert.True(view.TxtTextMotionIn.IsEnabled);
+                    Gir(view.TxtTextMotionIn, "1");
+                    Assert.Equal(S(1), Metin().MotionInLength);
+                    Assert.Contains("\\move(-160,120,80,120)", File.ReadAllText(view.OverlayPath));
+
+                    view.CmbTextMotionOut.SelectedIndex = (int)TextMotion.Typewriter;
+                    Assert.Equal(TextMotion.Typewriter, Metin().MotionOut);
+                    Gir(view.TxtTextMotionOut, "99");
+                    Assert.Equal(Metin().Length - S(1), Metin().MotionOutLength);
+                    Assert.Contains("{\\alpha&HFF&}", File.ReadAllText(view.OverlayPath));
+
+                    view.CmbTextMotionIn.SelectedIndex = 0;
+                    Assert.Equal(TextMotion.None, Metin().MotionIn);
+                    Assert.Equal(0, Metin().MotionInLength);
+                    Assert.True(view.Undo());
+                    Assert.Equal(TextMotion.Left, Metin().MotionIn);
+                    Assert.Equal((int)TextMotion.Left, view.CmbTextMotionIn.SelectedIndex);
+                    Assert.Equal(S(1), Metin().MotionInLength);
+                }
+                finally
+                {
+                    pencere.Close();
+                }
+            });
+        }
+        finally
+        {
+            KanitKapanisi.Kapat(Kanit, "metin-konum");
+        }
+    }
 }
 
 /// <summary>Katman cagrilarini sayan sahte motor; <c>sub-add</c> artan iz numarasi verir.</summary>
