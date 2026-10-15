@@ -115,7 +115,7 @@ public enum FrameRateMode { Auto, Constant, Peak }
 /// Kodlama surecinin onceligi: <see cref="Normal"/> bugunku davranis, <see cref="BelowNormal"/>
 /// Normalin Alti, <see cref="Low"/> isletim sisteminin bosta sinifi.
 /// </summary>
-public enum EncodePriority { Normal, BelowNormal, Low }
+public enum EncodePriority { Normal, BelowNormal, Low, AboveNormal }
 
 public sealed class EncodePlan
 {

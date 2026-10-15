@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Avalonia.Controls;
 using VidShrink.App;
 using VidShrink.Cli;
 using VidShrink.Core;
@@ -102,8 +103,42 @@ public sealed class KodlamaOncelikTests
     [InlineData(EncodePriority.Normal, ProcessPriorityClass.Normal)]
     [InlineData(EncodePriority.BelowNormal, ProcessPriorityClass.BelowNormal)]
     [InlineData(EncodePriority.Low, ProcessPriorityClass.Idle)]
+    [InlineData(EncodePriority.AboveNormal, ProcessPriorityClass.AboveNormal)]
     public void OncelikSurecSinifinaEslenir(EncodePriority oncelik, ProcessPriorityClass beklenen)
         => Assert.Equal(beklenen, EncodeRunner.PriorityClassOf(oncelik));
+
+    [Fact]
+    public void YuksekOncelikAyarlardaSecilirGidipDoner()
+    {
+        var klasor = Path.Combine(TestPaths.OutputRoot, "kodlama-oncelik", "yuksek-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(klasor);
+        try
+        {
+            var ayar = Path.Combine(klasor, "settings.json");
+            new AppSettings { EncodePriority = EncodePriority.AboveNormal }.Save(ayar);
+            Assert.Equal(EncodePriority.AboveNormal, AppSettings.Load(ayar).EncodePriority);
+
+            var sonuc = AppHost.Run(() =>
+            {
+                var pencere = new MainWindow { SettingsPathOverride = ayar };
+                try
+                {
+                    var kutu = pencere.FindControl<ComboBox>("CmbEncodePriority")!;
+                    var oge = kutu.ItemCount;
+                    pencere.RestoreAppSettingsForTest(new AppSettings { EncodePriority = EncodePriority.AboveNormal });
+                    var secili = pencere.SelectedEncodePriority;
+                    var toplanan = pencere.CaptureAppSettingsForTest().EncodePriority;
+                    return (oge, secili, toplanan);
+                }
+                finally { pencere.Close(); }
+            });
+
+            Assert.Equal(4, sonuc.oge);
+            Assert.Equal(EncodePriority.AboveNormal, sonuc.secili);
+            Assert.Equal(EncodePriority.AboveNormal, sonuc.toplanan);
+        }
+        finally { Directory.Delete(klasor, true); }
+    }
 
     [FfmpegFact]
     public async Task KomutSureciAyarlananOncelikteBaslar()

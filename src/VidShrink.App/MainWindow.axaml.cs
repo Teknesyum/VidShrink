@@ -325,6 +325,7 @@ public partial class MainWindow : Window
         CmbParallelJobs.SelectedIndex = 0;
         Watch(CmbParallelJobs, SelectingItemsControl.SelectedIndexProperty, SaveAppSettings);
         InitializeEncodeLoadUi();
+        RefreshFinishSoundFile();
         Player.Opened += OnPlayerOpened;
         Watch(ChkAdvKeepTracks, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkAdvDropMetadata, ToggleButton.IsCheckedProperty, SaveAppSettings);
@@ -1234,6 +1235,7 @@ public partial class MainWindow : Window
         RefreshShareTarget();
         RefreshAdvancedTexts();
         RefreshEncodeLoadTexts();
+        RefreshFinishSoundFile();
         UpdateToolStatus();
         RefreshPlatforms();
         SonDenetimiYaz();
@@ -1630,6 +1632,7 @@ public partial class MainWindow : Window
             FollowRecording = ChkFollowRecording.IsChecked == true,
             NotifyWhenDone = ChkNotifyWhenDone.IsChecked == true,
             FinishSound = ChkFinishSound.IsChecked == true,
+            FinishSoundFile = _finishSoundFile,
             PreventSleepWhileEncoding = ChkPreventSleep.IsChecked == true,
             KeepSourceDates = ChkKeepDates.IsChecked == true,
             ParallelJobs = Math.Max(0, CmbParallelJobs.SelectedIndex) + 1,
@@ -1698,6 +1701,7 @@ public partial class MainWindow : Window
             ChkFollowRecording.IsChecked = settings.FollowRecording;
             ChkNotifyWhenDone.IsChecked = settings.NotifyWhenDone;
             ChkFinishSound.IsChecked = settings.FinishSound;
+            SetFinishSoundFile(settings.FinishSoundFile);
             ChkPreventSleep.IsChecked = settings.PreventSleepWhileEncoding;
             ChkKeepDates.IsChecked = settings.KeepSourceDates;
             CmbParallelJobs.SelectedIndex = ParallelJobs.Clamp(settings.ParallelJobs, Environment.ProcessorCount) - 1;
@@ -5039,7 +5043,7 @@ public partial class MainWindow : Window
     {
         var karar = IsBittiBildirimi.Karar(new[] { biten }, PencereEtkin(), ChkNotifyWhenDone.IsChecked == true,
             (key, args) => string.Format(Strings.Culture, Say(key), args));
-        if (IsBittiBildirimi.SesKarari(new[] { biten }, ChkFinishSound.IsChecked == true) is bool hata) Ses.Cal(hata);
+        if (IsBittiBildirimi.SesKarari(new[] { biten }, ChkFinishSound.IsChecked == true) is bool hata) Ses.Cal(hata, FinishSoundFileOrNull);
         if (karar is not null) Bildirim.Bildir(this, karar);
     }
 
