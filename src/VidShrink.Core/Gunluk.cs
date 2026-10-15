@@ -125,11 +125,21 @@ public static class Gunluk
     }
 
     /// <summary>Gunlugun tamami; yoksa bos dizge.</summary>
-    public static string Oku()
+    public static string Oku() => Oku(Klasor);
+
+    /// <summary>
+    /// Verilen klasördeki günlüğün tamamı; yoksa boş dizge. Yazım sürerken de okunur:
+    /// dosya paylaşımlı açılır.
+    /// </summary>
+    public static string Oku(string klasor)
     {
         try
         {
-            return File.Exists(Dosya) ? File.ReadAllText(Dosya) : string.Empty;
+            var dosya = Path.Combine(klasor, DosyaAdi);
+            if (!File.Exists(dosya)) return string.Empty;
+            using var akis = new FileStream(dosya, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            using var okuyucu = new StreamReader(akis);
+            return okuyucu.ReadToEnd();
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {

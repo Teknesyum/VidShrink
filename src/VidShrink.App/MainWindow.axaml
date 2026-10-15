@@ -108,6 +108,11 @@
                            Theme="{StaticResource MonoValue}"
                            Foreground="{StaticResource NeonBlue}"
                            VerticalAlignment="Center"/>
+                <Button x:Name="BtnWhatsNew"
+                        Theme="{StaticResource LinkButton}"
+                        Content="{loc:Text main.update.whats-new}"
+                        VerticalAlignment="Center"
+                        Click="OnWhatsNew"/>
               </WrapPanel>
               <Button Grid.Column="1"
                       x:Name="BtnAppliedDismiss"
@@ -1846,11 +1851,16 @@
                 <StackPanel Spacing="{StaticResource SpaceSm}">
                   <TextBlock Text="{loc:Text settings.log.title}" Theme="{StaticResource H2}"/>
                   <TextBlock Text="{loc:Text settings.log.hint}" Theme="{StaticResource Caption}" TextWrapping="Wrap"/>
-                  <Button x:Name="BtnOpenLog"
-                          Content="{loc:Text settings.log.open}"
-                          Theme="{StaticResource GhostButton}"
-                          HorizontalAlignment="Left"
-                          Click="OnOpenLog"/>
+                  <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
+                    <Button x:Name="BtnOpenLog"
+                            Content="{loc:Text settings.log.open}"
+                            Theme="{StaticResource GhostButton}"
+                            Click="OnOpenLog"/>
+                    <Button x:Name="BtnReportBug"
+                            Content="{loc:Text settings.log.report}"
+                            Theme="{StaticResource GhostButton}"
+                            Click="OnReportBug"/>
+                  </WrapPanel>
                 </StackPanel>
               </Border>
 
@@ -2015,6 +2025,11 @@
                     </Grid>
                   </Button>
                   <StackPanel x:Name="AboutBody" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}">
+                    <WrapPanel x:Name="AboutLinks" ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceXs}">
+                      <Button x:Name="BtnReleaseNotes" Theme="{StaticResource LinkButton}" Content="{loc:Text main.about.notes}" Click="OnOpenReleaseNotes"/>
+                      <Button x:Name="BtnLicenses" Theme="{StaticResource LinkButton}" Content="{loc:Text main.about.licenses}" Click="OnOpenLicenses"/>
+                      <Button x:Name="BtnPrivacy" Theme="{StaticResource LinkButton}" Content="{loc:Text main.about.privacy}" Click="OnOpenPrivacy"/>
+                    </WrapPanel>
                     <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.intro}"/>
                     <TextBlock Text="{loc:Text main.about.engine.title}" Theme="{StaticResource H3}"/>
                     <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.engine.body}"/>
@@ -2030,7 +2045,11 @@
                     <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.codecs.body}"/>
                   </StackPanel>
                   <StackPanel x:Name="AboutStatus" Spacing="{StaticResource SpaceSm}">
-                    <TextBlock Text="{loc:Text main.about.status.title}" Theme="{StaticResource H3}"/>
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
+                      <TextBlock Text="{loc:Text main.about.status.title}" Theme="{StaticResource H3}" TextWrapping="Wrap"/>
+                      <TextBlock Grid.Row="1" x:Name="TxtLastCheck" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                      <Button Grid.Column="1" Grid.RowSpan="2" x:Name="BtnCheckNow" Theme="{StaticResource LinkButton}" Content="{loc:Text main.about.check.now}" Click="OnCheckNow" VerticalAlignment="Bottom"/>
+                    </Grid>
                     <TextBlock x:Name="TxtSystemStatus" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"
                                Cursor="Hand" PointerPressed="OnSystemStatusTapped"/>
                     <TextBlock Text="{loc:Text main.about.platforms.title}" Theme="{StaticResource H3}"/>
