@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "ตั้งเอง {0} รายการ",
   "main.section.advanced.none": "อัตโนมัติทั้งหมด",
   "main.language.name": "ไทย",
+  "main.language.unreviewed": "{0} · แปลด้วยเครื่อง",
 
   "main.window.minimize": "ย่อ",
   "main.window.maximize": "ขยาย",

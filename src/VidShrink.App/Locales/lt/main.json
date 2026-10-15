@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} nustatyta rankiniu būdu",
   "main.section.advanced.none": "Viskas automatiškai",
   "main.language.name": "Lietuvių",
+  "main.language.unreviewed": "{0} · mašininis vertimas",
 
   "main.window.minimize": "Sumažinti",
   "main.window.maximize": "Padidinti",

@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} nastavené ručne",
   "main.section.advanced.none": "Všetko automaticky",
   "main.language.name": "Slovenčina",
+  "main.language.unreviewed": "{0} · strojový preklad",
 
   "main.window.minimize": "Minimalizovať",
   "main.window.maximize": "Maximalizovať",

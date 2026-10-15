@@ -394,6 +394,12 @@ nothing merges red — and sign off each commit under the
 [Developer Certificate of Origin](DCO) with `git commit -s`. Build instructions, the project
 layout and the design rules are in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
+Translations are welcome too. English and Turkish are reviewed; the other 40 languages are
+machine translated and say so in the language picker. Each language is one folder under
+[`src/VidShrink.App/Locales/`](src/VidShrink.App/Locales/) — correct a line there in a pull
+request. A Weblate project for translating in the browser is being prepared
+([`docs/dagitim/weblate.md`](docs/dagitim/weblate.md)).
+
 ## License
 
 [AGPL-3.0-or-later](LICENSE). Copyright (C) 2026 Teknesyum.

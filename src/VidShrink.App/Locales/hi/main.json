@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} हाथ से सेट",
   "main.section.advanced.none": "सब स्वचालित",
   "main.language.name": "हिन्दी",
+  "main.language.unreviewed": "{0} · मशीनी अनुवाद",
 
   "main.window.minimize": "छोटा करें",
   "main.window.maximize": "बड़ा करें",

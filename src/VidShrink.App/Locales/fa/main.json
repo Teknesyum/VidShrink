@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} مورد دستی",
   "main.section.advanced.none": "همه خودکار",
   "main.language.name": "فارسی",
+  "main.language.unreviewed": "{0} · ترجمه ماشینی",
 
   "main.window.minimize": "کوچک‌کردن",
   "main.window.maximize": "بزرگ‌کردن",

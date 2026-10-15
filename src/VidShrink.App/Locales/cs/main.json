@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} nastaveno ručně",
   "main.section.advanced.none": "Vše automaticky",
   "main.language.name": "Čeština",
+  "main.language.unreviewed": "{0} · strojový překlad",
 
   "main.window.minimize": "Minimalizovat",
   "main.window.maximize": "Maximalizovat",

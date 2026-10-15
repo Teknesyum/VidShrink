@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} ditetapkan secara manual",
   "main.section.advanced.none": "Semua automatik",
   "main.language.name": "Bahasa Melayu",
+  "main.language.unreviewed": "{0} · terjemahan mesin",
 
   "main.window.minimize": "Minimumkan",
   "main.window.maximize": "Maksimumkan",

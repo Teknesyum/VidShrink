@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} handmatig ingesteld",
   "main.section.advanced.none": "Alles automatisch",
   "main.language.name": "Nederlands",
+  "main.language.unreviewed": "{0} · machinevertaling",
 
   "main.window.minimize": "Minimaliseren",
   "main.window.maximize": "Maximaliseren",

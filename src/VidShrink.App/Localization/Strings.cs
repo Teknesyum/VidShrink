@@ -124,6 +124,33 @@ public static class Strings
 
     public static bool IsUntrackedLanguage(string? language) => InList(UntrackedLanguages, language);
 
+    /// <summary>
+    /// İnsan gözünden geçmiş diller. Öteki diller dil seçicide kendi dillerinde
+    /// <c>main.language.unreviewed</c> işaretiyle görünür; bir dil gözden geçince buraya eklenir.
+    /// </summary>
+    public static IReadOnlyList<string> ReviewedLanguages { get; } = new[] { "en", "tr" };
+
+    public static bool IsReviewedLanguage(string? language) => InList(ReviewedLanguages, language);
+
+    /// <summary>
+    /// Dil seçicideki satır: dilin kendi adı, gözden geçmemiş dilde o dilin kendi işaret
+    /// cümlesiyle sarılı. İşaret biçimlenemezse yalın ad döner.
+    /// </summary>
+    public static string LanguageLabel(string language)
+    {
+        var name = PeekIn(language, "main.language.name");
+        if (IsReviewedLanguage(language)) return name;
+
+        try
+        {
+            return string.Format(CultureOf(language), PeekIn(language, "main.language.unreviewed"), name);
+        }
+        catch (FormatException)
+        {
+            return name;
+        }
+    }
+
     private static bool InList(IReadOnlyList<string> list, string? language)
     {
         if (string.IsNullOrWhiteSpace(language)) return false;

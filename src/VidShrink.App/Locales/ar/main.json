@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} مضبوطة يدوياً",
   "main.section.advanced.none": "الكل تلقائي",
   "main.language.name": "العربية",
+  "main.language.unreviewed": "{0} · ترجمة آلية",
 
   "main.window.minimize": "تصغير",
   "main.window.maximize": "تكبير",

@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} ročno nastavljeno",
   "main.section.advanced.none": "Vse samodejno",
   "main.language.name": "Slovenščina",
+  "main.language.unreviewed": "{0} · strojni prevod",
 
   "main.window.minimize": "Pomanjšaj",
   "main.window.maximize": "Povečaj",

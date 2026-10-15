@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} задано вручну",
   "main.section.advanced.none": "Усе автоматично",
   "main.language.name": "Українська",
+  "main.language.unreviewed": "{0} · машинний переклад",
 
   "main.window.minimize": "Згорнути",
   "main.window.maximize": "Розгорнути",

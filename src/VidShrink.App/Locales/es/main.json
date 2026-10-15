@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} fijados a mano",
   "main.section.advanced.none": "Todo automático",
   "main.language.name": "Español",
+  "main.language.unreviewed": "{0} · traducción automática",
 
   "main.window.minimize": "Minimizar",
   "main.window.maximize": "Maximizar",

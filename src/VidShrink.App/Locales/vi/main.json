@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} đặt thủ công",
   "main.section.advanced.none": "Tất cả tự động",
   "main.language.name": "Tiếng Việt",
+  "main.language.unreviewed": "{0} · bản dịch máy",
 
   "main.window.minimize": "Thu nhỏ",
   "main.window.maximize": "Phóng to",

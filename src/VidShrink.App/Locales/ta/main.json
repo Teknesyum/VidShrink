@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} கையால் அமைக்கப்பட்டது",
   "main.section.advanced.none": "எல்லாம் தானியங்கி",
   "main.language.name": "தமிழ்",
+  "main.language.unreviewed": "{0} · இயந்திர மொழிபெயர்ப்பு",
 
   "main.window.minimize": "சிறிதாக்கு",
   "main.window.maximize": "பெரிதாக்கு",

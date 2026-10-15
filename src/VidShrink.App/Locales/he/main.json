@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} נקבעו ידנית",
   "main.section.advanced.none": "הכול אוטומטי",
   "main.language.name": "עברית",
+  "main.language.unreviewed": "{0} · תרגום מכונה",
 
   "main.window.minimize": "מזער",
   "main.window.maximize": "הגדל",

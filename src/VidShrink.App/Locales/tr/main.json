@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} ayar elle",
   "main.section.advanced.none": "Hepsi otomatik",
   "main.language.name": "Türkçe",
+  "main.language.unreviewed": "{0} · makine çevirisi",
 
   "main.window.minimize": "Simge durumuna küçült",
   "main.window.maximize": "Büyüt",

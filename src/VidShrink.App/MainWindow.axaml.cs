@@ -1091,7 +1091,7 @@ public partial class MainWindow : Window
         {
             _languageOrder = Strings.Languages;
             CmbLanguage.ItemsSource = _languageOrder
-                .Select(language => Strings.PeekIn(language, "main.language.name"))
+                .Select(Strings.LanguageLabel)
                 .ToArray();
         }
         finally

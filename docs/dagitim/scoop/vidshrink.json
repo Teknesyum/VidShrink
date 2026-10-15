@@ -1,0 +1,38 @@
+{
+    "version": "1.2.16",
+    "description": "Shrink a video to a target file size, then play, convert, record or trim it.",
+    "homepage": "https://github.com/Teknesyum/VidShrink",
+    "license": "AGPL-3.0-or-later",
+    "depends": "ffmpeg",
+    "notes": [
+        "This package carries no launcher: VidShrink does not update itself here, 'scoop update vidshrink' does.",
+        "The player and editor tabs need libmpv-2.dll beside VidShrink.App.exe or a path in VIDSHRINK_LIBMPV."
+    ],
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/Teknesyum/VidShrink/releases/download/v1.2.16/vidshrink-win-x64.zip",
+            "hash": "0000000000000000000000000000000000000000000000000000000000000000"
+        }
+    },
+    "bin": "vidshrink.exe",
+    "shortcuts": [
+        [
+            "VidShrink.App.exe",
+            "VidShrink"
+        ]
+    ],
+    "checkver": {
+        "github": "https://github.com/Teknesyum/VidShrink"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/Teknesyum/VidShrink/releases/download/v$version/vidshrink-win-x64.zip",
+                "hash": {
+                    "url": "$baseurl/checksums-win-x64.txt",
+                    "regex": "$sha256\\s+$basename"
+                }
+            }
+        }
+    }
+}

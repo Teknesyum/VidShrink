@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0}개 수동 설정",
   "main.section.advanced.none": "모두 자동",
   "main.language.name": "한국어",
+  "main.language.unreviewed": "{0} · 기계 번역",
 
   "main.window.minimize": "최소화",
   "main.window.maximize": "최대화",

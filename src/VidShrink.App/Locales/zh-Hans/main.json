@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} 项手动设置",
   "main.section.advanced.none": "全部自动",
   "main.language.name": "简体中文",
+  "main.language.unreviewed": "{0} · 机器翻译",
 
   "main.window.minimize": "最小化",
   "main.window.maximize": "最大化",
