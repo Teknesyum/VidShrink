@@ -1300,8 +1300,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3511, toplam);
-        Assert.Equal(333, dilBasina["en"]);
+        Assert.Equal(3516, toplam);
+        Assert.Equal(334, dilBasina["en"]);
         Assert.Equal(110, dilBasina["tr"]);
     }
 
@@ -1583,7 +1583,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(70305, gezilen);
+        Assert.Equal(70563, gezilen);
         Assert.Empty(kayip);
     }
 

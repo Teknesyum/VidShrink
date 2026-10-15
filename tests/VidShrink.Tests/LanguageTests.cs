@@ -323,6 +323,8 @@ public sealed class LanguageTests : IDisposable
         "^The (.+) container does not support the selected (.+) audio encoder.$",
         "^The (.+) container does not support copying the source (.*) video stream.$",
         "^The (.+) container does not support copying the source (.*) audio stream.$",
+        "No audio track is selected.",
+        "^The (.+) container carries only one audio track.$",
         "Localization key ' ' is missing in ' ' and in ' '."
     };
 

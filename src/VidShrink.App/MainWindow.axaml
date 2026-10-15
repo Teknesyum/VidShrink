@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:auto="using:Avalonia.Automation"
         xmlns:playback="using:VidShrink.App.Playback"
@@ -1195,7 +1195,7 @@
                     </Grid>
                   </StackPanel>
                   <Grid x:Name="ConvertForm" Grid.IsSharedSizeScope="True" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}" RowSpacing="{StaticResource SpaceLg}"
-                        RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                        RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
                     <Grid.Styles>
                       <Style Selector="Grid#ConvertForm > Grid">
                         <Setter Property="VerticalAlignment" Value="Top"/>
@@ -1485,6 +1485,24 @@
                       <StackPanel x:Name="ConvertSubtitleList" Spacing="{StaticResource SpaceXs}" IsVisible="False"/>
                       <TextBlock x:Name="TxtConvertSubtitleResult" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"
                                  auto:AutomationProperties.LiveSetting="Polite"/>
+                    </StackPanel>
+                    <StackPanel x:Name="ConvertAudioPanel" Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Spacing="{StaticResource SpaceSm}" IsVisible="False">
+                      <TextBlock Text="{loc:Text main.convert.audio-tracks}" Theme="{StaticResource Label}" Margin="0"/>
+                      <TextBlock x:Name="TxtConvertAudioHint" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+                      <StackPanel x:Name="ConvertAudioTracks" Spacing="{StaticResource SpaceXs}"/>
+                      <TextBlock Text="{loc:Text main.audio.external.label}" Theme="{StaticResource Label}" Margin="0"/>
+                      <WrapPanel HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                        <Button x:Name="BtnConvertAudioFile" Theme="{StaticResource GhostButton}" Click="OnConvertAddAudioFile" VerticalAlignment="Bottom"
+                                MinHeight="{StaticResource FieldMinHeight}"
+                                Padding="{StaticResource ButtonPaddingSm}" Content="{loc:Text main.audio.external.add}"/>
+                        <CheckBox x:Name="ChkConvertAudioReplace" Theme="{StaticResource CheckStyle}" IsChecked="False" IsEnabled="False" VerticalAlignment="Bottom"
+                                  MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
+                                  Content="{loc:Text main.audio.external.replace}"/>
+                        <CheckBox x:Name="ChkConvertAudioShortest" Theme="{StaticResource CheckStyle}" IsChecked="False" IsEnabled="False" VerticalAlignment="Bottom"
+                                  MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
+                                  Content="{loc:Text main.convert.audio-external.shortest}"/>
+                      </WrapPanel>
+                      <StackPanel x:Name="ConvertAudioFileList" Spacing="{StaticResource SpaceXs}" IsVisible="False"/>
                     </StackPanel>
 
                   </Grid>

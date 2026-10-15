@@ -295,6 +295,8 @@ public partial class MainWindow : Window
             Watch(box, SelectingItemsControl.SelectedIndexProperty, OnConvertChanged);
         Watch(ChkConvertDropMetadata, ToggleButton.IsCheckedProperty, OnConvertChanged);
         Watch(ChkConvertSingleFrame, ToggleButton.IsCheckedProperty, OnConvertChanged);
+        Watch(ChkConvertAudioReplace, ToggleButton.IsCheckedProperty, OnConvertChanged);
+        Watch(ChkConvertAudioShortest, ToggleButton.IsCheckedProperty, OnConvertChanged);
         foreach (var field in new[] { TxtCustomResolution, TxtCustomFps, TxtAudioBitrate, TxtTrimStart, TxtTrimEnd })
             Watch(field, TextBox.TextProperty, OnConvertChanged);
 
@@ -4827,6 +4829,9 @@ public partial class MainWindow : Window
             HdrPolicy = HdrPolicyIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve,
             DropMetadata = ChkConvertDropMetadata.IsChecked == true,
             SubtitleTracks = ConvertSubtitleChoice(),
+            AudioTracks = ConvertAudioChoice(),
+            ExternalAudio = ConvertExternalAudio,
+            EndAtShortest = ChkConvertAudioShortest.IsChecked == true,
             ExternalSubtitles = _convertSubtitles.ToList(),
             SingleFrame = ChkConvertSingleFrame.IsChecked == true,
             TargetBytes = _sequence is null ? GifPalette.TargetFor(_info ?? _sesKaynagi, container, ParseTargetMb()) : null
@@ -4910,6 +4915,7 @@ public partial class MainWindow : Window
 
         var output = CommandOutputPath(plan, ConversionOutputPath(info, plan));
         RefreshConvertSubtitleState(plan);
+        RefreshConvertAudioState(plan);
         TxtConvertValidation.Text = errors.Count == 0
             ? string.Join("\n", ConversionArguments.Notes(plan).Select(note => Say(ConversionNoteKey(note))).Concat(ConvertSubtitleNotes(plan)).Prepend(Say("main.convert.ready")))
             : string.Join("\n", errors);
