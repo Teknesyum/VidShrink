@@ -2,6 +2,8 @@
   "player.tools.menu": "ツール",
   "player.tools.clip": "クリップを保存",
   "player.tools.gif": "GIFを保存",
+  "player.tools.frames": "フレームを保存",
+  "player.tools.sheet": "サムネイル一覧を保存",
   "player.tools.mini": "ミニモード",
   "player.tools.url": "アドレスを開く…",
   "player.tools.url-hint": "http、https、rtspのアドレス",

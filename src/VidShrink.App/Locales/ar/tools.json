@@ -2,6 +2,8 @@
   "player.tools.menu": "أدوات",
   "player.tools.clip": "حفظ المقطع",
   "player.tools.gif": "حفظ GIF",
+  "player.tools.frames": "حفظ الإطارات",
+  "player.tools.sheet": "حفظ لوحة الصور المصغرة",
   "player.tools.mini": "الوضع المصغّر",
   "player.tools.url": "فتح عنوان…",
   "player.tools.url-hint": "عنوان http أو https أو rtsp",

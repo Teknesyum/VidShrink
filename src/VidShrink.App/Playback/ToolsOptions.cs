@@ -12,6 +12,9 @@ internal sealed class ToolsOptions
     internal const string FileName = "player-tools.json";
     internal const string ClipExtension = ".mp4";
     internal const string GifExtension = ".gif";
+    internal const string FramesSuffix = "_frames";
+    internal const string SheetSuffix = "_sheet";
+    internal const string ImageExtension = ".png";
 
     internal const double DefaultClipSeconds = 10;
     internal const double MinimumClipSeconds = 1;
@@ -26,9 +29,21 @@ internal sealed class ToolsOptions
     internal const double DefaultMiniHeight = 270;
     internal const double MinimumMiniWidth = 240;
     internal const double MaximumMiniWidth = 1280;
+    internal const double DefaultFrameSeconds = 1;
+    internal const double MinimumFrameSeconds = 0.1;
+    internal const double MaximumFrameSeconds = 600;
+    internal const int DefaultSheetColumns = 4;
+    internal const int DefaultSheetRows = 4;
+    internal const int MinimumSheetCells = 1;
+    internal const int MaximumSheetCells = 10;
+    internal const int DefaultSheetWidth = 320;
+    internal const int MinimumSheetWidth = 80;
+    internal const int MaximumSheetWidth = 1920;
 
     internal static readonly PlayerAction Clip = new(PlayerCommandKind.ClipExport, 0, "player.tools.clip");
     internal static readonly PlayerAction Gif = new(PlayerCommandKind.GifExport, 0, "player.tools.gif");
+    internal static readonly PlayerAction Frames = new(PlayerCommandKind.FrameExport, 0, "player.tools.frames");
+    internal static readonly PlayerAction Sheet = new(PlayerCommandKind.ContactSheet, 0, "player.tools.sheet");
     internal static readonly PlayerAction MiniMode = new(PlayerCommandKind.MiniMode, 0, "player.tools.mini");
     internal static readonly PlayerAction OpenUrl = new(PlayerCommandKind.OpenUrl, 0, "player.tools.url");
     internal static readonly PlayerAction PasteUrl = new(PlayerCommandKind.PasteUrl, 0, "player.tools.paste");
@@ -45,6 +60,14 @@ internal sealed class ToolsOptions
 
     internal string LastUrl { get; private set; } = "";
 
+    internal double FrameSeconds { get; private set; } = DefaultFrameSeconds;
+
+    internal int SheetColumns { get; private set; } = DefaultSheetColumns;
+
+    internal int SheetRows { get; private set; } = DefaultSheetRows;
+
+    internal int SheetWidth { get; private set; } = DefaultSheetWidth;
+
     internal void UseClipSeconds(double seconds)
         => ClipSeconds = double.IsFinite(seconds) ? Math.Clamp(Math.Round(seconds, 3), MinimumClipSeconds, MaximumClipSeconds) : DefaultClipSeconds;
 
@@ -58,6 +81,17 @@ internal sealed class ToolsOptions
         MiniHeight = double.IsFinite(height) && height > 0 ? height : DefaultMiniHeight;
     }
 
+    internal void UseFrameSeconds(double seconds)
+        => FrameSeconds = double.IsFinite(seconds) ? Math.Clamp(Math.Round(seconds, 3), MinimumFrameSeconds, MaximumFrameSeconds) : DefaultFrameSeconds;
+
+    internal void UseSheetGrid(int columns, int rows)
+    {
+        SheetColumns = Math.Clamp(columns, MinimumSheetCells, MaximumSheetCells);
+        SheetRows = Math.Clamp(rows, MinimumSheetCells, MaximumSheetCells);
+    }
+
+    internal void UseSheetWidth(int width) => SheetWidth = Math.Clamp(EvenWidth(width), MinimumSheetWidth, MaximumSheetWidth);
+
     internal void UseUrl(string? url) => LastUrl = string.IsNullOrWhiteSpace(url) ? "" : MediaAddress.WithoutQuery(url.Trim());
 
     internal void Reset()
@@ -68,6 +102,10 @@ internal sealed class ToolsOptions
         MiniWidth = DefaultMiniWidth;
         MiniHeight = DefaultMiniHeight;
         LastUrl = "";
+        FrameSeconds = DefaultFrameSeconds;
+        SheetColumns = DefaultSheetColumns;
+        SheetRows = DefaultSheetRows;
+        SheetWidth = DefaultSheetWidth;
     }
 
     internal static ToolsOptions Load(string? file)
@@ -84,6 +122,9 @@ internal sealed class ToolsOptions
             if ((double?)root["miniWidth"] is { } miniWidth && (double?)root["miniHeight"] is { } miniHeight)
                 options.UseMiniSize(miniWidth, miniHeight);
             options.UseUrl((string?)root["lastUrl"]);
+            if ((double?)root["frameSeconds"] is { } frame) options.UseFrameSeconds(frame);
+            if ((int?)root["sheetColumns"] is { } columns && (int?)root["sheetRows"] is { } rows) options.UseSheetGrid(columns, rows);
+            if ((int?)root["sheetWidth"] is { } sheetWidth) options.UseSheetWidth(sheetWidth);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or FormatException)
         {
@@ -111,6 +152,10 @@ internal sealed class ToolsOptions
                 writer.WriteNumber("miniWidth", MiniWidth);
                 writer.WriteNumber("miniHeight", MiniHeight);
                 writer.WriteString("lastUrl", LastUrl);
+                writer.WriteNumber("frameSeconds", FrameSeconds);
+                writer.WriteNumber("sheetColumns", SheetColumns);
+                writer.WriteNumber("sheetRows", SheetRows);
+                writer.WriteNumber("sheetWidth", SheetWidth);
                 writer.WriteEndObject();
             }
             File.Move(temp, file, true);
@@ -126,6 +171,8 @@ internal sealed class ToolsOptions
             FormattableString.Invariant($"clip={ClipSeconds:0.###}"),
             FormattableString.Invariant($"gif={GifFps}/{GifWidth}"),
             FormattableString.Invariant($"mini={MiniWidth:0}x{MiniHeight:0}"),
+            FormattableString.Invariant($"frames={FrameSeconds:0.###}"),
+            FormattableString.Invariant($"sheet={SheetColumns}x{SheetRows}/{SheetWidth}"),
             "url=" + (LastUrl.Length == 0 ? "-" : LastUrl)
         });
 

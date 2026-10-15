@@ -2,6 +2,8 @@
   "player.tools.menu": "Outils",
   "player.tools.clip": "Enregistrer le clip",
   "player.tools.gif": "Enregistrer le GIF",
+  "player.tools.frames": "Enregistrer les images",
+  "player.tools.sheet": "Enregistrer la planche de miniatures",
   "player.tools.mini": "Mode mini",
   "player.tools.url": "Ouvrir une adresse…",
   "player.tools.url-hint": "Adresse http, https ou rtsp",

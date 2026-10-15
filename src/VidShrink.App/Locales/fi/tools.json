@@ -2,6 +2,8 @@
   "player.tools.menu": "Työkalut",
   "player.tools.clip": "Tallenna klippi",
   "player.tools.gif": "Tallenna GIF",
+  "player.tools.frames": "Tallenna ruudut",
+  "player.tools.sheet": "Tallenna pikkukuva-arkki",
   "player.tools.mini": "Minitila",
   "player.tools.url": "Avaa osoite…",
   "player.tools.url-hint": "http-, https- tai rtsp-osoite",

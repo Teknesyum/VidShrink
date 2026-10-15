@@ -2,6 +2,8 @@
   "player.tools.menu": "Narzędzia",
   "player.tools.clip": "Zapisz klip",
   "player.tools.gif": "Zapisz GIF",
+  "player.tools.frames": "Zapisz klatki",
+  "player.tools.sheet": "Zapisz arkusz miniatur",
   "player.tools.mini": "Tryb mini",
   "player.tools.url": "Otwórz adres…",
   "player.tools.url-hint": "Adres http, https lub rtsp",

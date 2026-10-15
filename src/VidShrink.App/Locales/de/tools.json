@@ -2,6 +2,8 @@
   "player.tools.menu": "Werkzeuge",
   "player.tools.clip": "Clip speichern",
   "player.tools.gif": "GIF speichern",
+  "player.tools.frames": "Einzelbilder speichern",
+  "player.tools.sheet": "Vorschaubogen speichern",
   "player.tools.mini": "Minimodus",
   "player.tools.url": "Adresse öffnen…",
   "player.tools.url-hint": "http-, https- oder rtsp-Adresse",

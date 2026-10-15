@@ -145,6 +145,8 @@ public sealed class KeymapTests
         [PlayerCommandKind.RepeatCycle] = "repeat -> ",
         [PlayerCommandKind.ClipExport] = "clip -> ",
         [PlayerCommandKind.GifExport] = "gif -> ",
+        [PlayerCommandKind.FrameExport] = "frames -> ",
+        [PlayerCommandKind.ContactSheet] = "sheet -> ",
         [PlayerCommandKind.MiniMode] = "mini -> ",
         [PlayerCommandKind.OpenUrl] = "url -> ",
         [PlayerCommandKind.PasteUrl] = "paste -> ",
@@ -262,8 +264,7 @@ public sealed class KeymapTests
             PlayerCommandKind.RepeatCycle when view.Settings.Repeat == tekrar => $"tekrar {tekrar} degismedi",
             PlayerCommandKind.ClipExport when yeni[0] != "clip -> no" => $"kaynaksiz klip izi '{yeni[0]}'",
             PlayerCommandKind.ClipExport when !view.ViewStateText.Contains(Strings.Get("player.tools.novideo"), StringComparison.Ordinal) => $"kaynaksiz klip bildirimi yok: '{view.ViewStateText}'",
-            PlayerCommandKind.GifExport when yeni[0] != "gif -> no" => $"kaynaksiz gif izi '{yeni[0]}'",
-            PlayerCommandKind.MiniMode when view.IsMiniMode == mini => "mini mod degismedi",
+            PlayerCommandKind.GifExport when yeni[0] != "gif -> no" => $"kaynaksiz gif izi '{yeni[0]}'",            PlayerCommandKind.MiniMode when view.IsMiniMode == mini => "mini mod degismedi",
             PlayerCommandKind.OpenUrl when yeni[0] != "url -> no" => $"gorunmez pencerede adres izi '{yeni[0]}'",
             PlayerCommandKind.PasteUrl when yeni[0] != "paste -> clipboard" => $"pano izi '{yeni[0]}'",
             PlayerCommandKind.Stop when !oynatma || view.IsPlaying || view.PositionSeconds != 0 => $"oynatma {oynatma} -> {view.IsPlaying}, konum {konum} -> {view.PositionSeconds}",
@@ -304,9 +305,16 @@ public sealed class KeymapTests
         DenetimKanit.Kapat("keymap-olay-pini.txt");
     }
 
+    /// <summary>
+    /// Kısayolu olmayan, yalnız Araçlar alt menüsünden erişilen komutlar (later 82). Ayarlar sekmesine
+    /// yeni kısayol satırı girmesin diye tuşa bağlanmadılar; menüdeki yerleri <c>OynaticiAracTests</c> pimler.
+    /// </summary>
+    internal static readonly PlayerAction[] YalnizAraclarMenusunde = { ToolsOptions.Frames, ToolsOptions.Sheet };
+
     [Fact]
     public void KisayolTablosundaCakismaYokVeHerKomutErisilebilir()
     {
+        Assert.DoesNotContain(Keymap.Rows, row => YalnizAraclarMenusunde.Contains(row.Action));
         var akorlar = Keymap.Rows
             .GroupBy(row => (row.Input.Kind, row.Input.Key, row.Input.Button, row.Input.Modifiers))
             .Where(group => group.Count() > 1)
@@ -328,6 +336,7 @@ public sealed class KeymapTests
 
         var erisilen = Keymap.Rows.Select(row => row.Action.Command)
             .Concat(Keymap.MenuActions.Select(action => action.Command))
+            .Concat(YalnizAraclarMenusunde.Select(action => action.Command))
             .ToHashSet();
         var erisilmeyen = Enum.GetValues<PlayerCommandKind>()
             .Where(kind => kind != PlayerCommandKind.None && !erisilen.Contains(kind))

@@ -2,6 +2,8 @@
   "player.tools.menu": "Eszközök",
   "player.tools.clip": "Klip mentése",
   "player.tools.gif": "GIF mentése",
+  "player.tools.frames": "Képkockák mentése",
+  "player.tools.sheet": "Bélyegképlap mentése",
   "player.tools.mini": "Mini mód",
   "player.tools.url": "Cím megnyitása…",
   "player.tools.url-hint": "http, https vagy rtsp cím",

@@ -2,6 +2,8 @@
   "player.tools.menu": "Værktøjer",
   "player.tools.clip": "Gem klip",
   "player.tools.gif": "Gem GIF",
+  "player.tools.frames": "Gem billeder",
+  "player.tools.sheet": "Gem miniatureark",
   "player.tools.mini": "Minitilstand",
   "player.tools.url": "Åbn adresse…",
   "player.tools.url-hint": "http-, https- eller rtsp-adresse",

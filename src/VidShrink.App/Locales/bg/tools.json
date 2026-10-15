@@ -2,6 +2,8 @@
   "player.tools.menu": "Инструменти",
   "player.tools.clip": "Запази клипа",
   "player.tools.gif": "Запази GIF",
+  "player.tools.frames": "Запази кадрите",
+  "player.tools.sheet": "Запази таблица с миниатюри",
   "player.tools.mini": "Мини режим",
   "player.tools.url": "Отвори адрес…",
   "player.tools.url-hint": "Адрес http, https или rtsp",

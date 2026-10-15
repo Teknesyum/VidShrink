@@ -2,6 +2,8 @@
   "player.tools.menu": "Įrankiai",
   "player.tools.clip": "Įrašyti klipą",
   "player.tools.gif": "Įrašyti GIF",
+  "player.tools.frames": "Įrašyti kadrus",
+  "player.tools.sheet": "Įrašyti miniatiūrų lapą",
   "player.tools.mini": "Mini režimas",
   "player.tools.url": "Atverti adresą…",
   "player.tools.url-hint": "http, https arba rtsp adresas",

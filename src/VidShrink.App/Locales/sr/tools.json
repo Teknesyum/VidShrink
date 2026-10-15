@@ -2,6 +2,8 @@
   "player.tools.menu": "Alatke",
   "player.tools.clip": "Sačuvaj isečak",
   "player.tools.gif": "Sačuvaj GIF",
+  "player.tools.frames": "Sačuvaj kadrove",
+  "player.tools.sheet": "Sačuvaj list minijatura",
   "player.tools.mini": "Mini režim",
   "player.tools.url": "Otvori adresu…",
   "player.tools.url-hint": "Adresa http, https ili rtsp",

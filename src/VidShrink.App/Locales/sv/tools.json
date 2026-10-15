@@ -2,6 +2,8 @@
   "player.tools.menu": "Verktyg",
   "player.tools.clip": "Spara klipp",
   "player.tools.gif": "Spara GIF",
+  "player.tools.frames": "Spara bildrutor",
+  "player.tools.sheet": "Spara miniatyrark",
   "player.tools.mini": "Miniläge",
   "player.tools.url": "Öppna adress…",
   "player.tools.url-hint": "http-, https- eller rtsp-adress",

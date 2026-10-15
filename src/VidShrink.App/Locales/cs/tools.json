@@ -2,6 +2,8 @@
   "player.tools.menu": "Nástroje",
   "player.tools.clip": "Uložit klip",
   "player.tools.gif": "Uložit GIF",
+  "player.tools.frames": "Uložit snímky",
+  "player.tools.sheet": "Uložit přehled náhledů",
   "player.tools.mini": "Mini režim",
   "player.tools.url": "Otevřít adresu…",
   "player.tools.url-hint": "Adresa http, https nebo rtsp",

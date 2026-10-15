@@ -2,6 +2,8 @@
   "player.tools.menu": "כלים",
   "player.tools.clip": "שמירת קליפ",
   "player.tools.gif": "שמירת GIF",
+  "player.tools.frames": "שמירת פריימים",
+  "player.tools.sheet": "שמירת גיליון תמונות ממוזערות",
   "player.tools.mini": "מצב מיני",
   "player.tools.url": "פתיחת כתובת…",
   "player.tools.url-hint": "כתובת http,‏ https או rtsp",
