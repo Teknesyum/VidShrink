@@ -3511,7 +3511,7 @@ public partial class MainWindow : Window
     /// Yol yoksa hiçbir şey yapmaz; kötü dosyanın hatasını o yükleyici bildirir.
     /// </summary>
     internal Task LoadStartupFileAsync()
-        => _startupFile is null ? Task.CompletedTask : LoadStartupFileAsync(_startupFile);
+        => _startupFile is not { } path ? Task.CompletedTask : StartShellOpen(path, () => LoadStartupFileAsync(path));
 
     internal int PlayerTabIndex => Tabs.Items.IndexOf(TabPlayer);
 

@@ -34,6 +34,16 @@ public static class ShellIntegration
         "m3u", "m3u8", "pls", "wpl", "zpl", "asx", "wax", "wvx", "wmx"
     };
 
+    /// <summary>
+    /// Sağ tıkta yalnız "aç" ve "sıraya ekle" fiillerini alan uzantılar: ses ve çalma listesi,
+    /// sırasıyla. "Küçült" fiiline girmezler; görüntüsü olmayan dosya küçültülmez.
+    /// </summary>
+    public static IReadOnlyList<string> PlayerMenuExtensions { get; } =
+        AudioExtensions.Concat(PlaylistExtensions).ToArray();
+
+    /// <summary>Kabuktan gelen yolları çalan oynatıcının kuyruğuna ekleten komut satırı bayrağı.</summary>
+    public const string EnqueueFlag = "--siraya-ekle";
+
     /// <summary>Yalnız oynatıcının açtığı yol: ses ya da çalma listesi. Küçültme sekmesine gitmez.</summary>
     public static bool IsPlayerOnly(string path) => IsAudio(path) || PlaylistFile.IsPlaylist(path);
 

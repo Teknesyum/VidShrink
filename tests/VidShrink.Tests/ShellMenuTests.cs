@@ -170,7 +170,7 @@ Set-Content -LiteralPath $Out -Value ($lines -join ""`n"") -Encoding UTF8
         Assert.True(run.Code == 0, run.Output);
 
         var written = ReadMenu().Select(entry => entry.Extension.TrimStart('.'));
-        Assert.Equal(Sorted(ShellIntegration.MediaExtensions), Sorted(written));
+        Assert.Equal(Sorted(ShellIntegration.MediaExtensions.Concat(ShellIntegration.PlayerMenuExtensions)), Sorted(written));
     }
 
     [Fact]
@@ -225,7 +225,7 @@ Set-Content -LiteralPath $Out -Value ($lines -join ""`n"") -Encoding UTF8
         var second = WriteMenu();
         Assert.True(second.Code == 0, second.Output);
 
-        Assert.Equal(ShellIntegration.MediaExtensions.Count, afterFirst);
+        Assert.Equal(ShellIntegration.MediaExtensions.Count + ShellIntegration.PlayerMenuExtensions.Count, afterFirst);
         Assert.Equal(afterFirst, ReadMenu().Count);
     }
 

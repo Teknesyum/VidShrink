@@ -140,7 +140,7 @@ public class KayitDefteriKapisiTests
         ShellMenu.TestRoot = root;
         try
         {
-            Assert.Equal(ShellMenu.Extensions.Length, ShellMenu.InstallOpen(@"C:\sahte\VidShrink.App.exe", "Ac"));
+            Assert.Equal(ShellMenu.ExtensionsFor(ShellMenu.MenuKey).Count, ShellMenu.InstallOpen(@"C:\sahte\VidShrink.App.exe", "Ac"));
             using (var command = Registry.CurrentUser.OpenSubKey(root + @"\Software\Classes\SystemFileAssociations\.mp4\shell\" + ShellMenu.MenuKey + @"\command"))
                 Assert.Equal("\"C:\\sahte\\VidShrink.App.exe\" \"%1\"", command?.GetValue(string.Empty));
             Assert.Equal(before, Before());

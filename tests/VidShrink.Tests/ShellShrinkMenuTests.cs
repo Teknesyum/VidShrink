@@ -342,7 +342,7 @@ public sealed class ShellShrinkMenuTests : IClassFixture<ShellShrinkMenuFixture>
     {
         if (Skip) return;
         var open = _fixture.OpenEntries;
-        Assert.Equal(ShellIntegration.MediaExtensions.Count, open.Count);
+        Assert.Equal(ShellIntegration.MediaExtensions.Count + ShellIntegration.PlayerMenuExtensions.Count, open.Count);
         Assert.All(open, entry =>
         {
             Assert.Equal(TurkishOpenLabel, entry.Label);
@@ -432,7 +432,7 @@ public sealed class ShellShrinkMenuTests : IClassFixture<ShellShrinkMenuFixture>
         Assert.NotEmpty(_fixture.OpenEntries);
         Assert.Empty(_fixture.ShrinkEntriesAfterRemoval);
         Assert.Empty(_fixture.OpenEntriesAfterRemoval);
-        Assert.Equal(ShellIntegration.MediaExtensions.Count, _fixture.ExtensionKeysAfterWrite);
+        Assert.Equal(ShellIntegration.MediaExtensions.Count + ShellIntegration.PlayerMenuExtensions.Count, _fixture.ExtensionKeysAfterWrite);
         Assert.Equal(0, _fixture.ExtensionKeysAfterRemoval);
     }
 

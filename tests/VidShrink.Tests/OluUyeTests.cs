@@ -770,7 +770,9 @@ public sealed class OluUyeTests
     /// Olcunun kalan kor noktasi: tarama ad esliyor, tur esliyemiyor. Bir baska turun ayni
     /// adli uyesi uretimde okununca olu uye canli gorunuyor — RecordProgress.Captured bu yuzden
     /// listeden dustu, uretimde okunan Pointer.Captured'di. Satiri silmeden once okuyanin
-    /// gercekten o tur oldugunu dogrula.
+    /// gercekten o tur oldugunu dogrula. RemoteZip.Paths de ayni yoldan dustu: OYB-P7 ile
+    /// ForwardedRequest.Paths uretimde okunuyor, RemoteZip.Paths hala okunmuyor. Kosum: 1478
+    /// ozellik, 70 isaretli.
     /// </summary>
     private static readonly string[] PinnedOzellik =
     {
@@ -822,7 +824,6 @@ public sealed class OluUyeTests
         "RecorderMachine.CpuCores  hic-gorunmeyen",
         "RecorderSession.SegmentCount  hic-gorunmeyen",
         "ReleaseManifest.Built  hic-gorunmeyen",
-        "RemoteZip.Paths  hic-gorunmeyen",
         "Scene.Complexity  yalniz-disarida",
         "SceneMap.Rule  yalniz-disarida",
         "SceneMap.Threshold  yalniz-disarida",

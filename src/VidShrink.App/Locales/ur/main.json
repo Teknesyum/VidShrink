@@ -675,6 +675,7 @@
   "settings-tab.default-app.hint": "Windows کا ڈیفالٹ ایپس صفحہ VidShrink کے اندراج پر کھولتا ہے؛ انتخاب وہیں کریں۔",
   "shell.menu.open": "یہ ویڈیو VidShrink سے کھولیں",
   "shell.menu.shrink": "VidShrink سے چھوٹا کریں",
+  "shell.menu.enqueue": "VidShrink کی قطار میں شامل کریں",
   "shell.menu.target.size-8": "8 MB",
   "shell.menu.target.whatsapp-chat": "WhatsApp (16 MB)",
   "shell.menu.target.discord-free": "Discord (20 MB)",

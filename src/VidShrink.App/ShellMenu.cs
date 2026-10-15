@@ -23,6 +23,10 @@ internal static class ShellMenu
 
     internal const string ShrinkMenuKey = "VidShrinkKucult";
 
+    internal const string EnqueueMenuKey = "VidShrinkSirayaEkle";
+
+    internal const string EnqueueFlag = "--siraya-ekle";
+
     internal const string PackageName = "Teknesyum.VidShrink.Shell";
 
     internal const string ShrinkFlag = "--kucult";
@@ -32,6 +36,23 @@ internal static class ShellMenu
         "mp4", "mkv", "mov", "avi", "webm", "wmv", "flv", "m4v", "mpg", "mpeg", "ts", "m2ts",
         "3gp", "ogv", "vob", "asf", "rm", "rmvb", "divx", "mxf", "f4v", "mts", "dav", "gif"
     };
+
+    /// <summary>
+    /// Yalnız "aç" ve "sıraya ekle" fiillerini alan ses ve çalma listesi uzantıları; küçültme
+    /// alt menüsü bunlara yazılmaz.
+    /// </summary>
+    internal static readonly string[] PlayerExtensions =
+    {
+        "mp3", "m4a", "m4b", "aac", "adt", "adts", "flac", "wav", "wma", "ogg", "oga", "opus",
+        "mka", "aif", "aifc", "aiff", "au", "snd", "mp2", "mpa", "ac3", "ape", "wv", "weba",
+        "m3u", "m3u8", "pls", "wpl", "zpl", "asx", "wax", "wvx", "wmx"
+    };
+
+    /// <summary>Bir menünün yazıldığı uzantılar: küçültme yalnız videoda, öteki iki fiil seste ve listede de.</summary>
+    internal static IReadOnlyList<string> ExtensionsFor(string menu)
+        => menu == ShrinkMenuKey ? Extensions : OpenExtensions;
+
+    private static readonly string[] OpenExtensions = [.. Extensions, .. PlayerExtensions];
 
     internal static bool Supported => OperatingSystem.IsWindows();
 
@@ -66,28 +87,53 @@ internal static class ShellMenu
     }
 
     /// <summary>
-    /// Açma girdisini yazar. Küçültme alt menüsüne dokunmaz: kullanıcı birini isteyip
-    /// diğerini istemeyebilir, iki kutu iki ayrı kayıt defteri koluna bakar.
+    /// Açma ve sıraya ekleme girdilerini yazar; ikisi aynı kutuya bağlı. Küçültme alt menüsüne
+    /// dokunmaz: kullanıcı birini isteyip diğerini istemeyebilir, iki kutu iki ayrı kayıt
+    /// defteri koluna bakar. Çoklu seçimde girdi kaybolmasın diye ikisi de <c>Player</c>
+    /// modelini taşır.
     /// </summary>
     [SupportedOSPlatform("windows")]
     internal static int InstallOpen(string executable, string label)
     {
         if (Root is not { } root) return 0;
         Drop(MenuKey);
+        Drop(EnqueueMenuKey);
         WriteLabel("open", label);
+        var enqueueLabel = EnqueueLabel();
+        WriteLabel("enqueue", enqueueLabel);
 
         var written = 0;
-        foreach (var extension in Extensions)
+        foreach (var extension in OpenExtensions)
         {
-            using var open = Registry.CurrentUser.CreateSubKey(root + Branch(extension) + "\\" + MenuKey);
-            open.SetValue("MUIVerb", label, RegistryValueKind.String);
-            open.SetValue("Icon", executable, RegistryValueKind.String);
-            using var command = open.CreateSubKey("command");
-            command.SetValue(string.Empty, $"\"{executable}\" \"%1\"", RegistryValueKind.String);
+            using (var open = Registry.CurrentUser.CreateSubKey(root + Branch(extension) + "\\" + MenuKey))
+            {
+                open.SetValue("MUIVerb", label, RegistryValueKind.String);
+                open.SetValue("Icon", executable, RegistryValueKind.String);
+                open.SetValue("MultiSelectModel", "Player", RegistryValueKind.String);
+                using var command = open.CreateSubKey("command");
+                command.SetValue(string.Empty, $"\"{executable}\" \"%1\"", RegistryValueKind.String);
+            }
+
+            using (var enqueue = Registry.CurrentUser.CreateSubKey(root + Branch(extension) + "\\" + EnqueueMenuKey))
+            {
+                enqueue.SetValue("MUIVerb", enqueueLabel, RegistryValueKind.String);
+                enqueue.SetValue("Icon", executable, RegistryValueKind.String);
+                enqueue.SetValue("MultiSelectModel", "Player", RegistryValueKind.String);
+                using var command = enqueue.CreateSubKey("command");
+                command.SetValue(string.Empty, $"\"{executable}\" \"%1\" " + EnqueueFlag, RegistryValueKind.String);
+            }
+
             written++;
         }
 
         return written;
+    }
+
+    /// <summary>"Sıraya ekle" girdisinin arayüz dilindeki etiketi; çözülmezse kurucunun İngilizce yedeği.</summary>
+    internal static string EnqueueLabel()
+    {
+        var text = Localization.Strings.Get("shell.menu.enqueue");
+        return string.IsNullOrWhiteSpace(text) || text == "shell.menu.enqueue" ? Core.Setup.SetupText.GetIn("en", "shell.menu.enqueue") : text;
     }
 
     /// <summary>Küçültme alt menüsünü yazar; açma girdisine dokunmaz.</summary>
@@ -141,7 +187,7 @@ internal static class ShellMenu
     internal static int Relabel(string menu, string label)
     {
         if (Root is not { } root) return 0;
-        var name = menu == MenuKey ? "open" : "shrink";
+        var name = menu == MenuKey ? "open" : menu == EnqueueMenuKey ? "enqueue" : "shrink";
         var written = 0;
         using (var labels = Registry.CurrentUser.OpenSubKey(root + LabelKey))
         {
@@ -153,7 +199,7 @@ internal static class ShellMenu
         }
 
         var entryLabels = menu == ShrinkMenuKey ? EntryLabels() : null;
-        foreach (var extension in Extensions)
+        foreach (var extension in ExtensionsFor(menu))
         {
             using var verb = Registry.CurrentUser.OpenSubKey(root + Branch(extension) + "\\" + menu, writable: true);
             if (verb is null) continue;
@@ -207,6 +253,7 @@ internal static class ShellMenu
     {
         if (Root is null) return 0;
         var removed = Drop(MenuKey);
+        Drop(EnqueueMenuKey);
         if (TestRoot is null) RemovePackage();
         return removed;
     }
@@ -219,7 +266,7 @@ internal static class ShellMenu
     {
         if (Root is not { } root) return 0;
         var removed = 0;
-        foreach (var extension in Extensions)
+        foreach (var extension in ExtensionsFor(menu))
         {
             var path = root + Branch(extension) + "\\" + menu;
             using var probe = Registry.CurrentUser.OpenSubKey(path);
@@ -277,5 +324,5 @@ internal static class ShellMenu
     private static string Branch(string extension)
         => "Software\\Classes\\SystemFileAssociations\\." + extension + "\\shell";
 
-    internal static IReadOnlyList<string> MenuKeys => new[] { MenuKey, ShrinkMenuKey };
+    internal static IReadOnlyList<string> MenuKeys => new[] { MenuKey, ShrinkMenuKey, EnqueueMenuKey };
 }

@@ -100,7 +100,10 @@ public partial class MainWindow
         try
         {
             if (ChkShellMenuOpen.IsChecked == true)
+            {
                 ShellMenu.Relabel(ShellMenu.MenuKey, Say("shell.menu.open"));
+                ShellMenu.Relabel(ShellMenu.EnqueueMenuKey, Say("shell.menu.enqueue"));
+            }
             if (ChkShellMenuShrink.IsChecked == true)
                 ShellMenu.Relabel(ShellMenu.ShrinkMenuKey, Say("shell.menu.shrink"));
         }

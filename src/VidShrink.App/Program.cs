@@ -155,17 +155,18 @@ internal static class Program
     private static int RunMain(string[] args)
     {
         AcilisIzi.Yaz("main");
-        var path = StartupTarget(args);
+        var request = Integration.ForwardedRequest.FromArguments(args, StartupTarget(args));
+        var path = request.Single ? request.First : null;
         using var instance = new SingleInstanceChannel(SingleInstanceChannel.DefaultChannel());
         var files = new Integration.ForwardedFiles();
         AcilisIzi.Yaz("tek-ornek");
-        if (path is not null && !MediaAddress.IsAddress(path)) WarmStartupFile(path);
+        if (request.First is { } first && !MediaAddress.IsAddress(first)) WarmStartupFile(first);
+        if (!request.Single && request.Paths.Count > 0) files.Receive(request.Encode());
 
         if (!instance.IsOwner)
         {
             AllowForeground();
-            var forwarded = path is null ? Array.Empty<string>() : new[] { path };
-            if (instance.Forward(forwarded, ForwardConnectTimeout, ForwardReplyTimeout)) return 0;
+            if (instance.Forward(request.Encode(), ForwardConnectTimeout, ForwardReplyTimeout)) return 0;
             return Build(path, files).StartWithClassicDesktopLifetime(args);
         }
 

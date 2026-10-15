@@ -36,7 +36,7 @@ public sealed class KabukKucultAltMenuTests : IDisposable
     public KabukKucultAltMenuTests()
     {
         var id = Guid.NewGuid().ToString("n");
-        _work = Path.Combine(TipSources.Root, ".calisma", "worktree-agent-a7c5e9e38858ffd4c", id);
+        _work = Path.Combine(TipSources.Root, ".calisma", "kabuk-kucult-alt-menu", id);
         _testKey = $@"Software\VidShrink-Test-{Environment.ProcessId}-{id}";
         Directory.CreateDirectory(_work);
     }

@@ -1292,6 +1292,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, DZB-P5 ve OYB-P8 birlesmelerinden sonra: iki dalin kaymasi toplandi, dusen yok; olculen toplam 3622 + 2 + 28 = 3652, en 351 + 5 = 356, tr 111 + 7 = 118, gezilen 74218 + 344 + 860 = 75422.</para>
     /// <para>2026-10-15, medya havuzu ve araya ekleme (DZB-P11): bes yeni <c>editor.media.*</c> anahtari; 4 kol (<c>editor.media.mode</c>: en; <c>editor.media.open</c>: es, pt, sw), KOL dokumunden ve SAYIM satirindan olculdu: toplam 3652 + 4 = 3656, en 356 + 1 = 357, tr 118, gezilen 75422 + 43 x 5 = 75637.</para>
     /// <para>2026-10-15, ara kare (ARC-P4): iki yeni anahtar (<c>main.convert.interpolate</c>, <c>main.convert.interpolate.tip</c>), toplam ve en/tr kaymadi; olculen gezilen 75422 + 43 x 2 = 75508.</para>
+    /// <para>2026-10-15, kabukta coklu acma ve siraya ekleme (OYB-P7): bir yeni anahtar (<c>shell.menu.enqueue</c>) 9 dilde kola giriyor (cs, en, es, fr, hu, pl, pt, sk, sw), KOL dokumunden ve SAYIM satirindan olculdu, tr girmiyor: toplam 3652 + 9 = 3661, en 356 + 1 = 357, tr 118, gezilen 75422 + 43 = 75465.</para>
     /// <para>2026-10-15, ses temizleme ve duzey (DZB-P5): sekiz yeni <c>editor.clip.*</c> anahtari (gurultu, ses esitleme, sikistirici, sinirlayici, uc bant, duzey olcer), testin SAYIM satirindan olculdu: toplam 3622 + 2 = 3624, gezilen 74218 + 344 = 74562.</para>
     /// <para>2026-10-15, yer imi listesi, sik kullanilanlar ve acilista sorma (later 49 + 159): yirmi yeni anahtar (<c>player.bookmarks.*</c>, <c>player.favorites.*</c>, <c>player.view.resume-*</c>, <c>player.resume.*</c>), KOL dokumunden ve SAYIM satirindan olculdu: toplam 3622 + 28 = 3650, en 351 + 5 = 356, tr 111 + 7 = 118, gezilen 74218 + 860 = 75078.</para>
     /// <para>2026-10-15, kuyrukta zamanlama, duzenleme ve bitis (SIK-P7): on dort yeni anahtar (<c>main.shrink-job.*</c> 12, <c>settings-tab.finish-sound.*</c> 2), testin SAYIM satirindan olculdu: toplam 3542 + 19 = 3561, en 337 + 6 = 343, tr 110 + 1 = 111, gezilen 72068 + 43 x 14 = 72670.</para>
@@ -1302,6 +1303,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, Donustur'de goruntu suzgecleri (DON-P10): dokuz yeni <c>main.convert.*</c> anahtari (olcekleme, kare hizi kipi, dolgu, suzgec notu), testin SAYIM satirindan olculdu: toplam 3558, en 338, tr 110.</para>
     /// <para>2026-10-15, doldurma kipi (OYA-P11): <c>player.view.fill</c> 3 dilde kola giriyor (en, nl, tr), KOL dokumunden sayildi: olculen 3652 + 3 = 3655, en 356 + 1 = 357, tr 118 + 1 = 119.</para>
     /// <para>2026-10-15, OYA-P11 ve DZB-P11 birlesmesinden sonra: iki dalin kaymasi toplandi, dusen yok; olculen toplam 3652 + 3 + 4 = 3659, en 356 + 1 + 1 = 358, tr 118 + 1 = 119, gezilen 75422 + 43 + 215 = 75680.</para>
+    /// <para>2026-10-15, ARC-P4 ve OYB-P7 birlesmesinden sonra: olculen toplam 3659 + 9 = 3668, en 358 + 1 = 359, tr 119, gezilen 75680 + 86 + 43 = 75809.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1327,8 +1329,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3659, toplam);
-        Assert.Equal(358, dilBasina["en"]);
+        Assert.Equal(3668, toplam);
+        Assert.Equal(359, dilBasina["en"]);
         Assert.Equal(119, dilBasina["tr"]);
     }
 
@@ -1616,7 +1618,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(75766, gezilen);
+        Assert.Equal(75809, gezilen);
         Assert.Empty(kayip);
     }
 

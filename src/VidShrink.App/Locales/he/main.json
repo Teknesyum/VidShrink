@@ -675,6 +675,7 @@
   "settings-tab.default-app.hint": "פותח את דף אפליקציות ברירת המחדל של Windows ברשומת VidShrink; הבחירה נעשית שם.",
   "shell.menu.open": "פתח סרטון זה עם VidShrink",
   "shell.menu.shrink": "כווץ עם VidShrink",
+  "shell.menu.enqueue": "הוסף לתור של VidShrink",
   "shell.menu.target.size-8": "8 MB",
   "shell.menu.target.whatsapp-chat": "WhatsApp (16 MB)",
   "shell.menu.target.discord-free": "Discord (20 MB)",
