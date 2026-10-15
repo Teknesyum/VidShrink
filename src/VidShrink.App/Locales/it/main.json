@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Rimuovi banding",
   "main.advanced.filters.gray": "Scala di grigi",
   "main.advanced.filters.autocrop": "Ritaglia le bande nere",
+  "main.advanced.filters.manualcrop": "Ritaglio manuale",
+  "main.advanced.filters.manualcrop.tip": "• Trascina il riquadro nell'anteprima per scegliere l'area da tenere.\n• Finché è attivo, il ritaglio delle bande nere è spento.",
   "main.advanced.filters.spec": "Specifica (ritaglio, margini e altro)",
   "main.advanced.codec-lock.label": "Blocco codec",
 

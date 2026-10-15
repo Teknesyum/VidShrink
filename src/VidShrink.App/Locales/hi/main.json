@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "बेंडिंग हताएं",
   "main.advanced.filters.gray": "ग्रेस्केल",
   "main.advanced.filters.autocrop": "काली पट्टियाँ काटें",
+  "main.advanced.filters.manualcrop": "हाथ से काटें",
+  "main.advanced.filters.manualcrop.tip": "• रखा जाने वाला हिस्सा चुनने के लिए प्रीव्यू पर बॉक्स खींचें।\n• चालू रहने पर काली पट्टियाँ काटना बंद रहता है।",
   "main.advanced.filters.spec": "विवरण (क्रॉप, पेड आदि)",
   "main.advanced.codec-lock.label": "कोडेक लॉक",
 

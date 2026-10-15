@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Αφαίρεση λωρίδωσης",
   "main.advanced.filters.gray": "Κλίμακα του γκρι",
   "main.advanced.filters.autocrop": "Περικοπή μαύρων λωρίδων",
+  "main.advanced.filters.manualcrop": "Χειροκίνητη περικοπή",
+  "main.advanced.filters.manualcrop.tip": "• Σύρετε το πλαίσιο στην προεπισκόπηση για να διαλέξετε την περιοχή που μένει.\n• Όσο είναι ενεργό, η περικοπή μαύρων λωρίδων είναι ανενεργή.",
   "main.advanced.filters.spec": "Προδιαγραφή (περικοπή, περιθώριο κ.λπ.)",
   "main.advanced.codec-lock.label": "Κλείδωμα κωδικοποιητή",
 

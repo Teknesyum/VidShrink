@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Bändäyksenpoisto",
   "main.advanced.filters.gray": "Harmaasävy",
   "main.advanced.filters.autocrop": "Rajaa mustat palkit",
+  "main.advanced.filters.manualcrop": "Rajaa käsin",
+  "main.advanced.filters.manualcrop.tip": "• Valitse säilyvä alue vetämällä kehystä esikatselussa.\n• Kun tämä on päällä, mustien palkkien rajaus on pois.",
   "main.advanced.filters.spec": "Määritys (rajaus, reunatäyte jne.)",
   "main.advanced.codec-lock.label": "Koodekkilukko",
 

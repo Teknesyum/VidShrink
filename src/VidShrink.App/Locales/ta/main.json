@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "பேண்டிங் அகற்று",
   "main.advanced.filters.gray": "சாம்பல் அளவீடு",
   "main.advanced.filters.autocrop": "கருப்புப் பட்டைகளை வெட்டு",
+  "main.advanced.filters.manualcrop": "கைமுறை வெட்டு",
+  "main.advanced.filters.manualcrop.tip": "• வைக்க வேண்டிய பகுதியைத் தேர்ந்தெடுக்க முன்னோட்டத்தில் பெட்டியை இழுக்கவும்.\n• இயக்கத்தில் இருக்கும்போது கருப்புப் பட்டை வெட்டுதல் அணைக்கப்படும்.",
   "main.advanced.filters.spec": "விவரக்குறிப்பு (கிராப், பேட் போன்றவை)",
   "main.advanced.codec-lock.label": "கோடெக் பூட்டு",
 

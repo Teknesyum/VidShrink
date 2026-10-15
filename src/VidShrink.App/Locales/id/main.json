@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Hilangkan banding",
   "main.advanced.filters.gray": "Skala abu-abu",
   "main.advanced.filters.autocrop": "Pangkas bilah hitam",
+  "main.advanced.filters.manualcrop": "Pangkas manual",
+  "main.advanced.filters.manualcrop.tip": "• Seret kotak di pratinjau untuk memilih area yang dipertahankan.\n• Selama aktif, pemangkasan bilah hitam dimatikan.",
   "main.advanced.filters.spec": "Spesifikasi (crop, pad, dll.)",
   "main.advanced.codec-lock.label": "Kunci codec",
 

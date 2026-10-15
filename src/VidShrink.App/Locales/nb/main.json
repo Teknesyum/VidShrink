@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Debanding",
   "main.advanced.filters.gray": "Gråtoner",
   "main.advanced.filters.autocrop": "Beskjær svarte felt",
+  "main.advanced.filters.manualcrop": "Manuell beskjæring",
+  "main.advanced.filters.manualcrop.tip": "• Dra rammen i forhåndsvisningen for å velge området som beholdes.\n• Mens det er på, er beskjæring av svarte felt av.",
   "main.advanced.filters.spec": "Spesifikasjon (beskjæring, kant m.m.)",
   "main.advanced.codec-lock.label": "Kodeklås",
 

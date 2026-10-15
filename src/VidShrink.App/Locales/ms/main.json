@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Buang banding",
   "main.advanced.filters.gray": "Skala kelabu",
   "main.advanced.filters.autocrop": "Pangkas jalur hitam",
+  "main.advanced.filters.manualcrop": "Pangkas manual",
+  "main.advanced.filters.manualcrop.tip": "• Seret kotak pada pratonton untuk memilih kawasan yang dikekalkan.\n• Semasa aktif, pemangkasan jalur hitam dimatikan.",
   "main.advanced.filters.spec": "Spesifikasi (potong, pad dll.)",
   "main.advanced.codec-lock.label": "Kunci kodek",
 

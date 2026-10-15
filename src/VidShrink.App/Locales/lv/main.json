@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Joslojuma novēršana",
   "main.advanced.filters.gray": "Pelēktoņi",
   "main.advanced.filters.autocrop": "Apgriezt melnās joslas",
+  "main.advanced.filters.manualcrop": "Manuāla apgriešana",
+  "main.advanced.filters.manualcrop.tip": "• Velciet rāmi priekšskatījumā, lai izvēlētos paliekošo laukumu.\n• Kamēr ieslēgts, melno joslu apgriešana ir izslēgta.",
   "main.advanced.filters.spec": "Specifikācija (apgriešana, malas u.c.)",
   "main.advanced.codec-lock.label": "Kodeka fiksācija",
 

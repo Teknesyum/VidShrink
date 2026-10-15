@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Elimină benzile",
   "main.advanced.filters.gray": "Scală de gri",
   "main.advanced.filters.autocrop": "Decupează benzile negre",
+  "main.advanced.filters.manualcrop": "Decupare manuală",
+  "main.advanced.filters.manualcrop.tip": "• Trageți cadrul în previzualizare pentru a alege zona păstrată.\n• Cât timp e activ, decuparea benzilor negre e oprită.",
   "main.advanced.filters.spec": "Specificație (decupare, margini etc.)",
   "main.advanced.codec-lock.label": "Blocare codec",
 

@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Débandage",
   "main.advanced.filters.gray": "Niveaux de gris",
   "main.advanced.filters.autocrop": "Rogner les bandes noires",
+  "main.advanced.filters.manualcrop": "Rognage manuel",
+  "main.advanced.filters.manualcrop.tip": "• Faites glisser le cadre dans l'aperçu pour choisir la zone conservée.\n• Tant que c'est actif, le rognage des bandes noires est désactivé.",
   "main.advanced.filters.spec": "Spécification (recadrage, marges, etc.)",
   "main.advanced.codec-lock.label": "Verrou de codec",
 

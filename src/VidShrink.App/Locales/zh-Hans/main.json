@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "去色带",
   "main.advanced.filters.gray": "灰度",
   "main.advanced.filters.autocrop": "裁掉黑边",
+  "main.advanced.filters.manualcrop": "手动裁剪",
+  "main.advanced.filters.manualcrop.tip": "• 在预览上拖动方框，选择要保留的区域。\n• 开启时，黑边裁剪会关闭。",
   "main.advanced.filters.spec": "规格（裁剪、填充等）",
   "main.advanced.codec-lock.label": "锁定编码",
 

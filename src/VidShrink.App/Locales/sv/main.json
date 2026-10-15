@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Avbandning",
   "main.advanced.filters.gray": "Gråskala",
   "main.advanced.filters.autocrop": "Beskär svarta fält",
+  "main.advanced.filters.manualcrop": "Manuell beskärning",
+  "main.advanced.filters.manualcrop.tip": "• Dra ramen i förhandsvisningen för att välja området som behålls.\n• Medan det är på är beskärning av svarta fält av.",
   "main.advanced.filters.spec": "Specifikation (beskärning, kant m.m.)",
   "main.advanced.codec-lock.label": "Kodeklås",
 

@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Odpruhovanie",
   "main.advanced.filters.gray": "Odtiene sivej",
   "main.advanced.filters.autocrop": "Orezať čierne pruhy",
+  "main.advanced.filters.manualcrop": "Ručné orezanie",
+  "main.advanced.filters.manualcrop.tip": "• Potiahnutím rámčeka v náhľade vyberte oblasť, ktorá zostane.\n• Kým je zapnuté, orezanie čiernych pruhov je vypnuté.",
   "main.advanced.filters.spec": "Špecifikácia (orezanie, okraje a ďalšie)",
   "main.advanced.codec-lock.label": "Zámok kodeku",
 

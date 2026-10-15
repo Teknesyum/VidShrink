@@ -1321,6 +1321,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, bas konus (later 68): iki yeni anahtar (<c>recorder.audio.push-to-talk</c>, <c>.hint</c>) 6 kol ekliyor (en <c>push-to-talk</c> dahil), tr degismedi; testin SAYIM satirindan olculdu: toplam 3733 + 6 = 3739, en 361 + 1 = 362, tr 120.</para>
     /// <para>2026-10-15, saatli kayit (later 67): on iki yeni <c>recorder.schedule.*</c> anahtarindan 5 kol (hu <c>.off</c>; pt <c>.weekly</c>; tr <c>.once</c>, <c>.daily</c>, <c>.weekly</c>), KOL dokumunden ve SAYIM satirindan olculdu: toplam 3733 + 5 = 3738, en 361, tr 120 + 3 = 123.</para>
     /// <para>2026-10-16, hizli kirpma (later 41): dokuz yeni <c>recorder.output.quick-trim*</c> anahtarindan 2 kol (it <c>quick-trim-running</c>, ro <c>quick-trim-failed</c>), KOL dokumunden sayildi, en ve tr girmiyor: olculen 3781 + 2 = 3783, en 364, tr 123.</para>
+    /// <para>2026-10-16, onizlemede elle kirpma (later 57): iki yeni anahtar (<c>main.advanced.filters.manualcrop</c>, <c>.tip</c>) kola girmiyor; en etiketi "Crop in preview" iken kola girip baslik denetiminde kusur sayildi, "Manual crop" yapildi. SAYIM satirindan olculdu: toplam 3781, en 364, tr 123.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1620,11 +1621,13 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, later 68 birlesmesinden sonra: bas konus anahtarlarinin kaymasi main'in uzerine toplandi, dusen yok; olculen toplam 3765 + 6 = 3771, en 363 + 1 = 364, tr 120, gezilen 79636 + 86 = 79722.</para>
     /// <para>2026-10-15, later 62 birlesmesinden sonra: ek arguman anahtarlarinin kaymasi main'in uzerine toplandi, dusen yok; olculen toplam 3771 + 5 = 3776, en 364, tr 120, gezilen 79722 + 215 = 79937.</para>
     /// <para>2026-10-15, later 67 birlesmesinden sonra: saatli kayit anahtarlarinin kaymasi main'in uzerine toplandi, dusen yok; olculen toplam 3776 + 5 = 3781, en 364, tr 120 + 3 = 123, gezilen 79937 + 516 = 80453.</para>
+    /// <para>2026-10-16, later 41 ve 57 birlesmesinden sonra: hizli kirpma metinleri toplam 3781 + 2 = 3783, gezilen 80453 + 387 = 80840; elle kirpma anahtarlari gezilen 80840 + 86 = 80926; en 364, tr 123 degismedi.</para>
     /// <para>2026-10-15, uzun iste oncelik ve bitis sesi (later 76): dort yeni anahtar (<c>settings-tab.encode-priority.above-normal</c>, <c>settings-tab.finish-sound-file.choose</c>, <c>.hint</c>, <c>.reset</c>) 42 dilde, dusen yok; olculen gezilen 78604 + 172 = 78776.</para>
     /// <para>2026-10-15, bas konus (later 68): iki yeni anahtar (<c>recorder.audio.push-to-talk</c>, <c>.hint</c>), dusen yok; olculen 78604 + 43 x 2 = 78690. <c>kayip</c> 0.</para>
     /// <para>2026-10-15, ek arguman (later 62): bes yeni <c>main.convert.extra-args*</c> anahtari, dusen yok; olculen toplam 3733 + 5 = 3738, en 361, tr 120, gezilen 78604 + 215 = 78819.</para>
     /// <para>2026-10-15, saatli kayit (later 67): on iki yeni <c>recorder.schedule.*</c> anahtari, dusen yok; olculen 78604 + 43 x 12 = 79120.</para>
     /// <para>2026-10-16, hizli kirpma (later 41): dokuz yeni <c>recorder.output.quick-trim*</c> anahtari, dusen yok; olculen 80453 + 387 = 80840. <c>kayip</c> 0.</para>
+    /// <para>2026-10-16, onizlemede elle kirpma (later 57): iki yeni anahtar (<c>main.advanced.filters.manualcrop</c>, <c>.tip</c>), dusen yok; olculen gezilen 80453 + 43 x 2 = 80539. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1652,7 +1655,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(80840, gezilen);
+        Assert.Equal(80926, gezilen);
         Assert.Empty(kayip);
     }
 

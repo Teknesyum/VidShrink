@@ -104,6 +104,8 @@
                      Margin="{StaticResource PlaybackBadgeMargin}"/>
         </Border>
 
+        <playback:KirpmaKatmani x:Name="CropLayer" IsVisible="False"/>
+
         <!-- K1: hiç kare yokken boş durum. İki dilde, dil geçidi kod tarafında. -->
         <StackPanel x:Name="EmptyState"
                     HorizontalAlignment="Center"

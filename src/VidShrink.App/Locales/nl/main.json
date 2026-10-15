@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Debanden",
   "main.advanced.filters.gray": "Grijswaarden",
   "main.advanced.filters.autocrop": "Zwarte balken bijsnijden",
+  "main.advanced.filters.manualcrop": "Handmatig bijsnijden",
+  "main.advanced.filters.manualcrop.tip": "• Sleep het kader in het voorbeeld om het te behouden gebied te kiezen.\n• Zolang dit aan staat, is zwarte balken bijsnijden uit.",
   "main.advanced.filters.spec": "Specificatie (bijsnijden, opvulling e.d.)",
   "main.advanced.codec-lock.label": "Codecvergrendeling",
 

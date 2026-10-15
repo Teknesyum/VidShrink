@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Bant gider",
   "main.advanced.filters.gray": "Gri tonlama",
   "main.advanced.filters.autocrop": "Siyah bantları kırp",
+  "main.advanced.filters.manualcrop": "Önizlemede kırp",
+  "main.advanced.filters.manualcrop.tip": "• Önizlemedeki çerçeveyi sürükleyip kalacak alanı seçin.\n• Açıkken siyah bant kırpma kapanır.",
   "main.advanced.filters.spec": "Belirtim (kırpma, kenar ve diğerleri)",
   "main.advanced.codec-lock.label": "Kodek kilidi",
 

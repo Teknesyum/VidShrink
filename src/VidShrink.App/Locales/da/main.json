@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Debanding",
   "main.advanced.filters.gray": "Gråtoner",
   "main.advanced.filters.autocrop": "Beskær sorte bjælker",
+  "main.advanced.filters.manualcrop": "Manuel beskæring",
+  "main.advanced.filters.manualcrop.tip": "• Træk rammen i forhåndsvisningen for at vælge det område, der beholdes.\n• Mens det er slået til, er beskæring af sorte bjælker slået fra.",
   "main.advanced.filters.spec": "Specifikation (beskæring, kant m.m.)",
   "main.advanced.codec-lock.label": "Codec-lås",
 

@@ -253,6 +253,8 @@
   "main.advanced.filters.deband": "Уклони пруге",
   "main.advanced.filters.gray": "Сиви тонови",
   "main.advanced.filters.autocrop": "Исеци црне траке",
+  "main.advanced.filters.manualcrop": "Ручно исецање",
+  "main.advanced.filters.manualcrop.tip": "• Превуците оквир у прегледу да изаберете део који остаје.\n• Док је укључено, исецање црних трака је искључено.",
   "main.advanced.filters.spec": "Спецификација (исецаље, рубови итд.)",
   "main.advanced.codec-lock.label": "Zaključan kodek",
 
