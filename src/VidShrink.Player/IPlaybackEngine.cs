@@ -76,6 +76,9 @@ public interface IPlaybackEngine : IDisposable
 
     MediaTags Tags => MediaTags.Empty;
 
+    /// <summary>Motorun yayın adı (etiket ya da liste girdisinin başlığı); yalnız dosya adına düşüyorsa <c>null</c>.</summary>
+    string? MediaTitle => null;
+
     bool IsPaused { get; }
 
     bool EndReached { get; }

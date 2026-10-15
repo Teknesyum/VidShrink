@@ -2,6 +2,8 @@
   "player.tools.menu": "工具",
   "player.tools.clip": "保存片段",
   "player.tools.gif": "保存 GIF",
+  "player.tools.frames": "保存帧",
+  "player.tools.sheet": "保存缩略图表",
   "player.tools.mini": "迷你模式",
   "player.tools.url": "打开地址…",
   "player.tools.url-hint": "http、https 或 rtsp 地址",

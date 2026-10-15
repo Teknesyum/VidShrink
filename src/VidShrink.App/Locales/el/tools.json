@@ -2,6 +2,8 @@
   "player.tools.menu": "Εργαλεία",
   "player.tools.clip": "Αποθήκευση κλιπ",
   "player.tools.gif": "Αποθήκευση GIF",
+  "player.tools.frames": "Αποθήκευση καρέ",
+  "player.tools.sheet": "Αποθήκευση πίνακα μικρογραφιών",
   "player.tools.mini": "Λειτουργία μίνι",
   "player.tools.url": "Άνοιγμα διεύθυνσης…",
   "player.tools.url-hint": "Διεύθυνση http, https ή rtsp",

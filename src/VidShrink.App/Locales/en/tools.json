@@ -2,6 +2,8 @@
   "player.tools.menu": "Tools",
   "player.tools.clip": "Save clip",
   "player.tools.gif": "Save GIF",
+  "player.tools.frames": "Save frames",
+  "player.tools.sheet": "Save thumbnail sheet",
   "player.tools.mini": "Mini mode",
   "player.tools.url": "Open address…",
   "player.tools.url-hint": "http, https or rtsp address",

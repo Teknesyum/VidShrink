@@ -2,6 +2,8 @@
   "player.tools.menu": "ابزارها",
   "player.tools.clip": "ذخیره کلیپ",
   "player.tools.gif": "ذخیره GIF",
+  "player.tools.frames": "ذخیره فریم‌ها",
+  "player.tools.sheet": "ذخیره برگه تصاویر کوچک",
   "player.tools.mini": "حالت کوچک",
   "player.tools.url": "باز کردن نشانی…",
   "player.tools.url-hint": "نشانی http، https یا rtsp",

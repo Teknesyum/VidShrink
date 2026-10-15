@@ -1,11 +1,16 @@
 using System;
 using System.IO;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using VidShrink.Core;
+using VidShrink.Player;
 
 namespace VidShrink.App.Playback;
 
@@ -26,14 +31,67 @@ internal partial class PlayerView
 
     internal MenuFlyout? MediaTitleMenu => _titleMenu;
 
-    private void ShowMediaTitle(string path)
+    private const int ListTitleMaxBytes = 64 * 1024;
+    private static readonly HttpClient ListTitleClient = new() { Timeout = TimeSpan.FromSeconds(5) };
+
+    /// <summary>Test konağı uzak pls listesini okumaz; okuyan ölçü <see cref="ListTitleReader"/>'ı kendisi verir.</summary>
+    internal static bool ListTitleDisabled { get; set; }
+
+    internal Func<string, CancellationToken, Task<string?>>? ListTitleReader { get; set; } = ListTitleDisabled ? null : ReadListTitleAsync;
+
+    private void ShowMediaTitle(string path, IPlaybackEngine? engine = null)
     {
-        var name = MediaName(path);
-        TxtMediaTitle.Text = name;
+        var stream = StreamTitle(path, engine);
+        SetMediaTitle(stream ?? MediaName(path));
         ToolTip.SetTip(MediaTitle, MediaAddress.WithoutQuery(path));
+        if (stream is null && IsRemotePls(path) && ListTitleReader is { } reader) _ = FetchListTitleAsync(path, reader);
+    }
+
+    private void SetMediaTitle(string name)
+    {
+        TxtMediaTitle.Text = name;
         AutomationProperties.SetName(MediaTitle, name);
         MediaTitle.Classes.Set(TitleFilled, name.Length > 0);
     }
+
+    private static bool IsRemotePls(string path)
+        => MediaAddress.IsAddress(path) && string.Equals(Path.GetExtension(MediaAddress.WithoutQuery(path)), ".pls", StringComparison.OrdinalIgnoreCase);
+
+    private async Task FetchListTitleAsync(string path, Func<string, CancellationToken, Task<string?>> reader)
+    {
+        string? title;
+        try
+        {
+            title = await reader(path, CancellationToken.None);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or IOException or InvalidOperationException)
+        {
+            return;
+        }
+
+        if (title is not { Length: > 0 }) return;
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            if (_path == path && MediaTitle.Classes.Contains(TitleFilled)) SetMediaTitle(title);
+        });
+    }
+
+    internal static async Task<string?> ReadListTitleAsync(string path, CancellationToken token)
+    {
+        using var response = await ListTitleClient.GetAsync(path, HttpCompletionOption.ResponseHeadersRead, token);
+        if (!response.IsSuccessStatusCode) return null;
+        await using var stream = await response.Content.ReadAsStreamAsync(token);
+        var buffer = new byte[ListTitleMaxBytes];
+        var read = 0;
+        while (read < buffer.Length && await stream.ReadAsync(buffer.AsMemory(read), token) is var count and > 0) read += count;
+        return PlaylistFile.PlsTitle(buffer[..read]);
+    }
+
+    internal static string? StreamTitle(string path, IPlaybackEngine? engine)
+        => engine is not null && MediaAddress.IsAddress(path) && PlaylistFile.IsPlaylist(MediaAddress.WithoutQuery(path))
+            && engine.MediaTitle is { Length: > 0 } title
+            ? title
+            : null;
 
     internal static string MediaName(string path) => MediaAddress.IsAddress(path) ? MediaAddress.Name(path) : Path.GetFileName(path);
 

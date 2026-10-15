@@ -2,6 +2,8 @@
   "player.tools.menu": "Strumenti",
   "player.tools.clip": "Salva clip",
   "player.tools.gif": "Salva GIF",
+  "player.tools.frames": "Salva fotogrammi",
+  "player.tools.sheet": "Salva foglio di miniature",
   "player.tools.mini": "Modalità mini",
   "player.tools.url": "Apri indirizzo…",
   "player.tools.url-hint": "Indirizzo http, https o rtsp",

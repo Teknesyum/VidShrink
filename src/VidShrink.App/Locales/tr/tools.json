@@ -2,6 +2,8 @@
   "player.tools.menu": "Araçlar",
   "player.tools.clip": "Klip kaydet",
   "player.tools.gif": "GIF kaydet",
+  "player.tools.frames": "Kareleri kaydet",
+  "player.tools.sheet": "Küçük resim tablosu kaydet",
   "player.tools.mini": "Mini mod",
   "player.tools.url": "Adres aç…",
   "player.tools.url-hint": "http, https ya da rtsp adresi",

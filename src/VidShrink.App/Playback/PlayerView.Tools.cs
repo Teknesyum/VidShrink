@@ -40,6 +40,7 @@ internal partial class PlayerView
     private double _thumbPending = double.NaN;
     private Task _thumbWork = Task.CompletedTask;
     private Task<ClipResult> _lastExport = Task.FromResult(new ClipResult(false, "", "", TimeSpan.Zero));
+    private Task<FrameResult> _lastFrames = Task.FromResult(new FrameResult(false, "", 0, "", TimeSpan.Zero));
     private Task<bool> _lastAddress = Task.FromResult(false);
     private Task<bool> _lastPaste = Task.FromResult(false);
 
@@ -61,6 +62,8 @@ internal partial class PlayerView
     internal Task ThumbnailWork => _thumbWork;
 
     internal Task<ClipResult> LastExport => _lastExport;
+
+    internal Task<FrameResult> LastFrames => _lastFrames;
 
     internal Task<bool> LastAddress => _lastAddress;
 
@@ -91,6 +94,12 @@ internal partial class PlayerView
                 return true;
             case PlayerCommandKind.GifExport:
                 _trace.Add("gif -> " + StartExport(ClipKind.Gif));
+                return true;
+            case PlayerCommandKind.FrameExport:
+                _trace.Add("frames -> " + StartFrames(FrameKind.Frames));
+                return true;
+            case PlayerCommandKind.ContactSheet:
+                _trace.Add("sheet -> " + StartFrames(FrameKind.Sheet));
                 return true;
             case PlayerCommandKind.MiniMode:
                 ToggleMiniMode();
@@ -127,17 +136,23 @@ internal partial class PlayerView
         mini.IsChecked = _mini.IsMini;
         var clip = ToolsRow(ToolsOptions.Clip);
         var gif = ToolsRow(ToolsOptions.Gif);
-        clip.IsEnabled = gif.IsEnabled = !AudioOnly;
+        var frames = ToolsRow(ToolsOptions.Frames);
+        var sheet = ToolsRow(ToolsOptions.Sheet);
+        clip.IsEnabled = gif.IsEnabled = frames.IsEnabled = sheet.IsEnabled = !AudioOnly;
         if (OnAddress)
         {
             ExplainAddress(clip);
             ExplainAddress(gif);
+            ExplainAddress(frames);
+            ExplainAddress(sheet);
         }
 
         return Submenu(Strings.Get("player.tools.menu"), new List<Control>
         {
             clip,
             gif,
+            frames,
+            sheet,
             ToolsRow(ToolsOptions.OpenUrl),
             ToolsRow(ToolsOptions.PasteUrl),
             new Separator(),
@@ -411,6 +426,57 @@ internal partial class PlayerView
         var request = new ClipRequest(media, target, range.Start, range.Duration, kind, _tools.GifFps, _tools.GifWidth);
         _lastExport = RunExportAsync(request);
         return Path.GetFileName(target);
+    }
+
+    /// <summary>
+    /// Kareler ve küçük resim tablosu. Aralık A-B işaretlerinden, yoksa dosyanın tamamı. Kareler
+    /// <c>&lt;ad&gt;_frames</c> klasörüne her <see cref="ToolsOptions.FrameSeconds"/>'ta bir, tablo
+    /// <c>&lt;ad&gt;_sheet.png</c> olarak klip ve GIF'in klasörüne yazılır; aynı ad varsa <c>_2</c>, <c>_3</c>.
+    /// </summary>
+    private string StartFrames(FrameKind kind)
+    {
+        if (_path is not { } media || IsAddress(media))
+        {
+            _notice = Strings.Get(OnAddress ? AddressUnsupportedKey : "player.tools.novideo");
+            RefreshState();
+            return "no";
+        }
+
+        EnsureSettings();
+        EnsureTools();
+
+        var range = FrameRange(_loopStart, _loopEnd, _seek.Duration);
+        if (range.Duration <= 0) return "no";
+
+        var folder = _settings.ResolveFolder(media);
+        var stem = _settings.FileStem(media, range.Start) + (kind == FrameKind.Frames ? ToolsOptions.FramesSuffix : ToolsOptions.SheetSuffix);
+        var extension = kind == FrameKind.Frames ? "" : ToolsOptions.ImageExtension;
+        var target = Path.Combine(folder, stem + extension);
+        for (var index = 2; File.Exists(target) || Directory.Exists(target); index++)
+            target = Path.Combine(folder, stem + "_" + index.ToString(CultureInfo.InvariantCulture) + extension);
+
+        var request = new FrameRequest(media, target, range.Start, range.Duration, kind,
+            _tools.FrameSeconds, _tools.SheetColumns, _tools.SheetRows, _tools.SheetWidth,
+            kind == FrameKind.Sheet ? FrameExport.Header(media, range.Start, range.Duration, _tools.SheetColumns, _tools.SheetRows) : "");
+        _lastFrames = RunFramesAsync(request);
+        return Path.GetFileName(target);
+    }
+
+    internal static (double Start, double Duration) FrameRange(double loopStart, double loopEnd, double mediaDuration)
+    {
+        if (double.IsFinite(loopStart) && double.IsFinite(loopEnd) && loopEnd > loopStart)
+            return (Math.Max(0, loopStart), loopEnd - Math.Max(0, loopStart));
+        return double.IsFinite(mediaDuration) && mediaDuration > 0 ? (0, mediaDuration) : (0, 0);
+    }
+
+    private async Task<FrameResult> RunFramesAsync(FrameRequest request)
+    {
+        var result = await FrameExport.RunAsync(request).ConfigureAwait(true);
+        _notice = result.Ok
+            ? Strings.Get("player.tools.saved", result.Target)
+            : Strings.Get("player.tools.failed");
+        RefreshState();
+        return result;
     }
 
     private async Task<ClipResult> RunExportAsync(ClipRequest request)

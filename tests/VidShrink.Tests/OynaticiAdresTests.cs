@@ -669,8 +669,53 @@ public sealed class OynaticiAdresTests
         }
     }
 
-    [Fact]
-    public void UzakPlsAdresiMotorunListesineDuserIlkGirdiCalar()
+    [Theory]
+    [InlineData("[playlist]\nFile1=http://a/b\nTitle1= Radyo Bir \n", "Radyo Bir")]
+    [InlineData("[playlist]\nfile1=http://a/b\ntitle1=kucuk\n", "kucuk")]
+    [InlineData("[playlist]\nFile2=http://a/c\nTitle2=Iki\nFile1=http://a/b\nTitle1=Bir\n", "Bir")]
+    [InlineData("[playlist]\nFile3=http://a/c\nTitle3=Uc\nTitle1=Sahipsiz\n", "Uc")]
+    [InlineData("[playlist]\nFile1=http://a/b\nTitle2=Baska\n", null)]
+    [InlineData("[playlist]\nFile1=http://a/b\nTitle1=\n", null)]
+    [InlineData("[playlist]\nFile1=http://a/b\n", null)]
+    public void PlsBasligiIlkGirdininBasligidir(string metin, string? beklenen)
+    {
+        Assert.Equal(beklenen, PlaylistFile.PlsTitle(metin));
+        Assert.Equal(beklenen, PlaylistFile.PlsTitle(System.Text.Encoding.UTF8.GetBytes(metin)));
+    }
+
+    [Theory]
+    [InlineData("https://ornek.test/radyo.pls", "Yayin", "Yayin")]
+    [InlineData("https://ornek.test/radyo.pls?k=1", "Yayin", "Yayin")]
+    [InlineData("https://ornek.test/radyo.pls", null, null)]
+    [InlineData("https://ornek.test/radyo.pls", "", null)]
+    [InlineData("https://ornek.test/klip.mp4", "Yayin", null)]
+    [InlineData("C:\\yerel\\liste.pls", "Yayin", null)]
+    public void MotorunYayinAdiYalnizUzakListedeAdOlur(string yol, string? motorAdi, string? beklenen)
+    {
+        var motor = AdliMotor.Kur(motorAdi);
+        Assert.Equal(beklenen, PlayerView.StreamTitle(yol, motor));
+        Assert.Null(PlayerView.StreamTitle(yol, null));
+    }
+
+    public class AdliMotor : System.Reflection.DispatchProxy
+    {
+        private string? _ad;
+
+        internal static IPlaybackEngine Kur(string? ad)
+        {
+            var motor = Create<IPlaybackEngine, AdliMotor>();
+            ((AdliMotor)(object)motor)._ad = ad;
+            return motor;
+        }
+
+        protected override object? Invoke(System.Reflection.MethodInfo? method, object?[]? args)
+            => method?.Name == "get_MediaTitle" ? _ad : throw new NotSupportedException(method?.Name);
+    }
+
+    [Theory]
+    [InlineData("Title1=Radyo\n", "Radyo")]
+    [InlineData("", "radyo.pls")]
+    public void UzakPlsAdresiMotorunListesineDuserIlkGirdiCalar(string baslikSatiri, string beklenenAd)
     {
         var klasor = Gecici();
         try
@@ -678,22 +723,29 @@ public sealed class OynaticiAdresTests
             File.Copy(MotorKlipleri.Kucuk, Path.Combine(klasor, "klip.mp4"));
             using var sunucu = new KlasorSunucu(klasor);
             var girdi = sunucu.Adres("klip.mp4");
-            File.WriteAllText(Path.Combine(klasor, "radyo.pls"), "[playlist]\nNumberOfEntries=1\nFile1=" + girdi + "\nTitle1=Radyo\nLength1=-1\nVersion=2\n");
+            File.WriteAllText(Path.Combine(klasor, "radyo.pls"), "[playlist]\nNumberOfEntries=1\nFile1=" + girdi + "\n" + baslikSatiri + "Length1=-1\nVersion=2\n");
             var adres = sunucu.Adres("radyo.pls");
 
             var rapor = AppHost.Run(() =>
             {
+                var okundu = false;
                 var view = new PlayerView { EngineFactory = GercekMotor };
+                view.ListTitleReader = async (yol, iptal) =>
+                {
+                    try { return await PlayerView.ReadListTitleAsync(yol, iptal); }
+                    finally { okundu = true; }
+                };
                 var window = new Window { Width = 640, Height = 480, Content = view };
                 try
                 {
                     var kabul = view.OpenAddress(adres);
                     DenetimSurucu.Pump(view, () => view.Navigation.IsCompleted, 30);
                     DenetimSurucu.Pump(view, () => view.Engine is { IsOpen: true }, 10);
+                    DenetimSurucu.Pump(view, () => okundu && view.MediaTitleText == beklenenAd, 10);
                     var motor = view.Engine as MpvEngine;
                     return (kabul, acik: view.Engine is { IsOpen: true }, motorYolu: motor?.GetProperty("path"), listeSayisi: motor?.GetProperty("playlist-count"),
                         yol: view.LoadedPath, kuyruk: view.Queue, hata: view.TxtStall.IsVisible, metin: view.TxtStall.Text, ad: view.MediaTitleText,
-                        ipucu: ToolTip.GetTip(view.FindControl<Border>("MediaTitle")!) as string);
+                        ipucu: ToolTip.GetTip(view.FindControl<Border>("MediaTitle")!) as string, okundu);
                 }
                 finally
                 {
@@ -709,7 +761,8 @@ public sealed class OynaticiAdresTests
             Assert.Equal("1", rapor.listeSayisi);
             Assert.Equal(adres, rapor.yol);
             Assert.Null(rapor.kuyruk);
-            Assert.Equal("radyo.pls", rapor.ad);
+            Assert.True(rapor.okundu, "liste basligi okunmadi");
+            Assert.Equal(beklenenAd, rapor.ad);
             Assert.Equal(adres, rapor.ipucu);
             Assert.Contains(sunucu.Satirlar, satir => satir.StartsWith("GET /radyo.pls ", StringComparison.Ordinal));
             Assert.Contains(sunucu.Satirlar, satir => satir.StartsWith("GET /klip.mp4 ", StringComparison.Ordinal));

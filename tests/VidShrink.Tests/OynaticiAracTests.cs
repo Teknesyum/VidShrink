@@ -864,7 +864,7 @@ public sealed class OynaticiAracTests
     }
 
     [Fact]
-    public void AraclarAltMenusuAltiSatirTasirVeDilDegisincePesindenGelir()
+    public void AraclarAltMenusuSekizSatirTasirVeDilDegisincePesindenGelir()
     {
         var rapor = AppHost.Run(() =>
         {
@@ -880,8 +880,8 @@ public sealed class OynaticiAracTests
                 var satirlar = araclar.Items.OfType<MenuItem>().ToList();
                 basliklar.Add((string)araclar.Header!);
                 body.AppendLine($"[{dil}] {araclar.Header}: {string.Join(" | ", satirlar.Select(s => s.Header))}");
-                Assert.Equal(6, satirlar.Count);
-                Assert.Equal(new object?[] { ToolsOptions.Clip, ToolsOptions.Gif, ToolsOptions.OpenUrl, ToolsOptions.PasteUrl, Keymap.Info, ToolsOptions.MiniMode }, satirlar.Select(s => s.Tag));
+                Assert.Equal(8, satirlar.Count);
+                Assert.Equal(new object?[] { ToolsOptions.Clip, ToolsOptions.Gif, ToolsOptions.Frames, ToolsOptions.Sheet, ToolsOptions.OpenUrl, ToolsOptions.PasteUrl, Keymap.Info, ToolsOptions.MiniMode }, satirlar.Select(s => s.Tag));
                 Assert.Equal(menu.Count - 5, menu.IndexOf(araclar));
                 Assert.All(satirlar, satir => Assert.NotNull(satir.Tag));
             }

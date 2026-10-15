@@ -2,6 +2,8 @@
   "player.tools.menu": "Tööriistad",
   "player.tools.clip": "Salvesta klipp",
   "player.tools.gif": "Salvesta GIF",
+  "player.tools.frames": "Salvesta kaadrid",
+  "player.tools.sheet": "Salvesta pisipiltide leht",
   "player.tools.mini": "Mini režiim",
   "player.tools.url": "Ava aadress…",
   "player.tools.url-hint": "http, https või rtsp aadress",

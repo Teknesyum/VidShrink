@@ -2,6 +2,8 @@
   "player.tools.menu": "Công cụ",
   "player.tools.clip": "Lưu clip",
   "player.tools.gif": "Lưu GIF",
+  "player.tools.frames": "Lưu khung hình",
+  "player.tools.sheet": "Lưu bảng ảnh thu nhỏ",
   "player.tools.mini": "Chế độ mini",
   "player.tools.url": "Mở địa chỉ…",
   "player.tools.url-hint": "Địa chỉ http, https hoặc rtsp",

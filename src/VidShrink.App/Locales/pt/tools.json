@@ -2,6 +2,8 @@
   "player.tools.menu": "Ferramentas",
   "player.tools.clip": "Salvar clipe",
   "player.tools.gif": "Salvar GIF",
+  "player.tools.frames": "Salvar quadros",
+  "player.tools.sheet": "Salvar folha de miniaturas",
   "player.tools.mini": "Modo mini",
   "player.tools.url": "Abrir endereço…",
   "player.tools.url-hint": "Endereço http, https ou rtsp",

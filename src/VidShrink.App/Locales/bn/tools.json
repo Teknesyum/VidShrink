@@ -2,6 +2,8 @@
   "player.tools.menu": "টুলস",
   "player.tools.clip": "ক্লিপ সংরক্ষণ করুন",
   "player.tools.gif": "GIF সংরক্ষণ করুন",
+  "player.tools.frames": "ফ্রেমগুলো সংরক্ষণ করুন",
+  "player.tools.sheet": "থাম্বনেইল শিট সংরক্ষণ করুন",
   "player.tools.mini": "মিনি মোড",
   "player.tools.url": "ঠিকানা খুলুন…",
   "player.tools.url-hint": "http, https বা rtsp ঠিকানা",

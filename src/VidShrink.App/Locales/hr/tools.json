@@ -2,6 +2,8 @@
   "player.tools.menu": "Alati",
   "player.tools.clip": "Spremi isječak",
   "player.tools.gif": "Spremi GIF",
+  "player.tools.frames": "Spremi sličice",
+  "player.tools.sheet": "Spremi list minijatura",
   "player.tools.mini": "Mini način rada",
   "player.tools.url": "Otvori adresu…",
   "player.tools.url-hint": "http, https ili rtsp adresa",

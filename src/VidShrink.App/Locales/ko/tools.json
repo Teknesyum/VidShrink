@@ -2,6 +2,8 @@
   "player.tools.menu": "도구",
   "player.tools.clip": "클립 저장",
   "player.tools.gif": "GIF 저장",
+  "player.tools.frames": "프레임 저장",
+  "player.tools.sheet": "썸네일 시트 저장",
   "player.tools.mini": "미니 모드",
   "player.tools.url": "주소 열기…",
   "player.tools.url-hint": "http, https 또는 rtsp 주소",

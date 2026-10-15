@@ -771,7 +771,8 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
                     is PlayerCommandKind.AudioCycle or PlayerCommandKind.SubtitleCycle
                     or PlayerCommandKind.SubtitleDelay or PlayerCommandKind.AudioDelay
                     or PlayerCommandKind.ClipExport or PlayerCommandKind.GifExport
-                    or PlayerCommandKind.MiniMode or PlayerCommandKind.OpenUrl or PlayerCommandKind.PasteUrl),
+                    or PlayerCommandKind.MiniMode or PlayerCommandKind.OpenUrl or PlayerCommandKind.PasteUrl)
+                + KeymapTests.YalnizAraclarMenusunde.Length,
                 parcaSatirlari.Count);
             var body = new StringBuilder();
 
