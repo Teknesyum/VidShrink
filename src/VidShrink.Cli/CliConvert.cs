@@ -17,11 +17,11 @@ public static class CliConvert
     public static IReadOnlyList<string> Containers { get; } = new[]
     {
         "mp4", "mkv", "webm", "mov", "avi", "gif", "mp3", "m4a", "wav", "flac", "webp", "avif", "mxf",
-        "png", "jpg", "opus", "ogg", "aiff", "ac3"
+        "png", "jpg", "opus", "ogg", "aiff", "ac3", "apng"
     };
 
     public static IReadOnlyList<string> VideoCodecs { get; } =
-        ConversionCodecChoice.LegacyOrder.Concat(ConversionCodecChoice.Hardware).Distinct().ToList();
+        ConversionCodecChoice.LegacyOrder.Concat(ConversionCodecChoice.Hardware).Concat(ConversionCodecChoice.Archive).Distinct().ToList();
 
     public static IReadOnlyList<string> AudioCodecs { get; } = new[]
     {

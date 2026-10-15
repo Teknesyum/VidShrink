@@ -84,6 +84,7 @@ internal static class LanguageCatalog
             ["webm"] = "WebM",
             ["webp"] = "WebP",
             ["avif"] = "AVIF",
+            ["apng"] = "APNG",
             ["pcm"] = "PCM",
             ["crf"] = "CRF",
             ["json"] = "JSON",
@@ -413,7 +414,10 @@ internal static class LanguageCatalog
             ["The trim end must come after the trim start."] = "main.validation.trim-order",
             ["No audio track is selected."] = "main.validation.no-audio-selected",
             ["Audio channel count must be positive."] = "main.validation.audio-channels-positive",
-            ["The MXF container carries only 48000 Hz audio."] = "main.validation.mxf-sample-rate"
+            ["The MXF container carries only 48000 Hz audio."] = "main.validation.mxf-sample-rate",
+            ["GIF palette colors must be between 2 and 256."] = "main.validation.gif-colors",
+            ["GIF loop count must be between -1 and 65535."] = "main.validation.gif-loop",
+            ["The GIF dither mode is not supported."] = "main.validation.gif-dither"
         };
 
     private static readonly (Regex Pattern, string Key)[] ValidationPatternKeys =

@@ -64,6 +64,12 @@ public static class ConversionArguments
         }
         if (plan.BurnSubtitle is not null && (plan.AudioOnly || plan.Gif || plan.AnimatedImage || plan.ImageSequenceOutput || plan.VideoCodec == "copy"))
             errors.Add("Burning subtitles requires video encoding.");
+        if (plan.Gif)
+        {
+            if (plan.GifColors is < 2 or > 256) errors.Add("GIF palette colors must be between 2 and 256.");
+            if (plan.GifLoop is < -1 or > 65535) errors.Add("GIF loop count must be between -1 and 65535.");
+            if (plan.GifDither is { } dither && !GifDithers.Contains(dither)) errors.Add("The GIF dither mode is not supported.");
+        }
         if (plan.BurnSubtitle is not null || !plan.AudioOnly) errors.AddRange(VideoFilterChain.Validate(info, plan.BurnOptions));
         return errors;
     }
@@ -76,7 +82,17 @@ public static class ConversionArguments
     {
         "webp" => AnimatedWebpEncoder,
         "avif" => AnimatedAvifEncoder,
+        "apng" => "apng",
         _ => null
+    };
+
+    /// <summary>
+    /// <c>paletteuse</c> titreme yöntemleri; yerel ffmpeg 9.0'da hepsi kısa örnekte kodlandı. Varsayılan
+    /// <c>sierra2_4a</c>. Kayıplı GIF bu derlemenin gif kodlayıcısında yok, sunulmaz.
+    /// </summary>
+    public static readonly IReadOnlyList<string> GifDithers = new[]
+    {
+        "none", "bayer", "heckbert", "floyd_steinberg", "sierra2", "sierra2_4a", "sierra3", "burkes", "atkinson"
     };
 
     /// <summary>
@@ -158,10 +174,12 @@ public static class ConversionArguments
                 a.AddRange(new[] { "-vf", string.Join(',', filters.Append(plan.GifColors is { } colors ? $"palettegen=stats_mode=diff:max_colors={colors}" : "palettegen=stats_mode=diff")), palettePath = outputPath });
             else
             {
+                var use = "paletteuse=dither=" + (plan.GifDither ?? "sierra2_4a");
                 var graph = filters.Count == 0
-                    ? "[0:v][1:v]paletteuse=dither=sierra2_4a"
-                    : $"{string.Join(',', filters)}[x];[x][1:v]paletteuse=dither=sierra2_4a";
+                    ? "[0:v][1:v]" + use
+                    : $"{string.Join(',', filters)}[x];[x][1:v]{use}";
                 a.AddRange(new[] { "-i", palettePath, "-lavfi", graph });
+                if (plan.GifLoop is { } loop) a.AddRange(new[] { "-loop", loop.ToString(CultureInfo.InvariantCulture) });
                 a.Add(outputPath);
             }
             return a;
@@ -203,7 +221,12 @@ public static class ConversionArguments
             else if (before.Count + after.Count > 0) a.AddRange(new[] { "-vf", string.Join(',', before.Concat(after)) });
 
             a.AddRange(new[] { "-c:v", plan.VideoCodec });
-            if (IntermediateCodecs.Find(plan.VideoCodec, plan.VideoProfile) is { } intermediate)
+            if (IntermediateCodecs.Find(plan.VideoCodec, plan.VideoProfile) is { Options.Count: > 0 } archive)
+            {
+                a.AddRange(archive.Options);
+                if (archive.PixelFormat.Length > 0) a.AddRange(new[] { "-pix_fmt", archive.PixelFormat });
+            }
+            else if (IntermediateCodecs.Find(plan.VideoCodec, plan.VideoProfile) is { } intermediate)
                 a.AddRange(new[] { "-profile:v", intermediate.Profile, "-pix_fmt", intermediate.PixelFormat });
             else
             {
@@ -243,6 +266,11 @@ public static class ConversionArguments
     private static IReadOnlyList<string> AnimatedImageArgs(ConversionPlan plan)
     {
         var a = new List<string>();
+        if (plan.Container == "apng")
+        {
+            a.AddRange(new[] { "-c:v", "apng", "-an", "-plays", "0", "-f", "apng" });
+            return a;
+        }
         var (min, max) = CodecModel.CrfRange(plan.VideoCodec);
         var share = Math.Clamp((plan.Crf - min) / (double)(max - min), 0, 1);
         if (plan.Container == "webp")
@@ -591,15 +619,17 @@ public static class ConversionArguments
     /// <c>mov</c>'a, DNxHR <c>mov</c> ve <c>mxf</c>'e. ffmpeg ProRes'i <c>mxf</c>'e ve
     /// <c>mkv</c>'ye de yaziyor (olcum <c>docs/olcumler/k12-ara-kodekler.md</c>), ama kurgu
     /// yazilimlarinin bekledigi eslesme bu; <c>mkv</c>'nin "her sey olur" satiri onlari kapsamaz.
+    /// Arsiv kodekleri (FFV1, CineForm) <c>mkv</c>, <c>mov</c> ve <c>avi</c>'ye yazilir; cfhd <c>mp4</c>'te
+    /// "Could not find tag for codec cfhd" ile dusuyor.
     /// </summary>
     private static bool VideoEncodeCompatible(string container, string codec) => container switch
     {
         "mp4" => codec is "libx264" or "libx265" or "libsvtav1" or "libvpx-vp9" or "h264_nvenc" or "hevc_nvenc" or "h264_qsv" or "hevc_qsv" or "av1_nvenc" or "av1_qsv" or "h264_amf" or "hevc_amf" or "av1_amf",
-        "mov" => codec is "libx264" or "libx265" or "libvpx-vp9" or "h264_nvenc" or "hevc_nvenc" or "h264_qsv" or "hevc_qsv" or "h264_amf" or "hevc_amf" or IntermediateCodecs.ProRes or IntermediateCodecs.DnxHr,
+        "mov" => codec is "libx264" or "libx265" or "libvpx-vp9" or "h264_nvenc" or "hevc_nvenc" or "h264_qsv" or "hevc_qsv" or "h264_amf" or "hevc_amf" or IntermediateCodecs.ProRes or IntermediateCodecs.DnxHr or IntermediateCodecs.Ffv1 or IntermediateCodecs.CineForm,
         "mxf" => codec is IntermediateCodecs.DnxHr,
         "webm" => codec is "libvpx-vp9" or "libsvtav1",
-        "avi" => codec is "libx264",
-        "mkv" => !IntermediateCodecs.IsIntermediate(codec),
+        "avi" => codec is "libx264" or IntermediateCodecs.Ffv1 or IntermediateCodecs.CineForm,
+        "mkv" => !IntermediateCodecs.IsIntermediate(codec) || codec is IntermediateCodecs.Ffv1 or IntermediateCodecs.CineForm,
         _ => false
     };
 

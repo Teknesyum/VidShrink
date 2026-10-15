@@ -109,7 +109,7 @@ public sealed record ConversionPlan
         : Filters with { BurnSubtitle = BurnSubtitle, BurnFile = null, BurnFont = BurnFont, BurnFontSize = BurnFontSize, BurnColor = BurnColor, BurnBox = BurnBox };
     public bool AudioOnly => Container is "mp3" or "m4a" or "wav" or "flac" or "opus" or "ogg" or "aiff" or "ac3";
     public bool Gif => Container == "gif";
-    public bool AnimatedImage => Container is "webp" or "avif";
+    public bool AnimatedImage => Container is "webp" or "avif" or "apng";
 
     /// <summary>PNG ya da JPEG dizisi: kareler bir klasöre numaralı yazılır.</summary>
     public bool ImageSequenceOutput => Container is "png" or "jpg";
@@ -125,4 +125,10 @@ public sealed record ConversionPlan
 
     /// <summary>GIF paletinin renk sayısı (<c>palettegen=max_colors</c>); <c>null</c> 256.</summary>
     public int? GifColors { get; init; }
+
+    /// <summary>GIF döngü sayısı (<c>-loop</c>): -1 bir kez oynar, 0 sonsuz, N kez tekrar; <c>null</c> yazılmaz (sonsuz).</summary>
+    public int? GifLoop { get; init; }
+
+    /// <summary>GIF titreme yöntemi (<c>paletteuse=dither</c>); <c>null</c> <c>sierra2_4a</c>.</summary>
+    public string? GifDither { get; init; }
 }

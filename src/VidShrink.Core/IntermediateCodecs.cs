@@ -11,10 +11,16 @@ public sealed record IntermediateProfile(string Encoder, string Profile, string 
 {
     /// <summary>Arayuz ogesinin ve ayarin tasidigi kimlik: <c>kodlayici:profil</c>.</summary>
     public string Id => Encoder + ":" + Profile;
+
+    /// <summary>
+    /// Doluysa <c>-profile:v</c> yerine yazilan kodlayici secenekleri; arsiv kodekleri profil degil
+    /// kendi anahtarlariyla ayarlanir.
+    /// </summary>
+    public IReadOnlyList<string> Options { get; init; } = Array.Empty<string>();
 }
 
 /// <summary>
-/// ProRes ve DNxHR: kurgu icin ara kodekler. Bit hizini profil ve kare boyutu belirler, hedef
+/// ProRes, DNxHR ve arsiv kodekleri (FFV1, CineForm): kurgu ve saklama icin ara kodekler. Bit hizini profil ve kare boyutu belirler, hedef
 /// boyuta surulemezler; bu yuzden yalniz Donustur yolunda, profil secimiyle yasarlar. Hedef
 /// boyut yolu (<see cref="PlanParser"/>, kodek kilidi) onlari acik bir hatayla reddeder.
 /// <para>
@@ -27,6 +33,8 @@ public static class IntermediateCodecs
 {
     public const string ProRes = "prores_ks";
     public const string DnxHr = "dnxhd";
+    public const string Ffv1 = "ffv1";
+    public const string CineForm = "cfhd";
 
     public static readonly IReadOnlyList<IntermediateProfile> Profiles = new[]
     {
@@ -42,18 +50,31 @@ public static class IntermediateCodecs
         new IntermediateProfile(DnxHr, "dnxhr_444", "yuv444p10le", "DNxHR 444")
     };
 
+    /// <summary>
+    /// Arsiv kodekleri: FFV1 kayipsiz (seviye 3, her kare anahtar, dilim CRC'si) ve CineForm 10 bit
+    /// 4:2:2 <c>film3+</c>. Yerel ffmpeg 9.0'da mkv, mov ve avi'ye yazildi; cfhd mp4'e yazilmiyor
+    /// ("Could not find tag for codec cfhd"), ffv1 mp4'te de kapali.
+    /// </summary>
+    public static readonly IReadOnlyList<IntermediateProfile> ArchiveProfiles = new[]
+    {
+        new IntermediateProfile(Ffv1, "archive", "", "FFV1") { Options = new[] { "-level", "3", "-g", "1", "-slicecrc", "1" } },
+        new IntermediateProfile(CineForm, "film3+", "yuv422p10le", "CineForm") { Options = new[] { "-quality", "film3+" } }
+    };
+
+    /// <summary>Ara ve arsiv profillerinin tamami.</summary>
+    public static readonly IReadOnlyList<IntermediateProfile> All = Profiles.Concat(ArchiveProfiles).ToArray();
+
     public static bool IsIntermediate(string? codec)
-        => codec is not null
-           && (codec.Equals(ProRes, StringComparison.OrdinalIgnoreCase) || codec.Equals(DnxHr, StringComparison.OrdinalIgnoreCase));
+        => codec is not null && All.Any(p => p.Encoder.Equals(codec, StringComparison.OrdinalIgnoreCase));
 
     /// <summary>Kodlayicinin o profili; kodlayici ara kodek degilse ya da profil tabloda yoksa <c>null</c>.</summary>
     public static IntermediateProfile? Find(string? codec, string? profile)
         => codec is null || profile is null
             ? null
-            : Profiles.FirstOrDefault(p => p.Encoder.Equals(codec, StringComparison.OrdinalIgnoreCase)
-                                           && p.Profile.Equals(profile, StringComparison.OrdinalIgnoreCase));
+            : All.FirstOrDefault(p => p.Encoder.Equals(codec, StringComparison.OrdinalIgnoreCase)
+                                      && p.Profile.Equals(profile, StringComparison.OrdinalIgnoreCase));
 
     /// <summary><see cref="IntermediateProfile.Id"/> ile arama; tanimayan <c>null</c> doner.</summary>
     public static IntermediateProfile? FromId(string? id)
-        => id is null ? null : Profiles.FirstOrDefault(p => p.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
+        => id is null ? null : All.FirstOrDefault(p => p.Id.Equals(id, StringComparison.OrdinalIgnoreCase));
 }

@@ -289,7 +289,7 @@ public partial class MainWindow : Window
         Watch(TxtQuality, TextBox.TextProperty, OnQualityTextChanged);
         foreach (var box in new[] { CmbQualityMode, CmbConvertCodec })
             Watch(box, SelectingItemsControl.SelectedIndexProperty, OnQualityRangeChanged);
-        foreach (var box in new[] { CmbContainer, CmbResolution, CmbConvertFps, CmbConvertAudio, CmbConvertChannels, CmbConvertSampleRate })
+        foreach (var box in new[] { CmbContainer, CmbResolution, CmbConvertFps, CmbConvertAudio, CmbConvertChannels, CmbConvertSampleRate, CmbConvertGifLoop, CmbConvertGifColors, CmbConvertGifDither })
             Watch(box, SelectingItemsControl.SelectedIndexProperty, OnConvertChanged);
         Watch(ChkConvertLoudnorm, ToggleButton.IsCheckedProperty, OnConvertChanged);
         Watch(ChkConvertDropMetadata, ToggleButton.IsCheckedProperty, OnConvertChanged);
@@ -4857,7 +4857,10 @@ public partial class MainWindow : Window
             Letterbox = resolutionTag == "custom" && ChkConvertLetterbox.IsChecked == true,
             FrameRate = DonusturKareHiziKipi(),
             Interpolate = ChkConvertInterpolate.IsVisible && ChkConvertInterpolate.IsChecked == true,
-            TargetBytes = _sequence is null ? GifPalette.TargetFor(_info ?? _sesKaynagi, container, ParseTargetMb()) : null
+            TargetBytes = _sequence is null ? GifPalette.TargetFor(_info ?? _sesKaynagi, container, ParseTargetMb()) : null,
+            GifLoop = container == "gif" ? ConvertAudioNumber(CmbConvertGifLoop) : null,
+            GifColors = container == "gif" ? ConvertAudioNumber(CmbConvertGifColors) : null,
+            GifDither = container == "gif" && SelectedTag(CmbConvertGifDither) is { Length: > 0 } dither ? dither : null
         };
     }
 
@@ -4927,6 +4930,7 @@ public partial class MainWindow : Window
         var kaliteOkunur = !IntermediateCodecs.IsIntermediate(plan.VideoCodec) && !plan.ImageSequenceOutput;
         CmbQualityMode.IsEnabled = SliderQuality.IsEnabled = TxtQuality.IsEnabled = kaliteOkunur;
         ChkConvertSingleFrame.IsVisible = plan.ImageSequenceOutput;
+        ConvertGifPanel.IsVisible = plan.Gif;
     }
 
     private void RefreshConversion()
