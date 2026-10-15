@@ -93,14 +93,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.App/Program.cs, src/VidShrink.App/Integration/ForwardedFiles.cs, src/VidShrink.App/MainWindow.SingleInstance.cs, src/VidShrink.Core/Setup/ShellRegistration.cs, src/VidShrink.App/ShellMenu.cs, Install-VidShrink.ps1, tests/VidShrink.Tests/KabukMenusuTests.cs
 - Plan: İkinci örnek artık bütün yolları çalışan örneğe aktarır; gelen yollar OYB-P2'nin toplayıcısıyla, yeni açılış yerine kuyruğa eklenir. Sağ tık menüsüne "Sıraya ekle" fiili ve onu taşıyan bir komut satırı bayrağı gelir; bayrak kuyruğa ekleme işlemine (`Enqueue`) bağlanır. Ses ve liste uzantıları yalnız "aç" ve "sıraya ekle" fiillerine eklenir, "küçült" fiiline eklenmez. Kanal ve kabuk kaydı testleriyle, sonra Explorer'da elle çoklu seçimle doğrulanır.
 
-## 49. Yer İmi Listesi Ve Sık Kullanılanlar
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · OYB-P8 · Oynatıcı · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (OYB-P8): OYB-15 Adlı yer imi ve yer imi listesi; OYB-16 Sık kullanılanlar. [Tablo](piyasa/2026-10-13/oynatici-kitaplik-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Playback/PlaybackHistory.cs, src/VidShrink.App/Playback/Keymap.cs, src/VidShrink.App/Playback/PlayerView.Window.cs, src/VidShrink.App/Locales/
-- Plan: Yer imine isteğe bağlı bir ad alanı eklenir (adsız eski kayıt okunmaya devam eder); bir pencere dosyanın yer imlerini listeler, seçilene gider ve tek tek siler. Ayrıca dosya, klasör ve adres tutan kalıcı bir sık kullanılanlar listesi menüye eklenir. Adres saklanırken sorgunun ve parolanın diske yazılmama kuralı (`docs/plan-url-oynatma.md:26`) uygulanır. Başsız testle ekleme, adlandırma, silme ve yeniden açılışta kalıcılık ölçülür.
-
 ## 50. Mac Ortam Denetimi Bağlantısı
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · OYB-P9 · Oynatıcı · iş orta · öncelik 2 · karar gerekmez
@@ -116,14 +108,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (DZA-P12): DZA-27 Akıllı kipte MPEG-2. [Tablo](piyasa/2026-10-13/duzenleyici-kesim-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Core/Editing/SmartCutCodec.cs, src/VidShrink.Core/Editing/EditExport.cs, tools/VidShrink.Bench
 - Plan: Akıllı kipin kodek kapısına (SmartCutCodec.cs:43) MPEG-2 eklenir; kenar parçası kaynağın profiline, kare hızına ve bit hızına uyan `mpeg2video` kodlayıcısıyla yazılır. TV kayıtlarının çoğu taramalı olduğundan taramalı kaynak kapısı (SmartCutCodec.cs:47) birlikte ele alınmazsa kazanç dar kalır; bu kayıtların sesi de genellikle AC-3 ya da MP2 (yayıncılığın eski ses kodeği) olduğundan paket DZA-P4'ten sonra anlam kazanır. Doğrulama: birleşim noktasında kare sayısı ve bozulma ölçümü `tools/VidShrink.Bench` ile.
-
-## 53. Ses Temizleme Ve Düzey
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DZB-P5 · Düzenleyici · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (DZB-P5): DZB-43 Gürültü azaltma; DZB-45 Ses yüksekliğini eşitleme; DZB-42 Ses efektleri; DZB-41 Ses düzeyi göstergesi. [Tablo](piyasa/2026-10-13/duzenleyici-kurgu-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/Editing/ClipEffects.cs, src/VidShrink.Core/Editing/ClipFilters.cs, src/VidShrink.Core/Editing/EditLook.cs, src/VidShrink.Core/Editing/EditExport.cs, src/VidShrink.Core/StreamMapping.cs, src/VidShrink.App/Editing/EditorView.Klip.cs, src/VidShrink.App/Editing/EditorView.axaml, src/VidShrink.Player/MpvEngine.cs, src/VidShrink.App/Locales/
-- Plan: Klip paneline gürültü azaltma (`afftdn`), yükseklik eşitleme (`loudnorm`; sabiti StreamMapping.cs:357'de hazır), ekolayzır, kompresör ve sınırlayıcı (`equalizer`, `acompressor`, `alimiter`) eklenir ve ClipFilters'ın ses zincirine (ClipFilters.cs:79) bağlanır. Düzey göstergesi ayrı parçadır: oynarken tepe düzeyi mpv'den okunur; okuma yolu kodda yok, önce o ölçülür. Doğrulama: argüman testleri ve teslim edilen dosyada ölçülen yükseklik değeri.
 
 ## 54. Medya Havuzu Ve Araya Ekleme
 
@@ -859,11 +843,4 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 - Kanıt: ajan raporu, akıllı kipte kare sınırına denk gelmeyen kesimde birleşim noktasında bir karenin tekrar ettiğini ve ffmpeg'in "non monotonically increasing dts" yazdığını söylüyor (`src/VidShrink.Core/Editing/EditExport.cs`, `SmartEncode`). Kodda doğrulanmadı.
 - Plan: Önce ölçüm: kare sınırı dışı kesimli kısa klipte kare sayısı ve dts dizisi okunur. Tekrar doğrulanırsa yeniden kodlanan baş parçanın bitişi bir sonraki anahtar karenin pts'sine hizalanır; test birleşik çıktıda kare sayısını ve dts'nin artan olduğunu pimler.
-
-## 159. Yer İmli Dosyalar Geçmişte Ve Açılışta Sorma
-
-14 Ekim 2026 · Dalga 2 yapımında görüldü (OYB-P4) · Oynatıcı · iş küçük · öncelik 2 · karar gerekmez
-
-- Kanıt: ajan raporu, yer imi taşıyan dosyaların geçmiş penceresinde ayrıca işaretlenmediğini ve devam ayarında "açılışta sor" kipinin olmadığını söylüyor. Kodda doğrulanmadı.
-- Plan: Geçmiş penceresinde yer imi olan satıra simge; devam ayarına üçüncü seçenek olarak "sor". İki kol için pencere testi.
 
