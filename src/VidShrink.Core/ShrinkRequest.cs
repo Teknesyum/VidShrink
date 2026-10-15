@@ -58,6 +58,22 @@ public static class ShrinkRequestResolver
 
         return ShrinkArgumentResult.Success(new ShrinkRequest(target, path));
     }
+
+    /// <summary>
+    /// Denetim kanalından gelen isteği kabuk isteğinin kurallarıyla sınar: hedef hızlı listede,
+    /// yol diskte. Geçerse <c>null</c> döner.
+    /// </summary>
+    public static ShrinkArgumentProblem? Check(ShrinkRequest request, IReadOnlyList<int> quickTargets, Func<string, bool> exists)
+    {
+        if (request.TargetMegabytes <= 0) return ShrinkArgumentProblem.TargetNotPositive;
+        if (!quickTargets.Contains(request.TargetMegabytes)) return ShrinkArgumentProblem.TargetNotInQuickList;
+        if (string.IsNullOrWhiteSpace(request.Path) || !exists(request.Path)) return ShrinkArgumentProblem.NoPath;
+        return null;
+    }
+
+    /// <summary>İsteği uygulamanın kabuk komutu biçimine çevirir: <c>--kucult &lt;mb&gt; &lt;yol&gt;</c>.</summary>
+    public static IReadOnlyList<string> ShellArguments(ShrinkRequest request)
+        => new[] { ShellIntegration.ShrinkFlag, request.TargetMegabytes.ToString(System.Globalization.CultureInfo.InvariantCulture), request.Path };
 }
 
 public sealed class ShrinkRequestQueue : IDisposable

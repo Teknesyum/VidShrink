@@ -20,7 +20,7 @@ public sealed class SingleInstanceChannel : IDisposable
 
     public SingleInstanceChannel(string channelName)
     {
-        PipeName = $"VidShrinkTekOrnek-{channelName}";
+        PipeName = PipeNameFor(channelName);
         var mutex = new Mutex(initiallyOwned: true, name: $"VidShrinkTekOrnekKilidi-{channelName}", out var createdNew);
         IsOwner = createdNew;
         if (IsOwner) _ownerLock = mutex;
@@ -30,6 +30,8 @@ public sealed class SingleInstanceChannel : IDisposable
     public bool IsOwner { get; }
 
     public string PipeName { get; }
+
+    public static string PipeNameFor(string channelName) => $"VidShrinkTekOrnek-{channelName}";
 
     public static string DefaultChannel()
     {
@@ -46,14 +48,19 @@ public sealed class SingleInstanceChannel : IDisposable
         return builder.Length == 0 ? "_" : builder.ToString();
     }
 
-    public void StartListening(Func<IReadOnlyList<string>, bool> handler)
+    /// <summary>
+    /// Yol listesi iletisini <paramref name="handler"/>'a, <c>{</c> ile başlayan komut satırını
+    /// <paramref name="commands"/>'a verir. <paramref name="commands"/> yoksa komut
+    /// <see cref="ControlErrors.Disabled"/> ile reddedilir.
+    /// </summary>
+    public void StartListening(Func<IReadOnlyList<string>, bool> handler, ControlDispatcher? commands = null)
     {
         if (!IsOwner) throw new InvalidOperationException("Bu örnek kanalın sahibi değil.");
         if (_cancel is not null) throw new InvalidOperationException("Kanal zaten dinleniyor.");
 
         _cancel = new CancellationTokenSource();
         var token = _cancel.Token;
-        _listenTask = Task.Run(() => Listen(handler, token));
+        _listenTask = Task.Run(() => Listen(handler, commands, token));
     }
 
     public bool Forward(IReadOnlyList<string> paths, TimeSpan connectTimeout, TimeSpan replyTimeout)
@@ -88,7 +95,7 @@ public sealed class SingleInstanceChannel : IDisposable
         catch (JsonException) { return null; }
     }
 
-    private void Listen(Func<IReadOnlyList<string>, bool> handler, CancellationToken token)
+    private void Listen(Func<IReadOnlyList<string>, bool> handler, ControlDispatcher? commands, CancellationToken token)
     {
         while (!token.IsCancellationRequested)
         {
@@ -124,8 +131,14 @@ public sealed class SingleInstanceChannel : IDisposable
                 {
                     using var reader = new StreamReader(server, Encoding.UTF8, false, 1024, leaveOpen: true);
                     using var writer = new StreamWriter(server, new UTF8Encoding(false), leaveOpen: true) { AutoFlush = true };
-                    var paths = Decode(reader.ReadLine());
-                    writer.WriteLine(paths is not null && Deliver(handler, paths) ? Ack : Nack);
+                    var line = reader.ReadLine();
+                    if (ControlProtocol.IsCommandLine(line))
+                        writer.WriteLine(commands is null ? ControlDispatcher.DisabledReply : commands.Handle(line!));
+                    else
+                    {
+                        var paths = Decode(line);
+                        writer.WriteLine(paths is not null && Deliver(handler, paths) ? Ack : Nack);
+                    }
                     if (OperatingSystem.IsWindows()) server.WaitForPipeDrain();
                 }
                 catch (Exception ex) when (ex is IOException or ObjectDisposedException)

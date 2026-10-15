@@ -171,10 +171,14 @@ internal static class Program
         }
 
         JitProfili.Baslat(AcilisBitti.Task);
-        instance.StartListening(files.Receive);
+        instance.StartListening(files.Receive, ControlFor(args, Integration.ControlBridge.Shared));
         StartLauncherMaintenance();
         return Build(path, files).StartWithClassicDesktopLifetime(args);
     }
+
+    /// <summary>Denetim kanalı yalnız <see cref="ControlSwitch.Flag"/> ile açılır; bayraksız açılışta komutlar reddedilir.</summary>
+    internal static ControlDispatcher? ControlFor(IReadOnlyList<string> args, Integration.ControlBridge bridge)
+        => ControlSwitch.Requested(args) ? new ControlDispatcher(() => true, bridge.ExecuteAsync) : null;
 
     /// <summary>
     /// Çift tık uygulamayı doğrudan açtığında başlatıcının bakımını arkada başlatır. Karar

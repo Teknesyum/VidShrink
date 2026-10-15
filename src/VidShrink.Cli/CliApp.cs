@@ -60,6 +60,9 @@ public sealed class CliServices
     public Func<RecorderRequest, string, CancellationToken, Task<RecordResult>> Record { get; init; } = CliRecord.RecordAsync;
 
     public Func<DateTime> Now { get; init; } = () => DateTime.Now;
+
+    /// <summary><c>denetim</c>'in istemcisi; varsayılanı açık pencerenin tek örnek borusu.</summary>
+    public Func<ControlCommand, ControlReply> Control { get; init; } = CliControl.DefaultSend;
 }
 
 public sealed record CliDecision(
@@ -91,6 +94,8 @@ public static class CliApp
 
         if (selection.Language is { } chosen) text = CliText.ForLanguage(chosen);
         args = selection.Rest;
+
+        if (CliControl.Matches(args)) return CliControl.Run(args, stdout, stderr, text, services.Control);
 
         var parsed = CliParser.Parse(args);
         if (!parsed.Ok)

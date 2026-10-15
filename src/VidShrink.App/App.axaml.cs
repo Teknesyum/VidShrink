@@ -117,6 +117,7 @@ public partial class App : Application
                 };
                 var files = _files ?? new Integration.ForwardedFiles();
                 main.AcceptForwardedFiles(files);
+                main.AcceptControl(Integration.ControlBridge.Shared);
                 main.Opened += (_, _) => RestoreQueue();
                 if (this.TryGetFeature<IActivatableLifetime>() is { } activatable)
                     activatable.Activated += (_, activation) => OpenActivatedFiles(files, activation);
