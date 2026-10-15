@@ -199,5 +199,22 @@
   "editor.export.audio-track": "Tonspur",
   "editor.export.audio-track.all": "Alle Spuren",
   "editor.export.audio-track.none": "Kein Ton",
-  "editor.monitor.audio-track": "Tonspur wechseln"
+  "editor.monitor.audio-track": "Tonspur wechseln",
+  "editor.remux.file-title": "Dateititel",
+  "editor.remux.track": "Spur",
+  "editor.remux.language": "Sprache",
+  "editor.remux.track-title": "Spurname",
+  "editor.remux.offset": "Versatz (ms)",
+  "editor.remux.rotation": "Drehung",
+  "editor.remux.rotation.keep": "Beibehalten",
+  "editor.remux.default": "Standardspur",
+  "editor.remux.run": "Neu verpacken…",
+  "editor.remux.tip": "• Schreibt die Quelle ohne Neukodierung in eine neue Datei.\n• Sprache, Name, Flag, Versatz und Drehung gelten pro Spur.",
+  "editor.remux.invalid": "Spur {0}: Die Sprache muss ein Code aus drei Buchstaben sein, der Versatz ganze Millisekunden.",
+  "editor.remux.same-file": "Die Ausgabe darf die Quelle nicht überschreiben.",
+  "editor.remux.save-title": "Neu verpackte Datei speichern",
+  "editor.remux.kind.video": "Video",
+  "editor.remux.kind.audio": "Audio",
+  "editor.remux.kind.subtitle": "Untertitel",
+  "editor.remux.kind.attachment": "Anhang"
 }

@@ -199,5 +199,22 @@
   "editor.export.audio-track": "ترک صدا",
   "editor.export.audio-track.all": "همه ترک‌ها",
   "editor.export.audio-track.none": "بدون صدا",
-  "editor.monitor.audio-track": "تغییر ترک صدا"
+  "editor.monitor.audio-track": "تغییر ترک صدا",
+  "editor.remux.file-title": "عنوان فایل",
+  "editor.remux.track": "ترک",
+  "editor.remux.language": "زبان",
+  "editor.remux.track-title": "نام ترک",
+  "editor.remux.offset": "جابه‌جایی (ms)",
+  "editor.remux.rotation": "چرخش",
+  "editor.remux.rotation.keep": "بدون تغییر",
+  "editor.remux.default": "ترک پیش‌فرض",
+  "editor.remux.run": "بسته‌بندی دوباره…",
+  "editor.remux.tip": "• منبع را بدون رمزگذاری دوباره در فایل تازه می‌نویسد.\n• زبان، نام، پرچم، جابه‌جایی و چرخش برای هر ترک است.",
+  "editor.remux.invalid": "ترک {0}: زبان باید کد سه‌حرفی و جابه‌جایی میلی‌ثانیه صحیح باشد.",
+  "editor.remux.same-file": "خروجی نمی‌تواند روی منبع بنویسد.",
+  "editor.remux.save-title": "ذخیره فایل بسته‌بندی‌شده",
+  "editor.remux.kind.video": "ویدیو",
+  "editor.remux.kind.audio": "صدا",
+  "editor.remux.kind.subtitle": "زیرنویس",
+  "editor.remux.kind.attachment": "پیوست"
 }

@@ -199,5 +199,22 @@
   "editor.export.audio-track": "ऑडियो ट्रैक",
   "editor.export.audio-track.all": "सभी ट्रैक",
   "editor.export.audio-track.none": "ऑडियो नहीं",
-  "editor.monitor.audio-track": "ऑडियो ट्रैक बदलें"
+  "editor.monitor.audio-track": "ऑडियो ट्रैक बदलें",
+  "editor.remux.file-title": "फ़ाइल शीर्षक",
+  "editor.remux.track": "ट्रैक",
+  "editor.remux.language": "भाषा",
+  "editor.remux.track-title": "ट्रैक नाम",
+  "editor.remux.offset": "ऑफ़सेट (ms)",
+  "editor.remux.rotation": "घुमाव",
+  "editor.remux.rotation.keep": "न बदलें",
+  "editor.remux.default": "डिफ़ॉल्ट ट्रैक",
+  "editor.remux.run": "फिर से पैक करें…",
+  "editor.remux.tip": "• स्रोत को दोबारा एन्कोड किए बिना नई फ़ाइल में लिखता है।\n• भाषा, नाम, फ़्लैग, ऑफ़सेट और घुमाव हर ट्रैक पर लागू होते हैं।",
+  "editor.remux.invalid": "ट्रैक {0}: भाषा तीन अक्षरों का कोड और ऑफ़सेट पूर्ण मिलीसेकंड होना चाहिए।",
+  "editor.remux.same-file": "आउटपुट स्रोत को अधिलेखित नहीं कर सकता।",
+  "editor.remux.save-title": "फिर से पैक की गई फ़ाइल सहेजें",
+  "editor.remux.kind.video": "वीडियो",
+  "editor.remux.kind.audio": "ऑडियो",
+  "editor.remux.kind.subtitle": "उपशीर्षक",
+  "editor.remux.kind.attachment": "अनुलग्नक"
 }

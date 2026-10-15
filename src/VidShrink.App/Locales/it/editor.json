@@ -199,5 +199,22 @@
   "editor.export.audio-track": "Traccia audio",
   "editor.export.audio-track.all": "Tutte le tracce",
   "editor.export.audio-track.none": "Nessun audio",
-  "editor.monitor.audio-track": "Cambia traccia audio"
+  "editor.monitor.audio-track": "Cambia traccia audio",
+  "editor.remux.file-title": "Titolo del file",
+  "editor.remux.track": "Traccia",
+  "editor.remux.language": "Lingua",
+  "editor.remux.track-title": "Nome traccia",
+  "editor.remux.offset": "Spostamento (ms)",
+  "editor.remux.rotation": "Rotazione",
+  "editor.remux.rotation.keep": "Mantieni",
+  "editor.remux.default": "Traccia predefinita",
+  "editor.remux.run": "Rimuxa…",
+  "editor.remux.tip": "• Scrive la sorgente in un nuovo file senza ricodifica.\n• Lingua, nome, flag, spostamento e rotazione valgono per traccia.",
+  "editor.remux.invalid": "Traccia {0}: la lingua deve essere un codice di tre lettere e lo spostamento millisecondi interi.",
+  "editor.remux.same-file": "L'output non può sovrascrivere la sorgente.",
+  "editor.remux.save-title": "Salva file rimuxato",
+  "editor.remux.kind.video": "Video",
+  "editor.remux.kind.audio": "Audio",
+  "editor.remux.kind.subtitle": "Sottotitoli",
+  "editor.remux.kind.attachment": "Allegato"
 }

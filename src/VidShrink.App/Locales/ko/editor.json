@@ -199,5 +199,22 @@
   "editor.export.audio-track": "오디오 트랙",
   "editor.export.audio-track.all": "모든 트랙",
   "editor.export.audio-track.none": "오디오 없음",
-  "editor.monitor.audio-track": "오디오 트랙 전환"
+  "editor.monitor.audio-track": "오디오 트랙 전환",
+  "editor.remux.file-title": "파일 제목",
+  "editor.remux.track": "트랙",
+  "editor.remux.language": "언어",
+  "editor.remux.track-title": "트랙 이름",
+  "editor.remux.offset": "오프셋 (ms)",
+  "editor.remux.rotation": "회전",
+  "editor.remux.rotation.keep": "유지",
+  "editor.remux.default": "기본 트랙",
+  "editor.remux.run": "다시 패키징…",
+  "editor.remux.tip": "• 다시 인코딩하지 않고 원본을 새 파일에 씁니다.\n• 언어, 이름, 플래그, 오프셋, 회전은 트랙별로 적용됩니다.",
+  "editor.remux.invalid": "트랙 {0}: 언어는 세 글자 코드, 오프셋은 정수 밀리초여야 합니다.",
+  "editor.remux.same-file": "출력이 원본을 덮어쓸 수 없습니다.",
+  "editor.remux.save-title": "다시 패키징한 파일 저장",
+  "editor.remux.kind.video": "비디오",
+  "editor.remux.kind.audio": "오디오",
+  "editor.remux.kind.subtitle": "자막",
+  "editor.remux.kind.attachment": "첨부"
 }

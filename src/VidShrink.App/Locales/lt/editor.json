@@ -199,5 +199,22 @@
   "editor.export.audio-track": "Garso takelis",
   "editor.export.audio-track.all": "Visi takeliai",
   "editor.export.audio-track.none": "Be garso",
-  "editor.monitor.audio-track": "Perjungti garso takelį"
+  "editor.monitor.audio-track": "Perjungti garso takelį",
+  "editor.remux.file-title": "Failo pavadinimas",
+  "editor.remux.track": "Takelis",
+  "editor.remux.language": "Kalba",
+  "editor.remux.track-title": "Takelio pavadinimas",
+  "editor.remux.offset": "Poslinkis (ms)",
+  "editor.remux.rotation": "Pasukimas",
+  "editor.remux.rotation.keep": "Palikti",
+  "editor.remux.default": "Numatytasis takelis",
+  "editor.remux.run": "Perpakuoti…",
+  "editor.remux.tip": "• Įrašo šaltinį į naują failą neperkoduodama.\n• Kalba, pavadinimas, žymė, poslinkis ir pasukimas taikomi takeliui.",
+  "editor.remux.invalid": "Takelis {0}: kalba turi būti trijų raidžių kodas, poslinkis – sveikos milisekundės.",
+  "editor.remux.same-file": "Išvestis negali perrašyti šaltinio.",
+  "editor.remux.save-title": "Įrašyti perpakuotą failą",
+  "editor.remux.kind.video": "Vaizdas",
+  "editor.remux.kind.audio": "Garsas",
+  "editor.remux.kind.subtitle": "Subtitrai",
+  "editor.remux.kind.attachment": "Priedas"
 }

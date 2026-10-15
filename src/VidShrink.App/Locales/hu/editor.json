@@ -199,5 +199,22 @@
   "editor.export.audio-track": "Hangsáv",
   "editor.export.audio-track.all": "Minden sáv",
   "editor.export.audio-track.none": "Nincs hang",
-  "editor.monitor.audio-track": "Hangsáv váltása"
+  "editor.monitor.audio-track": "Hangsáv váltása",
+  "editor.remux.file-title": "Fájl címe",
+  "editor.remux.track": "Sáv",
+  "editor.remux.language": "Nyelv",
+  "editor.remux.track-title": "Sáv neve",
+  "editor.remux.offset": "Eltolás (ms)",
+  "editor.remux.rotation": "Elforgatás",
+  "editor.remux.rotation.keep": "Megtartás",
+  "editor.remux.default": "Alapértelmezett sáv",
+  "editor.remux.run": "Újracsomagolás…",
+  "editor.remux.tip": "• Újrakódolás nélkül új fájlba írja a forrást.\n• A nyelv, név, jelző, eltolás és elforgatás sávonként érvényes.",
+  "editor.remux.invalid": "{0}. sáv: a nyelv hárombetűs kód, az eltolás egész ezredmásodperc legyen.",
+  "editor.remux.same-file": "A kimenet nem írhatja felül a forrást.",
+  "editor.remux.save-title": "Újracsomagolt fájl mentése",
+  "editor.remux.kind.video": "Videó",
+  "editor.remux.kind.audio": "Hang",
+  "editor.remux.kind.subtitle": "Felirat",
+  "editor.remux.kind.attachment": "Melléklet"
 }

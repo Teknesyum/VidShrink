@@ -199,5 +199,22 @@
   "editor.export.audio-track": "Heliriba",
   "editor.export.audio-track.all": "Kõik rajad",
   "editor.export.audio-track.none": "Heli puudub",
-  "editor.monitor.audio-track": "Vaheta heliriba"
+  "editor.monitor.audio-track": "Vaheta heliriba",
+  "editor.remux.file-title": "Faili pealkiri",
+  "editor.remux.track": "Rada",
+  "editor.remux.language": "Keel",
+  "editor.remux.track-title": "Raja nimi",
+  "editor.remux.offset": "Nihe (ms)",
+  "editor.remux.rotation": "Pööre",
+  "editor.remux.rotation.keep": "Jäta alles",
+  "editor.remux.default": "Vaikerada",
+  "editor.remux.run": "Paki ümber…",
+  "editor.remux.tip": "• Kirjutab allika uude faili ilma ümberkodeerimiseta.\n• Keel, nimi, lipp, nihe ja pööre kehtivad raja kaupa.",
+  "editor.remux.invalid": "Rada {0}: keel peab olema kolmetäheline kood ja nihe täisarv millisekundeid.",
+  "editor.remux.same-file": "Väljund ei tohi allikat üle kirjutada.",
+  "editor.remux.save-title": "Salvesta ümberpakitud fail",
+  "editor.remux.kind.video": "Video",
+  "editor.remux.kind.audio": "Heli",
+  "editor.remux.kind.subtitle": "Subtiitrid",
+  "editor.remux.kind.attachment": "Manus"
 }

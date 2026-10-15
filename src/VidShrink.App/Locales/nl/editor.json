@@ -199,5 +199,22 @@
   "editor.export.audio-track": "Audiospoor",
   "editor.export.audio-track.all": "Alle sporen",
   "editor.export.audio-track.none": "Geen audio",
-  "editor.monitor.audio-track": "Audiospoor wisselen"
+  "editor.monitor.audio-track": "Audiospoor wisselen",
+  "editor.remux.file-title": "Bestandstitel",
+  "editor.remux.track": "Spoor",
+  "editor.remux.language": "Taal",
+  "editor.remux.track-title": "Spoornaam",
+  "editor.remux.offset": "Verschuiving (ms)",
+  "editor.remux.rotation": "Rotatie",
+  "editor.remux.rotation.keep": "Behouden",
+  "editor.remux.default": "Standaardspoor",
+  "editor.remux.run": "Opnieuw verpakken…",
+  "editor.remux.tip": "• Schrijft de bron zonder hercodering naar een nieuw bestand.\n• Taal, naam, vlag, verschuiving en rotatie gelden per spoor.",
+  "editor.remux.invalid": "Spoor {0}: de taal moet een code van drie letters zijn en de verschuiving hele milliseconden.",
+  "editor.remux.same-file": "De uitvoer mag de bron niet overschrijven.",
+  "editor.remux.save-title": "Opnieuw verpakt bestand opslaan",
+  "editor.remux.kind.video": "Video",
+  "editor.remux.kind.audio": "Audio",
+  "editor.remux.kind.subtitle": "Ondertitels",
+  "editor.remux.kind.attachment": "Bijlage"
 }

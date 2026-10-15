@@ -199,5 +199,22 @@
   "editor.export.audio-track": "Zvuková stopa",
   "editor.export.audio-track.all": "Všetky stopy",
   "editor.export.audio-track.none": "Bez zvuku",
-  "editor.monitor.audio-track": "Prepnúť zvukovú stopu"
+  "editor.monitor.audio-track": "Prepnúť zvukovú stopu",
+  "editor.remux.file-title": "Názov súboru",
+  "editor.remux.track": "Stopa",
+  "editor.remux.language": "Jazyk",
+  "editor.remux.track-title": "Názov stopy",
+  "editor.remux.offset": "Posun (ms)",
+  "editor.remux.rotation": "Otočenie",
+  "editor.remux.rotation.keep": "Ponechať",
+  "editor.remux.default": "Predvolená stopa",
+  "editor.remux.run": "Prebaliť…",
+  "editor.remux.tip": "• Zapíše zdroj do nového súboru bez prekódovania.\n• Jazyk, názov, príznak, posun a otočenie platia pre stopu.",
+  "editor.remux.invalid": "Stopa {0}: jazyk musí byť trojpísmenový kód a posun celé milisekundy.",
+  "editor.remux.same-file": "Výstup nesmie prepísať zdroj.",
+  "editor.remux.save-title": "Uložiť prebalený súbor",
+  "editor.remux.kind.video": "Video",
+  "editor.remux.kind.audio": "Zvuk",
+  "editor.remux.kind.subtitle": "Titulky",
+  "editor.remux.kind.attachment": "Príloha"
 }

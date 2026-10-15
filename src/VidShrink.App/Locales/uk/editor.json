@@ -199,5 +199,22 @@
   "editor.export.audio-track": "Звукова доріжка",
   "editor.export.audio-track.all": "Усі доріжки",
   "editor.export.audio-track.none": "Без звуку",
-  "editor.monitor.audio-track": "Змінити звукову доріжку"
+  "editor.monitor.audio-track": "Змінити звукову доріжку",
+  "editor.remux.file-title": "Назва файлу",
+  "editor.remux.track": "Доріжка",
+  "editor.remux.language": "Мова",
+  "editor.remux.track-title": "Назва доріжки",
+  "editor.remux.offset": "Зсув (мс)",
+  "editor.remux.rotation": "Поворот",
+  "editor.remux.rotation.keep": "Не змінювати",
+  "editor.remux.default": "Доріжка за замовчуванням",
+  "editor.remux.run": "Перепакувати…",
+  "editor.remux.tip": "• Записує джерело в новий файл без перекодування.\n• Мова, назва, прапорець, зсув і поворот задаються для доріжки.",
+  "editor.remux.invalid": "Доріжка {0}: мова має бути трилітерним кодом, а зсув — цілими мілісекундами.",
+  "editor.remux.same-file": "Результат не може перезаписати джерело.",
+  "editor.remux.save-title": "Зберегти перепакований файл",
+  "editor.remux.kind.video": "Відео",
+  "editor.remux.kind.audio": "Аудіо",
+  "editor.remux.kind.subtitle": "Субтитри",
+  "editor.remux.kind.attachment": "Вкладення"
 }

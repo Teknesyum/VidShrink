@@ -199,5 +199,22 @@
   "editor.export.audio-track": "音轨",
   "editor.export.audio-track.all": "所有轨道",
   "editor.export.audio-track.none": "无音频",
-  "editor.monitor.audio-track": "切换音轨"
+  "editor.monitor.audio-track": "切换音轨",
+  "editor.remux.file-title": "文件标题",
+  "editor.remux.track": "轨道",
+  "editor.remux.language": "语言",
+  "editor.remux.track-title": "轨道名称",
+  "editor.remux.offset": "偏移 (ms)",
+  "editor.remux.rotation": "旋转",
+  "editor.remux.rotation.keep": "保持不变",
+  "editor.remux.default": "默认轨道",
+  "editor.remux.run": "重新封装…",
+  "editor.remux.tip": "• 不重新编码，将源写入新文件。\n• 语言、名称、标志、偏移和旋转按轨道设置。",
+  "editor.remux.invalid": "轨道 {0}：语言必须是三个字母的代码，偏移必须是整数毫秒。",
+  "editor.remux.same-file": "输出不能覆盖源文件。",
+  "editor.remux.save-title": "保存重新封装的文件",
+  "editor.remux.kind.video": "视频",
+  "editor.remux.kind.audio": "音频",
+  "editor.remux.kind.subtitle": "字幕",
+  "editor.remux.kind.attachment": "附件"
 }

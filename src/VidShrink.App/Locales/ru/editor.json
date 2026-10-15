@@ -199,5 +199,22 @@
   "editor.export.audio-track": "Звуковая дорожка",
   "editor.export.audio-track.all": "Все дорожки",
   "editor.export.audio-track.none": "Без звука",
-  "editor.monitor.audio-track": "Сменить звуковую дорожку"
+  "editor.monitor.audio-track": "Сменить звуковую дорожку",
+  "editor.remux.file-title": "Название файла",
+  "editor.remux.track": "Дорожка",
+  "editor.remux.language": "Язык",
+  "editor.remux.track-title": "Имя дорожки",
+  "editor.remux.offset": "Сдвиг (мс)",
+  "editor.remux.rotation": "Поворот",
+  "editor.remux.rotation.keep": "Не менять",
+  "editor.remux.default": "Дорожка по умолчанию",
+  "editor.remux.run": "Перепаковать…",
+  "editor.remux.tip": "• Записывает источник в новый файл без перекодирования.\n• Язык, имя, флаг, сдвиг и поворот задаются для дорожки.",
+  "editor.remux.invalid": "Дорожка {0}: язык должен быть трёхбуквенным кодом, а сдвиг — целым числом миллисекунд.",
+  "editor.remux.same-file": "Результат не может перезаписать источник.",
+  "editor.remux.save-title": "Сохранить перепакованный файл",
+  "editor.remux.kind.video": "Видео",
+  "editor.remux.kind.audio": "Аудио",
+  "editor.remux.kind.subtitle": "Субтитры",
+  "editor.remux.kind.attachment": "Вложение"
 }

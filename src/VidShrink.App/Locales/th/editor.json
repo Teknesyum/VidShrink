@@ -199,5 +199,22 @@
   "editor.export.audio-track": "แทร็กเสียง",
   "editor.export.audio-track.all": "ทุกแทร็ก",
   "editor.export.audio-track.none": "ไม่มีเสียง",
-  "editor.monitor.audio-track": "สลับแทร็กเสียง"
+  "editor.monitor.audio-track": "สลับแทร็กเสียง",
+  "editor.remux.file-title": "ชื่อไฟล์",
+  "editor.remux.track": "แทร็ก",
+  "editor.remux.language": "ภาษา",
+  "editor.remux.track-title": "ชื่อแทร็ก",
+  "editor.remux.offset": "เลื่อนเวลา (ms)",
+  "editor.remux.rotation": "การหมุน",
+  "editor.remux.rotation.keep": "คงเดิม",
+  "editor.remux.default": "แทร็กเริ่มต้น",
+  "editor.remux.run": "แพ็กใหม่…",
+  "editor.remux.tip": "• เขียนต้นฉบับลงไฟล์ใหม่โดยไม่เข้ารหัสใหม่\n• ภาษา ชื่อ แฟล็ก การเลื่อนเวลา และการหมุนใช้รายแทร็ก",
+  "editor.remux.invalid": "แทร็ก {0}: ภาษาต้องเป็นรหัสสามตัวอักษร และการเลื่อนเวลาต้องเป็นมิลลิวินาทีเต็ม",
+  "editor.remux.same-file": "ผลลัพธ์เขียนทับต้นฉบับไม่ได้",
+  "editor.remux.save-title": "บันทึกไฟล์ที่แพ็กใหม่",
+  "editor.remux.kind.video": "วิดีโอ",
+  "editor.remux.kind.audio": "เสียง",
+  "editor.remux.kind.subtitle": "คำบรรยาย",
+  "editor.remux.kind.attachment": "ไฟล์แนบ"
 }

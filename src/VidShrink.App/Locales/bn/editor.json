@@ -199,5 +199,22 @@
   "editor.export.audio-track": "অডিও ট্র্যাক",
   "editor.export.audio-track.all": "সব ট্র্যাক",
   "editor.export.audio-track.none": "অডিও নেই",
-  "editor.monitor.audio-track": "অডিও ট্র্যাক বদলান"
+  "editor.monitor.audio-track": "অডিও ট্র্যাক বদলান",
+  "editor.remux.file-title": "ফাইলের শিরোনাম",
+  "editor.remux.track": "ট্র্যাক",
+  "editor.remux.language": "ভাষা",
+  "editor.remux.track-title": "ট্র্যাকের নাম",
+  "editor.remux.offset": "অফসেট (ms)",
+  "editor.remux.rotation": "ঘূর্ণন",
+  "editor.remux.rotation.keep": "অপরিবর্তিত",
+  "editor.remux.default": "ডিফল্ট ট্র্যাক",
+  "editor.remux.run": "আবার প্যাক করুন…",
+  "editor.remux.tip": "• পুনরায় এনকোড না করে উৎসকে নতুন ফাইলে লেখে।\n• ভাষা, নাম, ফ্ল্যাগ, অফসেট ও ঘূর্ণন প্রতি ট্র্যাকে প্রযোজ্য।",
+  "editor.remux.invalid": "ট্র্যাক {0}: ভাষা তিন অক্ষরের কোড এবং অফসেট পূর্ণ মিলিসেকেন্ড হতে হবে।",
+  "editor.remux.same-file": "আউটপুট উৎসের উপর লিখতে পারে না।",
+  "editor.remux.save-title": "আবার প্যাক করা ফাইল সংরক্ষণ করুন",
+  "editor.remux.kind.video": "ভিডিও",
+  "editor.remux.kind.audio": "অডিও",
+  "editor.remux.kind.subtitle": "সাবটাইটেল",
+  "editor.remux.kind.attachment": "সংযুক্তি"
 }

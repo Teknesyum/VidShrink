@@ -199,5 +199,22 @@
   "editor.export.audio-track": "آڈیو ٹریک",
   "editor.export.audio-track.all": "تمام ٹریک",
   "editor.export.audio-track.none": "آڈیو نہیں",
-  "editor.monitor.audio-track": "آڈیو ٹریک بدلیں"
+  "editor.monitor.audio-track": "آڈیو ٹریک بدلیں",
+  "editor.remux.file-title": "فائل کا عنوان",
+  "editor.remux.track": "ٹریک",
+  "editor.remux.language": "زبان",
+  "editor.remux.track-title": "ٹریک کا نام",
+  "editor.remux.offset": "آفسیٹ (ms)",
+  "editor.remux.rotation": "گردش",
+  "editor.remux.rotation.keep": "برقرار رکھیں",
+  "editor.remux.default": "طے شدہ ٹریک",
+  "editor.remux.run": "دوبارہ پیک کریں…",
+  "editor.remux.tip": "• ماخذ کو دوبارہ انکوڈ کیے بغیر نئی فائل میں لکھتا ہے۔\n• زبان، نام، جھنڈا، آفسیٹ اور گردش ہر ٹریک پر لاگو ہوتے ہیں۔",
+  "editor.remux.invalid": "ٹریک {0}: زبان تین حرفی کوڈ اور آفسیٹ پورے ملی سیکنڈ ہونا چاہیے۔",
+  "editor.remux.same-file": "آؤٹ پٹ ماخذ کو اوور رائٹ نہیں کر سکتا۔",
+  "editor.remux.save-title": "دوبارہ پیک کی گئی فائل محفوظ کریں",
+  "editor.remux.kind.video": "ویڈیو",
+  "editor.remux.kind.audio": "آڈیو",
+  "editor.remux.kind.subtitle": "سب ٹائٹل",
+  "editor.remux.kind.attachment": "منسلکہ"
 }

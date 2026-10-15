@@ -199,5 +199,22 @@
   "editor.export.audio-track": "Pista de audio",
   "editor.export.audio-track.all": "Todas las pistas",
   "editor.export.audio-track.none": "Sin audio",
-  "editor.monitor.audio-track": "Cambiar pista de audio"
+  "editor.monitor.audio-track": "Cambiar pista de audio",
+  "editor.remux.file-title": "Título del archivo",
+  "editor.remux.track": "Pista",
+  "editor.remux.language": "Idioma",
+  "editor.remux.track-title": "Nombre de la pista",
+  "editor.remux.offset": "Desfase (ms)",
+  "editor.remux.rotation": "Rotación",
+  "editor.remux.rotation.keep": "Mantener",
+  "editor.remux.default": "Pista predeterminada",
+  "editor.remux.run": "Remuxar…",
+  "editor.remux.tip": "• Escribe la fuente en un archivo nuevo sin recodificar.\n• Idioma, nombre, marca, desfase y rotación se aplican por pista.",
+  "editor.remux.invalid": "Pista {0}: el idioma debe ser un código de tres letras y el desfase milisegundos enteros.",
+  "editor.remux.same-file": "La salida no puede sobrescribir la fuente.",
+  "editor.remux.save-title": "Guardar archivo remuxado",
+  "editor.remux.kind.video": "Vídeo",
+  "editor.remux.kind.audio": "Audio",
+  "editor.remux.kind.subtitle": "Subtítulos",
+  "editor.remux.kind.attachment": "Adjunto"
 }

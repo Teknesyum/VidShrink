@@ -161,6 +161,7 @@ internal partial class EditorView
         };
         InitExportSettings();
         InitAudioTrack();
+        InitRemux();
     }
 
     private void RefreshExport() => EnableExport(!Exporting);

@@ -199,5 +199,22 @@
   "editor.export.audio-track": "Ljudspår",
   "editor.export.audio-track.all": "Alla spår",
   "editor.export.audio-track.none": "Inget ljud",
-  "editor.monitor.audio-track": "Byt ljudspår"
+  "editor.monitor.audio-track": "Byt ljudspår",
+  "editor.remux.file-title": "Filtitel",
+  "editor.remux.track": "Spår",
+  "editor.remux.language": "Språk",
+  "editor.remux.track-title": "Spårnamn",
+  "editor.remux.offset": "Förskjutning (ms)",
+  "editor.remux.rotation": "Rotation",
+  "editor.remux.rotation.keep": "Behåll",
+  "editor.remux.default": "Standardspår",
+  "editor.remux.run": "Packa om…",
+  "editor.remux.tip": "• Skriver källan till en ny fil utan omkodning.\n• Språk, namn, flagga, förskjutning och rotation gäller per spår.",
+  "editor.remux.invalid": "Spår {0}: språket måste vara en kod på tre bokstäver och förskjutningen hela millisekunder.",
+  "editor.remux.same-file": "Utdata får inte skriva över källan.",
+  "editor.remux.save-title": "Spara ompackad fil",
+  "editor.remux.kind.video": "Video",
+  "editor.remux.kind.audio": "Ljud",
+  "editor.remux.kind.subtitle": "Undertexter",
+  "editor.remux.kind.attachment": "Bilaga"
 }

@@ -199,5 +199,22 @@
   "editor.export.audio-track": "Audio track",
   "editor.export.audio-track.all": "All tracks",
   "editor.export.audio-track.none": "No audio",
-  "editor.monitor.audio-track": "Switch audio track"
+  "editor.monitor.audio-track": "Switch audio track",
+  "editor.remux.file-title": "File title",
+  "editor.remux.track": "Track",
+  "editor.remux.language": "Language",
+  "editor.remux.track-title": "Track name",
+  "editor.remux.offset": "Offset (ms)",
+  "editor.remux.rotation": "Rotation",
+  "editor.remux.rotation.keep": "Keep",
+  "editor.remux.default": "Default Track",
+  "editor.remux.run": "Remux…",
+  "editor.remux.tip": "• Writes the source to a new file without re-encoding.\n• Language, name, flag, offset and rotation apply per track.",
+  "editor.remux.invalid": "Track {0}: the language must be a three-letter code and the offset whole milliseconds.",
+  "editor.remux.same-file": "The output cannot overwrite the source.",
+  "editor.remux.save-title": "Save Remuxed File",
+  "editor.remux.kind.video": "Video",
+  "editor.remux.kind.audio": "Audio",
+  "editor.remux.kind.subtitle": "Subtitle",
+  "editor.remux.kind.attachment": "Attachment"
 }

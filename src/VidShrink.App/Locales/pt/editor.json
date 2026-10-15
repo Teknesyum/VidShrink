@@ -199,5 +199,22 @@
   "editor.export.audio-track": "Faixa de áudio",
   "editor.export.audio-track.all": "Todas as faixas",
   "editor.export.audio-track.none": "Sem áudio",
-  "editor.monitor.audio-track": "Trocar faixa de áudio"
+  "editor.monitor.audio-track": "Trocar faixa de áudio",
+  "editor.remux.file-title": "Título do ficheiro",
+  "editor.remux.track": "Faixa",
+  "editor.remux.language": "Idioma",
+  "editor.remux.track-title": "Nome da faixa",
+  "editor.remux.offset": "Desvio (ms)",
+  "editor.remux.rotation": "Rotação",
+  "editor.remux.rotation.keep": "Manter",
+  "editor.remux.default": "Faixa predefinida",
+  "editor.remux.run": "Remuxar…",
+  "editor.remux.tip": "• Grava a origem num ficheiro novo sem recodificar.\n• Idioma, nome, sinalizador, desvio e rotação aplicam-se por faixa.",
+  "editor.remux.invalid": "Faixa {0}: o idioma deve ser um código de três letras e o desvio milissegundos inteiros.",
+  "editor.remux.same-file": "A saída não pode substituir a origem.",
+  "editor.remux.save-title": "Guardar ficheiro remuxado",
+  "editor.remux.kind.video": "Vídeo",
+  "editor.remux.kind.audio": "Áudio",
+  "editor.remux.kind.subtitle": "Legendas",
+  "editor.remux.kind.attachment": "Anexo"
 }

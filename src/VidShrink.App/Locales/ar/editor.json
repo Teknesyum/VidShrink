@@ -199,5 +199,22 @@
   "editor.export.audio-track": "مسار الصوت",
   "editor.export.audio-track.all": "كل المسارات",
   "editor.export.audio-track.none": "بلا صوت",
-  "editor.monitor.audio-track": "تبديل مسار الصوت"
+  "editor.monitor.audio-track": "تبديل مسار الصوت",
+  "editor.remux.file-title": "عنوان الملف",
+  "editor.remux.track": "المسار",
+  "editor.remux.language": "اللغة",
+  "editor.remux.track-title": "اسم المسار",
+  "editor.remux.offset": "الإزاحة (ms)",
+  "editor.remux.rotation": "التدوير",
+  "editor.remux.rotation.keep": "إبقاء",
+  "editor.remux.default": "المسار الافتراضي",
+  "editor.remux.run": "إعادة التغليف…",
+  "editor.remux.tip": "• يكتب المصدر في ملف جديد دون إعادة ترميز.\n• تُطبَّق اللغة والاسم والعلامة والإزاحة والتدوير لكل مسار.",
+  "editor.remux.invalid": "المسار {0}: يجب أن تكون اللغة رمزًا من ثلاثة أحرف والإزاحة أجزاء ألف كاملة.",
+  "editor.remux.same-file": "لا يمكن أن يستبدل الناتج المصدر.",
+  "editor.remux.save-title": "حفظ الملف المعاد تغليفه",
+  "editor.remux.kind.video": "فيديو",
+  "editor.remux.kind.audio": "صوت",
+  "editor.remux.kind.subtitle": "ترجمة",
+  "editor.remux.kind.attachment": "مرفق"
 }

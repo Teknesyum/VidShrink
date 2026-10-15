@@ -199,5 +199,22 @@
   "editor.export.audio-track": "Wimbo wa sauti",
   "editor.export.audio-track.all": "Nyimbo zote",
   "editor.export.audio-track.none": "Hakuna sauti",
-  "editor.monitor.audio-track": "Badilisha wimbo wa sauti"
+  "editor.monitor.audio-track": "Badilisha wimbo wa sauti",
+  "editor.remux.file-title": "Kichwa cha faili",
+  "editor.remux.track": "Wimbo",
+  "editor.remux.language": "Lugha",
+  "editor.remux.track-title": "Jina la wimbo",
+  "editor.remux.offset": "Msogeo (ms)",
+  "editor.remux.rotation": "Mzunguko",
+  "editor.remux.rotation.keep": "Acha",
+  "editor.remux.default": "Wimbo chaguo-msingi",
+  "editor.remux.run": "Funga upya…",
+  "editor.remux.tip": "• Huandika chanzo kwenye faili mpya bila kusimba upya.\n• Lugha, jina, alama, msogeo na mzunguko ni kwa kila wimbo.",
+  "editor.remux.invalid": "Wimbo {0}: lugha lazima iwe msimbo wa herufi tatu na msogeo milisekunde kamili.",
+  "editor.remux.same-file": "Tokeo haliwezi kuandika juu ya chanzo.",
+  "editor.remux.save-title": "Hifadhi faili lililofungwa upya",
+  "editor.remux.kind.video": "Video",
+  "editor.remux.kind.audio": "Sauti",
+  "editor.remux.kind.subtitle": "Manukuu",
+  "editor.remux.kind.attachment": "Kiambatisho"
 }

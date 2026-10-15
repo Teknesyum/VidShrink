@@ -199,5 +199,22 @@
   "editor.export.audio-track": "Trek audio",
   "editor.export.audio-track.all": "Semua trek",
   "editor.export.audio-track.none": "Tanpa audio",
-  "editor.monitor.audio-track": "Ganti trek audio"
+  "editor.monitor.audio-track": "Ganti trek audio",
+  "editor.remux.file-title": "Judul berkas",
+  "editor.remux.track": "Trek",
+  "editor.remux.language": "Bahasa",
+  "editor.remux.track-title": "Nama trek",
+  "editor.remux.offset": "Geser (ms)",
+  "editor.remux.rotation": "Rotasi",
+  "editor.remux.rotation.keep": "Biarkan",
+  "editor.remux.default": "Trek bawaan",
+  "editor.remux.run": "Kemas ulang…",
+  "editor.remux.tip": "• Menulis sumber ke berkas baru tanpa enkode ulang.\n• Bahasa, nama, tanda, geser, dan rotasi berlaku per trek.",
+  "editor.remux.invalid": "Trek {0}: bahasa harus kode tiga huruf dan geser berupa milidetik bulat.",
+  "editor.remux.same-file": "Keluaran tidak boleh menimpa sumber.",
+  "editor.remux.save-title": "Simpan berkas kemas ulang",
+  "editor.remux.kind.video": "Video",
+  "editor.remux.kind.audio": "Audio",
+  "editor.remux.kind.subtitle": "Subtitel",
+  "editor.remux.kind.attachment": "Lampiran"
 }
