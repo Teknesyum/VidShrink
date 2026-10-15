@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
 using Avalonia.VisualTree;
 using Avalonia.Media;
 using VidShrink.App.Localization;
@@ -54,6 +56,13 @@ internal partial class EditorView
     private void InitText()
     {
         BtnAddText.Click += (_, _) => AddText();
+        MnuSubtitleImport.Click += (_, _) => _ = ImportSubtitlesClickedAsync();
+        MnuSubtitleExport.Click += (_, _) => _ = ExportSubtitlesClickedAsync();
+        TimelineMenu.Opening += (_, _) =>
+        {
+            MnuSubtitleImport.IsEnabled = _model is { Duration: > 0 } && !Exporting;
+            MnuSubtitleExport.IsEnabled = _model is { HasText: true };
+        };
         Timeline.TextEdited += () => AfterTextEdit(Timeline.SelectedText);
         Timeline.TextSelectionChanged += ShowTextPanel;
         TxtTextContent.LostFocus += (_, _) => CommitTextContent();
@@ -271,6 +280,91 @@ internal partial class EditorView
         var index = model.AddText(new TextLayer(Strings.Get("editor.text.content"), start, start + length));
         AfterTextEdit(index);
         return true;
+    }
+
+    /// <summary>
+    /// SRT, VTT ya da ASS altyazisinin satirlarini metin izine ekler (<see cref="SubtitleFile"/>); var olan metinler
+    /// kalir. Tek geri alma adimidir. Okunamayan dosya izi degistirmez.
+    /// </summary>
+    internal bool ImportSubtitlesFrom(string path)
+    {
+        if (_model is not { Duration: > 0 } model || Exporting) return false;
+        IReadOnlyList<TextLayer> layers = Array.Empty<TextLayer>();
+        if (SubtitleFile.FormatOf(path) is { } format)
+        {
+            try
+            {
+                if (SubtitleFile.Read(format, File.ReadAllText(path)) is { } cues) layers = SubtitleFile.ToLayers(cues, model.Duration);
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+            {
+                layers = Array.Empty<TextLayer>();
+            }
+        }
+
+        if (layers.Count == 0)
+        {
+            ShowProjectStatus("StatusError", string.Format(Strings.Culture, Strings.Get("editor.subtitle.unreadable"), path));
+            return false;
+        }
+
+        var first = model.Texts.Count;
+        model.Restore(model.Clips, model.Texts.Concat(layers).ToArray());
+        AfterTextEdit(first);
+        ShowProjectStatus("StatusSuccess", string.Format(Strings.Culture, Strings.Get("editor.subtitle.imported"), layers.Count));
+        return true;
+    }
+
+    /// <summary>Metin izini uzantinin bicimindeki altyaziya yazar: <c>.srt</c> ya da kare boyutlu <c>.ass</c>.</summary>
+    internal bool ExportSubtitlesTo(string path)
+    {
+        if (_model is not { HasText: true } model || SubtitleFile.FormatOf(path) is not { } format || !SubtitleFile.CanWrite(format)) return false;
+        var (width, height) = Preview.Engine is { } engine ? FrameSize(engine) : (FallbackWidth, FallbackHeight);
+        bool ok;
+        try
+        {
+            File.WriteAllBytes(path, SubtitleFile.Bytes(format, model.Texts, width, height));
+            ok = true;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            ok = false;
+        }
+
+        ShowProjectStatus(ok ? "StatusSuccess" : "StatusError",
+            string.Format(Strings.Culture, Strings.Get(ok ? "editor.subtitle.exported" : "editor.subtitle.failed"), path));
+        return ok;
+    }
+
+    private async Task ExportSubtitlesClickedAsync()
+    {
+        if (_model is not { HasText: true } || _source is not { } source) return;
+        if (TopLevel.GetTopLevel(this)?.StorageProvider is not { } storage) return;
+        var file = await storage.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = Strings.Get("editor.subtitle.export"),
+            SuggestedFileName = Path.GetFileNameWithoutExtension(source) + ".srt",
+            DefaultExtension = "srt",
+            ShowOverwritePrompt = true,
+            FileTypeChoices = new[]
+            {
+                new FilePickerFileType("SRT") { Patterns = new[] { "*.srt" } },
+                new FilePickerFileType("ASS") { Patterns = new[] { "*.ass" } }
+            }
+        }).ConfigureAwait(true);
+        if (file?.TryGetLocalPath() is { } path) ExportSubtitlesTo(path);
+    }
+
+    private async Task ImportSubtitlesClickedAsync()
+    {
+        if (TopLevel.GetTopLevel(this)?.StorageProvider is not { } storage) return;
+        var files = await storage.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = Strings.Get("editor.subtitle.import"),
+            AllowMultiple = false,
+            FileTypeFilter = new[] { new FilePickerFileType(Strings.Get("editor.subtitle.files")) { Patterns = new[] { "*.srt", "*.vtt", "*.ass", "*.ssa" } } }
+        }).ConfigureAwait(true);
+        if (files.Count > 0 && files[0].TryGetLocalPath() is { } path) ImportSubtitlesFrom(path);
     }
 
     internal bool DeleteSelectedText()
