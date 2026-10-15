@@ -504,6 +504,8 @@ internal partial class PlayerView : UserControl
         items.Add(Switch(Strings.Get("player.view.screenshot-jpg"), Settings.ScreenshotFormat == ScreenshotFormat.Jpg, ToggleScreenshotJpg));
         items.Add(Switch(Strings.Get("player.view.keep-history"), Settings.KeepHistory, ToggleKeepHistory));
         items.Add(Switch(Strings.Get("player.view.resume"), Settings.Resume, ToggleResume));
+        items.Add(Switch(Strings.Get("player.view.audio-language"), Settings.AudioInInterfaceLanguage, ToggleAudioLanguage));
+        items.Add(Switch(Strings.Get("player.view.subtitle-language"), Settings.SubtitleInInterfaceLanguage, ToggleSubtitleLanguage));
         items.Add(Switch(Strings.Get("player.view.pause-on-minimize"), Settings.PauseOnMinimize, TogglePauseOnMinimize));
         items.Add(Switch(Strings.Get("player.view.topmost-while-playing"), Settings.TopmostWhilePlaying, ToggleTopmostWhilePlaying));
         items.Add(AdvancedMenu());

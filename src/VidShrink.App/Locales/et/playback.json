@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Salvesta ekraanipildid JPG-na",
   "player.view.keep-history": "Säilita ajalugu",
   "player.view.resume": "Jätka sealt, kus pooleli jäi",
+  "player.view.audio-language": "Vali heli liidese keeles",
+  "player.view.subtitle-language": "Lülita sisse subtiitrid liidese keeles",
   "player.view.pause-on-minimize": "Peata minimeerimisel",
   "player.view.topmost-while-playing": "Hoia pealmisena ainult esitamise ajal",
   "player.view.state-aspect": "kuvasuhe {0}",

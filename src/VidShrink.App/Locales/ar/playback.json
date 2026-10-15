@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "حفظ لقطات الشاشة بصيغة JPG",
   "player.view.keep-history": "الاحتفاظ بالسجل",
   "player.view.resume": "المتابعة من حيث توقفت",
+  "player.view.audio-language": "اختيار الصوت بلغة الواجهة",
+  "player.view.subtitle-language": "تشغيل الترجمة بلغة الواجهة",
   "player.view.pause-on-minimize": "إيقاف مؤقت عند التصغير",
   "player.view.topmost-while-playing": "الإبقاء في المقدمة أثناء التشغيل فقط",
   "player.view.state-aspect": "النسبة {0}",

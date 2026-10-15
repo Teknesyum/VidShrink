@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "บันทึกภาพหน้าจอเป็น JPG",
   "player.view.keep-history": "เก็บประวัติ",
   "player.view.resume": "เล่นต่อจากจุดที่ค้างไว้",
+  "player.view.audio-language": "เลือกเสียงในภาษาของอินเทอร์เฟซ",
+  "player.view.subtitle-language": "เปิดคำบรรยายในภาษาของอินเทอร์เฟซ",
   "player.view.pause-on-minimize": "หยุดชั่วคราวเมื่อย่อหน้าต่าง",
   "player.view.topmost-while-playing": "อยู่บนสุดเฉพาะขณะเล่น",
   "player.view.state-aspect": "อัตราส่วน {0}",

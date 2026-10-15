@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Saglabāt ekrānuzņēmumus JPG formātā",
   "player.view.keep-history": "Saglabāt vēsturi",
   "player.view.resume": "Turpināt no vietas, kur apstājos",
+  "player.view.audio-language": "Izvēlēties skaņu saskarnes valodā",
+  "player.view.subtitle-language": "Ieslēgt subtitrus saskarnes valodā",
   "player.view.pause-on-minimize": "Pauzēt, minimizējot",
   "player.view.topmost-while-playing": "Turēt virspusē tikai atskaņošanas laikā",
   "player.view.state-aspect": "attiecība {0}",

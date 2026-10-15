@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "திரைப்பட எடுகளை JPG ஆக சேமி",
   "player.view.keep-history": "வரலாற்றை வைத்திரு",
   "player.view.resume": "நிறுத்திய இடத்திலிருந்து தொடர்",
+  "player.view.audio-language": "இடைமுக மொழியில் ஒலியைத் தேர்ந்தெடு",
+  "player.view.subtitle-language": "இடைமுக மொழியில் வசனங்களை இயக்கு",
   "player.view.pause-on-minimize": "சிறிதாக்கும்போது இடைநிறுத்து",
   "player.view.topmost-while-playing": "இயக்கும்போது மட்டும் மேலே வைத்திரு",
   "player.view.state-aspect": "விகிதம் {0}",

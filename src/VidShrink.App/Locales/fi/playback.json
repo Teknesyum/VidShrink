@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Tallenna kuvakaappaukset JPG-muodossa",
   "player.view.keep-history": "Säilytä historia",
   "player.view.resume": "Jatka siitä, mihin jäin",
+  "player.view.audio-language": "Valitse ääni käyttöliittymän kielellä",
+  "player.view.subtitle-language": "Ota tekstitys käyttöön käyttöliittymän kielellä",
   "player.view.pause-on-minimize": "Keskeytä pienennettäessä",
   "player.view.topmost-while-playing": "Pidä päällimmäisenä vain toiston aikana",
   "player.view.state-aspect": "kuvasuhde {0}",

@@ -43,7 +43,7 @@ public sealed partial class MpvEngine
                 Percent(Field(color, "gamma", 1) - 1),
                 Scaled(Field(hue, "h", 0), HueSpan),
                 Scaled(Field(sharp, "luma_amount", 0), SharpSpan),
-                GetProperty("deinterlace") is "yes" or "auto",
+                GetProperty("deinterlace") is "yes",
                 Percent(Factor(crop, "x")));
         }
     }
@@ -94,7 +94,7 @@ public sealed partial class MpvEngine
             ? null
             : "crop=w=iw*" + F(keep) + ":h=ih*" + F(keep) + ":x=iw*" + F(edge) + ":y=ih*" + F(edge));
 
-        TrySet("deinterlace", wanted.Deinterlace ? "yes" : "no");
+        TrySet("deinterlace", wanted.Deinterlace ? "yes" : "auto");
     }
 
     public void SetSound(SoundAdjust sound)
