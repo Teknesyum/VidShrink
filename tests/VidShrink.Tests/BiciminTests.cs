@@ -1262,9 +1262,15 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, medya bilgisi ve denetim raporu (ARC-P2): 56 yeni <c>mediainfo.*</c> anahtarindan 82 kol 14 dilde (cs 1, en 2: failed, save; es 16, fr 6, hr 2, hu 1, id 1, lt 1, ms 4, pt 19, ro 12, sl 2, sr 4, sw 11), KOL dokumunden sayildi, tr girmiyor: 3334 + 82 = 3416, en 322 + 2 = 324, tr 108.</para>
     /// <para>2026-10-14, kamera bicimi ve konumu (EKB-P5): kaldirilan dort kose anahtarindan (<c>recorder.webcam.top-left</c>, <c>.top-right</c>, <c>.bottom-left</c>, <c>.bottom-right</c>) 12 kol 4 dilde gitti (es 4, hr 2, it 4, sr 2); bes yeni anahtar (<c>recorder.webcam.shape</c>, <c>.shape.rectangle</c>, <c>.shape.rounded</c>, <c>.shape.circle</c>, <c>.mirror</c>) hicbir dilde kola girmiyor. Taban dil dosyalariyla ve yenileriyle iki KOL dokumunden sayildi: 3334 - 12 = 3322, en 322, tr 108.</para>
     /// <para>2026-10-14, iz secim paneli (DZA-P5): uc yeni anahtardan (<c>editor.export.audio-track</c>, <c>.none</c>, <c>editor.monitor.audio-track</c>) 6 kol 4 dilde (es: export ve monitor; fr: monitor; lt: none; pt: export ve monitor), KOL dokumunden sayildi, en ve tr girmiyor: taban pimi 3334 + 6 = 3340, en 322, tr 108.</para>
+    /// <para>2026-10-15, acilis iz dili (OYA-P5): iki yeni anahtardan (<c>player.view.audio-language</c>, <c>.subtitle-language</c>) 16 kol 8 dilde (de, en, es, fr, hu, nl, pt, sw; ikisi de), KOL dokumunden sayildi, tr girmiyor: 3411 + 16 = 3427, en 324 + 2 = 326, tr 108.</para>
+    /// <para>2026-10-15, ceviri tamlik isareti (AYR-25): yeni <c>main.language.unreviewed</c> anahtarindan 1 kol 1 dilde (sw), KOL dokumunden sayildi, en ve tr girmiyor; 723bb1b8 agacinda olculen 3411 + 1 = 3412, en 324, tr 108.</para>
+    /// <para>2026-10-15, kodlarken uyumama (SIK-P2): iki yeni <c>settings-tab.prevent-sleep.*</c> anahtarindan 5 kol 5 dilde, hepsi <c>label</c> (en hr hu pt sl), KOL dokumunden sayildi, tr girmiyor: 723bb1b8 agacinda olculen 3411 + 5 = 3416, en 324 + 1 = 325, tr 108.</para>
+    /// <para>2026-10-15, kuyruk saklama (SIK-P9): yeni <c>main.shrink-job.restored</c> anahtarindan 8 kol 8 dilde (cs en hu it ro sk sl tr), KOL dokumunden sayildi: 3416 + 8 = 3424, en 325 + 1 = 326, tr 108 + 1 = 109.</para>
+    /// <para>2026-10-15, tasinabilir kip (AYR-P8): iki yeni anahtardan 8 kol 8 dilde (<c>main.update.download-page</c>: es, fr, pt, ro; <c>settings.update.portable-effect</c>: bn, hi, th, ur), KOL dokumunden sayildi, en ve tr girmiyor: 3411 + 8 = 3419.</para>
     /// <para>2026-10-15, HDR yakalama (EKA-P15): uc yeni anahtardan (<c>recorder.advanced.hdr-to-sdr</c>, <c>.hdr-to-sdr-hint</c>, <c>recorder.capture.hdr-lost</c>) yalniz <c>recorder.advanced.hdr-to-sdr</c> 9 dilde kola giriyor (cs, de, en, es, it, pl, pt, sk, sw), KOL dokumunden sayildi, tr girmiyor: taban pimi 3411 + 9 = 3420, en 324 + 1 = 325, tr 108.</para>
     /// <para>2026-10-15, tus gosterimi suzgeci (EKB-P1): on bir yeni <c>recorder.keys.*</c> anahtarindan 5 satir kola giriyor (hr <c>.place.top</c>; it <c>.place.bottom</c>, <c>.place.top</c>, <c>.title</c>; pt <c>.size</c>), KOL dokumunden sayildi, en ve tr girmiyor: taban pimi 3420 + 5 = 3425, en 325, tr 108.</para>
     /// <para>2026-10-15, kayan sonuc karti (EKB-P14): dort yeni <c>recorder.card.*</c> anahtarindan 14 satir kola giriyor (en <c>.show</c>; es, fr, hu <c>.show</c> ve <c>.never</c>; hr, sl, sr, tr <c>.never</c>; nl, pt, sw <c>.show</c>), KOL dokumunden sayildi: taban pimi 3425 + 14 = 3439, en 325 + 1 = 326, tr 108 + 1 = 109.</para>
+    /// <para>2026-10-15, origin/main birlesmesinden sonra (EKB-P14 dali): main tarafinin pimi 3449 / en 328 / tr 109 ile bu dalin artislari bir arada; testin kendi SAYIM satirindan olculdu: toplam 3477, en 330, tr 110.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1290,9 +1296,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3439, toplam);
-        Assert.Equal(326, dilBasina["en"]);
-        Assert.Equal(109, dilBasina["tr"]);
+        Assert.Equal(3477, toplam);
+        Assert.Equal(330, dilBasina["en"]);
+        Assert.Equal(110, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1532,9 +1538,15 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, medya bilgisi ve denetim raporu (ARC-P2): 56 yeni <c>mediainfo.*</c> anahtari, dusen yok; olculen 65188 + 43 x 56 = 67596. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, kamera bicimi ve konumu (EKB-P5): yedi anahtar dustu (<c>recorder.webcam.size</c>, <c>.width</c>, <c>.corner</c> ve dort kose), bes yeni geldi (<c>recorder.webcam.shape</c>, <c>.shape.rectangle</c>, <c>.shape.rounded</c>, <c>.shape.circle</c>, <c>.mirror</c>); 43 x (5 - 7) = -86, olculen 65188 - 86 = 65102. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, iz secim paneli (DZA-P5): uc yeni anahtar (<c>editor.export.audio-track</c>, <c>.none</c>, <c>editor.monitor.audio-track</c>), dusen yok; taban pimi 65188 + 43 x 3 = 65317. <c>kayip</c> 0.</para>
+    /// <para>2026-10-15, acilis iz dili (OYA-P5): iki yeni anahtar (<c>player.view.audio-language</c>, <c>.subtitle-language</c>), dusen yok; olculen 67897 + 43 x 2 = 67983. <c>kayip</c> 0.</para>
+    /// <para>2026-10-15, ceviri tamlik isareti (AYR-25): bir yeni anahtar (<c>main.language.unreviewed</c>), dusen yok; 723bb1b8 agacinda olculen 67897 + 43 x 1 = 67940. <c>kayip</c> 0.</para>
+    /// <para>2026-10-15, kodlarken uyumama (SIK-P2): iki yeni <c>settings-tab.prevent-sleep.*</c> anahtari (label, hint), dusen yok; 723bb1b8 agacinda olculen 67897 + 43 x 2 = 67983. <c>kayip</c> 0.</para>
+    /// <para>2026-10-15, kuyruk saklama (SIK-P9): bir yeni <c>main.shrink-job.restored</c> anahtari, dusen yok; 67983 + 43 = 68026. <c>kayip</c> 0.</para>
+    /// <para>2026-10-15, tasinabilir kip (AYR-P8): iki yeni anahtar (<c>main.update.download-page</c>, <c>settings.update.portable-effect</c>), dusen yok; olculen 67897 + 43 x 2 = 67983. <c>kayip</c> 0.</para>
     /// <para>2026-10-15, HDR yakalama (EKA-P15): uc yeni anahtar (<c>recorder.advanced.hdr-to-sdr</c>, <c>.hdr-to-sdr-hint</c>, <c>recorder.capture.hdr-lost</c>), dusen yok; taban pimi 67897 + 43 x 3 = 68026. <c>kayip</c> 0.</para>
     /// <para>2026-10-15, tus gosterimi suzgeci (EKB-P1): on bir yeni <c>recorder.keys.*</c> anahtari, dusen yok; taban pimi 68026 + 43 x 11 = 68499.</para>
     /// <para>2026-10-15, kayan sonuc karti (EKB-P14): dort yeni <c>recorder.card.*</c> anahtari, dusen yok; taban pimi 68499 + 43 x 4 = 68671.</para>
+    /// <para>2026-10-15, origin/main birlesmesinden sonra (EKB-P14 dali): main tarafinin pimi 68241 ile bu dalin anahtarlari bir arada, dusen yok; olculen gezilen 69015.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1562,7 +1574,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(68671, gezilen);
+        Assert.Equal(69015, gezilen);
         Assert.Empty(kayip);
     }
 

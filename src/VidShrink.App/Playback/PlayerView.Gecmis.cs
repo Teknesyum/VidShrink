@@ -57,4 +57,22 @@ internal partial class PlayerView
         _trace.Add("resumeonopen -> " + _settings.Resume);
         AdvancedChanged?.Invoke(this, EventArgs.Empty);
     }
+
+    internal void ToggleAudioLanguage()
+    {
+        EnsureSettings();
+        _settings.AudioInInterfaceLanguage = !_settings.AudioInInterfaceLanguage;
+        SaveSettings();
+        _trace.Add("audiolanguage -> " + _settings.AudioInInterfaceLanguage);
+        AdvancedChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    internal void ToggleSubtitleLanguage()
+    {
+        EnsureSettings();
+        _settings.SubtitleInInterfaceLanguage = !_settings.SubtitleInInterfaceLanguage;
+        SaveSettings();
+        _trace.Add("subtitlelanguage -> " + _settings.SubtitleInInterfaceLanguage);
+        AdvancedChanged?.Invoke(this, EventArgs.Empty);
+    }
 }

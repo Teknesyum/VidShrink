@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Spara skärmbilder som JPG",
   "player.view.keep-history": "Spara historik",
   "player.view.resume": "Fortsätt där jag slutade",
+  "player.view.audio-language": "Välj ljud på gränssnittets språk",
+  "player.view.subtitle-language": "Slå på undertexter på gränssnittets språk",
   "player.view.pause-on-minimize": "Pausa vid minimering",
   "player.view.topmost-while-playing": "Håll överst bara under uppspelning",
   "player.view.state-aspect": "förhållande {0}",

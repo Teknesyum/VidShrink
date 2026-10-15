@@ -55,6 +55,7 @@
   "settings.update.auto": "Ažuriraj automatski",
   "settings.update.auto-effect": "Uključeno: nova verzija preuzima se u pozadini i instalira pri zatvaranju VidShrinka. Isključeno: nova verzija najavljuje se na gornjoj traci i instalira gumbom.",
   "settings.update.no-self-effect": "VidShrink se na ovom sustavu ne ažurira sam: samo javlja da postoji nova verzija i prikazuje naredbu koja je instalira.",
+  "settings.update.portable-effect": "Prijenosna kopija: VidShrink se ne ažurira sam. Gumb za ažuriranje otvara stranicu za preuzimanje.",
 
   "settings.default-app.suggestion": "VidShrink nije zadani program za videozapise. Možete ga odabrati na stranici Zadane aplikacije u Windowsima.",
   "settings.default-app.all": "Postavi sve",

@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "স্ক্রিনশট JPG হিসেবে সংরক্ষণ করুন",
   "player.view.keep-history": "ইতিহাস রাখুন",
   "player.view.resume": "যেখানে থেমেছিলাম সেখান থেকে চালান",
+  "player.view.audio-language": "ইন্টারফেসের ভাষায় অডিও বেছে নিন",
+  "player.view.subtitle-language": "ইন্টারফেসের ভাষায় সাবটাইটেল চালু করুন",
   "player.view.pause-on-minimize": "ছোট করলে বিরতি দিন",
   "player.view.topmost-while-playing": "শুধু চালানোর সময় সবার উপরে রাখুন",
   "player.view.state-aspect": "অনুপাত {0}",

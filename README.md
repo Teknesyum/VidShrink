@@ -56,6 +56,13 @@ whichever way it is installed.
 **Uninstall.** `VidShrink-Setup.exe --uninstall` removes the shortcuts, the right-click
 entries, the Open With registration and the install folder.
 
+**Portable.** `VidShrink-Portable-win-x64.zip` (or `-win-arm64`) from the
+[latest release](https://github.com/Teknesyum/VidShrink/releases/latest) runs without
+installing: unzip it anywhere, a USB stick included, and start `VidShrink.App.exe`. The
+`VidShrink.portable` file beside the exe keeps settings and logs in a `data` folder next to
+it. A portable copy does not update itself, adds no shortcuts and writes nothing to the
+registry; when a new version is out, the update button opens the download page.
+
 ### Install On macOS And Linux
 
 ```bash
@@ -393,6 +400,12 @@ Open an issue first, keep a pull request to one concern, run `dotnet test VidShr
 nothing merges red — and sign off each commit under the
 [Developer Certificate of Origin](DCO) with `git commit -s`. Build instructions, the project
 layout and the design rules are in [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+Translations are welcome too. English and Turkish are reviewed; the other 40 languages are
+machine translated and say so in the language picker. Each language is one folder under
+[`src/VidShrink.App/Locales/`](src/VidShrink.App/Locales/) — correct a line there in a pull
+request. A Weblate project for translating in the browser is being prepared
+([`docs/dagitim/weblate.md`](docs/dagitim/weblate.md)).
 
 ## License
 

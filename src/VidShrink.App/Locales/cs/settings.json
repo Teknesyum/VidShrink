@@ -54,6 +54,7 @@
   "settings.update.auto": "Aktualizovat automaticky",
   "settings.update.auto-effect": "Zapnuto: nová verze se stáhne na pozadí a nainstaluje se při zavření VidShrink. Vypnuto: nová verze se ohlásí v horní liště a nainstaluje se tlačítkem.",
   "settings.update.no-self-effect": "VidShrink se na tomto systému sám neaktualizuje: pouze oznámí, že existuje nová verze, a ukáže příkaz, který ji nainstaluje.",
+  "settings.update.portable-effect": "Přenosná kopie: VidShrink se sám neaktualizuje. Tlačítko aktualizace otevře stránku ke stažení.",
   "settings.default-app.suggestion": "VidShrink není výchozí program pro videa. Můžete jej vybrat na stránce Výchozí aplikace ve Windows.",
   "settings.default-app.all": "Nastavit vše",
   "settings.default-app.all-copied": "Příkaz byl zkopírován do schránky. Otevřete okno PowerShellu a vložte ho; VidShrink se stane výchozím programem pro všechny zvukové a video formáty.",

@@ -54,6 +54,7 @@
   "settings.update.auto": "Atjaunināt automātiski",
   "settings.update.auto-effect": "Ieslēgts: jaunā versija tiek lejupielādēta fonā un instalēta, aizverot VidShrink. Izslēgts: par jauno versiju paziņo augšējā joslā, un to instalē ar pogu.",
   "settings.update.no-self-effect": "VidShrink šajā sistēmā pats neatjauninās: tas tikai paziņo, ka ir jauna versija, un parāda komandu, kas to instalē.",
+  "settings.update.portable-effect": "Pārnēsājama kopija: VidShrink pats sevi neatjaunina. Atjaunināšanas poga atver lejupielādes lapu.",
   "settings.default-app.suggestion": "VidShrink nav noklusējuma programma video failiem. To var izvēlēties Windows lapā Noklusējuma lietotnes.",
   "settings.default-app.all": "Iestatīt visu",
   "settings.default-app.all-copied": "Komanda nokopēta starpliktuvē. Atveriet PowerShell logu un ielīmējiet to; VidShrink kļūs par noklusējumu visiem audio un video formātiem.",

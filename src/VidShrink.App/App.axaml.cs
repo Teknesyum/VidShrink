@@ -105,6 +105,8 @@ public partial class App : Application
 
             if (window is MainWindow main)
             {
+                try { main.PencereKonumunuGeriYukle(); }
+                catch (Exception) { }
                 desktop.Exit += (_, _) =>
                 {
                     try { main.KapanistaGuncelle(); }
@@ -112,6 +114,7 @@ public partial class App : Application
                 };
                 var files = _files ?? new Integration.ForwardedFiles();
                 main.AcceptForwardedFiles(files);
+                main.Opened += (_, _) => RestoreQueue();
                 if (this.TryGetFeature<IActivatableLifetime>() is { } activatable)
                     activatable.Activated += (_, activation) => OpenActivatedFiles(files, activation);
             }
@@ -140,7 +143,7 @@ public partial class App : Application
     /// </summary>
     private static void RegisterFileTypes()
     {
-        if (!OperatingSystem.IsWindows()) return;
+        if (!OperatingSystem.IsWindows() || PortableMode.Active) return;
 
         try
         {
@@ -168,6 +171,18 @@ public partial class App : Application
 
         return paths.Count > 0 && files.Receive(paths);
     }
+
+    /// <summary>SIK-P9: ölmüş süreçten kalan kuyruk açılışta bir kez, sorusuz ve duraklatılmış açılır.</summary>
+    private void RestoreQueue()
+    {
+        if (_kuyrukGeriGeldi || VidShrink.Core.QueueJournal.Shared is not { } journal) return;
+        _kuyrukGeriGeldi = true;
+        if (ShrinkJobWindow.Restore(journal, VidShrink.Core.QueueJournal.IsAlive) is not { } restored) return;
+        restored.Icon = LoadAppIcon();
+        restored.Show();
+    }
+
+    private bool _kuyrukGeriGeldi;
 
     private static WindowIcon? LoadAppIcon()
     {

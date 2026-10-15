@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Ekran Görüntüsünü JPG Kaydet",
   "player.view.keep-history": "Geçmişi Tut",
   "player.view.resume": "Kaldığı Yerden Devam Et",
+  "player.view.audio-language": "Arayüz Dilindeki Sesi Seç",
+  "player.view.subtitle-language": "Arayüz Dilindeki Altyazıyı Aç",
   "player.view.pause-on-minimize": "Küçültünce Duraklat",
   "player.view.topmost-while-playing": "Yalnız Oynatırken Üstte Tut",
   "player.view.state-aspect": "oran {0}",

@@ -43,7 +43,28 @@ internal partial class PlayerView
         _trackNoticeArgs = Array.Empty<object?>();
         _subtitles.ApplyTo(engine);
         engine.SetSecondarySubtitleTrack(0);
+        ApplyTrackLanguage(engine);
         LoadSidecarSubtitles(engine);
+    }
+
+    private void ApplyTrackLanguage(IPlaybackEngine engine)
+    {
+        var language = Strings.Culture.Name;
+        var choice = TrackLanguage.Pick(
+            engine.Tracks,
+            Settings.AudioInInterfaceLanguage ? language : null,
+            Settings.SubtitleInInterfaceLanguage ? language : null);
+        if (choice.Audio > 0)
+        {
+            engine.SetAudioTrack(choice.Audio);
+            _trace.Add("audiolang -> " + choice.Audio.ToString(CultureInfo.InvariantCulture));
+        }
+
+        if (choice.Subtitle > 0)
+        {
+            SetPrimarySubtitle(engine, choice.Subtitle);
+            _trace.Add("sublang -> " + choice.Subtitle.ToString(CultureInfo.InvariantCulture));
+        }
     }
 
     /// <summary>

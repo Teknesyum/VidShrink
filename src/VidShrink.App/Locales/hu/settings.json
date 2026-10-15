@@ -55,6 +55,7 @@
   "settings.update.auto": "Automatikus frissítés",
   "settings.update.auto-effect": "Bekapcsolva: az új verzió a háttérben töltődik le, és a VidShrink bezárásakor települ. Kikapcsolva: az új verziót a felső sáv jelzi, telepítése gombbal történik.",
   "settings.update.no-self-effect": "A VidShrink ezen a rendszeren nem frissíti magát: csak jelzi, hogy új verzió létezik, és megmutatja a telepítő parancsot.",
+  "settings.update.portable-effect": "Hordozható példány: a VidShrink nem frissíti magát. A frissítés gomb a letöltési oldalt nyitja meg.",
 
   "settings.default-app.suggestion": "A VidShrink nem az alapértelmezett videóprogram. A Windows Alapértelmezett alkalmazások oldalán kiválaszthatja.",
   "settings.default-app.all": "Összes beállítása",

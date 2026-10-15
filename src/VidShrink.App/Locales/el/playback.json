@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Αποθήκευση στιγμιότυπων ως JPG",
   "player.view.keep-history": "Διατήρηση ιστορικού",
   "player.view.resume": "Συνέχεια από εκεί που σταμάτησα",
+  "player.view.audio-language": "Επιλογή ήχου στη γλώσσα της διεπαφής",
+  "player.view.subtitle-language": "Ενεργοποίηση υποτίτλων στη γλώσσα της διεπαφής",
   "player.view.pause-on-minimize": "Παύση κατά την ελαχιστοποίηση",
   "player.view.topmost-while-playing": "Πάντα μπροστά μόνο κατά την αναπαραγωγή",
   "player.view.state-aspect": "αναλογία {0}",

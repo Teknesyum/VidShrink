@@ -722,6 +722,8 @@ public sealed class OluUyeTests
     /// dort satir ekledi (206 -> 210, 1677 -> 1681). Deger degismedi, yeri degisti.</para>
     /// <para><b>14 Ekim 2026:</b> donanim kodlayicilari (DON-P1) <c>UpdateCheck.cs</c>ye
     /// sekiz satir ekledi (1681 -> 1689). Deger degismedi, yeri degisti.</para>
+    /// <para><b>15 Ekim 2026:</b> tasinabilir kip (AYR-P8) <c>CanSelfUpdateAt</c> ile dort satir ekledi, ayar
+    /// yolunu <c>PortableMode</c>a tasiyip uc satir sildi (210 -> 214, 1689 -> 1690). Deger degismedi, yeri degisti.</para>
     /// </summary>
     [Fact]
     public void NitelenmemisOkumaGoruluyor()
@@ -730,8 +732,8 @@ public sealed class OluUyeTests
 
         foreach (var (ad, dosya, satir) in new[]
                  {
-                     ("UpdateCheck.ManifestTimeout", "src/VidShrink.Core/UpdateCheck.cs", 210),
-                     ("MacUpdate.DownloadTimeout", "src/VidShrink.Core/UpdateCheck.cs", 1689),
+                     ("UpdateCheck.ManifestTimeout", "src/VidShrink.Core/UpdateCheck.cs", 214),
+                     ("MacUpdate.DownloadTimeout", "src/VidShrink.Core/UpdateCheck.cs", 1690),
                      ("DeveloperUnlock.Window", "src/VidShrink.Core/DeveloperUnlock.cs", 22)
                  })
         {

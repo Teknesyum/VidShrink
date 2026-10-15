@@ -3,26 +3,30 @@
 `VidShrink-Setup.exe` and the app are unsigned. A new unsigned executable that downloads
 and extracts other executables is exactly what heuristic scanners flag, so SmartScreen
 warnings and Avast/AVG detections are expected until the binaries are signed and have
-built reputation. Nothing below has been submitted; each step needs the maintainer.
+built reputation. Nothing below has been submitted or bought; each step needs the maintainer.
 
-## SignPath Foundation (free signing for open source)
+## SignPath Foundation
 
-1. Check the criteria at https://signpath.org/terms: an OSI license, public source,
-   no malware or PUA behavior, an active project, and release builds made by CI from the
-   public repository (GitHub Actions qualifies).
-2. Apply through the form linked from https://signpath.org/ ("Apply"). Give the repository
-   URL, the license, the maintainers, and the artifacts to sign: `VidShrink-Setup.exe`,
-   `VidShrink.exe` and `VidShrink.App.exe` from the `win-x64` release job.
-3. After approval SignPath creates an organization and project. Install the SignPath
-   GitHub App on the repository and add the `SIGNPATH_API_TOKEN` secret.
-4. Add an artifact configuration in SignPath describing the zip/exe layout, and a signing
-   policy (release-signing, tags only).
-5. In `release.yml`, upload the unsigned files as a workflow artifact, call
-   `signpath/github-action-submit-signing-request` with the organization, project, policy
-   and artifact configuration slugs, wait for completion, and publish the signed output
-   instead. Checksums must be computed after signing.
-6. The certificate is issued to "SignPath Foundation"; the README should say so, as
-   SignPath requires a code signing policy page.
+The SignPath Foundation application was rejected in 2026-10. The release workflow has no
+SignPath step, and the README makes no signing claim.
+
+## Other Low-Cost Signing Routes (Checked 2026-10-15, None Applied)
+
+| Route | Cost | Fits a maintainer in Türkiye? | SmartScreen |
+|-------|------|-------------------------------|-------------|
+| Azure Artifact Signing (formerly Trusted Signing), Basic | 9.99 USD a month, paid Azure subscription required; free, trial and sponsored subscriptions are not accepted | No: public-trust identity validation for individuals is open only in the USA and Canada; organisations need a verifiable legal entity in the supported countries | Not an EV certificate; reputation still builds with downloads |
+| Certum Open Source Code Signing | 69 EUR for the first year with a cryptoCertum card and reader; renewal about 25 EUR (second-hand source) | Yes: issued to a natural person running an open-source project | Standard certificate; reputation builds with downloads |
+| Unsigned (today) | 0 | — | Warnings until reputation builds; false positives are reported by hand (below) |
+
+Sources: https://learn.microsoft.com/azure/artifact-signing/faq,
+https://azure.microsoft.com/products/artifact-signing (pricing),
+https://shop.certum.eu/open-source-code-signing.html,
+https://github.com/daisy/ace-gui/issues/15 (Certum renewal price, not from Certum).
+MSYS2 reports paying about 8.60 EUR a month for Artifact Signing
+(https://www.msys2.org/dev/code-signing/).
+
+The Certum key lives on a physical card, so signing in GitHub Actions would need the card
+on a self-hosted runner or a manual signing step after the build; that was not measured.
 
 ## Reporting A False Positive To Avast (And AVG)
 
@@ -47,6 +51,7 @@ built reputation. Nothing below has been submitted; each step needs the maintain
 
 ## What Would Still Help
 
-- Signing (above) is the only step that removes SmartScreen warnings for good.
+- A code signing certificate (one of the routes above) is the precondition for SmartScreen
+  reputation that survives new releases; without it every release starts from zero.
 - Keep the file name and publisher stable across releases so reputation accumulates.
 - Avoid shipping a second, differently built installer next to the signed one.

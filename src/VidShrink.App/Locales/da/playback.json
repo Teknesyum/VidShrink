@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Gem skærmbilleder som JPG",
   "player.view.keep-history": "Gem historik",
   "player.view.resume": "Fortsæt hvor jeg slap",
+  "player.view.audio-language": "Vælg lyd på brugerfladens sprog",
+  "player.view.subtitle-language": "Slå undertekster til på brugerfladens sprog",
   "player.view.pause-on-minimize": "Sæt på pause ved minimering",
   "player.view.topmost-while-playing": "Hold øverst kun under afspilning",
   "player.view.state-aspect": "format {0}",

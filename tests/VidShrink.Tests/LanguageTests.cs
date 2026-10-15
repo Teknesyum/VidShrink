@@ -717,14 +717,15 @@ public sealed class LanguageTests : IDisposable
                     .Select(item => item?.ToString() ?? string.Empty)
                     .ToList();
 
-                picker.SelectedIndex = offered.IndexOf("Zzyzx");
+                picker.SelectedIndex = offered.IndexOf(Strings.LanguageLabel("zz"));
 
                 return new Reading(offered, window.TxtDropTitle.Text ?? string.Empty);
             });
 
             var (offered, chosen) = (read.Offered, read.Chosen);
 
-            Assert.Contains("Zzyzx", offered);
+            Assert.Contains(Strings.LanguageLabel("zz"), offered);
+            Assert.Contains("Zzyzx", Strings.LanguageLabel("zz"), StringComparison.Ordinal);
             Assert.Equal("zz", Strings.Language);
             Assert.StartsWith("Zz ", chosen, StringComparison.Ordinal);
         }

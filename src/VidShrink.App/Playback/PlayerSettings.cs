@@ -68,6 +68,10 @@ internal sealed class PlayerSettings
 
     internal bool Resume { get; set; } = true;
 
+    internal bool AudioInInterfaceLanguage { get; set; } = true;
+
+    internal bool SubtitleInInterfaceLanguage { get; set; } = true;
+
     internal bool PauseOnMinimize { get; set; }
 
     internal bool TopmostWhilePlaying { get; set; }
@@ -100,6 +104,8 @@ internal sealed class PlayerSettings
             settings.Muted = (bool?)root["muted"] ?? false;
             settings.KeepHistory = (bool?)root["keepHistory"] ?? true;
             settings.Resume = (bool?)root["resume"] ?? true;
+            settings.AudioInInterfaceLanguage = (bool?)root["audioInInterfaceLanguage"] ?? true;
+            settings.SubtitleInInterfaceLanguage = (bool?)root["subtitleInInterfaceLanguage"] ?? true;
             settings.PauseOnMinimize = (bool?)root["pauseOnMinimize"] ?? false;
             settings.TopmostWhilePlaying = (bool?)root["topmostWhilePlaying"] ?? false;
         }
@@ -143,6 +149,8 @@ internal sealed class PlayerSettings
                 writer.WriteBoolean("muted", Muted);
                 writer.WriteBoolean("keepHistory", KeepHistory);
                 writer.WriteBoolean("resume", Resume);
+                writer.WriteBoolean("audioInInterfaceLanguage", AudioInInterfaceLanguage);
+                writer.WriteBoolean("subtitleInInterfaceLanguage", SubtitleInInterfaceLanguage);
                 writer.WriteBoolean("pauseOnMinimize", PauseOnMinimize);
                 writer.WriteBoolean("topmostWhilePlaying", TopmostWhilePlaying);
                 writer.WriteEndObject();

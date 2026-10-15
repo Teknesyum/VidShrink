@@ -58,6 +58,9 @@ public sealed class AppSettings
     /// <summary>İş bitince, pencere önde değilse haber ver. Alanı olmayan eski dosya açık okunur.</summary>
     public bool NotifyWhenDone { get; set; } = true;
 
+    /// <summary>SIK-P2: kodlama sürerken sistem uyumaz, ekran kapanabilir. Alanı olmayan eski dosya açık okunur.</summary>
+    public bool PreventSleepWhileEncoding { get; set; } = true;
+
     /// <summary>
     /// K6: kuyrukta aynı anda kodlanan iş sayısı. Alanı olmayan eski dosya 1 okunur; makinenin
     /// üst sınırına <see cref="VidShrink.Core.ParallelJobs.Clamp"/> kullanılırken çekilir.
@@ -156,6 +159,7 @@ public sealed class AppSettings
             ReadBool(root, "advancedDefaultOpen", value => settings.AdvancedDefaultOpen = value);
             ReadBool(root, "followRecording", value => settings.FollowRecording = value);
             ReadBool(root, "notifyWhenDone", value => settings.NotifyWhenDone = value);
+            ReadBool(root, "preventSleepWhileEncoding", value => settings.PreventSleepWhileEncoding = value);
             ReadInt(root, "parallelJobs", value => settings.ParallelJobs = Math.Max(VidShrink.Core.ParallelJobs.Default, value));
             ReadInt(root, "encodePriority", value => settings.EncodePriority = Enum.IsDefined(typeof(EncodePriority), value) ? (EncodePriority)value : EncodePriority.Normal);
             ReadInt(root, "encoderThreads", value => settings.EncoderThreads = Math.Max(0, value));
@@ -246,6 +250,7 @@ public sealed class AppSettings
         root["advancedDefaultOpen"] = AdvancedDefaultOpen;
         root["followRecording"] = FollowRecording;
         root["notifyWhenDone"] = NotifyWhenDone;
+        root["preventSleepWhileEncoding"] = PreventSleepWhileEncoding;
         root["parallelJobs"] = ParallelJobs;
         root["encodePriority"] = (int)EncodePriority;
         root["encoderThreads"] = EncoderThreads;

@@ -55,6 +55,7 @@
   "settings.update.auto": "Mettre à jour automatiquement",
   "settings.update.auto-effect": "Activé : la nouvelle version se télécharge en arrière-plan et s'installe à la fermeture de VidShrink. Désactivé : la nouvelle version est signalée dans la barre supérieure et s'installe avec un bouton.",
   "settings.update.no-self-effect": "VidShrink ne se met pas à jour sur ce système : il signale seulement qu'une nouvelle version existe et affiche la commande qui l'installe.",
+  "settings.update.portable-effect": "Copie portable : VidShrink ne se met pas à jour lui-même. Le bouton de mise à jour ouvre la page de téléchargement.",
 
   "settings.default-app.suggestion": "VidShrink n'est pas le programme par défaut pour les vidéos. Vous pouvez le choisir dans la page Applications par défaut de Windows.",
   "settings.default-app.all": "Tout attribuer",

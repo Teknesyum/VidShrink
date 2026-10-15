@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Enregistrer les captures d'écran en JPG",
   "player.view.keep-history": "Conserver l'historique",
   "player.view.resume": "Reprendre là où je me suis arrêté",
+  "player.view.audio-language": "Choisir l'audio dans la langue de l'interface",
+  "player.view.subtitle-language": "Activer les sous-titres dans la langue de l'interface",
   "player.view.pause-on-minimize": "Mettre en pause à la réduction",
   "player.view.topmost-while-playing": "Garder au premier plan pendant la lecture uniquement",
   "player.view.state-aspect": "format {0}",

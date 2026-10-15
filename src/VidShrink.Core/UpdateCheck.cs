@@ -143,8 +143,12 @@ public static class UpdateCheck
     /// ikili bir <c>.app</c> paketinin içindeyken (<see cref="MacUpdate.CanSwap"/>) — düz
     /// kurulumda kapalı kalır ve kullanıcı yeni sürümü yine haber olarak görür. Linux'ta kapalı.
     /// </summary>
-    public static bool CanSelfUpdate =>
-        OperatingSystem.IsWindows() || MacUpdate.CanSwap(Environment.ProcessPath);
+    public static bool CanSelfUpdate => CanSelfUpdateAt(AppContext.BaseDirectory);
+
+    /// <summary>Taşınabilir kopya (<see cref="PortableMode"/>) kendini hiçbir platformda güncellemez.</summary>
+    internal static bool CanSelfUpdateAt(string? appDirectory) =>
+        !PortableMode.IsActive(appDirectory)
+        && (OperatingSystem.IsWindows() || MacUpdate.CanSwap(Environment.ProcessPath));
 
     /// <summary>
     /// Sessiz güncelleme yürürlükte mi. Kapalıysa ve kendini güncelleyemeyen bir kurulumda,
@@ -479,17 +483,14 @@ public sealed class UpdateSettings
     public int ShareTarget { get; set; }
     public int ShareRetention { get; set; }
 
-    /// <summary>VIDSHRINK_SETTINGS_PATH yalnız ölçüm ve deneme için ayarı başka yere alır.</summary>
+    /// <summary>VIDSHRINK_SETTINGS_PATH yalnız ölçüm ve deneme için ayarı başka yere alır; taşınabilir kopyada ayar uygulama klasöründedir.</summary>
     public static string DefaultPath
     {
         get
         {
-            var overridden = Environment.GetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH");
-            if (!string.IsNullOrWhiteSpace(overridden)) return overridden!;
-            return Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                FolderName,
-                FileName);
+            return PortableMode.SettingsPath(
+                Environment.GetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH"),
+                AppContext.BaseDirectory);
         }
     }
 

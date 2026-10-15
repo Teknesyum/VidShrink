@@ -57,6 +57,13 @@ VidShrink'i hangi yolla kurulursa kurulsun engeller.
 **Kaldırma.** `VidShrink-Setup.exe --uninstall` kısayolları, sağ tık girdilerini, Birlikte aç
 kaydını ve kurulum klasörünü siliyor.
 
+**Taşınabilir.** [Son sürümdeki](https://github.com/Teknesyum/VidShrink/releases/latest)
+`VidShrink-Portable-win-x64.zip` (ya da `-win-arm64`) kurulmadan çalışır: herhangi bir yere,
+USB belleğe de açın ve `VidShrink.App.exe`'yi başlatın. Exe'nin yanındaki `VidShrink.portable`
+dosyası ayarları ve günlüğü yanındaki `data` klasöründe tutar. Taşınabilir kopya kendini
+güncellemez, kısayol eklemez, kayıt defterine yazmaz; yeni sürüm çıkınca güncelleme düğmesi
+indirme sayfasını açar.
+
 ### macOS Ve Linux'a Kurulum
 
 ```bash
@@ -396,6 +403,11 @@ Proje yerleşimi ve tasarım kuralları [`CONTRIBUTING.md`](CONTRIBUTING.md) iç
 kırmızı hiçbir şey birleşmez — ve her commit'i [Developer Certificate of Origin](DCO)
 uyarınca `git commit -s` ile imzalayın. Derleme talimatı, proje yerleşimi ve tasarım
 kuralları: [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+Çeviri katkısı da açık. İngilizce ve Türkçe gözden geçti; öteki 40 dil makine çevirisi ve
+dil seçicide bunu söylüyor. Her dil [`src/VidShrink.App/Locales/`](src/VidShrink.App/Locales/)
+altında bir klasör — yanlış satırı orada bir çekme isteğiyle düzeltin. Tarayıcıdan çeviri
+için bir Weblate projesi hazırlanıyor ([`docs/dagitim/weblate.md`](docs/dagitim/weblate.md)).
 
 ## Lisans
 

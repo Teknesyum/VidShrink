@@ -58,7 +58,7 @@ Danışma da bir iddiadır. Cevabında satır numarasıyla gösterdiği dört ye
 1. Varsayılanlar önerildiği gibi; tek ayrım EKA-P15: HDR ekranda kayıt HDR kalır, kayıp olmasın. SDR'ye çevirme seçenek olur.
 2. Linux ölçümü Claude bulut oturumunda (bütçe 125 dolar); Mac işleri Serkan'a verilir.
 3. Hayır: model ya da hazır içerik paketi indiren özellik yok.
-4. Ücretsizlerin hepsi evet (SignPath, winget, Scoop, Weblate); hesap ve onay adımlarını sahip yapar. Ücretliler şimdi değil.
+4. Ücretsizlerin hepsi evet (winget, Scoop, Weblate); hesap ve onay adımlarını sahip yapar. Ücretliler şimdi değil. SignPath Foundation başvuruyu reddetti (2026-10-15); imza yolu açık.
 5. Evet, kademeli: önce geçiş ve müzik izi, sonra ikinci video izi.
 6. Evet, ama öteki işler bittikten sonra.
 7. Hayır.

@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "スクリーンショットを JPG で保存",
   "player.view.keep-history": "履歴を保存",
   "player.view.resume": "前回の位置から再開",
+  "player.view.audio-language": "インターフェースの言語の音声を選択",
+  "player.view.subtitle-language": "インターフェースの言語の字幕をオン",
   "player.view.pause-on-minimize": "最小化したら一時停止",
   "player.view.topmost-while-playing": "再生中のみ最前面に表示",
   "player.view.state-aspect": "縦横比 {0}",

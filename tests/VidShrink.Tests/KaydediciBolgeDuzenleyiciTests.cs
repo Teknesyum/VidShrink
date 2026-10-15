@@ -626,6 +626,8 @@ public sealed class KaydediciBolgeDuzenleyiciTests
 
                 sahte.Durdur();
                 Bekle(() => !view.HasSession, 30000);
+                view.ResultCard?.Close();
+                Bekle(() => view.ResultCardRun.IsCompleted, 15000);
                 var durdu = (view.HasSession, view.FrameHiddenByUser, sahte.Evre, sonuc: view.ResultPathText, view.ErrorText);
 
                 return (bostaKare, basladi, duraklatildi, surdu, gizlendi, tepsi, kisayol, durdu,

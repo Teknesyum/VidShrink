@@ -57,10 +57,28 @@ internal partial class RecorderView
         ChkShowKeys.IsVisible = HooksAvailable;
         ChkMagnifier.IsVisible = HooksAvailable;
         RefreshPointerChoices();
+        if (!_pointerGateWired)
+        {
+            _pointerGateWired = true;
+            foreach (var check in new[] { ChkCursorHighlight, ChkSpotlight, ChkShowClicks })
+                check.IsCheckedChanged += (_, _) => GatePointerBoxes();
+        }
+
+        GatePointerBoxes();
         RefreshMini();
     }
 
-    private bool WantsPointer => _settings.CursorHighlight || _settings.Spotlight;
+    private bool _pointerGateWired;
+
+    /// <summary>İmleç vurgusu ve spot ışığı da kancayla çiziliyor; kancasız platformda iki kutu ve boyut/renk seçimleri gizli.</summary>
+    private void GatePointerBoxes()
+    {
+        ChkCursorHighlight.IsVisible = HooksAvailable;
+        ChkSpotlight.IsVisible = HooksAvailable;
+        if (!HooksAvailable) PointerChoices.IsVisible = false;
+    }
+
+    private bool WantsPointer => HooksAvailable && (_settings.CursorHighlight || _settings.Spotlight);
 
     private PointerStyle CurrentPointerStyle => new(_settings.CursorHighlight, _settings.Spotlight, _settings.PointerSize, _settings.HighlightColor, _settings.LeftClickColor, _settings.RightClickColor);
 

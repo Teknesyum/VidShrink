@@ -8,8 +8,10 @@ using Xunit;
 namespace VidShrink.Tests;
 
 /// <summary>
-/// Kaldığı yerden devam yalnız son beş videodan biri ve dosya birebir aynıyken olur: bayt boyu,
-/// son yazma zamanı ve süre tutmalı. Aynı ad tek başına yetmez; izi olmayan eski kayıt baştan açılır.
+/// Kaldığı yerden devam dosya birebir aynıyken olur: bayt boyu, son yazma zamanı ve süre tutmalı.
+/// Aynı ad tek başına yetmez; izi olmayan eski kayıt baştan açılır. Sayı sınırı yok (OYB-P5): kaç video
+/// izlenirse izlensin kayıt döner, eski kayıt yaşla budanır (<see cref="PlaybackHistory.MaxAgeDays"/>
+/// günden eski ve yer imi taşımayan kayıt kaydedilirken düşer).
 /// </summary>
 public sealed class OynaticiDevamKosulTests : IDisposable
 {
@@ -76,9 +78,10 @@ public sealed class OynaticiDevamKosulTests : IDisposable
     }
 
     [Theory]
-    [InlineData(4, 42)]
-    [InlineData(5, 0)]
-    public void YalnizSonBesVideoDevamEder(int sonrakiler, double beklenen)
+    [InlineData(4)]
+    [InlineData(5)]
+    [InlineData(30)]
+    public void SonrakiVideoSayisiDevamiKesmez(int sonrakiler)
     {
         var video = Dosya("a.mp4");
         var dosyalar = new JsonObject();
@@ -91,7 +94,54 @@ public sealed class OynaticiDevamKosulTests : IDisposable
 
         var yol = Path.Combine(_klasor, "gecmis.json");
         File.WriteAllText(yol, new JsonObject { ["files"] = dosyalar }.ToJsonString());
-        Assert.Equal(beklenen, PlaybackHistory.Load(yol).ResumeFor(video, 120), 3);
+        Assert.Equal(42, PlaybackHistory.Load(yol).ResumeFor(video, 120), 3);
+    }
+
+    [Fact]
+    public void YasSiniriniAsanKayitKaydederkenBudanir()
+    {
+        const long gun = 24L * 60 * 60 * 1000;
+        var simdi = 400L * 365 * gun;
+        var eski = Dosya("eski.mp4");
+        var sinirda = Dosya("sinirda.mp4");
+        var imli = Dosya("imli.mp4");
+        var yeni = Dosya("yeni.mp4");
+        var gecmis = new PlaybackHistory();
+        gecmis.Now = () => simdi - (PlaybackHistory.MaxAgeDays + 1) * gun;
+        gecmis.Remember(eski, 42, false, 120);
+        gecmis.Remember(imli, 42, false, 120);
+        gecmis.AddBookmark(imli, 30);
+        gecmis.Now = () => simdi - (PlaybackHistory.MaxAgeDays - 1) * gun;
+        gecmis.Remember(sinirda, 42, false, 120);
+        gecmis.Now = () => simdi;
+        gecmis.Remember(yeni, 42, false, 120);
+
+        var geri = Dongu(gecmis);
+        Assert.Equal(3, geri.Count);
+        Assert.Equal(0, geri.ResumeFor(eski, 120));
+        Assert.Equal(42, geri.ResumeFor(sinirda, 120), 3);
+        Assert.Equal(42, geri.ResumeFor(yeni, 120), 3);
+        Assert.Equal(new[] { 30d }, geri.Bookmarks(imli));
+    }
+
+    [Fact]
+    public void IkiYuzdenFazlaKayitBudanmaz()
+    {
+        var gecmis = new PlaybackHistory();
+        var simdi = 1_000_000_000_000L;
+        var ilk = Dosya("ilk.mp4");
+        gecmis.Now = () => simdi;
+        gecmis.Remember(ilk, 42, false, 120);
+        for (var i = 0; i < 250; i++)
+        {
+            var an = simdi + i + 1;
+            gecmis.Now = () => an;
+            gecmis.Remember(Path.Combine(_klasor, $"yok{i}.mp4"), 10, false, 120);
+        }
+
+        var geri = Dongu(gecmis);
+        Assert.Equal(251, geri.Count);
+        Assert.Equal(42, geri.ResumeFor(ilk, 120), 3);
     }
 
     [Fact]

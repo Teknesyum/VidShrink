@@ -212,10 +212,7 @@ public sealed record ShareTargetTable
 
     private static IEnumerable<string> Candidates()
     {
-        yield return Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "VidShrink",
-            FileName);
+        yield return Path.Combine(PortableMode.RoamingFolder, FileName);
 
         var baseDir = AppContext.BaseDirectory;
         yield return Path.Combine(baseDir, FileName);

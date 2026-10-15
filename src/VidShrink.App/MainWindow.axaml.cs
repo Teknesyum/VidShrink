@@ -211,6 +211,7 @@ public partial class MainWindow : Window
         _motionReduced = !AnimationsAllowed();
         if (_motionReduced) Classes.Add("reduced-motion");
         ApplyStartupSize();
+        PencereKonumunuIzle();
         PreparePanelEntrance();
 
         DragDrop.SetAllowDrop(this, true);
@@ -308,6 +309,7 @@ public partial class MainWindow : Window
         Watch(ChkAdvancedDefaultOpen, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkFollowRecording, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkNotifyWhenDone, ToggleButton.IsCheckedProperty, SaveAppSettings);
+        Watch(ChkPreventSleep, ToggleButton.IsCheckedProperty, SaveAppSettings);
         CmbParallelJobs.ItemsSource = ParallelJobChoices(Environment.ProcessorCount);
         CmbParallelJobs.SelectedIndex = 0;
         Watch(CmbParallelJobs, SelectingItemsControl.SelectedIndexProperty, SaveAppSettings);
@@ -368,7 +370,7 @@ public partial class MainWindow : Window
     /// </summary>
     private void ShowDefaultAppSuggestion()
     {
-        if (!OperatingSystem.IsWindows()) return;
+        if (!OperatingSystem.IsWindows() || Tasinabilir) return;
 
         var executable = Environment.ProcessPath;
         if (string.IsNullOrEmpty(executable)) return;
@@ -709,6 +711,7 @@ public partial class MainWindow : Window
             if (WindowState == WindowState.FullScreen) WindowDecorationsTheme = SessizPencereBasligi.Tema;
             else ClearValue(WindowDecorationsThemeProperty);
         }
+        if (change.Property == ClientSizeProperty) NormalKonumuAl();
         if (!_controlsReady) return;
         if (change.Property == WindowStateProperty)
         {
@@ -726,12 +729,14 @@ public partial class MainWindow : Window
         _cts?.Cancel();
         // Kaynak burada kapanır: pencere kapanırken öksüz ffmpeg kalmaz.
         _preview?.Dispose();
+        PencereKonumunuKaydet();
         base.OnClosing(e);
     }
 
     protected override void OnClosed(EventArgs e)
     {
         _kapandi = true;
+        HoldSleep(false);
         base.OnClosed(e);
     }
 
@@ -1091,7 +1096,7 @@ public partial class MainWindow : Window
         {
             _languageOrder = Strings.Languages;
             CmbLanguage.ItemsSource = _languageOrder
-                .Select(language => Strings.PeekIn(language, "main.language.name"))
+                .Select(Strings.LanguageLabel)
                 .ToArray();
         }
         finally
@@ -1635,6 +1640,7 @@ public partial class MainWindow : Window
             AdvancedDefaultOpen = ChkAdvancedDefaultOpen.IsChecked == true,
             FollowRecording = ChkFollowRecording.IsChecked == true,
             NotifyWhenDone = ChkNotifyWhenDone.IsChecked == true,
+            PreventSleepWhileEncoding = ChkPreventSleep.IsChecked == true,
             ParallelJobs = Math.Max(0, CmbParallelJobs.SelectedIndex) + 1,
             EncodePriority = SelectedEncodePriority,
             EncoderThreads = SelectedEncoderThreads,
@@ -1692,6 +1698,7 @@ public partial class MainWindow : Window
             if (settings.AdvancedDefaultOpen) ExpandAdvanced();
             ChkFollowRecording.IsChecked = settings.FollowRecording;
             ChkNotifyWhenDone.IsChecked = settings.NotifyWhenDone;
+            ChkPreventSleep.IsChecked = settings.PreventSleepWhileEncoding;
             CmbParallelJobs.SelectedIndex = ParallelJobs.Clamp(settings.ParallelJobs, Environment.ProcessorCount) - 1;
             RestoreEncodeLoad(settings);
 
@@ -1901,7 +1908,7 @@ public partial class MainWindow : Window
 
     private void InitializeUpdateUi(UpdateSettings? settings = null)
     {
-        AutoUpdateRow.IsVisible = UpdateCheck.CanSelfUpdate;
+        AutoUpdateRow.IsVisible = UpdateCheck.CanSelfUpdate && !Tasinabilir;
 
         _updateUiSyncing = true;
         try { ChkAutoUpdate.IsChecked = (settings ?? UpdateSettings.Load(SettingsPathOverride)).AutoUpdate; }
@@ -2035,7 +2042,8 @@ public partial class MainWindow : Window
 
     private void RefreshUpdateTexts()
     {
-        TxtAutoUpdateEffect.Text = Say(UpdateCheck.CanSelfUpdate ? "settings.update.auto-effect" : "settings.update.no-self-effect");
+        TxtAutoUpdateEffect.Text = Say(Tasinabilir ? "settings.update.portable-effect"
+            : UpdateCheck.CanSelfUpdate ? "settings.update.auto-effect" : "settings.update.no-self-effect");
         RefreshUpdateNoticeButton();
     }
 
@@ -3146,16 +3154,8 @@ public partial class MainWindow : Window
     {
         if (_settingsSyncing || _syncing) return;
         if (PlanPanelRow.Height.GridUnitType != GridUnitType.Pixel) return;
-        try
-        {
-            var json = $"{{\"planPanelHeight\":{PlanPanelRow.Height.Value.ToString(CultureInfo.InvariantCulture)}}}";
-            Directory.CreateDirectory(Path.GetDirectoryName(SplitterSettingsPath)!);
-            File.WriteAllText(SplitterSettingsPath, json);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            TxtSystemStatus.Text = $"{Say("settings.error.save")}: {ex.Message}";
-        }
+        var height = PlanPanelRow.Height.Value;
+        LayoutYaz(kok => kok["planPanelHeight"] = height);
     }
 
     private void RestoreSplitterSettings()
@@ -5035,6 +5035,23 @@ public partial class MainWindow : Window
 
     internal void EndEncodeForTest() => SetRunning(false);
 
+    /// <summary>SIK-P2: kodlama boyunca tutulan uyku isteği; testler sahte katmanlı nöbet verir.</summary>
+    internal SleepGuard Uyku { get; set; } = SleepGuard.Shared;
+
+    private IDisposable? _uykuIstegi;
+
+    private void HoldSleep(bool running)
+    {
+        if (running && ChkPreventSleep.IsChecked == true)
+        {
+            _uykuIstegi ??= Uyku.Hold();
+            return;
+        }
+        if (running) return;
+        _uykuIstegi?.Dispose();
+        _uykuIstegi = null;
+    }
+
     /// <summary>SIK-P3: ana sekmede koşan kodlamayı askıya alan düğme; dönüştürme bunu kullanmaz.</summary>
     internal EncodePause RunPause { get; } = new();
 
@@ -5060,6 +5077,7 @@ public partial class MainWindow : Window
         BtnCancel.IsEnabled = BtnConvertCancel.IsEnabled = running;
         BtnPauseRun.IsVisible = BtnPauseRun.IsEnabled = running && pausable;
         if (!BtnPauseRun.IsEnabled) RunPause.Resume();
+        HoldSleep(running);
         if (running)
         {
             ShowRunPause();

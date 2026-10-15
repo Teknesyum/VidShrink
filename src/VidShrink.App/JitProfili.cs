@@ -24,9 +24,9 @@ internal static class JitProfili
     {
         try
         {
-            var klasor = Klasor(
-                Environment.GetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH"),
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+            var ayarYolu = Environment.GetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH");
+            if (string.IsNullOrWhiteSpace(ayarYolu) && PortableMode.Active) ayarYolu = UpdateSettings.DefaultPath;
+            var klasor = Klasor(ayarYolu, Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
             if (klasor is null) return;
             Directory.CreateDirectory(klasor);
             ProfileOptimization.SetProfileRoot(klasor);

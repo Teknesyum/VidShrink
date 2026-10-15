@@ -33,6 +33,8 @@
   "player.view.screenshot-jpg": "Screenshots als JPG speichern",
   "player.view.keep-history": "Verlauf speichern",
   "player.view.resume": "Dort fortsetzen, wo ich aufgehört habe",
+  "player.view.audio-language": "Ton in der Oberflächensprache wählen",
+  "player.view.subtitle-language": "Untertitel in der Oberflächensprache einschalten",
   "player.view.pause-on-minimize": "Bei Minimieren pausieren",
   "player.view.topmost-while-playing": "Nur während der Wiedergabe im Vordergrund",
   "player.view.state-aspect": "Seitenverhältnis {0}",

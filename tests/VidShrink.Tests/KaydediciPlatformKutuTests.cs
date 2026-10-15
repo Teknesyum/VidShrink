@@ -106,6 +106,62 @@ public sealed class KaydediciPlatformKutuTests
         Assert.Equal(mac, olcu.IstekTiklama);
     }
 
+    private sealed record ImlecOlcu(string Kutular, bool Secimler, bool TiklamaDegisinceSecimler, string Kanca);
+
+    private static ImlecOlcu ImlecOlc(RecorderPlatform platform) => AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+    {
+        var once = new RecorderView(ayarYolu) { SkipAutoMeasure = true, CapturePlatform = RecorderPlatform.Windows };
+        Bul<CheckBox>(once, "ChkCursorHighlight").IsChecked = true;
+        Bul<CheckBox>(once, "ChkSpotlight").IsChecked = true;
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        var kanca = new SahteKanca();
+        var view = new RecorderView(ayarYolu)
+        {
+            SkipAutoMeasure = true,
+            CapturePlatform = platform,
+            InputHooks = kanca,
+            InputOverlay = new SahteBindirme(),
+            ClickSound = new SahteSes(),
+            Magnifier = new SahteBuyutec()
+        };
+        var kutular = string.Join(" ", new[] { "ChkCursorHighlight", "ChkSpotlight" }.Select(ad => Bul<CheckBox>(view, ad).IsVisible ? 1 : 0));
+        var secimler = Bul<Control>(view, "PointerChoices");
+        var ilk = secimler.IsVisible;
+        var tiklama = Bul<CheckBox>(view, "ChkShowClicks");
+        tiklama.IsChecked = !(tiklama.IsChecked ?? false);
+        var sonra = secimler.IsVisible;
+
+        view.SyncInput(true);
+        var olcu = new ImlecOlcu(kutular, ilk, sonra, string.Join(" | ", kanca.Cagrilar));
+        view.SyncInput(false);
+        return olcu;
+    }));
+
+    [Theory]
+    [InlineData(RecorderPlatform.Linux)]
+    [InlineData(RecorderPlatform.MacOs)]
+    public void KapiKapaliykenImlecVurgusuKutulariVeSecimleriGizliKancaKurulmaz(RecorderPlatform platform)
+    {
+        var olcu = ImlecOlc(platform);
+
+        Assert.Equal("0 0", olcu.Kutular);
+        Assert.False(olcu.Secimler);
+        Assert.False(olcu.TiklamaDegisinceSecimler);
+        Assert.Equal(string.Empty, olcu.Kanca);
+    }
+
+    [Fact]
+    public void WindowstaImlecVurgusuKutulariVeSecimleriGorunur()
+    {
+        var olcu = ImlecOlc(RecorderPlatform.Windows);
+
+        Assert.Equal("1 1", olcu.Kutular);
+        Assert.True(olcu.Secimler);
+        Assert.True(olcu.TiklamaDegisinceSecimler);
+        Assert.StartsWith("basla ", olcu.Kanca);
+    }
+
     [Fact]
     public void WindowstaDortKutuGorunurVeKancaKurulur()
     {
