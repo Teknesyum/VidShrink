@@ -21,7 +21,7 @@ internal partial class RecorderView
 
         foreach (var box in new[]
                  {
-                     CmbTarget, CmbCodec, CmbPreset, CmbContainer, CmbProfile, CmbTune, CmbPixelFormat, CmbRateControl,
+                     CmbTarget, CmbCodec, CmbPreset, CmbContainer, CmbProfile, CmbTune, CmbPixelFormat, CmbRateControl, CmbFrameRateMode,
                      CmbColorSpace, CmbColorRange, CmbAudioLayout, CmbMicrophone, CmbSystemAudio,
                      CmbWebcam, CmbWebcamShape, CmbWebcamBackground
                  })

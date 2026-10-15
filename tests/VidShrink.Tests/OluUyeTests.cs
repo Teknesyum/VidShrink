@@ -593,6 +593,8 @@ public sealed class OluUyeTests
             "Zamanlamanin iki kipinin olumsuz kolu. ShrinkJobWindow.Zamanlama.cs secim kutusunun sirasini (QueueStartMode)SelectedIndex diye ture ceviriyor; QueueSchedule.Resolve yalniz After'i adiyla soruyor, saat kipi onun else'i."),
         new("RecorderCapture.Gdigrab", "varsayilan-kol", Legitimate,
             "Iki degerli yakalama yolunun olumsuz kolu ve varsayilani. Uc okuma yeri (RecorderArguments.cs:994, 1120, 1429) 'Capture == RecorderCapture.Ddagrab' diye soruyor; gdigrab o kosulun else'i, ayrica adlandirilmasi ayni dali ikiye bolerdi."),
+        new("RecorderFrameRateMode.Auto", "varsayilan-kol", Legitimate,
+            "Kare hizi kipinin varsayilani. RecorderArguments.Build yalniz Constant ve Variable'i soruyor ve -fps_mode yaziyor; Auto o kosulun else'i, ffmpeg'in kendi kararina birakir. Ayri bir dal argumansiz bir kol olurdu."),
         new("RecordingImpact.HardwareOffload", "varsayilan-kol", Legitimate,
             "PerformanceReportText.cs:22-26 mansetin Impact uzerinden kurulmadigini olcumle yaziyor: makine mesgulken Impact yazilim dalina kayiyor, dogru bilgi bulgularda. Alan raporda tasiniyor, karar vermiyor."),
         new("RecordingImpact.SoftwareHeavyLoad", "varsayilan-kol", Legitimate,

@@ -1003,6 +1003,10 @@
                 <ComboBox x:Name="CmbRateControl" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.rate}"/>
               </StackPanel>
               <StackPanel>
+                <TextBlock Text="{loc:Text recorder.advanced.frame-rate-mode}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbFrameRateMode" HorizontalAlignment="Stretch" ToolTip.Tip="{loc:Text recorder.advanced.frame-rate-mode-hint}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.frame-rate-mode}"/>
+              </StackPanel>
+              <StackPanel>
                 <TextBlock Text="{loc:Text recorder.advanced.bitrate}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtBitrate" auto:AutomationProperties.Name="{loc:Text recorder.advanced.bitrate}"/>
               </StackPanel>

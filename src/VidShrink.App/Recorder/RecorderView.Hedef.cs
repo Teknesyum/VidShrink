@@ -24,9 +24,34 @@ internal partial class RecorderView
     {
         "libx264", "libx265", "libsvtav1", "libvpx-vp9",
         "h264_nvenc", "hevc_nvenc", "av1_nvenc",
-        "h264_qsv", "hevc_qsv",
-        "h264_amf", "hevc_amf"
+        "h264_qsv", "hevc_qsv", "av1_qsv",
+        "h264_amf", "hevc_amf", "av1_amf"
     };
+
+    private static readonly string[] SoftwareCodecs = { "libx264", "libx265", "libsvtav1", "libvpx-vp9" };
+
+    /// <summary>
+    /// Yakalama platformunda sunulan kodlayıcılar. VideoToolbox yalnız macOS'ta, VAAPI yalnız
+    /// Linux'ta listelenir; macOS'ta NVENC, Quick Sync ve AMF yoktur.
+    /// <para>Her ad <see cref="RecorderArguments.Validate"/>'ten o platformla geçer.</para>
+    /// </summary>
+    internal static IReadOnlyList<string> CodecsFor(RecorderPlatform platform) => platform switch
+    {
+        RecorderPlatform.MacOs => SoftwareCodecs.Concat(new[] { "h264_videotoolbox", "hevc_videotoolbox" }).ToArray(),
+        RecorderPlatform.Linux => Codecs.Concat(new[] { "h264_vaapi", "hevc_vaapi" }).ToArray(),
+        _ => Codecs
+    };
+
+    private void RefreshCodecList()
+    {
+        var list = CodecsFor(CapturePlatform);
+        if (CmbCodec.ItemsSource is IEnumerable<string> shown && shown.SequenceEqual(list, StringComparer.Ordinal)) return;
+        var current = CmbCodec.SelectedItem as string;
+        CmbCodec.ItemsSource = list;
+        CmbCodec.SelectedItem = current is not null && list.Contains(current, StringComparer.Ordinal)
+            ? current
+            : RecorderArguments.DefaultVideoCodec;
+    }
 
     /// <summary>
     /// Ön ayarlar. Kayıt gerçek zamanlı: kodlama kareyi bekletemediği için liste hızlı
@@ -50,11 +75,12 @@ internal partial class RecorderView
     {
         CmbTarget.ItemsSource = TargetLabels();
 
-        CmbCodec.ItemsSource = Codecs;
+        var codecs = CodecsFor(CapturePlatform);
+        CmbCodec.ItemsSource = codecs;
         CmbPreset.ItemsSource = Presets;
 
         CmbTarget.SelectedIndex = (int)_settings.Target;
-        CmbCodec.SelectedItem = Codecs.Contains(_settings.Codec, StringComparer.Ordinal)
+        CmbCodec.SelectedItem = codecs.Contains(_settings.Codec, StringComparer.Ordinal)
             ? _settings.Codec
             : RecorderArguments.DefaultVideoCodec;
         CmbPreset.SelectedItem = Presets.Contains(_settings.Preset, StringComparer.Ordinal)
@@ -175,7 +201,7 @@ internal partial class RecorderView
             Audio = audio,
             Webcam = ChosenWebcam(),
             Container = _settings.Container,
-            ScreenIndex = target == RecorderTargetKind.Screen ? ChosenScreen : 0,
+            ScreenIndex = ScreenFor(target, region),
             Screens = Monitors(),
             PrivacyMasks = _settings.PrivacyMasks.ToArray(),
             Scale = _settings.Scale,
@@ -183,6 +209,7 @@ internal partial class RecorderView
             Profile = string.IsNullOrWhiteSpace(_settings.Profile) ? null : _settings.Profile,
             Tune = string.IsNullOrWhiteSpace(_settings.Tune) ? null : _settings.Tune,
             RateControl = _settings.RateControl,
+            FrameRateMode = _settings.FrameRateMode,
             BitrateKbps = _settings.RateControl == RecorderRateControl.Bitrate && _settings.BitrateKbps > 0
                 ? _settings.BitrateKbps
                 : null,
@@ -228,6 +255,19 @@ internal partial class RecorderView
             MaxMegabytes = cap ?? request.MaxMegabytes
         };
     }
+
+    /// <summary>
+    /// İsteğin ekran sırası. Ekran hedefinde seçilen ekran; macOS'ta bölge hedefinde bölgenin
+    /// en çok örtüştüğü ekran, çünkü <c>avfoundation</c> bölgeyi o ekranın karesinden keser.
+    /// Öteki hedeflerde 0.
+    /// </summary>
+    private int ScreenFor(RecorderTargetKind target, RecorderRegion? region) => target switch
+    {
+        RecorderTargetKind.Screen => ChosenScreen,
+        RecorderTargetKind.Region when CapturePlatform == RecorderPlatform.MacOs && region is not null
+            => RecorderArguments.ScreenOf(Monitors(), region),
+        _ => 0
+    };
 
     /// <summary>
     /// Masaüstündeki monitörlerin sınırları. <c>gdigrab</c> ekran indeksi almadığı için

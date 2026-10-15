@@ -1305,6 +1305,8 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, OYA-P11 ve DZB-P11 birlesmesinden sonra: iki dalin kaymasi toplandi, dusen yok; olculen toplam 3652 + 3 + 4 = 3659, en 356 + 1 + 1 = 358, tr 118 + 1 = 119, gezilen 75422 + 43 + 215 = 75680.</para>
     /// <para>2026-10-15, ARC-P4 ve OYB-P7 birlesmesinden sonra: olculen toplam 3659 + 9 = 3668, en 358 + 1 = 359, tr 119, gezilen 75680 + 86 + 43 = 75809.</para>
     /// <para>2026-10-15, kare ve tablo (later 82): iki yeni anahtar (<c>player.tools.frames</c>, <c>.sheet</c>); yalniz <c>player.tools.sheet</c> 5 dilde kola giriyor (es, fr, pt, ro, sw), KOL dokumunden sayildi, en ve tr girmiyor: olculen 3668 + 5 = 3673, en 359, tr 119, gezilen 75809 + 43 x 2 = 75895.</para>
+    /// <para>2026-10-15, later 65 kare hizi kipi: <c>recorder.advanced.frame-rate-mode</c> 6 dilde kola giriyor (es, fr, ms, pt, ro, sw), KOL dokumunden sayildi; en ve tr degismedi. Olculen toplam 3668 + 6 = 3674, gezilen 75809 + 215 = 76024.</para>
+    /// <para>2026-10-15, later 82 ve later 65 birlesmesinden sonra: iki dalin kaymasi toplandi, dusen yok; olculen toplam 3668 + 5 + 6 = 3679, en 359, tr 119, gezilen 75809 + 86 + 215 = 76110.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1330,7 +1332,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3673, toplam);
+        Assert.Equal(3679, toplam);
         Assert.Equal(359, dilBasina["en"]);
         Assert.Equal(119, dilBasina["tr"]);
     }
@@ -1619,7 +1621,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(75895, gezilen);
+        Assert.Equal(76110, gezilen);
         Assert.Empty(kayip);
     }
 

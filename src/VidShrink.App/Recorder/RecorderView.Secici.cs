@@ -32,6 +32,7 @@ internal partial class RecorderView
         {
             _capturePlatform = value;
             RefreshInputBoxes();
+            RefreshCodecList();
         }
     }
 
