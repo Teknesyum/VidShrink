@@ -349,6 +349,13 @@ public sealed class EditProject
             writer.WriteNumber("trebleDb", effects.TrebleDb);
             writer.WriteNumber("fadeIn", effects.FadeIn);
             writer.WriteNumber("fadeOut", effects.FadeOut);
+            if (effects.HasFit)
+            {
+                writer.WriteNumber("fitNum", effects.FitNum);
+                writer.WriteNumber("fitDen", effects.FitDen);
+                writer.WriteString("padColor", effects.PadColor);
+            }
+
             writer.WriteEndObject();
         }
 
@@ -395,6 +402,9 @@ public sealed class EditProject
             BassDb = e.TryGetProperty("bassDb", out var bass) ? bass.GetDouble() : 0,
             MidDb = e.TryGetProperty("midDb", out var mid) ? mid.GetDouble() : 0,
             TrebleDb = e.TryGetProperty("trebleDb", out var treble) ? treble.GetDouble() : 0,
+            FitNum = e.TryGetProperty("fitNum", out var fitNum) ? fitNum.GetInt32() : 0,
+            FitDen = e.TryGetProperty("fitDen", out var fitDen) ? fitDen.GetInt32() : 0,
+            PadColor = e.TryGetProperty("padColor", out var padColor) ? padColor.GetString() ?? ClipEffects.DefaultPadColor : ClipEffects.DefaultPadColor,
         };
         return clip with { Effects = effects.Normalized() };
     }

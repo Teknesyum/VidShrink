@@ -16,6 +16,10 @@ internal partial class EditorView
 {
     internal static readonly (int Num, int Den)[] CropPresets = { (0, 0), (16, 9), (9, 16), (1, 1), (4, 5), (4, 3) };
 
+    internal static readonly string[] PadColors = { ClipEffects.DefaultPadColor, "FFFFFF" };
+
+    private static readonly string[] PadKeys = { "editor.clip.pad.black", "editor.clip.pad.white" };
+
     internal static readonly ClipEffects[] LookPresets = { ClipEffects.None, ClipEffects.BlackWhite, ClipEffects.OldFilm };
 
     private static readonly string[] LookKeys = { "editor.clip.look.none", "editor.clip.look.bw", "editor.clip.look.old-film" };
@@ -36,6 +40,10 @@ internal partial class EditorView
                 Content = num == 0 ? Strings.Get("editor.clip.crop.none") : num.ToString(CultureInfo.InvariantCulture) + ":" + den.ToString(CultureInfo.InvariantCulture)
             });
 
+        CmbClipPad.Items.Clear();
+        foreach (var key in PadKeys) CmbClipPad.Items.Add(new ComboBoxItem { Content = Strings.Get(key) });
+        CmbClipPad.SelectedIndex = 0;
+
         CmbClipLook.Items.Clear();
         foreach (var key in LookKeys) CmbClipLook.Items.Add(new ComboBoxItem { Content = Strings.Get(key) });
 
@@ -50,6 +58,12 @@ internal partial class EditorView
         BtnClipFlipV.Click += (_, _) => { if (_showingClip) SetClipEffects(e => e with { FlipV = BtnClipFlipV.IsChecked == true }); };
         BtnClipMute.Click += (_, _) => { if (_showingClip) SetClipEffects(e => e with { Muted = BtnClipMute.IsChecked == true }); };
         CmbClipCrop.SelectionChanged += (_, _) => { if (_showingClip && CmbClipCrop.SelectedIndex >= 0) CropClip(CmbClipCrop.SelectedIndex); };
+        BtnClipFit.Click += (_, _) => { if (_showingClip && CmbClipCrop.SelectedIndex > 0) CropClip(CmbClipCrop.SelectedIndex); };
+        CmbClipPad.SelectionChanged += (_, _) =>
+        {
+            if (_showingClip && CmbClipPad.SelectedIndex >= 0 && CmbClipPad.SelectedIndex < PadColors.Length)
+                SetClipEffects(e => e.HasFit ? e with { PadColor = PadColors[CmbClipPad.SelectedIndex] } : e);
+        };
         BtnClipReset.Click += (_, _) => { if (_showingClip) SetClipEffects(_ => ClipEffects.None); };
         TxtClipVolume.LostFocus += (_, _) => CommitClipVolume();
         TxtClipVolume.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, CommitClipVolume);
@@ -154,7 +168,7 @@ internal partial class EditorView
         {
             var preset = CropPresetIndex(e, width, height);
             var turned = e with { Rotation = (e.Rotation + 90) % 360 };
-            return preset > 0 ? turned.WithAspect(CropPresets[preset].Num, CropPresets[preset].Den, width, height) : turned;
+            return preset > 0 && !e.HasFit ? turned.WithAspect(CropPresets[preset].Num, CropPresets[preset].Den, width, height) : turned;
         });
     }
 
@@ -163,7 +177,10 @@ internal partial class EditorView
         if (preset < 0 || preset >= CropPresets.Length) return false;
         var (width, height, _, _) = SourceGeometry();
         var (num, den) = CropPresets[preset];
-        return SetClipEffects(e => e.WithAspect(num, den, width, height));
+        var color = PadColors[Math.Clamp(CmbClipPad.SelectedIndex, 0, PadColors.Length - 1)];
+        return BtnClipFit.IsChecked == true
+            ? SetClipEffects(e => e.WithFit(num, den, color))
+            : SetClipEffects(e => e.WithAspect(num, den, width, height));
     }
 
     private void CommitClipVolume()
@@ -282,6 +299,16 @@ internal partial class EditorView
         BtnClipFlipV.IsChecked = effects.FlipV;
         BtnClipMute.IsChecked = effects.Muted;
         CmbClipCrop.SelectedIndex = CropPresetIndex(effects, width, height);
+        if (effects.HasFit)
+        {
+            BtnClipFit.IsChecked = true;
+            CmbClipPad.SelectedIndex = Array.IndexOf(PadColors, effects.PadColor);
+        }
+        else if (effects.HasCrop)
+        {
+            BtnClipFit.IsChecked = false;
+        }
+
         TxtClipVolume.Text = effects.VolumeDb.ToString("0.#", Strings.Culture);
         BtnClipDenoise.IsChecked = effects.Denoise;
         BtnClipLoudnorm.IsChecked = effects.Loudnorm;
@@ -306,9 +333,11 @@ internal partial class EditorView
         _showingClip = true;
     }
 
-    /// <summary>Ayarin hangi oran secenegine denk geldigi; kirpma yoksa 0, elle kirpilmissa -1.</summary>
+    /// <summary>Ayarin hangi oran secenegine denk geldigi; kirpma ve sigdirma yoksa 0, elle kirpilmissa ya da oran listede
+    /// yoksa -1.</summary>
     internal static int CropPresetIndex(ClipEffects effects, int width, int height)
     {
+        if (effects.HasFit) return Array.FindIndex(CropPresets, p => p.Num == effects.FitNum && p.Den == effects.FitDen && p.Num > 0);
         if (!effects.HasCrop) return 0;
         for (var i = 1; i < CropPresets.Length; i++)
         {
