@@ -105,6 +105,8 @@ public partial class App : Application
 
             if (window is MainWindow main)
             {
+                try { main.PencereKonumunuGeriYukle(); }
+                catch (Exception) { }
                 desktop.Exit += (_, _) =>
                 {
                     try { main.KapanistaGuncelle(); }
@@ -141,7 +143,7 @@ public partial class App : Application
     /// </summary>
     private static void RegisterFileTypes()
     {
-        if (!OperatingSystem.IsWindows()) return;
+        if (!OperatingSystem.IsWindows() || PortableMode.Active) return;
 
         try
         {

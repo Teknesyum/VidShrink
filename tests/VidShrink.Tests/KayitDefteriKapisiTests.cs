@@ -27,7 +27,8 @@ public class KayitDefteriKapisiTests
     [InlineData(null, false)]
     public void YalnizUygulamaSureciGercekKaydaYazar(string? processPath, bool allowed)
     {
-        Assert.Equal(allowed, RegistryWriteGate.Allows(processPath, _ => true));
+        Assert.Equal(allowed, RegistryWriteGate.Allows(processPath, f => !f.EndsWith(VidShrink.Core.PortableMode.MarkerFileName)));
+        Assert.False(RegistryWriteGate.Allows(processPath, _ => true));
         Assert.False(RegistryWriteGate.Allows(processPath, _ => false));
         Assert.False(RegistryWriteGate.Allows(processPath));
         Assert.Null(ShellMenu.WriteRoot(processPath, null));

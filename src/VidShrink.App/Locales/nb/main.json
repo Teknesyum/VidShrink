@@ -33,6 +33,7 @@
   "main.update.badge": "Oppdatering",
   "main.update.downloading": "Laster ned…",
   "main.update.ready": "Klar til installering",
+  "main.update.download-page": "Nedlastingsside",
   "main.update.ready-on-exit": "Oppdatering klar, installeres ved lukking",
   "main.update.failed": "Oppdateringen kunne ikke lastes ned",
   "main.update.maintenance-failed": "Oppdateringen kunne ikke installeres, det prøves igjen ved neste start",

@@ -24,8 +24,8 @@ public partial class MainWindow
 
     private void SetupShellMenu()
     {
-        ShellMenuPanel.IsVisible = ShellMenu.Supported;
-        if (!ShellMenu.Supported) return;
+        ShellMenuPanel.IsVisible = ShellMenu.Supported && !Tasinabilir;
+        if (!ShellMenuPanel.IsVisible) return;
 
         _shellMenuBusy = true;
         ChkShellMenuOpen.IsChecked = ShellMenuInstalled(ShellMenu.MenuKey);

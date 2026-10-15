@@ -99,7 +99,7 @@ public partial class MainWindow
 
     internal static async Task KisayolSimgesiniTazeleAsync()
     {
-        if (!OperatingSystem.IsWindows()) return;
+        if (!OperatingSystem.IsWindows() || PortableMode.Active) return;
         await AcilisiBekle();
         var appDirectory = AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
         if (LauncherUpdate.LocateLauncher(appDirectory) is null) return;
@@ -116,7 +116,7 @@ public partial class MainWindow
     private bool OtomatikAcik()
     {
         if (OtomatikGuncellemeAcik is { } karar) return karar();
-        return OperatingSystem.IsWindows() && UpdateCheck.AutoUpdateEnabled(UpdateSettings.Load(SettingsPathOverride));
+        return OperatingSystem.IsWindows() && !Tasinabilir && UpdateCheck.AutoUpdateEnabled(UpdateSettings.Load(SettingsPathOverride));
     }
 
     /// <summary>

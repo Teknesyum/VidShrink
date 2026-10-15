@@ -74,6 +74,11 @@ public partial class MainWindow
     private void OnDownloadAndInstallUpdate(object? sender, RoutedEventArgs e)
     {
         if (_updateBadgeState is UpdateBadgeState.Downloading or UpdateBadgeState.Ready or UpdateBadgeState.Installing) return;
+        if (Tasinabilir)
+        {
+            IndirmeSayfasiniAc();
+            return;
+        }
 
         _installAfterDownload = true;
         (UpdateDownloadStarter ?? StartUpdateDownload)();
@@ -91,6 +96,7 @@ public partial class MainWindow
     private void StartUpdateDownload()
     {
         if (_updateBadgeState is UpdateBadgeState.Downloading or UpdateBadgeState.Ready or UpdateBadgeState.Installing) return;
+        if (Tasinabilir) return;
         var appDirectory = AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
         if (LauncherUpdate.LocateLauncher(appDirectory) is null) return;
         var baseDirectory = Path.GetDirectoryName(appDirectory);
@@ -180,6 +186,7 @@ public partial class MainWindow
         BtnNoticeInstall.Content = Say(state == UpdateBadgeState.Downloading ? "main.action.cancel" : "main.action.install");
         BtnNoticeInstall.IsVisible = suruyor;
         BtnNoticeUpdate.IsVisible = !suruyor;
+        BtnNoticeUpdate.Content = Say(Tasinabilir ? "main.update.download-page" : "main.action.update");
         BtnNoticeLater.IsVisible = !suruyor;
         BtnNoticeInstall.IsEnabled = state switch
         {

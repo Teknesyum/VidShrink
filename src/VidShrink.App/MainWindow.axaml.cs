@@ -211,6 +211,7 @@ public partial class MainWindow : Window
         _motionReduced = !AnimationsAllowed();
         if (_motionReduced) Classes.Add("reduced-motion");
         ApplyStartupSize();
+        PencereKonumunuIzle();
         PreparePanelEntrance();
 
         DragDrop.SetAllowDrop(this, true);
@@ -369,7 +370,7 @@ public partial class MainWindow : Window
     /// </summary>
     private void ShowDefaultAppSuggestion()
     {
-        if (!OperatingSystem.IsWindows()) return;
+        if (!OperatingSystem.IsWindows() || Tasinabilir) return;
 
         var executable = Environment.ProcessPath;
         if (string.IsNullOrEmpty(executable)) return;
@@ -710,6 +711,7 @@ public partial class MainWindow : Window
             if (WindowState == WindowState.FullScreen) WindowDecorationsTheme = SessizPencereBasligi.Tema;
             else ClearValue(WindowDecorationsThemeProperty);
         }
+        if (change.Property == ClientSizeProperty) NormalKonumuAl();
         if (!_controlsReady) return;
         if (change.Property == WindowStateProperty)
         {
@@ -727,6 +729,7 @@ public partial class MainWindow : Window
         _cts?.Cancel();
         // Kaynak burada kapanır: pencere kapanırken öksüz ffmpeg kalmaz.
         _preview?.Dispose();
+        PencereKonumunuKaydet();
         base.OnClosing(e);
     }
 
@@ -1905,7 +1908,7 @@ public partial class MainWindow : Window
 
     private void InitializeUpdateUi(UpdateSettings? settings = null)
     {
-        AutoUpdateRow.IsVisible = UpdateCheck.CanSelfUpdate;
+        AutoUpdateRow.IsVisible = UpdateCheck.CanSelfUpdate && !Tasinabilir;
 
         _updateUiSyncing = true;
         try { ChkAutoUpdate.IsChecked = (settings ?? UpdateSettings.Load(SettingsPathOverride)).AutoUpdate; }
@@ -2039,7 +2042,8 @@ public partial class MainWindow : Window
 
     private void RefreshUpdateTexts()
     {
-        TxtAutoUpdateEffect.Text = Say(UpdateCheck.CanSelfUpdate ? "settings.update.auto-effect" : "settings.update.no-self-effect");
+        TxtAutoUpdateEffect.Text = Say(Tasinabilir ? "settings.update.portable-effect"
+            : UpdateCheck.CanSelfUpdate ? "settings.update.auto-effect" : "settings.update.no-self-effect");
         RefreshUpdateNoticeButton();
     }
 
@@ -3150,16 +3154,8 @@ public partial class MainWindow : Window
     {
         if (_settingsSyncing || _syncing) return;
         if (PlanPanelRow.Height.GridUnitType != GridUnitType.Pixel) return;
-        try
-        {
-            var json = $"{{\"planPanelHeight\":{PlanPanelRow.Height.Value.ToString(CultureInfo.InvariantCulture)}}}";
-            Directory.CreateDirectory(Path.GetDirectoryName(SplitterSettingsPath)!);
-            File.WriteAllText(SplitterSettingsPath, json);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            TxtSystemStatus.Text = $"{Say("settings.error.save")}: {ex.Message}";
-        }
+        var height = PlanPanelRow.Height.Value;
+        LayoutYaz(kok => kok["planPanelHeight"] = height);
     }
 
     private void RestoreSplitterSettings()

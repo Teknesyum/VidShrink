@@ -33,6 +33,7 @@
   "main.update.badge": "Update",
   "main.update.downloading": "Wird heruntergeladen…",
   "main.update.ready": "Bereit zur Installation",
+  "main.update.download-page": "Downloadseite",
   "main.update.ready-on-exit": "Update bereit, wird beim Schließen installiert",
   "main.update.failed": "Das Update konnte nicht heruntergeladen werden",
   "main.update.maintenance-failed": "Das Update konnte nicht installiert werden, beim nächsten Start wird es erneut versucht",

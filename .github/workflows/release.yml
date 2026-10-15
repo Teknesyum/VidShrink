@@ -484,6 +484,16 @@ jobs:
           cp publish/${{ matrix.rid }}/manifest.json assets/manifest-${{ matrix.rid }}.json
 
           checksummed="vidshrink-${{ matrix.rid }}.zip manifest-${{ matrix.rid }}.json"
+          # Portable copy: the same app folder plus the VidShrink.portable marker, which keeps
+          # settings and logs beside the exe and turns off self-update and registry writes.
+          if [[ "${{ matrix.rid }}" == win-* ]]; then
+            mkdir -p portable
+            cp -r publish/${{ matrix.rid }}/. portable/
+            : > portable/VidShrink.portable
+            ( cd portable && zip -qr "$GITHUB_WORKSPACE/assets/VidShrink-Portable-${{ matrix.rid }}.zip" . )
+            rm -rf portable
+            checksummed="$checksummed VidShrink-Portable-${{ matrix.rid }}.zip"
+          fi
           # The launcher travels as its own archive rather than inside the application
           # archive: the archive is what the updater unpacks over app/, and the launcher
           # does not live there. The manifest's "launcher" array points at this archive,

@@ -56,6 +56,13 @@ whichever way it is installed.
 **Uninstall.** `VidShrink-Setup.exe --uninstall` removes the shortcuts, the right-click
 entries, the Open With registration and the install folder.
 
+**Portable.** `VidShrink-Portable-win-x64.zip` (or `-win-arm64`) from the
+[latest release](https://github.com/Teknesyum/VidShrink/releases/latest) runs without
+installing: unzip it anywhere, a USB stick included, and start `VidShrink.App.exe`. The
+`VidShrink.portable` file beside the exe keeps settings and logs in a `data` folder next to
+it. A portable copy does not update itself, adds no shortcuts and writes nothing to the
+registry; when a new version is out, the update button opens the download page.
+
 ### Install On macOS And Linux
 
 ```bash
