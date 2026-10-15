@@ -449,6 +449,7 @@ function Install-VulkanLoader([string]$WorkRoot, [string]$Destination, [string]$
 
 $shellMenuKeyName = 'VidShrink'
 $shellShrinkMenuKeyName = 'VidShrinkKucult'
+$shellEnqueueMenuKeyName = 'VidShrinkSirayaEkle'
 $shellPackageName = 'Teknesyum.VidShrink.Shell'
 $shellCommandClsid = '7B8B4A16-E3F5-4C4A-A8D2-26B2F895BE58'
 $shellShrinkTargets = @(
@@ -460,10 +461,17 @@ $shellShrinkTargets = @(
     @{ Key = '06-size-100'; Preset = 'size-100'; Megabytes = 100; Fallback = '100 MB' }
 )
 $shellShrinkFlag = '--kucult'
+$shellEnqueueFlag = '--siraya-ekle'
 
 $shellMenuExtensions = @(
     'mp4', 'mkv', 'mov', 'avi', 'webm', 'wmv', 'flv', 'm4v', 'mpg', 'mpeg', 'ts', 'm2ts',
     '3gp', 'ogv', 'vob', 'asf', 'rm', 'rmvb', 'divx', 'mxf', 'f4v', 'mts', 'dav', 'gif'
+)
+
+$shellPlayerExtensions = @(
+    'mp3', 'm4a', 'm4b', 'aac', 'adt', 'adts', 'flac', 'wav', 'wma', 'ogg', 'oga', 'opus',
+    'mka', 'aif', 'aifc', 'aiff', 'au', 'snd', 'mp2', 'mpa', 'ac3', 'ape', 'wv', 'weba',
+    'm3u', 'm3u8', 'pls', 'wpl', 'zpl', 'asx', 'wax', 'wvx', 'wmx'
 )
 
 $defaultAppExtensions = @('mp4', 'mkv', 'mov', 'avi', 'webm')
@@ -567,6 +575,13 @@ function Get-ShellShrinkMenuLabel([string]$Language, [string]$LocalesFolder) {
     return 'Shrink with VidShrink'
 }
 
+function Get-ShellEnqueueMenuLabel([string]$Language, [string]$LocalesFolder) {
+    $metin = Get-LocalizedShellText $Language $LocalesFolder 'shell.menu.enqueue'
+    if ($metin) { return $metin }
+    if ($Language -eq 'tr') { return 'VidShrink S' + [char]0x0131 + 'ras' + [char]0x0131 + 'na Ekle' }
+    return 'Add to VidShrink queue'
+}
+
 function Get-QuickShrinkLabel($Target, [string]$Language, [string]$LocalesFolder) {
     $metin = Get-LocalizedShellText $Language $LocalesFolder ('shell.menu.target.' + $Target.Preset)
     if ($metin) { return $metin }
@@ -581,7 +596,7 @@ function Remove-ShellMenu([string]$Root) {
     foreach ($association in Get-ChildItem -LiteralPath $associations) {
         $shell = Join-Path $association.PSPath 'shell'
         $touched = $false
-        foreach ($menuKeyName in @($shellMenuKeyName, $shellShrinkMenuKeyName)) {
+        foreach ($menuKeyName in @($shellMenuKeyName, $shellShrinkMenuKeyName, $shellEnqueueMenuKeyName)) {
             $key = Join-Path $shell $menuKeyName
             if (-not (Test-Path -LiteralPath $key)) { continue }
             Remove-Item -LiteralPath $key -Recurse -Force
@@ -599,18 +614,30 @@ function Remove-ShellMenu([string]$Root) {
     return $removed
 }
 
-function Write-ShellMenu([string]$Root, [string]$Executable, [string]$Label) {
-    foreach ($extension in $shellMenuExtensions) {
+function Write-ShellMenu([string]$Root, [string]$Executable, [string]$Label, [string]$EnqueueLabel) {
+    $extensions = @($shellMenuExtensions) + @($shellPlayerExtensions)
+    foreach ($extension in $extensions) {
         $key = Join-Path (Get-ShellMenuAssociationRoot $Root) ".$extension\shell\$shellMenuKeyName"
         New-Item -Path $key -Force | Out-Null
         Set-ItemProperty -LiteralPath $key -Name 'MUIVerb' -Value $Label -Type String
         Set-ItemProperty -LiteralPath $key -Name 'Icon' -Value $Executable -Type String
+        Set-ItemProperty -LiteralPath $key -Name 'MultiSelectModel' -Value 'Player' -Type String
 
         $command = Join-Path $key 'command'
         New-Item -Path $command -Force | Out-Null
         Set-Item -LiteralPath $command -Value ('"{0}" "%1"' -f $Executable)
+
+        $enqueue = Join-Path (Get-ShellMenuAssociationRoot $Root) ".$extension\shell\$shellEnqueueMenuKeyName"
+        New-Item -Path $enqueue -Force | Out-Null
+        Set-ItemProperty -LiteralPath $enqueue -Name 'MUIVerb' -Value $EnqueueLabel -Type String
+        Set-ItemProperty -LiteralPath $enqueue -Name 'Icon' -Value $Executable -Type String
+        Set-ItemProperty -LiteralPath $enqueue -Name 'MultiSelectModel' -Value 'Player' -Type String
+
+        $enqueueCommand = Join-Path $enqueue 'command'
+        New-Item -Path $enqueueCommand -Force | Out-Null
+        Set-Item -LiteralPath $enqueueCommand -Value ('"{0}" "%1" {1}' -f $Executable, $shellEnqueueFlag)
     }
-    return $shellMenuExtensions.Count
+    return $extensions.Count
 }
 
 function Write-ShellShrinkMenu([string]$Root, [string]$Executable, [string]$Label, [string]$Language, [string]$LocalesFolder) {
@@ -642,7 +669,7 @@ function Update-ShellMenu([string]$Root, [string]$Executable, [string]$Language)
     Remove-ShellMenu $Root | Out-Null
     $locales = Join-Path (Join-Path (Split-Path -Parent $Executable) 'app') 'Locales'
     $dil = Resolve-ShellMenuLanguage $Language $locales
-    $written = Write-ShellMenu $Root $Executable (Get-ShellMenuLabel $dil $locales)
+    $written = Write-ShellMenu $Root $Executable (Get-ShellMenuLabel $dil $locales) (Get-ShellEnqueueMenuLabel $dil $locales)
     $shrinkWritten = Write-ShellShrinkMenu $Root $Executable (Get-ShellShrinkMenuLabel $dil $locales) $dil $locales
     $modern = Write-Windows11ShellMenu $Root (Split-Path -Parent $Executable)
     $path = if ($modern) { 'Windows 11 birincil ve klasik' } else { 'Windows 10 klasik' }

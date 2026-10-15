@@ -59,7 +59,42 @@ internal partial class PlayerView
     private bool OpenCollected(IReadOnlyList<string> paths, string trace)
     {
         var files = FolderNavigator.Collect(paths);
+        return files.Count > 0 && PlayCollected(files, trace);
+    }
+
+    /// <summary>
+    /// Kabuktan art arda gelen yolların toplu açılışı. Çalan dosya toplanan listedeyse
+    /// oynatma kesilmez, liste yalnız kuyruk olur; değilse kuyruk ilk dosyadan başlar.
+    /// </summary>
+    internal bool OpenShellBatch(IReadOnlyList<string> paths)
+    {
+        var files = FolderNavigator.Collect(paths);
         if (files.Count == 0) return false;
+        if (_path is not { } current || !files.Any(file => QueueEdit.Same(file, current))) return PlayCollected(files, "shell -> ");
+        _queue = files;
+        _queueArranged = false;
+        QueueSource = null;
+        _trace.Add("shell -> " + files.Count);
+        _trace.Add("queue " + files.Count);
+        return true;
+    }
+
+    /// <summary>
+    /// Kabuğun "sıraya ekle" fiili: toplanan dosyalar çalan listenin sonuna eklenir, oynatma
+    /// kesilmez. Hiçbir şey çalmıyorsa liste kuyruk olarak açılır ve ilki çalar.
+    /// </summary>
+    internal bool EnqueueItems(IReadOnlyList<string> paths)
+    {
+        var files = FolderNavigator.Collect(paths);
+        if (files.Count == 0) return false;
+        if (_path is null) return PlayCollected(files, "enqueue -> ");
+        var added = false;
+        foreach (var file in files) added |= Enqueue(file);
+        return added;
+    }
+
+    private bool PlayCollected(IReadOnlyList<string> files, string trace)
+    {
         _queue = files;
         _queueArranged = false;
         QueueSource = null;

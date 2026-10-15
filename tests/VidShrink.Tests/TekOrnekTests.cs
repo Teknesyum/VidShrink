@@ -180,10 +180,10 @@ public sealed class TekOrnekTests : IDisposable
         Assert.True(files.Receive(new[] { "ikinci.mkv" }));
         Assert.Equal(3, files.Pending);
 
-        var delivered = new List<string?>();
-        files.Attach(path => { delivered.Add(path); return true; });
+        var delivered = new List<string[]>();
+        files.Attach(request => { delivered.Add(request.Paths.ToArray()); return true; });
 
-        Assert.Equal(new string?[] { "ilk.mp4", null, "ikinci.mkv" }, delivered);
+        Assert.Equal(new[] { new[] { "ilk.mp4", "yok-sayilan.mp4" }, Array.Empty<string>(), new[] { "ikinci.mkv" } }, delivered);
         Assert.Equal(0, files.Pending);
     }
 
@@ -226,7 +226,7 @@ public sealed class TekOrnekTests : IDisposable
         Assert.False(empty);
 
         var delivered = new List<string?>();
-        files.Attach(path => { delivered.Add(path); return true; });
+        files.Attach(request => { delivered.Add(request.First); return true; });
         Assert.Equal(new string?[] { local }, delivered);
     }
 

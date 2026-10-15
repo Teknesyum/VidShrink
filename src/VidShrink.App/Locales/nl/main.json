@@ -673,6 +673,7 @@
   "settings-tab.default-app.hint": "Opent de Windows-pagina Standaard-apps bij VidShrink; daar maak je de keuze.",
   "shell.menu.open": "Deze video openen met VidShrink",
   "shell.menu.shrink": "Verkleinen met VidShrink",
+  "shell.menu.enqueue": "Toevoegen aan VidShrink-wachtrij",
   "shell.menu.target.size-8": "8 MB",
   "shell.menu.target.whatsapp-chat": "WhatsApp (16 MB)",
   "shell.menu.target.discord-free": "Discord (20 MB)",

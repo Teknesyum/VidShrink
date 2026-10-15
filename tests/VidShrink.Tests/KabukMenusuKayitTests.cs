@@ -95,9 +95,10 @@ public class KabukMenusuKayitTests
         WithTestRoot(root =>
         {
             const string target = @"C:\sahte\VidShrink.exe";
-            Assert.Equal(ShellMenu.Extensions.Length, ShellMenu.InstallOpen(target, "Ac"));
+            var extensions = ShellMenu.ExtensionsFor(ShellMenu.MenuKey);
+            Assert.Equal(extensions.Count, ShellMenu.InstallOpen(target, "Ac"));
 
-            foreach (var extension in ShellMenu.Extensions)
+            foreach (var extension in extensions)
             {
                 using var command = Registry.CurrentUser.OpenSubKey(
                     root + @"\Software\Classes\SystemFileAssociations\." + extension + @"\shell\" + ShellMenu.MenuKey + @"\command",
@@ -105,9 +106,9 @@ public class KabukMenusuKayitTests
                 command!.SetValue("Isaret", extension, RegistryValueKind.String);
             }
 
-            Assert.Equal(ShellMenu.Extensions.Length + 1, ShellMenu.Relabel(ShellMenu.MenuKey, "Open"));
+            Assert.Equal(extensions.Count + 1, ShellMenu.Relabel(ShellMenu.MenuKey, "Open"));
 
-            foreach (var extension in ShellMenu.Extensions)
+            foreach (var extension in extensions)
             {
                 var path = root + @"\Software\Classes\SystemFileAssociations\." + extension + @"\shell\" + ShellMenu.MenuKey;
                 using var verb = Registry.CurrentUser.OpenSubKey(path);
@@ -122,6 +123,68 @@ public class KabukMenusuKayitTests
                 Assert.Equal("Open", labels?.GetValue("open"));
 
             Assert.Equal(0, ShellMenu.Relabel(ShellMenu.MenuKey, "Open"));
+        });
+    }
+
+    /// <summary>
+    /// Açma kutusu iki fiil yazar: "aç" ve "sıraya ekle". İkisi videoya, sese ve çalma listesine
+    /// gider, çoklu seçimde düşmesinler diye <c>Player</c> modelini taşır; küçültme alt menüsü
+    /// sese ve listeye yazılmaz. Kaldırma iki fiili birlikte siler.
+    /// </summary>
+    [Fact]
+    [SupportedOSPlatform("windows")]
+    public void SirayaEkleFiiliSesVeListeyeYaziliyorKucultmeYazilmiyor()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+
+        WithTestRoot(root =>
+        {
+            const string target = @"C:\sahte\VidShrink.exe";
+            Assert.Equal(ShellMenu.ExtensionsFor(ShellMenu.MenuKey).Count, ShellMenu.InstallOpen(target, "Ac"));
+            ShellMenu.InstallShrink(target, "Kucult");
+
+            string Verb(string extension, string menu)
+                => root + @"\Software\Classes\SystemFileAssociations\." + extension + @"\shell\" + menu;
+
+            foreach (var extension in new[] { "mp4", "mp3", "flac", "m3u", "m3u8" })
+            {
+                using (var open = Registry.CurrentUser.OpenSubKey(Verb(extension, ShellMenu.MenuKey)))
+                using (var openCommand = Registry.CurrentUser.OpenSubKey(Verb(extension, ShellMenu.MenuKey) + @"\command"))
+                {
+                    Assert.Equal("Ac", open?.GetValue("MUIVerb"));
+                    Assert.Equal("Player", open?.GetValue("MultiSelectModel"));
+                    Assert.Equal($"\"{target}\" \"%1\"", openCommand?.GetValue(string.Empty));
+                }
+
+                using (var enqueue = Registry.CurrentUser.OpenSubKey(Verb(extension, ShellMenu.EnqueueMenuKey)))
+                using (var enqueueCommand = Registry.CurrentUser.OpenSubKey(Verb(extension, ShellMenu.EnqueueMenuKey) + @"\command"))
+                {
+                    Assert.Equal(ShellMenu.EnqueueLabel(), enqueue?.GetValue("MUIVerb"));
+                    Assert.Equal(target, enqueue?.GetValue("Icon"));
+                    Assert.Equal("Player", enqueue?.GetValue("MultiSelectModel"));
+                    Assert.Equal($"\"{target}\" \"%1\" {ShellMenu.EnqueueFlag}", enqueueCommand?.GetValue(string.Empty));
+                }
+            }
+
+            using (var videoShrink = Registry.CurrentUser.OpenSubKey(Verb("mp4", ShellMenu.ShrinkMenuKey)))
+                Assert.NotNull(videoShrink);
+            foreach (var extension in new[] { "mp3", "flac", "m3u", "m3u8" })
+            {
+                using var shrink = Registry.CurrentUser.OpenSubKey(Verb(extension, ShellMenu.ShrinkMenuKey));
+                Assert.Null(shrink);
+            }
+
+            Assert.Equal(ShellMenu.ExtensionsFor(ShellMenu.MenuKey).Count, ShellMenu.RemoveOpen());
+            foreach (var extension in new[] { "mp4", "mp3", "m3u" })
+            {
+                using var open = Registry.CurrentUser.OpenSubKey(Verb(extension, ShellMenu.MenuKey));
+                using var enqueue = Registry.CurrentUser.OpenSubKey(Verb(extension, ShellMenu.EnqueueMenuKey));
+                Assert.Null(open);
+                Assert.Null(enqueue);
+            }
+
+            using (var stillShrink = Registry.CurrentUser.OpenSubKey(Verb("mp4", ShellMenu.ShrinkMenuKey)))
+                Assert.NotNull(stillShrink);
         });
     }
 }

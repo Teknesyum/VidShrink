@@ -13,6 +13,12 @@ public static class ShellRegistration
 
     public const string ShrinkMenuKey = "VidShrinkKucult";
 
+    public const string EnqueueMenuKey = "VidShrinkSirayaEkle";
+
+    /// <summary>"Aç" ve "sıraya ekle" fiillerinin yazıldığı uzantılar: video, ses ve çalma listesi.</summary>
+    public static IReadOnlyList<string> OpenMenuExtensions { get; } =
+        ShellIntegration.MediaExtensions.Concat(ShellIntegration.PlayerMenuExtensions).ToArray();
+
     public const string PackageName = "Teknesyum.VidShrink.Shell";
 
     public const string CommandClsid = "7B8B4A16-E3F5-4C4A-A8D2-26B2F895BE58";
@@ -93,6 +99,9 @@ public static class ShellRegistration
     public static string ShrinkLabel(string language, string? localesFolder = null) =>
         Label(language, localesFolder, "shell.menu.shrink");
 
+    public static string EnqueueLabel(string language, string? localesFolder = null) =>
+        Label(language, localesFolder, "shell.menu.enqueue");
+
     /// <summary>
     /// Alt menü girdisinin etiketi. Çeviri okunamazsa girdinin kendi yedeği yazılır; gömülü
     /// ikili tablo bu anahtarları taşımaz.
@@ -150,17 +159,30 @@ public static class ShellRegistration
         var associations = classesRoot.TrimEnd('\\') + @"\SystemFileAssociations";
         var openLabel = OpenLabel(language, localesFolder);
         var shrinkLabel = ShrinkLabel(language, localesFolder);
+        var enqueueLabel = EnqueueLabel(language, localesFolder);
         var targetLabels = ShellIntegration.QuickShrinkMenu
             .Select(target => TargetLabel(target, language, localesFolder)).ToArray();
         var user = Registry.CurrentUser;
 
-        foreach (var extension in ShellIntegration.MediaExtensions)
+        foreach (var extension in OpenMenuExtensions)
         {
-            using var open = user.CreateSubKey($@"{associations}\.{extension}\shell\{MenuKey}");
-            open.SetValue("MUIVerb", openLabel, RegistryValueKind.String);
-            open.SetValue("Icon", executable, RegistryValueKind.String);
-            using (var command = open.CreateSubKey("command"))
+            using (var open = user.CreateSubKey($@"{associations}\.{extension}\shell\{MenuKey}"))
+            {
+                open.SetValue("MUIVerb", openLabel, RegistryValueKind.String);
+                open.SetValue("Icon", executable, RegistryValueKind.String);
+                open.SetValue("MultiSelectModel", "Player", RegistryValueKind.String);
+                using var command = open.CreateSubKey("command");
                 command.SetValue("", $"\"{executable}\" \"%1\"", RegistryValueKind.String);
+            }
+
+            using (var enqueue = user.CreateSubKey($@"{associations}\.{extension}\shell\{EnqueueMenuKey}"))
+            {
+                enqueue.SetValue("MUIVerb", enqueueLabel, RegistryValueKind.String);
+                enqueue.SetValue("Icon", executable, RegistryValueKind.String);
+                enqueue.SetValue("MultiSelectModel", "Player", RegistryValueKind.String);
+                using var command = enqueue.CreateSubKey("command");
+                command.SetValue("", $"\"{executable}\" \"%1\" {ShellIntegration.EnqueueFlag}", RegistryValueKind.String);
+            }
         }
 
         var written = 0;
@@ -203,7 +225,7 @@ public static class ShellRegistration
             var associationPath = $@"{associationsPath}\{association}";
             var shellPath = associationPath + @"\shell";
             var touched = false;
-            foreach (var menu in new[] { MenuKey, ShrinkMenuKey })
+            foreach (var menu in new[] { MenuKey, ShrinkMenuKey, EnqueueMenuKey })
             {
                 using (var probe = user.OpenSubKey($@"{shellPath}\{menu}"))
                 {

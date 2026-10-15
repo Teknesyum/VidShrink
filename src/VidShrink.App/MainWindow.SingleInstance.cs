@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,9 +20,18 @@ public partial class MainWindow
     /// </summary>
     internal static Func<bool> IsMacOSPlatformForTest = OperatingSystem.IsMacOS;
 
+    /// <summary>
+    /// Kabuk çoklu seçimde dosya başına ayrı bir süreç doğurur; her biri yolunu ayrı iletir.
+    /// Son kabuk açılışından bu süre geçmeden gelen yol yeni açılış sayılmaz, öncekilerle
+    /// birlikte tek kuyruk olur.
+    /// </summary>
+    internal static TimeSpan ShellBatchWindow { get; set; } = TimeSpan.FromSeconds(1.5);
+
     private WindowState _restoreState = WindowState.Maximized;
-    private string? _pendingMacPath;
-    private bool _pendingMacFile;
+    private ForwardedRequest? _pendingMacRequest;
+    private readonly List<string> _shellBatch = new();
+    private DateTime _shellBatchAt = DateTime.MinValue;
+    private Task _shellTail = Task.CompletedTask;
 
     internal void AcceptForwardedFiles(ForwardedFiles files)
     {
@@ -41,23 +51,86 @@ public partial class MainWindow
     /// yok; ret, dosyanın sessizce düşmesi olurdu. Orada yol bekletilip kodlama bitince
     /// (iptal ya da tamamlanma) <see cref="FlushPendingMacFile"/> ile yüklenir.
     /// </summary>
-    internal bool AcceptForwarded(string? path)
+    internal bool AcceptForwarded(ForwardedRequest request)
     {
         if (_cts is not null)
         {
             if (!IsMacOSPlatformForTest()) return false;
 
-            _pendingMacPath = path;
-            _pendingMacFile = true;
-            ReportSourceError(Say("main.instance.waiting", path is null ? "-" : Path.GetFileName(path)));
+            _pendingMacRequest = request;
+            ReportSourceError(Say("main.instance.waiting", request.First is null ? "-" : Path.GetFileName(request.First)));
             return true;
         }
 
-        if (WindowState == WindowState.Minimized) WindowState = _restoreState;
-        Activate();
+        if (!request.Enqueue || Player.LoadedPath is null)
+        {
+            if (WindowState == WindowState.Minimized) WindowState = _restoreState;
+            Activate();
+        }
 
-        if (path is not null) _ = LoadForwardedAsync(path);
+        if (request.Paths.Count == 0) return true;
+        if (request.Enqueue)
+        {
+            ForwardedLoad = AfterShellWork(() => EnqueueForwardedAsync(request.Paths));
+            return true;
+        }
+
+        if (JoinShellBatch(request.Paths) is { } batch)
+        {
+            ForwardedLoad = AfterShellWork(() => OpenShellBatchAsync(batch));
+            return true;
+        }
+
+        var path = request.Paths[0];
+        ForwardedLoad = AfterShellWork(() => LoadAndTraceAsync(path));
         return true;
+    }
+
+    /// <summary>
+    /// Yolları kabuk partisine yazar. Parti tek yolda kalıyorsa <c>null</c> döner ve yol
+    /// eskisi gibi tek dosya açılır; birden çok yol biriktiyse partinin tamamı döner.
+    /// </summary>
+    private IReadOnlyList<string>? JoinShellBatch(IReadOnlyList<string> paths)
+    {
+        var now = DateTime.UtcNow;
+        if (_shellBatch.Count == 0 || now - _shellBatchAt >= ShellBatchWindow) _shellBatch.Clear();
+        _shellBatchAt = now;
+        _shellBatch.AddRange(paths);
+        return _shellBatch.Count > 1 ? _shellBatch.ToArray() : null;
+    }
+
+    private Task StartShellOpen(string path, Func<Task> load)
+    {
+        _shellBatch.Clear();
+        _shellBatch.Add(path);
+        _shellBatchAt = DateTime.UtcNow;
+        return AfterShellWork(load);
+    }
+
+    private Task AfterShellWork(Func<Task> work)
+    {
+        _shellTail = RunAfter(_shellTail, work);
+        return _shellTail;
+    }
+
+    private static async Task RunAfter(Task previous, Func<Task> work)
+    {
+        try { await previous; }
+        catch (Exception) { }
+        await work();
+    }
+
+    private async Task OpenShellBatchAsync(IReadOnlyList<string> batch)
+    {
+        Tabs.SelectedIndex = PlayerTabIndex;
+        if (Player.OpenShellBatch(batch)) await Player.Navigation;
+    }
+
+    private async Task EnqueueForwardedAsync(IReadOnlyList<string> paths)
+    {
+        var idle = Player.LoadedPath is null;
+        if (idle) Tabs.SelectedIndex = PlayerTabIndex;
+        if (Player.EnqueueItems(paths) && idle) await Player.Navigation;
     }
 
     /// <summary>
@@ -66,11 +139,9 @@ public partial class MainWindow
     /// </summary>
     private void FlushPendingMacFile()
     {
-        if (!_pendingMacFile) return;
-        _pendingMacFile = false;
-        var path = _pendingMacPath;
-        _pendingMacPath = null;
-        AcceptForwarded(path);
+        if (_pendingMacRequest is not { } request) return;
+        _pendingMacRequest = null;
+        AcceptForwarded(request);
     }
 
     internal void BeginEncodingForTest() => _cts ??= new CancellationTokenSource();
@@ -84,12 +155,6 @@ public partial class MainWindow
     }
 
     internal Task? ForwardedLoad { get; private set; }
-
-    private Task LoadForwardedAsync(string path)
-    {
-        ForwardedLoad = LoadAndTraceAsync(path);
-        return ForwardedLoad;
-    }
 
     private async Task LoadAndTraceAsync(string path)
     {

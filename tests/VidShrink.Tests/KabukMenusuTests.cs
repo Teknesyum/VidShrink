@@ -26,6 +26,8 @@ public class KabukMenusuTests
     [InlineData("VidShrinkKucult", "shellShrinkMenuKeyName")]
     [InlineData("Teknesyum.VidShrink.Shell", "shellPackageName")]
     [InlineData("--kucult", "shellShrinkFlag")]
+    [InlineData("VidShrinkSirayaEkle", "shellEnqueueMenuKeyName")]
+    [InlineData("--siraya-ekle", "shellEnqueueFlag")]
     public void AnahtarAdlariIkiTaraftaAyni(string value, string scriptVariable)
     {
         Assert.Contains($"${scriptVariable} = '{value}'", Script());
@@ -44,6 +46,25 @@ public class KabukMenusuTests
 
         Assert.NotEmpty(beklenen);
         Assert.Equal(beklenen, bizim);
+    }
+
+    /// <summary>
+    /// Ses ve çalma listesi uzantıları betikte, uygulamada ve çekirdekte aynı küme; yalnız
+    /// "aç" ve "sıraya ekle" fiillerine gider, video uzantılarıyla kesişmez.
+    /// </summary>
+    [Fact]
+    public void OynaticiUzantilariUcTaraftaAyni()
+    {
+        var script = Regex.Match(Script(), @"\$shellPlayerExtensions = @\((?<body>[^)]*)\)").Groups["body"].Value;
+        var beklenen = Regex.Matches(script, "'(?<ad>[^']+)'").Select(m => m.Groups["ad"].Value).ToArray();
+
+        Assert.NotEmpty(beklenen);
+        Assert.Equal(beklenen, ShellMenu.PlayerExtensions);
+        Assert.Equal(beklenen, ShellIntegration.PlayerMenuExtensions);
+        Assert.Empty(ShellMenu.PlayerExtensions.Intersect(ShellMenu.Extensions));
+        Assert.Equal(ShellMenu.Extensions, ShellMenu.ExtensionsFor(ShellMenu.ShrinkMenuKey));
+        Assert.Equal(ShellMenu.Extensions.Concat(ShellMenu.PlayerExtensions), ShellMenu.ExtensionsFor(ShellMenu.EnqueueMenuKey));
+        Assert.Equal(ShellIntegration.EnqueueFlag, ShellMenu.EnqueueFlag);
     }
 
     /// <summary>
@@ -132,14 +153,14 @@ public class KabukMenusuTests
         Assert.Contains("WriteLabel(\"shrink\", label);", Code());
     }
 
-    /// <summary>Her girdi ikonu taşıyor: açma, küçültme başlığı ve her hedef.</summary>
+    /// <summary>Her girdi ikonu taşıyor: açma, sıraya ekleme, küçültme başlığı ve her hedef.</summary>
     [Fact]
     public void HerGirdideIkonVar()
     {
         var code = Code();
         var icons = Regex.Matches(code, @"SetValue\(""Icon"", executable").Count;
 
-        Assert.Equal(3, icons);
+        Assert.Equal(4, icons);
     }
 
     /// <summary>Menü etiketi arayüz dilini izliyor: dil değişince yeniden yazılıyor.</summary>
@@ -172,6 +193,7 @@ public class KabukMenusuTests
 
         Assert.Contains("ShellMenu.Relabel(ShellMenu.MenuKey", relabel);
         Assert.Contains("ShellMenu.Relabel(ShellMenu.ShrinkMenuKey", relabel);
+        Assert.Contains("ShellMenu.Relabel(ShellMenu.EnqueueMenuKey", relabel);
         Assert.DoesNotContain("Install", relabel);
         Assert.DoesNotContain("ProcessPath", relabel);
 
@@ -204,6 +226,7 @@ public class KabukMenusuTests
     [InlineData("settings-tab.shell-menu.error")]
     [InlineData("shell.menu.open")]
     [InlineData("shell.menu.shrink")]
+    [InlineData("shell.menu.enqueue")]
     [InlineData("shell.menu.target.size-8")]
     [InlineData("shell.menu.target.whatsapp-chat")]
     [InlineData("shell.menu.target.discord-free")]

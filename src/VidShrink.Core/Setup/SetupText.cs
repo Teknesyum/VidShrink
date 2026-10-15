@@ -312,6 +312,9 @@ public static class SetupText
         ["shell.menu.shrink"] = (
             "VidShrink ile Küçült",
             "Shrink with VidShrink"),
+        ["shell.menu.enqueue"] = (
+            "VidShrink Sırasına Ekle",
+            "Add to VidShrink queue"),
         ["setup.help"] = (
             """
             VidShrink-Setup - VidShrink'i kurar, günceller ya da kaldırır.

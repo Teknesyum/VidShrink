@@ -61,7 +61,7 @@ public sealed class KurucuExeTests : IDisposable
 
         var removed = Script("-RemoveShellMenu", "-RemoveFileAssociation", "-RegistryRoot", $@"HKCU:\{scriptRoot}");
         Assert.True(removed.Code == 0, removed.Output);
-        Assert.Equal(24, ShellRegistration.RemoveMenus(engineRoot));
+        Assert.Equal(57, ShellRegistration.RemoveMenus(engineRoot));
         Assert.Equal(24, ShellRegistration.RemoveFileAssociation(engineRoot));
 
         Assert.Equal(Dump(scriptRoot), Dump(engineRoot));
