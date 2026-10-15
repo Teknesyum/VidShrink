@@ -181,6 +181,26 @@
                    auto:AutomationProperties.Name="{loc:Text main.player.menu.goto}"/>
         </Border>
 
+        <Border x:Name="ResumeBox"
+                Theme="{StaticResource PlaybackBadge}"
+                Margin="{StaticResource PlaybackBadgeMargin}"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                IsVisible="False">
+          <StackPanel Spacing="{StaticResource PlaybackBadgeGap}">
+            <TextBlock Text="{loc:Text player.resume.ask}"
+                       Theme="{StaticResource PlaybackBadgeText}"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="{StaticResource PlaybackBadgeGap}">
+              <Button x:Name="BtnResumeContinue" Content="{loc:Text player.resume.continue}"
+                      Theme="{StaticResource PrimaryButton}" Click="OnResumeContinue"/>
+              <Button x:Name="BtnResumeRestart" Content="{loc:Text player.resume.restart}"
+                      Theme="{StaticResource GhostButton}" Click="OnResumeRestart"/>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
         <Border x:Name="MediaTitle" Theme="{StaticResource PlaybackMediaTitle}" Classes="reveal">
           <TextBlock x:Name="TxtMediaTitle" Theme="{StaticResource PlaybackMediaTitleText}"/>
         </Border>

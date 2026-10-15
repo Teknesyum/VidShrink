@@ -11,7 +11,7 @@ Sayı hiçbir yerde sabit yazılı değil. `docs/danisma/2026-09-17-fable-kararl
 diyor; o, 13 Eylül ölçümünün sayısıdır. Takım Fluent'e taşınırken `IconRestore` eklenmiş (27),
 ardından kullanılmayan iki geometri düşürülmüştü; 18 Eylül 2026'da uyarı durumu için
 `IconWarning` eklendi (26); 27 Eylül 2026'da Teknesyum düğmesi simgesiz kalınca `IconCode`
-düştü; 27 Eylül 2026'da düzenleyici sekmesi için `IconEditor` eklendi; 28 Eylül 2026'da bölge düzenleyicinin kare al ve çerçeveyi gizle düğmeleri için `IconCamera` ile `IconEyeOff` eklendi; 2 Ekim 2026'da oynatıcının hız A/B harfi göstergeye dönünce `IconSpeed` yerini `IconSpeedFast`, `IconSpeedFastTip` ve `IconSpeedSlow`'a bıraktı (kadran Fluent Top Speed, ibre türetildi; kadranın sol üst çentiği yavaş ibreye çarpmasın diye düştü) — bugün depoda **30** yol var. `IconsTests` bu
+düştü; 27 Eylül 2026'da düzenleyici sekmesi için `IconEditor` eklendi; 28 Eylül 2026'da bölge düzenleyicinin kare al ve çerçeveyi gizle düğmeleri için `IconCamera` ile `IconEyeOff` eklendi; 2 Ekim 2026'da oynatıcının hız A/B harfi göstergeye dönünce `IconSpeed` yerini `IconSpeedFast`, `IconSpeedFastTip` ve `IconSpeedSlow`'a bıraktı (kadran Fluent Top Speed, ibre türetildi; kadranın sol üst çentiği yavaş ibreye çarpmasın diye düştü); 15 Ekim 2026'da oynatıcının yer imi listesi ve geçmiş penceresindeki yer imi işareti için `IconBookmark` eklendi — bugün depoda **31** yol var. `IconsTests` bu
 tabloyla `Icons.axaml`'ı karşılıklı okur; tabloya girmeyen ya da tablodan düşen her anahtar
 ölçüyü kırar.
 
@@ -47,6 +47,7 @@ tabloyla `Icons.axaml`'ı karşılıklı okur; tabloya girmeyen ya da tablodan d
 | 28 | IconEditor | `Cut` | `ic_fluent_cut_24_filled.svg` | Filled / 24 px | Düzenleyici sekmesi |
 | 29 | IconCamera | `Camera` | `ic_fluent_camera_24_filled.svg` | Filled / 24 px | Bölge düzenleyicide kare al |
 | 30 | IconEyeOff | `Eye Off` | `ic_fluent_eye_off_24_filled.svg` | Filled / 24 px | Bölge düzenleyicide çerçeveyi gizle |
+| 31 | IconBookmark | `Bookmark` | `ic_fluent_bookmark_24_filled.svg` | Filled / 24 px | Geçmiş penceresinde yer imli dosya işareti |
 
 ## Ölçülen Sınır Kutuları
 
@@ -58,7 +59,7 @@ Sabitleyici çıkarıldıktan sonra `Geometry.Parse(...).Bounds` ile okunan değ
 - `IconSpeedFastTip` — yalnız hızlı ibrenin ucu (x 14,37–18,47, y 7,80–11,39); tek başına çizilmez, `IconSpeedFast`'in üstüne bindirilir.
 - `IconCoffee` — kulp sağda 2 birimlik kenar payını taşıyor (sağ kenar 23,00).
 
-Bu beşi ayrı ayrı, ölçülen kutularıyla pimlendi; kalan 25 simge genel kurala (mürekkep
+Bu beşi ayrı ayrı, ölçülen kutularıyla pimlendi; kalan 26 simge genel kurala (mürekkep
 2–22 aralığında, merkez 12±0,55) uyuyor.
 
 ## Kaldırılan Geometriler (18 Eylül 2026)

@@ -151,6 +151,7 @@ public sealed class KeymapTests
         [PlayerCommandKind.Stop] = "stop -> ",
         [PlayerCommandKind.GoToStart] = "tostart",
         [PlayerCommandKind.GoToTime] = "goto -> ",
+        [PlayerCommandKind.BookmarkList] = "bookmarklist -> ",
         [PlayerCommandKind.Edit] = "edit -> ",
         [PlayerCommandKind.SubtitleVisibility] = "subvisible -> ",
         [PlayerCommandKind.SubtitleLine] = "subline ",

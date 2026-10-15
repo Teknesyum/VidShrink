@@ -42,6 +42,11 @@ internal sealed partial class HistoryWindow : Window
 
     internal IEnumerable<string> ShownPaths => Rows.Items.OfType<ListBoxItem>().Select(item => (string)item.Tag!);
 
+    /// <summary>Yer imi simgesi taşıyan satırların yolları.</summary>
+    internal IEnumerable<string> BookmarkedPaths => Rows.Items.OfType<ListBoxItem>()
+        .Where(item => item.Content is Grid grid && grid.Children.OfType<PathIcon>().Any(icon => icon.IsVisible))
+        .Select(item => (string)item.Tag!);
+
     /// <summary>Seçili satırı, seçim yoksa ilk satırı açar ve pencereyi kapatır.</summary>
     internal bool OpenSelected()
     {
@@ -64,13 +69,34 @@ internal sealed partial class HistoryWindow : Window
                 TextTrimming = Avalonia.Media.TextTrimming.CharacterEllipsis,
             };
             if (this.TryFindResource("Hint", out var hint) && hint is Avalonia.Styling.ControlTheme theme) detail.Theme = theme;
-            var item = new ListBoxItem { Tag = row.Path, Content = new StackPanel { Children = { name, detail } } };
+            var text = new StackPanel { Children = { name, detail } };
+            var content = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
+            content.Children.Add(text);
+            if (row.HasBookmarks) content.Children.Add(BookmarkIcon());
+            var item = new ListBoxItem { Tag = row.Path, Content = content };
             ToolTip.SetTip(item, row.Path);
             Rows.Items.Add(item);
         }
 
         TxtEmpty.IsVisible = Rows.ItemCount == 0;
         BtnOpen.IsEnabled = Rows.ItemCount > 0;
+    }
+
+    private PathIcon BookmarkIcon()
+    {
+        var icon = new PathIcon { VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
+        Grid.SetColumn(icon, 1);
+        if (this.TryFindResource("IconBookmark", out var data) && data is Avalonia.Media.Geometry geometry) icon.Data = geometry;
+        if (this.TryFindResource("IconSizeSm", out var size) && size is double side)
+        {
+            icon.Width = side;
+            icon.Height = side;
+        }
+
+        if (this.TryFindResource("NeonPink", out var brush) && brush is Avalonia.Media.IBrush pink) icon.Foreground = pink;
+        ToolTip.SetTip(icon, Strings.Get("player.history.bookmarked"));
+        Avalonia.Automation.AutomationProperties.SetName(icon, Strings.Get("player.history.bookmarked"));
+        return icon;
     }
 
     private void OnKey(object? sender, KeyEventArgs e)

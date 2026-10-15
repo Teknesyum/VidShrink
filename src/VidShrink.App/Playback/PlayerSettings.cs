@@ -17,6 +17,14 @@ internal enum RepeatMode
     One
 }
 
+/// <summary>Açılışta kaldığı yerden devam: kapalı, açık ya da her açılışta sor.</summary>
+internal enum ResumeMode
+{
+    Off,
+    On,
+    Ask
+}
+
 internal enum ScreenshotFormat
 {
     Png,
@@ -122,7 +130,7 @@ internal sealed class PlayerSettings
 
     internal bool KeepHistory { get; set; } = true;
 
-    internal bool Resume { get; set; } = true;
+    internal ResumeMode Resume { get; set; } = ResumeMode.On;
 
     internal bool AudioInInterfaceLanguage { get; set; } = true;
 
@@ -162,7 +170,9 @@ internal sealed class PlayerSettings
             settings.Volume = (double?)root["volume"] is { } volume && double.IsFinite(volume) && volume >= 0 && volume <= SoundAdjust.BoostCeiling ? volume : DefaultVolume;
             settings.Muted = (bool?)root["muted"] ?? false;
             settings.KeepHistory = (bool?)root["keepHistory"] ?? true;
-            settings.Resume = (bool?)root["resume"] ?? true;
+            settings.Resume = Enum.TryParse<ResumeMode>((string?)root["resumeMode"], true, out var resume) && Enum.IsDefined(resume)
+                ? resume
+                : ((bool?)root["resume"] ?? true) ? ResumeMode.On : ResumeMode.Off;
             settings.AudioInInterfaceLanguage = (bool?)root["audioInInterfaceLanguage"] ?? true;
             settings.SubtitleInInterfaceLanguage = (bool?)root["subtitleInInterfaceLanguage"] ?? true;
             settings.PauseOnMinimize = (bool?)root["pauseOnMinimize"] ?? false;
@@ -209,7 +219,8 @@ internal sealed class PlayerSettings
                 writer.WriteNumber("volume", Volume);
                 writer.WriteBoolean("muted", Muted);
                 writer.WriteBoolean("keepHistory", KeepHistory);
-                writer.WriteBoolean("resume", Resume);
+                writer.WriteBoolean("resume", Resume != ResumeMode.Off);
+                writer.WriteString("resumeMode", Resume.ToString());
                 writer.WriteBoolean("audioInInterfaceLanguage", AudioInInterfaceLanguage);
                 writer.WriteBoolean("subtitleInInterfaceLanguage", SubtitleInInterfaceLanguage);
                 writer.WriteBoolean("pauseOnMinimize", PauseOnMinimize);

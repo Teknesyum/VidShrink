@@ -235,6 +235,9 @@ internal partial class PlayerView : UserControl
             case PlayerCommandKind.BookmarkNext:
                 StepBookmark(command.Amount < 0);
                 break;
+            case PlayerCommandKind.BookmarkList:
+                ShowBookmarks();
+                break;
             case PlayerCommandKind.ChapterStep:
                 StepChapter(command.Amount < 0);
                 break;
@@ -507,7 +510,7 @@ internal partial class PlayerView : UserControl
         items.Add(Switch(Strings.Get("player.view.screenshot-jpg"), Settings.ScreenshotFormat == ScreenshotFormat.Jpg, ToggleScreenshotJpg));
         items.Add(Switch(Strings.Get("player.view.screenshot-subtitles"), Settings.ScreenshotSubtitles, ToggleScreenshotSubtitles));
         items.Add(Switch(Strings.Get("player.view.keep-history"), Settings.KeepHistory, ToggleKeepHistory));
-        items.Add(Switch(Strings.Get("player.view.resume"), Settings.Resume, ToggleResume));
+        items.Add(ResumeMenu());
         items.Add(Switch(Strings.Get("player.view.audio-language"), Settings.AudioInInterfaceLanguage, ToggleAudioLanguage));
         items.Add(Switch(Strings.Get("player.view.subtitle-language"), Settings.SubtitleInInterfaceLanguage, ToggleSubtitleLanguage));
         items.Add(Switch(Strings.Get("player.view.pause-on-minimize"), Settings.PauseOnMinimize, TogglePauseOnMinimize));
@@ -595,6 +598,7 @@ internal partial class PlayerView : UserControl
         if (!_playing && _engine is { EndReached: true } && PlayFromEnd()) return;
         _playing = !_playing;
         _trackPaused = false;
+        if (_playing) HideResumePrompt();
         if (_engine is not { } engine) return;
 
         _stall.Reset();
@@ -793,10 +797,13 @@ internal partial class PlayerView : UserControl
         ShowMediaTitle(path);
         StartWatchdog();
         StartRender();
-        var resume = HistoryPath is null || !Settings.Resume ? 0 : _history.ResumeFor(path, engine.DurationSeconds);
-        _seek.GoTo(resume);
-        if (resume > 0) _trace.Add("resume -> " + Saat.Tani.Konum(resume));
-        if (!_playing) TogglePlay(false);
+        var mode = HistoryPath is null ? ResumeMode.Off : Settings.Resume;
+        var resume = mode == ResumeMode.Off ? 0 : _history.ResumeFor(path, engine.DurationSeconds);
+        var ask = mode == ResumeMode.Ask && resume > 0;
+        _seek.GoTo(ask ? 0 : resume);
+        if (resume > 0 && !ask) _trace.Add("resume -> " + Saat.Tani.Konum(resume));
+        if (ask) AskResume(resume);
+        else if (!_playing) TogglePlay(false);
         AfterOpen(path, engine);
         RefreshState();
         Opened?.Invoke(path);
@@ -814,7 +821,7 @@ internal partial class PlayerView : UserControl
     private void SaveHistory(bool finished)
     {
         if (_path is not { } path || HistoryPath?.Invoke() is not { } file || !Settings.KeepHistory) return;
-        _history.Remember(path, CurrentPosition(), finished, _seek.Duration, CurrentTracks());
+        _history.Remember(path, _pendingResume ?? CurrentPosition(), finished, _seek.Duration, CurrentTracks());
         _history.Save(file);
     }
 
@@ -958,6 +965,7 @@ internal partial class PlayerView : UserControl
         _shown = 0;
         _path = null;
         _playing = false;
+        HideResumePrompt();
         _trackPaused = false;
         OynatmaDurumunuYansit();
     }
