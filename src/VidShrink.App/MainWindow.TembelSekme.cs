@@ -11,6 +11,7 @@ public partial class MainWindow
     private RecorderView? _recorderPane;
     private EditorView? _editorPane;
     private bool _editorDropMetadata;
+    private bool _editorClipChapters;
     private string _editorPartNamePattern = string.Empty;
 
     /// <summary>
@@ -74,6 +75,12 @@ public partial class MainWindow
             _editorPane.DropMetadataChanged = value =>
             {
                 _editorDropMetadata = value;
+                SaveAppSettings();
+            };
+            _editorPane.ClipChapters = _editorClipChapters;
+            _editorPane.ClipChaptersChanged = value =>
+            {
+                _editorClipChapters = value;
                 SaveAppSettings();
             };
             _editorPane.PartNamePattern = _editorPartNamePattern;

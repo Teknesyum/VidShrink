@@ -55,6 +55,8 @@
   "editor.export.separate": "Ekspordi klipid eraldi failidena",
   "editor.export.segments-done": "{0} klippi eksporditud asukohta: {1}",
   "editor.export.segment-failed": "Klipp {0} ebaõnnestus, ülejäänud jäeti vahele: {1}",
+  "editor.export.chapters": "Kirjuta peatükid klippidest",
+  "editor.export.chapters.tip": "Iga klipp saab eksporditud failis peatükiks, mille nimi tuleb selle sildist. Väljalülitatuna säilivad allika peatükid ja need nihutatakse lõigete järgi.",
   "editor.tool.selection": "Valikutööriist",
   "editor.tool.razor": "Žiletitööriist",
   "editor.tool.ripple": "Nihkemuutmise tööriist",

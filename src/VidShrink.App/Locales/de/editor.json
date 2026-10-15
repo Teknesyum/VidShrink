@@ -55,6 +55,8 @@
   "editor.export.separate": "Clips als einzelne Dateien exportieren",
   "editor.export.segments-done": "{0} Clips exportiert nach: {1}",
   "editor.export.segment-failed": "Clip {0} fehlgeschlagen, die übrigen wurden übersprungen: {1}",
+  "editor.export.chapters": "Kapitel aus Clips schreiben",
+  "editor.export.chapters.tip": "Jeder Clip wird in der exportierten Datei zu einem Kapitel, benannt nach seiner Beschriftung. Ausgeschaltet bleiben die Kapitel der Quelle erhalten und werden den Schnitten entsprechend verschoben.",
   "editor.tool.selection": "Auswahl-Werkzeug",
   "editor.tool.razor": "Rasierklingen-Werkzeug",
   "editor.tool.ripple": "Werkzeug für Löschen und Lücke schließen",

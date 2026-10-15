@@ -55,6 +55,8 @@
   "editor.export.separate": "Exportovat klipy do samostatných souborů",
   "editor.export.segments-done": "Exportováno klipů: {0}, do: {1}",
   "editor.export.segment-failed": "Klip {0} selhal, ostatní byly přeskočeny: {1}",
+  "editor.export.chapters": "Zapsat kapitoly z klipů",
+  "editor.export.chapters.tip": "Každý klip se v exportovaném souboru stane kapitolou pojmenovanou podle svého štítku. Je-li vypnuto, kapitoly zdroje se zachovají a posunou podle střihů.",
   "editor.tool.selection": "Nástroj výběr",
   "editor.tool.razor": "Nástroj žiletka",
   "editor.tool.ripple": "Nástroj zvlněné úpravy",

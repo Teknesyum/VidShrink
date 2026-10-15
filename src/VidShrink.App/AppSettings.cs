@@ -41,6 +41,9 @@ public sealed class AppSettings
     /// <summary>Düzenleyici teslimindeki meta silme kutusu; eski dosyada anahtar yoktur ve kapalı okunur.</summary>
     public bool EditorDropMetadata { get; set; }
 
+    /// <summary>Duzenleyici teslimindeki parca bolumleri kutusu; eski dosyada anahtar yoktur ve kapali okunur.</summary>
+    public bool EditorClipChapters { get; set; }
+
     /// <summary>Düzenleyicide ayrı parçaların ad deseni; boş ise parçalar eski adlarını alır.</summary>
     public string EditorPartNamePattern { get; set; } = "";
 
@@ -151,6 +154,7 @@ public sealed class AppSettings
             ReadBool(root, "advDropMetadata", value => settings.AdvDropMetadata = value);
             ReadBool(root, "convertDropMetadata", value => settings.ConvertDropMetadata = value);
             ReadBool(root, "editorDropMetadata", value => settings.EditorDropMetadata = value);
+            ReadBool(root, "editorClipChapters", value => settings.EditorClipChapters = value);
             ReadString(root, "editorPartNamePattern", value => settings.EditorPartNamePattern = value);
             ReadInt(root, "outputFolderMode", value => settings.OutputFolderMode = value);
             ReadString(root, "outputFolder", value => settings.OutputFolder = value);
@@ -241,6 +245,7 @@ public sealed class AppSettings
         root["advDropMetadata"] = AdvDropMetadata;
         root["convertDropMetadata"] = ConvertDropMetadata;
         root["editorDropMetadata"] = EditorDropMetadata;
+        root["editorClipChapters"] = EditorClipChapters;
         root["editorPartNamePattern"] = EditorPartNamePattern;
         root["theme"] = Theme;
         root[ThemeMigrationMarker] = true;

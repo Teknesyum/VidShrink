@@ -55,6 +55,8 @@
   "editor.export.separate": "Exportă clipurile ca fișiere separate",
   "editor.export.segments-done": "{0} clipuri exportate în: {1}",
   "editor.export.segment-failed": "Clipul {0} a eșuat, restul au fost omise: {1}",
+  "editor.export.chapters": "Scrie capitole din clipuri",
+  "editor.export.chapters.tip": "Fiecare clip devine un capitol în fișierul exportat, numit după eticheta sa. Când este dezactivat, capitolele sursei se păstrează și se deplasează după tăieturi.",
   "editor.tool.selection": "Instrument de selecție",
   "editor.tool.razor": "Instrument lamă",
   "editor.tool.ripple": "Instrument de editare în val",

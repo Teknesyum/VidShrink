@@ -55,6 +55,8 @@
   "editor.export.separate": "برون‌بری کلیپ‌ها در فایل‌های جداگانه",
   "editor.export.segments-done": "{0} کلیپ برون‌بری شد در: {1}",
   "editor.export.segment-failed": "کلیپ {0} ناموفق بود، بقیه نادیده گرفته شدند: {1}",
+  "editor.export.chapters": "نوشتن فصل‌ها از کلیپ‌ها",
+  "editor.export.chapters.tip": "هر کلیپ در فایل خروجی یک فصل می‌شود و نامش را از برچسب خود می‌گیرد. وقتی خاموش است، فصل‌های منبع حفظ و مطابق برش‌ها جابه‌جا می‌شوند.",
   "editor.tool.selection": "ابزار انتخاب",
   "editor.tool.razor": "ابزار تیغ",
   "editor.tool.ripple": "ابزار ویرایش موجی",

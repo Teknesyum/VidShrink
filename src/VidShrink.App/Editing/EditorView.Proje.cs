@@ -101,7 +101,7 @@ internal partial class EditorView
 
     private EditTimeline OpenedTimeline(string path, long sourceDuration, EditProject? given)
     {
-        _pendingMarkers = Array.Empty<EditMarker>();
+        _pendingMarkers = SourceChapterMarkers(path);
         var model = EditTimeline.FromSource(sourceDuration);
         _stamp = SourceStamp.Of(path);
         if (_stamp is not { } stamp) return model;
@@ -131,6 +131,16 @@ internal partial class EditorView
         ShowProjectStatus("StatusSuccess", Strings.Get("editor.project.restored"));
         return model;
     }
+
+    /// <summary>
+    /// Acilista onerilen isaretciler: kaynagin bolum baslari, bolumun adiyla (<see cref="EditChapters.Markers"/>).
+    /// Kayitli proje isaretci tasiyorsa onlar kazanir. Bilgi <see cref="KnownInfo"/>'dan gelir; kaynagin baslangic
+    /// kaymasi acilista bilinmez, sifir sayilir.
+    /// </summary>
+    private IReadOnlyList<EditMarker> SourceChapterMarkers(string path)
+        => KnownInfo?.Invoke(path) is { Chapters.Count: > 0 } info
+            ? EditChapters.Markers(info.Chapters, 0)
+            : Array.Empty<EditMarker>();
 
     /// <summary>Kutudaki adi oynatma basindaki isaretciye yazar; isaretci yoksa ekler. Bos ad adi siler.</summary>
     internal bool CommitMarkerName()

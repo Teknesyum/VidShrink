@@ -55,6 +55,8 @@
   "editor.export.separate": "ส่งออกคลิปเป็นไฟล์แยกกัน",
   "editor.export.segments-done": "ส่งออก {0} คลิปไปที่: {1}",
   "editor.export.segment-failed": "คลิป {0} ล้มเหลว ที่เหลือถูกข้าม: {1}",
+  "editor.export.chapters": "เขียนบทจากคลิป",
+  "editor.export.chapters.tip": "แต่ละคลิปจะกลายเป็นบทในไฟล์ที่ส่งออกและใช้ชื่อตามป้ายกำกับ เมื่อปิด บทของต้นฉบับจะถูกเก็บไว้และเลื่อนตามจุดตัด",
   "editor.tool.selection": "เครื่องมือเลือก",
   "editor.tool.razor": "เครื่องมือมีดโกน",
   "editor.tool.ripple": "เครื่องมือแก้ไขแบบระลอก",

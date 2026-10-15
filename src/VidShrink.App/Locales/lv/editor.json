@@ -55,6 +55,8 @@
   "editor.export.separate": "Eksportēt klipus kā atsevišķus failus",
   "editor.export.segments-done": "Eksportēti klipi: {0}, uz: {1}",
   "editor.export.segment-failed": "Klips {0} neizdevās, pārējie izlaisti: {1}",
+  "editor.export.chapters": "Rakstīt nodaļas no klipiem",
+  "editor.export.chapters.tip": "Katrs klips eksportētajā failā kļūst par nodaļu ar tā etiķetes nosaukumu. Izslēgtā stāvoklī avota nodaļas tiek saglabātas un nobīdītas atbilstoši griezumiem.",
   "editor.tool.selection": "Atlases rīks",
   "editor.tool.razor": "Skuvekļa rīks",
   "editor.tool.ripple": "Viļņveida rediģēšanas rīks",

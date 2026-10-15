@@ -55,6 +55,8 @@
   "editor.export.separate": "Clips als afzonderlijke bestanden exporteren",
   "editor.export.segments-done": "{0} clips geëxporteerd naar: {1}",
   "editor.export.segment-failed": "Clip {0} is mislukt, de rest is overgeslagen: {1}",
+  "editor.export.chapters": "Hoofdstukken uit clips schrijven",
+  "editor.export.chapters.tip": "Elke clip wordt een hoofdstuk in het geëxporteerde bestand, genoemd naar zijn label. Uitgeschakeld blijven de hoofdstukken van de bron behouden, verschoven volgens de knippen.",
   "editor.tool.selection": "Selectiegereedschap",
   "editor.tool.razor": "Scheermesgereedschap",
   "editor.tool.ripple": "Rimpelbewerkingsgereedschap",

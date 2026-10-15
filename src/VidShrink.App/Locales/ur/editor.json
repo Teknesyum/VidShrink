@@ -55,6 +55,8 @@
   "editor.export.separate": "کلپس کو الگ الگ فائلوں میں برآمد کریں",
   "editor.export.segments-done": "{0} کلپس برآمد ہوئے: {1}",
   "editor.export.segment-failed": "کلپ {0} ناکام رہا، باقی چھوڑ دیے گئے: {1}",
+  "editor.export.chapters": "کلپس سے ابواب لکھیں",
+  "editor.export.chapters.tip": "ہر کلپ برآمد شدہ فائل میں ایک باب بنتی ہے اور اپنے لیبل کا نام لیتی ہے۔ بند ہونے پر ماخذ کے ابواب برقرار رہتے ہیں اور کٹ کے مطابق سرکائے جاتے ہیں۔",
   "editor.tool.selection": "انتخاب ٹول",
   "editor.tool.razor": "ریزر ٹول",
   "editor.tool.ripple": "رپل ایڈٹ ٹول",

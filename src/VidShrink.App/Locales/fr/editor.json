@@ -55,6 +55,8 @@
   "editor.export.separate": "Exporter les clips dans des fichiers séparés",
   "editor.export.segments-done": "{0} clips exportés vers : {1}",
   "editor.export.segment-failed": "Le clip {0} a échoué, les suivants ont été ignorés : {1}",
+  "editor.export.chapters": "Écrire les chapitres depuis les clips",
+  "editor.export.chapters.tip": "Chaque clip devient un chapitre du fichier exporté, nommé d'après son étiquette. Désactivé, les chapitres de la source sont conservés et décalés selon les coupes.",
   "editor.tool.selection": "Outil Sélection",
   "editor.tool.razor": "Outil Cutter",
   "editor.tool.ripple": "Outil Modification par propagation",

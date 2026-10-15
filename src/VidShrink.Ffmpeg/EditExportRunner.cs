@@ -26,12 +26,12 @@ public static class EditExportRunner
     public static async Task<ExportPlan> PrepareAsync(
         IReadOnlyList<string> sources, EditTimeline timeline, ExportMode mode, string outputPath, long memoryBudgetBytes,
         bool dropMetadata = false, CancellationToken ct = default, EditExportSettings? settings = null,
-        int audioTrack = EditAudioTrack.Default)
+        int audioTrack = EditAudioTrack.Default, bool clipChapters = false, string chapterTitle = EditChapters.DefaultTitle)
     {
         var probed = await ProbeSourcesAsync(sources, timeline, mode, false, ct).ConfigureAwait(false);
         var work = WorkDirectoryFor(outputPath);
         return EditExport.Build(timeline, probed, mode, EncodeRunner.PartialPathFor(outputPath), work, memoryBudgetBytes,
-                EncoderCapabilities.Instance.HasEncoder, dropMetadata, settings, audioTrack)
+                EncoderCapabilities.Instance.HasEncoder, dropMetadata, settings, audioTrack, clipChapters, chapterTitle)
             with { OutputPath = outputPath };
     }
 
@@ -43,14 +43,15 @@ public static class EditExportRunner
     public static async Task<IReadOnlyList<ExportPlan>> PrepareSegmentsAsync(
         IReadOnlyList<string> sources, EditTimeline timeline, ExportMode mode, string outputPath, long memoryBudgetBytes,
         Func<string, bool>? exists = null, bool dropMetadata = false, CancellationToken ct = default, string? partPattern = null,
-        EditExportSettings? settings = null, int audioTrack = EditAudioTrack.Default)
+        EditExportSettings? settings = null, int audioTrack = EditAudioTrack.Default, bool clipChapters = false,
+        string chapterTitle = EditChapters.DefaultTitle)
     {
         var probed = await ProbeSourcesAsync(sources, timeline, mode, true, ct).ConfigureAwait(false);
         var outputs = EditOutputName.Segments(outputPath, PartNames(timeline), partPattern, exists);
         var partials = outputs.Select(EncodeRunner.PartialPathFor).ToArray();
         var works = outputs.Select(WorkDirectoryFor).ToArray();
         return EditExport.BuildSegments(timeline, probed, mode, partials, works, memoryBudgetBytes,
-                EncoderCapabilities.Instance.HasEncoder, dropMetadata, settings, audioTrack)
+                EncoderCapabilities.Instance.HasEncoder, dropMetadata, settings, audioTrack, clipChapters, chapterTitle)
             .Select((plan, i) => plan with { OutputPath = outputs[i] })
             .ToArray();
     }

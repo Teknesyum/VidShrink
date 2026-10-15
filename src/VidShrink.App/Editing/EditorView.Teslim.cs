@@ -87,6 +87,22 @@ internal partial class EditorView
     internal Action<bool>? DropMetadataChanged { get; set; }
 
     /// <summary>
+    /// Teslim dosyasina parca sinirlarindan bolum yazilir mi (iki ya da daha cok parcada; parcanin etiketi bolumun
+    /// adi olur). Kapaliyken kaynagin kendi bolumleri kesimle kaymis haliyle tasinir. Secim ana pencerenin
+    /// ayarinda saklanir, degisimi <see cref="ClipChaptersChanged"/> bildirir.
+    /// </summary>
+    internal bool ClipChapters
+    {
+        get => ChkExportChapters.IsChecked == true;
+        set => ChkExportChapters.IsChecked = value;
+    }
+
+    internal Action<bool>? ClipChaptersChanged { get; set; }
+
+    /// <summary>Adsiz bolumun ve etiketsiz parcanin adi; Kaydedici'nin bolum adiyla ayni anahtar (<c>{0}</c> sira).</summary>
+    internal static string ChapterTitle => Strings.Get("recorder.chapter.title");
+
+    /// <summary>
     /// Ayri parcalarin ad deseni; kutu bos ya da bozuksa <c>null</c> ve parcalar eski adlarini alir. Secim ana
     /// pencerenin ayarinda saklanir, degisimi <see cref="PartNamePatternChanged"/> bildirir.
     /// </summary>
@@ -129,6 +145,11 @@ internal partial class EditorView
             _pendingPlan = null;
             DropMetadataChanged?.Invoke(DropMetadata);
         };
+        ChkExportChapters.IsCheckedChanged += (_, _) =>
+        {
+            _pendingPlan = null;
+            ClipChaptersChanged?.Invoke(ClipChapters);
+        };
         TxtPartName.PlaceholderText = EditOutputName.PartPattern;
         TxtPartName.PropertyChanged += (_, e) =>
         {
@@ -165,7 +186,7 @@ internal partial class EditorView
         _pendingPlan = null;
     }
 
-    private string SaveKey(EditTimeline model) => Fingerprint(model) + "|" + SelectedExportMode + (ExportSeparately ? "|parts|" + PartNamePattern : string.Empty) + (DropMetadata ? "|meta" : string.Empty) + "|set|" + ExportSettings + "|aud|" + SelectedAudioTrack.ToString(System.Globalization.CultureInfo.InvariantCulture);
+    private string SaveKey(EditTimeline model) => Fingerprint(model) + "|" + SelectedExportMode + (ExportSeparately ? "|parts|" + PartNamePattern : string.Empty) + (DropMetadata ? "|meta" : string.Empty) + (ClipChapters ? "|chap" : string.Empty) + "|set|" + ExportSettings + "|aud|" + SelectedAudioTrack.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
     internal async Task<bool> SaveAsync()
     {
@@ -216,8 +237,8 @@ internal partial class EditorView
         try
         {
             plans = ExportSeparately
-                ? await EditExportRunner.PrepareSegmentsAsync(sources, snapshot, SelectedExportMode, output, ExportMemoryBudget(), OutputExists, DropMetadata, partPattern: PartNamePattern, settings: ExportSettings, audioTrack: SelectedAudioTrack).ConfigureAwait(true)
-                : new[] { await EditExportRunner.PrepareAsync(sources, snapshot, SelectedExportMode, output, ExportMemoryBudget(), DropMetadata, settings: ExportSettings, audioTrack: SelectedAudioTrack).ConfigureAwait(true) };
+                ? await EditExportRunner.PrepareSegmentsAsync(sources, snapshot, SelectedExportMode, output, ExportMemoryBudget(), OutputExists, DropMetadata, partPattern: PartNamePattern, settings: ExportSettings, audioTrack: SelectedAudioTrack, clipChapters: ClipChapters, chapterTitle: ChapterTitle).ConfigureAwait(true)
+                : new[] { await EditExportRunner.PrepareAsync(sources, snapshot, SelectedExportMode, output, ExportMemoryBudget(), DropMetadata, settings: ExportSettings, audioTrack: SelectedAudioTrack, clipChapters: ClipChapters, chapterTitle: ChapterTitle).ConfigureAwait(true) };
         }
         catch (EditExportNoAudioException)
         {

@@ -55,6 +55,8 @@
   "editor.export.separate": "Vie leikkeet erillisinä tiedostoina",
   "editor.export.segments-done": "{0} leikettä viety kohteeseen: {1}",
   "editor.export.segment-failed": "Leike {0} epäonnistui, loput ohitettiin: {1}",
+  "editor.export.chapters": "Kirjoita luvut leikkeistä",
+  "editor.export.chapters.tip": "Jokaisesta leikkeestä tulee viedyssä tiedostossa luku, joka nimetään sen tunnisteen mukaan. Pois päältä lähteen luvut säilyvät ja siirtyvät leikkausten mukaan.",
   "editor.tool.selection": "Valintatyökalu",
   "editor.tool.razor": "Partaveitsityökalu",
   "editor.tool.ripple": "Aaltomuokkaustyökalu",

@@ -356,20 +356,25 @@ public static class EditExport
         EditTimeline timeline, IReadOnlyDictionary<int, ExportSource> sources, ExportMode mode,
         string outputPath, string workDirectory, long memoryBudgetBytes,
         Func<string, bool>? hasEncoder = null, bool dropMetadata = false, EditExportSettings? settings = null,
-        int audioTrack = EditAudioTrack.Default)
+        int audioTrack = EditAudioTrack.Default, bool clipChapters = false, string chapterTitle = EditChapters.DefaultTitle)
     {
         if (timeline.Clips.Count == 0) throw new ArgumentException("Cizelge bos", nameof(timeline));
         var used = UsedSources(timeline);
+        ExportPlan plan;
         if (used.Count > 1)
         {
             var merged = Merge(timeline, WithTrack(sources, audioTrack, out var track), used, mode, outputPath, workDirectory, memoryBudgetBytes, dropMetadata,
                 settings ?? EditExportSettings.Default, track);
-            return timeline.Music is { } music ? WithMusic(merged, music, settings ?? EditExportSettings.Default, outputPath) : merged;
+            plan = timeline.Music is { } music ? WithMusic(merged, music, settings ?? EditExportSettings.Default, outputPath) : merged;
+        }
+        else
+        {
+            var only = SourceOf(sources, used[0]);
+            plan = Build(timeline, only.Info, only.Keyframes, only.StartTime, mode, outputPath, workDirectory, memoryBudgetBytes,
+                only.Cuts, hasEncoder, dropMetadata, settings, used[0] == 0 ? audioTrack : EditAudioTrack.Default);
         }
 
-        var only = SourceOf(sources, used[0]);
-        return Build(timeline, only.Info, only.Keyframes, only.StartTime, mode, outputPath, workDirectory, memoryBudgetBytes,
-            only.Cuts, hasEncoder, dropMetadata, settings, used[0] == 0 ? audioTrack : EditAudioTrack.Default);
+        return WithChapters(plan, timeline, sources, clipChapters, chapterTitle);
     }
 
     /// <summary>
@@ -380,15 +385,16 @@ public static class EditExport
         EditTimeline timeline, IReadOnlyDictionary<int, ExportSource> sources, ExportMode mode,
         IReadOnlyList<string> outputPaths, IReadOnlyList<string> workDirectories, long memoryBudgetBytes,
         Func<string, bool>? hasEncoder = null, bool dropMetadata = false, EditExportSettings? settings = null,
-        int audioTrack = EditAudioTrack.Default)
+        int audioTrack = EditAudioTrack.Default, bool clipChapters = false, string chapterTitle = EditChapters.DefaultTitle)
     {
         if (timeline.Clips.Count == 0) throw new ArgumentException("Cizelge bos", nameof(timeline));
         var used = UsedSources(timeline);
         if (used.Count == 1)
         {
             var only = SourceOf(sources, used[0]);
-            return BuildSegments(timeline, only.Info, only.Keyframes, only.StartTime, mode, outputPaths, workDirectories, memoryBudgetBytes,
+            var single = BuildSegments(timeline, only.Info, only.Keyframes, only.StartTime, mode, outputPaths, workDirectories, memoryBudgetBytes,
                 only.Cuts, hasEncoder, dropMetadata, settings, used[0] == 0 ? audioTrack : EditAudioTrack.Default);
+            return single.Select((plan, i) => WithChapters(plan, new EditTimeline(new[] { timeline.Clips[i] }), sources, clipChapters, chapterTitle)).ToArray();
         }
 
         if (outputPaths.Count != timeline.Clips.Count)
@@ -404,14 +410,70 @@ public static class EditExport
             var piece = new EditTimeline(new[] { timeline.Clips[i] }, texts: SegmentTexts(timeline, i));
             var plan = Build(piece, source.Info, source.Keyframes, source.StartTime, mode, outputPaths[i], workDirectories[i], memoryBudgetBytes,
                 source.Cuts, hasEncoder, dropMetadata, settings, timeline.Clips[i].Source == 0 ? audioTrack : EditAudioTrack.Default);
-            plans.Add(plan with
+            plans.Add(WithChapters(plan with
             {
                 MotionClips = plan.MotionClips.Select(_ => index).ToArray(),
                 ReverseOverLimit = plan.ReverseOverLimit.Select(_ => index).ToArray()
-            });
+            }, new EditTimeline(new[] { timeline.Clips[i] }), sources, clipChapters, chapterTitle));
         }
 
         return plans;
+    }
+
+    /// <summary>
+    /// Teslimin bolumleri: <paramref name="clipChapters"/> acik ve iki ya da daha cok parca varsa parca
+    /// sinirlari (<see cref="EditChapters.FromClips"/>), yoksa kaynak bolumlerinin kesimle kaymis hali
+    /// (<see cref="EditChapters.Shifted"/>). Hizli kipte planin anahtar kare kaymasi hesaba girer.
+    /// </summary>
+    public static IReadOnlyList<RecorderChapter> ChaptersFor(
+        EditTimeline timeline, IReadOnlyDictionary<int, ExportSource> sources, bool clipChapters, string chapterTitle,
+        IReadOnlyList<double>? leads = null)
+    {
+        if (clipChapters && timeline.Clips.Count > 1) return EditChapters.FromClips(timeline, chapterTitle, leads);
+        var chapters = new Dictionary<int, IReadOnlyList<ChapterMark>>();
+        foreach (var index in UsedSources(timeline))
+            if (sources.TryGetValue(index, out var source) && source.Info.Chapters.Count > 0)
+                chapters[index] = EditChapters.Relative(source.Info.Chapters, source.StartTime);
+        return EditChapters.Shifted(timeline, chapters, chapterTitle, leads);
+    }
+
+    /// <summary>
+    /// Bolum listesini teslimin son adimina ekler: liste <see cref="RecorderChapters.Metadata"/> ile
+    /// is klasorundeki <c>chapters.ffmeta</c>'ya yazilir (adimin <see cref="ExportStep.ExtraLists"/>'i),
+    /// son girdinin ardina <c>-f ffmetadata -i</c> olarak girer ve <c>-map_chapters</c> ile eslenir; Kaydedici'nin
+    /// yeniden paketlemesiyle ayni yol (<see cref="RecorderChapters.BuildRemux"/>). Liste bossa ama kaynakta bolum
+    /// varsa <c>-map_chapters -1</c> yazilir: ffmpeg kendiliginden ilk girdinin bolumlerini kaymamis kopyalardi.
+    /// Bolum tasimayan kapta (<see cref="RecorderChapters.Carries"/>) liste yazilmaz, kaynak bolumu yine dusurulur.
+    /// Bolumsuz kaynakta arguman degismez. Ara adimlara dokunulmaz.
+    /// </summary>
+    private static ExportPlan WithChapters(
+        ExportPlan plan, EditTimeline timeline, IReadOnlyDictionary<int, ExportSource> sources, bool clipChapters, string chapterTitle)
+    {
+        var hadChapters = UsedSources(timeline).Any(i => sources.TryGetValue(i, out var s) && s.Info.Chapters.Count > 0);
+        var carries = RecorderChapters.Carries(RecorderArguments.ContainerOf(plan.OutputPath));
+        var chapters = carries
+            ? ChaptersFor(timeline, sources, clipChapters, chapterTitle, plan.KeyframeLeads)
+            : Array.Empty<RecorderChapter>();
+        if (chapters.Count == 0 && !hadChapters) return plan;
+
+        var last = plan.Steps[^1];
+        var args = last.Args.ToList();
+        var lists = last.ExtraLists;
+        string map;
+        if (chapters.Count > 0)
+        {
+            var path = Path.Combine(plan.WorkDirectory, "chapters.ffmeta");
+            map = args.Count(a => a == "-i").ToString(CultureInfo.InvariantCulture);
+            args.InsertRange(args.LastIndexOf("-i") + 2, new[] { "-f", "ffmetadata", "-i", path });
+            lists = lists.Append(new ExportList(path, RecorderChapters.Metadata(chapters))).ToArray();
+        }
+        else
+        {
+            map = "-1";
+        }
+
+        args.InsertRange(args.Count - 1, new[] { "-map_chapters", map });
+        return plan with { Steps = plan.Steps.Take(plan.Steps.Count - 1).Append(last with { Args = args, ExtraLists = lists }).ToArray() };
     }
 
     private static ExportSource SourceOf(IReadOnlyDictionary<int, ExportSource> sources, int index)
@@ -681,7 +743,8 @@ public static class EditExport
     /// <summary>
     /// Teslim dosyasini yazan son adima meta silme argumanlarini ekler; ara parcalara dokunmaz. Dizi
     /// kucultmeyle ayni kaynaktan (<see cref="StreamMapping.MetadataArguments"/>). Diller teslime giden izlerden
-    /// (<see cref="EditAudioTrack"/>) cikti sirasiyla yazilir. Duzenleyici kendi basina etiket ya da bolum yazmaz.
+    /// (<see cref="EditAudioTrack"/>) cikti sirasiyla yazilir. Bolum adlarini da ffmpeg duser; bolum
+    /// isaretleri (<see cref="WithChapters"/>) kalir.
     /// </summary>
     private static IReadOnlyList<ExportStep> WithoutMetadata(
         IReadOnlyList<ExportStep> steps, MediaInfo info, IReadOnlyList<string?> languages, IReadOnlyList<string?> subtitleLanguages)

@@ -55,6 +55,8 @@
   "editor.export.separate": "Export Clips as Separate Files",
   "editor.export.segments-done": "Exported {0} clips to: {1}",
   "editor.export.segment-failed": "Clip {0} failed, the rest were skipped: {1}",
+  "editor.export.chapters": "Write Chapters From Clips",
+  "editor.export.chapters.tip": "Each clip becomes a chapter in the exported file, named after its label. When off, the source's chapters are kept, shifted to follow the cuts.",
   "editor.tool.selection": "Selection tool",
   "editor.tool.razor": "Razor tool",
   "editor.tool.ripple": "Ripple edit tool",

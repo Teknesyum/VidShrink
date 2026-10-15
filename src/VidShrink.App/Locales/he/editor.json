@@ -55,6 +55,8 @@
   "editor.export.separate": "ייצוא הקליפים כקבצים נפרדים",
   "editor.export.segments-done": "{0} קליפים יוצאו אל: {1}",
   "editor.export.segment-failed": "קליפ {0} נכשל, השאר דולגו: {1}",
+  "editor.export.chapters": "כתיבת פרקים מהקליפים",
+  "editor.export.chapters.tip": "כל קליפ הופך לפרק בקובץ המיוצא ונקרא על שם התווית שלו. כשהאפשרות כבויה, פרקי המקור נשמרים ומוזזים בהתאם לחיתוכים.",
   "editor.tool.selection": "כלי בחירה",
   "editor.tool.razor": "כלי סכין",
   "editor.tool.ripple": "כלי עריכת גלים",

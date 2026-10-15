@@ -55,6 +55,8 @@
   "editor.export.separate": "Parçaları Ayrı Dosyalara Yaz",
   "editor.export.segments-done": "{0} parça dışa aktarıldı: {1}",
   "editor.export.segment-failed": "{0}. parça yazılamadı, kalanlar atlandı: {1}",
+  "editor.export.chapters": "Parçalardan Bölüm Yaz",
+  "editor.export.chapters.tip": "Her parça teslim dosyasında bir bölüm olur, adını etiketinden alır. Kapalıyken kaynağın bölümleri korunur ve kesimlere göre kaydırılır.",
   "editor.tool.selection": "Seçim aracı",
   "editor.tool.razor": "Jilet aracı",
   "editor.tool.ripple": "Dalga düzenleme aracı",

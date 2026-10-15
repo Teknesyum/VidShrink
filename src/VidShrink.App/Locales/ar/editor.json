@@ -55,6 +55,8 @@
   "editor.export.separate": "تصدير المقاطع كملفات منفصلة",
   "editor.export.segments-done": "تم تصدير {0} مقاطع إلى: {1}",
   "editor.export.segment-failed": "فشل المقطع {0}، وتم تخطي الباقي: {1}",
+  "editor.export.chapters": "كتابة الفصول من المقاطع",
+  "editor.export.chapters.tip": "يصبح كل مقطع فصلًا في الملف المُصدَّر ويأخذ اسمه من تسميته. عند إيقافه تُحفظ فصول المصدر وتُزاح لتتبع القصّات.",
   "editor.tool.selection": "أداة التحديد",
   "editor.tool.razor": "أداة الشفرة",
   "editor.tool.ripple": "أداة التحرير المتموج",
