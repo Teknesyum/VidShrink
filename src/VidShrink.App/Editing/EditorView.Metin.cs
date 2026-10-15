@@ -22,7 +22,7 @@ internal partial class EditorView
     private const int FallbackHeight = 1080;
     private static readonly long DefaultTextLength = EditTime.TicksPerSecond * 3;
     private static readonly long DefaultMotionLength = EditTime.TicksPerSecond / 2;
-    private static readonly string[] MotionKeys = { "none", "left", "right", "bottom", "top", "typewriter" };
+    private static readonly string[] MotionKeys = { "editor.text.motion.none", "editor.text.motion.left", "editor.text.motion.right", "editor.text.motion.bottom", "editor.text.motion.top", "editor.text.motion.typewriter" };
     private const double DragPad = 0.02;
 
     private int _dragIndex = -1;
@@ -82,7 +82,7 @@ internal partial class EditorView
         foreach (var combo in new[] { CmbTextMotionIn, CmbTextMotionOut })
         {
             combo.Items.Clear();
-            foreach (var key in MotionKeys) combo.Items.Add(new ComboBoxItem { Content = Strings.Get("editor.text.motion." + key) });
+            foreach (var key in MotionKeys) combo.Items.Add(new ComboBoxItem { Content = Strings.Get(key) });
         }
 
         CmbTextMotionIn.SelectionChanged += (_, _) => { if (_showingText && CmbTextMotionIn.SelectedIndex >= 0) CommitTextMotion(true); };
