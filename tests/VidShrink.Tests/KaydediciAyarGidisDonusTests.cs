@@ -18,6 +18,9 @@ namespace VidShrink.Tests;
 /// 2026-10-15: <c>KeyCaption</c> diske uc anahtarla yazilir (<c>keyCaptionPlace</c>, <c>keyCaptionSize</c>,
 /// <c>keyCaptionHold</c>); anahtar sayisi ozellik basina bir yerine <c>CokAnahtarli</c>'daki sayiyla toplanir.
 /// </para>
+/// <para>
+/// 2026-10-15: <c>ScheduleAt</c> saniyeye kadar yazilir; tik kesirli bir uretilmis deger geri donmez, sabit tarih <c>Kisitli</c>'da.
+/// </para>
 /// </summary>
 public sealed class KaydediciAyarGidisDonusTests
 {
@@ -34,7 +37,8 @@ public sealed class KaydediciAyarGidisDonusTests
         ["Preset"] = "slow",
         ["ColorRange"] = "jpeg",
         ["AudioCodec"] = "libopus",
-        ["Hotkeys"] = "2:F1,2:F2,2:F3,2:F4,2:F5,2:F6,2:F7"
+        ["Hotkeys"] = "2:F1,2:F2,2:F3,2:F4,2:F5,2:F6,2:F7",
+        ["ScheduleAt"] = new DateTime(2026, 10, 12, 14, 30, 0)
     };
 
     private static readonly Dictionary<string, int> CokAnahtarli = new()
