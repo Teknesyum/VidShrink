@@ -1242,6 +1242,7 @@
                         <ComboBoxItem Content="OGG" Tag="ogg"/>
                         <ComboBoxItem Content="AIFF" Tag="aiff"/>
                         <ComboBoxItem Content="AC3" Tag="ac3"/>
+                        <ComboBoxItem Content="APNG" Tag="apng"/>
                       </ComboBox>
                     </Grid>
 
@@ -1283,6 +1284,8 @@
                         <ComboBoxItem Content="DNxHR HQ" Tag="dnxhd:dnxhr_hq"/>
                         <ComboBoxItem Content="DNxHR HQX" Tag="dnxhd:dnxhr_hqx"/>
                         <ComboBoxItem Content="DNxHR 444" Tag="dnxhd:dnxhr_444"/>
+                        <ComboBoxItem Content="FFV1" Tag="ffv1:archive"/>
+                        <ComboBoxItem Content="CineForm" Tag="cfhd:film3+"/>
                       </ComboBox>
                     </Grid>
 
@@ -1488,6 +1491,57 @@
                         <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.single-frame.tip}"/>
                       </ToolTip.Tip>
                     </CheckBox>
+
+                    <WrapPanel x:Name="ConvertGifPanel" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" IsVisible="False" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                      <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+                        <ToolTip.Tip>
+                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.gif-loop.tip}"/>
+                        </ToolTip.Tip>
+                        <TextBlock Text="{loc:Text main.convert.gif-loop}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="CmbConvertGifLoop" SelectedIndex="0"
+                                  auto:AutomationProperties.Name="{loc:Text main.convert.gif-loop}">
+                          <ComboBoxItem Content="{loc:Text main.convert.gif-loop.infinite}" Tag=""/>
+                          <ComboBoxItem Content="{loc:Text main.convert.gif-loop.once}" Tag="-1"/>
+                          <ComboBoxItem Content="1" Tag="1"/>
+                          <ComboBoxItem Content="2" Tag="2"/>
+                          <ComboBoxItem Content="3" Tag="3"/>
+                          <ComboBoxItem Content="5" Tag="5"/>
+                          <ComboBoxItem Content="10" Tag="10"/>
+                        </ComboBox>
+                      </StackPanel>
+                      <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+                        <ToolTip.Tip>
+                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.gif-colors.tip}"/>
+                        </ToolTip.Tip>
+                        <TextBlock Text="{loc:Text main.convert.gif-colors}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="CmbConvertGifColors" SelectedIndex="0"
+                                  auto:AutomationProperties.Name="{loc:Text main.convert.gif-colors}">
+                          <ComboBoxItem Content="256" Tag=""/>
+                          <ComboBoxItem Content="128" Tag="128"/>
+                          <ComboBoxItem Content="64" Tag="64"/>
+                          <ComboBoxItem Content="32" Tag="32"/>
+                          <ComboBoxItem Content="16" Tag="16"/>
+                        </ComboBox>
+                      </StackPanel>
+                      <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+                        <ToolTip.Tip>
+                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.gif-dither.tip}"/>
+                        </ToolTip.Tip>
+                        <TextBlock Text="{loc:Text main.convert.gif-dither}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="CmbConvertGifDither" SelectedIndex="0"
+                                  auto:AutomationProperties.Name="{loc:Text main.convert.gif-dither}">
+                          <ComboBoxItem Content="Sierra-2-4A" Tag=""/>
+                          <ComboBoxItem Content="{loc:Text main.advanced.filters.off}" Tag="none"/>
+                          <ComboBoxItem Content="Bayer" Tag="bayer"/>
+                          <ComboBoxItem Content="Heckbert" Tag="heckbert"/>
+                          <ComboBoxItem Content="Floyd-Steinberg" Tag="floyd_steinberg"/>
+                          <ComboBoxItem Content="Sierra-2" Tag="sierra2"/>
+                          <ComboBoxItem Content="Sierra-3" Tag="sierra3"/>
+                          <ComboBoxItem Content="Burkes" Tag="burkes"/>
+                          <ComboBoxItem Content="Atkinson" Tag="atkinson"/>
+                        </ComboBox>
+                      </StackPanel>
+                    </WrapPanel>
 
                   </Grid>
                   <StackPanel x:Name="ConvertFilterPanel" Spacing="{StaticResource SpaceSm}">

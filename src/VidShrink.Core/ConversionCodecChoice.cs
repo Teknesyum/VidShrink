@@ -25,6 +25,9 @@ public static class ConversionCodecChoice
         "h264_amf", "hevc_amf", "av1_amf"
     ];
 
+    /// <summary>Arşiv kodekleri (<see cref="IntermediateCodecs.ArchiveProfiles"/>); eski listede yoktular, adla saklanır.</summary>
+    public static IReadOnlyList<string> Archive { get; } = IntermediateCodecs.ArchiveProfiles.Select(p => p.Id).ToList();
+
     /// <summary>Kayıtlı ad varsa o, yoksa eski sıra numarasının eski listedeki kodeği.</summary>
     public static string FromSaved(string? name, int legacyIndex)
     {

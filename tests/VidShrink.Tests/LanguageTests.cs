@@ -101,6 +101,8 @@ public sealed class LanguageTests : IDisposable
         "H.264 Nvidia", "H.265 Nvidia", "AV1 Nvidia", "H.264 Intel", "H.265 Intel", "AV1 Intel",
         "H.264 AMD", "H.265 AMD", "AV1 AMD",
         "Lanczos", "Spline",
+        "APNG", "FFV1", "CineForm",
+        "Sierra-2-4A", "Bayer", "Heckbert", "Floyd-Steinberg", "Sierra-2", "Sierra-3", "Burkes", "Atkinson",
         "T"
     };
 
@@ -330,6 +332,9 @@ public sealed class LanguageTests : IDisposable
         "^The (.+) container carries only one audio track.$",
         "Audio channel count must be positive.",
         "The MXF container carries only 48000 Hz audio.",
+        "GIF palette colors must be between 2 and 256.",
+        "GIF loop count must be between -1 and 65535.",
+        "The GIF dither mode is not supported.",
         "^The (.+) audio encoder does not support (.+) Hz.$",
         "Localization key ' ' is missing in ' ' and in ' '."
     };
