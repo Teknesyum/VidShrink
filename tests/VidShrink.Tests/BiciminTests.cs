@@ -1276,6 +1276,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, origin/main birlesmesinden sonra (EKB-P14 dali): main tarafinin pimi 3449 / en 328 / tr 109 ile bu dalin artislari bir arada; testin kendi SAYIM satirindan olculdu: toplam 3477, en 330, tr 110.</para>
     /// <para>2026-10-15, ses dosyasi ve GIF girdisi (ARC-P3): uc yeni anahtardan (<c>main.convert.note.gif-target</c>, <c>main.error.audio-only-shrink</c>, <c>main.validation.no-video-container</c>) 4 kol, KOL dokumunden sayildi, en ve tr girmiyor: olculen 3479 + 4 = 3483, en 331, tr 109.</para>
     /// <para>2026-10-15, altyazi gomme ve bicemi (DON-P3): alti yeni anahtar (<c>main.subtitles.style.color.*</c> bes renk, <c>main.validation.burn-encode</c>), dusen yok; olculen 70563 + 43 x 6 = 70821. <c>kayip</c> 0.</para>
+    /// <para>2026-10-15, Donustur ses secenekleri (DON-P9): alti yeni anahtar (<c>main.convert.audio-loudnorm</c>, <c>.audio-channels</c>, <c>.audio-sample-rate</c>, <c>main.validation.audio-channels-positive</c>, <c>.mxf-sample-rate</c>, <c>.audio-sample-rate</c>), testin SAYIM satirindan olculdu: toplam 3520, en 334, tr 110.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1301,7 +1302,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3516, toplam);
+        Assert.Equal(3520, toplam);
         Assert.Equal(334, dilBasina["en"]);
         Assert.Equal(110, dilBasina["tr"]);
     }
@@ -1557,6 +1558,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, kayan sonuc karti (EKB-P14): dort yeni <c>recorder.card.*</c> anahtari, dusen yok; taban pimi 68499 + 43 x 4 = 68671.</para>
     /// <para>2026-10-15, origin/main birlesmesinden sonra (EKB-P14 dali): main tarafinin pimi 68241 ile bu dalin anahtarlari bir arada, dusen yok; olculen gezilen 69015.</para>
     /// <para>2026-10-15, ses dosyasi ve GIF girdisi (ARC-P3): uc yeni anahtar (<c>main.convert.note.gif-target</c>, <c>main.error.audio-only-shrink</c>, <c>main.validation.no-video-container</c>), dusen yok; olculen 69402 + 43 x 3 = 69531. <c>kayip</c> 0.</para>
+    /// <para>2026-10-15, Donustur ses secenekleri (DON-P9): alti yeni anahtar (ses yuksekligi, kanal, ornekleme hizi ve uc dogrulama iletisi), dusen yok; olculen 70821 + 43 x 6 = 71079. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1584,7 +1586,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(70821, gezilen);
+        Assert.Equal(71079, gezilen);
         Assert.Empty(kayip);
     }
 

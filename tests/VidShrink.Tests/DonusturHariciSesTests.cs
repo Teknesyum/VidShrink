@@ -123,9 +123,9 @@ public sealed class DonusturHariciSesTests
     public void DogrulamaDisSesiSayar()
     {
         var dis = new ExternalAudio(Muzik, null, Replace: true);
-        Assert.Contains("The MP4 container does not support copying the source opus audio stream.",
-            ConversionArguments.Validate(Ornek(Video, Opus), new ConversionPlan { Container = "mp4", AudioCodec = "copy" }));
-        Assert.Empty(ConversionArguments.Validate(Ornek(Video, Opus), new ConversionPlan { Container = "mp4", AudioCodec = "copy", ExternalAudio = dis }));
+        Assert.Contains("The MP4 container does not support copying the source vorbis audio stream.",
+            ConversionArguments.Validate(Ornek(Video, Opus with { Codec = "vorbis" }), new ConversionPlan { Container = "mp4", AudioCodec = "copy" }));
+        Assert.Empty(ConversionArguments.Validate(Ornek(Video, Opus with { Codec = "vorbis" }), new ConversionPlan { Container = "mp4", AudioCodec = "copy", ExternalAudio = dis }));
 
         var sessiz = Ornek(Video);
         Assert.Empty(ConversionArguments.Validate(sessiz, new ConversionPlan { Container = "mp4", AudioCodec = "copy", ExternalAudio = dis with { Replace = false } }));

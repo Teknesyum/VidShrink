@@ -411,7 +411,9 @@ internal static class LanguageCatalog
             ["The source has no video stream; choose an audio container."] ="main.validation.no-video-container",
             ["The source has no audio stream to extract."] = "main.validation.no-audio-extract",
             ["The trim end must come after the trim start."] = "main.validation.trim-order",
-            ["No audio track is selected."] = "main.validation.no-audio-selected"
+            ["No audio track is selected."] = "main.validation.no-audio-selected",
+            ["Audio channel count must be positive."] = "main.validation.audio-channels-positive",
+            ["The MXF container carries only 48000 Hz audio."] = "main.validation.mxf-sample-rate"
         };
 
     private static readonly (Regex Pattern, string Key)[] ValidationPatternKeys =
@@ -425,7 +427,9 @@ internal static class LanguageCatalog
         (new Regex(@"^The (.+) container does not support copying the source (.*) audio stream\.$", RegexOptions.Compiled),
             "main.validation.container-audio-copy"),
         (new Regex(@"^The (.+) container carries only one audio track\.$", RegexOptions.Compiled),
-            "main.validation.single-audio-container")
+            "main.validation.single-audio-container"),
+        (new Regex(@"^The (.+) audio encoder does not support (.+) Hz\.$", RegexOptions.Compiled),
+            "main.validation.audio-sample-rate")
     };
 
     internal const string TrimFormatError = "Trim times must use HH:MM:SS format.";

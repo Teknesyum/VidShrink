@@ -95,6 +95,7 @@ public sealed class LanguageTests : IDisposable
         "MB", "CRF", "1280x720",
         "MP4", "MKV", "WebM", "MOV", "AVI", "GIF", "MP3", "M4A", "WAV", "FLAC", "WebP", "AVIF", "MXF",
         "H.264", "H.265", "VP9", "AV1", "AAC", "Opus", "PCM",
+        "OGG", "AIFF", "AC3", "E-AC3", "44100 Hz", "48000 Hz",
         "ProRes 422 Proxy", "ProRes 422 LT", "ProRes 422", "ProRes 422 HQ", "ProRes 4444",
         "DNxHR LB", "DNxHR SQ", "DNxHR HQ", "DNxHR HQX", "DNxHR 444",
         "H.264 Nvidia", "H.265 Nvidia", "AV1 Nvidia", "H.264 Intel", "H.265 Intel", "AV1 Intel",
@@ -326,6 +327,9 @@ public sealed class LanguageTests : IDisposable
         "^The (.+) container does not support copying the source (.*) audio stream.$",
         "No audio track is selected.",
         "^The (.+) container carries only one audio track.$",
+        "Audio channel count must be positive.",
+        "The MXF container carries only 48000 Hz audio.",
+        "^The (.+) audio encoder does not support (.+) Hz.$",
         "Localization key ' ' is missing in ' ' and in ' '."
     };
 
