@@ -3,7 +3,8 @@
 /// <summary>
 /// Klibin kaynak ustune uygulanan ayarlari: kaynak koordinatinda kesirli kirpma, saat yonunde
 /// 90 adimli dondurme, yatay ve dikey cevirme, desibel ses kazanci, sessize alma ve cizelge
-/// tick'inde giris/cikis solmasi, parlaklik, kontrast, doygunluk ve renk sicakligi. Sirasi sabittir:
+/// tick'inde giris/cikis solmasi, parlaklik, kontrast, doygunluk ve renk sicakligi; ses temizleme (gurultu azaltma,
+/// uc bantli ekolayzir, kompresor, yukseklik esitleme, sinirlayici). Sirasi sabittir:
 /// kirp, dondur, cevir, renk. Hazir gorunumler renk alanlarinin kayitli degerleridir.
 /// </summary>
 public sealed record ClipEffects
@@ -13,6 +14,8 @@ public sealed record ClipEffects
     public const int NeutralTemperature = 6500;
     public const int MinTemperature = 1000;
     public const int MaxTemperature = 40000;
+    public const double MinEqDb = -12;
+    public const double MaxEqDb = 12;
 
     public static ClipEffects None { get; } = new();
 
@@ -50,18 +53,37 @@ public sealed record ClipEffects
 
     public int Temperature { get; init; } = NeutralTemperature;
 
+    public bool Denoise { get; init; }
+
+    public bool Loudnorm { get; init; }
+
+    public bool Compressor { get; init; }
+
+    public bool Limiter { get; init; }
+
+    public double BassDb { get; init; }
+
+    public double MidDb { get; init; }
+
+    public double TrebleDb { get; init; }
+
+    public bool HasEqualizer => BassDb != 0 || MidDb != 0 || TrebleDb != 0;
+
+    public bool HasCleanup => Denoise || Loudnorm || Compressor || Limiter || HasEqualizer;
+
     public bool HasCrop => CropLeft > 0 || CropTop > 0 || CropRight > 0 || CropBottom > 0;
 
     public bool HasGeometry => HasCrop || Rotation != 0 || FlipH || FlipV;
 
-    public bool HasAudio => Muted || VolumeDb != 0;
+    public bool HasAudio => Muted || VolumeDb != 0 || HasCleanup;
 
     public bool HasColor => Brightness != 0 || Contrast != 1 || Saturation != 1 || Temperature != NeutralTemperature;
 
     public bool IsNeutral => !HasGeometry && !HasAudio && !HasColor && FadeIn == 0 && FadeOut == 0;
 
     /// <summary>Degerleri gecerli araliga ceker: kirpma kenarlari toplamda karenin %95'ini asmaz, aci 90'in katina iner,
-    /// renk alanlari araliga kirpilip iki ondaliga yuvarlanir; sayi olmayan renk degeri notre doner.</summary>
+    /// renk alanlari araliga kirpilip iki ondaliga yuvarlanir; sayi olmayan renk degeri notre doner. Ekolayzir bantlari
+    /// <see cref="MinEqDb"/>..<see cref="MaxEqDb"/> araligina kirpilip bir ondaliga yuvarlanir.</summary>
     public ClipEffects Normalized()
     {
         static double Edge(double v) => double.IsFinite(v) ? Math.Clamp(v, 0, 0.95) : 0;
@@ -85,6 +107,9 @@ public sealed record ClipEffects
             Contrast = Color(Contrast, 1, 0, 2),
             Saturation = Color(Saturation, 1, 0, 3),
             Temperature = Math.Clamp(Temperature, MinTemperature, MaxTemperature),
+            BassDb = Band(BassDb),
+            MidDb = Band(MidDb),
+            TrebleDb = Band(TrebleDb),
         };
     }
 
@@ -141,6 +166,8 @@ public sealed record ClipEffects
 
     private static double Color(double value, double neutral, double min, double max)
         => double.IsFinite(value) ? Math.Round(Math.Clamp(value, min, max), 2) : neutral;
+
+    private static double Band(double value) => double.IsFinite(value) ? Math.Round(Math.Clamp(value, MinEqDb, MaxEqDb), 1) : 0;
 
     private static int Even(double value) => Math.Max(0, (int)Math.Round(value / 2, MidpointRounding.AwayFromZero) * 2);
 

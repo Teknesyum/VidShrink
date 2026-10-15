@@ -64,6 +64,16 @@ internal partial class EditorView
             box.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitClipColor(box, field));
         }
 
+        BtnClipDenoise.Click += (_, _) => { if (_showingClip) SetClipEffects(e => e with { Denoise = BtnClipDenoise.IsChecked == true }); };
+        BtnClipLoudnorm.Click += (_, _) => { if (_showingClip) SetClipEffects(e => e with { Loudnorm = BtnClipLoudnorm.IsChecked == true }); };
+        BtnClipCompressor.Click += (_, _) => { if (_showingClip) SetClipEffects(e => e with { Compressor = BtnClipCompressor.IsChecked == true }); };
+        BtnClipLimiter.Click += (_, _) => { if (_showingClip) SetClipEffects(e => e with { Limiter = BtnClipLimiter.IsChecked == true }); };
+        foreach (var (box, band) in new[] { (TxtClipBass, EqBand.Bass), (TxtClipMid, EqBand.Mid), (TxtClipTreble, EqBand.Treble) })
+        {
+            box.LostFocus += (_, _) => CommitClipBand(box, band);
+            box.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitClipBand(box, band));
+        }
+
         CmbClipTransition.SelectionChanged += (_, _) => { if (_showingClip && CmbClipTransition.SelectedIndex >= 0) CommitClipTransition(); };
         TxtClipTransition.LostFocus += (_, _) => { if (_showingClip) CommitClipTransition(); };
         TxtClipTransition.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitClipTransition());
@@ -221,6 +231,32 @@ internal partial class EditorView
         if (!done) ShowClipPanel();
     }
 
+    private enum EqBand { Bass, Mid, Treble }
+
+    /// <summary>Ekolayzir bandini kutudan yazar; okunamayan giris eski degere doner, sinir disi -12..12 dB'ye kirpilir.</summary>
+    private void CommitClipBand(TextBox box, EqBand band)
+    {
+        if (!_showingClip) return;
+        var text = box.Text?.Trim();
+        double db = 0;
+        if (!string.IsNullOrEmpty(text)
+            && (!double.TryParse(text, NumberStyles.Float, Strings.Culture, out db)
+                && !double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out db)
+                || !double.IsFinite(db)))
+        {
+            ShowClipPanel();
+            return;
+        }
+
+        var done = SetClipEffects(e => (band switch
+        {
+            EqBand.Bass => e with { BassDb = db },
+            EqBand.Mid => e with { MidDb = db },
+            _ => e with { TrebleDb = db },
+        }).Normalized());
+        if (!done) ShowClipPanel();
+    }
+
     /// <summary>Renk alanlarinin hangi hazir gorunume denk geldigi; elle ayarlanmissa -1.</summary>
     internal static int LookPresetIndex(ClipEffects effects)
     {
@@ -247,6 +283,13 @@ internal partial class EditorView
         BtnClipMute.IsChecked = effects.Muted;
         CmbClipCrop.SelectedIndex = CropPresetIndex(effects, width, height);
         TxtClipVolume.Text = effects.VolumeDb.ToString("0.#", Strings.Culture);
+        BtnClipDenoise.IsChecked = effects.Denoise;
+        BtnClipLoudnorm.IsChecked = effects.Loudnorm;
+        BtnClipCompressor.IsChecked = effects.Compressor;
+        BtnClipLimiter.IsChecked = effects.Limiter;
+        TxtClipBass.Text = effects.BassDb.ToString("0.#", Strings.Culture);
+        TxtClipMid.Text = effects.MidDb.ToString("0.#", Strings.Culture);
+        TxtClipTreble.Text = effects.TrebleDb.ToString("0.#", Strings.Culture);
         TxtClipFadeIn.Text = EditTime.ToSeconds(effects.FadeIn).ToString("0.##", Strings.Culture);
         TxtClipFadeOut.Text = EditTime.ToSeconds(effects.FadeOut).ToString("0.##", Strings.Culture);
         CmbClipLook.SelectedIndex = LookPresetIndex(effects);

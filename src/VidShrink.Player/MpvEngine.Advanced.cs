@@ -19,6 +19,10 @@ public sealed partial class MpvEngine
     private string? _editFades;
     private string? _editAudio;
 
+    private const string MeterLabel = "vsmeter";
+    private const string MeterFilter = "lavfi=[astats=metadata=1:reset=1:measure_perchannel=none:measure_overall=Peak_level]";
+    private volatile bool _metering;
+
     private const double HueSpan = 1.8;
     private const double SharpSpan = 0.015;
 
@@ -112,6 +116,7 @@ public sealed partial class MpvEngine
                     + ":t=q:w=1.4:g=" + F(gain))) + "]", "af");
 
         Swap(NormalizeLabel, wanted.Normalize ? "lavfi=[dynaudnorm=f=150:g=15:p=0.9]" : null, "af");
+        KeepMeterLast();
         TrySet("volume-max", F(wanted.Boost ? SoundAdjust.BoostCeiling : SoundAdjust.PlainCeiling));
         if (!wanted.Boost && Volume > SoundAdjust.PlainCeiling) SetVolume(SoundAdjust.PlainCeiling);
     }
@@ -176,6 +181,35 @@ public sealed partial class MpvEngine
         if (wantedAudio == _editAudio) return;
         _editAudio = wantedAudio;
         Swap(ClipAudioLabel, wantedAudio is null ? null : "lavfi=[" + wantedAudio + "]", "af");
+        KeepMeterLast();
+    }
+
+    /// <summary>
+    /// Ses zincirinin sonuna <c>astats</c> halkasi koyar; tepe duzeyi her ses cercevesinde
+    /// <c>af-metadata/vsmeter</c> altina yazilir, <see cref="AudioPeakDb"/> oradan okur.
+    /// </summary>
+    public bool MeterAudio(bool on)
+    {
+        _metering = on;
+        Swap(MeterLabel, on ? MeterFilter : null, "af");
+        return !on || (GetProperty("af") ?? "").Contains("@" + MeterLabel, StringComparison.Ordinal);
+    }
+
+    public double AudioPeakDb
+    {
+        get
+        {
+            if (!_metering) return double.NaN;
+            var raw = GetProperty("af-metadata/" + MeterLabel + "/lavfi.astats.Overall.Peak_level");
+            if (raw is null) return double.NaN;
+            if (raw.Contains("inf", StringComparison.OrdinalIgnoreCase)) return raw.StartsWith('-') ? double.NegativeInfinity : double.NaN;
+            return double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out var db) ? db : double.NaN;
+        }
+    }
+
+    private void KeepMeterLast()
+    {
+        if (_metering) Swap(MeterLabel, MeterFilter, "af");
     }
 
     private void Swap(string label, string? filter, string property = "vf")

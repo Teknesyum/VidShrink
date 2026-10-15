@@ -396,10 +396,33 @@ internal partial class EditorView : UserControl
     {
         if (_driver is not { } driver) return;
         SyncDriver();
+        RefreshMeter();
         if (Timeline.Scrubbing) return;
         Timeline.Playhead = driver.TimelinePosition;
         if (driver.Playing) Timeline.FollowPlayhead();
         RefreshMonitor();
+    }
+
+    private IPlaybackEngine? _meteredEngine;
+    private bool _meterOn;
+
+    /// <summary>
+    /// Ses duzeyi gostergesi: motor degisince olceri acar, sonra her izlemede son tepe degeri (dBFS)
+    /// gostergenin -60..0 araligina kirpilarak yazilir. Motor olcemiyorsa gosterge gizli kalir.
+    /// </summary>
+    private void RefreshMeter()
+    {
+        var engine = Preview.Engine;
+        if (!ReferenceEquals(engine, _meteredEngine))
+        {
+            _meteredEngine = engine;
+            _meterOn = engine?.MeterAudio(true) == true;
+        }
+
+        LevelMeter.IsVisible = _meterOn;
+        if (!_meterOn || engine is null) return;
+        var peak = engine.AudioPeakDb;
+        LevelMeter.Value = double.IsNaN(peak) ? LevelMeter.Minimum : Math.Clamp(peak, LevelMeter.Minimum, LevelMeter.Maximum);
     }
 
     private void OnSeek(long time, bool final)
