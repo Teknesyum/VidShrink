@@ -258,9 +258,24 @@ internal sealed class MiniSunucu : IDisposable
     }
 }
 
-public sealed class OynaticiAracTests
+public sealed class OynaticiAracTests : IDisposable
 {
-    private static string Ayar(string ad) => Path.Combine(AracKanit.Gecici(ad), "history.json");
+    private readonly List<string> _geciciler = new();
+
+    /// <summary>Testin <c>.calisma/dalga4b/gecici</c> altinda actigi klasor; <see cref="Dispose"/> koşum sonunda siler.</summary>
+    private string Gecici(string ad)
+    {
+        var yol = AracKanit.Gecici(ad);
+        _geciciler.Add(yol);
+        return yol;
+    }
+
+    public void Dispose()
+    {
+        foreach (var yol in _geciciler) KanitKapanisi.Kapat(Path.GetDirectoryName(yol)!, Path.GetFileName(yol));
+    }
+
+    private string Ayar(string ad) => Path.Combine(Gecici(ad), "history.json");
 
     private static readonly Pointer SeritFaresi = new(7, PointerType.Mouse, true);
 
@@ -627,7 +642,7 @@ public sealed class OynaticiAracTests
     public async Task KlipVeGifUretilirGecersizAralikUretmez()
     {
         var clip = MotorKlipleri.Kucuk;
-        var klasor = AracKanit.Gecici("klip");
+        var klasor = Gecici("klip");
         var body = new StringBuilder();
 
         var klipHedef = Path.Combine(klasor, "klip.mp4");
@@ -800,7 +815,7 @@ public sealed class OynaticiAracTests
     [Fact]
     public void AracAyarlariYazilirOkunurSifirlanir()
     {
-        var klasor = AracKanit.Gecici("ayar");
+        var klasor = Gecici("ayar");
         var dosya = Path.Combine(klasor, ToolsOptions.FileName);
         var body = new StringBuilder();
 

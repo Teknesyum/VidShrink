@@ -231,7 +231,7 @@ public sealed class KirpmaKipiTests
         }
         finally
         {
-            Directory.Delete(klasor, recursive: true);
+            KanitKapanisi.Kapat(Path.GetDirectoryName(klasor)!, Path.GetFileName(klasor));
         }
     }
 

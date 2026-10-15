@@ -164,6 +164,17 @@ public static class EditExport
         return frames > 0 ? frames / info.Fps : span;
     }
 
+    /// <summary>
+    /// Hizi degismis ya da ters klip butunuyle kodlanir; <c>fps=</c> suzgeci cizelge suresini en yakin tam kareye
+    /// yuvarlar (1 sn kaynak 1,3x hizda 30 kare/sn'de 23 kare). Listedeki suresi bu karelerin sayisidir.
+    /// </summary>
+    private static double MotionListSeconds(MediaInfo info, double span)
+    {
+        if (info.Fps <= 0) return span;
+        var frames = Math.Round(span * info.Fps, MidpointRounding.AwayFromZero);
+        return frames > 0 ? frames / info.Fps : span;
+    }
+
     private static readonly IReadOnlyDictionary<string, string> MatchingEncoders = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
         ["h264"] = "libx264",
@@ -1107,7 +1118,7 @@ public static class EditExport
             if (NeedsReencode(clip))
             {
                 var length = EditTime.ToSeconds(clip.TimelineLength);
-                steps.Add(SmartEncode(info, encoding, keyframes, start, end - start, VideoMotion(clip, info), VideoPart(length)));
+                steps.Add(SmartEncode(info, encoding, keyframes, start, end - start, VideoMotion(clip, info), VideoPart(MotionListSeconds(info, length))));
                 for (var p = 0; p < count; p++) steps.Add(AudioEncode(info, start, end - start, AudioMotion(clip), AudioPart(p, length), tracks[p]));
                 expected += length;
                 continue;

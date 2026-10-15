@@ -6,6 +6,9 @@ param(
     [switch]$RemoveShellMenu,
     [switch]$RemoveFileAssociation,
     [switch]$Uninstall,
+    [switch]$Silent,
+    [switch]$AddToPath,
+    [switch]$RemoveSettings,
     [ValidateSet('auto', 'tr', 'en')]
     [string]$MenuLanguage = 'auto',
     [string]$RegistryRoot = 'HKCU:\Software\Classes',
@@ -22,6 +25,14 @@ $ProgressPreference = 'SilentlyContinue'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $repository = 'Teknesyum/VidShrink'
+
+if ($Silent) { $NoLaunch = $true }
+
+$uninstallKeyName = 'Software\Microsoft\Windows\CurrentVersion\Uninstall\VidShrink'
+$commandShimFolder = 'bin'
+$commandShimFile = 'vidshrink.cmd'
+$commandShimLine = '@"%~dp0..\app\vidshrink.exe" %*'
+$setupExecutableName = 'VidShrink-Setup.exe'
 
 $script:RemoveAttempts = 6
 $script:RemoveFirstDelayMilliseconds = 200
@@ -718,6 +729,106 @@ function Send-AssociationChanged([string]$Root) {
     catch { }
 }
 
+function Get-AppRegistrationKey([string]$Root, [string]$Name, [string]$Default) {
+    if (Test-DefaultRegistryRoot $Root) { return $Default }
+    $classes = Get-CurrentUserSubKey $Root
+    $slash = $classes.LastIndexOf('\')
+    if ($slash -lt 0) { return $Name }
+    return $classes.Substring(0, $slash) + '\' + $Name
+}
+
+function Remove-UninstallEntry([string]$Root) {
+    $subKey = Get-AppRegistrationKey $Root 'Uninstall\VidShrink' $uninstallKeyName
+    $key = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($subKey)
+    if ($null -eq $key) { return $false }
+    $key.Close()
+    [Microsoft.Win32.Registry]::CurrentUser.DeleteSubKeyTree($subKey, $false)
+    return $true
+}
+
+function Split-UserPath($Value) {
+    if ($Value -isnot [string] -or [string]::IsNullOrWhiteSpace($Value)) { return @() }
+    return @($Value.Split(';') | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+}
+
+function Test-SameUserPathEntry([string]$Entry, [string]$Directory) {
+    $left = $Entry.Trim().Trim('"').TrimEnd([char[]]@('\', '/'))
+    $right = $Directory.Trim().Trim('"').TrimEnd([char[]]@('\', '/'))
+    return [string]::Equals($left, $right, [StringComparison]::OrdinalIgnoreCase)
+}
+
+function Read-UserPath([string]$SubKey) {
+    $key = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($SubKey)
+    if ($null -eq $key) { return $null }
+    try { return $key.GetValue('Path', $null, [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames) }
+    finally { $key.Close() }
+}
+
+function Test-UserPathContains([string]$Root, [string]$Directory) {
+    $current = Read-UserPath (Get-AppRegistrationKey $Root 'Environment' 'Environment')
+    return @(Split-UserPath $current | Where-Object { Test-SameUserPathEntry $_ $Directory }).Count -gt 0
+}
+
+function Send-EnvironmentChanged([string]$Root) {
+    if (-not (Test-DefaultRegistryRoot $Root)) { return }
+    try {
+        Add-Type -Namespace VidShrinkKurulum -Name Ortam -MemberDefinition '[DllImport("user32.dll", CharSet = CharSet.Unicode)] public static extern IntPtr SendMessageTimeoutW(IntPtr hwnd, uint message, IntPtr wParam, string lParam, uint flags, uint timeout, out IntPtr result);' -ErrorAction Stop
+        $result = [IntPtr]::Zero
+        [VidShrinkKurulum.Ortam]::SendMessageTimeoutW([IntPtr]0xffff, 0x001A, [IntPtr]::Zero, 'Environment', 0x0002, 5000, [ref]$result) | Out-Null
+    }
+    catch { }
+}
+
+function Add-UserPathEntry([string]$Root, [string]$Directory) {
+    $subKey = Get-AppRegistrationKey $Root 'Environment' 'Environment'
+    $key = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey($subKey)
+    try {
+        $raw = $key.GetValue('Path', $null, [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
+        if ($null -ne $raw -and $raw -isnot [string]) { return $false }
+        if (@(Split-UserPath $raw | Where-Object { Test-SameUserPathEntry $_ $Directory }).Count -gt 0) { return $false }
+        if ([string]::IsNullOrWhiteSpace($raw)) { $next = $Directory }
+        else { $next = $raw.TrimEnd().TrimEnd(';') + ';' + $Directory }
+        if ($null -eq $raw) { $kind = [Microsoft.Win32.RegistryValueKind]::ExpandString }
+        else { $kind = $key.GetValueKind('Path') }
+        $key.SetValue('Path', $next, $kind)
+    }
+    finally { $key.Close() }
+    Send-EnvironmentChanged $Root
+    return $true
+}
+
+function Remove-UserPathEntry([string]$Root, [string]$Directory) {
+    $subKey = Get-AppRegistrationKey $Root 'Environment' 'Environment'
+    $key = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($subKey, $true)
+    if ($null -eq $key) { return $false }
+    try {
+        $current = $key.GetValue('Path', $null, [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
+        $entries = @(Split-UserPath $current)
+        $kept = @($entries | Where-Object { -not (Test-SameUserPathEntry $_ $Directory) })
+        if ($kept.Count -eq $entries.Count) { return $false }
+        if ($kept.Count -eq 0) { $key.DeleteValue('Path', $false) }
+        else { $key.SetValue('Path', ($kept -join ';'), $key.GetValueKind('Path')) }
+    }
+    finally { $key.Close() }
+    Send-EnvironmentChanged $Root
+    return $true
+}
+
+function Write-CommandShim([string]$Root) {
+    $folder = Join-Path $Root $commandShimFolder
+    New-Item -ItemType Directory -Path $folder -Force | Out-Null
+    $path = Join-Path $folder $commandShimFile
+    [IO.File]::WriteAllText($path, $commandShimLine + "`r`n", [Text.UTF8Encoding]::new($false))
+    return $path
+}
+
+function Remove-SetupCopy {
+    $copy = Join-Path $env:LOCALAPPDATA (Join-Path 'VidShrink' $setupExecutableName)
+    if (-not (Test-Path -LiteralPath $copy)) { return }
+    try { Remove-Item -LiteralPath $copy -Force -ErrorAction Stop }
+    catch { }
+}
+
 function Get-OpenCommandTarget([string]$Executable) {
     if ([IO.Path]::GetFileName($Executable) -ine 'VidShrink.exe') { return $Executable }
     return [IO.Path]::Combine([IO.Path]::GetDirectoryName($Executable), 'app\VidShrink.App.exe')
@@ -885,6 +996,14 @@ if ($Uninstall) {
     $unlinked = Remove-FileAssociation $RegistryRoot
     Write-Host "Sağ tık menüsü ($cleared uzantı, $packages paket) ve dosya ilişkilendirmesi ($unlinked uzantı) kaldırıldı." -ForegroundColor Green
 
+    if (Remove-UninstallEntry $RegistryRoot) {
+        Write-Host 'Yüklü uygulamalar kaydı kaldırıldı.' -ForegroundColor Green
+    }
+    $uninstallShimFolder = Join-Path $resolvedUninstallRoot $commandShimFolder
+    if (Remove-UserPathEntry $RegistryRoot $uninstallShimFolder) {
+        Write-Host "PATH girdisi kaldırıldı: $uninstallShimFolder" -ForegroundColor Green
+    }
+
     if (-not $SkipShortcuts) {
         Remove-Shortcut (Join-Path ([Environment]::GetFolderPath('Desktop')) 'VidShrink.lnk') $resolvedUninstallRoot | Out-Null
         $startMenuDirectory = Join-Path ([Environment]::GetFolderPath('Programs')) 'VidShrink'
@@ -900,6 +1019,15 @@ if ($Uninstall) {
     else {
         Write-Host "Kurulum klasörü LocalAppData\Programs altında değil, silinmedi: $resolvedUninstallRoot" -ForegroundColor Yellow
     }
+
+    if ($RemoveSettings) {
+        $settingsFolder = Join-Path ([Environment]::GetFolderPath('ApplicationData')) 'VidShrink'
+        if (Test-Path -LiteralPath $settingsFolder) {
+            Remove-Item -LiteralPath $settingsFolder -Recurse -Force
+            Write-Host "Ayar klasörü silindi: $settingsFolder" -ForegroundColor Green
+        }
+    }
+    if (Test-DefaultRegistryRoot $RegistryRoot) { Remove-SetupCopy }
     return
 }
 
@@ -1083,6 +1211,14 @@ try {
     if (-not (Test-Path -LiteralPath $installedExe)) { throw 'Kurulan VidShrink.exe bulunamadı.' }
     if (-not (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot 'app\VidShrink.App.exe'))) {
         throw 'Kurulan app\VidShrink.App.exe bulunamadı.'
+    }
+
+    $installShimFolder = Join-Path $resolvedInstallRoot $commandShimFolder
+    if ($AddToPath -or (Test-UserPathContains $RegistryRoot $installShimFolder)) {
+        Write-CommandShim $resolvedInstallRoot | Out-Null
+    }
+    if ($AddToPath -and (Add-UserPathEntry $RegistryRoot $installShimFolder)) {
+        Write-Host "PATH'e eklendi: $installShimFolder" -ForegroundColor Green
     }
 
     if (-not $SkipShortcuts) {
