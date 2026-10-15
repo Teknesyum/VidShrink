@@ -774,6 +774,33 @@ public static class RecorderArguments
     }
 
     /// <summary>
+    /// Bolgenin en cok ortustugu monitorun indeksi. macOS'ta <c>avfoundation</c> ekrani adla
+    /// aciyor ve bolge o ekranin karesinden kesiliyor; bolge ikinci ekrandayken ilk ekrani
+    /// acmak bos ya da yanlis kare verir. Esitlikte listede once gelen kazanir; liste bos ya
+    /// da hicbir monitorle ortusmuyorsa 0.
+    /// </summary>
+    public static int ScreenOf(IReadOnlyList<ScreenBounds> screens, RecorderRegion region)
+    {
+        ArgumentNullException.ThrowIfNull(region);
+        if (screens is null) return 0;
+
+        var best = 0;
+        long bestArea = 0;
+        foreach (var screen in screens)
+        {
+            long width = Math.Min(region.X + region.Width, screen.X + screen.Width) - Math.Max(region.X, screen.X);
+            long height = Math.Min(region.Y + region.Height, screen.Y + screen.Height) - Math.Max(region.Y, screen.Y);
+            if (width <= 0 || height <= 0) continue;
+            var area = width * height;
+            if (area <= bestArea) continue;
+            bestArea = area;
+            best = screen.Index;
+        }
+
+        return best;
+    }
+
+    /// <summary>
     /// <c>gdigrab</c>'a yazilacak yakalama bolgesi, ekran hedefi icin. <c>-i desktop</c>
     /// butun sanal masaustunu veriyor: <b>tek monitor degil</b>. Bu yuzden secilen monitor
     /// masaustunun tamami degilse indeks sifir olsa da ofsete cevriliyor — aksi halde iki
@@ -867,16 +894,19 @@ public static class RecorderArguments
     /// <para>
     /// Kural sayiya degil <b>kapsamaya</b> bakiyor: monitor listesi dikdortgeni kapsiyorsa
     /// negatif ofset gecerli. Liste bossa masaustunun sola uzandigina dair kanit yok ve
-    /// eski kural duruyor. macOS'ta bolge girdi degil kirpma filtresi: kare icinde negatif
-    /// koordinat yok, orada kural her zaman geciyor.
+    /// eski kural duruyor. macOS'ta bolge girdi degil secilen ekranin karesinde kirpma
+    /// filtresi: kirpma o ekranin kokenine gore yerellesmis haliyle negatif degilse gecerli.
     /// </para>
     /// </summary>
     private static IEnumerable<string> NegativeOffsetErrors(RecorderRequest request)
     {
-        if (request.Platform != RecorderPlatform.MacOs
-            && request.Screens.Count > 0
-            && request.Region is { } region
-            && RecorderLayout.Covered(request.Screens, region))
+        if (request.Platform == RecorderPlatform.MacOs)
+        {
+            if (MacCrop(request) is { X: >= 0, Y: >= 0 }) yield break;
+        }
+        else if (request.Screens.Count > 0
+                 && request.Region is { } region
+                 && RecorderLayout.Covered(request.Screens, region))
             yield break;
 
         yield return "Region offsets cannot be negative.";
@@ -1408,10 +1438,18 @@ public static class RecorderArguments
 
     private static RecorderRegion? MacCrop(RecorderRequest request) => request switch
     {
-        { Platform: RecorderPlatform.MacOs, Target: RecorderTargetKind.Region, Region: { } region } => region,
+        { Platform: RecorderPlatform.MacOs, Target: RecorderTargetKind.Region, Region: { } region } => MacLocal(request, region),
         { Platform: RecorderPlatform.MacOs, Target: RecorderTargetKind.Window, WindowRegion: { } window } => window,
         _ => null
     };
+
+    private static RecorderRegion MacLocal(RecorderRequest request, RecorderRegion region)
+    {
+        foreach (var screen in request.Screens)
+            if (screen.Index == request.ScreenIndex)
+                return region with { X = region.X - screen.X, Y = region.Y - screen.Y };
+        return region;
+    }
 
     /// <summary>
     /// Kosturulacak arguman listesi. Istek kabul edilemezse

@@ -175,7 +175,7 @@ internal partial class RecorderView
             Audio = audio,
             Webcam = ChosenWebcam(),
             Container = _settings.Container,
-            ScreenIndex = target == RecorderTargetKind.Screen ? ChosenScreen : 0,
+            ScreenIndex = ScreenFor(target, region),
             Screens = Monitors(),
             PrivacyMasks = _settings.PrivacyMasks.ToArray(),
             Scale = _settings.Scale,
@@ -228,6 +228,19 @@ internal partial class RecorderView
             MaxMegabytes = cap ?? request.MaxMegabytes
         };
     }
+
+    /// <summary>
+    /// İsteğin ekran sırası. Ekran hedefinde seçilen ekran; macOS'ta bölge hedefinde bölgenin
+    /// en çok örtüştüğü ekran, çünkü <c>avfoundation</c> bölgeyi o ekranın karesinden keser.
+    /// Öteki hedeflerde 0.
+    /// </summary>
+    private int ScreenFor(RecorderTargetKind target, RecorderRegion? region) => target switch
+    {
+        RecorderTargetKind.Screen => ChosenScreen,
+        RecorderTargetKind.Region when CapturePlatform == RecorderPlatform.MacOs && region is not null
+            => RecorderArguments.ScreenOf(Monitors(), region),
+        _ => 0
+    };
 
     /// <summary>
     /// Masaüstündeki monitörlerin sınırları. <c>gdigrab</c> ekran indeksi almadığı için
