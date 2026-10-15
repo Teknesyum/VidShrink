@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.9.0.schema.json
 PackageIdentifier: Teknesyum.VidShrink
-PackageVersion: 1.2.19
+PackageVersion: 1.2.20
 PackageLocale: en-US
 Publisher: Teknesyum
 PublisherUrl: https://github.com/Teknesyum

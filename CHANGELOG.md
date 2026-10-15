@@ -7,6 +7,32 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.20] - 2026-10-15
+
+### Added
+
+- Recorder hotkeys also work on macOS and on Linux under X11 (not yet Wayland).
+- Recorder codec list shows only the encoders the current platform can use, and a frame-rate
+  mode (Auto, Constant, Variable) joins the advanced options.
+- Player Tools: "Save Frames" writes a frame every N seconds (or across A-B) as numbered images,
+  and "Save Thumbnail Sheet" lays out evenly spaced frames on one image with a file header.
+- A remote `.pls` playlist shows the station name from the list instead of the file name.
+- Editor cut list: export to CSV, EDL, YouTube chapter text and Final Cut XML, and import CSV,
+  EDL or CUE from the timeline's right-click menu.
+- CLI: `--json` prints progress as one JSON object per line, `donustur` converts with the same
+  arguments as the Convert tab, presets can be exported, and a completion script is available for
+  bash, zsh, fish and PowerShell.
+- Installer: `--silent` runs without windows or prompts, the app appears in Windows "Installed
+  apps" with an uninstall entry, uninstall can also remove settings, and `--add-to-path` puts a
+  small `vidshrink` command on the user PATH (off by default).
+
+### Fixed
+
+- Smart cut no longer repeats a frame when a cut falls between frames, and keeps the source field
+  order in the output (HEVC lost it, interlaced MKV flipped it).
+- On macOS a region recording now captures from the screen the region is on.
+- The recorder passes a preset only to encoders that accept one.
+
 ## [1.2.19] - 2026-10-15
 
 ### Added

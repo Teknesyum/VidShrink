@@ -10,16 +10,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 **Dalga 2 — Karar Gerekmez, Küçük İş Öncelik 2 Ya Da Orta İş Öncelik 1**
 
-## 39. macOS Tıklama İşareti
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · PLT-P3 · Platform Eşitliği · iş küçük · öncelik 2 · karar gerekmez
-
-- Satırlar (PLT-P3): PLT-10 macOS'ta tıklama gösterimi. [Tablo](piyasa/2026-10-13/platform-esitligi-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/RecorderArguments.cs, src/VidShrink.App/Recorder/RecorderView.Girdi.cs, src/VidShrink.App/Recorder/RecorderView.axaml, tests/VidShrink.Tests
-- Plan: Mac'te tıklamaları göster kutusu ffmpeg'in `-capture_mouse_clicks 1` seçeneğine bağlanır; ek izin ve yardımcı ikili gerekmez. PLT-P1 ile aynı fonksiyona dokunur ve PLT-P2'nin gizlediği kutuyu yalnız Mac'te geri açar, bu yüzden ikisinden sonra gelir. Argüman testiyle doğrulanır; işaretin görünümü gerçek Mac'te görülmedi. EKB-P17 açılırsa bu paket onun macOS tıklama kolunu karşılamış olur.
-
-**Dalga 3 — Karar Gerekmez, Orta İş Öncelik 2 Ya Da Büyük İş Öncelik 1**
-
 ## 40. Komut Satırı Ve Toplu Teslim
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · DZA-P9 · Düzenleyici · iş büyük · öncelik 1 · karar gerekmez
@@ -109,14 +99,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.Core/RecorderArguments.cs, src/VidShrink.Core/AudioCaptureArguments.cs, src/VidShrink.App/Recorder/RecorderView.Ses.cs, src/VidShrink.App/Recorder/RecorderView.Gelismis.cs
 - Plan: Hedef listesine "yalnız ses" eklenir; görüntü girdisi kurulmaz ve ses girdilerinin sıra numarası varsayımı (`RecorderArguments.cs:366`) buna göre parametreye çevrilir. Ses kodeki sabiti (`RecorderArguments.cs:349`) seçilebilir olur; varsayılan AAC kalır, Opus yalnız onu taşıyan kaplarda sunulur. Ses süzgeç zincirine (`AudioCaptureArguments.cs:75`) ffmpeg'in `acompressor` (ses düzeyini dengeleyen) ve `alimiter` (patlamayı kesen) süzgeçleri iki yeni seçenek olarak girer. Üçü de argüman ölçüleriyle doğrulanır.
 
-## 65. Kodlayıcı Listesi Ve Kare Hızı
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · EKA-P4 · Kaydedici · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (EKA-P4): EKA-12 Kaydedicide donanım kodlayıcı Windows dışında; EKA-21 AV1 için QSV ve AMF kodlayıcıları; EKA-24 Sabit ya da değişken kare hızı seçimi. [Tablo](piyasa/2026-10-13/kaydedici-yakalama-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/RecorderArguments.cs, src/VidShrink.Core/CodecModel.cs, src/VidShrink.App/Recorder/RecorderView.Gelismis.cs
-- Plan: Kaydedicinin kodlayıcı listesine (`RecorderArguments.cs:368`) VideoToolbox, VAAPI, `av1_qsv` ve `av1_amf` eklenir; VideoToolbox ve VAAPI argümanları dönüştürme yolundan (`FfmpegArguments.cs`, K12) alınır. Aynı yere sabit ya da değişken kare hızı seçimi ffmpeg'in `-fps_mode` seçeneğiyle eklenir; varsayılan bugünkü davranış kalır. Argümanlar ölçüyle doğrulanır; macOS ve Linux kodlayıcıları bu makinede koşulamadığı için gerçek deneme o sistemlerde elle yapılır.
-
 ## 66. Komut Satırından Kayıt
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · EKA-P5 · Kaydedici · iş orta · öncelik 2 · karar gerekmez
@@ -158,14 +140,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.Core/RecorderArguments.cs, src/VidShrink.Ffmpeg/CaptureDevices.cs, src/VidShrink.App/Recorder/RecorderView.Kamera.cs
 - Plan: Kamera girdisi macOS'ta `avfoundation`, Linux'ta `v4l2` ile kurulur (ffmpeg'in o sistemlerdeki aygıt girdileri) ve kamera paneli yalnız Windows koşulundan çıkar (`RecorderView.Kamera.cs:53`). Kardeş tablodaki EKB-18 ve onun paketi EKB-P13 aynı iştir; yalnız biri açılır. Argüman üretimi `tests/VidShrink.Tests/KaydediciKameraTests.cs` yanında her sistem için ölçülür; gerçek aygıt denemesi bu makinede yapılamaz, o sistemlerde elle yapılır.
 
-## 71. Genel Kısayollar Windows Dışında
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · EKA-P10 · Kaydedici · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (EKA-P10): EKA-13 Genel kısayollar Windows dışında. [Tablo](piyasa/2026-10-13/kaydedici-yakalama-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Recorder/RecorderHotkeys.cs, src/VidShrink.App/Recorder/RecorderView.Kisayol.cs
-- Plan: Windows dışında bugün boş kısayol sürümü seçiliyor (`RecorderView.Kisayol.cs:29`, `RecorderHotkeys.cs:136`); macOS ve X11 karşılıkları yazılır: macOS'ta izin istemeyen sistem kısayol kaydı, X11'de tuş yakalama çağrısı. Wayland bu paketin dışında kalır; orada genel kısayol portal ister ve EKA-P14 ile birlikte düşünülür. Atama mantığı `tests/VidShrink.Tests/KaydediciKisayolAtamaTests.cs` içinde ölçülür; gerçek deneme o sistemlerde elle yapılır.
-
 ## 72. Sonuç Paneli Ve Paylaşım Kısayolları
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P3 · Kaydedici · iş orta · öncelik 2 · karar gerekmez
@@ -206,22 +180,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: docs/olcumler/, src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/Themes/Controls.axaml
 - Plan: Her sekmede bir ana iş baştan sona önce yalnız klavyeyle, sonra ekran okuyucuyla (Windows'ta Anlatıcı ve NVDA) yapılır; sekme sırası, klavye tuzağı ve adı okunmayan denetimler tek tek yazılır. Bulgular `docs/olcumler` altına kayıt olarak girer; adı eksik denetim ve bozuk sekme sırası gibi küçük kusurlar aynı turda düzeltilir, büyükleri deftere yazılır. macOS'ta VoiceOver denemesi o makinede ayrıca yapılır.
 
-## 79. Sessiz Kurulum Ve Uygulama Kaydı
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DAG-P1 · Dağıtım Ve Otomasyon · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (DAG-P1): DAG-16 Sessiz kurulum bayrağı; DAG-17 Yüklü uygulamalar kaydı; DAG-19 Kaldırmada ayar temizliği; DAG-28 Windows'ta komut PATH'te değil. [Tablo](piyasa/2026-10-13/dagitim-otomasyon-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Setup/Program.cs, src/VidShrink.Core/Setup/SetupRunner.cs, src/VidShrink.Core/Setup/SetupText.cs, Install-VidShrink.ps1, docs/kurulum.md
-- Plan: Kurucuya adı belli bir sessiz kip eklenir (`--silent`: pencere açmaz, soru sormaz, hata olunca beklemeden sıfırdan farklı kodla çıkar) ve yardım metni ile docs/kurulum.md'ye yazılır. Kurulum, Windows'un Ayarlar listesini besleyen kullanıcı düzeyi kaldırma kaydını (ad, sürüm, yayıncı, simge, kaldırma komutu) yazar, kaldırma onu siler; kaldırmaya ayar klasörünü de silen bir seçenek gelir. İsteğe bağlı ve varsayılanı kapalı bir seçenek kullanıcı PATH'ine yalnız küçük bir `bin` klasörü ekler; içinde komut satırı aracını çağıran küçük bir sarmalayıcı (örneğin tek satırlık `vidshrink.cmd`) durur, çünkü kökteki başlatıcı aynı adı taşıyor. Doğrulama: kurulum ve kaldırma testleri sahte kayıt köküyle, elle de Ayarlar listesinde görünme, sürümün doğru yazılması ve kaldırmanın iz bırakmaması.
-
-## 80. Komut Satırı Çıktısı Ve Dönüştürme
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DAG-P2 · Dağıtım Ve Otomasyon · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (DAG-P2): DAG-29 Makinece okunur ilerleme; DAG-30 Komut satırında dönüştürme; DAG-33 Ön ayarı komut satırından dışa aktarma; DAG-34 Kabuk tamamlama. [Tablo](piyasa/2026-10-13/dagitim-otomasyon-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Cli/CliRequest.cs, src/VidShrink.Cli/CliApp.cs, src/VidShrink.Core/PresetLibrary.cs, docs/cli.md, docs/cli.tr.md
-- Plan: Dört ek aynı iki dosyada olduğu için tek elde yapılır. `--json` ile birlikte ilerleme satır başına bir JSON nesnesi olarak yazılır (NDJSON: her satırı ayrı okunabilen JSON akışı); `profiller` komutuna çekirdekteki hazır `Export` işlevini çağıran dışa aktarma seçeneği, bir de bash, zsh, fish ve PowerShell için Tab tamamlama betiğini basan `tamamlama` komutu gelir. `donustur` komutu Dönüştür sekmesinin argüman üretimini çağırır ve kodek kümesini arayüzdekiyle eşitler; o üretim çekirdekte değilse önce oraya taşınır (bu turda bakılmadı). Doğrulama: ayrıştırma ve çıktı testleri, `donustur` için arayüzle aynı ffmpeg argümanını üretme testi.
-
 ## 81. Windows 11 İlk Menüde Küçültme
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · DAG-P3 · Dağıtım Ve Otomasyon · iş orta · öncelik 2 · karar gerekmez
@@ -230,17 +188,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.ShellExtension/VidShrink.ShellExtension.cpp, src/VidShrink.ShellExtension/AppxManifest.template.xml, src/VidShrink.Core/ShellIntegration.cs, src/VidShrink.Core/Setup/SetupRunner.cs, Install-VidShrink.ps1
 - Plan: Kabuk eklentisi (Windows 11'in ilk sağ tık menüsüne girdi koyan C++ bileşeni) bugün tek komut döndürüyor ve alt komut kolu boş. Açma girdisinin yanına "VidShrink ile Küçült" üst girdisi eklenir: `GetFlags` `ECF_HASSUBCOMMANDS` döndürür, `EnumSubCommands` altı hedefi `ShellIntegration.QuickShrinkMenu` sırasıyla sayar ve her biri başlatıcıyı `--kucult` ile çağırır. Etiketler var olan `ShellLabels` kayıt anahtarından okunur, böylece menü dili korunur. Doğrulama: listeyi üç kurucuyla karşılaştıran mevcut teste eklenti dizisi eklenir; Windows 11'de ilk menüde alt menünün görünmesi ve bir hedefin küçültmeyi başlatması elle bakılır.
 
-## 82. Oynatıcıdan Kare Ve Tablo Çıkarma
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · ARC-P7 = OYA-P12 · Bizde Olmayan Araçlar · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (ARC-P7): ARC-08 Toplu kare dışa aktarma; ARC-07 Küçük resim tablosu. [Tablo](piyasa/2026-10-13/eksik-araclar-dogrulanmis.md)
-- Satırlar (OYA-P12): OYA-44 Küçük resim tablosu. [Tablo](piyasa/2026-10-13/oynatici-cekirdek-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Playback/ToolsOptions.cs, src/VidShrink.App/Playback/PlayerView.Tools.cs, src/VidShrink.Core/GifPalette.cs, src/VidShrink.App/Locales/
-- Plan: Oynatıcının araç komutlarına (klip ve GIF dışa aktarmanın yanına) iki komut eklenir. "Kareleri dışa aktar": her N saniyede ya da A-B aralığında kareler numaralı resim olarak yazılır. "Küçük resim tablosu": eşit aralıklı kareler ffmpeg'in tile süzgeciyle tek resme dizilir, üstüne dosya bilgisi başlığı konur. Doğrulama: kısa üretilmiş örnekte yazılan dosya sayısı beklenene eşit, tablonun boyutu satır, sütun ve kare boyutunun çarpımına eşit.
-
-**Dalga 4 — Karar Gerekmez, Kalanlar**
-
 ## 83. Akış Kalitesi Ve Kesintisiz Çalma
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · OYB-P10 · Oynatıcı · iş büyük · öncelik 2 · karar gerekmez
@@ -248,14 +195,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (OYB-P10): OYB-21 Akış kalite seçimi; OYB-43 Kesintisiz çalma. [Tablo](piyasa/2026-10-13/oynatici-kitaplik-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Player/MpvEngine.cs, src/VidShrink.Player/IPlaybackEngine.cs, src/VidShrink.App/Playback/PlayerView.Tracks.cs, src/VidShrink.App/Playback/PlayerView.Kuyruk.cs
 - Plan: İki adımda teslim edilir ve adımlar ayrı işçilere verilebilir. Önce akış kalitesi (orta): uyarlamalı yayının katmanlarının motorun iz listesinde nasıl göründüğü ölçülür, sonra iz menüsüne kalite seçimi eklenir (video izi değiştirme ya da `hls-bitrate` seçeneği); OYB-P1 bitmeden başlamaz. Sonra kesintisiz çalma (büyük): sıradaki dosyayı önden yükleme (`prefetch-playlist`, `gapless-audio`) kuyruğun motora verilmemesi kararına dokunur, bu yüzden önce o kararın gerekçesi (`PlayerView.Kuyruk.cs:13`) yeniden ölçülür. İki katmanlı yerel bir HLS yayını ve ardışık iki ses dosyasıyla doğrulanır.
-
-## 84. Kesim Listesi Ve Kurgu Aktarımı
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DZA-P10 · Düzenleyici · iş büyük · öncelik 2 · karar gerekmez
-
-- Satırlar (DZA-P10): DZA-15 Kesim listesini dışa aktarma; DZA-16 Kesim listesini içe aktarma; DZA-17 Kurgu programına aktarma. [Tablo](piyasa/2026-10-13/duzenleyici-kesim-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/Editing/, src/VidShrink.App/Editing/EditorView.Proje.cs
-- Plan: Parça listesini dış biçimlere çeviren tek bir okuyucu ve yazıcı modülü yazılır: dışa CSV, EDL (kurgu programlarının düz metin kesim listesi) ve YouTube bölüm metni; içe CSV, EDL ve CUE. Aynı modül kesilmiş çizelgeyi Premiere Pro ile DaVinci Resolve'un açtığı Final Cut XML'ine de yazar. Bölünecekse önce liste biçimleri (orta), sonra XML (orta). Doğrulama: her biçim için gidiş dönüş birim testi; XML'in hedef programda açıldığını sahip gözle dener.
 
 ## 85. Kap İçi İz İşleri
 
@@ -774,25 +713,4 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.Core/, src/VidShrink.App/, yeni docs/ sayfası
 - Sahibin kararı: uygulamaya betik motoru (yeni bağımlılık) eklensin ve sürümler arası korunacak bir eklenti arabirimi sözü verilsin mi.
 - Plan: DAG-P4'ten önce başlanmaz: dış süreçten gelen komut kanalı, eklenti isteklerinin kumanda ve otomasyon kısmını bağımlılık eklemeden karşılar. Evet denirse ilk adım dar tutulur: kullanıcı klasöründeki betikler oynatıcı ve kuyruk olaylarına abone olur ve komut kanalındaki komutları çağırır; arayüze parça ekleyen eklenti sonraya kalır. Betik dili ve motoru kararın parçasıdır. Doğrulama: örnek betikle olay ve komut testi, betik hatasının uygulamayı düşürmediğinin testi.
-
-## 155. macOS'ta Bölge Kaydı Seçili Ekrandan
-
-14 Ekim 2026 · Dalga 1 yapımında görüldü (PLT-P1) · Platform Eşitliği · iş küçük · öncelik 2 · karar gerekmez
-
-- Kanıt: `src/VidShrink.App/Recorder/RecorderView.Hedef.cs:177` `ScreenIndex = target == RecorderTargetKind.Screen ? ChosenScreen : 0` yazıyor; bölge ve pencere hedefinde ekran sırası 0'a düşüyor, Mac'te bölge her zaman birinci ekrandan kesiliyor.
-- Plan: Bölge ve pencere hedefi, seçimin bulunduğu ekranın sırasını taşır. Argüman testi iki ekranlı sahte düzende bölgenin ikinci ekranın adıyla girdiğini pimler. Gerçek çok ekranlı Mac bu makinede ölçülemez; belgeye ölçülmedi diye yazılır.
-
-## 156. Uzak Liste Adresinde Yayın Adı
-
-14 Ekim 2026 · Dalga 1 yapımında ölçüldü (OYB-P1) · Oynatıcı · iş küçük · öncelik 2 · karar gerekmez
-
-- Kanıt: uzak bir `.pls` adresi açılınca başlıkta yayının adı yerine dosya adı ("radyo.pls") görünüyor.
-- Plan: Adres listeyse başlık, mpv'nin `media-title` değerini ya da listenin `Title1` satırını alır; ikisi de yoksa bugünkü gibi dosya adı. Yerel 127.0.0.1 sunucusuyla başlık testi.
-
-## 158. Akıllı Kipte Kare Sınırı Dışı Kesim
-
-14 Ekim 2026 · Dalga 2 yapımında görüldü (DZA-P4) · Düzenleyici · iş küçük · öncelik 2 · karar gerekmez
-
-- Kanıt: ajan raporu, akıllı kipte kare sınırına denk gelmeyen kesimde birleşim noktasında bir karenin tekrar ettiğini ve ffmpeg'in "non monotonically increasing dts" yazdığını söylüyor (`src/VidShrink.Core/Editing/EditExport.cs`, `SmartEncode`). Kodda doğrulanmadı.
-- Plan: Önce ölçüm: kare sınırı dışı kesimli kısa klipte kare sayısı ve dts dizisi okunur. Tekrar doğrulanırsa yeniden kodlanan baş parçanın bitişi bir sonraki anahtar karenin pts'sine hizalanır; test birleşik çıktıda kare sayısını ve dts'nin artan olduğunu pimler.
 
