@@ -258,7 +258,7 @@ public sealed class AltyaziTaramaTests
         Assert.Equal(ExitCodes.InBand, kosum.Exit);
         Assert.Equal(1, kosum.Sayim);
         Assert.Contains(":si=1", Zincir(kosum.Stdout));
-        Assert.Contains(CliText.ForLanguage("tr")["progress.subtitle-scan"], kosum.Stderr);
+        Assert.Contains(CliProgress.StageLine("subtitle-scan"), kosum.Stderr);
         Assert.Contains(CliText.ForLanguage("tr").Format("result.subtitle-scan.sparse", 2, 40, 900), kosum.Stderr);
     }
 

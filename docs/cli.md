@@ -116,6 +116,11 @@ single spelling.
 | `--oncelik` | `--priority` |
 | `--is-parcacigi` | `--threads` |
 | `--dil` | `--lang` |
+| `--kap` | `--container` |
+| `--bit-hizi` | `--bitrate` |
+| `--cozunurluk` | `--resolution` |
+| `--ses-bit-hizi` | `--audio-bitrate` |
+| `--disa-aktar` | `--export` |
 
 Exit codes: `0` in band, `2` under the band (quality saturated, the smaller file kept), `3`
 size ceiling exceeded (the smallest result is still written; JSON carries `output` and `overTarget: true`), `1` error, `64` wrong usage, `130` cancelled.
@@ -173,3 +178,71 @@ up as a new file.
 Exit codes: `0` finished, `4` `--bir-kez` finished but at least one file failed or was
 skipped for a name collision, `1` error, `64` wrong usage, `130` stopped with Ctrl+C. After
 `--bir-kez` a summary line reports how many files were skipped.
+
+## Convert
+
+`donustur` (`convert`) is the Convert tab without the window: the same argument builder
+(`ConversionArguments`), the same codec and container sets, the same output name
+(`<name>_converted.<ext>` next to the source). With the same settings the CLI and the tab
+write the same ffmpeg command; a test holds the two against each other.
+
+```bash
+vidshrink donustur clip.mov --kap mp4 --kodek hevc --crf 24
+vidshrink donustur clip.mp4 -o clip.webm --kodek vp9 --bit-hizi 2000
+vidshrink donustur clip.mp4 --kap gif --cozunurluk 480 --kare-hizi 15
+vidshrink donustur clip.mkv --kap mp3 --ses-bit-hizi 192 --json
+```
+
+Options: `--kap <container>` (mp4, mkv, webm, mov, avi, gif, mp3, m4a, wav, flac, webp,
+avif, mxf, png, jpg, opus, ogg, aiff, ac3; without it the extension of `--cikti` decides,
+otherwise mp4), `--kodek <codec>` (h264, hevc, vp9, av1, prores, dnxhr, `copy`, or an encoder
+name such as `libx264`, `h264_nvenc`, `prores_ks:hq`), `--crf <n>` (inside the codec's own
+range) or `--bit-hizi <kbit/s>` (not both), `--cozunurluk source|<height>|<W>x<H>`,
+`--kare-hizi source|<fps>`, `--ses-kodek <codec>` (aac, opus, mp3, pcm, flac, ac3, eac3,
+`copy`, `none`), `--ses-bit-hizi <kbit/s>`, `--kes <range>`, `--meta-yok`, `--cikti <path>`,
+`--json`. A combination the tab would refuse (an audio codec the container cannot carry, an
+odd size) is refused with the same reason and exit code `64`; a container whose encoder the
+local ffmpeg lacks gives `1`.
+
+The CLI does not carry the tab's GIF-from-GIF size target, its audio track picker or its
+external audio file.
+
+## Progress As NDJSON
+
+With `--json`, stderr progress is NDJSON too, one compact object per line, for `kucult`,
+`plan` and `donustur`. stdout keeps the result object as before. In `izle` the per-file
+progress lines follow the same format; the watcher's own event lines stay text.
+
+```json
+{"type":"stage","stage":"probe"}
+{"type":"progress","percent":42,"fraction":0.4213,"stage":"pass 1/2","remainingSeconds":12.5}
+```
+
+`stage` lines name a step (`probe`, `crop`, `measure`, `calibrate` and so on);
+`progress` lines repeat only when the percent or the stage changes, and `remainingSeconds`
+is `null` while it is unknown.
+
+## Exporting Presets
+
+`profiller --disa-aktar <file>` writes your own presets to a JSON file that the app's
+"Import" reads (`PresetLibrary.Export`). `--profil <id or name>` (repeatable) picks some of
+them; without it all are written. Built-in presets ship with every copy and cannot be
+exported; asking for one gives `64`, as does an unknown name.
+
+```bash
+vidshrink profiller --disa-aktar profiles.json
+vidshrink profiller --disa-aktar discord.json --profil "Discord clip"
+```
+
+## Shell Completion
+
+`tamamlama <shell>` (`completion`) prints a completion script for `bash`, `zsh`, `fish` or
+`powershell` (`pwsh`). It completes commands, options and the values of options with a
+closed set (codecs, containers, profiles, languages).
+
+```bash
+source <(vidshrink tamamlama bash)                              # ~/.bashrc
+source <(vidshrink tamamlama zsh)                               # ~/.zshrc
+vidshrink tamamlama fish | source                               # ~/.config/fish/config.fish
+vidshrink tamamlama powershell | Out-String | Invoke-Expression # $PROFILE
+```

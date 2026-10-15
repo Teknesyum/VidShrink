@@ -37,6 +37,10 @@ public sealed class CliServices
         catch (Exception ex) when (ex is PresetFileException or IOException or UnauthorizedAccessException) { return Array.Empty<PresetProfile>(); }
     };
 
+    /// <summary><c>donustur</c>'un kodlaması; panelin çağırdığı <see cref="EncodeRunner.ConvertAsync"/>.</summary>
+    public Func<MediaInfo, ConversionPlan, string, IProgress<EncodeProgress>, CancellationToken, Task<ConversionResult>> Convert { get; init; }
+        = (info, plan, output, progress, ct) => new EncodeRunner().ConvertAsync(info, plan, output, progress, ct);
+
     public IWatchFileSystem WatchFileSystem { get; init; } = PhysicalWatchFileSystem.Instance;
     public IWatchClock WatchClock { get; init; } = SystemWatchClock.Instance;
     public Func<string?> WatchStateFallbackDirectory { get; init; } = () => Path.GetDirectoryName(UpdateSettings.DefaultPath) is { } settings ? Path.Combine(settings, "izle") : null;
@@ -89,8 +93,13 @@ public static class CliApp
             case CliCommand.Version:
                 stdout.WriteLine(CliText.Version);
                 return ExitCodes.InBand;
+            case CliCommand.Profiller when request.ExportPath is { } disaAktarilan:
+                return ProfilDisaAktar(request, disaAktarilan, services, stdout, stderr, text);
             case CliCommand.Profiller:
                 stdout.Write(ProfilListesi(services, text));
+                return ExitCodes.InBand;
+            case CliCommand.Completion:
+                stdout.Write(CliCompletion.Script(request.Shell!));
                 return ExitCodes.InBand;
             case CliCommand.Gunluk:
             {
@@ -155,6 +164,8 @@ public static class CliApp
 
             if (request.Command == CliCommand.Watch)
                 return await WatchAsync(request, services, stdout, stderr, text, ct);
+            if (request.Command == CliCommand.Convert)
+                return await CliConvert.RunAsync(request, services, stdout, stderr, text, ct);
 
             return (await ProcessFileAsync(request, services, stdout, stderr, text, ct)).ExitCode;
         }
@@ -224,7 +235,7 @@ public static class CliApp
             return new FileRun(ExitCodes.Error, null, text.Format("error.input-missing", input));
         }
 
-        stderr.WriteLine(text["progress.probe"]);
+        CliProgress.Stage(stderr, text, "progress.probe", request.Json);
         var info = await services.Probe(input, ct);
 
         if (request.Scan)
@@ -266,7 +277,7 @@ public static class CliApp
             var bulunan = ForeignAudioSearch.Flagged(info, request.PreferredLanguage);
             if (bulunan is null && ForeignAudioSearch.Decide(info, null, request.PreferredLanguage).Outcome == ForeignAudioOutcome.NotMeasured)
             {
-                stderr.WriteLine(text["progress.subtitle-scan"]);
+                CliProgress.Stage(stderr, text, "progress.subtitle-scan", request.Json);
                 bulunan = ForeignAudioSearch.Decide(info, await services.CountSubtitlePackets(info, ct), request.PreferredLanguage);
             }
             bulunan ??= new ForeignAudioPick(ForeignAudioOutcome.NoSubtitles);
@@ -297,7 +308,7 @@ public static class CliApp
         if (okunanKodlama is not null) stderr.WriteLine(text.Format(BurnEncodingNote, okunanKodlama));
         if (request.ProbesCrop && request.Filters?.Crop is null)
         {
-            stderr.WriteLine(text["progress.crop"]);
+            CliProgress.Stage(stderr, text, "progress.crop", request.Json);
             var detection = await services.DetectCrop(info, ct);
             var conservative = request.CropMode == CropMode.Conservative;
             var found = conservative
@@ -496,16 +507,16 @@ public static class CliApp
     public static async Task<CliDecision> MeasureAndDecideAsync(CliRequest request, MediaInfo info,
         IEncoderAvailability? availability, TextWriter stderr, CliText text, CancellationToken ct)
     {
-        stderr.WriteLine(text["progress.scenes"]);
+        CliProgress.Stage(stderr, text, "progress.scenes", request.Json);
         var scenes = await EncodeRunner.TryBuildSceneMapAsync(info, ct: ct);
         var draft = Decide(request, info, null, scenes, availability);
 
-        stderr.WriteLine(text["progress.measure"]);
+        CliProgress.Stage(stderr, text, "progress.measure", request.Json);
         var profile = await ShrinkEngine.CalibrateAsync(info, scenes, draft.Options.SpeedMode,
             () => request.ToPlanOptions(draft.TargetMb, info.DurationSeconds), availability,
             (stage, _) =>
             {
-                if (stage == ShrinkMeasureStage.Probed) stderr.WriteLine(text["progress.calibrate"]);
+                if (stage == ShrinkMeasureStage.Probed) CliProgress.Stage(stderr, text, "progress.calibrate", request.Json);
                 return true;
             }, ct);
 
@@ -530,7 +541,7 @@ public static class CliApp
 
         var clock = Stopwatch.StartNew();
         var result = await ShrinkEngine.EncodeAsync(decision.Info, decision.Plan, decision.OutputPath, targetMb,
-            new StderrProgress(stderr, text), ct, decision.Options.FillPolicy, decision.Profile, null, decision.Scenes?.Map);
+            new CliProgress.Encode(stderr, text, request.Json), ct, decision.Options.FillPolicy, decision.Profile, null, decision.Scenes?.Map);
         clock.Stop();
 
         QualityScore? vmaf = null;
@@ -676,6 +687,48 @@ public static class CliApp
 
         builder.AppendLine(text["presets.hint"]);
         return builder.ToString();
+    }
+
+    /// <summary>
+    /// <c>profiller --disa-aktar</c>: kullanıcı profillerini çekirdeğin <see cref="PresetLibrary.Export"/>'u ile yazar.
+    /// Yerleşik profil aktarılmaz; <see cref="PresetLibrary.Import"/> yerleşik kimliği reddettiği için dosya geri okunamazdı.
+    /// </summary>
+    private static int ProfilDisaAktar(CliRequest request, string path, CliServices services, TextWriter stdout, TextWriter stderr, CliText text)
+    {
+        var kullanici = services.UserPresets();
+        var secilen = new List<PresetProfile>();
+        foreach (var kimlik in request.ExportIds)
+        {
+            var bulunan = kullanici.FirstOrDefault(p => string.Equals(p.Id, kimlik, StringComparison.OrdinalIgnoreCase)
+                                                        || string.Equals(p.Name, kimlik, StringComparison.OrdinalIgnoreCase));
+            if (bulunan is null)
+            {
+                stderr.WriteLine(text.Format(PresetLibrary.BuiltIn.Find(kimlik) is null ? "error.bad-profile" : "error.export-builtin", kimlik));
+                stderr.WriteLine(text["usage.hint"]);
+                return ExitCodes.Usage;
+            }
+            if (!secilen.Contains(bulunan)) secilen.Add(bulunan);
+        }
+        if (request.ExportIds.Count == 0) secilen.AddRange(kullanici);
+        if (secilen.Count == 0)
+        {
+            stderr.WriteLine(text["error.export-empty"]);
+            return ExitCodes.Error;
+        }
+
+        var hedef = Path.GetFullPath(path);
+        try
+        {
+            PresetLibrary.Export(secilen, hedef);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or NotSupportedException)
+        {
+            stderr.WriteLine(text.Format("error.export-failed", hedef, ex.Message));
+            return ExitCodes.Error;
+        }
+
+        stdout.WriteLine(text.Format("presets.exported", secilen.Count, hedef));
+        return ExitCodes.InBand;
     }
 
     public static string ShrinkText(CliDecision decision, EncodeResult result, TimeSpan elapsed, QualityScore? vmaf, CliText text)
@@ -877,24 +930,4 @@ public static class CliApp
     private static string Clock(TimeSpan span) => Saat.Ekran(span);
 
     private static bool PathEquals(string left, string right) => PathEquality.Same(left, right);
-
-    private sealed class StderrProgress(TextWriter stderr, CliText text) : IProgress<EncodeProgress>
-    {
-        private readonly object _gate = new();
-        private int _lastPercent = -1;
-        private string _lastStage = "";
-
-        public void Report(EncodeProgress value)
-        {
-            var percent = (int)Math.Clamp(Math.Floor(value.Fraction * 100), 0, 100);
-            lock (_gate)
-            {
-                if (percent == _lastPercent && value.Stage == _lastStage) return;
-                _lastPercent = percent;
-                _lastStage = value.Stage;
-                var remaining = value.Remaining is { } left ? Clock(left) : "-";
-                stderr.WriteLine(text.Format("progress.encode", percent, value.Stage, remaining));
-            }
-        }
-    }
 }
