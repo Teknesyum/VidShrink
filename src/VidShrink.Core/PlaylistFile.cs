@@ -147,6 +147,27 @@ public static partial class PlaylistFile
         return files.Values;
     }
 
+    /// <summary>pls listesinin çalan ilk girdisinin (en küçük numaralı <c>FileN</c>) <c>TitleN</c> satırı; yoksa <c>null</c>.</summary>
+    public static string? PlsTitle(byte[] bytes) => PlsTitle(Decode(bytes));
+
+    public static string? PlsTitle(string text)
+    {
+        int? first = null;
+        var titles = new Dictionary<int, string>();
+        foreach (var line in Lines(text))
+        {
+            var file = PlsFile().Match(line);
+            if (file.Success && int.TryParse(file.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out var index)
+                && file.Groups[2].Value.Trim().Length > 0)
+                first = first is { } known ? Math.Min(known, index) : index;
+            var title = PlsTitleLine().Match(line);
+            if (title.Success && int.TryParse(title.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out var number))
+                titles[number] = OneLine(title.Groups[2].Value);
+        }
+
+        return first is { } entry && titles.TryGetValue(entry, out var found) && found.Length > 0 ? found : null;
+    }
+
     private static IEnumerable<string> Attributes(Regex pattern, string text)
         => pattern.Matches(text).Select(match => WebUtility.HtmlDecode(match.Groups["v"].Value).Trim());
 
@@ -177,6 +198,9 @@ public static partial class PlaylistFile
 
     [GeneratedRegex(@"^File(\d+)\s*=(.*)$", RegexOptions.IgnoreCase)]
     private static partial Regex PlsFile();
+
+    [GeneratedRegex(@"^Title(\d+)\s*=(.*)$", RegexOptions.IgnoreCase)]
+    private static partial Regex PlsTitleLine();
 
     [GeneratedRegex(@"<media\b[^>]*?\bsrc\s*=\s*(?:""(?<v>[^""]*)""|'(?<v>[^']*)')", RegexOptions.IgnoreCase)]
     private static partial Regex MediaSrc();

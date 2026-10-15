@@ -184,6 +184,16 @@ public sealed partial class MpvEngine : IPlaybackEngine
 
     public MediaTags Tags => _isOpen ? new MediaTags(Tag("title"), Tag("artist"), Tag("album")) : MediaTags.Empty;
 
+    public string? MediaTitle
+    {
+        get
+        {
+            if (!_isOpen || GetProperty("media-title") is not { Length: > 0 } raw) return null;
+            var title = raw.Trim();
+            return title.Length == 0 || string.Equals(title, GetProperty("filename"), StringComparison.Ordinal) ? null : title;
+        }
+    }
+
     private string? Tag(string key) => GetProperty("metadata/by-key/" + key) is { Length: > 0 } value ? value.Trim() : null;
 
     public bool IsPaused => _paused;
