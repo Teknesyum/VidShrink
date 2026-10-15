@@ -3,7 +3,7 @@ using VidShrink.Core;
 
 namespace VidShrink.Cli;
 
-public enum CliCommand { Help, Version, Shrink, Plan, Watch, Gunluk, Profiller, Convert, Completion, Record }
+public enum CliCommand { Help, Version, Shrink, Plan, Watch, Gunluk, Profiller, Convert, Completion, Record, Edit }
 
 public enum CliCodec { Auto, H264, Hevc, Av1, Vp9 }
 
@@ -193,6 +193,9 @@ public sealed record CliRequest
 
     /// <summary><c>kaydet --sure</c>: kaydın süre sınırı, saniye. Yoksa kayıt Ctrl+C ya da kayıtlı sınırla biter.</summary>
     public double? RecordSeconds { get; init; }
+
+    /// <summary><c>teslim --kip</c>: projenin kayitli kipinin yerine gecen teslim kipi. Yoksa projenin kipi kalir.</summary>
+    public VidShrink.Core.Editing.ExportMode? EditMode { get; init; }
 
     /// <summary><c>kaydet --ayarlar</c>: kaydedici ayar dosyası. Yoksa pencerenin kendi dosyası okunur.</summary>
     public string? RecordSettings { get; init; }
@@ -433,6 +436,8 @@ public static class CliParser
             return CliConvert.Parse(args);
         if (head is "kaydet" or "record")
             return CliRecord.Parse(args);
+        if (head is "teslim" or "export")
+            return CliEdit.Parse(args);
 
         var command = head switch
         {

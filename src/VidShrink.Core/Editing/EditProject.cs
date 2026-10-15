@@ -29,6 +29,9 @@ public sealed record SourceStamp(string Path, long Size, long ModifiedUtcTicks)
 /// <summary>Sonradan eklenen kaynagin kimligi ve suresi; sirasi listedeki yerinin bir fazlasidir.</summary>
 public sealed record ExtraSource(SourceStamp Stamp, long Duration);
 
+/// <summary>Projeden pencere acmadan kurulan teslim isi: kaynak yollari (ilk kaynak basta), cizelge, kip ve ses izi.</summary>
+public sealed record EditProjectJob(IReadOnlyList<string> Sources, EditTimeline Timeline, ExportMode Mode, int AudioTrack);
+
 /// <summary>
 /// Duzenleyicinin diske yazilan durumu: kaynak kimligi, kesim listesi, klip ayarlari ve metin
 /// katmani. Geri al / ileri al yigini yazilmaz. Okuma hicbir kosulda firlatmaz: bozuk dosya,
@@ -104,6 +107,29 @@ public sealed class EditProject
         => Clips.All(c => c.Source == 0
             ? c.SourceEnd <= sourceDuration
             : c.Source <= ExtraSources.Count && c.SourceEnd <= ExtraSources[c.Source - 1].Duration);
+
+    /// <summary>
+    /// Pencere acmadan teslim isi. Her kaynagin kimligi <paramref name="stampOf"/> ile yeniden okunur; biri yoksa ya da
+    /// boyu veya zamani degistiyse <c>null</c> doner ve <paramref name="stale"/> o kaynagin yoludur. Cizelge bossa
+    /// <c>null</c> doner, <paramref name="stale"/> bos kalir. Kip projedeki addan duzenleyicinin kuraliyla okunur, taninmazsa Akilli.
+    /// </summary>
+    public EditProjectJob? ToJob(Func<string, SourceStamp?> stampOf, out string? stale)
+    {
+        ArgumentNullException.ThrowIfNull(stampOf);
+        stale = null;
+        foreach (var stamp in ExtraSources.Select(extra => extra.Stamp).Prepend(Source))
+        {
+            if (stampOf(stamp.Path) is { } now && stamp.Matches(now)) continue;
+            stale = stamp.Path;
+            return null;
+        }
+
+        if (Clips.Count == 0) return null;
+        var timeline = new EditTimeline(Array.Empty<EditClip>(), SourceDuration, extraSources: ExtraSources.Select(extra => extra.Duration));
+        timeline.Restore(Clips, Texts, Music);
+        var mode = Enum.TryParse<Editing.ExportMode>(ExportMode, ignoreCase: false, out var parsed) && Enum.IsDefined(parsed) ? parsed : Editing.ExportMode.Smart;
+        return new EditProjectJob(ExtraSources.Select(extra => extra.Stamp.Path).Prepend(Source.Path).ToArray(), timeline, mode, AudioTrack);
+    }
 
     public string ToJson()
     {

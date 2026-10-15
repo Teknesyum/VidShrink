@@ -124,6 +124,7 @@ bunların tek yazımı var.
 | `--ses-bit-hizi` | `--audio-bitrate` |
 | `--disa-aktar` | `--export` |
 | `--ek-arguman` | `--extra-args` |
+| `--kip` | `--mode` |
 
 Çıkış kodları: bantta `0`, bandın altında `2` (kalite doyduğu için daha küçük dosya
 saklandı), boy tavanı aşıldığında `3` (en küçük sonuç yine yazılıyor; JSON `output` ve
@@ -214,6 +215,29 @@ veriyor.
 
 Komut satırı sekmenin GIF'ten GIF'e boyut hedefini, ses izi seçimini ve harici ses dosyasını
 taşımıyor.
+
+## Proje Teslimi
+
+`teslim` (`export`) düzenleyicinin kaydettiği projeyi (`.vsproj.json`) pencere açmadan teslim
+ediyor. Çizelge projeden kuruluyor (`EditProject.ToJob`): her parça, metin, müzik izi, ses izi
+seçimi ve sonradan eklenen kaynak; plan ve koşu düzenleyicinin kendi teslim yolu
+(`EditExportRunner`). Komut satırının `--kes` anahtarı tek aralık kesiyor; çok parçalı kesim
+bu komutla, düzenleyicide kaydedilmiş projeden yineleniyor.
+
+```bash
+vidshrink teslim kesim.vsproj.json
+vidshrink teslim kesim.vsproj.json --cikti son.mp4 --kip tam --json
+```
+
+Anahtarlar: `--kip hizli|akilli|tam` (`--mode fast|smart|full`; verilmezse projeye kayıtlı
+kip, o da tanınmazsa akıllı), `--cikti <yol>` (verilmezse ilk kaynağın yanında
+`<ad>-duzenlenmis.<uzantı>`), `--meta-yok`, `--json`. Metin, efekt, müzik ya da birden çok
+kaynak düzenleyicide olduğu gibi kipi tama çeviriyor; stdout uygulanan kipi yazıyor.
+
+Proje kaydedildikten sonra bir kaynağın boyu ya da yazma zamanı değiştiyse ya da kaynak
+yoksa teslim başlamıyor ve çıkış kodu `1`; okunamayan proje, boş çizelge ve bellek sınırını
+aşan ters klip de `1` veriyor. Çıktı yolu bir kaynağın ya da projenin kendisiyse `64`.
+Parçaları ayrı dosyalara yazmak ve sıraya konan toplu teslim bu komutta yok.
 
 ## NDJSON İlerleme
 

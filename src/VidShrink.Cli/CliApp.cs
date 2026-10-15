@@ -63,6 +63,13 @@ public sealed class CliServices
 
     /// <summary><c>denetim</c>'in istemcisi; varsayılanı açık pencerenin tek örnek borusu.</summary>
     public Func<ControlCommand, ControlReply> Control { get; init; } = CliControl.DefaultSend;
+    /// <summary><c>teslim</c>: proje kaynaklarinin kimligi; testte sahte kaynakla degisir.</summary>
+    public Func<string, VidShrink.Core.Editing.SourceStamp?> Stamp { get; init; } = VidShrink.Core.Editing.SourceStamp.Of;
+
+    public Func<VidShrink.Core.Editing.EditProjectJob, string, bool, CancellationToken, Task<VidShrink.Core.Editing.ExportPlan>> EditPrepare { get; init; }
+        = (job, output, dropMetadata, ct) => EditExportRunner.PrepareAsync(job, output, dropMetadata, ct);
+
+    public Func<VidShrink.Core.Editing.ExportPlan, IProgress<EncodeProgress>, CancellationToken, Task> EditRun { get; init; } = EditExportRunner.RunAsync;
 }
 
 public sealed record CliDecision(
@@ -189,6 +196,8 @@ public static class CliApp
                 return await CliConvert.RunAsync(request, services, stdout, stderr, text, ct);
             if (request.Command == CliCommand.Record)
                 return await CliRecord.RunAsync(request, services, stdout, stderr, text, ct);
+            if (request.Command == CliCommand.Edit)
+                return await CliEdit.RunAsync(request, services, stdout, stderr, text, ct);
 
             return (await ProcessFileAsync(request, services, stdout, stderr, text, ct)).ExitCode;
         }

@@ -61,6 +61,10 @@ public static class CliCompletion
         "--cikti", "--output", "-o", "--ek-arguman", "--extra-args"
     };
 
+    private static readonly string[] EditFlags = { "-h", "--yardim", "--help", "--meta-yok", "--no-metadata", "--json" };
+
+    private static readonly string[] EditValues = { "--kip", "--mode", "--cikti", "--output", "-o" };
+
     private static readonly string[] ExportValues = { "--disa-aktar", "--export", "--profil", "--profile" };
 
     private static Dictionary<string, IReadOnlyList<string>> Pairs(params (string[] Options, IReadOnlyList<string> Values)[] rows)
@@ -112,6 +116,8 @@ public static class CliCompletion
                 RecordValues.Concat(Language).ToList(), Pairs((Language, CliText.Languages)), Array.Empty<string>()),
             new Command(new[] { "denetim", "control" }, new[] { "--json" }.Concat(Language).ToList(), Language,
                 Pairs((Language, CliText.Languages)), CliControl.Actions.SelectMany(a => new[] { a.Turkish, a.English }).ToList()),
+            new Command(new[] { "teslim", "export" }, EditFlags.Concat(EditValues).Concat(Language).ToList(),
+                EditValues.Concat(Language).ToList(), Pairs((new[] { "--kip", "--mode" }, CliEdit.Modes), (Language, CliText.Languages)), Array.Empty<string>()),
             new Command(new[] { "profiller", "presets" }, ExportValues.Concat(Language).ToList(), ExportValues.Concat(Language).ToList(),
                 Pairs((Language, CliText.Languages)), Array.Empty<string>()),
             new Command(new[] { "tamamlama", "completion" }, Array.Empty<string>(), Array.Empty<string>(),
