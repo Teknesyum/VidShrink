@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using VidShrink.Core;
 using VidShrink.Player;
@@ -20,6 +21,59 @@ internal enum ScreenshotFormat
 {
     Png,
     Jpg
+}
+
+internal enum SeekStep
+{
+    None,
+    Fine,
+    Small,
+    Medium,
+    Large
+}
+
+/// <summary>Ok tuşlarının ve şerit düğmelerinin atlama adımları; varsayılan 1, 10, 60 ve 300 sn.</summary>
+internal sealed record SeekSteps(double Fine, double Small, double Medium, double Large)
+{
+    internal const double Minimum = 0.1;
+    internal const double Maximum = 3600;
+
+    internal static readonly SeekSteps Default = new(Keymap.SeekFine, Keymap.SeekSmall, Keymap.SeekMedium, Keymap.SeekLarge);
+
+    internal static readonly IReadOnlyList<SeekStep> Slots = new[] { SeekStep.Fine, SeekStep.Small, SeekStep.Medium, SeekStep.Large };
+
+    internal double Of(SeekStep step) => step switch
+    {
+        SeekStep.Fine => Fine,
+        SeekStep.Small => Small,
+        SeekStep.Medium => Medium,
+        SeekStep.Large => Large,
+        _ => 0
+    };
+
+    internal SeekSteps With(SeekStep step, double seconds)
+    {
+        if (!Valid(seconds)) return this;
+        return step switch
+        {
+            SeekStep.Fine => this with { Fine = seconds },
+            SeekStep.Small => this with { Small = seconds },
+            SeekStep.Medium => this with { Medium = seconds },
+            SeekStep.Large => this with { Large = seconds },
+            _ => this
+        };
+    }
+
+    internal static bool Valid(double seconds) => double.IsFinite(seconds) && seconds >= Minimum && seconds <= Maximum;
+
+    internal static IReadOnlyList<double> Presets(SeekStep step) => step switch
+    {
+        SeekStep.Fine => new[] { 0.5, 1d, 2d, 3d, 5d },
+        SeekStep.Small => new[] { 3d, 5d, 10d, 15d, 30d },
+        SeekStep.Medium => new[] { 30d, 60d, 90d, 120d },
+        SeekStep.Large => new[] { 120d, 300d, 600d, 900d },
+        _ => Array.Empty<double>()
+    };
 }
 
 internal sealed class PlayerSettings
@@ -76,6 +130,8 @@ internal sealed class PlayerSettings
 
     internal bool TopmostWhilePlaying { get; set; }
 
+    internal SeekSteps SeekSteps { get; set; } = SeekSteps.Default;
+
     internal static PlayerSettings Load(string? file)
     {
         var settings = new PlayerSettings();
@@ -108,6 +164,7 @@ internal sealed class PlayerSettings
             settings.SubtitleInInterfaceLanguage = (bool?)root["subtitleInInterfaceLanguage"] ?? true;
             settings.PauseOnMinimize = (bool?)root["pauseOnMinimize"] ?? false;
             settings.TopmostWhilePlaying = (bool?)root["topmostWhilePlaying"] ?? false;
+            if (root["seekSteps"] is JsonObject steps) settings.SeekSteps = ReadSteps(steps);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or FormatException)
         {
@@ -153,6 +210,12 @@ internal sealed class PlayerSettings
                 writer.WriteBoolean("subtitleInInterfaceLanguage", SubtitleInInterfaceLanguage);
                 writer.WriteBoolean("pauseOnMinimize", PauseOnMinimize);
                 writer.WriteBoolean("topmostWhilePlaying", TopmostWhilePlaying);
+                writer.WriteStartObject("seekSteps");
+                writer.WriteNumber("fine", SeekSteps.Fine);
+                writer.WriteNumber("small", SeekSteps.Small);
+                writer.WriteNumber("medium", SeekSteps.Medium);
+                writer.WriteNumber("large", SeekSteps.Large);
+                writer.WriteEndObject();
                 writer.WriteEndObject();
             }
             File.Move(temp, file, true);
@@ -160,6 +223,14 @@ internal sealed class PlayerSettings
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
         }
+    }
+
+    private static SeekSteps ReadSteps(JsonObject node)
+    {
+        var steps = SeekSteps.Default;
+        foreach (var (slot, name) in new[] { (SeekStep.Fine, "fine"), (SeekStep.Small, "small"), (SeekStep.Medium, "medium"), (SeekStep.Large, "large") })
+            if ((double?)node[name] is { } seconds) steps = steps.With(slot, seconds);
+        return steps;
     }
 
     private static double Speed(double? value, double fallback) =>

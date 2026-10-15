@@ -721,6 +721,7 @@
   "main.player.menu.chapters": "Luvut",
   "main.player.menu.stop": "Pysäytä",
   "main.player.menu.tostart": "Siirry alkuun",
+  "main.player.menu.goto": "Siirry aikaan",
   "main.player.input.wheel": "Rulla",
   "main.player.input.left": "Vasen klikkaus",
   "main.player.input.middle": "Keskiklikkaus",

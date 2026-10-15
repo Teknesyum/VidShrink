@@ -721,6 +721,7 @@
   "main.player.menu.chapters": "Chapters",
   "main.player.menu.stop": "Stop",
   "main.player.menu.tostart": "Go to start",
+  "main.player.menu.goto": "Go to time",
   "main.player.input.wheel": "Wheel",
   "main.player.input.left": "Left click",
   "main.player.input.middle": "Middle click",

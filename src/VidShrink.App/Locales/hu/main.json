@@ -721,6 +721,7 @@
   "main.player.menu.chapters": "Fejezetek",
   "main.player.menu.stop": "Leállítás",
   "main.player.menu.tostart": "Ugrás az elejére",
+  "main.player.menu.goto": "Ugrás időpontra",
   "main.player.input.wheel": "Görgő",
   "main.player.input.left": "Bal kattintás",
   "main.player.input.middle": "Középső kattintás",

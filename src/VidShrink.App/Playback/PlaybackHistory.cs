@@ -13,6 +13,9 @@ namespace VidShrink.App.Playback;
 
 internal sealed record HistoryRow(string Path, DateTimeOffset Seen, double Position);
 
+/// <summary>Dosya başına hatırlanan seçimler: ses izi, altyazı izi, ikincil altyazı (0 kapalı), iki gecikme ve hız.</summary>
+internal sealed record TrackMemory(long Audio, long Subtitle, long SecondarySubtitle, double SubtitleDelay, double AudioDelay, double Speed);
+
 internal sealed class PlaybackHistory
 {
     internal const int MaxAgeDays = 365;
@@ -55,6 +58,7 @@ internal sealed class PlaybackHistory
             entry.Size = -1;
             entry.Modified = -1;
             entry.Duration = double.NaN;
+            entry.Tracks = null;
         }
     }
 
@@ -88,6 +92,7 @@ internal sealed class PlaybackHistory
                     }
 
                 entry.Bookmarks.Sort();
+                if (item["tracks"] is JsonObject tracks) entry.Tracks = ReadTracks(tracks);
                 history._entries[media] = entry;
             }
         }
@@ -121,6 +126,18 @@ internal sealed class PlaybackHistory
                     if (entry.Size >= 0) writer.WriteNumber("size", entry.Size);
                     if (entry.Modified >= 0) writer.WriteNumber("modified", entry.Modified);
                     if (double.IsFinite(entry.Duration) && entry.Duration > 0) writer.WriteNumber("duration", Math.Round(entry.Duration, 3));
+                    if (entry.Tracks is { } tracks)
+                    {
+                        writer.WriteStartObject("tracks");
+                        writer.WriteNumber("audio", tracks.Audio);
+                        writer.WriteNumber("subtitle", tracks.Subtitle);
+                        writer.WriteNumber("subtitle2", tracks.SecondarySubtitle);
+                        writer.WriteNumber("subtitleDelay", Math.Round(tracks.SubtitleDelay, 3));
+                        writer.WriteNumber("audioDelay", Math.Round(tracks.AudioDelay, 3));
+                        writer.WriteNumber("speed", Math.Round(tracks.Speed, 2));
+                        writer.WriteEndObject();
+                    }
+
                     writer.WriteStartArray("bookmarks");
                     foreach (var mark in entry.Bookmarks) writer.WriteNumberValue(Math.Round(mark, 3));
                     writer.WriteEndArray();
@@ -145,9 +162,14 @@ internal sealed class PlaybackHistory
         return at;
     }
 
-    internal void Remember(string media, double positionSeconds, bool finished, double durationSeconds = double.NaN)
+    /// <summary>Kayıt dosyası aynı dosyaya döndüyse o dosyada en son seçilen izler, gecikmeler ve hız; eski kayıtta ya da başka dosyada yok.</summary>
+    internal TrackMemory? TracksFor(string media, double durationSeconds)
+        => _entries.TryGetValue(Normalize(media), out var entry) && entry.Tracks is { } tracks && SameFile(media, durationSeconds, entry) ? tracks : null;
+
+    internal void Remember(string media, double positionSeconds, bool finished, double durationSeconds = double.NaN, TrackMemory? tracks = null)
     {
         var entry = Touch(media);
+        if (tracks is not null) entry.Tracks = tracks;
         entry.Position = finished || !double.IsFinite(positionSeconds) ? 0 : Math.Max(0, positionSeconds);
         var (size, modified) = Stamp(media);
         entry.Size = size;
@@ -237,6 +259,19 @@ internal sealed class PlaybackHistory
         catch (Exception ex) when (ex is InvalidOperationException or FormatException) { return double.NaN; }
     }
 
+    private static TrackMemory ReadTracks(JsonObject node)
+    {
+        var subtitleDelay = Read(node["subtitleDelay"]);
+        var audioDelay = Read(node["audioDelay"]);
+        return new TrackMemory(
+            ReadLong(node["audio"]),
+            ReadLong(node["subtitle"]),
+            ReadLong(node["subtitle2"]),
+            double.IsFinite(subtitleDelay) ? subtitleDelay : 0,
+            double.IsFinite(audioDelay) ? audioDelay : 0,
+            Read(node["speed"]));
+    }
+
     private static long ReadLong(JsonNode? node)
     {
         try { return node?.GetValue<long>() ?? -1; }
@@ -256,5 +291,7 @@ internal sealed class PlaybackHistory
         internal double Seen { get; set; }
 
         internal List<double> Bookmarks { get; } = new();
+
+        internal TrackMemory? Tracks { get; set; }
     }
 }

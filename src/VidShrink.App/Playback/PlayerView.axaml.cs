@@ -247,6 +247,9 @@ internal partial class PlayerView : UserControl
                 _seek.GoTo(0);
                 _trace.Add("tostart");
                 break;
+            case PlayerCommandKind.GoToTime:
+                ShowGoTo();
+                break;
             case PlayerCommandKind.AudioCycle:
                 CycleAudio();
                 break;
@@ -508,6 +511,7 @@ internal partial class PlayerView : UserControl
         items.Add(Switch(Strings.Get("player.view.subtitle-language"), Settings.SubtitleInInterfaceLanguage, ToggleSubtitleLanguage));
         items.Add(Switch(Strings.Get("player.view.pause-on-minimize"), Settings.PauseOnMinimize, TogglePauseOnMinimize));
         items.Add(Switch(Strings.Get("player.view.topmost-while-playing"), Settings.TopmostWhilePlaying, ToggleTopmostWhilePlaying));
+        items.Add(SeekStepsMenu());
         items.Add(AdvancedMenu());
         items.Add(ShortcutsMenu());
         return items;
@@ -809,7 +813,7 @@ internal partial class PlayerView : UserControl
     private void SaveHistory(bool finished)
     {
         if (_path is not { } path || HistoryPath?.Invoke() is not { } file || !Settings.KeepHistory) return;
-        _history.Remember(path, CurrentPosition(), finished, _seek.Duration);
+        _history.Remember(path, CurrentPosition(), finished, _seek.Duration, CurrentTracks());
         _history.Save(file);
     }
 

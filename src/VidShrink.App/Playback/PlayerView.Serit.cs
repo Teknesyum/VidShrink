@@ -180,8 +180,8 @@ internal partial class PlayerView
         };
 
         BtnSeritPlay.Click += (_, _) => Apply(Keymap.PlayPause.ToCommand());
-        BtnSeritBack.Click += (_, _) => Apply(new PlayerCommand(PlayerCommandKind.Seek, -Keymap.SeekSmall));
-        BtnSeritForward.Click += (_, _) => Apply(new PlayerCommand(PlayerCommandKind.Seek, Keymap.SeekSmall));
+        BtnSeritBack.Click += (_, _) => Apply(new PlayerCommand(PlayerCommandKind.Seek, -Keymap.Steps.Small));
+        BtnSeritForward.Click += (_, _) => Apply(new PlayerCommand(PlayerCommandKind.Seek, Keymap.Steps.Small));
         BtnSeritMute.Click += (_, _) => Apply(Keymap.Mute.ToCommand());
         BtnSeritFullScreen.Click += (_, _) => Apply(Keymap.Fullscreen.ToCommand());
         BtnSeritSpeedAb.Click += (_, _) => Apply(Keymap.SpeedAb.ToCommand());
@@ -319,10 +319,10 @@ internal partial class PlayerView
         GlyphSeritVolume.Data = Icon(_muted || _volume <= 0 ? "IconVolumeMute" : "IconVolume");
 
         SeritLabel(BtnSeritPlay, Strings.Get(_playing ? "playback.control.pause" : "playback.control.play"), Keymap.FirstKeyRow(Keymap.PlayPause));
-        SeritLabel(BtnSeritBack, Strings.Get("main.player.menu.seek", "−" + Keymap.SeekSmall.ToString(Strings.Culture)), SeekRow(-Keymap.SeekSmall));
-        SeritLabel(BtnSeritForward, Strings.Get("main.player.menu.seek", "+" + Keymap.SeekSmall.ToString(Strings.Culture)), SeekRow(Keymap.SeekSmall));
-        TxtSeritBack.Text = "−" + Keymap.SeekSmall.ToString(Strings.Culture);
-        TxtSeritForward.Text = "+" + Keymap.SeekSmall.ToString(Strings.Culture);
+        SeritLabel(BtnSeritBack, Strings.Get("main.player.menu.seek", "−" + Keymap.Steps.Small.ToString(Strings.Culture)), SeekRow(-Keymap.SeekSmall));
+        SeritLabel(BtnSeritForward, Strings.Get("main.player.menu.seek", "+" + Keymap.Steps.Small.ToString(Strings.Culture)), SeekRow(Keymap.SeekSmall));
+        TxtSeritBack.Text = "−" + Keymap.Steps.Small.ToString(Strings.Culture);
+        TxtSeritForward.Text = "+" + Keymap.Steps.Small.ToString(Strings.Culture);
         SeritLabel(BtnSeritMute, Strings.Get(Keymap.Mute.LabelKey), Keymap.FirstKeyRow(Keymap.Mute));
         SeritLabel(BtnSeritFullScreen, Strings.Get(Keymap.Fullscreen.LabelKey), Keymap.FirstKeyRow(Keymap.Fullscreen));
         var hizliKip = SpeedFast;
