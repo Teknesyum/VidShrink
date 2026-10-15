@@ -627,6 +627,8 @@
   "settings-tab.follow-recording.hint": "À l'arrêt d'un enregistrement, Réduire et Lecteur le chargent sans changer d'onglet. Un fichier ouvert dans le Lecteur est aussi chargé dans Réduire.",
   "settings-tab.notify-done.label": "Prévenir quand une tâche se termine",
   "settings-tab.notify-done.hint": "Si une réduction, une conversion ou la file se termine alors que la fenêtre est en arrière-plan, le bouton de la barre des tâches clignote et une notification apparaît. Les tâches annulées restent silencieuses.",
+  "settings-tab.prevent-sleep.label": "Garder l'ordinateur éveillé pendant l'encodage",
+  "settings-tab.prevent-sleep.hint": "Pendant une réduction, une conversion ou la file d'attente, l'ordinateur ne se met pas en veille. L'écran peut quand même s'éteindre.",
   "settings-tab.parallel-jobs.label": "Tâches encodées en même temps",
   "settings-tab.parallel-jobs.hint": "• La file encode ce nombre de fichiers ensemble.\n• 1 les traite l'un après l'autre.\n• Davantage termine la file plus tôt mais occupe le processeur.\n• Les encodeurs matériels traitent au plus deux tâches à la fois.",
   "settings-tab.encode-priority.label": "Priorité d’encodage",

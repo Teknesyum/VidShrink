@@ -627,6 +627,8 @@
   "settings-tab.follow-recording.hint": "Wenn eine Aufnahme endet, laden Verkleinern und Player sie, ohne den Tab zu wechseln. Eine im Player geöffnete Datei wird auch in Verkleinern geladen.",
   "settings-tab.notify-done.label": "Benachrichtigen, wenn ein Auftrag fertig ist",
   "settings-tab.notify-done.hint": "Endet ein Verkleinern, eine Umwandlung oder die Warteschlange, während das Fenster im Hintergrund ist, blinkt die Schaltfläche in der Taskleiste und eine Benachrichtigung erscheint. Abgebrochene Aufträge bleiben still.",
+  "settings-tab.prevent-sleep.label": "Computer während der Kodierung wach halten",
+  "settings-tab.prevent-sleep.hint": "Solange eine Verkleinerung, eine Umwandlung oder die Warteschlange läuft, wechselt der Computer nicht in den Ruhezustand. Der Bildschirm kann sich trotzdem ausschalten.",
   "settings-tab.parallel-jobs.label": "Gleichzeitig kodierte Aufträge",
   "settings-tab.parallel-jobs.hint": "• Die Warteschlange kodiert so viele Dateien gleichzeitig.\n• 1 arbeitet sie nacheinander ab.\n• Mehr beendet die Warteschlange früher, lastet aber den Prozessor aus.\n• Hardware-Encoder führen höchstens zwei Aufträge gleichzeitig aus.",
   "settings-tab.encode-priority.label": "Kodierungspriorität",

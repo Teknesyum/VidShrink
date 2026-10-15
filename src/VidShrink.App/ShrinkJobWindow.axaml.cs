@@ -132,6 +132,14 @@ public partial class ShrinkJobWindow : Window
     /// <summary>Şu an koşan istekler, başlama sırasıyla.</summary>
     internal IReadOnlyList<ShrinkRequest> RunningJobs => _pump.Running;
 
+    /// <summary>SIK-P2: kodlama boyunca tutulan uyku isteği; testler sahte katmanlı nöbet verir.</summary>
+    internal SleepGuard Uyku { get; set; } = SleepGuard.Shared;
+
+    /// <summary>SIK-P2: Ayarlar'daki "kodlarken uyuma" kutusu; açılışta ayardan okunur.</summary>
+    internal bool UykuyuEngelle { get; set; }
+
+    private IDisposable? _uykuIstegi;
+
     /// <summary>K6: koşan tek işi iptal eder; ötekiler ve sıra sürer.</summary>
     internal bool CancelJob(ShrinkRequest request) => _pump.Cancel(request);
 
@@ -182,7 +190,8 @@ public partial class ShrinkJobWindow : Window
     {
         _startup = startup;
         _queue = queue;
-        _pump = new JobPump<ShrinkRequest>((request, ct) => (Kosturucu ?? RunOneAsync)(request, ct), () => ParallelLimit);
+        _pump = new JobPump<ShrinkRequest>(RunAwakeAsync, () => ParallelLimit);
+        UykuyuEngelle = _appSettings.PreventSleepWhileEncoding;
         _pump.Drained += OnDrained;
 
         var language = MainWindow.ResolveLanguage(null, CultureInfo.CurrentUICulture.Name);
@@ -654,6 +663,7 @@ public partial class ShrinkJobWindow : Window
         }
         var choice = _whenDone;
         CancelCountdown();
+        ReleaseSleep();
         if (choice == QueueEndChoice.Sleep) Actions.Sleep();
         else if (choice == QueueEndChoice.PowerOff) Actions.PowerOff();
     }
@@ -670,6 +680,29 @@ public partial class ShrinkJobWindow : Window
         CountdownRow.IsVisible = true;
         TxtCountdown.Text = Core.Bicim.Satir.Bagla(Say(_whenDone == QueueEndChoice.Sleep ? "main.shrink-job.countdown.sleep" : "main.shrink-job.countdown.power-off", _countdownLeft));
     }
+
+    /// <summary>
+    /// SIK-P2: istek ilk iş başlarken alınır. Sıradaki iş hemen başlayacaksa bırakılmaz; son koşan iş
+    /// bitince, iptalde ya da duraklatılmış kuyrukta koşan kalmayınca geri verilir.
+    /// </summary>
+    private async Task RunAwakeAsync(ShrinkRequest request, CancellationToken ct)
+    {
+        if (UykuyuEngelle && Volatile.Read(ref _uykuIstegi) is null)
+        {
+            var istek = Uyku.Hold();
+            if (Interlocked.CompareExchange(ref _uykuIstegi, istek, null) is not null) istek.Dispose();
+        }
+        try
+        {
+            await (Kosturucu ?? RunOneAsync)(request, ct);
+        }
+        finally
+        {
+            if (_pump.RunningCount <= 1 && (_pump.PendingCount == 0 || _pump.Paused)) ReleaseSleep();
+        }
+    }
+
+    private void ReleaseSleep() => Interlocked.Exchange(ref _uykuIstegi, null)?.Dispose();
 
     private async Task RunOneAsync(ShrinkRequest request, CancellationToken ct)
     {
@@ -912,6 +945,7 @@ public partial class ShrinkJobWindow : Window
         StopWatch();
         _closed = true;
         _pump.CancelAll();
+        ReleaseSleep();
         _shareFlow?.Cancel();
         _queue?.Dispose();
         base.OnClosing(e);

@@ -1680,6 +1680,11 @@
                   </StackPanel>
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <CheckBox x:Name="ChkPreventSleep" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="{loc:Text settings-tab.prevent-sleep.label}"/>
+                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.prevent-sleep.hint}"/>
+                  </StackPanel>
+
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
                     <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
                       <TextBlock Text="{loc:Text settings-tab.ffmpeg-path.label}" Theme="{StaticResource Label}"/>
                       <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.ffmpeg-path.label}">

@@ -627,6 +627,8 @@
   "settings-tab.follow-recording.hint": "Når en optagelse stopper, indlæses den i Formindsk og Afspiller uden at skifte fane. En fil åbnet i afspilleren indlæses også i Formindsk.",
   "settings-tab.notify-done.label": "Giv besked, når et job er færdigt",
   "settings-tab.notify-done.hint": "Hvis en formindskelse, en konvertering eller køen bliver færdig, mens vinduet er i baggrunden, blinker knappen på proceslinjen, og der vises en meddelelse. Annullerede job giver ingen besked.",
+  "settings-tab.prevent-sleep.label": "Hold computeren vågen under kodning",
+  "settings-tab.prevent-sleep.hint": "Mens en formindskelse, en konvertering eller køen kører, går computeren ikke i dvale. Skærmen kan stadig slukke.",
   "settings-tab.parallel-jobs.label": "Job, der kodes samtidig",
   "settings-tab.parallel-jobs.hint": "• Køen koder så mange filer samtidig.\n• 1 kører dem efter hinanden.\n• Flere gør køen færdig tidligere, men holder processoren optaget.\n• Hardwarekodere kører højst to job ad gangen.",
   "settings-tab.encode-priority.label": "Kodningsprioritet",

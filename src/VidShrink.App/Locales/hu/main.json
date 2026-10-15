@@ -627,6 +627,8 @@
   "settings-tab.follow-recording.hint": "A felvétel leállításakor a Tömörítés és a Lejátszó lap betölti azt lapváltás nélkül. A lejátszóban megnyitott fájl a Tömörítés lapra is betöltődik.",
   "settings-tab.notify-done.label": "Értesítés, ha egy feladat elkészül",
   "settings-tab.notify-done.hint": "Ha egy kicsinyítés, átalakítás vagy a sor akkor fejeződik be, amikor az ablak a háttérben van, a tálcagomb villog, és értesítés jelenik meg. A megszakított feladatokról nincs értesítés.",
+  "settings-tab.prevent-sleep.label": "A számítógép ne aludjon el kódolás közben",
+  "settings-tab.prevent-sleep.hint": "Amíg kicsinyítés, átalakítás vagy a sor fut, a számítógép nem vált alvó állapotba. A képernyő ettől még kikapcsolhat.",
   "settings-tab.parallel-jobs.label": "Egyszerre kódolt feladatok",
   "settings-tab.parallel-jobs.hint": "• A sor ennyi fájlt kódol egyszerre.\n• 1 esetén egymás után futnak.\n• A nagyobb érték hamarabb befejezi a sort, de leterheli a processzort.\n• A hardveres kódolók egyszerre legfeljebb két feladatot futtatnak.",
   "settings-tab.encode-priority.label": "Kódolási prioritás",

@@ -308,6 +308,7 @@ public partial class MainWindow : Window
         Watch(ChkAdvancedDefaultOpen, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkFollowRecording, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkNotifyWhenDone, ToggleButton.IsCheckedProperty, SaveAppSettings);
+        Watch(ChkPreventSleep, ToggleButton.IsCheckedProperty, SaveAppSettings);
         CmbParallelJobs.ItemsSource = ParallelJobChoices(Environment.ProcessorCount);
         CmbParallelJobs.SelectedIndex = 0;
         Watch(CmbParallelJobs, SelectingItemsControl.SelectedIndexProperty, SaveAppSettings);
@@ -732,6 +733,7 @@ public partial class MainWindow : Window
     protected override void OnClosed(EventArgs e)
     {
         _kapandi = true;
+        HoldSleep(false);
         base.OnClosed(e);
     }
 
@@ -1635,6 +1637,7 @@ public partial class MainWindow : Window
             AdvancedDefaultOpen = ChkAdvancedDefaultOpen.IsChecked == true,
             FollowRecording = ChkFollowRecording.IsChecked == true,
             NotifyWhenDone = ChkNotifyWhenDone.IsChecked == true,
+            PreventSleepWhileEncoding = ChkPreventSleep.IsChecked == true,
             ParallelJobs = Math.Max(0, CmbParallelJobs.SelectedIndex) + 1,
             EncodePriority = SelectedEncodePriority,
             EncoderThreads = SelectedEncoderThreads,
@@ -1692,6 +1695,7 @@ public partial class MainWindow : Window
             if (settings.AdvancedDefaultOpen) ExpandAdvanced();
             ChkFollowRecording.IsChecked = settings.FollowRecording;
             ChkNotifyWhenDone.IsChecked = settings.NotifyWhenDone;
+            ChkPreventSleep.IsChecked = settings.PreventSleepWhileEncoding;
             CmbParallelJobs.SelectedIndex = ParallelJobs.Clamp(settings.ParallelJobs, Environment.ProcessorCount) - 1;
             RestoreEncodeLoad(settings);
 
@@ -5035,6 +5039,23 @@ public partial class MainWindow : Window
 
     internal void EndEncodeForTest() => SetRunning(false);
 
+    /// <summary>SIK-P2: kodlama boyunca tutulan uyku isteği; testler sahte katmanlı nöbet verir.</summary>
+    internal SleepGuard Uyku { get; set; } = SleepGuard.Shared;
+
+    private IDisposable? _uykuIstegi;
+
+    private void HoldSleep(bool running)
+    {
+        if (running && ChkPreventSleep.IsChecked == true)
+        {
+            _uykuIstegi ??= Uyku.Hold();
+            return;
+        }
+        if (running) return;
+        _uykuIstegi?.Dispose();
+        _uykuIstegi = null;
+    }
+
     /// <summary>SIK-P3: ana sekmede koşan kodlamayı askıya alan düğme; dönüştürme bunu kullanmaz.</summary>
     internal EncodePause RunPause { get; } = new();
 
@@ -5060,6 +5081,7 @@ public partial class MainWindow : Window
         BtnCancel.IsEnabled = BtnConvertCancel.IsEnabled = running;
         BtnPauseRun.IsVisible = BtnPauseRun.IsEnabled = running && pausable;
         if (!BtnPauseRun.IsEnabled) RunPause.Resume();
+        HoldSleep(running);
         if (running)
         {
             ShowRunPause();

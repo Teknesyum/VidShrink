@@ -627,6 +627,8 @@
   "settings-tab.follow-recording.hint": "Apabila rakaman berhenti, Kecilkan dan Pemain memuatkannya tanpa menukar tab. Fail yang dibuka dalam Pemain turut dimuatkan ke Kecilkan.",
   "settings-tab.notify-done.label": "Maklumkan apabila kerja selesai",
   "settings-tab.notify-done.hint": "Jika pengecilan, penukaran atau baris gilir selesai semasa tetingkap berada di latar belakang, butang bar tugas berkelip dan pemberitahuan muncul. Kerja yang dibatalkan tidak dimaklumkan.",
+  "settings-tab.prevent-sleep.label": "Pastikan komputer tidak tidur semasa pengekodan",
+  "settings-tab.prevent-sleep.hint": "Semasa pengecilan, penukaran atau baris gilir sedang berjalan, komputer tidak masuk mod tidur. Skrin masih boleh dimatikan.",
   "settings-tab.parallel-jobs.label": "Kerja yang dikodkan serentak",
   "settings-tab.parallel-jobs.hint": "• Baris gilir mengekod sebanyak ini fail serentak.\n• 1 menjalankannya satu demi satu.\n• Lebih banyak menyiapkan baris gilir lebih awal tetapi menyibukkan pemproses.\n• Pengekod perkakasan menjalankan paling banyak dua kerja serentak.",
   "settings-tab.encode-priority.label": "Keutamaan pengekodan",

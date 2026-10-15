@@ -627,6 +627,8 @@
   "settings-tab.follow-recording.hint": "录制停止后，压缩和播放器标签页会加载该文件，不会切换标签页。在播放器中打开的文件也会加载到压缩标签页。",
   "settings-tab.notify-done.label": "任务完成时通知",
   "settings-tab.notify-done.hint": "当窗口处于后台时，如果压缩、转换或队列结束，任务栏按钮会闪烁并显示通知。已取消的任务不会通知。",
+  "settings-tab.prevent-sleep.label": "编码时阻止电脑睡眠",
+  "settings-tab.prevent-sleep.hint": "在压缩、转换或队列运行期间，电脑不会进入睡眠。屏幕仍可能关闭。",
   "settings-tab.parallel-jobs.label": "同时编码的任务数",
   "settings-tab.parallel-jobs.hint": "• 队列同时编码这么多个文件。\n• 1 表示逐个进行。\n• 数值越大队列完成越早，但会占用处理器。\n• 硬件编码器最多同时运行两个任务。",
   "settings-tab.encode-priority.label": "编码优先级",

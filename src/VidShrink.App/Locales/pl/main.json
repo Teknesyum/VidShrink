@@ -627,6 +627,8 @@
   "settings-tab.follow-recording.hint": "Po zatrzymaniu nagrania karty Zmniejsz i Odtwarzacz wczytują je bez przełączania karty. Plik otwarty w odtwarzaczu trafia też do karty Zmniejsz.",
   "settings-tab.notify-done.label": "Powiadamiaj o zakończeniu zadania",
   "settings-tab.notify-done.hint": "Gdy zmniejszanie, konwersja albo kolejka kończą się, a okno jest w tle, przycisk na pasku zadań miga i pojawia się powiadomienie. Anulowane zadania nie powiadamiają.",
+  "settings-tab.prevent-sleep.label": "Nie usypiaj komputera podczas kodowania",
+  "settings-tab.prevent-sleep.hint": "Podczas zmniejszania, konwersji lub pracy kolejki komputer nie przechodzi w stan uśpienia. Ekran nadal może się wyłączyć.",
   "settings-tab.parallel-jobs.label": "Zadania kodowane jednocześnie",
   "settings-tab.parallel-jobs.hint": "• Kolejka koduje tyle plików naraz.\n• 1 przetwarza je po kolei.\n• Więcej kończy kolejkę wcześniej, ale zajmuje procesor.\n• Kodery sprzętowe wykonują najwyżej dwa zadania jednocześnie.",
   "settings-tab.encode-priority.label": "Priorytet kodowania",

@@ -627,6 +627,8 @@
   "settings-tab.follow-recording.hint": "Kad ieraksts apstājas, Samazināt un Atskaņotājs to ielādē, nemainot cilni. Atskaņotājā atvērts fails tiek ielādēts arī cilnē Samazināt.",
   "settings-tab.notify-done.label": "Paziņot, kad darbs ir pabeigts",
   "settings-tab.notify-done.hint": "Ja samazināšana, pārveidošana vai rinda beidzas, kamēr logs ir fonā, uzdevumjoslas poga mirgo un parādās paziņojums. Par atceltiem darbiem netiek paziņots.",
+  "settings-tab.prevent-sleep.label": "Neļaut datoram iemigt kodēšanas laikā",
+  "settings-tab.prevent-sleep.hint": "Kamēr notiek samazināšana, pārveidošana vai rinda, dators nepāriet miega režīmā. Ekrāns tomēr var izslēgties.",
   "settings-tab.parallel-jobs.label": "Vienlaikus kodētie darbi",
   "settings-tab.parallel-jobs.hint": "• Rinda vienlaikus kodē tik daudz failu.\n• 1 tos apstrādā citu pēc cita.\n• Vairāk pabeidz rindu ātrāk, bet noslogo procesoru.\n• Aparatūras kodētāji vienlaikus izpilda ne vairāk kā divus darbus.",
   "settings-tab.encode-priority.label": "Kodēšanas prioritāte",

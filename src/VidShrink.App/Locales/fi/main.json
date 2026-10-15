@@ -627,6 +627,8 @@
   "settings-tab.follow-recording.hint": "Kun tallennus pysähtyy, Pienennä ja Soitin lataavat sen vaihtamatta välilehteä. Soittimessa avattu tiedosto latautuu myös Pienennä-välilehteen.",
   "settings-tab.notify-done.label": "Ilmoita, kun työ valmistuu",
   "settings-tab.notify-done.hint": "Jos pienennys, muunnos tai jono valmistuu ikkunan ollessa taustalla, tehtäväpalkin painike vilkkuu ja ilmoitus tulee näkyviin. Perutuista töistä ei ilmoiteta.",
+  "settings-tab.prevent-sleep.label": "Pidä tietokone hereillä koodauksen ajan",
+  "settings-tab.prevent-sleep.hint": "Kun pienennys, muunnos tai jono on käynnissä, tietokone ei siirry lepotilaan. Näyttö voi silti sammua.",
   "settings-tab.parallel-jobs.label": "Samanaikaisesti koodattavat työt",
   "settings-tab.parallel-jobs.hint": "• Jono koodaa näin monta tiedostoa yhtä aikaa.\n• 1 käsittelee ne peräkkäin.\n• Suurempi määrä saa jonon valmiiksi aiemmin mutta pitää suorittimen varattuna.\n• Laitteistokooderit ajavat enintään kaksi työtä kerrallaan.",
   "settings-tab.encode-priority.label": "Koodauksen prioriteetti",

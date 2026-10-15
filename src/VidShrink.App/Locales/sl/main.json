@@ -627,6 +627,8 @@
   "settings-tab.follow-recording.hint": "Ko se snemanje ustavi, ga Pomanjšaj in Predvajalnik naložita brez menjave zavihka. Datoteka, odprta v predvajalniku, se naloži tudi v Pomanjšaj.",
   "settings-tab.notify-done.label": "Obvesti, ko se opravilo konča",
   "settings-tab.notify-done.hint": "Če se pomanjšanje, pretvorba ali čakalna vrsta končajo, ko je okno v ozadju, gumb v opravilni vrstici utripa in prikaže se obvestilo. Preklicana opravila ne obveščajo.",
+  "settings-tab.prevent-sleep.label": "Med kodiranjem ne preklopi računalnika v spanje",
+  "settings-tab.prevent-sleep.hint": "Med zmanjševanjem, pretvorbo ali izvajanjem čakalne vrste računalnik ne preide v stanje spanja. Zaslon se lahko vseeno izklopi.",
   "settings-tab.parallel-jobs.label": "Opravila, kodirana hkrati",
   "settings-tab.parallel-jobs.hint": "• Vrsta kodira toliko datotek hkrati.\n• 1 jih obdela eno za drugo.\n• Več konča vrsto prej, vendar zaposli procesor.\n• Strojni kodirniki izvajajo največ dve opravili hkrati.",
   "settings-tab.encode-priority.label": "Prednost kodiranja",
