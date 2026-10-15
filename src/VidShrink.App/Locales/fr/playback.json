@@ -19,6 +19,7 @@
   "playback.control.pause": "Pause",
   "playback.control.play": "Lecture",
   "player.view.aspect": "Format d'image",
+  "player.view.fill": "Remplir ou ajuster",
   "player.view.rotate": "Rotation 90°",
   "player.view.mirror": "Miroir",
   "player.view.topmost": "Toujours au premier plan",

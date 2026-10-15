@@ -152,6 +152,7 @@ public sealed class KeymapTests
         [PlayerCommandKind.GoToStart] = "tostart",
         [PlayerCommandKind.GoToTime] = "goto -> ",
         [PlayerCommandKind.BookmarkList] = "bookmarklist -> ",
+        [PlayerCommandKind.ToggleFill] = "fill -> ",
         [PlayerCommandKind.Edit] = "edit -> ",
         [PlayerCommandKind.SubtitleVisibility] = "subvisible -> ",
         [PlayerCommandKind.SubtitleLine] = "subline ",
@@ -218,6 +219,7 @@ public sealed class KeymapTests
         var tekrar = view.Settings.Repeat;
         var mini = view.IsMiniMode;
         var hizModu = view.SpeedModeB;
+        var doldur = view.FillMode;
 
         tetik();
 
@@ -248,6 +250,7 @@ public sealed class KeymapTests
             PlayerCommandKind.SubtitleCycle when yeni[0] != "subtitle -> no" => $"motorsuz altyazi dongusu '{yeni[0]}'",
             PlayerCommandKind.ToggleTopmost when view.IsTopmost == ustte => "ustte degismedi",
             PlayerCommandKind.AspectCycle when view.AspectRatio == oran => $"oran {oran} degismedi",
+            PlayerCommandKind.ToggleFill when view.FillMode == doldur => "doldurma degismedi",
             PlayerCommandKind.Rotate when view.RotationDegrees != (aci + (int)action.Amount) % 360 => $"aci {aci} -> {view.RotationDegrees}, beklenen fark {action.Amount}",
             PlayerCommandKind.Mirror when view.IsMirrored == ayna => "ayna degismedi",
             PlayerCommandKind.ToggleInfo when view.InfoVisible == bilgi => "bilgi paneli degismedi",

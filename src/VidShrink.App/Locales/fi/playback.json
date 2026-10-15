@@ -19,6 +19,7 @@
   "playback.control.pause": "Tauko",
   "playback.control.play": "Toista",
   "player.view.aspect": "Kuvasuhde",
+  "player.view.fill": "Täytä tai sovita",
   "player.view.rotate": "Kierrä 90°",
   "player.view.mirror": "Peilaa",
   "player.view.topmost": "Aina päällimmäisenä",

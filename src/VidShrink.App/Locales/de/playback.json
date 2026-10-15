@@ -19,6 +19,7 @@
   "playback.control.pause": "Pause",
   "playback.control.play": "Abspielen",
   "player.view.aspect": "Seitenverhältnis",
+  "player.view.fill": "Füllen oder einpassen",
   "player.view.rotate": "90° drehen",
   "player.view.mirror": "Spiegeln",
   "player.view.topmost": "Immer im Vordergrund",

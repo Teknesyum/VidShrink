@@ -80,6 +80,8 @@ internal static class Keymap
     internal static readonly PlayerAction CompactOrFullscreen = new(PlayerCommandKind.CompactOrFullscreen, 0, "main.player.menu.fullscreen");
     internal static readonly PlayerAction ResetZoom = new(PlayerCommandKind.ResetZoom, 0, "main.player.menu.reset");
     internal static readonly PlayerAction AspectCycle = new(PlayerCommandKind.AspectCycle, 0, "player.view.aspect");
+
+    internal static readonly PlayerAction Fill = new(PlayerCommandKind.ToggleFill, 0, "player.view.fill");
     internal static readonly PlayerAction Rotate = new(PlayerCommandKind.Rotate, 90, "player.view.rotate");
     internal static readonly PlayerAction Mirror = new(PlayerCommandKind.Mirror, 0, "player.view.mirror");
     internal static readonly PlayerAction Topmost = new(PlayerCommandKind.ToggleTopmost, 0, "player.view.topmost");
@@ -162,6 +164,7 @@ internal static class Keymap
         new(PlayerInput.OnSymbol("]", Key.OemCloseBrackets), LoopEnd),
         new(PlayerInput.OnSymbol("/", Key.Oem2), LoopClear),
         new(PlayerInput.OnKey(Key.F5, KeyModifiers.Control), AspectCycle),
+        new(PlayerInput.OnKey(Key.D), Fill),
         new(PlayerInput.OnKey(Key.S, KeyModifiers.Control | KeyModifiers.Shift), Rotate),
         new(PlayerInput.OnKey(Key.H, KeyModifiers.Control), Mirror),
         new(PlayerInput.OnKey(Key.A, KeyModifiers.Control), Topmost),
