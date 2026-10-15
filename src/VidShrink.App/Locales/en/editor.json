@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "Video",
   "editor.remux.kind.audio": "Audio",
   "editor.remux.kind.subtitle": "Subtitle",
-  "editor.remux.kind.attachment": "Attachment"
+  "editor.remux.kind.attachment": "Attachment",
+  "editor.remux.include": "Include in File",
+  "editor.remux.add": "Add Tracks…",
+  "editor.remux.add.tip": "• Adds another file's tracks to the list.\n• To replace the audio, leave the source audio out.",
+  "editor.remux.add-title": "Choose File to Add Tracks From",
+  "editor.remux.extract": "Save Track Separately…",
+  "editor.remux.extract.tip": "• Writes the selected track to its own file without re-encoding.",
+  "editor.remux.extract-title": "Save Track",
+  "editor.remux.cover": "Cover…",
+  "editor.remux.cover.tip": "• Attaches a PNG or JPEG cover; MP4 and MKV only.\n• Cancelling the choice removes the cover.",
+  "editor.remux.cover-title": "Choose Cover Image",
+  "editor.remux.cover.set": "Cover: {0}",
+  "editor.remux.cover.unsupported": "This container cannot carry a cover; choose MP4 or MKV.",
+  "editor.remux.empty": "At least one track must be included in the file."
 }

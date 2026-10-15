@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "วิดีโอ",
   "editor.remux.kind.audio": "เสียง",
   "editor.remux.kind.subtitle": "คำบรรยาย",
-  "editor.remux.kind.attachment": "ไฟล์แนบ"
+  "editor.remux.kind.attachment": "ไฟล์แนบ",
+  "editor.remux.include": "รวมในไฟล์",
+  "editor.remux.add": "เพิ่มแทร็ก…",
+  "editor.remux.add.tip": "• เพิ่มแทร็กของไฟล์อื่นลงในรายการ\n• หากต้องการแทนที่เสียง ให้ไม่รวมเสียงต้นฉบับ",
+  "editor.remux.add-title": "เลือกไฟล์ที่จะเพิ่มแทร็ก",
+  "editor.remux.extract": "บันทึกแทร็กแยก…",
+  "editor.remux.extract.tip": "• เขียนแทร็กที่เลือกลงไฟล์ของตัวเองโดยไม่เข้ารหัสใหม่",
+  "editor.remux.extract-title": "บันทึกแทร็ก",
+  "editor.remux.cover": "ปก…",
+  "editor.remux.cover.tip": "• แนบปก PNG หรือ JPEG เฉพาะ MP4 และ MKV\n• การยกเลิกการเลือกจะเอาปกออก",
+  "editor.remux.cover-title": "เลือกภาพปก",
+  "editor.remux.cover.set": "ปก: {0}",
+  "editor.remux.cover.unsupported": "คอนเทนเนอร์นี้ใส่ปกไม่ได้ เลือก MP4 หรือ MKV",
+  "editor.remux.empty": "ต้องรวมแทร็กอย่างน้อยหนึ่งแทร็กในไฟล์"
 }

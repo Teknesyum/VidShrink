@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "காணொளி",
   "editor.remux.kind.audio": "ஒலி",
   "editor.remux.kind.subtitle": "வசனம்",
-  "editor.remux.kind.attachment": "இணைப்பு"
+  "editor.remux.kind.attachment": "இணைப்பு",
+  "editor.remux.include": "கோப்பில் சேர்",
+  "editor.remux.add": "தடங்களைச் சேர்…",
+  "editor.remux.add.tip": "• வேறொரு கோப்பின் தடங்களைப் பட்டியலில் சேர்க்கிறது.\n• ஒலியை மாற்ற மூல ஒலியை விலக்கவும்.",
+  "editor.remux.add-title": "தடங்களைச் சேர்க்க கோப்பைத் தேர்வுசெய்",
+  "editor.remux.extract": "தடத்தைத் தனியாகச் சேமி…",
+  "editor.remux.extract.tip": "• தேர்ந்த தடத்தை மறுகுறியாக்கமின்றி தனிக் கோப்பில் எழுதுகிறது.",
+  "editor.remux.extract-title": "தடத்தைச் சேமி",
+  "editor.remux.cover": "அட்டை…",
+  "editor.remux.cover.tip": "• PNG அல்லது JPEG அட்டையை இணைக்கிறது; MP4, MKV மட்டும்.\n• தேர்வை ரத்துசெய்தால் அட்டை நீங்கும்.",
+  "editor.remux.cover-title": "அட்டைப் படத்தைத் தேர்வுசெய்",
+  "editor.remux.cover.set": "அட்டை: {0}",
+  "editor.remux.cover.unsupported": "இந்தக் கொள்கலன் அட்டையைத் தாங்காது; MP4 அல்லது MKV தேர்வுசெய்.",
+  "editor.remux.empty": "கோப்பில் குறைந்தது ஒரு தடம் சேர்க்கப்பட வேண்டும்."
 }

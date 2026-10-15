@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "Video",
   "editor.remux.kind.audio": "Audio",
   "editor.remux.kind.subtitle": "Sottotitoli",
-  "editor.remux.kind.attachment": "Allegato"
+  "editor.remux.kind.attachment": "Allegato",
+  "editor.remux.include": "Includi nel file",
+  "editor.remux.add": "Aggiungi tracce…",
+  "editor.remux.add.tip": "• Aggiunge all'elenco le tracce di un altro file.\n• Per sostituire l'audio, escludi l'audio sorgente.",
+  "editor.remux.add-title": "Scegli il file da cui aggiungere tracce",
+  "editor.remux.extract": "Salva traccia a parte…",
+  "editor.remux.extract.tip": "• Scrive la traccia selezionata in un file proprio senza ricodifica.",
+  "editor.remux.extract-title": "Salva traccia",
+  "editor.remux.cover": "Copertina…",
+  "editor.remux.cover.tip": "• Allega una copertina PNG o JPEG; solo MP4 e MKV.\n• Annullare la scelta rimuove la copertina.",
+  "editor.remux.cover-title": "Scegli immagine di copertina",
+  "editor.remux.cover.set": "Copertina: {0}",
+  "editor.remux.cover.unsupported": "Questo contenitore non supporta la copertina; scegli MP4 o MKV.",
+  "editor.remux.empty": "Almeno una traccia deve essere inclusa nel file."
 }

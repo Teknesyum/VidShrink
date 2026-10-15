@@ -29,7 +29,7 @@ public sealed class KapIciIzTests
     {
         get
         {
-            var yol = Path.Combine(GirdiKanit.Root, ".calisma", "worktree-agent-abc2ed49a4f3cc92a", "kap-ici");
+            var yol = Path.Combine(GirdiKanit.Root, ".calisma", "kap-ici-iz");
             Directory.CreateDirectory(yol);
             return yol;
         }
@@ -235,7 +235,7 @@ public sealed class KapIciIzTests
         Assert.True(surec.ExitCode == 0, hata.GetAwaiter().GetResult());
     }
 
-    private static string Ffprobe(params string[] args)
+    internal static string Ffprobe(params string[] args)
     {
         var psi = new ProcessStartInfo("ffprobe") { RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true, StandardOutputEncoding = System.Text.Encoding.UTF8 };
         psi.ArgumentList.Add("-v");
@@ -353,5 +353,276 @@ public sealed class KapIciIzArayuzTests
             }
         });
         KanitKapanisi.Kapat(Path.GetDirectoryName(klasor)!, Path.GetFileName(klasor));
+    }
+
+    [Fact]
+    public void DisIzKatmaKapakVeCikarmaIstegeIner()
+    {
+        var klasor = Klasor();
+        var dosya = Path.Combine(klasor, "kaynak.mkv");
+        var dis = Path.Combine(klasor, "dis.mka");
+        var kapak = Path.Combine(klasor, "kapak.png");
+        File.WriteAllBytes(dosya, new byte[16]);
+        File.WriteAllBytes(dis, new byte[16]);
+        AppHost.Run(() =>
+        {
+            var view = new EditorView
+            {
+                KnownInfo = yol => new MediaInfo { FilePath = yol, FileSizeBytes = 16, DurationSeconds = 600, Width = 320, Height = 240, Fps = 30, VideoCodec = "h264", TotalBitrateBps = 1 },
+                AutosaveDelay = TimeSpan.FromHours(1),
+            };
+            view.SourceProber = (yol, _) => Task.FromResult(PathEquality.Same(yol, dis)
+                ? Bilgi(yol) with
+                {
+                    Streams = new[]
+                    {
+                        new SourceStream(0, StreamKind.Audio, "opus", "jpn", false, false, 2, 0, 0),
+                        new SourceStream(1, StreamKind.Subtitle, "ass", "tur", false, false, 0, 0, 0)
+                    }
+                }
+                : Bilgi(yol));
+            view.Player.EngineFactory = () => new IzMotoru(2);
+            view.OverlayRoot = Path.Combine(klasor, "katman");
+            var pencere = new Window { Width = 900, Height = 600, Content = view };
+            pencere.Show();
+            try
+            {
+                var acilis = view.OpenSourceAsync(dosya);
+                DenetimSurucu.Pump(view.Player, () => acilis.IsCompleted, 10);
+                acilis.GetAwaiter().GetResult();
+                Assert.False(view.BtnRemuxAdd.IsEnabled);
+                var yukle = view.LoadRemuxAsync();
+                DenetimSurucu.Pump(view.Player, () => yukle.IsCompleted, 10);
+                yukle.GetAwaiter().GetResult();
+                Assert.True(view.BtnRemuxAdd.IsEnabled);
+                Assert.True(view.BtnRemuxExtract.IsEnabled);
+                Assert.True(view.BtnRemuxCover.IsEnabled);
+
+                var ekle = view.AddRemuxSourceAsync(dis);
+                DenetimSurucu.Pump(view.Player, () => ekle.IsCompleted, 10);
+                ekle.GetAwaiter().GetResult();
+                var ikinci = view.AddRemuxSourceAsync(dis);
+                DenetimSurucu.Pump(view.Player, () => ikinci.IsCompleted, 10);
+                Assert.Equal(5, view.CmbRemuxTrack.ItemCount);
+                Assert.Equal(3, view.CmbRemuxTrack.SelectedIndex);
+                Assert.Contains("dis.mka", view.CmbRemuxTrack.SelectedItem as string);
+                Assert.Equal("jpn", view.TxtRemuxLanguage.Text);
+                Assert.Equal("dis-0.opus", view.RemuxExtractName());
+                view.CmbRemuxTrack.SelectedIndex = 1;
+                Assert.Equal("kaynak-1.m4a", view.RemuxExtractName());
+                Assert.True(view.ChkRemuxInclude.IsChecked);
+                view.ChkRemuxInclude.IsChecked = false;
+
+                var istek = view.RemuxRequestFor(Path.Combine(klasor, "cikti.mkv"));
+                Assert.NotNull(istek);
+                Assert.Equal(new[] { 0, 2, 0, 1 }, istek!.Tracks.Select(t => t.Index));
+                Assert.Equal(new string?[] { null, null, dis, dis }, istek.Tracks.Select(t => t.Source));
+                Assert.Equal(StreamKind.Subtitle, istek.Tracks[3].Kind);
+                Assert.Null(istek.Cover);
+
+                view.SetRemuxCover(kapak);
+                Assert.Null(view.RemuxRequestFor(Path.Combine(klasor, "cikti.mov")));
+                Assert.False(string.IsNullOrEmpty(view.TxtExportStatus.Text));
+                Assert.Equal(kapak, view.RemuxRequestFor(Path.Combine(klasor, "cikti.mp4"))!.Cover);
+                view.SetRemuxCover(null);
+                Assert.Null(view.RemuxRequestFor(Path.Combine(klasor, "cikti.mov"))!.Cover);
+
+                for (var i = 0; i < view.CmbRemuxTrack.ItemCount; i++)
+                {
+                    view.CmbRemuxTrack.SelectedIndex = i;
+                    view.ChkRemuxInclude.IsChecked = false;
+                }
+
+                Assert.Null(view.RemuxRequestFor(Path.Combine(klasor, "cikti.mkv")));
+            }
+            finally
+            {
+                pencere.Close();
+            }
+        });
+        KanitKapanisi.Kapat(Path.GetDirectoryName(klasor)!, Path.GetFileName(klasor));
+    }
+}
+
+/// <summary>
+/// DZA-85 ikinci yarisi: baska dosyadan iz ekleme (DZA-25; <see cref="RemuxTrack.Source"/> dolu iz kendi girdisinden
+/// eslenir, kaynak sesi listeden cikarmak sesi degistirir), secili izi ayri dosyaya cikarma (DZA-26,
+/// <see cref="Remux.ExtractArguments"/>) ve kapak (DZA-44). Kapak kap kuralina uyar: MP4 kapagi goruntu izi ve
+/// <c>-disposition:v:N attached_pic</c> ile, MKV <c>-attach</c> eki ve mimetype ile tasir, MOV ve WebM reddedilir
+/// (<c>docs/olcumler/kapak-mkv-mov.md</c>). Canli kol 1 sn 160x120 klip, dis ses, wav, srt ve png kapak uretir
+/// (<c>-threads 2</c>), iki kaba yeniden paketler, iki izi ayri cikarir ve ffprobe ile izleri ve kapagi okur. Kanit
+/// <c>.calisma/worktree-agent-a62647971eb059d1d/kap-ici-ek/</c>, test siler.
+/// </summary>
+public sealed class KapIciIzEkTests
+{
+    private static string Kanit
+    {
+        get
+        {
+            var yol = Path.Combine(GirdiKanit.Root, ".calisma", "worktree-agent-a62647971eb059d1d", "kap-ici-ek");
+            Directory.CreateDirectory(yol);
+            return yol;
+        }
+    }
+
+    private static List<string> Args(string cikti, IReadOnlyList<RemuxTrack> izler, string? kapak = null)
+        => Remux.Arguments(new RemuxRequest("k.mp4", cikti, izler, null, kapak)).ToList();
+
+    private static List<string> Degerler(List<string> args, string anahtar)
+        => args.Select((a, i) => (a, i)).Where(x => x.a == anahtar && x.i + 1 < args.Count).Select(x => args[x.i + 1]).ToList();
+
+    [Fact]
+    public void DisIzKendiGirdisindenEslenir()
+    {
+        var args = Args("o.mkv", new[]
+        {
+            new RemuxTrack(0, StreamKind.Video),
+            new RemuxTrack(1, StreamKind.Audio),
+            new RemuxTrack(0, StreamKind.Audio, "tur", Source: "dis.wav"),
+            new RemuxTrack(0, StreamKind.Subtitle, "eng", Source: "dis.srt")
+        });
+        Assert.Equal(new[] { "k.mp4", "dis.wav", "dis.srt" }, Degerler(args, "-i"));
+        Assert.Equal(new[] { "0:0", "0:1", "1:0", "2:0" }, Degerler(args, "-map"));
+        Assert.Contains("language=tur", Degerler(args, "-metadata:s:2"));
+        Assert.Contains("language=eng", Degerler(args, "-metadata:s:3"));
+    }
+
+    [Fact]
+    public void SesiDegistirmekKaynakSesiniDisaridaBirakir()
+    {
+        var args = Args("o.mp4", new[]
+        {
+            new RemuxTrack(0, StreamKind.Video),
+            new RemuxTrack(0, StreamKind.Audio, IsDefault: true, Source: "yeni.m4a")
+        });
+        Assert.Equal(new[] { "0:0", "1:0" }, Degerler(args, "-map"));
+        Assert.Equal(new[] { "-default", "+default" }, Degerler(args, "-disposition:0").Concat(Degerler(args, "-disposition:1")));
+    }
+
+    [Fact]
+    public void AyniDisDosyaTekGirdiKaydirmaAyriGirdi()
+    {
+        var args = Args("o.mkv", new[]
+        {
+            new RemuxTrack(0, StreamKind.Video),
+            new RemuxTrack(0, StreamKind.Audio, Source: "dis.mkv"),
+            new RemuxTrack(1, StreamKind.Subtitle, Source: "dis.mkv"),
+            new RemuxTrack(2, StreamKind.Subtitle, OffsetMs: 1500, Source: "dis.mkv")
+        });
+        Assert.Equal(new[] { "k.mp4", "dis.mkv", "dis.mkv" }, Degerler(args, "-i"));
+        Assert.Equal(new[] { "1.5" }, Degerler(args, "-itsoffset"));
+        Assert.Equal(args.IndexOf("-itsoffset") + 2, args.LastIndexOf("-i"));
+        Assert.Equal(new[] { "0:0", "1:0", "1:1", "2:2" }, Degerler(args, "-map"));
+    }
+
+    [Fact]
+    public void Mp4KapagiGoruntuIziVeAttachedPicYazar()
+    {
+        var args = Args("o.mp4", new[] { new RemuxTrack(0, StreamKind.Video), new RemuxTrack(1, StreamKind.Audio) }, "kapak.png");
+        Assert.Equal(new[] { "k.mp4", "kapak.png" }, Degerler(args, "-i"));
+        Assert.Equal(new[] { "0:0", "0:1", "1:0" }, Degerler(args, "-map"));
+        Assert.Equal(new[] { "attached_pic" }, Degerler(args, "-disposition:v:1"));
+        Assert.DoesNotContain("-attach", args);
+        Assert.Equal("o.mp4", args[^1]);
+    }
+
+    [Fact]
+    public void MkvKapagiEkVeMimetypeYazar()
+    {
+        var args = Args("o.MKV", new[]
+        {
+            new RemuxTrack(0, StreamKind.Video),
+            new RemuxTrack(4, StreamKind.Attachment)
+        }, "kapak.jpeg");
+        Assert.Equal(new[] { "k.mp4" }, Degerler(args, "-i"));
+        Assert.Equal(new[] { "kapak.jpeg" }, Degerler(args, "-attach"));
+        Assert.Equal(new[] { "mimetype=image/jpeg", "filename=cover.jpg" }, Degerler(args, "-metadata:s:t:1"));
+        Assert.DoesNotContain(args, a => a.StartsWith("-disposition:v:", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void KapakTasimayanKapVeResimReddedilir()
+    {
+        var izler = new[] { new RemuxTrack(0, StreamKind.Video) };
+        Assert.Throws<ArgumentException>(() => Args("o.mov", izler, "kapak.png"));
+        Assert.Throws<ArgumentException>(() => Args("o.webm", izler, "kapak.png"));
+        Assert.Throws<ArgumentException>(() => Args("o.mp4", izler, "kapak.bmp"));
+        Assert.True(Remux.CarriesCover("a.mp4"));
+        Assert.True(Remux.CarriesCover("a.M4V"));
+        Assert.True(Remux.CarriesCover("a.mkv"));
+        Assert.False(Remux.CarriesCover("a.mov"));
+        Assert.False(Remux.CarriesCover("a.webm"));
+    }
+
+    [Fact]
+    public void TekIzCikarmaKopyaVeOneriUzantisi()
+    {
+        Assert.Equal(new[] { "-hide_banner", "-nostdin", "-y", "-i", "k.mp4", "-map", "0:2", "-c", "copy", "o.m4a" },
+            Remux.ExtractArguments("k.mp4", new RemuxTrack(2, StreamKind.Audio), "o.m4a"));
+        Assert.Equal(new[] { "-hide_banner", "-nostdin", "-y", "-i", "dis.mkv", "-map", "0:1", "-c", "copy", "o.srt" },
+            Remux.ExtractArguments("k.mp4", new RemuxTrack(1, StreamKind.Subtitle, Source: "dis.mkv"), "o.srt"));
+        Assert.Equal(".m4a", Remux.ExtractExtension("aac"));
+        Assert.Equal(".mp3", Remux.ExtractExtension("mp3"));
+        Assert.Equal(".opus", Remux.ExtractExtension("opus"));
+        Assert.Equal(".flac", Remux.ExtractExtension("flac"));
+        Assert.Equal(".wav", Remux.ExtractExtension("pcm_s16le"));
+        Assert.Equal(".srt", Remux.ExtractExtension("subrip"));
+        Assert.Equal(".ass", Remux.ExtractExtension("ass"));
+        Assert.Equal(".mkv", Remux.ExtractExtension("h264"));
+        Assert.Equal(".mkv", Remux.ExtractExtension(null));
+    }
+
+    [FfmpegFact]
+    public async Task CanliDisIzKapakVeCikarma()
+    {
+        var adlar = new[] { "kaynak.mp4", "dis.m4a", "dis.wav", "dis.srt", "kapak.png", "cikti.mp4", "cikti.mkv", "ses.m4a", "altyazi.srt", "olcu.txt" };
+        KanitKapanisi.Onceki(Kanit, adlar);
+        string Yol(string ad) => Path.Combine(Kanit, ad);
+        KapIciIzTests.Ffmpeg("-hide_banner", "-y", "-f", "lavfi", "-i", "testsrc2=s=160x120:r=15:d=1", "-f", "lavfi", "-i", "sine=f=440:d=1",
+            "-map", "0:v", "-map", "1:a", "-c:v", "libx264", "-preset", "ultrafast", "-threads", "2", "-c:a", "aac",
+            "-metadata:s:a:0", "language=eng", Yol("kaynak.mp4"));
+        KapIciIzTests.Ffmpeg("-hide_banner", "-y", "-f", "lavfi", "-i", "sine=f=880:d=1", "-c:a", "aac", "-threads", "2", Yol("dis.m4a"));
+        KapIciIzTests.Ffmpeg("-hide_banner", "-y", "-f", "lavfi", "-i", "sine=f=660:d=1", "-c:a", "pcm_s16le", Yol("dis.wav"));
+        KapIciIzTests.Ffmpeg("-hide_banner", "-y", "-f", "lavfi", "-i", "color=c=red:s=64x64", "-frames:v", "1", "-threads", "2", Yol("kapak.png"));
+        File.WriteAllText(Yol("dis.srt"), "1\n00:00:00,000 --> 00:00:00,900\nMerhaba\n");
+
+        await RemuxRunner.RunAsync(new RemuxRequest(Yol("kaynak.mp4"), Yol("cikti.mp4"), new[]
+        {
+            new RemuxTrack(0, StreamKind.Video),
+            new RemuxTrack(0, StreamKind.Audio, "tur", IsDefault: true, Source: Yol("dis.m4a"))
+        }, null, Yol("kapak.png")), 1, null);
+        await RemuxRunner.RunAsync(new RemuxRequest(Yol("kaynak.mp4"), Yol("cikti.mkv"), new[]
+        {
+            new RemuxTrack(0, StreamKind.Video),
+            new RemuxTrack(1, StreamKind.Audio),
+            new RemuxTrack(0, StreamKind.Audio, "jpn", Source: Yol("dis.wav")),
+            new RemuxTrack(0, StreamKind.Subtitle, "tur", Source: Yol("dis.srt"))
+        }, null, Yol("kapak.png")), 1, null);
+        await RemuxRunner.ExtractAsync(Yol("kaynak.mp4"), new RemuxTrack(1, StreamKind.Audio), Yol("ses.m4a"), 1, null);
+        await RemuxRunner.ExtractAsync(Yol("kaynak.mp4"), new RemuxTrack(3, StreamKind.Subtitle, Source: Yol("cikti.mkv")), Yol("altyazi.srt"), 1, null);
+
+        string[] Satir(string ad) => KapIciIzTests.Ffprobe("-show_entries",
+                "stream=index,codec_name,codec_type:stream_tags=language,mimetype,filename:stream_disposition=attached_pic", "-of", "compact", Yol(ad))
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var mp4 = Satir("cikti.mp4");
+        var mkv = Satir("cikti.mkv");
+        var ses = Satir("ses.m4a");
+        var altyazi = Satir("altyazi.srt");
+        File.WriteAllText(Yol("olcu.txt"), string.Join('\n', new[] { "cikti.mp4" }.Concat(mp4).Append("cikti.mkv").Concat(mkv)
+            .Append("ses.m4a").Concat(ses).Append("altyazi.srt").Concat(altyazi)));
+
+        Assert.Equal(3, mp4.Length);
+        Assert.Contains("tag:language=tur", Assert.Single(mp4, s => s.Contains("codec_type=audio", StringComparison.Ordinal)));
+        Assert.Contains("disposition:attached_pic=1", Assert.Single(mp4, s => s.Contains("codec_name=png", StringComparison.Ordinal)));
+        Assert.Equal(2, mkv.Count(s => s.Contains("codec_type=audio", StringComparison.Ordinal)));
+        Assert.Contains("tag:language=jpn", Assert.Single(mkv, s => s.Contains("codec_name=pcm_s16le", StringComparison.Ordinal)));
+        Assert.Contains("tag:language=tur", Assert.Single(mkv, s => s.Contains("codec_name=subrip", StringComparison.Ordinal)));
+        var kapak = Assert.Single(mkv, s => s.Contains("codec_name=png", StringComparison.Ordinal));
+        Assert.Contains("disposition:attached_pic=1", kapak);
+        Assert.Contains("tag:mimetype=image/png", kapak);
+        Assert.Contains("codec_name=aac", Assert.Single(ses));
+        Assert.Contains("codec_name=subrip", Assert.Single(altyazi));
+        Assert.Empty(Directory.GetFiles(Kanit, "vidshrink_partial_*"));
+        KanitKapanisi.Kapat(Kanit, adlar);
     }
 }

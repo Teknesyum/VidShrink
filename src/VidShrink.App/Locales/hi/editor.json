@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "वीडियो",
   "editor.remux.kind.audio": "ऑडियो",
   "editor.remux.kind.subtitle": "उपशीर्षक",
-  "editor.remux.kind.attachment": "अनुलग्नक"
+  "editor.remux.kind.attachment": "अनुलग्नक",
+  "editor.remux.include": "फ़ाइल में शामिल करें",
+  "editor.remux.add": "ट्रैक जोड़ें…",
+  "editor.remux.add.tip": "• किसी दूसरी फ़ाइल के ट्रैक सूची में जोड़ता है।\n• ऑडियो बदलने के लिए स्रोत ऑडियो छोड़ दें।",
+  "editor.remux.add-title": "ट्रैक जोड़ने के लिए फ़ाइल चुनें",
+  "editor.remux.extract": "ट्रैक अलग सहेजें…",
+  "editor.remux.extract.tip": "• चुने गए ट्रैक को बिना री-एन्कोड किए उसकी अपनी फ़ाइल में लिखता है।",
+  "editor.remux.extract-title": "ट्रैक सहेजें",
+  "editor.remux.cover": "कवर…",
+  "editor.remux.cover.tip": "• PNG या JPEG कवर जोड़ता है; केवल MP4 और MKV।\n• चयन रद्द करने से कवर हट जाता है।",
+  "editor.remux.cover-title": "कवर छवि चुनें",
+  "editor.remux.cover.set": "कवर: {0}",
+  "editor.remux.cover.unsupported": "यह कंटेनर कवर नहीं रख सकता; MP4 या MKV चुनें।",
+  "editor.remux.empty": "फ़ाइल में कम से कम एक ट्रैक शामिल होना चाहिए।"
 }

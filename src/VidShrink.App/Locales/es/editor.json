@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "Vídeo",
   "editor.remux.kind.audio": "Audio",
   "editor.remux.kind.subtitle": "Subtítulos",
-  "editor.remux.kind.attachment": "Adjunto"
+  "editor.remux.kind.attachment": "Adjunto",
+  "editor.remux.include": "Incluir en el archivo",
+  "editor.remux.add": "Añadir pistas…",
+  "editor.remux.add.tip": "• Añade a la lista las pistas de otro archivo.\n• Para reemplazar el audio, deja fuera el audio de origen.",
+  "editor.remux.add-title": "Elegir archivo del que añadir pistas",
+  "editor.remux.extract": "Guardar pista aparte…",
+  "editor.remux.extract.tip": "• Escribe la pista seleccionada en su propio archivo sin recodificar.",
+  "editor.remux.extract-title": "Guardar pista",
+  "editor.remux.cover": "Portada…",
+  "editor.remux.cover.tip": "• Adjunta una portada PNG o JPEG; solo MP4 y MKV.\n• Cancelar la elección quita la portada.",
+  "editor.remux.cover-title": "Elegir imagen de portada",
+  "editor.remux.cover.set": "Portada: {0}",
+  "editor.remux.cover.unsupported": "Este contenedor no admite portada; elige MP4 o MKV.",
+  "editor.remux.empty": "Debe incluirse al menos una pista en el archivo."
 }

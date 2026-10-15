@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "Görüntü",
   "editor.remux.kind.audio": "Ses",
   "editor.remux.kind.subtitle": "Altyazı",
-  "editor.remux.kind.attachment": "Ek"
+  "editor.remux.kind.attachment": "Ek",
+  "editor.remux.include": "Dosyaya Kat",
+  "editor.remux.add": "İz Ekle…",
+  "editor.remux.add.tip": "• Başka dosyanın izlerini listeye ekler.\n• Sesi değiştirmek için kaynak sesi dosyaya katma.",
+  "editor.remux.add-title": "İz Eklenecek Dosyayı Seç",
+  "editor.remux.extract": "İzi Ayrı Kaydet…",
+  "editor.remux.extract.tip": "• Seçili izi yeniden kodlamadan kendi dosyasına yazar.",
+  "editor.remux.extract-title": "İzi Kaydet",
+  "editor.remux.cover": "Kapak…",
+  "editor.remux.cover.tip": "• PNG ya da JPEG kapak iliştirir; yalnız MP4 ve MKV.\n• Seçimden vazgeçmek kapağı kaldırır.",
+  "editor.remux.cover-title": "Kapak Resmini Seç",
+  "editor.remux.cover.set": "Kapak: {0}",
+  "editor.remux.cover.unsupported": "Bu kap kapak taşımaz; MP4 ya da MKV seç.",
+  "editor.remux.empty": "Dosyaya en az bir iz katılmalı."
 }

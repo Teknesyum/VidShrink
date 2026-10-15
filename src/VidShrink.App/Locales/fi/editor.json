@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "Video",
   "editor.remux.kind.audio": "Ääni",
   "editor.remux.kind.subtitle": "Tekstitys",
-  "editor.remux.kind.attachment": "Liite"
+  "editor.remux.kind.attachment": "Liite",
+  "editor.remux.include": "Sisällytä tiedostoon",
+  "editor.remux.add": "Lisää raitoja…",
+  "editor.remux.add.tip": "• Lisää toisen tiedoston raidat luetteloon.\n• Korvaa ääni jättämällä lähteen ääni pois.",
+  "editor.remux.add-title": "Valitse tiedosto, josta raidat lisätään",
+  "editor.remux.extract": "Tallenna raita erikseen…",
+  "editor.remux.extract.tip": "• Kirjoittaa valitun raidan omaan tiedostoonsa ilman uudelleenkoodausta.",
+  "editor.remux.extract-title": "Tallenna raita",
+  "editor.remux.cover": "Kansikuva…",
+  "editor.remux.cover.tip": "• Liittää PNG- tai JPEG-kansikuvan; vain MP4 ja MKV.\n• Valinnan peruminen poistaa kansikuvan.",
+  "editor.remux.cover-title": "Valitse kansikuva",
+  "editor.remux.cover.set": "Kansikuva: {0}",
+  "editor.remux.cover.unsupported": "Tämä säiliö ei voi sisältää kansikuvaa; valitse MP4 tai MKV.",
+  "editor.remux.empty": "Tiedostoon on sisällytettävä vähintään yksi raita."
 }

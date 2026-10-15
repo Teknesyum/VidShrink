@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "Video",
   "editor.remux.kind.audio": "Zvok",
   "editor.remux.kind.subtitle": "Podnapisi",
-  "editor.remux.kind.attachment": "Priloga"
+  "editor.remux.kind.attachment": "Priloga",
+  "editor.remux.include": "Vključi v datoteko",
+  "editor.remux.add": "Dodaj sledi…",
+  "editor.remux.add.tip": "• Na seznam doda sledi druge datoteke.\n• Za zamenjavo zvoka izpustite izvorni zvok.",
+  "editor.remux.add-title": "Izberite datoteko, iz katere dodate sledi",
+  "editor.remux.extract": "Shrani sled posebej…",
+  "editor.remux.extract.tip": "• Izbrano sled zapiše v lastno datoteko brez ponovnega kodiranja.",
+  "editor.remux.extract-title": "Shrani sled",
+  "editor.remux.cover": "Naslovnica…",
+  "editor.remux.cover.tip": "• Priloži naslovnico PNG ali JPEG; samo MP4 in MKV.\n• Preklic izbire odstrani naslovnico.",
+  "editor.remux.cover-title": "Izberite sliko naslovnice",
+  "editor.remux.cover.set": "Naslovnica: {0}",
+  "editor.remux.cover.unsupported": "Ta vsebnik ne more nositi naslovnice; izberite MP4 ali MKV.",
+  "editor.remux.empty": "V datoteko mora biti vključena vsaj ena sled."
 }

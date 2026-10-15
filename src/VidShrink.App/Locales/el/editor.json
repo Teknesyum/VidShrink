@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "Βίντεο",
   "editor.remux.kind.audio": "Ήχος",
   "editor.remux.kind.subtitle": "Υπότιτλοι",
-  "editor.remux.kind.attachment": "Συνημμένο"
+  "editor.remux.kind.attachment": "Συνημμένο",
+  "editor.remux.include": "Συμπερίληψη στο αρχείο",
+  "editor.remux.add": "Προσθήκη κομματιών…",
+  "editor.remux.add.tip": "• Προσθέτει στη λίστα τα κομμάτια άλλου αρχείου.\n• Για αντικατάσταση του ήχου, παραλείψτε τον ήχο της πηγής.",
+  "editor.remux.add-title": "Επιλογή αρχείου για προσθήκη κομματιών",
+  "editor.remux.extract": "Αποθήκευση κομματιού χωριστά…",
+  "editor.remux.extract.tip": "• Γράφει το επιλεγμένο κομμάτι σε δικό του αρχείο χωρίς επανακωδικοποίηση.",
+  "editor.remux.extract-title": "Αποθήκευση κομματιού",
+  "editor.remux.cover": "Εξώφυλλο…",
+  "editor.remux.cover.tip": "• Επισυνάπτει εξώφυλλο PNG ή JPEG· μόνο MP4 και MKV.\n• Η ακύρωση της επιλογής αφαιρεί το εξώφυλλο.",
+  "editor.remux.cover-title": "Επιλογή εικόνας εξωφύλλου",
+  "editor.remux.cover.set": "Εξώφυλλο: {0}",
+  "editor.remux.cover.unsupported": "Αυτό το κοντέινερ δεν μπορεί να φέρει εξώφυλλο· επιλέξτε MP4 ή MKV.",
+  "editor.remux.empty": "Τουλάχιστον ένα κομμάτι πρέπει να συμπεριληφθεί στο αρχείο."
 }

@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "Vaizdas",
   "editor.remux.kind.audio": "Garsas",
   "editor.remux.kind.subtitle": "Subtitrai",
-  "editor.remux.kind.attachment": "Priedas"
+  "editor.remux.kind.attachment": "Priedas",
+  "editor.remux.include": "Įtraukti į failą",
+  "editor.remux.add": "Pridėti takelius…",
+  "editor.remux.add.tip": "• Prideda į sąrašą kito failo takelius.\n• Norėdami pakeisti garsą, praleiskite šaltinio garsą.",
+  "editor.remux.add-title": "Pasirinkite failą, iš kurio pridėti takelius",
+  "editor.remux.extract": "Įrašyti takelį atskirai…",
+  "editor.remux.extract.tip": "• Įrašo pasirinktą takelį į atskirą failą be perkodavimo.",
+  "editor.remux.extract-title": "Įrašyti takelį",
+  "editor.remux.cover": "Viršelis…",
+  "editor.remux.cover.tip": "• Prisega PNG arba JPEG viršelį; tik MP4 ir MKV.\n• Atšaukus pasirinkimą viršelis pašalinamas.",
+  "editor.remux.cover-title": "Pasirinkite viršelio paveikslėlį",
+  "editor.remux.cover.set": "Viršelis: {0}",
+  "editor.remux.cover.unsupported": "Šis konteineris negali turėti viršelio; pasirinkite MP4 arba MKV.",
+  "editor.remux.empty": "Į failą turi būti įtrauktas bent vienas takelis."
 }

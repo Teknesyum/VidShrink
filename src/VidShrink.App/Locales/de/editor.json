@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "Video",
   "editor.remux.kind.audio": "Audio",
   "editor.remux.kind.subtitle": "Untertitel",
-  "editor.remux.kind.attachment": "Anhang"
+  "editor.remux.kind.attachment": "Anhang",
+  "editor.remux.include": "In Datei aufnehmen",
+  "editor.remux.add": "Spuren hinzufügen…",
+  "editor.remux.add.tip": "• Fügt die Spuren einer anderen Datei zur Liste hinzu.\n• Zum Ersetzen des Tons den Quellton weglassen.",
+  "editor.remux.add-title": "Datei mit Spuren wählen",
+  "editor.remux.extract": "Spur separat speichern…",
+  "editor.remux.extract.tip": "• Schreibt die gewählte Spur ohne Neukodierung in eine eigene Datei.",
+  "editor.remux.extract-title": "Spur speichern",
+  "editor.remux.cover": "Cover…",
+  "editor.remux.cover.tip": "• Hängt ein PNG- oder JPEG-Cover an; nur MP4 und MKV.\n• Abbrechen der Auswahl entfernt das Cover.",
+  "editor.remux.cover-title": "Coverbild wählen",
+  "editor.remux.cover.set": "Cover: {0}",
+  "editor.remux.cover.unsupported": "Dieser Container kann kein Cover tragen; MP4 oder MKV wählen.",
+  "editor.remux.empty": "Mindestens eine Spur muss in die Datei aufgenommen werden."
 }

@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "视频",
   "editor.remux.kind.audio": "音频",
   "editor.remux.kind.subtitle": "字幕",
-  "editor.remux.kind.attachment": "附件"
+  "editor.remux.kind.attachment": "附件",
+  "editor.remux.include": "包含在文件中",
+  "editor.remux.add": "添加轨道…",
+  "editor.remux.add.tip": "• 将另一个文件的轨道添加到列表。\n• 要替换音频，请排除源音频。",
+  "editor.remux.add-title": "选择要添加轨道的文件",
+  "editor.remux.extract": "单独保存轨道…",
+  "editor.remux.extract.tip": "• 不重新编码，将所选轨道写入单独的文件。",
+  "editor.remux.extract-title": "保存轨道",
+  "editor.remux.cover": "封面…",
+  "editor.remux.cover.tip": "• 附加 PNG 或 JPEG 封面；仅限 MP4 和 MKV。\n• 取消选择会移除封面。",
+  "editor.remux.cover-title": "选择封面图片",
+  "editor.remux.cover.set": "封面：{0}",
+  "editor.remux.cover.unsupported": "此容器无法携带封面；请选择 MP4 或 MKV。",
+  "editor.remux.empty": "文件中至少要包含一条轨道。"
 }

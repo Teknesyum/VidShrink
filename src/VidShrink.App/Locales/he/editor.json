@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "וידאו",
   "editor.remux.kind.audio": "שמע",
   "editor.remux.kind.subtitle": "כתוביות",
-  "editor.remux.kind.attachment": "קובץ מצורף"
+  "editor.remux.kind.attachment": "קובץ מצורף",
+  "editor.remux.include": "כלול בקובץ",
+  "editor.remux.add": "הוספת רצועות…",
+  "editor.remux.add.tip": "• מוסיף לרשימה את הרצועות של קובץ אחר.\n• כדי להחליף את השמע, השמט את שמע המקור.",
+  "editor.remux.add-title": "בחירת קובץ להוספת רצועות ממנו",
+  "editor.remux.extract": "שמירת רצועה בנפרד…",
+  "editor.remux.extract.tip": "• כותב את הרצועה הנבחרת לקובץ משלה ללא קידוד מחדש.",
+  "editor.remux.extract-title": "שמירת רצועה",
+  "editor.remux.cover": "עטיפה…",
+  "editor.remux.cover.tip": "• מצרף עטיפה מסוג PNG או JPEG; רק MP4 ו-MKV.\n• ביטול הבחירה מסיר את העטיפה.",
+  "editor.remux.cover-title": "בחירת תמונת עטיפה",
+  "editor.remux.cover.set": "עטיפה: {0}",
+  "editor.remux.cover.unsupported": "מכל זה אינו יכול לשאת עטיפה; בחר MP4 או MKV.",
+  "editor.remux.empty": "יש לכלול בקובץ לפחות רצועה אחת."
 }

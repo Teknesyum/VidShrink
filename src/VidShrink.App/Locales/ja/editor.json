@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "映像",
   "editor.remux.kind.audio": "音声",
   "editor.remux.kind.subtitle": "字幕",
-  "editor.remux.kind.attachment": "添付"
+  "editor.remux.kind.attachment": "添付",
+  "editor.remux.include": "ファイルに含める",
+  "editor.remux.add": "トラックを追加…",
+  "editor.remux.add.tip": "• 別ファイルのトラックを一覧に追加します。\n• 音声を差し替えるには元の音声を外します。",
+  "editor.remux.add-title": "トラックを追加するファイルを選択",
+  "editor.remux.extract": "トラックを個別に保存…",
+  "editor.remux.extract.tip": "• 選択したトラックを再エンコードせずに単独のファイルへ書き出します。",
+  "editor.remux.extract-title": "トラックを保存",
+  "editor.remux.cover": "カバー…",
+  "editor.remux.cover.tip": "• PNG または JPEG のカバーを添付します。MP4 と MKV のみ。\n• 選択を取り消すとカバーを外します。",
+  "editor.remux.cover-title": "カバー画像を選択",
+  "editor.remux.cover.set": "カバー: {0}",
+  "editor.remux.cover.unsupported": "このコンテナはカバーを持てません。MP4 か MKV を選んでください。",
+  "editor.remux.empty": "少なくとも 1 つのトラックをファイルに含める必要があります。"
 }

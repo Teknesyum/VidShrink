@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "Видео",
   "editor.remux.kind.audio": "Аудио",
   "editor.remux.kind.subtitle": "Субтитри",
-  "editor.remux.kind.attachment": "Прикачен файл"
+  "editor.remux.kind.attachment": "Прикачен файл",
+  "editor.remux.include": "Включване във файла",
+  "editor.remux.add": "Добавяне на писти…",
+  "editor.remux.add.tip": "• Добавя към списъка пистите на друг файл.\n• За замяна на звука изпуснете изходния звук.",
+  "editor.remux.add-title": "Изберете файл, от който да добавите писти",
+  "editor.remux.extract": "Запис на пистата отделно…",
+  "editor.remux.extract.tip": "• Записва избраната писта в собствен файл без прекодиране.",
+  "editor.remux.extract-title": "Запис на пистата",
+  "editor.remux.cover": "Корица…",
+  "editor.remux.cover.tip": "• Прикачва корица PNG или JPEG; само MP4 и MKV.\n• Отказът от избора премахва корицата.",
+  "editor.remux.cover-title": "Изберете изображение за корица",
+  "editor.remux.cover.set": "Корица: {0}",
+  "editor.remux.cover.unsupported": "Този контейнер не може да носи корица; изберете MP4 или MKV.",
+  "editor.remux.empty": "Поне една писта трябва да бъде включена във файла."
 }

@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "ویدیو",
   "editor.remux.kind.audio": "صدا",
   "editor.remux.kind.subtitle": "زیرنویس",
-  "editor.remux.kind.attachment": "پیوست"
+  "editor.remux.kind.attachment": "پیوست",
+  "editor.remux.include": "گنجاندن در فایل",
+  "editor.remux.add": "افزودن ترک‌ها…",
+  "editor.remux.add.tip": "• ترک‌های فایل دیگری را به فهرست می‌افزاید.\n• برای جایگزینی صدا، صدای منبع را کنار بگذارید.",
+  "editor.remux.add-title": "انتخاب فایل برای افزودن ترک",
+  "editor.remux.extract": "ذخیرهٔ جداگانهٔ ترک…",
+  "editor.remux.extract.tip": "• ترک انتخاب‌شده را بدون رمزگذاری دوباره در فایل خودش می‌نویسد.",
+  "editor.remux.extract-title": "ذخیرهٔ ترک",
+  "editor.remux.cover": "جلد…",
+  "editor.remux.cover.tip": "• جلد PNG یا JPEG پیوست می‌کند؛ فقط MP4 و MKV.\n• لغو انتخاب جلد را برمی‌دارد.",
+  "editor.remux.cover-title": "انتخاب تصویر جلد",
+  "editor.remux.cover.set": "جلد: {0}",
+  "editor.remux.cover.unsupported": "این قالب نمی‌تواند جلد داشته باشد؛ MP4 یا MKV را انتخاب کنید.",
+  "editor.remux.empty": "دست‌کم یک ترک باید در فایل گنجانده شود."
 }

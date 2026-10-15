@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "ভিডিও",
   "editor.remux.kind.audio": "অডিও",
   "editor.remux.kind.subtitle": "সাবটাইটেল",
-  "editor.remux.kind.attachment": "সংযুক্তি"
+  "editor.remux.kind.attachment": "সংযুক্তি",
+  "editor.remux.include": "ফাইলে অন্তর্ভুক্ত করুন",
+  "editor.remux.add": "ট্র্যাক যোগ করুন…",
+  "editor.remux.add.tip": "• অন্য ফাইলের ট্র্যাক তালিকায় যোগ করে।\n• অডিও বদলাতে উৎসের অডিও বাদ দিন।",
+  "editor.remux.add-title": "ট্র্যাক যোগ করার ফাইল বেছে নিন",
+  "editor.remux.extract": "ট্র্যাক আলাদা সংরক্ষণ…",
+  "editor.remux.extract.tip": "• নির্বাচিত ট্র্যাক পুনরায় এনকোড না করে নিজস্ব ফাইলে লেখে।",
+  "editor.remux.extract-title": "ট্র্যাক সংরক্ষণ",
+  "editor.remux.cover": "কভার…",
+  "editor.remux.cover.tip": "• PNG বা JPEG কভার যুক্ত করে; শুধু MP4 ও MKV।\n• নির্বাচন বাতিল করলে কভার সরে যায়।",
+  "editor.remux.cover-title": "কভার ছবি বেছে নিন",
+  "editor.remux.cover.set": "কভার: {0}",
+  "editor.remux.cover.unsupported": "এই কনটেইনার কভার বহন করতে পারে না; MP4 বা MKV বেছে নিন।",
+  "editor.remux.empty": "ফাইলে অন্তত একটি ট্র্যাক অন্তর্ভুক্ত থাকতে হবে।"
 }

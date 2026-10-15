@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "Wideo",
   "editor.remux.kind.audio": "Dźwięk",
   "editor.remux.kind.subtitle": "Napisy",
-  "editor.remux.kind.attachment": "Załącznik"
+  "editor.remux.kind.attachment": "Załącznik",
+  "editor.remux.include": "Dołącz do pliku",
+  "editor.remux.add": "Dodaj ścieżki…",
+  "editor.remux.add.tip": "• Dodaje do listy ścieżki innego pliku.\n• Aby zastąpić dźwięk, pomiń dźwięk źródłowy.",
+  "editor.remux.add-title": "Wybierz plik, z którego dodać ścieżki",
+  "editor.remux.extract": "Zapisz ścieżkę osobno…",
+  "editor.remux.extract.tip": "• Zapisuje wybraną ścieżkę do osobnego pliku bez ponownego kodowania.",
+  "editor.remux.extract-title": "Zapisz ścieżkę",
+  "editor.remux.cover": "Okładka…",
+  "editor.remux.cover.tip": "• Dołącza okładkę PNG lub JPEG; tylko MP4 i MKV.\n• Anulowanie wyboru usuwa okładkę.",
+  "editor.remux.cover-title": "Wybierz obraz okładki",
+  "editor.remux.cover.set": "Okładka: {0}",
+  "editor.remux.cover.unsupported": "Ten kontener nie obsługuje okładki; wybierz MP4 lub MKV.",
+  "editor.remux.empty": "Do pliku musi trafić co najmniej jedna ścieżka."
 }

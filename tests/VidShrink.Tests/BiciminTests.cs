@@ -1316,6 +1316,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, metin konumu ve hareketi (later 86): on dort yeni <c>editor.text.*</c> anahtarindan 8 kol (es, it, pl, pt <c>.motion.typewriter</c>; hr <c>.keyframe</c>; ro <c>.motion.bottom</c>, <c>.motion.top</c>, <c>.motion.typewriter</c>), KOL dokumunden sayildi, en ve tr girmiyor: olculen 3714 + 8 = 3722, en 361, tr 119.</para>
     /// <para>2026-10-15, later 64 yalniz ses ve ses secenekleri: dort yeni kaydedici anahtari 3 kol ekliyor, en ve tr degismedi; olculen toplam 3714 + 3 = 3717, gezilen 76454 + 172 = 76626.</para>
     /// <para>2026-10-15, altyazi aktarimi (DZB-62): yedi yeni <c>editor.subtitle.*</c> anahtarindan 9 kol (es, ro <c>files</c>; fr <c>files</c>, <c>unreadable</c>; hu <c>failed</c>, <c>unreadable</c>; pt <c>failed</c>, <c>files</c>, <c>unreadable</c>), KOL dokumunden sayildi, en ve tr girmiyor: olculen 3733 + 9 = 3742, en 361, tr 120.</para>
+    /// <para>2026-10-15, kap ici iz isleri ikinci yarisi (DZA-25, 26, 44): on uc yeni <c>editor.remux.*</c> anahtarindan 18 kol (<c>include</c> cs, de, en, hu, nl, pl, sk; <c>add-title</c> da, en, hu, it, sw; <c>cover-title</c> es, fr, pt, ro, sw; <c>extract</c> it), KOL dokumunden ve SAYIM satirindan olculdu, tr girmiyor: toplam 3733 + 18 = 3751, en 361 + 2 = 363, tr 120.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1341,8 +1342,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3742, toplam);
-        Assert.Equal(361, dilBasina["en"]);
+        Assert.Equal(3760, toplam);
+        Assert.Equal(363, dilBasina["en"]);
         Assert.Equal(120, dilBasina["tr"]);
     }
 
@@ -1609,6 +1610,8 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, later 64 birlesmesinden sonra: kaydedici ses anahtarlarinin kaymasi main'in uzerine toplandi, dusen yok; olculen toplam 3729 + 3 = 3732, en 361, tr 119, gezilen 77959 + 172 = 78131.</para>
     /// <para>2026-10-15, later 61 birlesmesinden sonra: arsiv kodegi ve GIF anahtarlarinin kaymasi main'in uzerine toplandi, dusen yok; olculen toplam 3732 + 1 = 3733, en 361, tr 119 + 1 = 120, gezilen 78131 + 473 = 78604.</para>
     /// <para>2026-10-15, altyazi aktarimi (DZB-62): yedi yeni <c>editor.subtitle.*</c> anahtari, dusen yok; olculen 78604 + 43 x 7 = 78905. <c>kayip</c> 0.</para>
+    /// <para>2026-10-15, kap ici iz isleri ikinci yarisi (DZA-25, 26, 44): on uc yeni <c>editor.remux.*</c> anahtari, dusen yok; olculen 78604 + 43 x 13 = 79163. <c>kayip</c> 0.</para>
+    /// <para>2026-10-15, later 86 ve later 85 ikinci yari birlesmesinden sonra: iki dalin kaymasi main'in uzerine toplandi, dusen yok; olculen toplam 3733 + 9 + 18 = 3760, en 361 + 2 = 363, tr 120, gezilen 78604 + 301 + 559 = 79464.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1636,7 +1639,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(78905, gezilen);
+        Assert.Equal(79464, gezilen);
         Assert.Empty(kayip);
     }
 

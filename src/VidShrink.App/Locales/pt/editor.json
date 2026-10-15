@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "Vídeo",
   "editor.remux.kind.audio": "Áudio",
   "editor.remux.kind.subtitle": "Legendas",
-  "editor.remux.kind.attachment": "Anexo"
+  "editor.remux.kind.attachment": "Anexo",
+  "editor.remux.include": "Incluir no arquivo",
+  "editor.remux.add": "Adicionar faixas…",
+  "editor.remux.add.tip": "• Adiciona à lista as faixas de outro arquivo.\n• Para substituir o áudio, deixe de fora o áudio de origem.",
+  "editor.remux.add-title": "Escolher arquivo para adicionar faixas",
+  "editor.remux.extract": "Salvar faixa separada…",
+  "editor.remux.extract.tip": "• Grava a faixa selecionada no próprio arquivo sem recodificar.",
+  "editor.remux.extract-title": "Salvar faixa",
+  "editor.remux.cover": "Capa…",
+  "editor.remux.cover.tip": "• Anexa uma capa PNG ou JPEG; apenas MP4 e MKV.\n• Cancelar a escolha remove a capa.",
+  "editor.remux.cover-title": "Escolher imagem de capa",
+  "editor.remux.cover.set": "Capa: {0}",
+  "editor.remux.cover.unsupported": "Este contêiner não suporta capa; escolha MP4 ou MKV.",
+  "editor.remux.empty": "Pelo menos uma faixa deve ser incluída no arquivo."
 }

@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "Videó",
   "editor.remux.kind.audio": "Hang",
   "editor.remux.kind.subtitle": "Felirat",
-  "editor.remux.kind.attachment": "Melléklet"
+  "editor.remux.kind.attachment": "Melléklet",
+  "editor.remux.include": "Belefoglalás a fájlba",
+  "editor.remux.add": "Sávok hozzáadása…",
+  "editor.remux.add.tip": "• Egy másik fájl sávjait adja a listához.\n• A hang cseréjéhez hagyd ki a forrás hangját.",
+  "editor.remux.add-title": "Fájl választása a sávok hozzáadásához",
+  "editor.remux.extract": "Sáv mentése külön…",
+  "editor.remux.extract.tip": "• A kijelölt sávot újrakódolás nélkül saját fájlba írja.",
+  "editor.remux.extract-title": "Sáv mentése",
+  "editor.remux.cover": "Borító…",
+  "editor.remux.cover.tip": "• PNG vagy JPEG borítót csatol; csak MP4 és MKV.\n• A választás megszakítása eltávolítja a borítót.",
+  "editor.remux.cover-title": "Borítókép választása",
+  "editor.remux.cover.set": "Borító: {0}",
+  "editor.remux.cover.unsupported": "Ez a tároló nem hordozhat borítót; válassz MP4-et vagy MKV-t.",
+  "editor.remux.empty": "Legalább egy sávot bele kell foglalni a fájlba."
 }

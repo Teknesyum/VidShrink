@@ -237,5 +237,18 @@
   "editor.remux.kind.video": "Video",
   "editor.remux.kind.audio": "Audio",
   "editor.remux.kind.subtitle": "Subtitel",
-  "editor.remux.kind.attachment": "Lampiran"
+  "editor.remux.kind.attachment": "Lampiran",
+  "editor.remux.include": "Sertakan dalam file",
+  "editor.remux.add": "Tambah trek…",
+  "editor.remux.add.tip": "• Menambahkan trek dari file lain ke daftar.\n• Untuk mengganti audio, jangan sertakan audio sumber.",
+  "editor.remux.add-title": "Pilih file untuk menambah trek",
+  "editor.remux.extract": "Simpan trek terpisah…",
+  "editor.remux.extract.tip": "• Menulis trek terpilih ke file tersendiri tanpa enkode ulang.",
+  "editor.remux.extract-title": "Simpan trek",
+  "editor.remux.cover": "Sampul…",
+  "editor.remux.cover.tip": "• Melampirkan sampul PNG atau JPEG; hanya MP4 dan MKV.\n• Membatalkan pilihan menghapus sampul.",
+  "editor.remux.cover-title": "Pilih gambar sampul",
+  "editor.remux.cover.set": "Sampul: {0}",
+  "editor.remux.cover.unsupported": "Wadah ini tidak dapat membawa sampul; pilih MP4 atau MKV.",
+  "editor.remux.empty": "Setidaknya satu trek harus disertakan dalam file."
 }
