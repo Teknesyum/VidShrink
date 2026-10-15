@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Peruttu",
   "main.convert-queue.summary": "{0} valmis, {1} epäonnistui, {2} peruttu.",
   "main.convert.note.webp-bitrate-ignored": "WebP:ssä ei ole bittinopeustilaa: bittinopeuden arvo ohitetaan ja käytetään kooderin oletuslaatua.",
+  "main.convert.note.gif-target": "GIF-lähde: kuvataajuutta, leveyttä ja värien määrää lasketaan, kunnes tuloste alittaa Pakkaa-välilehden kohdekoon.",
 
   "main.stage.encoding": "Koodataan",
   "main.stage.converting": "Muunnetaan",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Tätä tiedostoa ei voi käyttää",
   "main.error.generic": "Toimintoa ei voitu suorittaa loppuun. ffmpeg:n ilmoittama tarkenne on alla.",
   "main.error.disk-full": "Kohdeasemalta loppui tila. Vapauta tilaa tai kirjoita tuloste toiselle asemalle.",
+  "main.error.audio-only-shrink": "Pakkaa ottaa vain videota; tämä äänitiedosto on avattu Muunna-välilehdellä.",
   "main.error.encoder-container": "Valittu kooderi ja säiliö eivät sovi yhteen. Aseta säiliöksi MP4 ja videokoodekiksi H.264, ja yritä uudelleen.",
   "main.error.undecodable": "Lähdetiedostoa ei voitu purkaa; se voi olla vaurioitunut, tai tämä ffmpeg-versio ei tunne muotoa.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "Kuvasarjana tallentaminen vaatii videon koodauksen eikä voi käyttää virran kopiointia.",
   "main.validation.no-audio-copy": "Lähteessä ei ole kopioitavaa äänivirtaa.",
   "main.validation.no-audio-extract": "Lähteessä ei ole eristettävää äänivirtaa.",
+  "main.validation.no-video-container": "Lähteessä ei ole videovirtaa; valitse äänisäiliö.",
   "main.validation.trim-order": "Leikkauksen lopun on oltava alun jälkeen.",
   "main.validation.container-video-encoder": "{0}-säiliö ei tue valittua {1}-videokooderia.",
   "main.validation.container-audio-encoder": "{0}-säiliö ei tue valittua {1}-äänikooderia.",

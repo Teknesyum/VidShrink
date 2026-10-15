@@ -22,6 +22,7 @@ public static class ConversionArguments
         if (plan.VideoCodec == "copy" && plan.ImageSequenceOutput) errors.Add("Image sequence output requires video encoding and cannot use stream copy.");
         if (plan.CarriesAudio && plan.AudioCodec == "copy" && !info.HasAudio) errors.Add("The source has no audio stream to copy.");
         if (plan.AudioOnly && !info.HasAudio) errors.Add("The source has no audio stream to extract.");
+        if (info.IsAudioOnly && !plan.AudioOnly) errors.Add("The source has no video stream; choose an audio container.");
 
         if (!plan.AudioOnly && !plan.Gif && !plan.AnimatedImage && !plan.ImageSequenceOutput && plan.VideoCodec != "copy" && !VideoEncodeCompatible(plan.Container, plan.VideoCodec))
             errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support the selected {plan.VideoCodec} video encoder.");
@@ -65,8 +66,14 @@ public static class ConversionArguments
         var notes = new List<ConversionNote>();
         if (plan.Container == "webp" && plan.QualityMode == ConversionQualityMode.Bitrate)
             notes.Add(ConversionNote.WebpBitrateIgnored);
+        if (plan.Gif && plan.TargetBytes > 0)
+            notes.Add(ConversionNote.GifFitsTarget);
         return notes;
     }
+
+    /// <summary>Ses-yalnız kaynak yalnız ses kabına çevrilir; görüntülü kaynakta her kap uyar.</summary>
+    public static bool ContainerFitsSource(string container, MediaInfo? source)
+        => source is not { IsAudioOnly: true } || new ConversionPlan { Container = container }.AudioOnly;
 
     public static IReadOnlyList<string> Build(MediaInfo info, ConversionPlan plan, string outputPath, string? palettePath = null, IEncoderAvailability? availability = null)
     {
@@ -107,7 +114,7 @@ public static class ConversionArguments
         if (plan.Gif)
         {
             if (palettePath is null)
-                a.AddRange(new[] { "-vf", string.Join(',', filters.Append("palettegen=stats_mode=diff")), palettePath = outputPath });
+                a.AddRange(new[] { "-vf", string.Join(',', filters.Append(plan.GifColors is { } colors ? $"palettegen=stats_mode=diff:max_colors={colors}" : "palettegen=stats_mode=diff")), palettePath = outputPath });
             else
             {
                 var graph = filters.Count == 0

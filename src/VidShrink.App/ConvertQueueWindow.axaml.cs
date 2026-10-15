@@ -102,7 +102,7 @@ public partial class ConvertQueueWindow : Window
 
     private async Task<string> RunOneAsync(string path, ConversionPreset preset, IProgress<EncodeProgress> progress, CancellationToken ct)
     {
-        var info = await FfprobeClient.ProbeAsync(path, ct);
+        var info = await FfprobeClient.ProbeAsync(path, allowAudioOnly: true, ct);
         var (plan, output) = Prepare(info, preset, _hdr, _outputFolder);
         QueueWatch.MarkOwn(output);
         var result = await new EncodeRunner().ConvertAsync(info, plan, output, progress, ct);

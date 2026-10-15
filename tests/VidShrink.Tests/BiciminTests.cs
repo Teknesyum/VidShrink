@@ -1270,6 +1270,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, Donustur'de altyazi izleri (DON-P2): yedi yeni <c>main.convert.subtitles.*</c> anahtarindan 14 kol 13 dilde (<c>main.convert.subtitles</c>: es, fr, pt, ro; <c>.extract</c>: cs, de, en, it, pl, sk; <c>.extract-failed</c>: en, hu, pt, ro), KOL dokumunden sayildi, tr girmiyor; olculen 3334 + 14 = 3348, en 322 + 2 = 324, tr 108.</para>
     /// <para>2026-10-15, tum izleri varsayilan tasima (DZA-P7): yeni anahtar <c>editor.export.audio-track.all</c> 1 kol (pt: Todas as faixas), KOL dokumunden; taban pimi 3411 + 1 = 3412.</para>
     /// <para>2026-10-15, capraz gecis teslimi (DZB-P6): sekiz yeni anahtardan (<c>editor.clip.transition</c>, <c>.none</c>, <c>.dissolve</c>, <c>.wipe</c>, <c>.slide</c>, <c>.iris</c>, <c>.duration</c>, <c>editor.export.transitions-full</c>) 4 kol, hepsi <c>editor.clip.transition.duration</c> (es, fr, nl, pt), KOL dokumunden; taban pimi 3412 + 4 = 3416.</para>
+    /// <para>2026-10-15, ses dosyasi ve GIF girdisi (ARC-P3): uc yeni anahtardan (<c>main.convert.note.gif-target</c>, <c>main.error.audio-only-shrink</c>, <c>main.validation.no-video-container</c>) 4 kol, KOL dokumunden sayildi, en ve tr girmiyor: olculen 3479 + 4 = 3483, en 331, tr 109.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1295,7 +1296,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3479, toplam);
+        Assert.Equal(3483, toplam);
         Assert.Equal(331, dilBasina["en"]);
         Assert.Equal(109, dilBasina["tr"]);
     }
@@ -1546,6 +1547,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, tum izleri varsayilan tasima (DZA-P7): yeni anahtar <c>editor.export.audio-track.all</c>, dusen yok; taban pimi 67897 + 43 = 67940. <c>kayip</c> 0.</para>
     /// <para>2026-10-15, capraz gecis teslimi (DZB-P6): sekiz yeni anahtar, dusen yok; taban pimi 67940 + 43 x 8 = 68284. <c>kayip</c> 0.</para>
     /// <para>2026-10-15, muzik izi (DZB-P7): bir yeni anahtar, dusen yok; taban pimi 68284 + 43 = 68327. <c>kayip</c> 0.</para>
+    /// <para>2026-10-15, ses dosyasi ve GIF girdisi (ARC-P3): uc yeni anahtar (<c>main.convert.note.gif-target</c>, <c>main.error.audio-only-shrink</c>, <c>main.validation.no-video-container</c>), dusen yok; olculen 69402 + 43 x 3 = 69531. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1573,7 +1575,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(69402, gezilen);
+        Assert.Equal(69531, gezilen);
         Assert.Empty(kayip);
     }
 

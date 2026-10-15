@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Cancelled",
   "main.convert-queue.summary": "{0} done, {1} failed, {2} cancelled.",
   "main.convert.note.webp-bitrate-ignored": "WebP has no bitrate mode: the bitrate value is ignored and the encoder's default quality is used.",
+  "main.convert.note.gif-target": "GIF source: frame rate, width and colour count are lowered until the output fits under the target size from Shrink.",
 
   "main.stage.encoding": "Encoding",
   "main.stage.converting": "Converting",
@@ -476,6 +477,7 @@
   "main.error.unusable": "This file cannot be used",
   "main.error.generic": "The operation could not be completed. The detail ffmpeg reported is below.",
   "main.error.disk-full": "The target drive ran out of space. Free some room, or write the output to another drive.",
+  "main.error.audio-only-shrink": "Shrink takes video only; this audio file is open in the Convert tab.",
   "main.error.encoder-container": "The chosen encoder and container do not fit together. Set the container to MP4 and the video codec to H.264, then try again.",
   "main.error.undecodable": "The source file could not be decoded; it may be damaged, or this ffmpeg build does not know the format.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "Image sequence output requires video encoding and cannot use stream copy.",
   "main.validation.no-audio-copy": "The source has no audio stream to copy.",
   "main.validation.no-audio-extract": "The source has no audio stream to extract.",
+  "main.validation.no-video-container": "The source has no video stream; choose an audio container.",
   "main.validation.trim-order": "The trim end must come after the trim start.",
   "main.validation.container-video-encoder": "The {0} container does not support the selected {1} video encoder.",
   "main.validation.container-audio-encoder": "The {0} container does not support the selected {1} audio encoder.",

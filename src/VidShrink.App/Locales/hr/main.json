@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Otkazano",
   "main.convert-queue.summary": "{0} gotovo, {1} neuspjelo, {2} otkazano.",
   "main.convert.note.webp-bitrate-ignored": "WebP nema način brzine prijenosa: vrijednost brzine prijenosa se zanemaruje i koristi se zadana kvaliteta kodera.",
+  "main.convert.note.gif-target": "GIF izvor: broj sličica u sekundi, širina i broj boja smanjuju se dok izlaz ne bude ispod ciljne veličine iz kartice „Smanji”.",
 
   "main.stage.encoding": "Kodiranje",
   "main.stage.converting": "Pretvorba",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Ova datoteka se ne može koristiti",
   "main.error.generic": "Operacija se nije mogla dovršiti. Detalj koji je ffmpeg javio je ispod.",
   "main.error.disk-full": "Na ciljnom disku je ponestalo prostora. Oslobodite mjesto ili zapišite izlaz na drugi disk.",
+  "main.error.audio-only-shrink": "„Smanji” prima samo video; ova zvučna datoteka otvorena je na kartici „Pretvori”.",
   "main.error.encoder-container": "Odabrani koder i spremnik ne idu zajedno. Postavite spremnik na MP4 i video kodek na H.264, pa pokušajte ponovno.",
   "main.error.undecodable": "Izvorna datoteka se nije mogla dekodirati; možda je oštećena ili ova verzija ffmpeg-a ne poznaje format.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "Izlaz kao niz slika zahtijeva kodiranje videa i ne može koristiti kopiranje toka.",
   "main.validation.no-audio-copy": "Izvornik nema zvučni tok za kopiranje.",
   "main.validation.no-audio-extract": "Izvornik nema zvučni tok za izdvajanje.",
+  "main.validation.no-video-container": "Izvor nema video tok; odaberite audio spremnik.",
   "main.validation.trim-order": "Kraj rezanja mora doći nakon početka rezanja.",
   "main.validation.container-video-encoder": "Spremnik {0} ne podržava odabrani video koder {1}.",
   "main.validation.container-audio-encoder": "Spremnik {0} ne podržava odabrani zvučni koder {1}.",

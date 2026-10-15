@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Zrušeno",
   "main.convert-queue.summary": "{0} hotovo, {1} s chybou, {2} zrušeno.",
   "main.convert.note.webp-bitrate-ignored": "WebP nemá režim datového toku: hodnota datového toku se ignoruje a použije se výchozí kvalita kodéru.",
+  "main.convert.note.gif-target": "Zdroj GIF: snímková frekvence, šířka a počet barev se snižují, dokud výstup neklesne pod cílovou velikost z karty „Zmenšit“.",
 
   "main.stage.encoding": "Kódování",
   "main.stage.converting": "Převod",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Tento soubor nelze použít",
   "main.error.generic": "Operaci se nepodařilo dokončit. Podrobnost hlášená ffmpeg je níže.",
   "main.error.disk-full": "Na cílovém disku došlo místo. Uvolněte místo nebo zapište výstup na jiný disk.",
+  "main.error.audio-only-shrink": "„Zmenšit“ přijímá jen video; tento zvukový soubor je otevřen na kartě „Převést“.",
   "main.error.encoder-container": "Zvolený enkodér a kontejner k sobě nepasují. Nastavte kontejner na MP4 a video kodek na H.264 a zkuste to znovu.",
   "main.error.undecodable": "Zdrojový soubor se nepodařilo dekódovat; může být poškozený nebo toto sestavení ffmpeg formát nezná.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "Výstup do sekvence obrázků vyžaduje kódování videa a nemůže použít kopii streamu.",
   "main.validation.no-audio-copy": "Zdroj nemá žádný zvukový stream ke kopírování.",
   "main.validation.no-audio-extract": "Zdroj nemá žádný zvukový stream k extrakci.",
+  "main.validation.no-video-container": "Zdroj nemá video stopu; zvolte zvukový kontejner.",
   "main.validation.trim-order": "Konec střihu musí být po začátku střihu.",
   "main.validation.container-video-encoder": "Kontejner {0} nepodporuje zvolený video enkodér {1}.",
   "main.validation.container-audio-encoder": "Kontejner {0} nepodporuje zvolený zvukový enkodér {1}.",

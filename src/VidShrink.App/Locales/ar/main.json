@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "أُلغي",
   "main.convert-queue.summary": "تم {0}، فشل {1}، أُلغي {2}.",
   "main.convert.note.webp-bitrate-ignored": "لا يدعم WebP وضع معدل البت: يتم تجاهل قيمة معدل البت وتُستخدم الجودة الافتراضية للمرمّز.",
+  "main.convert.note.gif-target": "مصدر GIF: يُخفَّض معدل الإطارات والعرض وعدد الألوان حتى يصبح الناتج أصغر من الحجم المستهدف في «تقليص».",
 
   "main.stage.encoding": "جارٍ الترميز",
   "main.stage.converting": "جارٍ التحويل",
@@ -476,6 +477,7 @@
   "main.error.unusable": "لا يمكن استخدام هذا الملف",
   "main.error.generic": "تعذر إتمام العملية. التفاصيل التي أبلغها ffmpeg أدناه.",
   "main.error.disk-full": "نفدت مساحة القرص الهدف. حرر بعض المساحة، أو اكتب الناتج إلى قرص آخر.",
+  "main.error.audio-only-shrink": "«تقليص» يقبل الفيديو فقط؛ ملف الصوت هذا مفتوح في تبويب «تحويل».",
   "main.error.encoder-container": "المرمّز والحاوية المختاران لا يتوافقان. اضبط الحاوية على MP4 وترميز الفيديو على H.264، ثم حاول مجدداً.",
   "main.error.undecodable": "تعذر فك ترميز ملف المصدر؛ قد يكون تالفاً، أو أن بناء ffmpeg هذا لا يعرف الصيغة.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "مخرج تسلسل الصور يتطلب ترميز الفيديو ولا يمكنه استخدام نسخ التدفق.",
   "main.validation.no-audio-copy": "المصدر بلا تدفق صوتي لنسخه.",
   "main.validation.no-audio-extract": "المصدر بلا تدفق صوتي لاستخراجه.",
+  "main.validation.no-video-container": "لا يحتوي المصدر على مسار فيديو؛ اختر حاوية صوت.",
   "main.validation.trim-order": "يجب أن تأتي نهاية القص بعد بدايته.",
   "main.validation.container-video-encoder": "الحاوية {0} لا تدعم مرمّز الفيديو المختار {1}.",
   "main.validation.container-audio-encoder": "الحاوية {0} لا تدعم مرمّز الصوت المختار {1}.",

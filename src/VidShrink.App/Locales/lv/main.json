@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Atcelts",
   "main.convert-queue.summary": "Gatavi {0}, neizdevās {1}, atcelti {2}.",
   "main.convert.note.webp-bitrate-ignored": "WebP nav bitu ātruma režīma: bitu ātruma vērtība tiek ignorēta un tiek izmantota kodētāja noklusējuma kvalitāte.",
+  "main.convert.note.gif-target": "GIF avots: kadru ātrums, platums un krāsu skaits tiek samazināts, līdz izvade ir mazāka par cilnes “Saspiest” mērķa izmēru.",
 
   "main.stage.encoding": "Kodē",
   "main.stage.converting": "Pārveido",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Šo failu nevar lietot",
   "main.error.generic": "Darbību neizdevās pabeigt. ffmpeg ziņotā informācija ir zemāk.",
   "main.error.disk-full": "Mērķa diskā beidzās vieta. Atbrīvojiet vietu vai rakstiet izvadi citā diskā.",
+  "main.error.audio-only-shrink": "“Saspiest” pieņem tikai video; šis audio fails ir atvērts cilnē “Pārveidot”.",
   "main.error.encoder-container": "Izvēlētais kodētājs un konteiners nesader. Iestatiet konteineru uz MP4 un video kodeku uz H.264, tad mēģiniet vēlreiz.",
   "main.error.undecodable": "Avota failu neizdevās dekodēt; tas var būt bojāts, vai šis ffmpeg būvējums nepazīst formātu.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "Izvade attēlu secībā prasa video kodēšanu un nevar lietot straumes kopiju.",
   "main.validation.no-audio-copy": "Avotam nav audio straumes, ko kopēt.",
   "main.validation.no-audio-extract": "Avotam nav audio straumes, ko izvilkt.",
+  "main.validation.no-video-container": "Avotā nav video straumes; izvēlieties audio konteineru.",
   "main.validation.trim-order": "Apgriešanas beigām jābūt pēc apgriešanas sākuma.",
   "main.validation.container-video-encoder": "Konteiners {0} neatbalsta izvēlēto video kodētāju {1}.",
   "main.validation.container-audio-encoder": "Konteiners {0} neatbalsta izvēlēto audio kodētāju {1}.",

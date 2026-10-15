@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Đã hủy",
   "main.convert-queue.summary": "{0} xong, {1} thất bại, {2} đã hủy.",
   "main.convert.note.webp-bitrate-ignored": "WebP không có chế độ bitrate: giá trị bitrate bị bỏ qua và chất lượng mặc định của bộ mã hóa được dùng.",
+  "main.convert.note.gif-target": "Nguồn GIF: tốc độ khung hình, chiều rộng và số màu được giảm cho đến khi đầu ra nhỏ hơn kích thước mục tiêu từ \"Nén\".",
 
   "main.stage.encoding": "Đang mã hóa",
   "main.stage.converting": "Đang chuyển đổi",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Không dùng được tệp này",
   "main.error.generic": "Không hoàn tất được thao tác. Chi tiết ffmpeg báo ở bên dưới.",
   "main.error.disk-full": "Ổ đích hết chỗ trống. Hãy giải phóng dung lượng, hoặc ghi đầu ra sang ổ khác.",
+  "main.error.audio-only-shrink": "\"Nén\" chỉ nhận video; tệp âm thanh này đang mở trong thẻ \"Chuyển đổi\".",
   "main.error.encoder-container": "Bộ mã hóa và định dạng chứa đã chọn không khớp nhau. Đặt định dạng chứa là MP4 và codec video là H.264, rồi thử lại.",
   "main.error.undecodable": "Không giải mã được tệp nguồn; có thể tệp hỏng, hoặc bản ffmpeg này không biết định dạng.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "Xuất chuỗi ảnh cần mã hóa video và không dùng được sao chép luồng.",
   "main.validation.no-audio-copy": "Nguồn không có luồng âm thanh để sao chép.",
   "main.validation.no-audio-extract": "Nguồn không có luồng âm thanh để trích.",
+  "main.validation.no-video-container": "Nguồn không có luồng video; hãy chọn một vùng chứa âm thanh.",
   "main.validation.trim-order": "Điểm kết thúc cắt phải sau điểm bắt đầu cắt.",
   "main.validation.container-video-encoder": "Định dạng chứa {0} không hỗ trợ bộ mã hóa video {1} đã chọn.",
   "main.validation.container-audio-encoder": "Định dạng chứa {0} không hỗ trợ bộ mã hóa âm thanh {1} đã chọn.",

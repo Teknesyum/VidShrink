@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Abgebrochen",
   "main.convert-queue.summary": "{0} fertig, {1} fehlgeschlagen, {2} abgebrochen.",
   "main.convert.note.webp-bitrate-ignored": "WebP hat keinen Bitratenmodus: Der Bitratenwert wird ignoriert und die Standardqualität des Encoders verwendet.",
+  "main.convert.note.gif-target": "GIF-Quelle: Bildrate, Breite und Farbanzahl werden gesenkt, bis die Ausgabe unter der Zielgröße aus „Verkleinern“ liegt.",
 
   "main.stage.encoding": "Kodierung",
   "main.stage.converting": "Konvertierung",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Diese Datei kann nicht verwendet werden",
   "main.error.generic": "Der Vorgang konnte nicht abgeschlossen werden. Die Meldung von ffmpeg steht unten.",
   "main.error.disk-full": "Das Ziellaufwerk ist voll. Schaffen Sie Platz oder schreiben Sie die Ausgabe auf ein anderes Laufwerk.",
+  "main.error.audio-only-shrink": "„Verkleinern“ nimmt nur Videos an; diese Audiodatei ist im Tab „Konvertieren“ geöffnet.",
   "main.error.encoder-container": "Der gewählte Encoder und der Container passen nicht zusammen. Stellen Sie den Container auf MP4 und den Video-Codec auf H.264 und versuchen Sie es erneut.",
   "main.error.undecodable": "Die Quelldatei konnte nicht dekodiert werden; sie ist womöglich beschädigt, oder dieser ffmpeg-Build kennt das Format nicht.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "Ausgabe als Bildsequenz erfordert Videokodierung und kann keine Stream-Kopie verwenden.",
   "main.validation.no-audio-copy": "Die Quelle hat keine Audiospur zum Kopieren.",
   "main.validation.no-audio-extract": "Die Quelle hat keine Audiospur zum Extrahieren.",
+  "main.validation.no-video-container": "Die Quelle hat keinen Videostream; wählen Sie einen Audiocontainer.",
   "main.validation.trim-order": "Das Schnittende muss nach dem Schnittstart liegen.",
   "main.validation.container-video-encoder": "Der Container {0} unterstützt den gewählten Video-Encoder {1} nicht.",
   "main.validation.container-audio-encoder": "Der Container {0} unterstützt den gewählten Audio-Encoder {1} nicht.",

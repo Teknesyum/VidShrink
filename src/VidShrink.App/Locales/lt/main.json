@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Atšaukta",
   "main.convert-queue.summary": "Atlikta {0}, nepavyko {1}, atšaukta {2}.",
   "main.convert.note.webp-bitrate-ignored": "WebP neturi bitų spartos režimo: bitų spartos reikšmė ignoruojama ir naudojama numatytoji kodavimo priemonės kokybė.",
+  "main.convert.note.gif-target": "GIF šaltinis: kadrų dažnis, plotis ir spalvų skaičius mažinami, kol išvestis tampa mažesnė už „Mažinti“ tikslinį dydį.",
 
   "main.stage.encoding": "Koduojama",
   "main.stage.converting": "Konvertuojama",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Šio failo naudoti negalima",
   "main.error.generic": "Operacijos nepavyko užbaigti. ffmpeg pranešta detalė žemiau.",
   "main.error.disk-full": "Tiksliniame diske baigėsi vieta. Atlaisvinkite vietos arba įrašykite išvestį į kitą diską.",
+  "main.error.audio-only-shrink": "„Mažinti“ priima tik vaizdo įrašus; šis garso failas atidarytas skirtuke „Konvertuoti“.",
   "main.error.encoder-container": "Pasirinktas koduotuvas ir konteineris nedera. Nustatykite konteinerį MP4, vaizdo kodeką H.264 ir bandykite dar kartą.",
   "main.error.undecodable": "Šaltinio failo nepavyko dekoduoti; jis gali būti sugadintas arba ši ffmpeg versija nežino formato.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "Išvestis vaizdų seka reikalauja vaizdo kodavimo ir negali naudoti srauto kopijos.",
   "main.validation.no-audio-copy": "Šaltinis neturi garso srauto, kurį būtų galima kopijuoti.",
   "main.validation.no-audio-extract": "Šaltinis neturi garso srauto, kurį būtų galima išgauti.",
+  "main.validation.no-video-container": "Šaltinyje nėra vaizdo srauto; pasirinkite garso konteinerį.",
   "main.validation.trim-order": "Apkirpimo pabaiga turi būti po apkirpimo pradžios.",
   "main.validation.container-video-encoder": "{0} konteineris nepalaiko pasirinkto {1} vaizdo koduotuvo.",
   "main.validation.container-audio-encoder": "{0} konteineris nepalaiko pasirinkto {1} garso koduotuvo.",

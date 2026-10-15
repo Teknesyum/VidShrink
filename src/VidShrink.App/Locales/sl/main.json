@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Preklicano",
   "main.convert-queue.summary": "{0} končanih, {1} neuspešnih, {2} preklicanih.",
   "main.convert.note.webp-bitrate-ignored": "WebP nima načina bitne hitrosti: vrednost bitne hitrosti se prezre in uporabi se privzeta kakovost kodirnika.",
+  "main.convert.note.gif-target": "Vir GIF: hitrost sličic, širina in število barv se znižujejo, dokler izhod ni pod ciljno velikostjo iz zavihka »Skrči«.",
 
   "main.stage.encoding": "Kodiranje",
   "main.stage.converting": "Pretvarjanje",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Te datoteke ni mogoče uporabiti",
   "main.error.generic": "Operacije ni bilo mogoče dokončati. Podrobnost, ki jo je sporočil ffmpeg, je spodaj.",
   "main.error.disk-full": "Na ciljnem pogonu je zmanjkalo prostora. Sprostite prostor ali zapišite izhod na drug pogon.",
+  "main.error.audio-only-shrink": "»Skrči« sprejme samo video; ta zvočna datoteka je odprta na zavihku »Pretvori«.",
   "main.error.encoder-container": "Izbrani kodirnik in vsebnik ne sodita skupaj. Nastavite vsebnik na MP4 in video kodek na H.264, nato poskusite znova.",
   "main.error.undecodable": "Izvorne datoteke ni bilo mogoče dekodirati; morda je poškodovana ali pa ta gradnja ffmpeg ne pozna oblike.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "Izhod kot zaporedje slik zahteva kodiranje videa in ne more uporabiti kopiranja toka.",
   "main.validation.no-audio-copy": "Vir nima zvočnega toka za kopiranje.",
   "main.validation.no-audio-extract": "Vir nima zvočnega toka za izvlečenje.",
+  "main.validation.no-video-container": "Vir nima video toka; izberite zvočni vsebnik.",
   "main.validation.trim-order": "Konec obrezovanja mora biti za začetkom obrezovanja.",
   "main.validation.container-video-encoder": "Vsebnik {0} ne podpira izbranega video kodirnika {1}.",
   "main.validation.container-audio-encoder": "Vsebnik {0} ne podpira izbranega zvočnega kodirnika {1}.",

@@ -2,9 +2,9 @@
 
 public enum ConversionQualityMode { Crf, Bitrate }
 
-public enum ConversionNote { WebpBitrateIgnored }
+public enum ConversionNote { WebpBitrateIgnored, GifFitsTarget }
 
-public sealed class ConversionPlan
+public sealed record ConversionPlan
 {
     public string Container { get; init; } = "mp4";
     public string VideoCodec { get; init; } = "libx264";
@@ -50,4 +50,10 @@ public sealed class ConversionPlan
 
     /// <summary>Çıktı ses akışı taşıyor mu. GIF, hareketli görsel ve resim dizisi taşımaz; ses seçimi orada okunmaz.</summary>
     public bool CarriesAudio => !Gif && !AnimatedImage && !ImageSequenceOutput;
+
+    /// <summary>GIF kaynaktan GIF çıktıda hedef boyut; <see cref="GifPalette.FitAsync"/> bunun altına iner. Öteki planlarda okunmaz.</summary>
+    public long? TargetBytes { get; init; }
+
+    /// <summary>GIF paletinin renk sayısı (<c>palettegen=max_colors</c>); <c>null</c> 256.</summary>
+    public int? GifColors { get; init; }
 }

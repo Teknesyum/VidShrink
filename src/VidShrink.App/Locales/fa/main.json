@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "لغو شد",
   "main.convert-queue.summary": "{0} انجام شد، {1} ناموفق، {2} لغو شد.",
   "main.convert.note.webp-bitrate-ignored": "WebP حالت نرخ بیت ندارد: مقدار نرخ بیت نادیده گرفته می‌شود و کیفیت پیش‌فرض رمزگذار به کار می‌رود.",
+  "main.convert.note.gif-target": "منبع GIF: نرخ فریم، عرض و تعداد رنگ‌ها کاهش می‌یابد تا خروجی از اندازهٔ هدف «فشرده‌سازی» کوچک‌تر شود.",
 
   "main.stage.encoding": "رمزگذاری",
   "main.stage.converting": "تبدیل",
@@ -476,6 +477,7 @@
   "main.error.unusable": "این فایل قابل‌استفاده نیست",
   "main.error.generic": "عملیات کامل نشد. جزئیاتی که ffmpeg گزارش داد در زیر است.",
   "main.error.disk-full": "فضای درایو مقصد تمام شد. کمی فضا آزاد کنید یا خروجی را روی درایو دیگری بنویسید.",
+  "main.error.audio-only-shrink": "«فشرده‌سازی» فقط ویدیو می‌پذیرد؛ این فایل صوتی در زبانهٔ «تبدیل» باز است.",
   "main.error.encoder-container": "رمزگذار و قالب انتخابی با هم سازگار نیستند. قالب را MP4 و کدک ویدیو را H.264 بگذارید و دوباره تلاش کنید.",
   "main.error.undecodable": "فایل منبع رمزگشایی نشد؛ شاید آسیب دیده یا این نسخهٔ ffmpeg قالب را نمی‌شناسد.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "خروجی دنباله تصویر به رمزگذاری ویدیو نیاز دارد و نمی‌تواند از کپی جریان استفاده کند.",
   "main.validation.no-audio-copy": "منبع جریان صدایی برای کپی ندارد.",
   "main.validation.no-audio-extract": "منبع جریان صدایی برای استخراج ندارد.",
+  "main.validation.no-video-container": "منبع جریان ویدیویی ندارد؛ یک قالب صوتی انتخاب کنید.",
   "main.validation.trim-order": "پایان برش باید پس از آغاز برش باشد.",
   "main.validation.container-video-encoder": "قالب {0} رمزگذار ویدیوی انتخابی {1} را پشتیبانی نمی‌کند.",
   "main.validation.container-audio-encoder": "قالب {0} رمزگذار صدای انتخابی {1} را پشتیبانی نمی‌کند.",

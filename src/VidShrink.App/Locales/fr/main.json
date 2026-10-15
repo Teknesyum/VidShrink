@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Annulé",
   "main.convert-queue.summary": "{0} terminés, {1} en échec, {2} annulés.",
   "main.convert.note.webp-bitrate-ignored": "WebP n'a pas de mode débit : la valeur de débit est ignorée et la qualité par défaut de l'encodeur est utilisée.",
+  "main.convert.note.gif-target": "Source GIF : la fréquence d'images, la largeur et le nombre de couleurs sont réduits jusqu'à ce que la sortie passe sous la taille cible de « Réduire ».",
 
   "main.stage.encoding": "Encodage",
   "main.stage.converting": "Conversion",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Ce fichier ne peut pas être utilisé",
   "main.error.generic": "L'opération n'a pas pu aboutir. Le détail rapporté par ffmpeg est ci-dessous.",
   "main.error.disk-full": "Le lecteur cible est plein. Libérez de l'espace, ou écrivez la sortie sur un autre lecteur.",
+  "main.error.audio-only-shrink": "« Réduire » n'accepte que la vidéo ; ce fichier audio est ouvert dans l'onglet « Convertir ».",
   "main.error.encoder-container": "L'encodeur et le conteneur choisis ne vont pas ensemble. Mettez le conteneur en MP4 et le codec vidéo en H.264, puis réessayez.",
   "main.error.undecodable": "Le fichier source n'a pas pu être décodé ; il est peut-être endommagé, ou cette version de ffmpeg ne connaît pas le format.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "La sortie en séquence d'images exige un encodage vidéo et ne peut pas utiliser la copie de flux.",
   "main.validation.no-audio-copy": "La source n'a aucun flux audio à copier.",
   "main.validation.no-audio-extract": "La source n'a aucun flux audio à extraire.",
+  "main.validation.no-video-container": "La source n'a pas de flux vidéo ; choisissez un conteneur audio.",
   "main.validation.trim-order": "La fin de coupe doit venir après le début de coupe.",
   "main.validation.container-video-encoder": "Le conteneur {0} ne prend pas en charge l'encodeur vidéo {1} choisi.",
   "main.validation.container-audio-encoder": "Le conteneur {0} ne prend pas en charge l'encodeur audio {1} choisi.",

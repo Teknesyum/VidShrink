@@ -693,6 +693,14 @@ public sealed class EncodeRunner
                 var palettePath = Path.Combine(Path.GetTempPath(), $"vidshrink_{Guid.NewGuid():N}.png");
                 try
                 {
+                    if (plan.TargetBytes > 0)
+                    {
+                        await GifPalette.FitAsync(info, plan, partialPath, palettePath,
+                            (args, palette) => RunCommandAsync(args, duration, progress, palette ? "GIF palette 1/2" : "GIF encode 2/2", palette ? 0 : 0.35, palette ? 0.35 : 1, ct),
+                            path => new FileInfo(path).Length, EncoderCapabilities.Instance);
+                        File.Move(partialPath, outputPath, overwrite: true);
+                        return new ConversionResult(outputPath, Megabayt.Oku(new FileInfo(outputPath).Length));
+                    }
                     await RunCommandAsync(ConversionArguments.Build(info, plan, palettePath, availability: EncoderCapabilities.Instance), duration, progress, "GIF palette 1/2", 0, 0.35, ct);
                     await RunCommandAsync(ConversionArguments.Build(info, plan, partialPath, palettePath, EncoderCapabilities.Instance), duration, progress, "GIF encode 2/2", 0.35, 1, ct);
                 }

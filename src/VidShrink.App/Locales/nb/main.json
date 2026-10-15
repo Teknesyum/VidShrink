@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Avbrutt",
   "main.convert-queue.summary": "{0} ferdige, {1} mislyktes, {2} avbrutt.",
   "main.convert.note.webp-bitrate-ignored": "WebP har ingen bitrate-modus: bitrate-verdien ignoreres, og koderens standardkvalitet brukes.",
+  "main.convert.note.gif-target": "GIF-kilde: bildefrekvens, bredde og antall farger senkes til utdataene er under målstørrelsen fra «Krymp».",
 
   "main.stage.encoding": "Koder",
   "main.stage.converting": "Konverterer",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Denne filen kan ikke brukes",
   "main.error.generic": "Operasjonen kunne ikke fullføres. Detaljen ffmpeg rapporterte står nedenfor.",
   "main.error.disk-full": "Målstasjonen gikk tom for plass. Frigjør plass, eller skriv utdata til en annen stasjon.",
+  "main.error.audio-only-shrink": "«Krymp» tar bare video; denne lydfilen er åpnet i fanen «Konverter».",
   "main.error.encoder-container": "Valgt koder og beholder passer ikke sammen. Sett beholderen til MP4 og videokodeken til H.264, og prøv igjen.",
   "main.error.undecodable": "Kildefilen kunne ikke dekodes; den kan være skadet, eller denne ffmpeg-versjonen kjenner ikke formatet.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "Utdata som bildesekvens krever videokoding og kan ikke bruke strømkopi.",
   "main.validation.no-audio-copy": "Kilden har ingen lydstrøm å kopiere.",
   "main.validation.no-audio-extract": "Kilden har ingen lydstrøm å hente ut.",
+  "main.validation.no-video-container": "Kilden har ingen videostrøm; velg en lydbeholder.",
   "main.validation.trim-order": "Klippeslutten må komme etter klippestarten.",
   "main.validation.container-video-encoder": "Beholderen {0} støtter ikke valgt videokoder {1}.",
   "main.validation.container-audio-encoder": "Beholderen {0} støtter ikke valgt lydkoder {1}.",

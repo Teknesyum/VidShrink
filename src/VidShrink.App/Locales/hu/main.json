@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Megszakítva",
   "main.convert-queue.summary": "{0} kész, {1} sikertelen, {2} megszakítva.",
   "main.convert.note.webp-bitrate-ignored": "A WebP-nek nincs bitráta módja: a bitráta értékét figyelmen kívül hagyja, és a kódoló alapértelmezett minőségét használja.",
+  "main.convert.note.gif-target": "GIF-forrás: a képkockasebesség, a szélesség és a színek száma addig csökken, amíg a kimenet a „Tömörítés” célmérete alá nem kerül.",
 
   "main.stage.encoding": "Kódolás",
   "main.stage.converting": "Konvertálás",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Ez a fájl nem használható",
   "main.error.generic": "A műveletet nem sikerült befejezni. Az ffmpeg által jelentett részlet alább látható.",
   "main.error.disk-full": "A célmeghajtón elfogyott a hely. Szabadítson fel helyet, vagy írja a kimenetet másik meghajtóra.",
+  "main.error.audio-only-shrink": "A „Tömörítés” csak videót fogad; ez a hangfájl a „Konvertálás” lapon van megnyitva.",
   "main.error.encoder-container": "A kiválasztott kódoló és konténer nem illik össze. Állítsa a konténert MP4-re és a videokodeket H.264-re, majd próbálja újra.",
   "main.error.undecodable": "A forrásfájlt nem sikerült dekódolni; sérült lehet, vagy ez az ffmpeg-változat nem ismeri a formátumot.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "A képsorozat kimenet videokódolást igényel, adatfolyam-másolás nem használható.",
   "main.validation.no-audio-copy": "A forrásnak nincs másolható hangsávja.",
   "main.validation.no-audio-extract": "A forrásnak nincs kinyerhető hangsávja.",
+  "main.validation.no-video-container": "A forrásnak nincs videosávja; válasszon hangtárolót.",
   "main.validation.trim-order": "A vágás végének a vágás kezdete után kell lennie.",
   "main.validation.container-video-encoder": "A(z) {0} konténer nem támogatja a kiválasztott {1} videokódolót.",
   "main.validation.container-audio-encoder": "A(z) {0} konténer nem támogatja a kiválasztott {1} hangkódolót.",

@@ -159,7 +159,8 @@ public sealed class DonusturEksikleriTests
     public void NotAnahtariKirkIkiDildeCevrili()
     {
         var anahtarlar = Enum.GetValues<ConversionNote>().Select(MainWindow.ConversionNoteKey).ToList();
-        Assert.Equal(new[] { NotAnahtari }, anahtarlar);
+        var adlar = new Dictionary<string, string> { [NotAnahtari] = "WebP", ["main.convert.note.gif-target"] = "GIF" };
+        Assert.Equal(adlar.Keys, anahtarlar);
 
         var english = Locales.Domain("en", "main");
         Assert.Equal(42, Locales.Languages.Count);
@@ -167,9 +168,12 @@ public sealed class DonusturEksikleriTests
         foreach (var language in Locales.Languages)
         {
             var values = Locales.Domain(language, "main");
-            if (!values.TryGetValue(NotAnahtari, out var value) || string.IsNullOrWhiteSpace(value)) eksik.Add($"{language}: yok");
-            else if (language != "en" && value == english[NotAnahtari]) eksik.Add($"{language}: cevrilmemis");
-            else if (!value.Contains("WebP", StringComparison.Ordinal)) eksik.Add($"{language}: WebP adi yok");
+            foreach (var (anahtar, ad) in adlar)
+            {
+                if (!values.TryGetValue(anahtar, out var value) || string.IsNullOrWhiteSpace(value)) eksik.Add($"{language} {anahtar}: yok");
+                else if (language != "en" && value == english[anahtar]) eksik.Add($"{language} {anahtar}: cevrilmemis");
+                else if (!value.Contains(ad, StringComparison.Ordinal)) eksik.Add($"{language} {anahtar}: {ad} adi yok");
+            }
         }
 
         Assert.True(eksik.Count == 0, string.Join(Environment.NewLine, eksik));
