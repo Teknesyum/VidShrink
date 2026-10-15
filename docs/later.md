@@ -85,14 +85,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.Core/RecorderChapters.cs, src/VidShrink.Core/StreamMapping.cs, src/VidShrink.Core/ConversionPlan.cs, src/VidShrink.Core/ConversionArguments.cs, src/VidShrink.App/MainWindow.axaml, src/VidShrink.Cli/CliRequest.cs
 - Plan: Üçü de Dönüştür'de "Kopyala" seçiliyken, yani yeniden kodlamadan yapılır; sırayla ayrı ayrı teslim edilebilir. Etiket için "Meta veriyi sil" kutusunun yanına başlık, sanatçı, yıl, açıklama ve kapak alanları gelir; bölüm için kaydedicinin bölüm yazan yolu ortak hâle getirilir ve kaynağın bölümleri eklenip adlandırılıp silinebilen liste olur; onarma için akışları kopyalayan, bozuk zaman damgasını hoş gören bayraklarla "Onar" hazır ayarı eklenir. Doğrulama: MetaSilDonusturTests ve KayitBolumIsaretiTests'teki gibi ffprobe ile etiket ve bölüm okunur; boş alan anahtarı hiç yazmaz.
 
-## 46. Altyazı Biçemi Ve Kare Kaydı
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · OYA-P10 · Oynatıcı · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (OYA-P10): OYA-27 ASS biçemini geçersiz kılma; OYA-33 İşitme engelli notlarını ayıklama; OYA-34 Altyazı yazı tipi seçimi; OYA-43 Altyazılı kare kaydı. [Tablo](piyasa/2026-10-13/oynatici-cekirdek-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Player/MpvEngine.Advanced.cs, src/VidShrink.Player/MpvEngine.cs, src/VidShrink.App/Playback/PlayerView.Advanced.cs, src/VidShrink.App/Playback/PlayerAdvancedPanel.axaml.cs, src/VidShrink.App/Playback/PlayerSettings.cs
-- Plan: Önce ölçüm: biçemli (ASS) bir altyazıda bugünkü yazı tipi ve renk ayarının uygulanıp uygulanmadığı görülür; uygulanmıyorsa `sub-ass-override` anahtarı eklenir. Yazı tipi listesi üç genel aileden sistem yazı tiplerine genişler, `sub-filter-sdh` ile işitme engelli notlarını gizleme anahtarı gelir. Kare kaydına altyazıyla kaydetme seçeneği eklenir: `screenshot-to-file` komutunun son değeri `video` yerine `subtitles` olur (MpvEngine.cs:538). Doğrulama: ASS örneğinde biçem geri okuması, altyazılı ve altyazısız karenin piksel farkı.
-
 ## 47. Doldurma Ve Dokunmatik Hareketler
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · OYA-P11 · Oynatıcı · iş orta · öncelik 2 · karar gerekmez
@@ -149,14 +141,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.App/Editing/EditorView.Kaynak.cs, src/VidShrink.App/Editing/EditorView.axaml, src/VidShrink.App/Editing/EditorTimeline.cs, src/VidShrink.Core/Editing/EditTimeline.cs, src/VidShrink.Core/Editing/EditProject.cs, src/VidShrink.App/Locales/, tests/VidShrink.Tests/DuzenleyiciCokKaynakTests.cs
 - Plan: Projeye alınan kaynaklar bir listede görünür (proje dosyası ek kaynakları zaten tutuyor: EditProject.cs:68); listeden çizelgeye sürüklenen klip bırakıldığı yere girer. Araya ekleme sonraki klipleri iter, üstüne yazma aynı süreyi silip yerine koyar (aralık silme hazır: EditTimeline.cs:148). Dosya ekleyince çizelgenin sonuna gitme davranışı varsayılan kalır, o yüzden karar gerekmez. Doğrulama: DuzenleyiciCokKaynakTests'e iki kipin süre ve sıra ölçüleri.
 
-## 56. Kuyrukta Zamanlama, Düzenleme Ve Bitiş
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · SIK-P7 · Küçült · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (SIK-P7): SIK-07 Zamanlanmış başlatma; SIK-08 Kuyruktaki işi düzenleme; SIK-09 Bitince uygulamadan çık; SIK-10 Bildirim sesi. [Tablo](piyasa/2026-10-13/kucult-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/ShrinkJobWindow.axaml, src/VidShrink.App/ShrinkJobWindow.axaml.cs, src/VidShrink.Core/JobPump.cs, src/VidShrink.App/QueueEndActions.cs, src/VidShrink.App/IsBittiBildirimi.cs, src/VidShrink.App/AppSettings.cs, src/VidShrink.App/Locales/
-- Plan: Kuyruk penceresine "şu saatte başlat" ve "şu kadar sonra başlat" seçimi eklenir; pompa o ana dek duraklatılmış bekler ve var olan geri sayım satırı kalan süreyi gösterir. Bekleyen iş satırına düzenle düğmesi gelir: iş kuyruktan çıkmadan hedefi ve ayarı değiştirilir. Bitince eylemlerine uygulamadan çık eklenir ve Ayarlar'a varsayılan kapalı bir bitiş sesi kutusu konur; işçi önce bugünkü Windows balonunun ses çalıp çalmadığını ölçer. Doğrulama: sahte saatle zamanlama testi, düzenlenen işin yeni ayarla koştuğunu ölçen pompa testi, yeni eylemin seçilip saklandığını ölçen test.
-
 ## 57. Önizlemede Elle Kırpma
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · SIK-P8 · Küçült · iş orta · öncelik 2 · karar gerekmez
@@ -164,14 +148,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (SIK-P8): SIK-12 Görsel elle kırpma. [Tablo](piyasa/2026-10-13/kucult-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.App/MainWindow.axaml (önizleme alanı ve `ChkFltAutoCrop` çevresi), src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.Core/VideoFilterChain.cs, src/VidShrink.App/Locales/
 - Plan: Önizleme karesinin üstüne tutamaçlı bir dikdörtgen çizilir; kullanıcı fareyle sürükler, sonuç kaynak pikseline çevrilip var olan `crop` süzgeç yoluna yazılır (`src/VidShrink.Core/VideoFilterChain.cs:330`). Elle kırpma seçiliyken otomatik siyah bant kırpma kapanır; genişlik ve yükseklik kodlayıcının istediği çift sayıya yuvarlanır. Doğrulama: ekran koordinatından kaynak pikseline çeviriyi ölçen test ve çıktı çözünürlüğünü ffprobe ile okuyan test.
-
-## 59. Dönüştür'de Görüntü Süzgeçleri
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DON-P10 · Dönüştür · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (DON-P10): DON-14 Dönüştür'de görüntü süzgeçleri; DON-41 Sabit ve değişken kare hızı seçimi; DON-43 Ölçekleme algoritması ve dolgu. [Tablo](piyasa/2026-10-13/donustur-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/ConversionArguments.cs, src/VidShrink.Core/ConversionPlan.cs, src/VidShrink.Core/VideoFilterChain.cs, src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.App/Locales/, tests/VidShrink.Tests/
-- Plan: DON-P3'ün bağladığı zincire dayanır. Dönüştür paneline kırpma, döndürme, tarama çözme ve gürültü azaltma seçimleri konur; değerler Küçült'teki süzgeç seçeneklerine yazılır (`VideoFilterChain.cs:63`). Sabit ya da değişken kare hızı seçimi (`VideoFilterChain.cs:379`) ve siyah bantla dolgu (`VideoFilterChain.cs:347`) aynı zincirden gelir; ölçekleme algoritması zincire yeni bir alan olarak eklenir. Doğrulama: zincir sırası testleri ve kopya kipinde süzgeç seçilince yeniden kodlamaya geçiş testi.
 
 ## 60. Kodlayıcı, HDR Ve Renk Ayarları
 
@@ -277,14 +253,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (EKB-P12): EKB-19 En-boy ön ayarı. [Tablo](piyasa/2026-10-13/kaydedici-sunum-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Core/Editing/ClipEffects.cs, src/VidShrink.Core/Editing/ClipFilters.cs, src/VidShrink.App/Editing/EditorView.Klip.cs, src/VidShrink.App/Locales/
 - Plan: Düzenleyicideki en-boy ön ayarları bugün ortadan kırpıyor (EditorView.Klip.cs:17, ClipEffects.cs:96-113). Yanına "sığdır" kipi eklenir: kare `scale` ile küçültülür, kalan alan `pad` ile seçilen düz renkle doldurulur; bu ikili dışa aktarımda zaten var (ClipFilters.cs:60-61). Çıktı boyutu ve dolgu pikseli düzenleyicinin dışa aktarım testlerinde ölçülür.
-
-## 74. Güncelleme, Hakkında Ve Tanılama
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · AYR-P3 · Ayarlar Ve Kabuk · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (AYR-P3): AYR-06 Yenilikler Ekranı; AYR-07 Hata Bildirme Yolu; AYR-10 Uygulama İçi Günlük Görüntüleyici; AYR-47 Elle Güncelleme Denetimi; AYR-11 Lisanslar Sayfası; AYR-27 Tanılama Paketi; AYR-29 Gizlilik Beyanı Bağlantısı. [Tablo](piyasa/2026-10-13/ayarlar-kabuk-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.App/MainWindow.Guncelleme.cs, src/VidShrink.Core/Gunluk.cs, .github/ISSUE_TEMPLATE/, src/VidShrink.App/Locales/
-- Plan: Güncelleme kartına otomatik güncelleme açıkken de çalışan "şimdi denetle" düğmesi ve son denetimin sonucu eklenir; güncellemeden sonraki ilk açılışta sürüm notlarına giden kısa bir bildirim gösterilir. Hakkında'ya sürüm notları, lisanslar ve gizlilik beyanı bağlantıları konur. Tanılama kartında günlük uygulama içinde okunur ve kopyalanır; "hata bildir" düğmesi sürümü, işletim sistemini ve günlük yolunu taşıyan hazır kaydı açar, yanındaki düğme günlüğü ve sistem bilgisini tek zip'e toplar. Doğrulama: her düğmenin açtığı adresi ve ürettiği metni ölçen testler ile 42 dilde dizgi tamlığı testi.
 
 ## 76. Uzun İşte Öncelik, Bildirim Ve Ses
 
