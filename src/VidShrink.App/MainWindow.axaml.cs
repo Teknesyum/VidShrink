@@ -173,6 +173,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         AcilisIzi.Yaz("xaml");
         _controlsReady = true;
+        TxtLastCheck.Text = Say("main.about.check.never");
         TxtResult.PropertyChanged += (_, e) =>
         {
             if (e.Property != TextBlock.TextProperty || TxtResult.Text is not { Length: > 0 } yazi) return;
