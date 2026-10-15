@@ -43,7 +43,14 @@ internal partial class EditorView
         CmbExportMode.SelectionChanged += (_, _) => MarkEdited();
         MnuProjectSave.Click += (_, _) => _ = SaveProjectClickedAsync();
         MnuProjectOpen.Click += (_, _) => _ = OpenProjectClickedAsync();
-        TimelineMenu.Opening += (_, _) => MnuProjectSave.IsEnabled = _model is not null && _stamp is not null;
+        MnuCutListExport.Click += (_, _) => _ = ExportCutListClickedAsync();
+        MnuCutListImport.Click += (_, _) => _ = ImportCutListClickedAsync();
+        TimelineMenu.Opening += (_, _) =>
+        {
+            MnuProjectSave.IsEnabled = _model is not null && _stamp is not null;
+            MnuCutListExport.IsEnabled = _model is { Clips.Count: > 0 };
+            MnuCutListImport.IsEnabled = _model is not null && !Exporting;
+        };
     }
 
     private void AttachProject()
@@ -238,4 +245,102 @@ internal partial class EditorView
 
     private static FilePickerFileType ProjectFileType()
         => new("VidShrink") { Patterns = new[] { "*" + EditProject.Extension } };
+
+    /// <summary>
+    /// Cizelgeyi uzantinin bicimindeki kesim listesine yazar (<see cref="CutList"/>): <c>.csv</c>, <c>.edl</c>, YouTube
+    /// bolumleri icin <c>.txt</c>, Premiere Pro ve DaVinci Resolve icin Final Cut <c>.xml</c>. Adsiz bolum yerel
+    /// "Bolum {0}" adini alir.
+    /// </summary>
+    internal bool ExportCutListTo(string path)
+    {
+        if (_model is not { Clips.Count: > 0 } model || CutList.FormatOf(path) is not { } format || !CutList.CanWrite(format)) return false;
+        var info = _source is { } source ? KnownInfo?.Invoke(source) : null;
+        var context = new CutListContext(SourcePaths, MonitorFps)
+        {
+            Width = info?.Width ?? 0,
+            Height = info?.Height ?? 0,
+            HasAudio = info?.HasAudio ?? true,
+            ChapterTitle = Strings.Get("mediainfo.section.chapter"),
+            Title = _source is { } named ? Path.GetFileNameWithoutExtension(named) : null
+        };
+        bool ok;
+        try
+        {
+            File.WriteAllText(path, CutList.Write(format, model, context));
+            ok = true;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            ok = false;
+        }
+
+        ShowProjectStatus(ok ? "StatusSuccess" : "StatusError",
+            string.Format(Strings.Culture, Strings.Get(ok ? "editor.cutlist.exported" : "editor.cutlist.failed"), path));
+        return ok;
+    }
+
+    /// <summary>
+    /// CSV, EDL ya da CUE listesindeki araliklari ilk kaynaktan parca olarak cizelgenin yerine koyar; metinler ve muzik
+    /// kalir. Tek geri alma adimidir. Okunamayan ya da gecerli araligi kalmayan liste cizelgeye dokunmaz.
+    /// </summary>
+    internal bool ImportCutListFrom(string path)
+    {
+        if (_model is not { } model || Exporting) return false;
+        IReadOnlyList<CutListEntry>? entries = null;
+        if (CutList.FormatOf(path) is { } format && CutList.CanRead(format) && model.SourceDuration is { } duration)
+        {
+            try
+            {
+                entries = CutList.Read(format, File.ReadAllText(path), MonitorFps, duration);
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+            {
+                entries = null;
+            }
+        }
+
+        if (entries is null)
+        {
+            ShowProjectStatus("StatusError", string.Format(Strings.Culture, Strings.Get("editor.cutlist.unreadable"), path));
+            return false;
+        }
+
+        var clips = CutList.ToClips(entries);
+        Apply(m => m.Restore(clips, m.Texts), 0, reload: true);
+        ShowProjectStatus("StatusSuccess", string.Format(Strings.Culture, Strings.Get("editor.cutlist.imported"), clips.Count));
+        return true;
+    }
+
+    private async Task ExportCutListClickedAsync()
+    {
+        if (_model is null || _source is not { } source) return;
+        if (TopLevel.GetTopLevel(this)?.StorageProvider is not { } storage) return;
+        var file = await storage.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = Strings.Get("editor.cutlist.export"),
+            SuggestedFileName = Path.GetFileNameWithoutExtension(source) + ".csv",
+            DefaultExtension = "csv",
+            ShowOverwritePrompt = true,
+            FileTypeChoices = new[]
+            {
+                new FilePickerFileType("CSV") { Patterns = new[] { "*.csv" } },
+                new FilePickerFileType("EDL") { Patterns = new[] { "*.edl" } },
+                new FilePickerFileType(Strings.Get("editor.cutlist.youtube")) { Patterns = new[] { "*.txt" } },
+                new FilePickerFileType("XML") { Patterns = new[] { "*.xml" } }
+            }
+        }).ConfigureAwait(true);
+        if (file?.TryGetLocalPath() is { } path) ExportCutListTo(path);
+    }
+
+    private async Task ImportCutListClickedAsync()
+    {
+        if (TopLevel.GetTopLevel(this)?.StorageProvider is not { } storage) return;
+        var files = await storage.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = Strings.Get("editor.cutlist.import"),
+            AllowMultiple = false,
+            FileTypeFilter = new[] { new FilePickerFileType(Strings.Get("editor.cutlist.files")) { Patterns = new[] { "*.csv", "*.edl", "*.cue" } } }
+        }).ConfigureAwait(true);
+        if (files.Count > 0 && files[0].TryGetLocalPath() is { } path) ImportCutListFrom(path);
+    }
 }
