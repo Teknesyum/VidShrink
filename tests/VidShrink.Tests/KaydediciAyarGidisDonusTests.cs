@@ -33,6 +33,7 @@ public sealed class KaydediciAyarGidisDonusTests
         ["Codec"] = "libx265",
         ["Preset"] = "slow",
         ["ColorRange"] = "jpeg",
+        ["AudioCodec"] = "libopus",
         ["Hotkeys"] = "2:F1,2:F2,2:F3,2:F4,2:F5,2:F6"
     };
 

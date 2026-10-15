@@ -111,7 +111,8 @@ internal partial class RecorderView
     {
         RecorderTargetKind.Screen,
         RecorderTargetKind.Window,
-        RecorderTargetKind.Region
+        RecorderTargetKind.Region,
+        RecorderTargetKind.AudioOnly
     }.Select(TargetLabel).ToList();
 
     /// <summary>
@@ -129,6 +130,7 @@ internal partial class RecorderView
     {
         RecorderTargetKind.Window => Say("recorder.target.window"),
         RecorderTargetKind.Region => Say("recorder.target.region"),
+        RecorderTargetKind.AudioOnly => Say("recorder.target.audio"),
         _ => Say("recorder.target.screen")
     };
 
@@ -156,7 +158,9 @@ internal partial class RecorderView
     /// </para>
     /// </summary>
     internal RecorderRequest? BuildRequest(bool applyAuto = true)
-        => ReadAdvanced() && BuildChosen(applyAuto) is { } request ? WithPreview(FitToCodec(request)) : null;
+        => ReadAdvanced() && BuildChosen(applyAuto) is { } request
+            ? request.Target == RecorderTargetKind.AudioOnly ? request with { PreviewPath = null } : WithPreview(FitToCodec(request))
+            : null;
 
     private RecorderRequest? BuildChosen(bool applyAuto)
     {
@@ -175,6 +179,7 @@ internal partial class RecorderView
         if (AudioPlan() is not { } audio) return null;
 
         var target = SelectedTarget;
+        var audioOnly = target == RecorderTargetKind.AudioOnly;
         RecorderRegion? region = null;
 
         if (target == RecorderTargetKind.Region)
@@ -199,11 +204,12 @@ internal partial class RecorderView
         {
             Region = region,
             Audio = audio,
-            Webcam = ChosenWebcam(),
+            Webcam = audioOnly ? null : ChosenWebcam(),
             Container = _settings.Container,
+            AudioCodec = ChosenAudioCodec(_settings.Container),
             ScreenIndex = ScreenFor(target, region),
             Screens = Monitors(),
-            PrivacyMasks = _settings.PrivacyMasks.ToArray(),
+            PrivacyMasks = audioOnly ? Array.Empty<RecorderRegion>() : _settings.PrivacyMasks.ToArray(),
             Scale = _settings.Scale,
             KeyframeSeconds = _settings.KeyframeSeconds,
             Profile = string.IsNullOrWhiteSpace(_settings.Profile) ? null : _settings.Profile,
@@ -230,6 +236,13 @@ internal partial class RecorderView
         if (!ResolveWindow(ref request)) return null;
 
         if (!applyAuto || !AutoMode) return request;
+
+        if (audioOnly)
+            return request with
+            {
+                MaxDuration = _settings.TargetSeconds is { } limit ? TimeSpan.FromSeconds(limit) : request.MaxDuration,
+                MaxMegabytes = _settings.TargetMegabytes ?? request.MaxMegabytes
+            };
 
         var planned = RecorderAutoPlan.Apply(request, PlannedChoice);
         request = planned with

@@ -72,16 +72,24 @@ public enum AudioTrackLayout
 /// <param name="NoiseSuppression">
 /// <c>afftdn</c>: genis bantli gurultuyu frekans alaninda bastiriyor.
 /// </param>
+/// <param name="Compressor">
+/// <c>acompressor</c>: yuksek sesi kisip dinamik araligi daraltiyor.
+/// </param>
+/// <param name="Limiter">
+/// <c>alimiter</c>: tepeyi tam olcegin altinda tutuyor; zincirin en sonunda.
+/// </param>
 public sealed record AudioFilterOptions(
     double GainDb = 0,
     bool NoiseGate = false,
-    bool NoiseSuppression = false)
+    bool NoiseSuppression = false,
+    bool Compressor = false,
+    bool Limiter = false)
 {
     /// <summary>Hicbir filtre kurulmayan hal.</summary>
     public static AudioFilterOptions None { get; } = new();
 
     /// <summary>En az bir halka kuruluyor mu.</summary>
-    public bool IsSet => GainDb != 0 || NoiseGate || NoiseSuppression;
+    public bool IsSet => GainDb != 0 || NoiseGate || NoiseSuppression || Compressor || Limiter;
 }
 
 /// <summary>
@@ -133,6 +141,12 @@ public static class AudioCaptureArguments
 
     /// <summary>Gurultu bastirmanin filtre adi.</summary>
     public const string NoiseSuppressionFilterName = "afftdn";
+
+    /// <summary>Ses sikistiricisinin filtre adi.</summary>
+    public const string CompressorFilterName = "acompressor";
+
+    /// <summary>Sinirlayicinin filtre adi.</summary>
+    public const string LimiterFilterName = "alimiter";
 
     /// <summary>
     /// Kabul edilen en dusuk kazanc, desibel. <b>Olculmus bir sayi degil</b>: ffmpeg'in
@@ -256,20 +270,23 @@ public static class AudioCaptureArguments
 
     /// <summary>
     /// Girdi basina kurulan filtre zinciri; hicbir secim yoksa <c>null</c> ve grafik hic
-    /// kurulmuyor. Sira sabit: once kazanc, sonra kapi, sonra bastirma — kapiya kazanci
-    /// uygulanmis isaret giriyor, yoksa esik kullanicinin duydugu seviyeye gore degil ham
-    /// seviyeye gore calisiyor.
+    /// kurulmuyor. Sira sabit: once kazanc, sonra kapi, sonra bastirma, sonra sikistirici,
+    /// en sonda sinirlayici — kapiya kazanci uygulanmis isaret giriyor, yoksa esik kullanicinin
+    /// duydugu seviyeye gore degil ham seviyeye gore calisiyor; sinirlayici sonda, yoksa
+    /// sikistiricinin cikisi tepeyi yeniden asabiliyor.
     /// </summary>
     public static string? FilterChain(AudioFilterOptions? filters)
     {
         var options = filters ?? AudioFilterOptions.None;
         if (!options.IsSet) return null;
 
-        var links = new List<string>(3);
+        var links = new List<string>(5);
         if (options.GainDb != 0)
             links.Add($"{GainFilterName}={options.GainDb.ToString("0.##", CultureInfo.InvariantCulture)}dB");
         if (options.NoiseGate) links.Add(NoiseGateFilterName);
         if (options.NoiseSuppression) links.Add(NoiseSuppressionFilterName);
+        if (options.Compressor) links.Add(CompressorFilterName);
+        if (options.Limiter) links.Add(LimiterFilterName);
         return links.Count == 0 ? null : string.Join(',', links);
     }
 

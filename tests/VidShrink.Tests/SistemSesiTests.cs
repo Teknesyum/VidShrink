@@ -187,11 +187,11 @@ public sealed class SistemSesiTests
     {
         var liste = new[] { Mik, Miks, LoopbackAudio.Device };
         var ikili = AudioCaptureArguments.Build(
-            new AudioCaptureSelection(Mik, LoopbackAudio.Device), liste, RecorderArguments.AudioFirstInputIndex);
+            new AudioCaptureSelection(Mik, LoopbackAudio.Device), liste, RecorderArguments.AudioFirstInputIndexFor(RecorderTargetKind.Screen));
         var eski = AudioCaptureArguments.Build(
-            new AudioCaptureSelection(Mik, Miks), liste, RecorderArguments.AudioFirstInputIndex);
+            new AudioCaptureSelection(Mik, Miks), liste, RecorderArguments.AudioFirstInputIndexFor(RecorderTargetKind.Screen));
         var tek = AudioCaptureArguments.Build(
-            new AudioCaptureSelection(null, LoopbackAudio.Device), liste, RecorderArguments.AudioFirstInputIndex);
+            new AudioCaptureSelection(null, LoopbackAudio.Device), liste, RecorderArguments.AudioFirstInputIndexFor(RecorderTargetKind.Screen));
 
         Assert.Equal(2, ikili.InputCount);
         Assert.Equal(eski.FilterComplex, ikili.FilterComplex);
@@ -211,7 +211,7 @@ public sealed class SistemSesiTests
     public void LoopbackYalnizWindowsIsteginGecer(RecorderPlatform platform, bool reddedilir)
     {
         var plan = AudioCaptureArguments.Build(
-            new AudioCaptureSelection(null, LoopbackAudio.Device), new[] { LoopbackAudio.Device }, RecorderArguments.AudioFirstInputIndex);
+            new AudioCaptureSelection(null, LoopbackAudio.Device), new[] { LoopbackAudio.Device }, RecorderArguments.AudioFirstInputIndexFor(RecorderTargetKind.Screen));
         var hatalar = RecorderArguments.Validate(BolgeIstegi(plan) with { Platform = platform }, "kayit.mp4");
 
         Assert.Equal(reddedilir, hatalar.Any(h => h.Contains("loopback", StringComparison.OrdinalIgnoreCase)));
@@ -221,7 +221,7 @@ public sealed class SistemSesiTests
     public void KayitArgumaniBoruJetonunuBirKezTasir()
     {
         var plan = AudioCaptureArguments.Build(
-            new AudioCaptureSelection(null, LoopbackAudio.Device), new[] { LoopbackAudio.Device }, RecorderArguments.AudioFirstInputIndex);
+            new AudioCaptureSelection(null, LoopbackAudio.Device), new[] { LoopbackAudio.Device }, RecorderArguments.AudioFirstInputIndexFor(RecorderTargetKind.Screen));
         var arguman = RecorderArguments.Build(BolgeIstegi(plan), "kayit.mp4");
 
         Assert.Single(arguman, a => a == LoopbackAudio.PipeToken);
@@ -480,7 +480,7 @@ public sealed class SistemSesiTests
         var cikti = KayitKanit.Path_(ad);
         var ses = new SahteSes(sesli: true);
         var plan = AudioCaptureArguments.Build(
-            new AudioCaptureSelection(null, LoopbackAudio.Device), new[] { LoopbackAudio.Device }, RecorderArguments.AudioFirstInputIndex);
+            new AudioCaptureSelection(null, LoopbackAudio.Device), new[] { LoopbackAudio.Device }, RecorderArguments.AudioFirstInputIndexFor(RecorderTargetKind.Screen));
 
         var once = DateTime.UtcNow;
         var oturum = await RecorderSession.StartAsync(BolgeIstegi(plan), cikti, systemAudio: () => ses);

@@ -284,7 +284,7 @@ public static class CliRecord
             Pick(AudioSourceRole.SystemAudio, saved.SystemAudioName));
         var audio = AudioCapturePlan.Silent;
         if (selection.Count > 0
-            && !AudioCaptureArguments.TryBuild(selection, machine.AudioDevices, RecorderArguments.AudioFirstInputIndex,
+            && !AudioCaptureArguments.TryBuild(selection, machine.AudioDevices, RecorderArguments.AudioFirstInputIndexFor(saved.Target),
                 saved.AudioLayout, new AudioFilterOptions(saved.AudioGainDb, saved.AudioNoiseGate, saved.AudioNoiseSuppression),
                 out audio, out var reason))
         {
