@@ -299,7 +299,7 @@ public sealed class OynaticiParcaTests
         var clip = ParcaKanit.Klip;
         var rapor = AppHost.Run(() =>
         {
-            var view = DenetimSurucu.Ac(clip, out var window);
+            var view = DenetimSurucu.Ac(clip, out var window, hazirla: v => v.Settings.AudioInInterfaceLanguage = v.Settings.SubtitleInInterfaceLanguage = false);
             var motor = DenetimSurucu.Motor(view);
             var body = new StringBuilder();
             string Oku() => $"aid {motor.GetProperty("aid")} sid {motor.GetProperty("sid")} sub-delay {motor.GetProperty("sub-delay")} audio-delay {motor.GetProperty("audio-delay")} sub-scale {motor.GetProperty("sub-scale")} sub-pos {motor.GetProperty("sub-pos")} sub-codepage {motor.GetProperty("sub-codepage")}";

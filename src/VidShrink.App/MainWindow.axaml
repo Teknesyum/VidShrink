@@ -302,11 +302,13 @@
                       </StackPanel>
                     </Panel>
 
-                    <Grid x:Name="SourceCard" IsVisible="False" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+                    <DockPanel x:Name="SourceCard" IsVisible="False" HorizontalSpacing="{StaticResource SpaceMd}">
+                      <WrapPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
+                        <Button x:Name="BtnMediaDetails" Content="{loc:Text mediainfo.open}" Theme="{StaticResource GhostButton}" Click="OnMediaDetails"/>
+                        <Button Content="{loc:Text main.action.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowse"/>
+                      </WrapPanel>
                       <TextBlock x:Name="TxtFileName" Theme="{StaticResource Body}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip.Tip="{Binding $self.Text}"/>
-                      <Button Grid.Column="1" x:Name="BtnMediaDetails" Content="{loc:Text mediainfo.open}" Theme="{StaticResource GhostButton}" Click="OnMediaDetails"/>
-                      <Button Grid.Column="2" Content="{loc:Text main.action.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowse"/>
-                    </Grid>
+                    </DockPanel>
 
                     <TextBlock x:Name="TxtSourceStatus" Classes="reveal" Theme="{StaticResource StatusError}" IsVisible="False"/>
 
@@ -1195,7 +1197,7 @@
                     </Grid>
                   </StackPanel>
                   <Grid x:Name="ConvertForm" Grid.IsSharedSizeScope="True" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}" RowSpacing="{StaticResource SpaceLg}"
-                        RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                        RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
                     <Grid.Styles>
                       <Style Selector="Grid#ConvertForm > Grid">
                         <Setter Property="VerticalAlignment" Value="Top"/>
@@ -1475,41 +1477,45 @@
                         <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.single-frame.tip}"/>
                       </ToolTip.Tip>
                     </CheckBox>
-                    <StackPanel x:Name="ConvertSubtitlePanel" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Spacing="{StaticResource SpaceSm}" IsVisible="False">
-                      <TextBlock Text="{loc:Text main.convert.subtitles}" Theme="{StaticResource Label}" Margin="0"/>
-                      <TextBlock x:Name="TxtConvertSubtitleHint" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
-                      <StackPanel x:Name="ConvertSubtitleTracks" Spacing="{StaticResource SpaceXs}"/>
-                      <Button x:Name="BtnConvertAddSubtitle" Theme="{StaticResource GhostButton}" Click="OnConvertAddSubtitle" HorizontalAlignment="Left"
-                              MinHeight="{StaticResource FieldMinHeight}"
-                              Padding="{StaticResource ButtonPaddingSm}" Content="{loc:Text main.subtitles.add}"/>
-                      <StackPanel x:Name="ConvertSubtitleList" Spacing="{StaticResource SpaceXs}" IsVisible="False"/>
-                      <TextBlock x:Name="TxtConvertSubtitleResult" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"
-                                 auto:AutomationProperties.LiveSetting="Polite"/>
-                    </StackPanel>
-                    <StackPanel x:Name="ConvertAudioPanel" Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Spacing="{StaticResource SpaceSm}" IsVisible="False">
-                      <TextBlock Text="{loc:Text main.convert.audio-tracks}" Theme="{StaticResource Label}" Margin="0"/>
-                      <TextBlock x:Name="TxtConvertAudioHint" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
-                      <StackPanel x:Name="ConvertAudioTracks" Spacing="{StaticResource SpaceXs}"/>
-                      <TextBlock Text="{loc:Text main.audio.external.label}" Theme="{StaticResource Label}" Margin="0"/>
-                      <WrapPanel HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
-                        <Button x:Name="BtnConvertAudioFile" Theme="{StaticResource GhostButton}" Click="OnConvertAddAudioFile" VerticalAlignment="Bottom"
-                                MinHeight="{StaticResource FieldMinHeight}"
-                                Padding="{StaticResource ButtonPaddingSm}" Content="{loc:Text main.audio.external.add}"/>
-                        <CheckBox x:Name="ChkConvertAudioReplace" Theme="{StaticResource CheckStyle}" IsChecked="False" IsEnabled="False" VerticalAlignment="Bottom"
-                                  MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
-                                  Content="{loc:Text main.audio.external.replace}"/>
-                        <CheckBox x:Name="ChkConvertAudioShortest" Theme="{StaticResource CheckStyle}" IsChecked="False" IsEnabled="False" VerticalAlignment="Bottom"
-                                  MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
-                                  Content="{loc:Text main.convert.audio-external.shortest}"/>
-                      </WrapPanel>
-                      <StackPanel x:Name="ConvertAudioFileList" Spacing="{StaticResource SpaceXs}" IsVisible="False"/>
-                    </StackPanel>
 
                   </Grid>
                 </StackPanel>
               </Border>
 
               <StackPanel Grid.Column="1" Spacing="{StaticResource SpaceLg}">
+                <Border x:Name="ConvertAudioPanel" Theme="{StaticResource Panel}" IsVisible="False">
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <TextBlock Text="{loc:Text main.convert.audio-tracks}" Theme="{StaticResource H2}"/>
+                    <TextBlock x:Name="TxtConvertAudioHint" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+                    <StackPanel x:Name="ConvertAudioTracks" Spacing="{StaticResource SpaceXs}"/>
+                    <TextBlock Text="{loc:Text main.audio.external.label}" Theme="{StaticResource Label}" Margin="0"/>
+                    <WrapPanel HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                      <Button x:Name="BtnConvertAudioFile" Theme="{StaticResource GhostButton}" Click="OnConvertAddAudioFile" VerticalAlignment="Bottom"
+                              MinHeight="{StaticResource FieldMinHeight}"
+                              Padding="{StaticResource ButtonPaddingSm}" Content="{loc:Text main.audio.external.add}"/>
+                      <CheckBox x:Name="ChkConvertAudioReplace" Theme="{StaticResource CheckStyle}" IsChecked="False" IsEnabled="False" VerticalAlignment="Bottom"
+                                MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
+                                Content="{loc:Text main.audio.external.replace}"/>
+                      <CheckBox x:Name="ChkConvertAudioShortest" Theme="{StaticResource CheckStyle}" IsChecked="False" IsEnabled="False" VerticalAlignment="Bottom"
+                                MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
+                                Content="{loc:Text main.convert.audio-external.shortest}"/>
+                    </WrapPanel>
+                    <StackPanel x:Name="ConvertAudioFileList" Spacing="{StaticResource SpaceXs}" IsVisible="False"/>
+                  </StackPanel>
+                </Border>
+                <Border x:Name="ConvertSubtitlePanel" Theme="{StaticResource Panel}" IsVisible="False">
+                  <StackPanel Spacing="{StaticResource SpaceSm}">
+                    <TextBlock Text="{loc:Text main.convert.subtitles}" Theme="{StaticResource H2}"/>
+                    <TextBlock x:Name="TxtConvertSubtitleHint" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+                    <StackPanel x:Name="ConvertSubtitleTracks" Spacing="{StaticResource SpaceXs}"/>
+                    <Button x:Name="BtnConvertAddSubtitle" Theme="{StaticResource GhostButton}" Click="OnConvertAddSubtitle" HorizontalAlignment="Left"
+                            MinHeight="{StaticResource FieldMinHeight}"
+                            Padding="{StaticResource ButtonPaddingSm}" Content="{loc:Text main.subtitles.add}"/>
+                    <StackPanel x:Name="ConvertSubtitleList" Spacing="{StaticResource SpaceXs}" IsVisible="False"/>
+                    <TextBlock x:Name="TxtConvertSubtitleResult" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"
+                               auto:AutomationProperties.LiveSetting="Polite"/>
+                  </StackPanel>
+                </Border>
                 <Border Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
                     <TextBlock Text="{loc:Text main.convert.command}" Theme="{StaticResource H2}"/>
@@ -1678,7 +1684,13 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <ComboBox x:Name="CmbLanguage" HorizontalAlignment="Stretch"/>
+                      <ComboBox x:Name="CmbLanguage" HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
+                          <DataTemplate x:DataType="x:String">
+                            <TextBlock Text="{Binding}" TextWrapping="Wrap"/>
+                          </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                      </ComboBox>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Spacing="{StaticResource SpaceSm}">
                       <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
@@ -1712,15 +1724,17 @@
                     <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.follow-recording.hint}"/>
                   </StackPanel>
 
-                  <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <CheckBox x:Name="ChkNotifyWhenDone" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="{loc:Text settings-tab.notify-done.label}"/>
-                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.notify-done.hint}"/>
-                  </StackPanel>
+                  <CheckBox x:Name="ChkNotifyWhenDone" Theme="{StaticResource CheckStyle}" IsChecked="True" HorizontalAlignment="Left" Content="{loc:Text settings-tab.notify-done.label}">
+                    <ToolTip.Tip>
+                      <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.notify-done.hint}"/>
+                    </ToolTip.Tip>
+                  </CheckBox>
 
-                  <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <CheckBox x:Name="ChkPreventSleep" Theme="{StaticResource CheckStyle}" IsChecked="True" Content="{loc:Text settings-tab.prevent-sleep.label}"/>
-                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.prevent-sleep.hint}"/>
-                  </StackPanel>
+                  <CheckBox x:Name="ChkPreventSleep" Theme="{StaticResource CheckStyle}" IsChecked="True" HorizontalAlignment="Left" Content="{loc:Text settings-tab.prevent-sleep.label}">
+                    <ToolTip.Tip>
+                      <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.prevent-sleep.hint}"/>
+                    </ToolTip.Tip>
+                  </CheckBox>
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
                     <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">

@@ -59,7 +59,7 @@ internal static class DenetimSurucu
         Pump(view, () => saat.Elapsed.TotalSeconds >= seconds, seconds + 1);
     }
 
-    internal static PlayerView Ac(string clip, out Window window, string? history = null)
+    internal static PlayerView Ac(string clip, out Window window, string? history = null, Action<PlayerView>? hazirla = null)
     {
         var view = new PlayerView
         {
@@ -71,6 +71,7 @@ internal static class DenetimSurucu
             }
         };
         if (history is not null) view.HistoryPath = () => history;
+        hazirla?.Invoke(view);
         window = new Window { Width = 640, Height = 480, Content = view };
 
         var open = view.OpenAsync(clip);
