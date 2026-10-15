@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Gelişmiş seçenekleri varsayılan olarak açık göster",
   "settings-tab.advanced-default-open.hint": "Gelişmiş bölümü uygulama her açıldığında otomatik olarak açar.",
   "settings-tab.follow-recording.label": "Kaydı bütün sekmelerde izle",
-  "settings-tab.follow-recording.hint": "Kayıt durunca dosya Küçült ve Oynatıcı sekmelerine yüklenir, açık sekme değişmez. Oynatıcıda açılan dosya da Küçült'e geçer.",
+  "settings-tab.follow-recording.hint": "• Kayıt durunca dosya Küçült ve Oynatıcı sekmelerine yüklenir, açık sekme değişmez.\n• Oynatıcıda açılan dosya da Küçült'e geçer.",
   "settings-tab.notify-done.label": "İş bitince haber ver",
   "settings-tab.notify-done.hint": "• Küçültme, dönüştürme ya da kuyruk pencere arkadayken bitince çalışır.\n• Görev çubuğu düğmesi yanıp söner ve bir bildirim çıkar.\n• İptal edilen işte haber verilmez.",
   "settings-tab.finish-sound.label": "İş bitince ses çal",

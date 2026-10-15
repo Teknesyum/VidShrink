@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Rādīt papildu opcijas izvērstas pēc noklusējuma",
   "settings-tab.advanced-default-open.hint": "Automātiski atver papildu sadaļu katrā lietotnes palaišanā.",
   "settings-tab.follow-recording.label": "Sekot ierakstam visās cilnēs",
-  "settings-tab.follow-recording.hint": "Kad ieraksts apstājas, Samazināt un Atskaņotājs to ielādē, nemainot cilni. Atskaņotājā atvērts fails tiek ielādēts arī cilnē Samazināt.",
+  "settings-tab.follow-recording.hint": "• Kad ieraksts apstājas, Samazināt un Atskaņotājs to ielādē, nemainot cilni.\n• Atskaņotājā atvērts fails tiek ielādēts arī cilnē Samazināt.",
   "settings-tab.notify-done.label": "Paziņot, kad darbs ir pabeigts",
   "settings-tab.notify-done.hint": "Ja samazināšana, pārveidošana vai rinda beidzas, kamēr logs ir fonā, uzdevumjoslas poga mirgo un parādās paziņojums. Par atceltiem darbiem netiek paziņots.",
   "settings-tab.finish-sound.label": "Atskaņot skaņu, kad darbs beidzas",

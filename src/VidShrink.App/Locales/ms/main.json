@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Tunjuk pilihan lanjutan terbuka secara lalai",
   "settings-tab.advanced-default-open.hint": "Membuka bahagian lanjutan secara automatik setiap kali aplikasi dimulakan.",
   "settings-tab.follow-recording.label": "Ikut rakaman dalam semua tab",
-  "settings-tab.follow-recording.hint": "Apabila rakaman berhenti, Kecilkan dan Pemain memuatkannya tanpa menukar tab. Fail yang dibuka dalam Pemain turut dimuatkan ke Kecilkan.",
+  "settings-tab.follow-recording.hint": "• Apabila rakaman berhenti, Kecilkan dan Pemain memuatkannya tanpa menukar tab.\n• Fail yang dibuka dalam Pemain turut dimuatkan ke Kecilkan.",
   "settings-tab.notify-done.label": "Maklumkan apabila kerja selesai",
   "settings-tab.notify-done.hint": "Jika pengecilan, penukaran atau baris gilir selesai semasa tetingkap berada di latar belakang, butang bar tugas berkelip dan pemberitahuan muncul. Kerja yang dibatalkan tidak dimaklumkan.",
   "settings-tab.finish-sound.label": "Mainkan bunyi apabila kerja selesai",

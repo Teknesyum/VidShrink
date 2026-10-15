@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Näita täpsemaid valikuid vaikimisi avatuna",
   "settings-tab.advanced-default-open.hint": "Avab täpsema jaotise automaatselt igal rakenduse käivitusel.",
   "settings-tab.follow-recording.label": "Järgi salvestust kõigil vahekaartidel",
-  "settings-tab.follow-recording.hint": "Kui salvestus peatub, laadivad Vähenda ja Pleier selle ilma vahekaarti vahetamata. Pleieris avatud fail laaditakse ka vahekaardile Vähenda.",
+  "settings-tab.follow-recording.hint": "• Kui salvestus peatub, laadivad Vähenda ja Pleier selle ilma vahekaarti vahetamata.\n• Pleieris avatud fail laaditakse ka vahekaardile Vähenda.",
   "settings-tab.notify-done.label": "Teavita, kui töö saab valmis",
   "settings-tab.notify-done.hint": "Kui vähendamine, teisendamine või järjekord lõpeb ajal, mil aken on taustal, vilgub tegumiriba nupp ja ilmub teavitus. Tühistatud töödest ei teavitata.",
   "settings-tab.finish-sound.label": "Esita heli, kui töö lõpeb",

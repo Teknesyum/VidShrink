@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "הצג אפשרויות מתקדמות פתוחות כברירת מחדל",
   "settings-tab.advanced-default-open.hint": "פותח את הקטע המתקדם אוטומטית בכל הפעלה של היישום.",
   "settings-tab.follow-recording.label": "לעקוב אחר ההקלטה בכל הלשוניות",
-  "settings-tab.follow-recording.hint": "כשהקלטה נעצרת, הלשוניות כיווץ ונגן טוענות אותה בלי להחליף לשונית. קובץ שנפתח בנגן נטען גם בכיווץ.",
+  "settings-tab.follow-recording.hint": "• כשהקלטה נעצרת, הלשוניות כיווץ ונגן טוענות אותה בלי להחליף לשונית.\n• קובץ שנפתח בנגן נטען גם בכיווץ.",
   "settings-tab.notify-done.label": "הודעה בסיום עבודה",
   "settings-tab.notify-done.hint": "אם הקטנה, המרה או התור מסתיימים כשהחלון ברקע, לחצן שורת המשימות מהבהב ומופיעה התראה. עבודות שבוטלו אינן מודיעות.",
   "settings-tab.finish-sound.label": "השמעת צליל בסיום משימה",

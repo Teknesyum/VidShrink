@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Išplėstines parinktis rodyti išskleistas pagal numatymą",
   "settings-tab.advanced-default-open.hint": "Automatiškai atidaro išplėstinę dalį kiekvieną kartą paleidus programą.",
   "settings-tab.follow-recording.label": "Sekti įrašą visuose skirtukuose",
-  "settings-tab.follow-recording.hint": "Sustabdžius įrašymą, Sumažinti ir Grotuvas jį įkelia nekeičiant skirtuko. Grotuve atidarytas failas įkeliamas ir į Sumažinti.",
+  "settings-tab.follow-recording.hint": "• Sustabdžius įrašymą, Sumažinti ir Grotuvas jį įkelia nekeičiant skirtuko.\n• Grotuve atidarytas failas įkeliamas ir į Sumažinti.",
   "settings-tab.notify-done.label": "Pranešti, kai užduotis baigta",
   "settings-tab.notify-done.hint": "Jei mažinimas, konvertavimas ar eilė baigiasi, kol langas yra fone, užduočių juostos mygtukas mirksi ir pasirodo pranešimas. Apie atšauktas užduotis nepranešama.",
   "settings-tab.finish-sound.label": "Groti garsą, kai darbas baigiasi",

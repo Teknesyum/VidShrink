@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Mặc định mở rộng tùy chọn nâng cao",
   "settings-tab.advanced-default-open.hint": "Tự mở phần nâng cao mỗi khi ứng dụng khởi động.",
   "settings-tab.follow-recording.label": "Theo dõi bản ghi ở mọi thẻ",
-  "settings-tab.follow-recording.hint": "Khi dừng ghi, thẻ Thu nhỏ và Trình phát tải bản ghi mà không đổi thẻ. Tệp mở trong Trình phát cũng được tải vào Thu nhỏ.",
+  "settings-tab.follow-recording.hint": "• Khi dừng ghi, thẻ Thu nhỏ và Trình phát tải bản ghi mà không đổi thẻ.\n• Tệp mở trong Trình phát cũng được tải vào Thu nhỏ.",
   "settings-tab.notify-done.label": "Báo khi một tác vụ hoàn tất",
   "settings-tab.notify-done.hint": "Nếu việc thu nhỏ, chuyển đổi hoặc hàng đợi kết thúc khi cửa sổ đang ở nền, nút trên thanh tác vụ sẽ nhấp nháy và một thông báo hiện ra. Tác vụ bị hủy sẽ không báo.",
   "settings-tab.finish-sound.label": "Phát âm thanh khi xong việc",

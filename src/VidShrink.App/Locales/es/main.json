@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Mostrar opciones avanzadas desplegadas por defecto",
   "settings-tab.advanced-default-open.hint": "Abre la sección avanzada automáticamente cada vez que arranca la app.",
   "settings-tab.follow-recording.label": "Seguir la grabación en todas las pestañas",
-  "settings-tab.follow-recording.hint": "Al detener una grabación, Reducir y Reproductor la cargan sin cambiar de pestaña. Un archivo abierto en el Reproductor también se carga en Reducir.",
+  "settings-tab.follow-recording.hint": "• Al detener una grabación, Reducir y Reproductor la cargan sin cambiar de pestaña.\n• Un archivo abierto en el Reproductor también se carga en Reducir.",
   "settings-tab.notify-done.label": "Avisar cuando termine un trabajo",
   "settings-tab.notify-done.hint": "Si una reducción, una conversión o la cola terminan con la ventana en segundo plano, el botón de la barra de tareas parpadea y aparece una notificación. Los trabajos cancelados no avisan.",
   "settings-tab.finish-sound.label": "Reproducir un sonido al terminar un trabajo",

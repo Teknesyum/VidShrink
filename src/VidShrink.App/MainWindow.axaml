@@ -1872,10 +1872,11 @@
                     </ToolTip.Tip>
                   </CheckBox>
 
-                  <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <CheckBox x:Name="ChkFollowRecording" Theme="{StaticResource CheckStyle}" Content="{loc:Text settings-tab.follow-recording.label}"/>
-                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.follow-recording.hint}"/>
-                  </StackPanel>
+                  <CheckBox x:Name="ChkFollowRecording" Theme="{StaticResource CheckStyle}" HorizontalAlignment="Left" Content="{loc:Text settings-tab.follow-recording.label}">
+                    <ToolTip.Tip>
+                      <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.follow-recording.hint}"/>
+                    </ToolTip.Tip>
+                  </CheckBox>
 
                   <CheckBox x:Name="ChkNotifyWhenDone" Theme="{StaticResource CheckStyle}" IsChecked="True" HorizontalAlignment="Left" Content="{loc:Text settings-tab.notify-done.label}">
                     <ToolTip.Tip>

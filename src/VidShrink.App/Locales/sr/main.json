@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Prikaži napredne opcije raširene podrazumevano",
   "settings-tab.advanced-default-open.hint": "Automatski otvara napredni odeljak pri svakom pokretanju aplikacije.",
   "settings-tab.follow-recording.label": "Прати снимак у свим картицама",
-  "settings-tab.follow-recording.hint": "Када снимање стане, Смањи и Плејер га учитавају без промене картице. Датотека отворена у плејеру учитава се и у Смањи.",
+  "settings-tab.follow-recording.hint": "• Када снимање стане, Смањи и Плејер га учитавају без промене картице.\n• Датотека отворена у плејеру учитава се и у Смањи.",
   "settings-tab.notify-done.label": "Обавести кад се посао заврши",
   "settings-tab.notify-done.hint": "Ако се смањивање, конверзија или ред заврше док је прозор у позадини, дугме на траци задатака трепери и појављује се обавештење. Отказани послови не обавештавају.",
   "settings-tab.finish-sound.label": "Пусти звук кад се посао заврши",

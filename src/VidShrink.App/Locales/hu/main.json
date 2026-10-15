@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Haladó beállítások alapból kibontva",
   "settings-tab.advanced-default-open.hint": "Minden indításkor automatikusan kinyitja a haladó szakaszt.",
   "settings-tab.follow-recording.label": "A felvétel követése minden lapon",
-  "settings-tab.follow-recording.hint": "A felvétel leállításakor a Tömörítés és a Lejátszó lap betölti azt lapváltás nélkül. A lejátszóban megnyitott fájl a Tömörítés lapra is betöltődik.",
+  "settings-tab.follow-recording.hint": "• A felvétel leállításakor a Tömörítés és a Lejátszó lap betölti azt lapváltás nélkül.\n• A lejátszóban megnyitott fájl a Tömörítés lapra is betöltődik.",
   "settings-tab.notify-done.label": "Értesítés, ha egy feladat elkészül",
   "settings-tab.notify-done.hint": "Ha egy kicsinyítés, átalakítás vagy a sor akkor fejeződik be, amikor az ablak a háttérben van, a tálcagomb villog, és értesítés jelenik meg. A megszakított feladatokról nincs értesítés.",
   "settings-tab.finish-sound.label": "Hang lejátszása, ha egy feladat véget ér",

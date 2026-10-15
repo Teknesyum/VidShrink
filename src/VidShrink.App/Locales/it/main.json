@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Mostra le opzioni avanzate espanse per impostazione predefinita",
   "settings-tab.advanced-default-open.hint": "Apre automaticamente la sezione avanzata a ogni avvio dell'app.",
   "settings-tab.follow-recording.label": "Segui la registrazione in tutte le schede",
-  "settings-tab.follow-recording.hint": "Quando una registrazione si ferma, Riduci e Lettore la caricano senza cambiare scheda. Un file aperto nel Lettore viene caricato anche in Riduci.",
+  "settings-tab.follow-recording.hint": "• Quando una registrazione si ferma, Riduci e Lettore la caricano senza cambiare scheda.\n• Un file aperto nel Lettore viene caricato anche in Riduci.",
   "settings-tab.notify-done.label": "Avvisa quando un lavoro finisce",
   "settings-tab.notify-done.hint": "Se una riduzione, una conversione o la coda finiscono mentre la finestra è in secondo piano, il pulsante sulla barra delle applicazioni lampeggia e compare una notifica. I lavori annullati non avvisano.",
   "settings-tab.finish-sound.label": "Riproduci un suono alla fine di un lavoro",

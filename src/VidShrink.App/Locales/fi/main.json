@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Näytä lisäasetukset oletuksena avattuina",
   "settings-tab.advanced-default-open.hint": "Avaa lisäasetusosion automaattisesti joka käynnistyksellä.",
   "settings-tab.follow-recording.label": "Seuraa tallennetta kaikissa välilehdissä",
-  "settings-tab.follow-recording.hint": "Kun tallennus pysähtyy, Pienennä ja Soitin lataavat sen vaihtamatta välilehteä. Soittimessa avattu tiedosto latautuu myös Pienennä-välilehteen.",
+  "settings-tab.follow-recording.hint": "• Kun tallennus pysähtyy, Pienennä ja Soitin lataavat sen vaihtamatta välilehteä.\n• Soittimessa avattu tiedosto latautuu myös Pienennä-välilehteen.",
   "settings-tab.notify-done.label": "Ilmoita, kun työ valmistuu",
   "settings-tab.notify-done.hint": "Jos pienennys, muunnos tai jono valmistuu ikkunan ollessa taustalla, tehtäväpalkin painike vilkkuu ja ilmoitus tulee näkyviin. Perutuista töistä ei ilmoiteta.",
   "settings-tab.finish-sound.label": "Soita ääni, kun työ valmistuu",

@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Show Advanced Options Expanded by Default",
   "settings-tab.advanced-default-open.hint": "Opens the advanced section automatically every time the app starts.",
   "settings-tab.follow-recording.label": "Follow the Recording in Every Tab",
-  "settings-tab.follow-recording.hint": "When a recording stops, Shrink and Player load it without switching tabs. A file opened in the Player also loads into Shrink.",
+  "settings-tab.follow-recording.hint": "• When a recording stops, Shrink and Player load it without switching tabs.\n• A file opened in the Player also loads into Shrink.",
   "settings-tab.notify-done.label": "Notify When a Job Finishes",
   "settings-tab.notify-done.hint": "• Works when a shrink, a conversion or the queue ends in the background.\n• The taskbar button flashes and a notification appears.\n• Cancelled jobs stay silent.",
   "settings-tab.finish-sound.label": "Play a Sound When a Job Finishes",

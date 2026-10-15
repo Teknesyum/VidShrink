@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Afficher les options avancées dépliées par défaut",
   "settings-tab.advanced-default-open.hint": "Ouvre automatiquement la section avancée à chaque démarrage de l'application.",
   "settings-tab.follow-recording.label": "Suivre l'enregistrement dans tous les onglets",
-  "settings-tab.follow-recording.hint": "À l'arrêt d'un enregistrement, Réduire et Lecteur le chargent sans changer d'onglet. Un fichier ouvert dans le Lecteur est aussi chargé dans Réduire.",
+  "settings-tab.follow-recording.hint": "• À l'arrêt d'un enregistrement, Réduire et Lecteur le chargent sans changer d'onglet.\n• Un fichier ouvert dans le Lecteur est aussi chargé dans Réduire.",
   "settings-tab.notify-done.label": "Prévenir quand une tâche se termine",
   "settings-tab.notify-done.hint": "Si une réduction, une conversion ou la file se termine alors que la fenêtre est en arrière-plan, le bouton de la barre des tâches clignote et une notification apparaît. Les tâches annulées restent silencieuses.",
   "settings-tab.finish-sound.label": "Jouer un son à la fin d'une tâche",

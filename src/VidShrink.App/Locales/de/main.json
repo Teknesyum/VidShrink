@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Erweiterte Optionen standardmäßig ausgeklappt zeigen",
   "settings-tab.advanced-default-open.hint": "Öffnet den erweiterten Bereich bei jedem Start der App automatisch.",
   "settings-tab.follow-recording.label": "Aufnahme in allen Tabs übernehmen",
-  "settings-tab.follow-recording.hint": "Wenn eine Aufnahme endet, laden Verkleinern und Player sie, ohne den Tab zu wechseln. Eine im Player geöffnete Datei wird auch in Verkleinern geladen.",
+  "settings-tab.follow-recording.hint": "• Wenn eine Aufnahme endet, laden Verkleinern und Player sie, ohne den Tab zu wechseln.\n• Eine im Player geöffnete Datei wird auch in Verkleinern geladen.",
   "settings-tab.notify-done.label": "Benachrichtigen, wenn ein Auftrag fertig ist",
   "settings-tab.notify-done.hint": "Endet ein Verkleinern, eine Umwandlung oder die Warteschlange, während das Fenster im Hintergrund ist, blinkt die Schaltfläche in der Taskleiste und eine Benachrichtigung erscheint. Abgebrochene Aufträge bleiben still.",
   "settings-tab.finish-sound.label": "Ton abspielen, wenn ein Auftrag fertig ist",

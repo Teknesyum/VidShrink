@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Domyślnie pokazuj opcje zaawansowane rozwinięte",
   "settings-tab.advanced-default-open.hint": "Otwiera sekcję zaawansowaną automatycznie przy każdym uruchomieniu aplikacji.",
   "settings-tab.follow-recording.label": "Śledź nagranie we wszystkich kartach",
-  "settings-tab.follow-recording.hint": "Po zatrzymaniu nagrania karty Zmniejsz i Odtwarzacz wczytują je bez przełączania karty. Plik otwarty w odtwarzaczu trafia też do karty Zmniejsz.",
+  "settings-tab.follow-recording.hint": "• Po zatrzymaniu nagrania karty Zmniejsz i Odtwarzacz wczytują je bez przełączania karty.\n• Plik otwarty w odtwarzaczu trafia też do karty Zmniejsz.",
   "settings-tab.notify-done.label": "Powiadamiaj o zakończeniu zadania",
   "settings-tab.notify-done.hint": "Gdy zmniejszanie, konwersja albo kolejka kończą się, a okno jest w tle, przycisk na pasku zadań miga i pojawia się powiadomienie. Anulowane zadania nie powiadamiają.",
   "settings-tab.finish-sound.label": "Odtwórz dźwięk po zakończeniu zadania",

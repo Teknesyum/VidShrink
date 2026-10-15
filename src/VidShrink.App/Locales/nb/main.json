@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Vis avanserte valg utvidet som standard",
   "settings-tab.advanced-default-open.hint": "Åpner den avanserte delen automatisk hver gang appen starter.",
   "settings-tab.follow-recording.label": "Følg opptaket i alle faner",
-  "settings-tab.follow-recording.hint": "Når et opptak stopper, lastes det inn i Krymp og Spiller uten å bytte fane. En fil åpnet i spilleren lastes også inn i Krymp.",
+  "settings-tab.follow-recording.hint": "• Når et opptak stopper, lastes det inn i Krymp og Spiller uten å bytte fane.\n• En fil åpnet i spilleren lastes også inn i Krymp.",
   "settings-tab.notify-done.label": "Varsle når en jobb er ferdig",
   "settings-tab.notify-done.hint": "Hvis en krymping, en konvertering eller køen blir ferdig mens vinduet er i bakgrunnen, blinker knappen på oppgavelinjen og et varsel vises. Avbrutte jobber varsles ikke.",
   "settings-tab.finish-sound.label": "Spill en lyd når en jobb er ferdig",

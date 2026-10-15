@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Tampilkan opsi lanjutan terbuka secara bawaan",
   "settings-tab.advanced-default-open.hint": "Membuka bagian lanjutan otomatis setiap kali aplikasi dimulai.",
   "settings-tab.follow-recording.label": "Ikuti rekaman di semua tab",
-  "settings-tab.follow-recording.hint": "Saat rekaman berhenti, Perkecil dan Pemutar memuatnya tanpa berpindah tab. Berkas yang dibuka di Pemutar juga dimuat ke Perkecil.",
+  "settings-tab.follow-recording.hint": "• Saat rekaman berhenti, Perkecil dan Pemutar memuatnya tanpa berpindah tab.\n• Berkas yang dibuka di Pemutar juga dimuat ke Perkecil.",
   "settings-tab.notify-done.label": "Beri tahu saat pekerjaan selesai",
   "settings-tab.notify-done.hint": "Jika pengecilan, konversi, atau antrean selesai saat jendela berada di latar belakang, tombol bilah tugas berkedip dan notifikasi muncul. Pekerjaan yang dibatalkan tidak diberitahukan.",
   "settings-tab.finish-sound.label": "Putar suara saat pekerjaan selesai",

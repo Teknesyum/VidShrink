@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Onyesha chaguo za kina zikiwa zimepanuliwa kwa chaguomsingi",
   "settings-tab.advanced-default-open.hint": "Hufungua sehemu ya kina kiotomatiki kila programu inapoanza.",
   "settings-tab.follow-recording.label": "Fuata rekodi katika vichupo vyote",
-  "settings-tab.follow-recording.hint": "Rekodi inaposimama, Punguza na Kicheza huipakia bila kubadilisha kichupo. Faili iliyofunguliwa kwenye Kicheza pia hupakiwa kwenye Punguza.",
+  "settings-tab.follow-recording.hint": "• Rekodi inaposimama, Punguza na Kicheza huipakia bila kubadilisha kichupo.\n• Faili iliyofunguliwa kwenye Kicheza pia hupakiwa kwenye Punguza.",
   "settings-tab.notify-done.label": "Arifu kazi inapokamilika",
   "settings-tab.notify-done.hint": "Ikiwa upunguzaji, ubadilishaji au foleni itakamilika wakati dirisha liko nyuma, kitufe cha upau wa kazi humweka na arifa huonekana. Kazi zilizoghairiwa haziarifiwi.",
   "settings-tab.finish-sound.label": "Cheza sauti kazi ikiisha",

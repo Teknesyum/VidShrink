@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Napredne možnosti privzeto razširjene",
   "settings-tab.advanced-default-open.hint": "Ob vsakem zagonu aplikacije samodejno odpre napredni razdelek.",
   "settings-tab.follow-recording.label": "Sledi posnetku v vseh zavihkih",
-  "settings-tab.follow-recording.hint": "Ko se snemanje ustavi, ga Pomanjšaj in Predvajalnik naložita brez menjave zavihka. Datoteka, odprta v predvajalniku, se naloži tudi v Pomanjšaj.",
+  "settings-tab.follow-recording.hint": "• Ko se snemanje ustavi, ga Pomanjšaj in Predvajalnik naložita brez menjave zavihka.\n• Datoteka, odprta v predvajalniku, se naloži tudi v Pomanjšaj.",
   "settings-tab.notify-done.label": "Obvesti, ko se opravilo konča",
   "settings-tab.notify-done.hint": "Če se pomanjšanje, pretvorba ali čakalna vrsta končajo, ko je okno v ozadju, gumb v opravilni vrstici utripa in prikaže se obvestilo. Preklicana opravila ne obveščajo.",
   "settings-tab.finish-sound.label": "Predvajaj zvok, ko se opravilo konča",

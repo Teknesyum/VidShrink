@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "Vis avancerede valg udfoldet som standard",
   "settings-tab.advanced-default-open.hint": "Åbner det avancerede afsnit automatisk, hver gang appen starter.",
   "settings-tab.follow-recording.label": "Følg optagelsen i alle faner",
-  "settings-tab.follow-recording.hint": "Når en optagelse stopper, indlæses den i Formindsk og Afspiller uden at skifte fane. En fil åbnet i afspilleren indlæses også i Formindsk.",
+  "settings-tab.follow-recording.hint": "• Når en optagelse stopper, indlæses den i Formindsk og Afspiller uden at skifte fane.\n• En fil åbnet i afspilleren indlæses også i Formindsk.",
   "settings-tab.notify-done.label": "Giv besked, når et job er færdigt",
   "settings-tab.notify-done.hint": "Hvis en formindskelse, en konvertering eller køen bliver færdig, mens vinduet er i baggrunden, blinker knappen på proceslinjen, og der vises en meddelelse. Annullerede job giver ingen besked.",
   "settings-tab.finish-sound.label": "Afspil en lyd, når et job er færdigt",

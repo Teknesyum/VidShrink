@@ -707,7 +707,7 @@
   "settings-tab.advanced-default-open.label": "默认展开高级选项",
   "settings-tab.advanced-default-open.hint": "每次启动应用时自动展开高级部分。",
   "settings-tab.follow-recording.label": "在所有标签页中跟随录制",
-  "settings-tab.follow-recording.hint": "录制停止后，压缩和播放器标签页会加载该文件，不会切换标签页。在播放器中打开的文件也会加载到压缩标签页。",
+  "settings-tab.follow-recording.hint": "• 录制停止后，压缩和播放器标签页会加载该文件，不会切换标签页。\n• 在播放器中打开的文件也会加载到压缩标签页。",
   "settings-tab.notify-done.label": "任务完成时通知",
   "settings-tab.notify-done.hint": "当窗口处于后台时，如果压缩、转换或队列结束，任务栏按钮会闪烁并显示通知。已取消的任务不会通知。",
   "settings-tab.finish-sound.label": "任务完成时播放声音",

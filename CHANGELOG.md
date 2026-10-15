@@ -20,6 +20,8 @@ ship as part of it.
   frame rate; scaling method and keeping the aspect ratio with black bars.
 - Queue: a queue can start at a set time, a waiting job can be edited before it runs, the queue
   can play a sound when it finishes, and "Quit the App" joins the after-queue actions.
+- Editor audio: noise cleanup, loudness levelling, effects and a level meter.
+- Player bookmarks list and favourites, with an option to ask where to resume on open.
 
 ### Fixed
 
@@ -28,6 +30,8 @@ ship as part of it.
   `--denoise` stops with a clear error instead of failing the encode.
 - A queued job no longer carries the burned-in subtitle font, size and box settings of the
   previous source.
+- Settings no longer needs scrolling at full screen: the "Follow Recording" note moved into
+  its tooltip.
 
 ## [1.2.18] - 2026-10-15
 
