@@ -165,4 +165,29 @@ public sealed class DonusturSesIziTests
                 if (File.Exists(dosya)) File.Delete(dosya);
         }
     }
+
+    /// <summary>
+    /// Seçimsiz kopya kipi ffmpeg'in kopyalayacağı izi denetler, ilk ses izini değil. İlk iz aac (MP4 alır),
+    /// varsayılan işaretli altı kanallı ikinci iz opus (MP4 almaz): ffmpeg opus'u seçer, doğrulama reddeder.
+    /// Ters dizilimde (ilk iz opus, seçilen aac) hata yok.
+    /// </summary>
+    [Fact]
+    public void SecimsizKopyaFfmpeginSececegiIziDenetler()
+    {
+        var ilkAac = new SourceStream(1, StreamKind.Audio, "aac", "eng", Channels: 2, BitrateBps: 128_000);
+        var seciliOpus = new SourceStream(2, StreamKind.Audio, "opus", "tur", IsDefault: true, Channels: 6, BitrateBps: 256_000);
+        var ilkOpus = new SourceStream(1, StreamKind.Audio, "opus", "eng", Channels: 2, BitrateBps: 128_000);
+        var seciliAac = new SourceStream(2, StreamKind.Audio, "aac", "tur", IsDefault: true, Channels: 6, BitrateBps: 256_000);
+        var plan = new ConversionPlan { Container = "mp4", AudioCodec = "copy" };
+        var hata = "The MP4 container does not support copying the source opus audio stream.";
+
+        var info = Ornek(Video, ilkAac, seciliOpus);
+        Assert.Equal("aac", info.AudioCodec);
+        Assert.Same(seciliOpus, ConversionArguments.AutoAudio(info));
+        Assert.Contains(hata, ConversionArguments.Validate(info, plan));
+
+        var ters = Ornek(Video, ilkOpus, seciliAac);
+        Assert.Equal("opus", ters.AudioCodec);
+        Assert.DoesNotContain(ConversionArguments.Validate(ters, plan), e => e.Contains("does not support copying"));
+    }
 }

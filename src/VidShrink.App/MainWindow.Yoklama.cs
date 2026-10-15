@@ -399,6 +399,7 @@ public partial class MainWindow
         {
             _textBurnOffered = textBurn;
             RefreshBurnChoices();
+            RefreshConvertBurnChoices();
         }
         Recalculate();
     }

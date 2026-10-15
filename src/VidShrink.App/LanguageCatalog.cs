@@ -406,6 +406,7 @@ internal static class LanguageCatalog
             ["Stream copy cannot change resolution or frame rate."] = "main.validation.copy-fixed",
             ["GIF requires video encoding and cannot use stream copy."] = "main.validation.gif-copy",
             ["Image sequence output requires video encoding and cannot use stream copy."] = "main.validation.sequence-copy",
+            ["Burning subtitles requires video encoding."] = "main.validation.burn-encode",
             ["The source has no audio stream to copy."] = "main.validation.no-audio-copy",
             ["The source has no video stream; choose an audio container."] ="main.validation.no-video-container",
             ["The source has no audio stream to extract."] = "main.validation.no-audio-extract",

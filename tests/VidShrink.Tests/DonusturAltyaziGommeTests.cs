@@ -142,6 +142,62 @@ public sealed class DonusturAltyaziGommeTests
         Assert.Equal("PrimaryColour=" + ass, style);
     }
 
+    /// <summary>
+    /// Canlı kol: siyah 2 sn 320x240 kaynak ve tek metin altyazı, <c>-threads 2</c>. Ürünün
+    /// <see cref="ConversionArguments.Build"/> komutuyla sarı biçemli yakma 1. saniyenin karesinde sarı
+    /// piksel (R ve G yüksek, B düşük) bırakır; biçemsiz yakma parlak ama sarısız, yakmasız eş karanlık.
+    /// Yakılan çıktı altyazı izi taşımaz.
+    /// </summary>
+    [FfmpegFact]
+    public async Task CanliSariYakmaKareyeIner()
+    {
+        var srt = Yol("don-yak.srt");
+        File.WriteAllText(srt, "1\n00:00:00,000 --> 00:00:02,000\nMERHABA DUNYA\n\n", new System.Text.UTF8Encoding(false));
+        var kaynak = Yol("don-yak-kaynak.mkv");
+        await AkisGirdisi.RunOrThrowAsync(VidShrink.Ffmpeg.ToolLocator.Ffmpeg, new[]
+        {
+            "-hide_banner", "-y",
+            "-f", "lavfi", "-i", "color=c=black:size=320x240:rate=25:duration=2",
+            "-i", srt, "-map", "0", "-map", "1",
+            "-c:v", "libx264", "-preset", "ultrafast", "-c:s", "srt", "-threads", "2", kaynak
+        });
+        var info = await VidShrink.Ffmpeg.FfprobeClient.ProbeAsync(kaynak);
+
+        async Task<(int Parlak, int Sari)> Kodla(string ad, ConversionPlan plan)
+        {
+            var cikti = Yol(ad + ".mp4");
+            var args = ConversionArguments.Build(info, plan, cikti).ToList();
+            args.InsertRange(args.Count - 1, new[] { "-threads", "2" });
+            await AkisGirdisi.RunOrThrowAsync(VidShrink.Ffmpeg.ToolLocator.Ffmpeg, args);
+            var rgb = Yol(ad + ".rgb");
+            await AkisGirdisi.RunOrThrowAsync(VidShrink.Ffmpeg.ToolLocator.Ffmpeg, new[]
+            {
+                "-hide_banner", "-y", "-ss", "1", "-i", cikti, "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", "rgb24", rgb
+            });
+            var b = File.ReadAllBytes(rgb);
+            Assert.Equal(320 * 240 * 3, b.Length);
+            int parlak = 0, sari = 0;
+            for (var i = 0; i < b.Length; i += 3)
+            {
+                if (Math.Max(b[i], Math.Max(b[i + 1], b[i + 2])) > 200) parlak++;
+                if (b[i] > 180 && b[i + 1] > 180 && b[i + 2] < 100) sari++;
+            }
+            return (parlak, sari);
+        }
+
+        var temel = new ConversionPlan { Container = "mp4", Crf = 30, AudioCodec = null };
+        var sariYak = await Kodla("don-yak-sari", temel with { BurnSubtitle = 0, BurnColor = "FFFF00", BurnFontSize = 28 });
+        var duzYak = await Kodla("don-yak-duz", temel with { BurnSubtitle = 0, BurnFontSize = 28 });
+        var yok = await Kodla("don-yak-yok", temel);
+
+        Assert.True(sariYak.Sari > 50, $"sari yakma: {sariYak}");
+        Assert.True(duzYak.Parlak > 50 && duzYak.Sari == 0, $"biçemsiz yakma: {duzYak}");
+        Assert.True(yok.Parlak == 0 && yok.Sari == 0, $"yakmasiz: {yok}");
+        Assert.DoesNotContain(await AkislarAsync(Yol("don-yak-sari.mp4")), stream => Alan(stream, "codec_type") == "subtitle");
+
+        Kapat("don-yak*");
+    }
+
     [Fact]
     public void YakmasizPlanEskiKomutuYaziyor()
     {

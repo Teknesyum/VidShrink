@@ -38,7 +38,7 @@ public static class ConversionArguments
         {
             var copied = plan.ExternalAudio is { Replace: true } ? Array.Empty<string?>()
                 : plan.AudioTracks is null
-                ? plan.ExternalAudio is not null && !info.HasAudio ? Array.Empty<string?>() : new[] { info.AudioCodec }
+                ? plan.ExternalAudio is not null && !info.HasAudio ? Array.Empty<string?>() : new[] { AutoAudio(info)?.Codec ?? info.AudioCodec }
                 : SourceAudio(info, plan).Select(stream => (string?)stream.Codec).Distinct().ToArray();
             foreach (var codec in copied.Where(codec => !AudioCopyCompatible(plan.Container, codec)))
                 errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support copying the source {codec} audio stream.");
