@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -61,10 +63,37 @@ internal static class IsBittiBildirimi
     /// seçilir; test konağında sessiz olan gelir, gerçek pencere yanıp sönmez.
     /// </summary>
     internal static IIsBildirimYuzu Varsayilan()
-        => OperatingSystem.IsWindows()
-           && Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime
-            ? SistemIsBildirimYuzu.Instance
-            : SessizIsBildirimYuzu.Instance;
+        => YuzSec(SistemKomutlari.Simdiki, Masaustu, SurecBaslatici.Instance);
+
+    /// <summary>
+    /// İşletim sistemine ve masaüstünde koşmaya göre yüz: Windows'ta API, macOS ve Linux'ta sistemin
+    /// kendi komutu, masaüstü dışında ve tanımsız sistemde sessiz.
+    /// </summary>
+    internal static IIsBildirimYuzu YuzSec(Isletim isletim, bool masaustu, ISurecBaslatici baslatici)
+    {
+        if (!masaustu) return SessizIsBildirimYuzu.Instance;
+        return isletim switch
+        {
+            Isletim.Windows => SistemIsBildirimYuzu.Instance,
+            Isletim.MacOS or Isletim.Linux => new KomutIsBildirimYuzu(isletim, baslatici),
+            _ => SessizIsBildirimYuzu.Instance
+        };
+    }
+
+    /// <summary>Sesin karşılığı; seçim kuralı <see cref="YuzSec"/> ile aynı.</summary>
+    internal static IBitisSesi SesSec(Isletim isletim, bool masaustu, ISurecBaslatici baslatici)
+    {
+        if (!masaustu) return SessizBitisSesi.Instance;
+        return isletim switch
+        {
+            Isletim.Windows => SistemBitisSesi.Instance,
+            Isletim.MacOS or Isletim.Linux => new KomutBitisSesi(isletim, baslatici),
+            _ => SessizBitisSesi.Instance
+        };
+    }
+
+    private static bool Masaustu
+        => Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime;
 
     /// <summary>
     /// "İş bitince ses çal" kararı: ayar kapalıyken ya da yalnız iptal edilen işlerde <c>null</c>,
@@ -80,16 +109,133 @@ internal static class IsBittiBildirimi
 
     /// <summary>Sesin sistem yüzü; test konağında sessiz olan gelir, hoparlörden ses çıkmaz.</summary>
     internal static IBitisSesi VarsayilanSes()
-        => OperatingSystem.IsWindows()
-           && Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime
-            ? SistemBitisSesi.Instance
-            : SessizBitisSesi.Instance;
+        => SesSec(SistemKomutlari.Simdiki, Masaustu, SurecBaslatici.Instance);
+}
+
+/// <summary>Haberin ve sesin yolunu seçen işletim sistemi.</summary>
+public enum Isletim
+{
+    Windows,
+    MacOS,
+    Linux,
+    Diger
+}
+
+/// <summary>Başlatılacak sistem aracı ve argümanları; kabuk kullanılmaz.</summary>
+internal sealed record SistemKomutu(string Program, IReadOnlyList<string> Argumanlar);
+
+/// <summary>
+/// macOS ve Linux'ta haberin ve sesin komutu. Saf: süreç başlatmaz, yalnız komutu kurar.
+/// macOS <c>osascript</c> ve <c>afplay</c>, Linux <c>notify-send</c>, <c>paplay</c> ve
+/// <c>canberra-gtk-play</c>; Windows ve tanımsız sistemde komut yok.
+/// </summary>
+internal static class SistemKomutlari
+{
+    internal static Isletim Simdiki
+        => OperatingSystem.IsWindows() ? Isletim.Windows
+            : OperatingSystem.IsMacOS() ? Isletim.MacOS
+            : OperatingSystem.IsLinux() ? Isletim.Linux
+            : Isletim.Diger;
+
+    internal static SistemKomutu? Bildirim(Isletim isletim, IsBildirimi bildirim) => isletim switch
+    {
+        Isletim.MacOS => new SistemKomutu("osascript", new[]
+        {
+            "-e", $"display notification {AppleMetni(bildirim.Metin)} with title {AppleMetni(bildirim.Baslik)}"
+        }),
+        Isletim.Linux => new SistemKomutu("notify-send", new[]
+        {
+            "--app-name=VidShrink", "--urgency=" + (bildirim.Hata ? "critical" : "normal"), "--", bildirim.Baslik, bildirim.Metin
+        }),
+        _ => null
+    };
+
+    internal static SistemKomutu? Ses(Isletim isletim, string? dosya, bool hata) => isletim switch
+    {
+        Isletim.MacOS => new SistemKomutu("afplay", new[]
+        {
+            string.IsNullOrEmpty(dosya) ? (hata ? "/System/Library/Sounds/Basso.aiff" : "/System/Library/Sounds/Glass.aiff") : dosya
+        }),
+        Isletim.Linux => string.IsNullOrEmpty(dosya)
+            ? new SistemKomutu("canberra-gtk-play", new[] { "-i", hata ? "dialog-error" : "complete" })
+            : new SistemKomutu("paplay", new[] { dosya }),
+        _ => null
+    };
+
+    /// <summary>Seçilen ses dosyası hâlâ duruyorsa yolu; yoksa sistem sesine düşmek için <c>null</c>.</summary>
+    internal static string? SesDosyasi(string? yol) => !string.IsNullOrEmpty(yol) && File.Exists(yol) ? yol : null;
+
+    private static string AppleMetni(string metin)
+        => "\"" + metin.Replace("\\", "\\\\", StringComparison.Ordinal).Replace("\"", "\\\"", StringComparison.Ordinal) + "\"";
+}
+
+/// <summary>Sistem komutunu başlatan katman; testler sahtesini verir, gerçek süreç açılmaz.</summary>
+internal interface ISurecBaslatici
+{
+    void Baslat(SistemKomutu komut);
+}
+
+/// <summary>Komutu kabuksuz ve penceresiz başlatır, beklemez. Araç yoksa sessizce vazgeçer.</summary>
+internal sealed class SurecBaslatici : ISurecBaslatici
+{
+    internal static SurecBaslatici Instance { get; } = new();
+
+    public void Baslat(SistemKomutu komut)
+    {
+        var bilgi = new ProcessStartInfo(komut.Program) { UseShellExecute = false, CreateNoWindow = true };
+        foreach (var arguman in komut.Argumanlar) bilgi.ArgumentList.Add(arguman);
+        try { Process.Start(bilgi)?.Dispose(); }
+        catch (Exception ex) when (ex is Win32Exception or InvalidOperationException or PlatformNotSupportedException)
+        {
+        }
+    }
+}
+
+/// <summary>macOS ve Linux: haberi sistemin bildirim aracıyla verir.</summary>
+internal sealed class KomutIsBildirimYuzu : IIsBildirimYuzu
+{
+    private readonly Isletim _isletim;
+    private readonly ISurecBaslatici _baslatici;
+
+    internal KomutIsBildirimYuzu(Isletim isletim, ISurecBaslatici baslatici)
+    {
+        _isletim = isletim;
+        _baslatici = baslatici;
+    }
+
+    public void Bildir(Window pencere, IsBildirimi bildirim)
+    {
+        if (SistemKomutlari.Bildirim(_isletim, bildirim) is { } komut) _baslatici.Baslat(komut);
+    }
+}
+
+/// <summary>macOS ve Linux: sesi sistemin çalar aracıyla çalar; seçilen dosya yoksa sistem sesi.</summary>
+internal sealed class KomutBitisSesi : IBitisSesi
+{
+    private readonly Isletim _isletim;
+    private readonly ISurecBaslatici _baslatici;
+
+    internal KomutBitisSesi(Isletim isletim, ISurecBaslatici baslatici)
+    {
+        _isletim = isletim;
+        _baslatici = baslatici;
+    }
+
+    public void Cal(bool hata) => Cal(hata, null);
+
+    public void Cal(bool hata, string? dosya)
+    {
+        if (SistemKomutlari.Ses(_isletim, SistemKomutlari.SesDosyasi(dosya), hata) is { } komut) _baslatici.Baslat(komut);
+    }
 }
 
 /// <summary>Bitiş sesinin sistem yüzü. Pencere bunu çağırır, testler sahtesini verir.</summary>
 internal interface IBitisSesi
 {
     void Cal(bool hata);
+
+    /// <summary>Seçilen dosyayla çalar; dosya yoksa ya da yüz dosya çalamıyorsa sistem sesi.</summary>
+    void Cal(bool hata, string? dosya) => Cal(hata);
 }
 
 /// <summary>Ses çalmayan yüz: test konağı ve Windows dışı.</summary>
@@ -110,14 +256,28 @@ internal sealed class SistemBitisSesi : IBitisSesi
 
     internal static SistemBitisSesi Instance { get; } = new();
 
-    public void Cal(bool hata)
+    public void Cal(bool hata) => Cal(hata, null);
+
+    public void Cal(bool hata, string? dosya)
     {
         if (!OperatingSystem.IsWindows()) return;
-        try { MessageBeep(hata ? HataSesi : BilgiSesi); }
+        try
+        {
+            if (SistemKomutlari.SesDosyasi(dosya) is { } yol && PlaySoundW(yol, IntPtr.Zero, SndFilename | SndAsync | SndNodefault)) return;
+            MessageBeep(hata ? HataSesi : BilgiSesi);
+        }
         catch (Exception ex) when (ex is DllNotFoundException or EntryPointNotFoundException)
         {
         }
     }
+
+    private const uint SndAsync = 0x1;
+    private const uint SndNodefault = 0x2;
+    private const uint SndFilename = 0x20000;
+
+    [DllImport("winmm.dll", CharSet = CharSet.Unicode)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool PlaySoundW(string ses, IntPtr modul, uint bayrak);
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]

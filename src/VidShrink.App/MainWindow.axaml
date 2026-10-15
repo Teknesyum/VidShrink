@@ -1947,8 +1947,17 @@
 
                   <CheckBox x:Name="ChkFinishSound" Theme="{StaticResource CheckStyle}" HorizontalAlignment="Left" Content="{loc:Text settings-tab.finish-sound.label}">
                     <ToolTip.Tip>
-                      <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.finish-sound.hint}"/>
+                      <StackPanel Spacing="{StaticResource SpaceSm}">
+                        <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.finish-sound.hint}"/>
+                        <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.finish-sound-file.hint}"/>
+                      </StackPanel>
                     </ToolTip.Tip>
+                    <CheckBox.ContextFlyout>
+                      <MenuFlyout>
+                        <MenuItem x:Name="BtnFinishSoundFile" Click="OnChooseFinishSound"/>
+                        <MenuItem x:Name="BtnFinishSoundReset" IsVisible="False" Header="{loc:Text settings-tab.finish-sound-file.reset}" Click="OnResetFinishSound"/>
+                      </MenuFlyout>
+                    </CheckBox.ContextFlyout>
                   </CheckBox>
 
                   <CheckBox x:Name="ChkPreventSleep" Theme="{StaticResource CheckStyle}" IsChecked="True" HorizontalAlignment="Left" Content="{loc:Text settings-tab.prevent-sleep.label}">

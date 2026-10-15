@@ -185,7 +185,8 @@ public partial class ShrinkJobWindow : Window
     {
         var karar = IsBittiBildirimi.Karar(_bitenler.ToList(), PencereEtkin(), _appSettings.NotifyWhenDone,
             (key, args) => string.Format(Strings.CultureOf(_language), Say(key), args));
-        if (IsBittiBildirimi.SesKarari(_bitenler.ToList(), BitisSesi) is bool hata) Ses.Cal(hata);
+        if (IsBittiBildirimi.SesKarari(_bitenler.ToList(), BitisSesi) is bool hata)
+            Ses.Cal(hata, BitisSesiDosyasi.Length > 0 ? BitisSesiDosyasi : null);
         _bitenler.Clear();
         if (karar is not null) Bildirim.Bildir(this, karar);
     }
@@ -202,6 +203,7 @@ public partial class ShrinkJobWindow : Window
         _pump.Changed += SaveQueue;
         UykuyuEngelle = _appSettings.PreventSleepWhileEncoding;
         BitisSesi = _appSettings.FinishSound;
+        BitisSesiDosyasi = _appSettings.FinishSoundFile;
         _pump.Drained += OnDrained;
 
         var language = MainWindow.ResolveLanguage(null, CultureInfo.CurrentUICulture.Name);

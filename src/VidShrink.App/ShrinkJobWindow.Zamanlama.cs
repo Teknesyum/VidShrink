@@ -30,6 +30,9 @@ public partial class ShrinkJobWindow
     /// <summary>"İş bitince ses çal" ayarı.</summary>
     internal bool BitisSesi { get; set; }
 
+    /// <summary>Bitişte çalacak ses dosyası; boşsa sistem sesi.</summary>
+    internal string BitisSesiDosyasi { get; set; } = "";
+
     /// <summary>Zamanlanan başlangıca kalan süre; zamanlama yoksa <c>null</c>.</summary>
     internal TimeSpan? ScheduleLeft => _scheduleAt is { } at ? at - ZamanSaati.GetLocalNow() : null;
 

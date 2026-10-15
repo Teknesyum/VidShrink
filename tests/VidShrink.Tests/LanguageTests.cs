@@ -302,6 +302,7 @@ public sealed class LanguageTests : IDisposable
         "Windows ARM64", "macOS Apple Silicon (arm64)", "macOS Intel (x64)", "Linux ARM64",
         "GIF palette", "GIF encode",
         "powrprof.dll,SetSuspendState 0,1,0", "-e \"tell application \\\"System Events\\\" to shut down\"",
+        "display notification   with title",
         "no space left", "not enough space", "disk full", "insufficient disk space",
         "unknown encoder", "encoder not found", "does not support", "could not write header",
         "error initializing output stream", "automatic encoder selection failed",

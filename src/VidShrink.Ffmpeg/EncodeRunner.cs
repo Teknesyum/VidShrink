@@ -912,6 +912,7 @@ public sealed class EncodeRunner
     {
         EncodePriority.BelowNormal => ProcessPriorityClass.BelowNormal,
         EncodePriority.Low => ProcessPriorityClass.Idle,
+        EncodePriority.AboveNormal => ProcessPriorityClass.AboveNormal,
         _ => ProcessPriorityClass.Normal
     };
 

@@ -22,7 +22,7 @@ public partial class MainWindow
     }
 
     internal EncodePriority SelectedEncodePriority
-        => CmbEncodePriority.SelectedIndex is >= 0 and <= (int)EncodePriority.Low
+        => CmbEncodePriority.SelectedIndex is >= 0 and <= (int)EncodePriority.AboveNormal
             ? (EncodePriority)CmbEncodePriority.SelectedIndex
             : EncodePriority.Normal;
 
@@ -50,7 +50,8 @@ public partial class MainWindow
         {
             Say("settings-tab.encode-priority.normal"),
             Say("settings-tab.encode-priority.below-normal"),
-            Say("settings-tab.encode-priority.low")
+            Say("settings-tab.encode-priority.low"),
+            Say("settings-tab.encode-priority.above-normal")
         };
         CmbEncoderThreads.ItemsSource = new[] { new ComboBoxItem { Content = Say("main.plan.automatic") } }
             .Concat(EncoderThreadCandidates.Select(n => new ComboBoxItem
