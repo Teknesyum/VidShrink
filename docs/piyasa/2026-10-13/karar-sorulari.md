@@ -52,3 +52,17 @@ OYA-P6, OYB-P6, DZA-P6, SIK-P11, SIK-P12, SIK-P13, EKA-P16, EKB-P9, EKB-P10, EKB
 ### Bu Ayıklamanın Sınırı
 
 Danışma da bir iddiadır. Cevabında satır numarasıyla gösterdiği dört yer açıldı: üçü tuttu, biri tutmadı (Wayland'da pencere listesi X11'e düşmüyor, boş dönüyor); ayrıntı ana oturumun kod okumasında. Danışmanın kendi "emin değilim" dedikleri: LosslessCut ve KeyCastr varsayılanları, gürültü bastırma modelinin boyutu ve lisansı, Linux'ta kendini güncellemenin neden kapalı tutulduğu, EKA-P2'de hangi gösterim kuralının yürürlükte olduğu.
+
+### Sahibin Cevabı (2026-10-15)
+
+1. Varsayılanlar önerildiği gibi; tek ayrım EKA-P15: HDR ekranda kayıt HDR kalır, kayıp olmasın. SDR'ye çevirme seçenek olur.
+2. Linux ölçümü Claude bulut oturumunda (bütçe 125 dolar); Mac işleri Serkan'a verilir.
+3. Hayır: model ya da hazır içerik paketi indiren özellik yok.
+4. Ücretsizlerin hepsi evet (SignPath, winget, Scoop, Weblate); hesap ve onay adımlarını sahip yapar. Ücretliler şimdi değil.
+5. Evet, kademeli: önce geçiş ve müzik izi, sonra ikinci video izi.
+6. Evet, ama öteki işler bittikten sonra.
+7. Hayır.
+8. Taşınabilir zip evet; ön sürüm kanalı hayır.
+9. İkisi de hayır.
+
+Ek istek: Kaydedicinin mini penceresinin düzeni kötü; araştırılıp düzeltilecek.
