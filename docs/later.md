@@ -10,14 +10,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 **Dalga 2 — Karar Gerekmez, Küçük İş Öncelik 2 Ya Da Orta İş Öncelik 1**
 
-## 34. Medya Bilgisi Ve Denetim Raporu
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · ARC-P2 · Bizde Olmayan Araçlar · iş orta · öncelik 1 · karar gerekmez
-
-- Satırlar (ARC-P2): ARC-01 Medya bilgisi görüntüleyici; ARC-05 Denetim raporu. [Tablo](piyasa/2026-10-13/eksik-araclar-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/MediaInfo.cs, src/VidShrink.Ffmpeg/FfprobeClient.cs, src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.App/Playback/PlayerView.Window.cs, src/VidShrink.Core/Editing/SilenceCut.cs, src/VidShrink.App/Editing/EditorView.Sessizlik.cs
-- Plan: Küçült'ün kaynak paneline ve oynatıcının bilgi katmanına "tüm ayrıntılar" düğmesi eklenir; açılan pencere ffprobe'un zaten okuduğu akışları ve bölümleri tek tek gösterir, "kopyala" ve "metin olarak kaydet" verir. Aynı pencerenin ikinci bölümü düzenleyicinin sessizlik, siyah kare ve sahne taramasını çağırıp sonucu zaman kodlu liste olarak verir; düzenleyicinin tarama paneline de "listeyi kaydet" eklenir. Doğrulama: StreamMappingTests'in ürettiği çok izli, bölümlü 3 saniyelik dosyada dökümün her izi ve bölümü içerdiği; sahte tarayıcıyla listenin tarama sonucuyla birebir aynı olduğu sınanır.
-
 ## 36. Resim Dizisi Girdisi Ve Ara Kare
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · ARC-P4 · Bizde Olmayan Araçlar · iş orta · öncelik 1 · karar gerekmez
