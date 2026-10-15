@@ -339,6 +339,7 @@ public partial class MainWindow : Window
         Watch(TxtOpenSubtitlesUser, TextBox.TextProperty, SaveAppSettings);
         InitUserPresets();
         InitConvertPresets();
+        InitConvertTags();
         BuildShareTargetStrip();
         Watch(CmbShareRetention, SelectingItemsControl.SelectedIndexProperty, SaveSettings);
         foreach (var control in new SelectingItemsControl[]
@@ -4835,7 +4836,7 @@ public partial class MainWindow : Window
         var audio = SelectedTag(CmbConvertAudio);
         if (new ConversionPlan { Container = container }.AudioOnly) audio = ConversionPresetPlan.AudioCodecForAudioContainer(container);
 
-        return new ConversionPlan
+        return WithConvertTags(new ConversionPlan
         {
             Container = container,
             VideoCodec = codec,
@@ -4875,7 +4876,7 @@ public partial class MainWindow : Window
             GifColors = container == "gif" ? ConvertAudioNumber(CmbConvertGifColors) : null,
             GifDither = container == "gif" && SelectedTag(CmbConvertGifDither) is { Length: > 0 } dither ? dither : null,
             ExtraArgs = CustomArguments.Parse(TxtConvertExtraArgs.Text).Arguments
-        };
+        });
     }
 
     private static string? ExtraArgsError(CustomArgumentResult extra) => extra.Problem switch

@@ -42,6 +42,30 @@ public sealed record ConversionPlan
     /// <summary>Kap ve akış etiketleri silinir, iz dili açıkça geri yazılır. GIF'te okunmaz.</summary>
     public bool DropMetadata { get; init; }
 
+    /// <summary>Kap başlığı (<c>title</c>); boş ya da yalnız boşluksa anahtar yazılmaz.</summary>
+    public string? Title { get; init; }
+
+    /// <summary>Sanatçı (<c>artist</c>); boşsa anahtar yazılmaz.</summary>
+    public string? Artist { get; init; }
+
+    /// <summary>Yıl (<c>date</c>); boşsa anahtar yazılmaz.</summary>
+    public string? Year { get; init; }
+
+    /// <summary>Açıklama (<c>comment</c>); boşsa anahtar yazılmaz.</summary>
+    public string? Comment { get; init; }
+
+    /// <summary>
+    /// Kapak resmi, png ya da jpeg. MP4'te <c>attached_pic</c> video izi, MKV'de <c>-attach</c> eki olur;
+    /// boşsa kapak yazılmaz.
+    /// </summary>
+    public string? CoverPath { get; init; }
+
+    /// <summary>
+    /// Onar: girdide bozuk paket atılır, eksik zaman damgası üretilir, çözme hatası hoş görülür; çıktı
+    /// zaman damgası sıfırdan başlatılır.
+    /// </summary>
+    public bool Repair { get; init; }
+
     /// <summary>
     /// Ciktiya giden kaynak altyazi izleri (0 tabanli altyazi sirasi). <c>null</c> hepsi, bos liste
     /// hicbiri. Kabin tasiyamadigi iz kuralla cevrilir ya da duser (<see cref="StreamMapping.SubtitleTracks"/>).
