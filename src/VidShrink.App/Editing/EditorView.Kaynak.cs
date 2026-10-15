@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using VidShrink.App.Localization;
 using VidShrink.Core;
@@ -33,10 +34,78 @@ internal partial class EditorView
     internal IReadOnlyList<string> SourcePaths
         => _source is { } first ? _extraPaths.Prepend(first).ToArray() : Array.Empty<string>();
 
+    private static readonly DataFormat<string> PoolFormat = DataFormat.CreateStringApplicationFormat("vidshrink-media-source");
+
+    private string[] _mediaItems = Array.Empty<string>();
+
+    /// <summary>Medya havuzundaki satirlar: kaynak sirasiyla dosya adlari.</summary>
+    internal IReadOnlyList<string> MediaItems => _mediaItems;
+
+    /// <summary>Havuzdan birakilan klip ustune mi yazar; yanlissa araya girer ve sonrakileri iter.</summary>
+    internal bool PlaceOverwrite
+    {
+        get => CmbPlaceMode.SelectedIndex == 1;
+        set => CmbPlaceMode.SelectedIndex = value ? 1 : 0;
+    }
+
     private void InitSources()
     {
         BtnAddSource.Click += (_, _) => _ = AddSourceClickedAsync();
         MnuAddSource.Click += (_, _) => _ = AddSourceClickedAsync();
+        BtnMedia.Click += (_, _) => ShowMediaPanel(BtnMedia.IsChecked == true);
+        CmbPlaceMode.SelectedIndex = 0;
+        LstMedia.AddHandler(PointerPressedEvent, OnPoolPressed, handledEventsToo: true);
+    }
+
+    internal void ShowMediaPanel(bool open)
+    {
+        BtnMedia.IsChecked = open;
+        MediaPanel.IsVisible = open;
+        RefreshMedia();
+    }
+
+    private void RefreshMedia()
+    {
+        var items = SourcePaths.Select(path => Path.GetFileName(path)).ToArray();
+        if (items.SequenceEqual(_mediaItems, StringComparer.Ordinal)) return;
+        _mediaItems = items;
+        LstMedia.ItemsSource = items;
+    }
+
+    /// <summary>
+    /// Havuzdaki kaynagin tamamini cizelgenin <paramref name="at"/> anina secili kiple koyar ve konan
+    /// parcayi secer. Kaynak yoksa ya da teslim suruyorsa cizelge degismez.
+    /// </summary>
+    internal bool PlaceFromPool(int source, long at)
+    {
+        if (_model is null || Exporting || source < 0 || source >= SourcePaths.Count) return false;
+        var overwrite = PlaceOverwrite;
+        var placed = -1;
+        if (!Apply(model => (placed = model.PlaceSource(source, Math.Clamp(at, 0, model.Duration), overwrite)) >= 0, -1, reload: true)) return false;
+        Timeline.SelectedIndex = placed;
+        return true;
+    }
+
+    private async void OnPoolPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (!e.GetCurrentPoint(LstMedia).Properties.IsLeftButtonPressed || e.Source is not Avalonia.Visual visual) return;
+        if (Avalonia.VisualTree.VisualExtensions.FindAncestorOfType<ListBoxItem>(visual, includeSelf: true) is not { } row) return;
+        var index = LstMedia.IndexFromContainer(row);
+        if (index < 0) return;
+        var data = new DataTransfer();
+        data.Add(DataTransferItem.Create(PoolFormat, index.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+        await DragDrop.DoDragDropAsync(e, data, DragDropEffects.Copy).ConfigureAwait(true);
+    }
+
+    private static int? PoolSource(DragEventArgs e)
+        => e.DataTransfer.TryGetValue(PoolFormat) is { } text && int.TryParse(text, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var index) ? index : null;
+
+    private bool DropOnTimeline(DragEventArgs e, int source)
+    {
+        var x = e.GetPosition(Timeline).X;
+        if (x < Timeline.HeaderWidth || x > Timeline.Bounds.Width) return false;
+        var at = Timeline.XToTime(x);
+        return PlaceFromPool(source, Timeline.SnapTarget(at) ?? Timeline.RoundToFrame(at));
     }
 
     private bool IsSource(int index, string path)

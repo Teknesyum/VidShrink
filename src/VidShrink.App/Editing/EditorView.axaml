@@ -77,6 +77,7 @@
               </Button>
               <ToggleButton x:Name="BtnSnap" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.snap}" AutomationProperties.Name="{loc:Text editor.snap}"/>
               <Button x:Name="BtnAddSource" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.source.add}"/>
+              <ToggleButton x:Name="BtnMedia" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.media.open}" AutomationProperties.Name="{loc:Text editor.media.open}"/>
               <Button x:Name="BtnAddText" Theme="{StaticResource GhostButton}" MinWidth="{StaticResource EditorToolButtonSize}" Content="T" AutomationProperties.Name="{loc:Text editor.text.add}"/>
               <ToggleButton x:Name="BtnSilence" Theme="{StaticResource EditorToolButton}" AutomationProperties.Name="{loc:Text editor.silence.open}" ToolTip.Tip="{loc:Text editor.silence.open}">
                 <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconVolumeMute}" Fill="{Binding $parent[ToggleButton].Foreground}"/>
@@ -252,6 +253,16 @@
               <TextBox x:Name="TxtClipTemperature" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.temperature}"/>
             </StackPanel>
             <Button x:Name="BtnClipReset" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.reset}" AutomationProperties.Name="{loc:Text editor.clip.reset}"/>
+          </WrapPanel>
+          <WrapPanel x:Name="MediaPanel" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.media.open}">
+            <ListBox x:Name="LstMedia" Width="{StaticResource FieldWidth}" MaxHeight="{StaticResource DropDownMaxHeight}" SelectionMode="Single" AutomationProperties.Name="{loc:Text editor.media.open}" ToolTip.Tip="{loc:Text editor.media.tip}"/>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Top">
+              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.media.mode}"/>
+              <ComboBox x:Name="CmbPlaceMode" MinWidth="{StaticResource FieldWidthSm}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.media.mode}">
+                <ComboBoxItem Content="{loc:Text editor.media.insert}"/>
+                <ComboBoxItem Content="{loc:Text editor.media.overwrite}"/>
+              </ComboBox>
+            </StackPanel>
           </WrapPanel>
           <StackPanel x:Name="SilencePanel" Spacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.silence.panel}">
             <WrapPanel Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
