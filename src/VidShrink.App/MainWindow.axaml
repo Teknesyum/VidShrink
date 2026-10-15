@@ -1490,6 +1490,76 @@
                     </CheckBox>
 
                   </Grid>
+                  <StackPanel x:Name="ConvertFilterPanel" Spacing="{StaticResource SpaceSm}">
+                    <Button x:Name="BtnConvertFiltersToggle"
+                            Click="OnConvertFiltersToggle"
+                            Theme="{StaticResource PanelHeaderToggle}"
+                            auto:AutomationProperties.Name="{loc:Text main.advanced.filters.label}">
+                      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
+                        <Path x:Name="ConvertFiltersGlyph" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="{loc:Text main.advanced.filters.label}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                      </Grid>
+                    </Button>
+                    <WrapPanel x:Name="ConvertFilterBody" Classes="disclose" IsVisible="False" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                      <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+                        <TextBlock Text="{loc:Text main.advanced.filters.deinterlace}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="CmbConvertDeinterlace" SelectedIndex="0"
+                                  auto:AutomationProperties.Name="{loc:Text main.advanced.filters.deinterlace}">
+                          <ComboBoxItem Content="{loc:Text main.advanced.filters.off}" Tag="off"/>
+                          <ComboBoxItem Content="{loc:Text main.plan.automatic}" Tag="auto"/>
+                          <ComboBoxItem Content="{loc:Text main.advanced.filters.on}" Tag="on"/>
+                        </ComboBox>
+                      </StackPanel>
+                      <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+                        <TextBlock Text="{loc:Text main.advanced.filters.denoise}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="CmbConvertDenoise" SelectedIndex="0"
+                                  auto:AutomationProperties.Name="{loc:Text main.advanced.filters.denoise}">
+                          <ComboBoxItem Content="{loc:Text main.advanced.filters.off}" Tag="off"/>
+                          <ComboBoxItem Content="{loc:Text main.advanced.filters.light}" Tag="light"/>
+                          <ComboBoxItem Content="{loc:Text main.advanced.filters.medium}" Tag="medium"/>
+                          <ComboBoxItem Content="{loc:Text main.advanced.filters.strong}" Tag="strong"/>
+                        </ComboBox>
+                      </StackPanel>
+                      <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+                        <TextBlock Text="{loc:Text main.advanced.filters.rotate}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="CmbConvertRotate" SelectedIndex="0"
+                                  auto:AutomationProperties.Name="{loc:Text main.advanced.filters.rotate}">
+                          <ComboBoxItem Content="{loc:Text main.advanced.filters.off}" Tag="none"/>
+                          <ComboBoxItem Content="{loc:Text main.advanced.filters.rotate.clock}" Tag="clock"/>
+                          <ComboBoxItem Content="{loc:Text main.advanced.filters.rotate.cclock}" Tag="cclock"/>
+                          <ComboBoxItem Content="{loc:Text main.advanced.filters.rotate.180}" Tag="180"/>
+                          <ComboBoxItem Content="{loc:Text main.advanced.filters.rotate.hflip}" Tag="hflip"/>
+                          <ComboBoxItem Content="{loc:Text main.advanced.filters.rotate.vflip}" Tag="vflip"/>
+                        </ComboBox>
+                      </StackPanel>
+                      <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+                        <TextBlock Text="{loc:Text main.convert.scaler}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="CmbConvertScaler" SelectedIndex="0"
+                                  auto:AutomationProperties.Name="{loc:Text main.convert.scaler}">
+                          <ComboBoxItem Content="Lanczos" Tag="lanczos"/>
+                          <ComboBoxItem Content="{loc:Text main.convert.scaler.bicubic}" Tag="bicubic"/>
+                          <ComboBoxItem Content="{loc:Text main.convert.scaler.bilinear}" Tag="bilinear"/>
+                          <ComboBoxItem Content="Spline" Tag="spline"/>
+                          <ComboBoxItem Content="{loc:Text main.convert.scaler.neighbor}" Tag="neighbor"/>
+                        </ComboBox>
+                      </StackPanel>
+                      <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+                        <TextBlock Text="{loc:Text main.convert.fps-mode}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="CmbConvertFpsMode" SelectedIndex="0"
+                                  auto:AutomationProperties.Name="{loc:Text main.convert.fps-mode}">
+                          <ComboBoxItem Content="{loc:Text main.plan.automatic}" Tag="auto"/>
+                          <ComboBoxItem Content="{loc:Text main.convert.fps-mode.constant}" Tag="constant"/>
+                          <ComboBoxItem Content="{loc:Text main.convert.fps-mode.variable}" Tag="variable"/>
+                        </ComboBox>
+                      </StackPanel>
+                      <CheckBox x:Name="ChkConvertAutoCrop" Theme="{StaticResource CheckStyle}" IsChecked="False" VerticalAlignment="Center"
+                                MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
+                                Content="{loc:Text main.advanced.filters.autocrop}"/>
+                      <CheckBox x:Name="ChkConvertLetterbox" Theme="{StaticResource CheckStyle}" IsChecked="False" IsEnabled="False" VerticalAlignment="Center"
+                                MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
+                                Content="{loc:Text main.convert.letterbox}"/>
+                    </WrapPanel>
+                  </StackPanel>
                 </StackPanel>
               </Border>
 

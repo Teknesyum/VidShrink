@@ -100,6 +100,7 @@ public sealed class LanguageTests : IDisposable
         "DNxHR LB", "DNxHR SQ", "DNxHR HQ", "DNxHR HQX", "DNxHR 444",
         "H.264 Nvidia", "H.265 Nvidia", "AV1 Nvidia", "H.264 Intel", "H.265 Intel", "AV1 Intel",
         "H.264 AMD", "H.265 AMD", "AV1 AMD",
+        "Lanczos", "Spline",
         "T"
     };
 

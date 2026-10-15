@@ -17,6 +17,9 @@ public enum TransposeMode { None, Clockwise, CounterClockwise, UpsideDown, FlipH
 
 public enum ColorMatrixTarget { Keep, Bt709, Bt601 }
 
+/// <summary>DON-P10: ölçek süzgecinin algoritması (<c>scale</c>'in <c>flags</c> değeri); varsayılan <see cref="Lanczos"/>.</summary>
+public enum ScaleAlgorithm { Lanczos, Bicubic, Bilinear, Spline, Neighbor }
+
 public readonly record struct CropRect(int Width, int Height, int X, int Y)
 {
     public override string ToString()
@@ -73,6 +76,12 @@ public sealed record VideoFilterOptions
     public ColorMatrixTarget ColorMatrix { get; init; } = ColorMatrixTarget.Keep;
     public bool Deband { get; init; }
     public CropRect? Crop { get; init; }
+
+    /// <summary>
+    /// DON-P10: ölçek süzgecinin algoritması. Görüntünün içeriğini değil yalnız ölçeğin
+    /// nasıl yapılacağını seçer; <see cref="ChangesPicture"/>'a girmez.
+    /// </summary>
+    public ScaleAlgorithm Scaler { get; init; } = ScaleAlgorithm.Lanczos;
 
     /// <summary>
     /// B1f: kaynagin bu sirali altyazisi (0 tabanli, ffmpeg'in <c>si</c>'si) goruntuye yakilir ve
@@ -383,13 +392,14 @@ public static class VideoFilterChain
         return before;
     }
 
-    private static (List<string> Before, List<string> After) Split(MediaInfo info, EncodePlan plan)
+    /// <summary>
+    /// Ölçekten ve yakmadan önceki görüntü süzgeçleri, Küçült'ün sırasıyla: detelecine,
+    /// taramasızlaştırma, kırpma, blok giderme, gürültü, bant giderme, döndürme. Dönüştür aynı
+    /// listeyi kullanır.
+    /// </summary>
+    public static List<string> PictureFilters(MediaInfo info, VideoFilterOptions options)
     {
-        var options = plan.Filters ?? VideoFilterOptions.Default;
-        var source = PlannedSource(info, options);
-        var before = new List<string>();
-        var filters = before;
-
+        var filters = new List<string>();
         if (options.Detelecine) filters.Add(DetelecineChain);
         if (Deinterlaces(info, options)) filters.Add(DeinterlaceChain);
         if (options.Crop is { } crop) filters.Add($"crop={crop}");
@@ -397,10 +407,46 @@ public static class VideoFilterChain
         if (DenoiseText(options) is string denoise) filters.Add(denoise);
         if (options.Deband) filters.Add(DebandFilter);
         filters.AddRange(TransposeFilters(options.Transpose));
+        return filters;
+    }
+
+    public static string ScaleFlags(ScaleAlgorithm scaler) => scaler switch
+    {
+        ScaleAlgorithm.Bicubic => "bicubic",
+        ScaleAlgorithm.Bilinear => "bilinear",
+        ScaleAlgorithm.Spline => "spline",
+        ScaleAlgorithm.Neighbor => "neighbor",
+        _ => "lanczos"
+    };
+
+    /// <summary>
+    /// DON-P10: görüntüyü oranını bozmadan hedef çerçeveye sığdırıp kalan yeri siyah bantla
+    /// doldurur. Boyut tek sayıya düşmesin diye ölçek <c>force_divisible_by=2</c> ile yuvarlanır.
+    /// </summary>
+    public static IReadOnlyList<string> LetterboxFilters(int width, int height, ScaleAlgorithm scaler)
+    {
+        var w = width.ToString(CultureInfo.InvariantCulture);
+        var h = height.ToString(CultureInfo.InvariantCulture);
+        return new[]
+        {
+            $"scale={w}:{h}:force_original_aspect_ratio=decrease:force_divisible_by=2:flags={ScaleFlags(scaler)}",
+            $"pad={w}:{h}:(ow-iw)/2:(oh-ih)/2:color=black",
+            SquarePixelFilter
+        };
+    }
+
+    private static (List<string> Before, List<string> After) Split(MediaInfo info, EncodePlan plan)
+    {
+        var options = plan.Filters ?? VideoFilterOptions.Default;
+        var source = PlannedSource(info, options);
+        var before = new List<string>();
+        var filters = before;
+
+        filters.AddRange(PictureFilters(info, options));
         if (BurnFilter(info, options, plan.Trim?.LeadSeconds ?? 0) is string burn) filters.Add(burn);
         filters = new List<string>();
         if (plan.Width != source.Width || plan.Height != source.Height)
-            filters.Add($"scale={plan.Width}:{plan.Height}:flags=lanczos");
+            filters.Add($"scale={plan.Width}:{plan.Height}:flags={ScaleFlags(options.Scaler)}");
         if (info.IsAnamorphic) filters.Add(SquarePixelFilter);
         if (ChromaSmoothText(options.ChromaSmooth) is string chroma) filters.Add(chroma);
         if (SharpenText(options.Sharpen) is string sharpen) filters.Add(sharpen);
@@ -437,12 +483,16 @@ public static class VideoFilterChain
     /// Olcum: <c>docs/olcumler/kare-hizi-kipi.md</c>.
     /// </summary>
     public static IReadOnlyList<string> FrameRateArgs(MediaInfo info, EncodePlan plan, string specifier = "")
+        => FrameRateArgs(plan.FrameRate, plan.Fps, plan.FrameRate == FrameRateMode.Peak ? PeakCeiling(info, plan) : plan.Fps, specifier);
+
+    /// <summary>Aynı seçenekler, hız ve tavan dışarıdan; Dönüştür kendi hızını verir.</summary>
+    public static IReadOnlyList<string> FrameRateArgs(FrameRateMode mode, double fps, double ceiling, string specifier = "")
     {
         static string Number(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
-        return plan.FrameRate switch
+        return mode switch
         {
-            FrameRateMode.Constant => new[] { "-r" + specifier, Number(plan.Fps), "-fps_mode" + specifier, "cfr" },
-            FrameRateMode.Peak => new[] { "-enc_time_base" + specifier, "1/" + Number(PeakCeiling(info, plan)), "-fps_mode" + specifier, "vfr" },
+            FrameRateMode.Constant => new[] { "-r" + specifier, Number(fps), "-fps_mode" + specifier, "cfr" },
+            FrameRateMode.Peak => new[] { "-enc_time_base" + specifier, "1/" + Number(ceiling), "-fps_mode" + specifier, "vfr" },
             _ => Array.Empty<string>()
         };
     }
@@ -582,6 +632,7 @@ public static class VideoFilterChain
         if (options.ColorMatrix != ColorMatrixTarget.Keep)
             parts.Add(options.ColorMatrix == ColorMatrixTarget.Bt709 ? "colorspace=bt709" : "colorspace=bt601");
         if (options.Crop is { } crop) parts.Add("crop=" + crop);
+        if (options.Scaler != ScaleAlgorithm.Lanczos) parts.Add("scaler=" + ScaleFlags(options.Scaler));
         return string.Join(", ", parts);
     }
 
@@ -647,6 +698,15 @@ public static class VideoFilterChain
                     _ => throw Bad(raw)
                 } },
                 "crop" => ParseCrop(options, value, raw),
+                "scaler" => options with { Scaler = value switch
+                {
+                    "lanczos" => ScaleAlgorithm.Lanczos,
+                    "bicubic" => ScaleAlgorithm.Bicubic,
+                    "bilinear" => ScaleAlgorithm.Bilinear,
+                    "spline" => ScaleAlgorithm.Spline,
+                    "neighbor" => ScaleAlgorithm.Neighbor,
+                    _ => throw Bad(raw)
+                } },
                 _ => throw Bad(raw)
             };
         }

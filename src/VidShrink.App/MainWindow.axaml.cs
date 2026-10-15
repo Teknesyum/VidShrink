@@ -302,6 +302,7 @@ public partial class MainWindow : Window
         Watch(ChkConvertBurnBox, ToggleButton.IsCheckedProperty, OnConvertChanged);
         foreach (var field in new[] { TxtCustomResolution, TxtCustomFps, TxtAudioBitrate, TxtTrimStart, TxtTrimEnd })
             Watch(field, TextBox.TextProperty, OnConvertChanged);
+        InitializeConvertFilterUi();
 
         Watch(ChkAutoUpdate, ToggleButton.IsCheckedProperty, OnAutoUpdateChanged);
         foreach (var radio in new[] { RbTrimEnd, RbTrimStart, RbTrimBoth })
@@ -4839,6 +4840,9 @@ public partial class MainWindow : Window
             BurnFontSize = ConvertBurnsText ? ConvertBurnFontSize : null,
             BurnColor = ConvertBurnsText ? ConvertBurnColor : null,
             BurnBox = ConvertBurnsText && ChkConvertBurnBox.IsChecked == true,
+            Filters = DonusturSuzgecleri(),
+            Letterbox = resolutionTag == "custom" && ChkConvertLetterbox.IsChecked == true,
+            FrameRate = DonusturKareHiziKipi(),
             TargetBytes = _sequence is null ? GifPalette.TargetFor(_info ?? _sesKaynagi, container, ParseTargetMb()) : null
         };
     }
@@ -4903,6 +4907,7 @@ public partial class MainWindow : Window
     {
         TxtCustomResolution.IsEnabled = SelectedTag(CmbResolution) == "custom";
         TxtCustomFps.IsEnabled = SelectedTag(CmbConvertFps) == "custom";
+        ChkConvertLetterbox.IsEnabled = SelectedTag(CmbResolution) == "custom";
         var plan = ReadConversionPlan();
         TxtAudioBitrate.IsEnabled = plan.AudioCodec is { } ses && ses != "copy";
         var kaliteOkunur = !IntermediateCodecs.IsIntermediate(plan.VideoCodec) && !plan.ImageSequenceOutput;
@@ -4913,6 +4918,7 @@ public partial class MainWindow : Window
     private void RefreshConversion()
     {
         if (ConvertInfo is not { } info) return;
+        DonusturKirpmaYoklamasi();
         var plan = ReadConversionPlan();
         var errors = ConversionArguments.Validate(info, plan).Select(message => LanguageCatalog.Validation(message)).ToList();
         if (plan.Start == TimeSpan.MinValue || plan.End == TimeSpan.MinValue)
@@ -4922,7 +4928,7 @@ public partial class MainWindow : Window
         RefreshConvertSubtitleState(plan);
         RefreshConvertAudioState(plan);
         TxtConvertValidation.Text = errors.Count == 0
-            ? string.Join("\n", ConversionArguments.Notes(plan).Select(note => Say(ConversionNoteKey(note))).Concat(ConvertSubtitleNotes(plan)).Prepend(Say("main.convert.ready")))
+            ? string.Join("\n", ConversionArguments.Notes(plan, info).Select(note => Say(ConversionNoteKey(note))).Concat(ConvertSubtitleNotes(plan)).Prepend(Say("main.convert.ready")))
             : string.Join("\n", errors);
         BtnConvert.IsEnabled = errors.Count == 0 && _cts is null;
 

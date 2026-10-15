@@ -159,7 +159,7 @@ public sealed class DonusturEksikleriTests
     public void NotAnahtariKirkIkiDildeCevrili()
     {
         var anahtarlar = Enum.GetValues<ConversionNote>().Select(MainWindow.ConversionNoteKey).ToList();
-        var adlar = new Dictionary<string, string> { [NotAnahtari] = "WebP", ["main.convert.note.gif-target"] = "GIF" };
+        var adlar = new Dictionary<string, string> { [NotAnahtari] = "WebP", ["main.convert.note.gif-target"] = "GIF", ["main.convert.note.filters-reencode"] = "" };
         Assert.Equal(adlar.Keys, anahtarlar);
 
         var english = Locales.Domain("en", "main");
