@@ -19,7 +19,7 @@ public static class AdlandirmaDeseni
 
     /// <summary>Tanınan yer tutucular. Küme kapalı: dışarıdan gelen ad buna göre elenir.</summary>
     public static readonly IReadOnlyList<string> YerTutucular =
-        ["ad", "hedef", "kalite", "cozunurluk", "kodek", "tarih"];
+        ["ad", "hedef", "kalite", "cozunurluk", "kodek", "tarih", "saat", "bithizi", "karehizi", "klasor", "sayac"];
 
     /// <summary>Düzenleyicinin parça adı deseninin varsayılanı; etiketsiz parçada eski <c>&lt;ad&gt;-01</c> adını verir.</summary>
     public const string ParcaVarsayilan = "{ad}-{parca}-{etiket}";
@@ -133,6 +133,17 @@ public static class AdlandirmaDeseni
             : string.Empty,
         "kodek" => KisaKodek(bilgi.Kodek),
         "tarih" => bilgi.Tarih.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+        "saat" => bilgi.Tarih.ToString("HH-mm", CultureInfo.InvariantCulture),
+        "bithizi" => bilgi.VideoBitrateK is { } bit && bit > 0
+            ? string.Create(CultureInfo.InvariantCulture, $"{bit}kbps")
+            : string.Empty,
+        "karehizi" => bilgi.KareHizi is { } fps && fps > 0
+            ? string.Create(CultureInfo.InvariantCulture, $"{Math.Round(fps, 2):0.##}fps").Replace(".", "_", StringComparison.Ordinal)
+            : string.Empty,
+        "klasor" => Temizle(bilgi.KaynakKlasoru),
+        "sayac" => bilgi.Sayac is { } sayac && sayac > 0
+            ? sayac.ToString("000", CultureInfo.InvariantCulture)
+            : string.Empty,
         "parca" => bilgi.Parca ?? string.Empty,
         "etiket" => Temizle(bilgi.Etiket),
         "zaman" => bilgi.Zaman ?? string.Empty,
@@ -206,6 +217,15 @@ public sealed record AdBilgisi(string Ad)
     public string? Kodek { get; init; }
 
     public DateTime Tarih { get; init; } = DateTime.Now;
+
+    /// <summary>SIK-13: <c>{karehizi}</c> için çıktının kare hızı.</summary>
+    public double? KareHizi { get; init; }
+
+    /// <summary>SIK-13: <c>{klasor}</c> için kaynağın bulunduğu klasörün adı.</summary>
+    public string? KaynakKlasoru { get; init; }
+
+    /// <summary>SIK-13: <c>{sayac}</c> için işin sıra numarası; üç haneye sıfırla doldurulur.</summary>
+    public int? Sayac { get; init; }
 
     /// <summary>Parça adında sıra numarası, sıfır dolgulu.</summary>
     public string? Parca { get; init; }

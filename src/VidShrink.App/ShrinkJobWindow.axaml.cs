@@ -104,6 +104,7 @@ public partial class ShrinkJobWindow : Window
     internal IQueueEndActions Actions { get; set; } = SystemQueueEndActions.Instance;
 
     private readonly List<BitenIs> _bitenler = new();
+    private readonly List<ShrinkRequest> _dusenler = new();
     private Func<bool>? _pencereEtkin;
 
     /// <summary>İş bitti haberinin sistem yüzü; testler sahtesini verir.</summary>
@@ -535,6 +536,51 @@ public partial class ShrinkJobWindow : Window
         for (var i = 0; i < pending.Count; i++) PendingList.Children.Add(PendingRow(pending, i));
     }
 
+    /// <summary>SIK-24: hata veren işler, bitiş sırasıyla. Satırdaki düğme işi tek tıkla yeniden sıraya alır.</summary>
+    internal IReadOnlyList<ShrinkRequest> FailedJobs => _dusenler;
+
+    internal void Dustu(ShrinkRequest request)
+    {
+        _dusenler.Add(request);
+        RefreshFailed();
+    }
+
+    /// <summary>SIK-24: düşen işi listeden çıkarıp aynı seçenekleriyle sıranın sonuna ekler.</summary>
+    internal void RetryFailed(int index)
+    {
+        if (index < 0 || index >= _dusenler.Count) return;
+        var request = _dusenler[index];
+        _dusenler.RemoveAt(index);
+        RefreshFailed();
+        CancelCountdown();
+        Accept(request);
+    }
+
+    private void RefreshFailed()
+    {
+        FailedPanel.IsVisible = _dusenler.Count > 0;
+        TxtFailed.Text = Say("main.shrink-job.failed", _dusenler.Count);
+        FailedList.Children.Clear();
+        for (var i = 0; i < _dusenler.Count; i++)
+        {
+            var index = i;
+            var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), ColumnSpacing = Token("SpaceXs") };
+            var name = new TextBlock
+            {
+                Text = Path.GetFileName(_dusenler[i].Path),
+                FontSize = Token("FontSizeSm"),
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                FlowDirection = FlowDirection.LeftToRight,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            ToolTip.SetTip(name, _dusenler[i].Path);
+            row.Children.Add(name);
+            AddRowButton(row, 1, "IconRestart", "main.shrink-job.retry", true, () => RetryFailed(index));
+            FailedList.Children.Add(row);
+        }
+    }
+
     private Grid PendingRow(IReadOnlyList<ShrinkRequest> pending, int index)
     {
         var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto,Auto,Auto"), ColumnSpacing = Token("SpaceXs") };
@@ -791,7 +837,7 @@ public partial class ShrinkJobWindow : Window
             RefreshActive(false);
             var plan = PlanCalculator.Build(info, options);
             var output = OutputReservations.Shared.Reserve(taken =>
-                UniqueOutputPath(request.Path, _appSettings, plan, targetMb, ExtensionFor(plan), taken));
+                UniqueOutputPath(request.Path, _appSettings, plan, targetMb, ExtensionFor(plan), taken, sira));
             ayrilan = output;
             QueueWatch.MarkOwn(output);
             if (SpaceBeforeStart(output, targetMb) is { } alanYok)
@@ -804,7 +850,7 @@ public partial class ShrinkJobWindow : Window
             var progress = new Progress<EncodeProgress>(step => ShowProgress(job, step));
             var soruAdi = ParallelLimit > ParallelJobs.Default ? Path.GetFileName(request.Path) : null;
 
-            var result = await new EncodeRunner { Pause = EncodePause }.RunAsync(
+            var result = await new EncodeRunner { Pause = EncodePause, KaynakTarihleriniKoru = _appSettings.KeepSourceDates }.RunAsync(
                 info, plan, output, targetMb, progress, ct, options.FillPolicy,
                 askBeforeRetry: (prompt, token) => AskOvershootAsync(soruAdi, prompt, token));
 
@@ -839,6 +885,7 @@ public partial class ShrinkJobWindow : Window
             if (ayrilan is not null) OutputReservations.Shared.Release(ayrilan);
             _finished++;
             IsBitti(request.Path, sonuc);
+            if (sonuc == IsSonucu.Hatali) Dustu(request);
             _aktif.Remove(job);
             RefreshActive(true);
             if (_aktif.Count == 0)
@@ -1023,7 +1070,7 @@ public partial class ShrinkJobWindow : Window
     }
 
     internal static string UniqueOutputPath(string inputPath, AppSettings settings, EncodePlan? plan, double targetMb, string extension = "mp4",
-        Func<string, bool>? taken = null)
+        Func<string, bool>? taken = null, int sayac = 1)
         => ShrinkEngine.UniqueOutputPath(
             inputPath,
             "shrunk",
@@ -1035,7 +1082,10 @@ public partial class ShrinkJobWindow : Window
                 Crf = plan?.Crf,
                 VideoBitrateK = plan?.VideoBitrateK,
                 Yukseklik = plan?.Height,
-                Kodek = plan?.Codec
+                Kodek = plan?.Codec,
+                KareHizi = plan?.Fps > 0 ? plan.Fps : null,
+                KaynakKlasoru = ShrinkEngine.KaynakKlasoru(inputPath),
+                Sayac = sayac
             }),
             taken);
 
@@ -1067,6 +1117,10 @@ public partial class ShrinkJobWindow : Window
     internal string HataSatiri(EncodeResult result, double hedefMb, EncodePlan plan)
     {
         var kultur = Strings.CultureOf(_language);
+        if (result.Kusur is { } kusur)
+            return kusur.Cozulemedi
+                ? Say("main.run.output-unreadable")
+                : Say("main.run.output-short", kusur.OkunanSaniye!.Value.ToString("0.#", kultur), kusur.BeklenenSaniye.ToString("0.#", kultur));
         return result.CeilingExceeded
             ? Say("main.run.over-ceiling", Bicim.Boyut.Hedef(EncodeRunner.EffectiveTargetMb(hedefMb, plan), kultur), result.Attempts, Bicim.Boyut.Mb(result.OutputMb, kultur))
             : Say("main.run.ended");

@@ -113,6 +113,16 @@
         </ScrollViewer>
       </StackPanel>
 
+      <StackPanel x:Name="FailedPanel" Spacing="{StaticResource SpaceXs}" IsVisible="False">
+        <TextBlock x:Name="TxtFailed"
+                   FontSize="{StaticResource FontSizeSm}"
+                   Foreground="{StaticResource TextBody}"/>
+        <ScrollViewer MaxHeight="{StaticResource DropDownMaxHeight}"
+                      HorizontalScrollBarVisibility="Disabled">
+          <StackPanel x:Name="FailedList" Spacing="{StaticResource SpaceXs}"/>
+        </ScrollViewer>
+      </StackPanel>
+
       <StackPanel x:Name="QueueControls" Spacing="{StaticResource SpaceSm}">
         <Button Theme="{StaticResource GhostButton}" x:Name="BtnPause"
                 Content="{loc:Text main.shrink-job.pause}"

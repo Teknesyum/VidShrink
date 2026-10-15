@@ -1280,6 +1280,8 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, dosya basina hatirlama ve gezinme (OYA-05): dort yeni anahtar (<c>main.player.menu.goto</c>, <c>player.view.seek-steps</c>, <c>player.goto.hint</c>, <c>player.goto.invalid</c>), dusen yok; olculen 70821 + 43 x 4 = 70993. <c>kayip</c> 0.</para>
     /// <para>2026-10-15, dosya basina hatirlama ve gezinme (OYA-05): dort yeni anahtardan 7 kol (<c>main.player.menu.goto</c>: en, es, pl; <c>player.view.seek-steps</c>: es, fr, pt, ro), KOL dokumunden sayildi, tr girmiyor: taban pimi 3516 + 7 = 3523, en 334 + 1 = 335, tr 110.</para>
     /// <para>2026-10-15, iki dalin birlesmesi: 70821 + 215 + 172 = 71208.</para>
+    /// <para>2026-10-15, SIK-P6 birlesmesi: olculen toplam 3523 + 10 = 3533, en 336, tr 110, gezilen 71208 + 258 = 71466.</para>
+    /// <para>2026-10-15, cikti tarihi, adi ve dogrulamasi (SIK-P6): alti yeni anahtardan (<c>main.shrink-job.failed</c>, <c>.retry</c>, <c>main.run.output-unreadable</c>, <c>.output-short</c>, <c>settings-tab.keep-dates.label</c>, <c>.hint</c>) 10 kol (<c>main.shrink-job.retry</c>: es, hu, it, nl, pl, pt; <c>settings-tab.keep-dates.label</c>: en, es, hu, pt), KOL dokumunden sayildi, tr girmiyor: olculen 3516 + 10 = 3526, en 334 + 1 = 335, tr 110.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1305,8 +1307,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3523, toplam);
-        Assert.Equal(335, dilBasina["en"]);
+        Assert.Equal(3533, toplam);
+        Assert.Equal(336, dilBasina["en"]);
         Assert.Equal(110, dilBasina["tr"]);
     }
 
@@ -1561,6 +1563,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, kayan sonuc karti (EKB-P14): dort yeni <c>recorder.card.*</c> anahtari, dusen yok; taban pimi 68499 + 43 x 4 = 68671.</para>
     /// <para>2026-10-15, origin/main birlesmesinden sonra (EKB-P14 dali): main tarafinin pimi 68241 ile bu dalin anahtarlari bir arada, dusen yok; olculen gezilen 69015.</para>
     /// <para>2026-10-15, ses dosyasi ve GIF girdisi (ARC-P3): uc yeni anahtar (<c>main.convert.note.gif-target</c>, <c>main.error.audio-only-shrink</c>, <c>main.validation.no-video-container</c>), dusen yok; olculen 69402 + 43 x 3 = 69531. <c>kayip</c> 0.</para>
+    /// <para>2026-10-15, cikti tarihi, adi ve dogrulamasi (SIK-P6): alti yeni anahtar (<c>main.shrink-job.failed</c>, <c>.retry</c>, <c>main.run.output-unreadable</c>, <c>.output-short</c>, <c>settings-tab.keep-dates.label</c>, <c>.hint</c>), dusen yok; olculen 70821 + 43 x 6 = 71079. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1588,7 +1591,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(71208, gezilen);
+        Assert.Equal(71466, gezilen);
         Assert.Empty(kayip);
     }
 

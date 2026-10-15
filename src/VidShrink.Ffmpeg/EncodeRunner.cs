@@ -17,6 +17,9 @@ public sealed record EncodeAttempt(int Number, string Branch, double AimMb, doub
 /// </summary>
 public sealed record EncodeResult(bool Success, string OutputPath, double OutputMb, EncodePlan PlanUsed, int Attempts, string? Error, bool UnderBand = false, bool CeilingExceeded = false, IReadOnlyList<EncodeAttempt>? Trace = null, IReadOnlyList<string>? DroppedOptions = null, bool OverTarget = false, TrimPlan? Trim = null, bool Saturated = false, Hdr10PlusCount? Hdr10Plus = null)
 {
+    /// <summary>SIK-18: teslimden önceki okumada çıktı çözülemedi ya da kısa çıktı; hedef dosya ezilmedi.</summary>
+    public CiktiKusuru? Kusur { get; init; }
+
     /// <summary>Teslim edilen kodlamada motorun verdigi ayarlardan en az biri dusurulmus.</summary>
     public bool DroppedAnOption => DroppedOptions is { Count: > 0 };
 
@@ -136,12 +139,77 @@ public sealed class EncodeRunner
         SceneMap? scenes = null)
     {
         var bridge = new Hdr10PlusSource();
-        var result = await RunEncodeAsync(info, plan, outputPath, targetMb, progress, ct, fillPolicy, profile, askBeforeRetry, scenes, bridge);
+        var dogrula = plan.ModeEnum != EncodeMode.PassThrough && (SureOkuyucu is not null || SahteKodlayici is null);
+        var teslimYolu = dogrula ? PartialPathFor(outputPath) : outputPath;
+        EncodeResult result;
+        try
+        {
+            result = await RunEncodeAsync(info, plan, teslimYolu, targetMb, progress, ct, fillPolicy, profile, askBeforeRetry, scenes, bridge);
+            if (dogrula) result = await TeslimEtAsync(info, result, teslimYolu, outputPath, ct);
+        }
+        catch
+        {
+            if (dogrula) TryDelete(teslimYolu);
+            throw;
+        }
+        if (KaynakTarihleriniKoru && result.Success && File.Exists(result.OutputPath) && !PathEquality.Same(info.FilePath, result.OutputPath))
+            KaynakTarihi.Tasi(info.FilePath, result.OutputPath);
         if (bridge.CoverLost && result.Success)
             result = result with { DroppedOptions = (result.DroppedOptions ?? Array.Empty<string>()).Append(CoverLostWarning).ToList() };
         if (bridge.Frames is not int sourceFrames || !result.Success || !File.Exists(result.OutputPath)) return result;
         var outputFrames = await FfprobeClient.CountHdr10PlusAsync(result.OutputPath, ct);
         return result with { Hdr10Plus = new Hdr10PlusCount(sourceFrames, outputFrames) };
+    }
+
+    /// <summary>
+    /// SIK-18: kodlanan dosya asıl ada ancak okunduktan sonra taşınır. Çözülemeyen ya da beklenenden
+    /// belirgin kısa dosya silinir, iş hatalı döner ve hedefte duran eski dosyaya dokunulmaz.
+    /// Beklenen süre, kullanıcı aşımda kırpmayı seçtiyse kırpılmış süredir.
+    /// </summary>
+    private async Task<EncodeResult> TeslimEtAsync(MediaInfo info, EncodeResult result, string teslimYolu, string outputPath, CancellationToken ct)
+    {
+        if (!result.Success || !File.Exists(teslimYolu))
+        {
+            TryDelete(teslimYolu);
+            return result with { OutputPath = outputPath };
+        }
+
+        var beklenen = result.Trim?.KeptSeconds ?? result.PlanUsed.EffectiveDurationSeconds(info.DurationSeconds);
+        var okunan = await (SureOkuyucu ?? CiktiSuresiAsync)(teslimYolu, ct);
+        if (CiktiDogrulama.Denetle(beklenen, okunan) is { } kusur)
+        {
+            TryDelete(teslimYolu);
+            var neden = kusur.Cozulemedi
+                ? "the encoded file could not be read back"
+                : $"the encoded file lasts {kusur.OkunanSaniye:0.###} s, {kusur.BeklenenSaniye:0.###} s was expected";
+            return result with
+            {
+                Success = false,
+                OutputPath = outputPath,
+                Error = $"Output check failed: {neden}; the target file was left untouched.",
+                Kusur = kusur
+            };
+        }
+
+        File.Move(teslimYolu, outputPath, overwrite: true);
+        return result with { OutputPath = outputPath };
+    }
+
+    /// <summary>Çıktının ffprobe ile okunan süresi; dosya çözülemiyorsa <c>null</c>.</summary>
+    public static async Task<double?> CiktiSuresiAsync(string path, CancellationToken ct)
+    {
+        try
+        {
+            return (await FfprobeClient.ProbeAsync(path, ct)).DurationSeconds;
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     /// <summary>
@@ -824,6 +892,15 @@ public sealed class EncodeRunner
 
     /// <summary>Testin ffmpeg yerine koydugu kodlayici: plani, cikti yolunu ve gecisi alir, dosyayi kendisi yazar.</summary>
     internal Func<EncodePlan, string, int, Task>? SahteKodlayici { get; init; }
+
+    /// <summary>
+    /// SIK-18: teslimden önce çıktının süresini okuyan kanca; <c>null</c> ise ffprobe okur. Sahte kodlayıcıyla
+    /// koşan test bunu vermezse doğrulama atlanır, çünkü sahte dosya video değildir.
+    /// </summary>
+    internal Func<string, CancellationToken, Task<double?>>? SureOkuyucu { get; init; }
+
+    /// <summary>SIK-11: açıksa teslimden sonra kaynağın oluşturma ve değiştirme tarihi çıktıya yazılır.</summary>
+    public bool KaynakTarihleriniKoru { get; init; }
 
     /// <summary>Testin kodlama sureci baslar baslamaz okudugu kanca; onceligi atandiktan sonra cagrilir.</summary>
     internal Action<Process>? Started { get; init; }
