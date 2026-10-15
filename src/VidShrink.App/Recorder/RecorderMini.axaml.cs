@@ -130,7 +130,7 @@ internal partial class RecorderMini : Window
         var counting = countdown > 0;
 
         TxtElapsed.Text = counting ? RecorderView.CountdownDigits(countdown) : elapsed;
-        LiveDot.IsVisible = running;
+        LiveDot.Opacity = running ? 1 : 0;
 
         BtnStop.IsVisible = running || paused || counting;
         BtnRegion.IsVisible = !BtnStop.IsVisible;
