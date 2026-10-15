@@ -4819,6 +4819,7 @@ public partial class MainWindow : Window
             HdrPolicy = HdrPolicyIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve,
             DropMetadata = ChkConvertDropMetadata.IsChecked == true,
             SubtitleTracks = ConvertSubtitleChoice(),
+            AudioTracks = ConvertAudioChoice(),
             ExternalSubtitles = _convertSubtitles.ToList(),
             SingleFrame = ChkConvertSingleFrame.IsChecked == true
         };
@@ -4901,6 +4902,7 @@ public partial class MainWindow : Window
 
         var output = CommandOutputPath(plan, ConversionOutputPath(info, plan));
         RefreshConvertSubtitleState(plan);
+        RefreshConvertAudioState(plan);
         TxtConvertValidation.Text = errors.Count == 0
             ? string.Join("\n", ConversionArguments.Notes(plan).Select(note => Say(ConversionNoteKey(note))).Concat(ConvertSubtitleNotes(plan)).Prepend(Say("main.convert.ready")))
             : string.Join("\n", errors);

@@ -36,6 +36,13 @@ public sealed class ConversionPlan
     /// </summary>
     public IReadOnlyList<int>? SubtitleTracks { get; init; }
 
+    /// <summary>
+    /// Ciktiya giden kaynak ses izleri (0 tabanli ses sirasi), kaynak sirasiyla eslenir. <c>null</c>
+    /// bugunku davranis: tek ses, ffmpeg'in <c>-map</c>'siz sececegi iz (<see cref="ConversionArguments.AutoAudio"/>).
+    /// Bos liste ses yazmaz.
+    /// </summary>
+    public IReadOnlyList<int>? AudioTracks { get; init; }
+
     /// <summary>Ek <c>-i</c> girdisi olarak baglanan .srt/.ass dosyalari.</summary>
     public IReadOnlyList<ExternalSubtitle> ExternalSubtitles { get; init; } = Array.Empty<ExternalSubtitle>();
     public bool AudioOnly => Container is "mp3" or "m4a" or "wav" or "flac";

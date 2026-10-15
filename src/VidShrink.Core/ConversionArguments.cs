@@ -33,8 +33,22 @@ public static class ConversionArguments
             errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support copying the source {source} video stream.");
         if (plan.Start is { } trimStart && plan.End is { } trimEnd && trimEnd <= trimStart)
             errors.Add("The trim end must come after the trim start.");
-        if (plan.CarriesAudio && plan.AudioCodec == "copy" && !AudioCopyCompatible(plan.Container, info.AudioCodec))
-            errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support copying the source {info.AudioCodec} audio stream.");
+        if (plan.CarriesAudio && plan.AudioCodec == "copy")
+        {
+            var copied = plan.AudioTracks is null
+                ? new[] { info.AudioCodec }
+                : SourceAudio(info, plan).Select(stream => (string?)stream.Codec).Distinct().ToArray();
+            foreach (var codec in copied.Where(codec => !AudioCopyCompatible(plan.Container, codec)))
+                errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support copying the source {codec} audio stream.");
+        }
+        if (plan.CarriesAudio && plan.AudioCodec is not null && plan.AudioTracks is not null)
+        {
+            var selected = SourceAudio(info, plan).Count;
+            if (selected > 1 && plan.Container is "mp3" or "wav" or "flac")
+                errors.Add($"The {plan.Container.ToUpperInvariant()} container carries only one audio track.");
+            if (selected == 0 && plan.AudioOnly && info.HasAudio)
+                errors.Add("No audio track is selected.");
+        }
         return errors;
     }
 
@@ -96,8 +110,8 @@ public static class ConversionArguments
         if (plan.AudioOnly)
         {
             a.Add("-vn");
-            AddAudio(a, plan);
-            a.AddRange(MetadataArgs(info, plan));
+            AddAudio(a, info, plan);
+            a.AddRange(MetadataArgs(info, plan, subtitles));
             a.Add(outputPath);
             return a;
         }
@@ -166,7 +180,7 @@ public static class ConversionArguments
             if (hdr.ColorArgs.Count > 0) a.AddRange(hdr.ColorArgs);
             if (dolbyVision) a.AddRange(HdrResolver.DolbyVisionArgs);
         }
-        AddAudio(a, plan);
+        AddAudio(a, info, plan);
         if (subtitles is not null)
         {
             a.AddRange(StreamPlan.SubtitleCodecArguments(subtitles));
@@ -232,16 +246,14 @@ public static class ConversionArguments
 
     /// <summary>
     /// Meta silme argümanları küçültmeyle aynı kaynaktan (<see cref="StreamMapping.MetadataArguments"/>).
-    /// Çıktıya giren ses ffmpeg'in seçeceği izdir (<see cref="AutoAudio"/>) ve dili ondan yazılır.
+    /// Çıktıya giren sesler <see cref="SourceAudio"/>'dan (seçim yokken ffmpeg'in seçeceği iz) ve dilleri çıktı sırasıyla yazılır.
     /// Altyazılar açık eşlendiğinde (<paramref name="mapped"/>) dil her kaynak ize kendi sırasıyla yazılır;
     /// eşlenmeyen planda yalnız kaynakta tek altyazı izi varken yazılır. Kapalıyken hiçbir argüman eklenmez.
     /// </summary>
     private static IReadOnlyList<string> MetadataArgs(MediaInfo info, ConversionPlan plan, IReadOnlyList<SubtitleTrack>? mapped = null)
     {
         if (!plan.DropMetadata) return Array.Empty<string>();
-        var audio = plan.CarriesAudio && plan.AudioCodec is not null
-            ? new[] { AutoAudio(info)?.Language }
-            : Array.Empty<string?>();
+        var audio = SourceAudio(info, plan).Select(stream => stream.Language).ToArray();
         if (mapped is not null)
             return StreamMapping.MetadataArguments(true, audio, mapped.Select(track => track.InputPath is null ? track.Language : null).ToArray());
         var subtitles = info.Streams.Where(stream => stream.Kind == StreamKind.Subtitle).ToArray();
@@ -269,11 +281,26 @@ public static class ConversionArguments
 
     /// <summary>
     /// Komut akislari acik <c>-map</c> ile mi secer: altyazi tasiyan kapta kaynakta altyazi izi ya da
-    /// eklenmis dis dosya varken. Oteki planlarda komut eskisi gibi ffmpeg'in secimine birakilir.
+    /// eklenmis dis dosya varken, ya da ses izi secimi verilmisken. Oteki planlarda komut eskisi gibi ffmpeg'in secimine birakilir.
     /// </summary>
     public static bool MapsStreams(MediaInfo info, ConversionPlan plan)
         => SubtitleContainer(plan) is not null
-           && (plan.ExternalSubtitles.Count > 0 || info.Streams.Any(stream => stream.Kind == StreamKind.Subtitle));
+           && (plan.ExternalSubtitles.Count > 0 || info.Streams.Any(stream => stream.Kind == StreamKind.Subtitle))
+           || plan.AudioTracks is not null && plan.CarriesAudio && plan.AudioCodec is not null;
+
+    /// <summary>
+    /// Ciktiya giden kaynak ses izleri, kaynak sirasiyla. Secim yokken (<see cref="ConversionPlan.AudioTracks"/>
+    /// <c>null</c>) ffmpeg'in sececegi tek iz (<see cref="AutoAudio"/>); secimde aralik disi sira ve tekrar atilir.
+    /// Ses tasimayan ya da sesi dusuren planda bos.
+    /// </summary>
+    public static IReadOnlyList<SourceStream> SourceAudio(MediaInfo info, ConversionPlan plan)
+    {
+        if (!plan.CarriesAudio || plan.AudioCodec is null) return Array.Empty<SourceStream>();
+        var audio = info.Streams.Where(stream => stream.Kind == StreamKind.Audio).ToList();
+        if (plan.AudioTracks is null) return AutoAudio(info) is { } auto ? new[] { auto } : Array.Empty<SourceStream>();
+        var chosen = plan.AudioTracks.Where(ordinal => ordinal >= 0 && ordinal < audio.Count).ToHashSet();
+        return audio.Where((_, ordinal) => chosen.Contains(ordinal)).ToList();
+    }
 
     /// <summary>
     /// Ciktiya giden altyazi izleri, kucultmenin akis kuralindan (<see cref="StreamMapping.SubtitleTracks"/>):
@@ -288,15 +315,19 @@ public static class ConversionArguments
     }
 
     /// <summary>
-    /// Acik akis secimi: ilk video, ffmpeg'in <c>-map</c>'siz sececegi ses (<see cref="AutoAudio"/>), sonra altyazilar.
-    /// Ses secimi esleme yazilinca degismez.
+    /// Acik akis secimi: ilk video (ses kabinda yok), secilen sesler ya da secim yokken ffmpeg'in <c>-map</c>'siz
+    /// sececegi ses (<see cref="AutoAudio"/>), sonra altyazilar. Secimsiz planda ses esleme yazilinca degismez.
     /// </summary>
     private static IReadOnlyList<string> MapArguments(MediaInfo info, ConversionPlan plan, IReadOnlyList<SubtitleTrack> subtitles)
     {
         var a = new List<string>();
         var video = info.Streams.FirstOrDefault(stream => stream.Kind == StreamKind.Video && !stream.IsAttachedPicture);
-        a.AddRange(new[] { "-map", video is null ? "0:v:0" : "0:" + video.Index.ToString(CultureInfo.InvariantCulture) });
-        if (plan.CarriesAudio && plan.AudioCodec is not null)
+        if (!plan.AudioOnly)
+            a.AddRange(new[] { "-map", video is null ? "0:v:0" : "0:" + video.Index.ToString(CultureInfo.InvariantCulture) });
+        if (plan.AudioTracks is not null)
+            foreach (var stream in SourceAudio(info, plan))
+                a.AddRange(new[] { "-map", "0:" + stream.Index.ToString(CultureInfo.InvariantCulture) });
+        else if (plan.CarriesAudio && plan.AudioCodec is not null)
         {
             if (AutoAudio(info) is { } audio) a.AddRange(new[] { "-map", "0:" + audio.Index.ToString(CultureInfo.InvariantCulture) });
             else if (info.HasAudio) a.AddRange(new[] { "-map", "0:a:0?" });
@@ -337,12 +368,12 @@ public static class ConversionArguments
         return filters;
     }
 
-    private static void AddAudio(List<string> args, ConversionPlan plan)
+    private static void AddAudio(List<string> args, MediaInfo info, ConversionPlan plan)
     {
-        if (plan.AudioCodec is null) args.Add("-an");
+        if (plan.AudioCodec is null || plan.AudioTracks is not null && SourceAudio(info, plan).Count == 0) args.Add("-an");
         else if (plan.AudioCodec == "copy") args.AddRange(new[] { "-c:a", "copy" });
         else args.AddRange(new[] { "-c:a", plan.AudioCodec, "-b:a", $"{plan.AudioBitrateK}k" });
-        if (plan.Container == "mxf" && plan.AudioCodec is not null) args.AddRange(MxfAudioArgs);
+        if (plan.Container == "mxf" && plan.AudioCodec is not null && !args.Contains("-an")) args.AddRange(MxfAudioArgs);
     }
 
     /// <summary>

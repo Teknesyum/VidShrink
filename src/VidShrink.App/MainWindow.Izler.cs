@@ -177,6 +177,7 @@ public partial class MainWindow
         RefreshBurnChoices();
         RefreshSubtitleList();
         ResetConvertSubtitles();
+        ResetConvertAudio();
         YuksekligiSifirla();
     }
 
