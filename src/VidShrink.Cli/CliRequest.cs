@@ -3,7 +3,7 @@ using VidShrink.Core;
 
 namespace VidShrink.Cli;
 
-public enum CliCommand { Help, Version, Shrink, Plan, Watch, Gunluk, Profiller, Convert, Completion }
+public enum CliCommand { Help, Version, Shrink, Plan, Watch, Gunluk, Profiller, Convert, Completion, Record }
 
 public enum CliCodec { Auto, H264, Hevc, Av1, Vp9 }
 
@@ -190,6 +190,12 @@ public sealed record CliRequest
 
     /// <summary><c>--oncelik</c>: kodlama surecinin isletim sistemi onceligi.</summary>
     public EncodePriority Priority { get; init; } = EncodePriority.Normal;
+
+    /// <summary><c>kaydet --sure</c>: kaydın süre sınırı, saniye. Yoksa kayıt Ctrl+C ya da kayıtlı sınırla biter.</summary>
+    public double? RecordSeconds { get; init; }
+
+    /// <summary><c>kaydet --ayarlar</c>: kaydedici ayar dosyası. Yoksa pencerenin kendi dosyası okunur.</summary>
+    public string? RecordSettings { get; init; }
 
     /// <summary><c>--is-parcacigi</c>: siniri dinleyen kodlayiciya yazilan <c>-threads</c>; digerlerinde yok sayilir.</summary>
     public int? EncoderThreads { get; init; }
@@ -422,6 +428,8 @@ public static class CliParser
                 : Fail("error.bad-shell", args.Count > 1 ? args[1] : "-");
         if (head is "donustur" or "convert")
             return CliConvert.Parse(args);
+        if (head is "kaydet" or "record")
+            return CliRecord.Parse(args);
 
         var command = head switch
         {
@@ -902,7 +910,7 @@ public static class CliParser
         return true;
     }
 
-    private static bool TryParseClock(string text, out double seconds)
+    internal static bool TryParseClock(string text, out double seconds)
     {
         seconds = 0;
         if (text.Length == 0) return false;

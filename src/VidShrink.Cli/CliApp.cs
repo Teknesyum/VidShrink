@@ -44,6 +44,22 @@ public sealed class CliServices
     public IWatchFileSystem WatchFileSystem { get; init; } = PhysicalWatchFileSystem.Instance;
     public IWatchClock WatchClock { get; init; } = SystemWatchClock.Instance;
     public Func<string?> WatchStateFallbackDirectory { get; init; } = () => Path.GetDirectoryName(UpdateSettings.DefaultPath) is { } settings ? Path.Combine(settings, "izle") : null;
+
+    /// <summary><c>kaydet</c>'in okuduğu kaydedici ayar dosyası; pencerenin yazdığı yer.</summary>
+    public Func<string?> RecorderSettingsPath { get; init; } = () => CliRecordSettings.DefaultPath;
+
+    /// <summary><c>kaydet</c>'in makinesi: ffmpeg'in listelediği cihazlar ve çalıştığı ölçülmüş donanım kodlayıcıları.</summary>
+    public Func<CliRecordMachine> RecordMachine { get; init; } = () =>
+    {
+        var devices = CaptureDevices.Instance;
+        return new CliRecordMachine(CliRecordMachine.HostPlatform, devices.Audio, devices.Video,
+            RecorderAutoProbe.WorkingHardwareEncoders(EncoderCapabilities.Instance), Environment.ProcessorCount);
+    };
+
+    /// <summary><c>kaydet</c>'in kaydı; varsayılanı <see cref="CliRecord.RecordAsync"/>.</summary>
+    public Func<RecorderRequest, string, CancellationToken, Task<RecordResult>> Record { get; init; } = CliRecord.RecordAsync;
+
+    public Func<DateTime> Now { get; init; } = () => DateTime.Now;
 }
 
 public sealed record CliDecision(
@@ -166,6 +182,8 @@ public static class CliApp
                 return await WatchAsync(request, services, stdout, stderr, text, ct);
             if (request.Command == CliCommand.Convert)
                 return await CliConvert.RunAsync(request, services, stdout, stderr, text, ct);
+            if (request.Command == CliCommand.Record)
+                return await CliRecord.RunAsync(request, services, stdout, stderr, text, ct);
 
             return (await ProcessFileAsync(request, services, stdout, stderr, text, ct)).ExitCode;
         }

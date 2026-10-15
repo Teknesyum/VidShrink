@@ -50,6 +50,10 @@ public static class CliCompletion
 
     private static readonly string[] ConvertFlags = { "-h", "--yardim", "--help", "--meta-yok", "--no-metadata", "--json" };
 
+    private static readonly string[] RecordFlags = { "-h", "--yardim", "--help", "--json" };
+
+    private static readonly string[] RecordValues = { "--sure", "--duration", "--cikti", "--output", "-o", "--ayarlar", "--settings" };
+
     private static readonly string[] ConvertValues =
     {
         "--kap", "--container", "--kodek", "--codec", "--crf", "--bit-hizi", "--bitrate", "--cozunurluk", "--resolution",
@@ -104,6 +108,8 @@ public static class CliCompletion
             new Command(new[] { "izle", "watch" }, watchFlags.Concat(watchValueOptions).ToList(), watchValueOptions, watchValues, Array.Empty<string>()),
             new Command(new[] { "donustur", "convert" }, ConvertFlags.Concat(ConvertValues).Concat(Language).ToList(),
                 ConvertValues.Concat(Language).ToList(), convertValues, Array.Empty<string>()),
+            new Command(new[] { "kaydet", "record" }, RecordFlags.Concat(RecordValues).Concat(Language).ToList(),
+                RecordValues.Concat(Language).ToList(), Pairs((Language, CliText.Languages)), Array.Empty<string>()),
             new Command(new[] { "profiller", "presets" }, ExportValues.Concat(Language).ToList(), ExportValues.Concat(Language).ToList(),
                 Pairs((Language, CliText.Languages)), Array.Empty<string>()),
             new Command(new[] { "tamamlama", "completion" }, Array.Empty<string>(), Array.Empty<string>(),
