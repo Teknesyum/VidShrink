@@ -80,6 +80,11 @@ internal partial class RecorderView
         : CmbRateControl.SelectedIndex < 0 ? _settings.RateControl
         : RecorderRateControl.Quality;
 
+    internal RecorderFrameRateMode SelectedFrameRateMode =>
+        CmbFrameRateMode.SelectedIndex >= 0 && Enum.IsDefined((RecorderFrameRateMode)CmbFrameRateMode.SelectedIndex)
+            ? (RecorderFrameRateMode)CmbFrameRateMode.SelectedIndex
+            : _settings.FrameRateMode;
+
     internal AudioTrackLayout SelectedAudioLayout =>
         CmbAudioLayout.SelectedIndex == (int)AudioTrackLayout.SeparateTracks ? AudioTrackLayout.SeparateTracks
         : CmbAudioLayout.SelectedIndex < 0 ? _settings.AudioLayout
@@ -118,6 +123,7 @@ internal partial class RecorderView
         {
             var container = SelectedContainer;
             var rate = SelectedRateControl;
+            var fpsMode = SelectedFrameRateMode;
             var layout = SelectedAudioLayout;
             var space = SelectedColorSpace;
             var range = SelectedColorRange;
@@ -127,6 +133,14 @@ internal partial class RecorderView
 
             CmbRateControl.ItemsSource = new List<string> { Say("recorder.advanced.rate-quality"), Say("recorder.advanced.rate-bitrate") };
             CmbRateControl.SelectedIndex = (int)rate;
+
+            CmbFrameRateMode.ItemsSource = new List<string>
+            {
+                Say("recorder.advanced.frame-rate-mode-auto"),
+                Say("recorder.advanced.frame-rate-mode-constant"),
+                Say("recorder.advanced.frame-rate-mode-variable")
+            };
+            CmbFrameRateMode.SelectedIndex = (int)fpsMode;
 
             CmbAudioLayout.ItemsSource = new List<string> { Say("recorder.advanced.audio-mixed"), Say("recorder.advanced.audio-separate") };
             CmbAudioLayout.SelectedIndex = (int)layout;
@@ -245,6 +259,7 @@ internal partial class RecorderView
         _settings.Profile = SelectedProfile;
         _settings.Tune = SelectedTune;
         _settings.RateControl = SelectedRateControl;
+        _settings.FrameRateMode = SelectedFrameRateMode;
         _settings.PixelFormat = SelectedPixelFormat;
         _settings.ColorSpace = SelectedColorSpace;
         _settings.ColorRange = SelectedColorRange;

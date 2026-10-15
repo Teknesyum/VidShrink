@@ -70,6 +70,22 @@ public enum RecorderRateControl
     Bitrate
 }
 
+/// <summary>
+/// Cikisin kare zamanlamasi. <see cref="Auto"/> hicbir sey yazmaz ve muxer'in karari kalir;
+/// oteki iki kip <c>-fps_mode cfr</c> ya da <c>-fps_mode vfr</c> yazar.
+/// </summary>
+public enum RecorderFrameRateMode
+{
+    /// <summary>Kip yazilmaz.</summary>
+    Auto,
+
+    /// <summary>Sabit kare hizi: eksik kare kopyalanir, fazlasi atilir.</summary>
+    Constant,
+
+    /// <summary>Degisken kare hizi: yakalanan zaman damgasi korunur.</summary>
+    Variable
+}
+
 /// <summary>Kaydedilecek dikdortgen. Olculer <c>yuv420p</c> icin cift olmak zorunda.</summary>
 public sealed record RecorderRegion(int X, int Y, int Width, int Height);
 
@@ -260,6 +276,9 @@ public sealed record RecorderRequest
 
     /// <summary>Kodlayici ayari (<c>-tune</c>); kodegin tanidiklarindan biri olmak zorunda.</summary>
     public string? Tune { get; init; }
+
+    /// <summary>Cikisin kare zamanlamasi; <see cref="RecorderFrameRateMode.Auto"/> <c>-fps_mode</c> yazmaz.</summary>
+    public RecorderFrameRateMode FrameRateMode { get; init; } = RecorderFrameRateMode.Auto;
 
     /// <summary>Ciktinin yeniden olceklenecegi boyut; bos birakilirsa yakalama boyutu korunur.</summary>
     public RecorderScale? Scale { get; init; }
@@ -456,8 +475,10 @@ public static class RecorderArguments
     {
         "libx264", "libx265", "libsvtav1", "libvpx-vp9",
         "h264_nvenc", "hevc_nvenc", "av1_nvenc",
-        "h264_qsv", "hevc_qsv",
-        "h264_amf", "hevc_amf"
+        "h264_qsv", "hevc_qsv", "av1_qsv",
+        "h264_amf", "hevc_amf", "av1_amf",
+        "h264_videotoolbox", "hevc_videotoolbox",
+        "h264_vaapi", "hevc_vaapi"
     };
 
     /// <summary>
@@ -710,7 +731,8 @@ public static class RecorderArguments
         "libsvtav1" => EightAndTenBit420,
         "h264_nvenc" or "hevc_nvenc" or "av1_nvenc" => NvencFormats,
         "h264_qsv" => Only420,
-        "hevc_qsv" or "h264_amf" or "hevc_amf" => EightAndTenBit420,
+        "hevc_qsv" or "h264_amf" or "hevc_amf" or "av1_qsv" or "av1_amf" => EightAndTenBit420,
+        "h264_videotoolbox" or "hevc_videotoolbox" or "h264_vaapi" or "hevc_vaapi" => Only420,
         _ => Array.Empty<string>()
     };
 
@@ -737,8 +759,8 @@ public static class RecorderArguments
     {
         var c = (codec ?? string.Empty).ToLowerInvariant();
         var f = (pixelFormat ?? string.Empty).ToLowerInvariant();
-        var qsv = c is "h264_qsv" or "hevc_qsv";
-        var packed10 = qsv || c is "h264_nvenc" or "hevc_nvenc" or "av1_nvenc" or "h264_amf" or "hevc_amf";
+        var qsv = c is "h264_qsv" or "hevc_qsv" or "av1_qsv";
+        var packed10 = qsv || c is "h264_nvenc" or "hevc_nvenc" or "av1_nvenc" or "h264_amf" or "hevc_amf" or "av1_amf";
         if (qsv && f == "yuv420p") return "nv12";
         if (packed10 && f == "yuv420p10le") return "p010le";
         return pixelFormat ?? string.Empty;
@@ -843,6 +865,8 @@ public static class RecorderArguments
         if (string.IsNullOrWhiteSpace(request.Preset)) errors.Add("Encoder preset is required.");
         if (!KnownVideoCodecs.Contains(request.VideoCodec, StringComparer.OrdinalIgnoreCase))
             errors.Add($"The {request.VideoCodec} video encoder is not one of the recorder's measured encoders.");
+        else
+            errors.AddRange(CodecPlatformErrors(request));
 
         errors.AddRange(RegionErrors(request));
         errors.AddRange(ScaleErrors(request));
@@ -920,6 +944,24 @@ public static class RecorderArguments
             yield return "Output scale dimensions must be positive.";
         else if (scale.Width % 2 != 0 || scale.Height % 2 != 0)
             yield return "Output scale dimensions must be even for the selected pixel format.";
+    }
+
+    /// <summary>
+    /// Kayit platformunun karsiligi; <see cref="CodecModel.OnlyPlatform"/> bununla karsilastirilir.
+    /// </summary>
+    public static HostPlatform HostOf(RecorderPlatform platform) => platform switch
+    {
+        RecorderPlatform.MacOs => HostPlatform.MacOS,
+        RecorderPlatform.Linux => HostPlatform.Linux,
+        _ => HostPlatform.Windows
+    };
+
+    private static IEnumerable<string> CodecPlatformErrors(RecorderRequest request)
+    {
+        if (CodecModel.OnlyPlatform(request.VideoCodec) is { } only && only != HostOf(request.Platform))
+            yield return $"The {request.VideoCodec} video encoder only runs on {only}.";
+        if (request.RateControl == RecorderRateControl.Quality && !CodecModel.HasQualityScale(request.VideoCodec))
+            yield return $"The {request.VideoCodec} video encoder has no quality scale; use the bitrate arm.";
     }
 
     private static IEnumerable<string> RateControlErrors(RecorderRequest request)
@@ -1465,6 +1507,7 @@ public static class RecorderArguments
             return Build(CaptureRequest(request), CapturePath(outputPath, request.Container));
 
         var a = new List<string> { "-hide_banner", "-y" };
+        a.AddRange(CodecModel.DeviceArgs(request.VideoCodec));
         a.AddRange(Input(request));
 
         var audio = request.Audio is { InputCount: > 0 } plan ? plan : null;
@@ -1474,13 +1517,14 @@ public static class RecorderArguments
         if (request.Webcam is { } cam)
             a.AddRange(new[] { "-f", "dshow", "-rtbufsize", WebcamBufferSize, "-i", "video=" + cam.Device });
 
-        if (webcam is null && VideoFilter(request) is { } filter) a.AddRange(new[] { "-vf", filter });
+        if (webcam is null && EncoderFilter(request) is { } filter) a.AddRange(new[] { "-vf", filter });
 
         var graphs = new[] { webcam, audio?.FilterComplex }.Where(g => !string.IsNullOrEmpty(g)).ToArray();
         if (graphs.Length > 0)
             a.AddRange(new[] { "-filter_complex", string.Join(";", graphs) });
 
-        a.AddRange(new[] { "-c:v", request.VideoCodec, "-preset", request.Preset });
+        a.AddRange(new[] { "-c:v", request.VideoCodec });
+        if (CodecModel.TakesPreset(request.VideoCodec)) a.AddRange(new[] { "-preset", request.Preset });
         a.AddRange(RateControlArgs(request));
         a.AddRange(StreamShapeArgs(request));
         a.AddRange(ColourArgs(request));
@@ -1496,6 +1540,9 @@ public static class RecorderArguments
             a.AddRange(new[] { "-movflags", "+faststart" });
         else if (request.Container == RecorderContainer.Mkv)
             a.AddRange(new[] { "-flush_packets", "1", "-cluster_time_limit", "500" });
+
+        if (request.FrameRateMode is RecorderFrameRateMode.Constant or RecorderFrameRateMode.Variable)
+            a.AddRange(new[] { "-fps_mode", request.FrameRateMode == RecorderFrameRateMode.Variable ? "vfr" : "cfr" });
 
         a.Add(outputPath);
         a.AddRange(PreviewArgs(request));
@@ -1664,7 +1711,11 @@ public static class RecorderArguments
                 "-color_primaries", "bt2020", "-color_trc", "smpte2084", "-colorspace", "bt2020nc", "-color_range", "tv"
             };
 
-        var a = new List<string> { "-pix_fmt", PixelFormatArgument(request.VideoCodec, request.PixelFormat) };
+        var a = new List<string>();
+        var format = OutputPixelFormat(request);
+        if (CodecModel.TakesPixelFormatFlag(request.VideoCodec)) a.AddRange(new[] { "-pix_fmt", format });
+        if (string.IsNullOrWhiteSpace(request.Profile) && CodecModel.OutputProfile(request.VideoCodec, format) is { } profile)
+            a.AddRange(new[] { "-profile:v", profile });
         if (!string.IsNullOrWhiteSpace(request.ColorSpace)) a.AddRange(new[] { "-colorspace", request.ColorSpace! });
         if (!string.IsNullOrWhiteSpace(request.ColorRange)) a.AddRange(new[] { "-color_range", request.ColorRange! });
         return a;
@@ -1782,6 +1833,22 @@ public static class RecorderArguments
     /// dikdortgen kirpma filtresiyle aliniyor. Oteki iki platformda bolge zaten girdide.
     /// </para>
     /// </summary>
+    private static string OutputPixelFormat(RecorderRequest request)
+        => CodecModel.OutputPixelFormat(request.VideoCodec, PixelFormatArgument(request.VideoCodec, request.PixelFormat));
+
+    /// <summary>
+    /// Kodlayiciya giden <c>-vf</c>: yakalama suzgeclerinin ardina kodlayicinin yukleme
+    /// adimlari (VAAPI'de <c>format=nv12,hwupload</c>) eklenir.
+    /// </summary>
+    private static string? EncoderFilter(RecorderRequest request)
+    {
+        var upload = CodecModel.UploadFilters(request.VideoCodec, OutputPixelFormat(request));
+        var filter = VideoFilter(request);
+        if (upload.Count == 0) return filter;
+        var tail = string.Join(",", upload);
+        return filter is null ? tail : filter + "," + tail;
+    }
+
     private static string? VideoFilter(RecorderRequest request)
     {
         var links = new List<string>();

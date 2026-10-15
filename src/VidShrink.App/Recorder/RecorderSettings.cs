@@ -170,6 +170,9 @@ internal sealed class RecorderSettings
     /// <summary>Hangi hız kontrolü kolunun koşacağı.</summary>
     internal RecorderRateControl RateControl { get; set; } = RecorderRateControl.Quality;
 
+    /// <summary>Kare hızı kipi; Otomatik'te <c>-fps_mode</c> yazılmıyor.</summary>
+    internal RecorderFrameRateMode FrameRateMode { get; set; } = RecorderFrameRateMode.Auto;
+
     /// <summary>Hedef görüntü bit hızı, kbit/s. Sıfır "verilmedi" demek.</summary>
     internal int BitrateKbps { get; set; }
 
@@ -337,6 +340,7 @@ internal sealed class RecorderSettings
             settings.Profile = (string?)root["profile"];
             settings.Tune = (string?)root["tune"];
             if (Enum.TryParse<RecorderRateControl>((string?)root["rateControl"], true, out var rate)) settings.RateControl = rate;
+            if (Enum.TryParse<RecorderFrameRateMode>((string?)root["frameRateMode"], true, out var fpsMode) && Enum.IsDefined(fpsMode)) settings.FrameRateMode = fpsMode;
             settings.BitrateKbps = (int?)root["bitrateKbps"] ?? 0;
             settings.MaxBitrateKbps = (int?)root["maxBitrateKbps"] ?? 0;
             settings.BufferKbits = (int?)root["bufferKbits"] ?? 0;
@@ -458,6 +462,7 @@ internal sealed class RecorderSettings
                 if (Tune is null) writer.WriteNull("tune");
                 else writer.WriteString("tune", Tune);
                 writer.WriteString("rateControl", RateControl.ToString());
+                writer.WriteString("frameRateMode", FrameRateMode.ToString());
                 writer.WriteNumber("bitrateKbps", BitrateKbps);
                 writer.WriteNumber("maxBitrateKbps", MaxBitrateKbps);
                 writer.WriteNumber("bufferKbits", BufferKbits);
