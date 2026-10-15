@@ -22,6 +22,13 @@ ship as part of it.
   can play a sound when it finishes, and "Quit the App" joins the after-queue actions.
 - Editor audio: noise cleanup, loudness levelling, effects and a level meter.
 - Player bookmarks list and favourites, with an option to ask where to resume on open.
+- Player fill mode that crops to the window, plus touch gestures: pinch to zoom, swipe sideways
+  to seek and up or down for volume.
+- Editor media pool: clips wait in a bin and drop into the timeline as insert or overwrite.
+- Convert accepts a dropped image sequence and can create intermediate frames.
+- Explorer: files opened together reach the player as one playlist, and a new "Add to Queue" verb
+  appends to the playing list without interrupting it; audio and playlist files get both verbs.
+- Smart cut supports MPEG-2, including interlaced and TS sources: only the edges are re-encoded.
 
 ### Fixed
 

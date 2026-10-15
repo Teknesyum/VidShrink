@@ -10,14 +10,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 **Dalga 2 — Karar Gerekmez, Küçük İş Öncelik 2 Ya Da Orta İş Öncelik 1**
 
-## 36. Resim Dizisi Girdisi Ve Ara Kare
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · ARC-P4 · Bizde Olmayan Araçlar · iş orta · öncelik 1 · karar gerekmez
-
-- Satırlar (ARC-P4): ARC-09 Resim dizisi girdisi; ARC-13 Resimlerden GIF; ARC-28 Kare ara değerleme. [Tablo](piyasa/2026-10-13/eksik-araclar-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/ConversionPlan.cs, src/VidShrink.Core/ConversionArguments.cs, src/VidShrink.Core/DroppedMedia.cs, src/VidShrink.Core/VideoFilterChain.cs, src/VidShrink.App/MainWindow.axaml
-- Plan: Üçü de Dönüştür'ün kare hızı yoluna dokunur. Bir klasör ya da numaralı resimler bırakılınca dosyalar ada göre sıralanıp ffmpeg'in resim dizisi okuyucusuyla tek kaynak sayılır; kare hızı kutusu dizinin hızını belirler, GIF kabı seçilince resimlerden GIF de aynı yoldan çıkar. Kare hızı kutusuna "ara kare üret" seçeneği eklenir (minterpolate süzgeci; yapıda yoksa seçenek gizlenir). Doğrulama: üretilmiş 30 karelik PNG dizisinde çıktının kare sayısı ve süresi beklenene eşit; ara karede çıktının kare sayısı hedef hıza uyar.
-
 ## 39. macOS Tıklama İşareti
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · PLT-P3 · Platform Eşitliği · iş küçük · öncelik 2 · karar gerekmez
@@ -69,22 +61,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.Core/RecorderChapters.cs, src/VidShrink.Core/StreamMapping.cs, src/VidShrink.Core/ConversionPlan.cs, src/VidShrink.Core/ConversionArguments.cs, src/VidShrink.App/MainWindow.axaml, src/VidShrink.Cli/CliRequest.cs
 - Plan: Üçü de Dönüştür'de "Kopyala" seçiliyken, yani yeniden kodlamadan yapılır; sırayla ayrı ayrı teslim edilebilir. Etiket için "Meta veriyi sil" kutusunun yanına başlık, sanatçı, yıl, açıklama ve kapak alanları gelir; bölüm için kaydedicinin bölüm yazan yolu ortak hâle getirilir ve kaynağın bölümleri eklenip adlandırılıp silinebilen liste olur; onarma için akışları kopyalayan, bozuk zaman damgasını hoş gören bayraklarla "Onar" hazır ayarı eklenir. Doğrulama: MetaSilDonusturTests ve KayitBolumIsaretiTests'teki gibi ffprobe ile etiket ve bölüm okunur; boş alan anahtarı hiç yazmaz.
 
-## 47. Doldurma Ve Dokunmatik Hareketler
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · OYA-P11 · Oynatıcı · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (OYA-P11): OYA-47 Kenar bantlarını kırparak doldurma; OYA-53 Dokunmatik hareketler. [Tablo](piyasa/2026-10-13/oynatici-cekirdek-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Playback/PlayerView.axaml.cs, src/VidShrink.App/Playback/ZoomGesture.cs, src/VidShrink.App/Playback/PlayerView.Fare.cs, src/VidShrink.App/Playback/Keymap.cs
-- Plan: Görüntüyü pencereye sığdıran ölçek (`Resize`, PlayerView.axaml.cs:854–862) için ikinci bir kip eklenir: doldur kipinde ölçek panoyu tümüyle kaplayacak biçimde seçilir, taşan kısım kırpılır; tek tuşla sığdır ile doldur arasında geçilir. Dokunmatik ekran için işaretçi türü ayrılır: iki parmakla yakınlaştırma, yatay kaydırmayla atlama, dikey kaydırmayla ses. Fare davranışı değişmez. Doğrulama: doldur kipinde kare ölçüsünün panoyu kapladığı görünüm testi; üretilmiş dokunma olaylarıyla hareket testi ve gerçek dokunmatik ekranda elle deneme.
-
-## 48. Kabukta Çoklu Açma Ve Sıraya Ekleme
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · OYB-P7 · Oynatıcı · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (OYB-P7): OYB-32 Çoklu seçimle açma; OYB-33 Kabukta sıraya ekle fiili; OYB-34 Ses ve liste dosyalarında kabuk kaydı. [Tablo](piyasa/2026-10-13/oynatici-kitaplik-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Program.cs, src/VidShrink.App/Integration/ForwardedFiles.cs, src/VidShrink.App/MainWindow.SingleInstance.cs, src/VidShrink.Core/Setup/ShellRegistration.cs, src/VidShrink.App/ShellMenu.cs, Install-VidShrink.ps1, tests/VidShrink.Tests/KabukMenusuTests.cs
-- Plan: İkinci örnek artık bütün yolları çalışan örneğe aktarır; gelen yollar OYB-P2'nin toplayıcısıyla, yeni açılış yerine kuyruğa eklenir. Sağ tık menüsüne "Sıraya ekle" fiili ve onu taşıyan bir komut satırı bayrağı gelir; bayrak kuyruğa ekleme işlemine (`Enqueue`) bağlanır. Ses ve liste uzantıları yalnız "aç" ve "sıraya ekle" fiillerine eklenir, "küçült" fiiline eklenmez. Kanal ve kabuk kaydı testleriyle, sonra Explorer'da elle çoklu seçimle doğrulanır.
-
 ## 50. Mac Ortam Denetimi Bağlantısı
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · OYB-P9 · Oynatıcı · iş orta · öncelik 2 · karar gerekmez
@@ -92,22 +68,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (OYB-P9): OYB-30 macOS Now Playing. [Tablo](piyasa/2026-10-13/oynatici-kitaplik-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Player/MpvEngine.cs, src/VidShrink.App/Playback/
 - Plan: mpv'nin ortam tuşları seçeneği (`input-media-keys`) gömülü kullanımda varsayılan kapalıdır; önce macOS'ta açılır ve klavye ortam tuşlarının, Denetim Merkezi'ndeki çalan ortam alanının oynatıcıyı yönetip yönetmediği ölçülür. Yetmezse macOS'un ortam denetimi arayüzüne ayrı bir bağ yazılır. Sonraki ve önceki tuşu yine uygulamanın kuyruğuna bağlanır. Bu iş Windows makinesinde doğrulanamaz; Mac'te koşan bir işçi ister.
-
-## 52. Akıllı Kipte MPEG-2
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DZA-P12 · Düzenleyici · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (DZA-P12): DZA-27 Akıllı kipte MPEG-2. [Tablo](piyasa/2026-10-13/duzenleyici-kesim-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/Editing/SmartCutCodec.cs, src/VidShrink.Core/Editing/EditExport.cs, tools/VidShrink.Bench
-- Plan: Akıllı kipin kodek kapısına (SmartCutCodec.cs:43) MPEG-2 eklenir; kenar parçası kaynağın profiline, kare hızına ve bit hızına uyan `mpeg2video` kodlayıcısıyla yazılır. TV kayıtlarının çoğu taramalı olduğundan taramalı kaynak kapısı (SmartCutCodec.cs:47) birlikte ele alınmazsa kazanç dar kalır; bu kayıtların sesi de genellikle AC-3 ya da MP2 (yayıncılığın eski ses kodeği) olduğundan paket DZA-P4'ten sonra anlam kazanır. Doğrulama: birleşim noktasında kare sayısı ve bozulma ölçümü `tools/VidShrink.Bench` ile.
-
-## 54. Medya Havuzu Ve Araya Ekleme
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DZB-P11 · Düzenleyici · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (DZB-P11): DZB-64 Medya havuzu; DZB-08 Ekleme ve üstüne yazma kipleri. [Tablo](piyasa/2026-10-13/duzenleyici-kurgu-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Editing/EditorView.Kaynak.cs, src/VidShrink.App/Editing/EditorView.axaml, src/VidShrink.App/Editing/EditorTimeline.cs, src/VidShrink.Core/Editing/EditTimeline.cs, src/VidShrink.Core/Editing/EditProject.cs, src/VidShrink.App/Locales/, tests/VidShrink.Tests/DuzenleyiciCokKaynakTests.cs
-- Plan: Projeye alınan kaynaklar bir listede görünür (proje dosyası ek kaynakları zaten tutuyor: EditProject.cs:68); listeden çizelgeye sürüklenen klip bırakıldığı yere girer. Araya ekleme sonraki klipleri iter, üstüne yazma aynı süreyi silip yerine koyar (aralık silme hazır: EditTimeline.cs:148). Dosya ekleyince çizelgenin sonuna gitme davranışı varsayılan kalır, o yüzden karar gerekmez. Doğrulama: DuzenleyiciCokKaynakTests'e iki kipin süre ve sıra ölçüleri.
 
 ## 57. Önizlemede Elle Kırpma
 

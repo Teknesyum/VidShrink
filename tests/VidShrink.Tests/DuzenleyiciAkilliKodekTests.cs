@@ -41,7 +41,7 @@ public sealed class AkilliKodekFactAttribute : FactAttribute
 /// Saf kollar kapinin kararini ve plan argumanlarini her yerde pimler. Canli kollar 6 sn 320x240
 /// lavfi kaynagindan 4 sn'lik kesimi gercek ffmpeg ile teslim edip dort olcutu okur: sure, cozme
 /// hatasi, paket/kare sayisi, bas ile govdenin ayni akista cozulmesi (govde kaynakla bayt bayt ayni).
-/// Kanit <c>.calisma/worktree-agent-a037bbec50fedd114/akilli-kodek/</c>, test siler.
+/// Kanit <c>.calisma/akilli-kodek/</c>, test siler.
 /// </summary>
 public sealed class DuzenleyiciAkilliKodekTests
 {
@@ -606,7 +606,7 @@ public sealed class DuzenleyiciAkilliKodekTests
     }
 
     private static string Klasor(string ad)
-        => Path.Combine(GirdiKanit.Root, ".calisma", "worktree-agent-a037bbec50fedd114", "akilli-kodek", ad);
+        => Path.Combine(GirdiKanit.Root, ".calisma", "akilli-kodek", ad);
 
     private static void Sil(string klasor)
     {
