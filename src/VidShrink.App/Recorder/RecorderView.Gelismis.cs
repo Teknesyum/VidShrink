@@ -46,11 +46,14 @@ internal partial class RecorderView
         TxtAudioGain.Text = _settings.AudioGainDb.ToString("0.##", CultureInfo.InvariantCulture);
         ChkNoiseGate.IsChecked = _settings.AudioNoiseGate;
         ChkNoiseSuppression.IsChecked = _settings.AudioNoiseSuppression;
+        ChkCompressor.IsChecked = _settings.AudioCompressor;
+        ChkLimiter.IsChecked = _settings.AudioLimiter;
         ChkHdrToSdr.IsChecked = _settings.HdrToSdr;
 
         RefreshAdvancedLabels();
 
         CmbCodec.SelectionChanged += (_, _) => RefreshCodecChoices();
+        CmbContainer.SelectionChanged += (_, _) => RefreshAudioCodecChoices();
         CmbRateControl.SelectionChanged += (_, _) => ApplyRateRows();
         ApplyRateRows();
     }
@@ -154,7 +157,47 @@ internal partial class RecorderView
         }
 
         RefreshCodecChoices();
+        RefreshAudioCodecChoices();
     }
+
+    private IReadOnlyList<string> _audioCodecItems = Array.Empty<string>();
+
+    /// <summary>
+    /// Ses kodeği kutusu seçili kabın taşıdığı kodeklerle dolar. MOV Opus taşımadığı için orada yalnız AAC
+    /// kalır; listede olmayan seçim AAC'ye döner.
+    /// </summary>
+    private void RefreshAudioCodecChoices()
+    {
+        var current = SelectedAudioCodec ?? _settings.AudioCodec;
+        _fillingAdvanced = true;
+        try
+        {
+            _audioCodecItems = RecorderArguments.AudioCodecsFor(SelectedContainer);
+            CmbAudioCodec.ItemsSource = _audioCodecItems.Select(AudioCodecLabel).ToList();
+            var index = IndexOf(_audioCodecItems, current);
+            CmbAudioCodec.SelectedIndex = index >= 0 ? index : IndexOf(_audioCodecItems, RecorderArguments.DefaultAudioCodec);
+        }
+        finally
+        {
+            _fillingAdvanced = false;
+        }
+
+        CmbAudioCodec.IsEnabled = _audioCodecItems.Count > 1;
+    }
+
+    private static string AudioCodecLabel(string codec)
+        => codec == RecorderArguments.OpusAudioCodec ? "Opus" : "AAC";
+
+    private string? SelectedAudioCodec =>
+        CmbAudioCodec.SelectedIndex >= 0 && CmbAudioCodec.SelectedIndex < _audioCodecItems.Count
+            ? _audioCodecItems[CmbAudioCodec.SelectedIndex]
+            : null;
+
+    /// <summary>İsteğe yazılacak ses kodeği: kabın taşımadığı kayıtlı seçim varsayılana düşer.</summary>
+    private string ChosenAudioCodec(RecorderContainer container)
+        => IndexOf(RecorderArguments.AudioCodecsFor(container), _settings.AudioCodec) >= 0
+            ? _settings.AudioCodec
+            : RecorderArguments.DefaultAudioCodec;
 
     private void RefreshCodecChoices()
     {
@@ -266,6 +309,9 @@ internal partial class RecorderView
         _settings.AudioLayout = SelectedAudioLayout;
         _settings.AudioNoiseGate = ChkNoiseGate.IsChecked ?? false;
         _settings.AudioNoiseSuppression = ChkNoiseSuppression.IsChecked ?? false;
+        _settings.AudioCompressor = ChkCompressor.IsChecked ?? false;
+        _settings.AudioLimiter = ChkLimiter.IsChecked ?? false;
+        _settings.AudioCodec = SelectedAudioCodec ?? RecorderArguments.DefaultAudioCodec;
         _settings.HdrToSdr = ChkHdrToSdr.IsChecked ?? false;
         return true;
     }

@@ -215,6 +215,15 @@ internal sealed class RecorderSettings
     /// <summary>Gürültü bastırma (<c>afftdn</c>) açık mı.</summary>
     internal bool AudioNoiseSuppression { get; set; }
 
+    /// <summary>Dinamik aralık sıkıştırıcısı (<c>acompressor</c>) açık mı.</summary>
+    internal bool AudioCompressor { get; set; }
+
+    /// <summary>Tepe sınırlayıcı (<c>alimiter</c>) açık mı.</summary>
+    internal bool AudioLimiter { get; set; }
+
+    /// <summary>Ses kodeği; <see cref="RecorderArguments.AudioCodecsFor"/> kümesinden.</summary>
+    internal string AudioCodec { get; set; } = RecorderArguments.DefaultAudioCodec;
+
     /// <summary>Gizlilik maskeleri, masaüstü pikselinde; kayda bulanık yakılır.</summary>
     internal List<RecorderRegion> PrivacyMasks { get; set; } = new();
 
@@ -223,7 +232,7 @@ internal sealed class RecorderSettings
     /// <see cref="AudioFilterOptions.None"/> dönüyor ve grafik hiç kurulmuyor.
     /// </summary>
     internal AudioFilterOptions AudioFilters =>
-        new(AudioGainDb, AudioNoiseGate, AudioNoiseSuppression);
+        new(AudioGainDb, AudioNoiseGate, AudioNoiseSuppression, AudioCompressor, AudioLimiter);
 
     /// <summary>Ölçekleme seçilmişse boyut, seçilmemişse <c>null</c>.</summary>
     internal RecorderScale? Scale =>
@@ -355,6 +364,11 @@ internal sealed class RecorderSettings
             settings.AudioGainDb = (double?)root["audioGainDb"] ?? 0;
             settings.AudioNoiseGate = (bool?)root["audioNoiseGate"] ?? false;
             settings.AudioNoiseSuppression = (bool?)root["audioNoiseSuppression"] ?? false;
+            settings.AudioCompressor = (bool?)root["audioCompressor"] ?? false;
+            settings.AudioLimiter = (bool?)root["audioLimiter"] ?? false;
+            settings.AudioCodec = (string?)root["audioCodec"] == RecorderArguments.OpusAudioCodec
+                ? RecorderArguments.OpusAudioCodec
+                : RecorderArguments.DefaultAudioCodec;
             if (root["privacyMasks"] is JsonArray masks)
                 foreach (var mask in masks.OfType<JsonObject>())
                     if ((int?)mask["x"] is { } mx && (int?)mask["y"] is { } my
@@ -491,6 +505,9 @@ internal sealed class RecorderSettings
 
                 writer.WriteEndArray();
                 writer.WriteBoolean("audioNoiseSuppression", AudioNoiseSuppression);
+                writer.WriteBoolean("audioCompressor", AudioCompressor);
+                writer.WriteBoolean("audioLimiter", AudioLimiter);
+                writer.WriteString("audioCodec", AudioCodec);
                 writer.WriteEndObject();
             }
         }

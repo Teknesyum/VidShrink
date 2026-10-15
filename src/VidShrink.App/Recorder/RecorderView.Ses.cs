@@ -142,7 +142,7 @@ internal partial class RecorderView
         if (selection.Count == 0) return AudioCapturePlan.Silent;
 
         if (AudioCaptureArguments.TryBuild(
-                selection, _devices, RecorderArguments.AudioFirstInputIndex,
+                selection, _devices, RecorderArguments.AudioFirstInputIndexFor(SelectedTarget),
                 _settings.AudioLayout, _settings.AudioFilters, out var plan, out var reason))
             return plan;
 

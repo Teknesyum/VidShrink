@@ -869,6 +869,10 @@
                 <TextBlock Text="{loc:Text recorder.advanced.audio-gain}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtAudioGain" auto:AutomationProperties.Name="{loc:Text recorder.advanced.audio-gain}"/>
               </StackPanel>
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.advanced.audio-codec}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbAudioCodec" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.audio-codec}"/>
+              </StackPanel>
             </izi:SutunIzgara>
 
             <izi:SutunIzgara MaxColumns="2" Uniform="True"
@@ -882,6 +886,14 @@
                         Theme="{StaticResource CheckStyle}"
                         Content="{loc:Text recorder.advanced.noise-suppression}"
                         auto:AutomationProperties.Name="{loc:Text recorder.advanced.noise-suppression}"/>
+              <CheckBox x:Name="ChkCompressor"
+                        Theme="{StaticResource CheckStyle}"
+                        Content="{loc:Text recorder.advanced.compressor}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.advanced.compressor}"/>
+              <CheckBox x:Name="ChkLimiter"
+                        Theme="{StaticResource CheckStyle}"
+                        Content="{loc:Text recorder.advanced.limiter}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.advanced.limiter}"/>
             </izi:SutunIzgara>
           </StackPanel>
         </Border>

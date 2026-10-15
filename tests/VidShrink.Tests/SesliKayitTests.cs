@@ -76,7 +76,7 @@ public sealed class SesliKayitTests
     private static AudioCapturePlan Plan(
         AudioCaptureSelection secim,
         IReadOnlyCollection<AudioCaptureDevice>? liste = null)
-        => AudioCaptureArguments.Build(secim, liste ?? Liste, RecorderArguments.AudioFirstInputIndex);
+        => AudioCaptureArguments.Build(secim, liste ?? Liste, RecorderArguments.AudioFirstInputIndexFor(RecorderTargetKind.Screen));
 
     /// <summary>
     /// Iki cihaz secilince argumanda grafik <b>ve</b> eslem duruyor. Eslemin ikinci yarisi
@@ -182,7 +182,7 @@ public sealed class SesliKayitTests
         Assert.Equal("Uydurma Mikrofon", hata.DeviceName);
         Assert.False(
             AudioCaptureArguments.TryBuild(
-                new AudioCaptureSelection(uydurma), Liste, RecorderArguments.AudioFirstInputIndex,
+                new AudioCaptureSelection(uydurma), Liste, RecorderArguments.AudioFirstInputIndexFor(RecorderTargetKind.Screen),
                 out var plan, out var sebep));
         Assert.Same(AudioCapturePlan.Silent, plan);
         Assert.NotNull(sebep);
@@ -206,7 +206,7 @@ public sealed class SesliKayitTests
             Fps = 15,
             Region = new RecorderRegion(0, 0, 640, 480),
             Audio = AudioCaptureArguments.Build(
-                new AudioCaptureSelection(cihaz), listelenen, RecorderArguments.AudioFirstInputIndex)
+                new AudioCaptureSelection(cihaz), listelenen, RecorderArguments.AudioFirstInputIndexFor(RecorderTargetKind.Screen))
         };
 
         var cikti = Path.Combine(Klasor, "sesli.mp4");

@@ -86,7 +86,7 @@ public sealed class KaydediciKameraTests
     [Fact]
     public void KameraOlcekVeSesleAyniGraftaBirlesir()
     {
-        var ses = AudioCaptureArguments.Build(new AudioCaptureSelection(Mikrofon), new[] { Mikrofon }, RecorderArguments.AudioFirstInputIndex);
+        var ses = AudioCaptureArguments.Build(new AudioCaptureSelection(Mikrofon), new[] { Mikrofon }, RecorderArguments.AudioFirstInputIndexFor(RecorderTargetKind.Screen));
         var args = RecorderArguments.Build(
             Istek() with { Scale = new RecorderScale(640, 480), Audio = ses, Webcam = new RecorderWebcam("Kam A", 160) }, "a.mkv");
         var girdiler = args.Select((a, i) => (a, i)).Where(x => x.a == "-i").Select(x => args[x.i + 1]).ToList();

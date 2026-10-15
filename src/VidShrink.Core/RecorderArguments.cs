@@ -30,7 +30,10 @@ public enum RecorderTargetKind
     Window,
 
     /// <summary>Ekranin bir dikdortgeni.</summary>
-    Region
+    Region,
+
+    /// <summary>Goruntusuz kayit: yalniz secilen ses girdileri yazilir.</summary>
+    AudioOnly
 }
 
 /// <summary>
@@ -242,6 +245,9 @@ public sealed record RecorderRequest
     /// <summary>Goruntu kodlayicisi.</summary>
     public string VideoCodec { get; init; } = RecorderArguments.DefaultVideoCodec;
 
+    /// <summary>Ses izi basina yazilan kodlayici; kabin tasidigi listeden (<see cref="RecorderArguments.AudioCodecsFor"/>).</summary>
+    public string AudioCodec { get; init; } = RecorderArguments.DefaultAudioCodec;
+
     /// <summary>Kodlayici on ayari.</summary>
     public string Preset { get; init; } = RecorderArguments.DefaultPreset;
 
@@ -451,8 +457,21 @@ public static class RecorderArguments
     /// <summary>Varsayilan piksel bicimi.</summary>
     public const string DefaultPixelFormat = "yuv420p";
 
-    /// <summary>Ses izi basina yazilan kodlayici.</summary>
-    public const string AudioCodec = "aac";
+    /// <summary>Ses izi basina varsayilan kodlayici.</summary>
+    public const string DefaultAudioCodec = "aac";
+
+    /// <summary>Opus kodlayicisi; mov kabi tasimiyor (ffmpeg 9.0'da baslik yazilamiyor).</summary>
+    public const string OpusAudioCodec = "libopus";
+
+    /// <summary>
+    /// Kabin tasidigi ses kodlayicilari, varsayilan basta. GIF ses tasimiyor.
+    /// </summary>
+    public static IReadOnlyList<string> AudioCodecsFor(RecorderContainer container) => container switch
+    {
+        RecorderContainer.Mp4 or RecorderContainer.Mkv => new[] { DefaultAudioCodec, OpusAudioCodec },
+        RecorderContainer.Mov => new[] { DefaultAudioCodec },
+        _ => Array.Empty<string>()
+    };
 
     /// <summary>Ses izi basina yazilan bit hizi.</summary>
     public const string AudioBitrate = "160k";
@@ -464,12 +483,14 @@ public static class RecorderArguments
     public const int MaxFps = 240;
 
     /// <summary>
-    /// Ses girdilerinin ffmpeg girdi sirasindaki ilk numarasi. Yakalama girdisi her zaman
-    /// 0 oldugu icin 1; <see cref="AudioCaptureArguments.Build"/>in ucuncu argumani bu
-    /// olmak zorunda, yoksa <c>amix</c> grafigi var olmayan bir girdiye bakar. Sayi
-    /// arayuzde uydurulmuyor, motordan okunuyor.
+    /// Ses girdilerinin ffmpeg girdi sirasindaki ilk numarasi. Goruntulu hedefte yakalama
+    /// girdisi 0 oldugu icin 1, yalniz seste goruntu girdisi olmadigi icin 0;
+    /// <see cref="AudioCaptureArguments.Build"/>in ucuncu argumani bu olmak zorunda, yoksa
+    /// <c>amix</c> grafigi var olmayan bir girdiye bakar. Sayi arayuzde uydurulmuyor,
+    /// motordan okunuyor.
     /// </summary>
-    public const int AudioFirstInputIndex = 1;
+    public static int AudioFirstInputIndexFor(RecorderTargetKind target)
+        => target == RecorderTargetKind.AudioOnly ? 0 : 1;
 
     private static readonly string[] KnownVideoCodecs =
     {
@@ -852,6 +873,7 @@ public static class RecorderArguments
     {
         ArgumentNullException.ThrowIfNull(request);
         var errors = new List<string>();
+        if (request.Target == RecorderTargetKind.AudioOnly) return AudioOnlyErrors(request, outputPath);
 
         if (string.IsNullOrWhiteSpace(outputPath)) errors.Add("Output path is required.");
         else if (ContainerOf(outputPath) is not { } written)
@@ -888,7 +910,44 @@ public static class RecorderArguments
         if (request.Platform != RecorderPlatform.Windows && LoopbackAudio.Uses(request.Audio?.Inputs))
             errors.Add("System audio loopback capture is only available on Windows.");
 
+        errors.AddRange(AudioCodecErrors(request));
         return errors;
+    }
+
+    private static List<string> AudioOnlyErrors(RecorderRequest request, string outputPath)
+    {
+        var errors = new List<string>();
+        if (string.IsNullOrWhiteSpace(outputPath)) errors.Add("Output path is required.");
+        else if (ContainerOf(outputPath) is not { } written)
+            errors.Add($"The {Path.GetExtension(outputPath)} output extension is not one of the recorder's containers (mp4, mkv, mov, gif).");
+        else if (written != request.Container)
+            errors.Add($"The output extension says {Extension(written)} but the selected container is {Extension(request.Container)}.");
+
+        if (request.Audio is not { InputCount: > 0 })
+            errors.Add("Audio-only recording needs at least one audio input.");
+        if (request.Container == RecorderContainer.Gif)
+            errors.Add("Audio-only recording cannot be written to gif.");
+        if (request.Webcam is not null)
+            errors.Add("Audio-only recording has no picture to place a webcam on.");
+        if (!string.IsNullOrWhiteSpace(request.PreviewPath))
+            errors.Add("Audio-only recording has no picture to preview.");
+        if (request.Capture == RecorderCapture.Ddagrab)
+            errors.Add("Audio-only recording does not capture the screen.");
+
+        errors.AddRange(LimitErrors(request));
+        if (request.Platform != RecorderPlatform.Windows && LoopbackAudio.Uses(request.Audio?.Inputs))
+            errors.Add("System audio loopback capture is only available on Windows.");
+
+        if (request.Container != RecorderContainer.Gif) errors.AddRange(AudioCodecErrors(request));
+        return errors;
+    }
+
+    private static IEnumerable<string> AudioCodecErrors(RecorderRequest request)
+    {
+        if (request.Audio is not { InputCount: > 0 } && request.Target != RecorderTargetKind.AudioOnly) yield break;
+        if (request.Container == RecorderContainer.Gif) yield break;
+        if (!AudioCodecsFor(request.Container).Contains(request.AudioCodec, StringComparer.Ordinal))
+            yield return $"The {request.AudioCodec} audio encoder cannot be written to {Extension(request.Container)}.";
     }
 
     private static IEnumerable<string> RegionErrors(RecorderRequest request)
@@ -1155,7 +1214,7 @@ public static class RecorderArguments
     {
         ArgumentNullException.ThrowIfNull(request);
         if (request.Webcam is not { } cam) return null;
-        var index = Number(AudioFirstInputIndex + (request.Audio?.InputCount ?? 0));
+        var index = Number(AudioFirstInputIndexFor(request.Target) + (request.Audio?.InputCount ?? 0));
 
         var before = new List<string>();
         if (cam.Mirror) before.Add("hflip");
@@ -1262,6 +1321,7 @@ public static class RecorderArguments
         {
             RecorderTargetKind.Region => request.Region,
             RecorderTargetKind.Window => request.WindowRegion,
+            RecorderTargetKind.AudioOnly => null,
             _ when request.Screens.Count > 0 => RegionForScreen(request.Screens, request.ScreenIndex),
             _ when request.ScreenIndex == 0 => request.DdaOutputs.FirstOrDefault(o => o.X == 0 && o.Y == 0) is { } primary
                 ? new RecorderRegion(primary.X, primary.Y, primary.Width - primary.Width % 2, primary.Height - primary.Height % 2)
@@ -1317,7 +1377,8 @@ public static class RecorderArguments
     {
         ArgumentNullException.ThrowIfNull(request);
         reason = DdagrabFallback.None;
-        if (request.Platform != RecorderPlatform.Windows) return request with { Capture = RecorderCapture.Gdigrab };
+        if (request.Platform != RecorderPlatform.Windows || request.Target == RecorderTargetKind.AudioOnly)
+            return request with { Capture = RecorderCapture.Gdigrab };
 
         reason = DdagrabBlocker(request);
         if (reason == DdagrabFallback.None && !ddagrabWorks) reason = DdagrabFallback.Unavailable;
@@ -1505,6 +1566,7 @@ public static class RecorderArguments
         if (errors.Count > 0) throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
         if (request.Container == RecorderContainer.Gif)
             return Build(CaptureRequest(request), CapturePath(outputPath, request.Container));
+        if (request.Target == RecorderTargetKind.AudioOnly) return BuildAudioOnly(request, outputPath);
 
         var a = new List<string> { "-hide_banner", "-y" };
         a.AddRange(CodecModel.DeviceArgs(request.VideoCodec));
@@ -1528,8 +1590,34 @@ public static class RecorderArguments
         a.AddRange(RateControlArgs(request));
         a.AddRange(StreamShapeArgs(request));
         a.AddRange(ColourArgs(request));
-        a.AddRange(AudioOutputArgs(audio, webcam is null ? "0:v" : $"[{WebcamOutputLabel}]"));
+        a.AddRange(AudioOutputArgs(audio, webcam is null ? "0:v" : $"[{WebcamOutputLabel}]", request.AudioCodec));
 
+        a.AddRange(LimitAndContainerArgs(request));
+
+        if (request.FrameRateMode is RecorderFrameRateMode.Constant or RecorderFrameRateMode.Variable)
+            a.AddRange(new[] { "-fps_mode", request.FrameRateMode == RecorderFrameRateMode.Variable ? "vfr" : "cfr" });
+
+        a.Add(outputPath);
+        a.AddRange(PreviewArgs(request));
+        return a;
+    }
+
+    private static IReadOnlyList<string> BuildAudioOnly(RecorderRequest request, string outputPath)
+    {
+        var audio = request.Audio!;
+        var a = new List<string> { "-hide_banner", "-y" };
+        a.AddRange(audio.Inputs);
+        if (!string.IsNullOrEmpty(audio.FilterComplex)) a.AddRange(new[] { "-filter_complex", audio.FilterComplex });
+        a.AddRange(AudioOutputArgs(audio, null, request.AudioCodec));
+        a.Add("-vn");
+        a.AddRange(LimitAndContainerArgs(request));
+        a.Add(outputPath);
+        return a;
+    }
+
+    private static IReadOnlyList<string> LimitAndContainerArgs(RecorderRequest request)
+    {
+        var a = new List<string>();
         if (request.MaxDuration is { } limit)
             a.AddRange(new[] { "-t", limit.TotalSeconds.ToString("0.###", CultureInfo.InvariantCulture) });
 
@@ -1540,12 +1628,6 @@ public static class RecorderArguments
             a.AddRange(new[] { "-movflags", "+faststart" });
         else if (request.Container == RecorderContainer.Mkv)
             a.AddRange(new[] { "-flush_packets", "1", "-cluster_time_limit", "500" });
-
-        if (request.FrameRateMode is RecorderFrameRateMode.Constant or RecorderFrameRateMode.Variable)
-            a.AddRange(new[] { "-fps_mode", request.FrameRateMode == RecorderFrameRateMode.Variable ? "vfr" : "cfr" });
-
-        a.Add(outputPath);
-        a.AddRange(PreviewArgs(request));
         return a;
     }
 
@@ -1658,6 +1740,8 @@ public static class RecorderArguments
     public static IReadOnlyList<string> BuildSnapshot(RecorderRequest request, string imagePath)
     {
         ArgumentNullException.ThrowIfNull(request);
+        if (request.Target == RecorderTargetKind.AudioOnly)
+            throw new InvalidOperationException("Audio-only recording has no picture to snapshot.");
         if (string.IsNullOrWhiteSpace(imagePath)) throw new ArgumentException("Image path is required.", nameof(imagePath));
 
         var probe = request with
@@ -1727,24 +1811,25 @@ public static class RecorderArguments
     /// cunku izler ayri kaldiginda hangisinin hangi kodlayiciya gittigi argumandan
     /// okunabilmeli.
     /// </summary>
-    private static IReadOnlyList<string> AudioOutputArgs(AudioCapturePlan? audio, string videoMap)
+    private static IReadOnlyList<string> AudioOutputArgs(AudioCapturePlan? audio, string? videoMap, string codec)
     {
         if (audio is null)
-            return videoMap == "0:v" ? new[] { "-an" } : new[] { "-map", videoMap, "-an" };
+            return videoMap is null or "0:v" ? new[] { "-an" } : new[] { "-map", videoMap, "-an" };
 
-        var a = new List<string> { "-map", videoMap };
+        var a = new List<string>();
+        if (videoMap is not null) a.AddRange(new[] { "-map", videoMap });
         foreach (var map in audio.Maps) a.AddRange(new[] { "-map", map });
 
         if (audio.Maps.Count <= 1)
         {
-            a.AddRange(new[] { "-c:a", AudioCodec, "-b:a", AudioBitrate });
+            a.AddRange(new[] { "-c:a", codec, "-b:a", AudioBitrate });
             return a;
         }
 
         for (var track = 0; track < audio.Maps.Count; track++)
         {
             var suffix = Number(track);
-            a.AddRange(new[] { $"-c:a:{suffix}", AudioCodec, $"-b:a:{suffix}", AudioBitrate });
+            a.AddRange(new[] { $"-c:a:{suffix}", codec, $"-b:a:{suffix}", AudioBitrate });
         }
 
         return a;

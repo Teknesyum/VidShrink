@@ -767,7 +767,7 @@ public sealed class KayitFfmpegKoluTests
     private static AudioCapturePlan Plan(AudioTrackLayout duzen, AudioFilterOptions? filtreler = null)
         => AudioCaptureArguments.Build(
             new AudioCaptureSelection(Mikrofon, SistemSesi), Liste,
-            RecorderArguments.AudioFirstInputIndex, duzen, filtreler);
+            RecorderArguments.AudioFirstInputIndexFor(RecorderTargetKind.Screen), duzen, filtreler);
 
     /// <summary>
     /// Ayri iz kolunda <c>amix</c> hic kurulmuyor ve iki girdi kendi <c>-map</c>'ini
@@ -800,12 +800,12 @@ public sealed class KayitFfmpegKoluTests
         var karisik = RecorderArguments.Build(
             Istek() with { Audio = Plan(AudioTrackLayout.MixedSingleTrack) }, @"C:\kayit\a.mp4");
 
-        Assert.Equal(RecorderArguments.AudioCodec, Deger(ayri, "-c:a:0"));
-        Assert.Equal(RecorderArguments.AudioCodec, Deger(ayri, "-c:a:1"));
+        Assert.Equal(RecorderArguments.DefaultAudioCodec, Deger(ayri, "-c:a:0"));
+        Assert.Equal(RecorderArguments.DefaultAudioCodec, Deger(ayri, "-c:a:1"));
         Assert.Equal(RecorderArguments.AudioBitrate, Deger(ayri, "-b:a:0"));
         Assert.DoesNotContain("-c:a", ayri);
 
-        Assert.Equal(RecorderArguments.AudioCodec, Deger(karisik, "-c:a"));
+        Assert.Equal(RecorderArguments.DefaultAudioCodec, Deger(karisik, "-c:a"));
         Assert.DoesNotContain("-c:a:0", karisik);
 
         Assert.Equal(2, ayri.Count(a => a == "-map") - 1);
@@ -820,14 +820,14 @@ public sealed class KayitFfmpegKoluTests
     {
         var tek = AudioCaptureArguments.Build(
             new AudioCaptureSelection(Mikrofon), Liste,
-            RecorderArguments.AudioFirstInputIndex, AudioTrackLayout.SeparateTracks, null);
+            RecorderArguments.AudioFirstInputIndexFor(RecorderTargetKind.Screen), AudioTrackLayout.SeparateTracks, null);
 
         Assert.Equal(new[] { "1:a" }, tek.Maps);
         Assert.Null(tek.FilterComplex);
 
         var hata = Assert.Throws<ArgumentOutOfRangeException>(() => AudioCaptureArguments.Build(
             new AudioCaptureSelection(Mikrofon, SistemSesi), Liste,
-            RecorderArguments.AudioFirstInputIndex, (AudioTrackLayout)77, null));
+            RecorderArguments.AudioFirstInputIndexFor(RecorderTargetKind.Screen), (AudioTrackLayout)77, null));
         Assert.Contains("tanimsiz ses izi duzeni", hata.Message);
     }
 
@@ -882,7 +882,7 @@ public sealed class KayitFfmpegKoluTests
     public void FiltresizKolBugunkuGrafiginAynisi()
     {
         var eski = AudioCaptureArguments.Build(
-            new AudioCaptureSelection(Mikrofon, SistemSesi), Liste, RecorderArguments.AudioFirstInputIndex);
+            new AudioCaptureSelection(Mikrofon, SistemSesi), Liste, RecorderArguments.AudioFirstInputIndexFor(RecorderTargetKind.Screen));
         var yeni = Plan(AudioTrackLayout.MixedSingleTrack, AudioFilterOptions.None);
 
         Assert.Equal(eski.Inputs, yeni.Inputs);
@@ -899,11 +899,11 @@ public sealed class KayitFfmpegKoluTests
         var secim = new AudioCaptureSelection(Mikrofon);
 
         Assert.Throws<ArgumentOutOfRangeException>(() => AudioCaptureArguments.Build(
-            secim, Liste, RecorderArguments.AudioFirstInputIndex,
+            secim, Liste, RecorderArguments.AudioFirstInputIndexFor(RecorderTargetKind.Screen),
             AudioTrackLayout.MixedSingleTrack, new AudioFilterOptions(AudioCaptureArguments.MaxGainDb + 1)));
 
         var kabul = AudioCaptureArguments.TryBuild(
-            secim, Liste, RecorderArguments.AudioFirstInputIndex,
+            secim, Liste, RecorderArguments.AudioFirstInputIndexFor(RecorderTargetKind.Screen),
             AudioTrackLayout.MixedSingleTrack, new AudioFilterOptions(AudioCaptureArguments.MinGainDb - 1),
             out var plan, out var sebep);
 
