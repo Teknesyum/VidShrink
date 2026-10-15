@@ -134,7 +134,9 @@ public static class EditExport
     /// <summary>
     /// Akilli kesimde bas kenarin kodlamasi anahtar kareden yarim kare once biter. Goruntu akisi
     /// kabin baslangicindan gec baslayan TS kaynakta (bench kaynaginda 23,2 ms) <c>-t</c> o kadar gec kesiyor,
-    /// anahtar kareyi de kapsiyor ve parca bir kare uzuyordu.
+    /// anahtar kareyi de kapsiyor ve parca bir kare uzuyordu. TS disinda girdi <c>-t</c> sureyi ilk tutulan
+    /// kareden sayar; kesim kare arasina dusunce pay listedeki tam kare suresinden dusulur, yoksa kenar govdenin
+    /// ilk karesini de kodluyor, birlesimde kare yineleniyordu (0,52 sn kesim: 95 yerine 96 kare).
     /// </summary>
     private static double HeadMarginSeconds(MediaInfo info) => 0.5 / (info.Fps > 0 ? info.Fps : 30);
 
@@ -1113,7 +1115,12 @@ public static class EditExport
 
             if (SmartBody(cuts, keyframes, start, end, nudge) is var (a, b))
             {
-                if (a.Time > start + 1e-6) steps.Add(SmartEncode(info, encoding, keyframes, start, a.Time - start - HeadMarginSeconds(info), string.Empty, VideoPart(HeadListSeconds(info, a.Time - start))));
+                if (a.Time > start + 1e-6)
+                {
+                    var head = HeadListSeconds(info, a.Time - start);
+                    var span = SmartCutCodec.SeekOvershoots(info.FormatName) ? a.Time - start : head;
+                    steps.Add(SmartEncode(info, encoding, keyframes, start, span - HeadMarginSeconds(info), string.Empty, VideoPart(head)));
+                }
                 steps.Add(SmartCopy(info, encoding, a.Time + nudge, b.Time - a.Time, b.Packet - a.Packet, VideoPart(b.Time - a.Time)));
                 if (end > b.Time + 1e-6) steps.Add(SmartEncode(info, encoding, keyframes, b.Time, end - b.Time, string.Empty, VideoPart(TailListSeconds(info, end - b.Time))));
             }
@@ -1135,6 +1142,7 @@ public static class EditExport
         join.AddRange(new[] { "-map", "0:v:0" });
         for (var p = 0; p < count; p++) join.AddRange(new[] { "-map", (p + 1).ToString(CultureInfo.InvariantCulture) + ":a:0" });
         join.AddRange(new[] { "-c", "copy" });
+        if (info.FieldOrder is "progressive" or "tt" or "bb" or "tb" or "bt") join.AddRange(new[] { "-field_order:v", info.FieldOrder });
         if (encoding.OutputTag is { } tag && IsMp4Family(output)) join.AddRange(new[] { "-tag:v", tag });
         join.AddRange(Faststart(output));
         join.Add(output);
