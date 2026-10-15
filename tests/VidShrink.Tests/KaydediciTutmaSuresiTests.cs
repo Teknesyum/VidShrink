@@ -39,12 +39,17 @@ public sealed class KaydediciTutmaSuresiTests
     [Theory]
     [InlineData("RecorderClickRingHold", 360)]
     [InlineData("RecorderKeyCaptionHold", 1500)]
+    [InlineData("RecorderKeyCaptionHoldShort", 800)]
+    [InlineData("RecorderKeyCaptionHoldLong", 3000)]
     public void TutmaSuresiKaynaktaPimli(string anahtar, int milisaniye)
         => Assert.Equal(milisaniye, Kaynaktan(anahtar).TotalMilliseconds, 3);
 
     /// <summary>
     /// Yedek deger kaynaktakiyle ayni. Kaynak bulunamadiginda sessizce baska bir
     /// sure kullanilmasi, kusurun yalniz kaynak kaybinda ortaya cikmasi demekti.
+    ///
+    /// <para>2026-10-15, tus yazisi suresi secimi (EKB-P1): yazinin kisa, orta ve uzun tutmasi
+    /// <c>RecorderInputOverlay.CaptionHold</c> icinde uc ayri <c>Hold</c> cagrisi; halkayla birlikte 4.</para>
     /// </summary>
     [Fact]
     public void YedekDegerKaynaktakiyleAyni()
@@ -54,7 +59,7 @@ public sealed class KaydediciTutmaSuresiTests
             kaynak,
             @"OverlayPlace\.Hold\([^,]+,\s*""(?<anahtar>[^""]+)"",\s*TimeSpan\.(?<uretici>FromMilliseconds|FromSeconds)\((?<deger>[0-9.]+)\)\)");
 
-        Assert.Equal(2, cagrilar.Count);
+        Assert.Equal(4, cagrilar.Count);
 
         foreach (Match cagri in cagrilar)
         {

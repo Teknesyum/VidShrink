@@ -73,6 +73,11 @@ internal sealed class RecorderSettings
 
     internal bool ShowKeys { get; set; }
 
+    /// <summary>Varsayılan açık: tuş gösterimi yalnız kısayolları yazar, yazılan parola kayda girmez.</summary>
+    internal bool KeysShortcutsOnly { get; set; } = true;
+
+    internal KeyCaptionStyle KeyCaption { get; set; } = KeyCaptionStyle.Default;
+
     internal bool ShowMagnifier { get; set; }
 
     internal bool CursorHighlight { get; set; }
@@ -276,6 +281,12 @@ internal sealed class RecorderSettings
             settings.ShowClicks = (bool?)root["showClicks"] ?? false;
             settings.ClickSound = (bool?)root["clickSound"] ?? false;
             settings.ShowKeys = (bool?)root["showKeys"] ?? false;
+            settings.KeysShortcutsOnly = (bool?)root["keysShortcutsOnly"] ?? true;
+            var caption = KeyCaptionStyle.Default;
+            if (Enum.TryParse<KeyCaptionPlace>((string?)root["keyCaptionPlace"], true, out var captionPlace) && Enum.IsDefined(captionPlace)) caption = caption with { Place = captionPlace };
+            if (Enum.TryParse<KeyCaptionSize>((string?)root["keyCaptionSize"], true, out var captionSize) && Enum.IsDefined(captionSize)) caption = caption with { Size = captionSize };
+            if (Enum.TryParse<KeyCaptionHold>((string?)root["keyCaptionHold"], true, out var captionHold) && Enum.IsDefined(captionHold)) caption = caption with { Hold = captionHold };
+            settings.KeyCaption = caption;
             settings.ShowMagnifier = (bool?)root["showMagnifier"] ?? false;
             settings.CursorHighlight = (bool?)root["cursorHighlight"] ?? false;
             settings.Spotlight = (bool?)root["spotlight"] ?? false;
@@ -393,6 +404,10 @@ internal sealed class RecorderSettings
                 writer.WriteBoolean("showClicks", ShowClicks);
                 writer.WriteBoolean("clickSound", ClickSound);
                 writer.WriteBoolean("showKeys", ShowKeys);
+                writer.WriteBoolean("keysShortcutsOnly", KeysShortcutsOnly);
+                writer.WriteString("keyCaptionPlace", KeyCaption.Place.ToString());
+                writer.WriteString("keyCaptionSize", KeyCaption.Size.ToString());
+                writer.WriteString("keyCaptionHold", KeyCaption.Hold.ToString());
                 writer.WriteBoolean("showMagnifier", ShowMagnifier);
                 writer.WriteBoolean("cursorHighlight", CursorHighlight);
                 writer.WriteBoolean("spotlight", Spotlight);

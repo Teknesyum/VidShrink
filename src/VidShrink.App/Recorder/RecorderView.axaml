@@ -700,6 +700,40 @@
               </StackPanel>
             </izi:SutunIzgara>
 
+            <TextBlock Text="{loc:Text recorder.keys.title}"
+                       Theme="{StaticResource Label}"
+                       IsVisible="{Binding #KeyChoices.IsVisible}"/>
+            <izi:SutunIzgara x:Name="KeyChoices" MaxColumns="2" Uniform="True"
+                             ColumnSpacing="{StaticResource SpaceMd}"
+                             RowSpacing="{StaticResource SpaceSm}">
+              <CheckBox x:Name="ChkKeysShortcutsOnly"
+                        Theme="{StaticResource CheckStyle}"
+                        Content="{loc:Text recorder.keys.shortcuts-only}"
+                        ToolTip.Tip="{loc:Text recorder.keys.shortcuts-only-hint}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.keys.shortcuts-only}"/>
+
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.keys.place}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbKeyCaptionPlace"
+                          HorizontalAlignment="Stretch"
+                          auto:AutomationProperties.Name="{loc:Text recorder.keys.place}"/>
+              </StackPanel>
+
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.keys.size}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbKeyCaptionSize"
+                          HorizontalAlignment="Stretch"
+                          auto:AutomationProperties.Name="{loc:Text recorder.keys.size}"/>
+              </StackPanel>
+
+              <StackPanel>
+                <TextBlock Text="{loc:Text recorder.keys.hold}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbKeyCaptionHold"
+                          HorizontalAlignment="Stretch"
+                          auto:AutomationProperties.Name="{loc:Text recorder.keys.hold}"/>
+              </StackPanel>
+            </izi:SutunIzgara>
+
             <StackPanel>
               <TextBlock Text="{loc:Text recorder.output.title}" Theme="{StaticResource Label}"/>
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">

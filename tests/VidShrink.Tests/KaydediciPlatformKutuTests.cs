@@ -40,6 +40,7 @@ public sealed class KaydediciPlatformKutuTests
         public void Ring(PixelPoint point, PointerButton button) { }
         public void Pointer(PixelPoint point, PixelRect area) { }
         public void Keys(string text, PixelRect region) { }
+        public void CaptionStyle(KeyCaptionStyle style) { }
         public void Hide() { }
     }
 

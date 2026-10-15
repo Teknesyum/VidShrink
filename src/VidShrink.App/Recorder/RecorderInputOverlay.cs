@@ -49,9 +49,43 @@ internal sealed record PointerStyle(bool Highlight, bool Spotlight, PointerRingS
     };
 }
 
+internal enum KeyCaptionPlace
+{
+    Bottom,
+    Top
+}
+
+internal enum KeyCaptionSize
+{
+    Small,
+    Medium,
+    Large
+}
+
+internal enum KeyCaptionHold
+{
+    Short,
+    Normal,
+    Long
+}
+
+internal sealed record KeyCaptionStyle(KeyCaptionPlace Place, KeyCaptionSize Size, KeyCaptionHold Hold)
+{
+    internal static KeyCaptionStyle Default { get; } = new(KeyCaptionPlace.Bottom, KeyCaptionSize.Medium, KeyCaptionHold.Normal);
+
+    internal string FontKey => Size switch
+    {
+        KeyCaptionSize.Small => "RecorderKeyCaptionFontSmall",
+        KeyCaptionSize.Large => "RecorderKeyCaptionFontLarge",
+        _ => "RecorderKeyCaptionFontMedium"
+    };
+}
+
 internal interface IInputOverlay
 {
     void Style(PointerStyle style);
+
+    void CaptionStyle(KeyCaptionStyle style);
 
     void Ring(PixelPoint point, PointerButton button);
 
@@ -67,8 +101,9 @@ internal static class OverlayPlace
     internal static PixelRect Ring(PixelPoint click, int size)
         => new(click.X - size / 2, click.Y - size / 2, size, size);
 
-    internal static PixelPoint Caption(PixelRect region, PixelSize caption, int gap)
-        => new(region.X + (region.Width - caption.Width) / 2, Math.Max(region.Y, region.Bottom - caption.Height - gap));
+    internal static PixelPoint Caption(PixelRect region, PixelSize caption, int gap, bool top = false)
+        => new(region.X + (region.Width - caption.Width) / 2,
+            top ? Math.Min(region.Y + gap, region.Bottom - caption.Height) : Math.Max(region.Y, region.Bottom - caption.Height - gap));
 
     internal static long ClickThrough(nint hwnd)
     {
@@ -167,12 +202,13 @@ internal partial class RecorderKeyCaption : Window
         set => TxtKeys.Text = value;
     }
 
-    internal void Place(PixelRect region)
+    internal void Place(PixelRect region, KeyCaptionStyle style)
     {
+        if (OverlayPlace.Size(this, style.FontKey) is > 0 and var font) TxtKeys.FontSize = font;
         var scaling = (Screens.ScreenFromPoint(region.Center) ?? Screens.Primary)?.Scaling ?? 1;
         Measure(Size.Infinity);
         var size = PixelSize.FromSize(DesiredSize, scaling);
-        Position = OverlayPlace.Caption(region, size, (int)Math.Ceiling(OverlayPlace.Size(this, "RecorderKeyCaptionGap") * scaling));
+        Position = OverlayPlace.Caption(region, size, (int)Math.Ceiling(OverlayPlace.Size(this, "RecorderKeyCaptionGap") * scaling), style.Place == KeyCaptionPlace.Top);
     }
 }
 
@@ -183,6 +219,7 @@ internal sealed class RecorderInputOverlay : IInputOverlay
     private RecorderSpotlight? _spotlight;
     private RecorderKeyCaption? _caption;
     private PointerStyle _style = PointerStyle.Default;
+    private KeyCaptionStyle _captionStyle = KeyCaptionStyle.Default;
     private int _ringTurn;
     private int _captionTurn;
 
@@ -195,6 +232,8 @@ internal sealed class RecorderInputOverlay : IInputOverlay
     internal RecorderKeyCaption? CaptionWindow => _caption;
 
     public void Style(PointerStyle style) => _style = style;
+
+    public void CaptionStyle(KeyCaptionStyle style) => _captionStyle = style;
 
     public void Ring(PixelPoint point, PointerButton button)
     {
@@ -240,10 +279,10 @@ internal sealed class RecorderInputOverlay : IInputOverlay
     {
         _caption ??= new RecorderKeyCaption();
         _caption.Text = text;
-        _caption.Place(region);
+        _caption.Place(region, _captionStyle);
         if (!_caption.IsVisible) _caption.Show();
         var turn = ++_captionTurn;
-        _ = HideLater(OverlayPlace.Hold(_caption, "RecorderKeyCaptionHold", TimeSpan.FromSeconds(1.5)), () =>
+        _ = HideLater(CaptionHold(_caption, _captionStyle.Hold), () =>
         {
             if (turn == _captionTurn) _caption?.Hide();
         });
@@ -262,6 +301,13 @@ internal sealed class RecorderInputOverlay : IInputOverlay
         _spotlight = null;
         _caption = null;
     }
+
+    internal static TimeSpan CaptionHold(Control owner, KeyCaptionHold hold) => hold switch
+    {
+        KeyCaptionHold.Short => OverlayPlace.Hold(owner, "RecorderKeyCaptionHoldShort", TimeSpan.FromMilliseconds(800)),
+        KeyCaptionHold.Long => OverlayPlace.Hold(owner, "RecorderKeyCaptionHoldLong", TimeSpan.FromSeconds(3)),
+        _ => OverlayPlace.Hold(owner, "RecorderKeyCaptionHold", TimeSpan.FromSeconds(1.5))
+    };
 
     private static async System.Threading.Tasks.Task HideLater(TimeSpan hold, Action done)
     {

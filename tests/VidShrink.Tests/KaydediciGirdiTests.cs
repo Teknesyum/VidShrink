@@ -68,6 +68,10 @@ public sealed class KaydediciGirdiTests
 
         public void Keys(string text, PixelRect region) => Cagrilar.Add($"tus {text}");
 
+        public void CaptionStyle(KeyCaptionStyle style) => YaziStili = style;
+
+        public KeyCaptionStyle? YaziStili;
+
         public void Hide() => Cagrilar.Add("gizle");
     }
 
@@ -122,6 +126,159 @@ public sealed class KaydediciGirdiTests
         Assert.Equal(new PixelRect(276, 176, 48, 48), OverlayPlace.Ring(new PixelPoint(300, 200), 48));
         Assert.Equal(new PixelPoint(260, 516), OverlayPlace.Caption(new PixelRect(100, 100, 640, 480), new PixelSize(320, 40), 24));
         Assert.Equal(new PixelPoint(100, 100), OverlayPlace.Caption(new PixelRect(100, 100, 320, 30), new PixelSize(320, 40), 24));
+        Assert.Equal(new PixelPoint(260, 124), OverlayPlace.Caption(new PixelRect(100, 100, 640, 480), new PixelSize(320, 40), 24, top: true));
+        Assert.Equal(new PixelPoint(100, 90), OverlayPlace.Caption(new PixelRect(100, 100, 320, 30), new PixelSize(320, 40), 24, top: true));
+    }
+
+    /// <summary>
+    /// "Yalnız kısayollar" süzgeci (EKB-P1): açıkken yalnız Ctrl, Alt ya da Win ile basılan tuş
+    /// ve işlev tuşu yazıya döner; düz harf, rakam, Shift'li harf ve Enter dönmez, yazılan parola
+    /// kayda girmez. Süzgeç kapalıyken bugünkü davranış sürer.
+    /// </summary>
+    [Fact]
+    public void YalnizKisayolSuzgeciDuzHarfiBosCtrlCyiMetinDondurur()
+    {
+        var suzgecli = new KeyTracker(shortcutsOnly: true);
+        var akis = new List<string?>
+        {
+            suzgecli.Feed(0x41, true), suzgecli.Feed(0x41, false), suzgecli.Feed(0x31, true), suzgecli.Feed(0x0D, true),
+            suzgecli.Feed(0xA2, true), suzgecli.Feed(0x43, true), suzgecli.Feed(0xA2, false),
+            suzgecli.Feed(0xA0, true), suzgecli.Feed(0x41, true), suzgecli.Feed(0x72, true), suzgecli.Feed(0xA0, false),
+            suzgecli.Feed(0x74, true), suzgecli.Feed(0xA4, true), suzgecli.Feed(0x09, true), suzgecli.Feed(0xA4, false),
+            suzgecli.Feed(0x5B, true), suzgecli.Feed(0x44, true), suzgecli.Feed(0x5B, false), suzgecli.Feed(0x42, true)
+        };
+
+        Assert.Equal(new string?[]
+        {
+            null, null, null, null,
+            null, "Ctrl + C", null,
+            null, null, "Shift + F3", null,
+            "F5", null, "Alt + Tab", null,
+            null, "Win + D", null, null
+        }, akis);
+
+        var suzgecsiz = new KeyTracker(shortcutsOnly: false);
+        Assert.Equal("A", suzgecsiz.Feed(0x41, true));
+        Assert.Equal("Enter", suzgecsiz.Feed(0x0D, true));
+    }
+
+    [Fact]
+    public void TusYazisiAyarlariVarsayilanlaGelirDiskeGidipDoner()
+    {
+        var varsayilan = new RecorderSettings();
+        Assert.True(varsayilan.KeysShortcutsOnly);
+        Assert.Equal(KeyCaptionStyle.Default, varsayilan.KeyCaption);
+        Assert.Equal(new KeyCaptionStyle(KeyCaptionPlace.Bottom, KeyCaptionSize.Medium, KeyCaptionHold.Normal), KeyCaptionStyle.Default);
+
+        var klasor = Path.Combine(AppContext.BaseDirectory, "tus-ayar-" + Guid.NewGuid().ToString("N"));
+        var dosya = Path.Combine(klasor, RecorderSettings.FileName);
+        try
+        {
+            new RecorderSettings
+            {
+                KeysShortcutsOnly = false,
+                KeyCaption = new KeyCaptionStyle(KeyCaptionPlace.Top, KeyCaptionSize.Large, KeyCaptionHold.Long)
+            }.Save(dosya);
+            var okunan = RecorderSettings.Load(dosya);
+            Assert.False(okunan.KeysShortcutsOnly);
+            Assert.Equal(new KeyCaptionStyle(KeyCaptionPlace.Top, KeyCaptionSize.Large, KeyCaptionHold.Long), okunan.KeyCaption);
+
+            File.WriteAllText(dosya, "{\"showKeys\": true, \"keyCaptionSize\": \"Huge\"}");
+            var eski = RecorderSettings.Load(dosya);
+            Assert.True(eski.ShowKeys);
+            Assert.True(eski.KeysShortcutsOnly);
+            Assert.Equal(KeyCaptionStyle.Default, eski.KeyCaption);
+        }
+        finally
+        {
+            if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
+        }
+    }
+
+    [Fact]
+    public void SuzgecVeYaziAyariArayuzdenKancayaVeBindirmeyeGecer()
+    {
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            var ilk = new RecorderView(ayarYolu) { SkipAutoMeasure = true };
+            var ilkKutu = Bul<CheckBox>(ilk, "ChkKeysShortcutsOnly").IsChecked;
+            Bul<CheckBox>(ilk, "ChkShowKeys").IsChecked = true;
+            var secenekGorunur = Bul<Control>(ilk, "KeyChoices").IsVisible;
+
+            var kanca = new SahteKanca();
+            var bindirme = new SahteBindirme();
+            var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true, InputHooks = kanca, InputOverlay = bindirme, ClickSound = new SahteSes() };
+            view.SyncInput(true);
+            kanca.Tus!(0x50, true);
+            kanca.Tus!(0x31, true);
+            kanca.Tus!(0xA2, true);
+            kanca.Tus!(0x43, true);
+            kanca.Tus!(0xA2, false);
+            view.SyncInput(false);
+            var suzgecli = bindirme.Cagrilar.ToList();
+
+            Bul<CheckBox>(view, "ChkKeysShortcutsOnly").IsChecked = false;
+            Bul<ComboBox>(view, "CmbKeyCaptionPlace").SelectedIndex = Array.IndexOf(Enum.GetValues<KeyCaptionPlace>(), KeyCaptionPlace.Top);
+            Bul<ComboBox>(view, "CmbKeyCaptionSize").SelectedIndex = Array.IndexOf(Enum.GetValues<KeyCaptionSize>(), KeyCaptionSize.Large);
+            Bul<ComboBox>(view, "CmbKeyCaptionHold").SelectedIndex = Array.IndexOf(Enum.GetValues<KeyCaptionHold>(), KeyCaptionHold.Short);
+            var dosya = (Dosyada(ayarYolu, "keysShortcutsOnly"), Dosyada(ayarYolu, "keyCaptionPlace"), Dosyada(ayarYolu, "keyCaptionSize"), Dosyada(ayarYolu, "keyCaptionHold"));
+
+            var kanca2 = new SahteKanca();
+            var bindirme2 = new SahteBindirme();
+            var yeni = new RecorderView(ayarYolu) { SkipAutoMeasure = true, InputHooks = kanca2, InputOverlay = bindirme2, ClickSound = new SahteSes() };
+            yeni.SyncInput(true);
+            kanca2.Tus!(0x50, true);
+            yeni.SyncInput(false);
+
+            return (ilkKutu, secenekGorunur, suzgecli, dosya, suzgecsiz: bindirme2.Cagrilar, stil: bindirme2.YaziStili);
+        }));
+
+        Assert.True(olcu.ilkKutu);
+        Assert.True(olcu.secenekGorunur);
+        Assert.Equal(new[] { "tus Ctrl + C", "gizle" }, olcu.suzgecli);
+        Assert.Equal(("false", "\"Top\"", "\"Large\"", "\"Short\""), olcu.dosya);
+        Assert.Equal(new[] { "tus P", "gizle" }, olcu.suzgecsiz);
+        Assert.Equal(new KeyCaptionStyle(KeyCaptionPlace.Top, KeyCaptionSize.Large, KeyCaptionHold.Short), olcu.stil);
+    }
+
+    [Fact]
+    public void GercekTusYazisiUsteBuyukVeKisaTutulur()
+    {
+        var olcu = AppHost.Run(() =>
+        {
+            var bolge = new PixelRect(100, 100, 640, 480);
+            var orta = new RecorderInputOverlay();
+            orta.Keys("Ctrl + S", bolge);
+            var ortaBoy = orta.CaptionWindow!.TxtKeys.FontSize;
+            var ortaY = orta.CaptionWindow.Position.Y;
+            orta.Hide();
+
+            var buyuk = new RecorderInputOverlay();
+            buyuk.CaptionStyle(new KeyCaptionStyle(KeyCaptionPlace.Top, KeyCaptionSize.Large, KeyCaptionHold.Short));
+            var saat = Stopwatch.StartNew();
+            buyuk.Keys("Ctrl + S", bolge);
+            var yazi = buyuk.CaptionWindow!;
+            var buyukBoy = yazi.TxtKeys.FontSize;
+            var buyukY = yazi.Position.Y;
+            var tutmalar = Enum.GetValues<KeyCaptionHold>()
+                .Select(t => RecorderInputOverlay.CaptionHold(yazi, t).TotalMilliseconds).ToArray();
+            long kapandi = -1;
+            while (saat.ElapsedMilliseconds < Tavan && kapandi < 0)
+            {
+                Bekle(10);
+                if (!yazi.IsVisible) kapandi = saat.ElapsedMilliseconds;
+            }
+            buyuk.Hide();
+            return (ortaBoy, ortaY, buyukBoy, buyukY, kapandi, tutmalar);
+        });
+
+        Assert.True(olcu.buyukBoy > olcu.ortaBoy, $"büyük {olcu.buyukBoy} orta {olcu.ortaBoy}");
+        Assert.True(olcu.ortaY > 100 + 480 / 2);
+        Assert.True(olcu.buyukY < 100 + 480 / 2);
+        Assert.Equal(1500, olcu.tutmalar[Array.IndexOf(Enum.GetValues<KeyCaptionHold>(), KeyCaptionHold.Normal)]);
+        Assert.Equal(olcu.tutmalar.OrderBy(t => t).Distinct(), olcu.tutmalar);
+        Assert.True(olcu.kapandi >= 0, $"Tuş yazısı {Tavan} ms içinde kendiliğinden kapanmadı.");
+        Assert.True(olcu.kapandi >= olcu.tutmalar[0], $"Tuş yazısı kısa tutmadan önce kapandı: {olcu.kapandi} ms < {olcu.tutmalar[0]} ms.");
     }
 
     [Fact]

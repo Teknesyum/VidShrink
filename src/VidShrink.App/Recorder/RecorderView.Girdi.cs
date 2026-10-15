@@ -10,7 +10,7 @@ internal partial class RecorderView
     private IInputHooks? _inputHooks;
     private IClickSound? _clickSound;
     private KeyTracker _keys = new();
-    private (bool WantsClicks, bool ShowKeys, PointerStyle Style) _inputMode;
+    private (bool WantsClicks, bool ShowKeys, PointerStyle Style, bool ShortcutsOnly, KeyCaptionStyle Caption) _inputMode;
 
     private static bool RealDesktop
         => OperatingSystem.IsWindows()
@@ -79,7 +79,7 @@ internal partial class RecorderView
         else if (!lens && Magnifier.Running) Magnifier.Stop();
 
         var wanted = recording && (WantsClicks || WantsPointer || ShowKeysOn);
-        var mode = (WantsClicks, ShowKeys: ShowKeysOn, CurrentPointerStyle);
+        var mode = (WantsClicks, ShowKeys: ShowKeysOn, CurrentPointerStyle, _settings.KeysShortcutsOnly, _settings.KeyCaption);
         if (wanted == InputActive && (!wanted || mode == _inputMode)) return;
 
         if (InputActive)
@@ -91,8 +91,9 @@ internal partial class RecorderView
 
         if (!wanted) return;
 
-        _keys = new KeyTracker();
+        _keys = new KeyTracker(mode.KeysShortcutsOnly);
         InputOverlay.Style(mode.CurrentPointerStyle);
+        InputOverlay.CaptionStyle(mode.KeyCaption);
         InputHooks.Start(mode.WantsClicks, WantsPointer, mode.ShowKeys, OnInputClick, OnInputMove, OnInputKey);
         _inputMode = mode;
         InputActive = true;

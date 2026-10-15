@@ -13,11 +13,22 @@ internal partial class RecorderView
 
     private static readonly PointerColor[] PointerColors = Enum.GetValues<PointerColor>();
 
+    private static readonly KeyCaptionPlace[] CaptionPlaces = Enum.GetValues<KeyCaptionPlace>();
+
+    private static readonly KeyCaptionSize[] CaptionSizes = Enum.GetValues<KeyCaptionSize>();
+
+    private static readonly KeyCaptionHold[] CaptionHolds = Enum.GetValues<KeyCaptionHold>();
+
     private void InitImlec()
     {
         ChkCursorHighlight.IsChecked = _settings.CursorHighlight;
         ChkSpotlight.IsChecked = _settings.Spotlight;
+        ChkKeysShortcutsOnly.IsChecked = _settings.KeysShortcutsOnly;
         RefreshPointerLabels();
+        ChkKeysShortcutsOnly.IsCheckedChanged += (_, _) => PersistChoices();
+        foreach (var box in new[] { CmbKeyCaptionPlace, CmbKeyCaptionSize, CmbKeyCaptionHold })
+            box.SelectionChanged += (_, _) => PersistChoices();
+        ChkShowKeys.IsCheckedChanged += (_, _) => RefreshKeyChoices();
         ChkCursorHighlight.IsCheckedChanged += (_, _) => PersistChoices();
         ChkSpotlight.IsCheckedChanged += (_, _) => PersistChoices();
         foreach (var box in new[] { CmbPointerSize, CmbHighlightColor, CmbLeftClickColor, CmbRightClickColor })
@@ -27,8 +38,13 @@ internal partial class RecorderView
         RefreshInputBoxes();
     }
 
-    private void RefreshPointerChoices() =>
+    private void RefreshPointerChoices()
+    {
         PointerChoices.IsVisible = ChkCursorHighlight.IsChecked == true || ChkSpotlight.IsChecked == true || (HooksAvailable && ChkShowClicks.IsChecked == true);
+        RefreshKeyChoices();
+    }
+
+    private void RefreshKeyChoices() => KeyChoices.IsVisible = HooksAvailable && ChkShowKeys.IsChecked == true;
 
     private void RefreshPointerLabels()
     {
@@ -36,9 +52,30 @@ internal partial class RecorderView
         CmbPointerSize.ItemsSource = PointerSizes.Select(s => Say(PointerSizeKey(s))).ToList();
         CmbPointerSize.SelectedIndex = Array.IndexOf(PointerSizes, size);
 
+        Fill(CmbKeyCaptionPlace, CaptionPlaces, _settings.KeyCaption.Place, p => p == KeyCaptionPlace.Top ? "recorder.keys.place.top" : "recorder.keys.place.bottom");
+        Fill(CmbKeyCaptionSize, CaptionSizes, _settings.KeyCaption.Size, s => s switch
+        {
+            KeyCaptionSize.Small => "recorder.pointer.size.small",
+            KeyCaptionSize.Large => "recorder.pointer.size.large",
+            _ => "recorder.pointer.size.medium"
+        });
+        Fill(CmbKeyCaptionHold, CaptionHolds, _settings.KeyCaption.Hold, h => h switch
+        {
+            KeyCaptionHold.Short => "recorder.keys.hold.short",
+            KeyCaptionHold.Long => "recorder.keys.hold.long",
+            _ => "recorder.keys.hold.normal"
+        });
+
         FillColors(CmbHighlightColor, _settings.HighlightColor);
         FillColors(CmbLeftClickColor, _settings.LeftClickColor);
         FillColors(CmbRightClickColor, _settings.RightClickColor);
+    }
+
+    private void Fill<T>(ComboBox box, T[] values, T saved, Func<T, string> key)
+    {
+        var value = box.SelectedIndex >= 0 ? values[box.SelectedIndex] : saved;
+        box.ItemsSource = values.Select(v => Say(key(v))).ToList();
+        box.SelectedIndex = Array.IndexOf(values, value);
     }
 
     private void FillColors(ComboBox box, PointerColor saved)
@@ -80,5 +117,10 @@ internal partial class RecorderView
         if (CmbHighlightColor.SelectedIndex >= 0) _settings.HighlightColor = PointerColors[CmbHighlightColor.SelectedIndex];
         if (CmbLeftClickColor.SelectedIndex >= 0) _settings.LeftClickColor = PointerColors[CmbLeftClickColor.SelectedIndex];
         if (CmbRightClickColor.SelectedIndex >= 0) _settings.RightClickColor = PointerColors[CmbRightClickColor.SelectedIndex];
+        _settings.KeysShortcutsOnly = ChkKeysShortcutsOnly.IsChecked ?? true;
+        _settings.KeyCaption = new KeyCaptionStyle(
+            CmbKeyCaptionPlace.SelectedIndex >= 0 ? CaptionPlaces[CmbKeyCaptionPlace.SelectedIndex] : _settings.KeyCaption.Place,
+            CmbKeyCaptionSize.SelectedIndex >= 0 ? CaptionSizes[CmbKeyCaptionSize.SelectedIndex] : _settings.KeyCaption.Size,
+            CmbKeyCaptionHold.SelectedIndex >= 0 ? CaptionHolds[CmbKeyCaptionHold.SelectedIndex] : _settings.KeyCaption.Hold);
     }
 }
