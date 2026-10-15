@@ -397,6 +397,11 @@ kırmızı hiçbir şey birleşmez — ve her commit'i [Developer Certificate of
 uyarınca `git commit -s` ile imzalayın. Derleme talimatı, proje yerleşimi ve tasarım
 kuralları: [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
+Çeviri katkısı da açık. İngilizce ve Türkçe gözden geçti; öteki 40 dil makine çevirisi ve
+dil seçicide bunu söylüyor. Her dil [`src/VidShrink.App/Locales/`](src/VidShrink.App/Locales/)
+altında bir klasör — yanlış satırı orada bir çekme isteğiyle düzeltin. Tarayıcıdan çeviri
+için bir Weblate projesi hazırlanıyor ([`docs/dagitim/weblate.md`](docs/dagitim/weblate.md)).
+
 ## Lisans
 
 [AGPL-3.0-or-later](LICENSE). Telif hakkı (C) 2026 Teknesyum.

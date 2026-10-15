@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} impostati a mano",
   "main.section.advanced.none": "Tutto automatico",
   "main.language.name": "Italiano",
+  "main.language.unreviewed": "{0} · traduzione automatica",
 
   "main.window.minimize": "Riduci a icona",
   "main.window.maximize": "Ingrandisci",

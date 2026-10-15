@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} asetettu käsin",
   "main.section.advanced.none": "Kaikki automaattisesti",
   "main.language.name": "Suomi",
+  "main.language.unreviewed": "{0} · konekäännös",
 
   "main.window.minimize": "Pienennä",
   "main.window.maximize": "Suurenna",

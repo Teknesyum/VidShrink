@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} kézzel beállítva",
   "main.section.advanced.none": "Minden automatikus",
   "main.language.name": "Magyar",
+  "main.language.unreviewed": "{0} · gépi fordítás",
 
   "main.window.minimize": "Kis méret",
   "main.window.maximize": "Teljes méret",

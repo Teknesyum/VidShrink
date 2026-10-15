@@ -554,6 +554,99 @@ jobs:
           done
           test "$(gh release view "$tag" --json isDraft --jq .isDraft)" = "false"
 
+  # winget: the published release goes to microsoft/winget-pkgs as a pull request from the
+  # owner's fork. Without the WINGET_TOKEN secret the job says so and stops green; the first
+  # submission is made by hand (docs/dagitim/sahip-adimlari.md), wingetcreate only updates a
+  # package that already exists there. The installer's Custom switch pins --tag to the same
+  # version, otherwise VidShrink-Setup.exe would install whatever is latest on the day.
+  winget:
+    needs: [version, release]
+    if: ${{ !cancelled() && needs.release.result == 'success' }}
+    runs-on: windows-latest
+    timeout-minutes: 15
+    env:
+      WINGET_TOKEN: ${{ secrets.WINGET_TOKEN }}
+      WINGETCREATE_VERSION: v1.12.13.0
+    steps:
+      - name: No token, no winget update
+        if: env.WINGET_TOKEN == ''
+        run: echo "WINGET_TOKEN yok, winget guncellemesi atlandi."
+
+      - name: Update Teknesyum.VidShrink in winget-pkgs
+        if: env.WINGET_TOKEN != ''
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $tag = '${{ needs.version.outputs.tag }}'
+          $version = '${{ needs.version.outputs.version }}'
+          $url = "https://github.com/${{ github.repository }}/releases/download/$tag/VidShrink-Setup.exe"
+          Invoke-WebRequest "https://github.com/microsoft/winget-create/releases/download/$env:WINGETCREATE_VERSION/wingetcreate.exe" -OutFile wingetcreate.exe
+          "wingetcreate $env:WINGETCREATE_VERSION sha256 $((Get-FileHash wingetcreate.exe -Algorithm SHA256).Hash)"
+          .\wingetcreate.exe update Teknesyum.VidShrink --version $version --urls $url --out winget-out --token $env:WINGET_TOKEN
+          if ($LASTEXITCODE -ne 0) { throw "wingetcreate update $LASTEXITCODE" }
+          $installer = Get-ChildItem winget-out -Recurse -Filter 'Teknesyum.VidShrink.installer.yaml' | Select-Object -First 1
+          if (-not $installer) { throw 'installer manifest yazilmadi' }
+          $text = (Get-Content $installer.FullName -Raw) -replace '(?m)^(\s*Custom:\s*--tag\s+)v\S+', "`${1}$tag"
+          Set-Content -Path $installer.FullName -Value $text -NoNewline
+          if (-not (Select-String -Path $installer.FullName -SimpleMatch "Custom: --tag $tag" -Quiet)) { throw 'Custom --tag yeni surume cekilemedi' }
+          Get-Content $installer.FullName
+          .\wingetcreate.exe submit --prtitle "New version: Teknesyum.VidShrink version $version" --token $env:WINGET_TOKEN $installer.DirectoryName
+          if ($LASTEXITCODE -ne 0) { throw "wingetcreate submit $LASTEXITCODE" }
+
+  # Scoop: the bucket is a separate repository (vars.SCOOP_BUCKET_REPO, by default
+  # Teknesyum/scoop-bucket). The manifest kept in docs/dagitim/scoop/ is written there with
+  # this version's url and the hash read from checksums-win-x64.txt. Without the
+  # SCOOP_BUCKET_TOKEN secret the job says so and stops green.
+  scoop:
+    needs: [version, release]
+    if: ${{ !cancelled() && needs.release.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SCOOP_TOKEN: ${{ secrets.SCOOP_BUCKET_TOKEN }}
+      BUCKET_REPO: ${{ vars.SCOOP_BUCKET_REPO || 'Teknesyum/scoop-bucket' }}
+    steps:
+      - name: No token, no Scoop update
+        if: env.SCOOP_TOKEN == ''
+        run: echo "SCOOP_BUCKET_TOKEN yok, Scoop kovasi guncellenmedi."
+
+      - uses: actions/checkout@v4
+        if: env.SCOOP_TOKEN != ''
+        with:
+          path: source
+
+      - uses: actions/checkout@v4
+        if: env.SCOOP_TOKEN != ''
+        with:
+          repository: ${{ env.BUCKET_REPO }}
+          token: ${{ secrets.SCOOP_BUCKET_TOKEN }}
+          path: bucket
+
+      - name: Write and push bucket/vidshrink.json
+        if: env.SCOOP_TOKEN != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="${{ needs.version.outputs.tag }}"
+          version="${{ needs.version.outputs.version }}"
+          gh release download "$tag" --repo "${{ github.repository }}" --pattern checksums-win-x64.txt --dir .
+          hash=$(awk '$2 == "vidshrink-win-x64.zip" { print $1 }' checksums-win-x64.txt)
+          test -n "$hash"
+          mkdir -p bucket/bucket
+          jq --arg v "$version" --arg h "$hash" \
+             --arg u "https://github.com/${{ github.repository }}/releases/download/$tag/vidshrink-win-x64.zip" \
+             '.version = $v | .architecture."64bit".url = $u | .architecture."64bit".hash = $h' \
+             source/docs/dagitim/scoop/vidshrink.json > bucket/bucket/vidshrink.json
+          cat bucket/bucket/vidshrink.json
+          cd bucket
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bucket/vidshrink.json
+          if git diff --cached --quiet; then echo "kova zaten $version"; exit 0; fi
+          git commit -m "vidshrink: Update to version $version"
+          git push
+
   # arm64 dogrulamasi: yalniz elle tetiklenir, etiket ve yayin olusturmaz. arm64 artik etiket
   # matrisinde de var (publish isi); bu is surum kesmeden ayni paketi uretip gercek arm64
   # kosucusunda actirmak icin duruyor.

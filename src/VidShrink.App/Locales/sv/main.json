@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} satta för hand",
   "main.section.advanced.none": "Allt automatiskt",
   "main.language.name": "Svenska",
+  "main.language.unreviewed": "{0} · maskinöversatt",
 
   "main.window.minimize": "Minimera",
   "main.window.maximize": "Maximera",

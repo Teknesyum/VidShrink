@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} зададени ръчно",
   "main.section.advanced.none": "Всичко автоматично",
   "main.language.name": "Български",
+  "main.language.unreviewed": "{0} · машинен превод",
 
   "main.window.minimize": "Минимизиране",
   "main.window.maximize": "Максимизиране",

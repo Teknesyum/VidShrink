@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} ručno postavljeno",
   "main.section.advanced.none": "Sve automatski",
   "main.language.name": "Hrvatski",
+  "main.language.unreviewed": "{0} · strojni prijevod",
 
   "main.window.minimize": "Smanji",
   "main.window.maximize": "Povećaj",

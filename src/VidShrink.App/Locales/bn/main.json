@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0}টি হাতে সেট করা",
   "main.section.advanced.none": "সব স্বয়ংক্রিয়",
   "main.language.name": "বাংলা",
+  "main.language.unreviewed": "{0} · যন্ত্র-অনূদিত",
 
   "main.window.minimize": "ছোট করুন",
   "main.window.maximize": "বড় করুন",

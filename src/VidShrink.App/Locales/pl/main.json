@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} ustawiono ręcznie",
   "main.section.advanced.none": "Wszystko automatyczne",
   "main.language.name": "Polski",
+  "main.language.unreviewed": "{0} · tłumaczenie maszynowe",
 
   "main.window.minimize": "Minimalizuj",
   "main.window.maximize": "Maksymalizuj",

@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} iestatīti manuāli",
   "main.section.advanced.none": "Viss automātiski",
   "main.language.name": "Latviešu",
+  "main.language.unreviewed": "{0} · mašīntulkojums",
 
   "main.window.minimize": "Minimizēt",
   "main.window.maximize": "Maksimizēt",

@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} setate manual",
   "main.section.advanced.none": "Totul automat",
   "main.language.name": "Română",
+  "main.language.unreviewed": "{0} · traducere automată",
 
   "main.window.minimize": "Minimizează",
   "main.window.maximize": "Maximizează",

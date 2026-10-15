@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "手動設定 {0}件",
   "main.section.advanced.none": "すべて自動",
   "main.language.name": "日本語",
+  "main.language.unreviewed": "{0} · 機械翻訳",
 
   "main.window.minimize": "最小化",
   "main.window.maximize": "最大化",

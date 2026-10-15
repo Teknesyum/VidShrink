@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} sat manuelt",
   "main.section.advanced.none": "Alt automatisk",
   "main.language.name": "Dansk",
+  "main.language.unreviewed": "{0} · maskinoversat",
 
   "main.window.minimize": "Minimer",
   "main.window.maximize": "Maksimer",

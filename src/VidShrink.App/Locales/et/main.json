@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} käsitsi seatud",
   "main.section.advanced.none": "Kõik automaatne",
   "main.language.name": "Eesti",
+  "main.language.unreviewed": "{0} · masintõlge",
 
   "main.window.minimize": "Minimeeri",
   "main.window.maximize": "Maksimeeri",

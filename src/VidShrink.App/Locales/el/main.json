@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} ορίστηκαν χειροκίνητα",
   "main.section.advanced.none": "Όλα αυτόματα",
   "main.language.name": "Ελληνικά",
+  "main.language.unreviewed": "{0} · αυτόματη μετάφραση",
 
   "main.window.minimize": "Ελαχιστοποίηση",
   "main.window.maximize": "Μεγιστοποίηση",

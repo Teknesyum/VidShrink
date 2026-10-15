@@ -12,6 +12,7 @@
   "main.section.advanced.overrides": "{0} satt manuelt",
   "main.section.advanced.none": "Alt automatisk",
   "main.language.name": "Norsk bokmål",
+  "main.language.unreviewed": "{0} · maskinoversatt",
 
   "main.window.minimize": "Minimer",
   "main.window.maximize": "Maksimer",
