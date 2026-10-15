@@ -85,7 +85,10 @@ public partial class App : Application
         {
             var ayar = LoadStartupSettings();
             AcilisIzi.Yaz("ayar-okundu");
-            PaletteCatalog.Use(ayar.Theme);
+            MotionPreference.UserReduced = ayar.ReduceMotion;
+            PaletteCatalog.Use(PaletteCatalog.Pick(ayar.Theme, ayar.FollowSystemTheme,
+                ayar.FollowSystemTheme ? new PlatformThemeSource(PlatformSettings).IsLight : null,
+                ayar.LightTheme, ayar.DarkTheme));
         }
         catch { }
         AcilisIzi.Yaz("palet");

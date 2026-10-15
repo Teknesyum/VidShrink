@@ -45,6 +45,20 @@ public static class PaletteCatalog
     public const string Default = "Teknesyum";
 
     /// <summary>
+    /// Sistem temasını izlerken açık sistemde varsayılan palet: standardın ilk açık zeminli
+    /// paleti. Koyu sistemin varsayılanı <see cref="Default"/>.
+    /// </summary>
+    public const string DefaultLight = "Buz";
+
+    /// <summary>
+    /// AYR-P4: uygulanacak paletin adı. İzleme kapalıysa ya da sistemin teması okunamıyorsa
+    /// kullanıcının seçtiği palet; açıkken sistemin açık ya da koyu oluşuna göre iki seçimden biri.
+    /// Karar burada, uygulama yine yalnız <see cref="Use"/> ile.
+    /// </summary>
+    public static string Pick(string? chosen, bool follow, bool? systemLight, string? light, string? dark)
+        => Resolve(!follow || systemLight is not { } isLight ? chosen : isLight ? light : dark);
+
+    /// <summary>
     /// Sıra <c>seeds.json</c> ile aynı: varsayılan başta, sonra koyu paletler, en sonda açık
     /// zeminli olanlar; iki grupta da önce projenin paletleri, sonra standardınkiler.
     /// </summary>
