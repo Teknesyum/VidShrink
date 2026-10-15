@@ -44,6 +44,8 @@
   "recorder.audio.system": "সিস্টেম অডিও",
   "recorder.audio.none": "নীরব",
   "recorder.audio.refresh": "তালিকা রিফ্রেশ করুন",
+  "recorder.audio.push-to-talk": "চেপে কথা বলুন",
+  "recorder.audio.push-to-talk.hint": "• {0} চেপে ধরে থাকলেই কেবল মাইক্রোফোন রেকর্ড হয়।\n• শর্টকাট মেনু থেকে কী পরিবর্তন করা যায়।",
   "recorder.audio.hint": "দুটোই বেছে নিলে দুটি ইনপুট রেকর্ড হয় এবং একটি ট্র্যাকে মিশে যায়।",
   "recorder.audio.loopback": "এই কম্পিউটারে বাজতে থাকা শব্দ",
   "recorder.audio.loopback.switched": "আউটপুট ডিভাইস বদলেছে; সিস্টেম অডিও এখন নতুন ডিভাইস থেকে আসছে।",

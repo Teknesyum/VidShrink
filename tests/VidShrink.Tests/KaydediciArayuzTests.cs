@@ -838,7 +838,7 @@ public sealed class KaydediciArayuzTests
 
         public Action<HotkeyAction>? Basildi { get; private set; }
 
-        public IReadOnlyList<HotkeyBinding> Register(IReadOnlyList<HotkeyBinding> bindings, Action<HotkeyAction> pressed)
+        public IReadOnlyList<HotkeyBinding> Register(IReadOnlyList<HotkeyBinding> bindings, Action<HotkeyAction> pressed, Action<HotkeyAction> released)
         {
             Kayit++;
             Basildi = pressed;
@@ -859,7 +859,7 @@ public sealed class KaydediciArayuzTests
         Assert.Null(RecorderHotkeys.ActionOf(Avalonia.Input.Key.F7, Avalonia.Input.KeyModifiers.Control));
         Assert.Equal(HotkeyAction.Chapter, RecorderHotkeys.ActionOf(Avalonia.Input.Key.F6, Avalonia.Input.KeyModifiers.None));
         Assert.Null(RecorderHotkeys.ActionOf(Avalonia.Input.Key.F5, Avalonia.Input.KeyModifiers.None));
-        Assert.Equal(6, RecorderHotkeys.All.Select(b => b.VirtualKey).Distinct().Count());
+        Assert.Equal(7, RecorderHotkeys.All.Select(b => b.VirtualKey).Distinct().Count());
         Assert.Equal(Enum.GetValues<HotkeyAction>().Length, RecorderHotkeys.All.Select(b => b.Action).Distinct().Count());
     }
 

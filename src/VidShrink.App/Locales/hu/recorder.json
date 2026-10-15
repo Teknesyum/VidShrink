@@ -44,6 +44,8 @@
   "recorder.audio.system": "Rendszerhang",
   "recorder.audio.none": "Nincs hang",
   "recorder.audio.refresh": "Lista frissítése",
+  "recorder.audio.push-to-talk": "Nyomd és beszélj",
+  "recorder.audio.push-to-talk.hint": "• A mikrofon csak a(z) {0} lenyomva tartása alatt kerül a felvételbe.\n• A billentyű a gyorsbillentyűk menüben módosítható.",
   "recorder.audio.hint": "Ha mindkettőt kiválasztja, két bemenet kerül rögzítésre, és egy sávvá keverednek.",
   "recorder.audio.loopback": "A számítógépen szóló hang",
   "recorder.audio.loopback.switched": "A kimeneti eszköz megváltozott; a rendszerhang mostantól az új eszközről érkezik.",

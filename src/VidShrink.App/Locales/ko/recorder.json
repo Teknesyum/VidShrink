@@ -44,6 +44,8 @@
   "recorder.audio.system": "시스템 오디오",
   "recorder.audio.none": "소리 없음",
   "recorder.audio.refresh": "목록 새로고침",
+  "recorder.audio.push-to-talk": "눌러서 말하기",
+  "recorder.audio.push-to-talk.hint": "• {0} 키를 누르고 있는 동안에만 마이크가 녹음됩니다.\n• 키는 단축키 메뉴에서 바꿀 수 있습니다.",
   "recorder.audio.hint": "둘 다 선택하면 두 입력이 녹음되어 하나의 트랙으로 믹싱됩니다.",
   "recorder.audio.loopback": "이 PC에서 재생되는 소리",
   "recorder.audio.loopback.switched": "출력 장치가 바뀌었습니다. 시스템 오디오는 이제 새 장치에서 가져옵니다.",

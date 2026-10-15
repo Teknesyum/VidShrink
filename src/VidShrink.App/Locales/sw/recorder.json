@@ -44,6 +44,8 @@
   "recorder.audio.system": "Sauti ya mfumo",
   "recorder.audio.none": "Bila sauti",
   "recorder.audio.refresh": "Onyesha upya orodha",
+  "recorder.audio.push-to-talk": "Bonyeza ili kuongea",
+  "recorder.audio.push-to-talk.hint": "• Maikrofoni hurekodiwa tu wakati {0} imeshikiliwa.\n• Badilisha kitufe kwenye menyu ya njia za mkato.",
   "recorder.audio.hint": "Kuchagua zote mbili hurekodi vyanzo viwili na kuvichanganya kuwa wimbo mmoja.",
   "recorder.audio.loopback": "Sauti inayochezwa kwenye kompyuta hii",
   "recorder.audio.loopback.switched": "Kifaa cha kutoa sauti kimebadilika; sauti ya mfumo sasa inatoka kwenye kifaa kipya.",

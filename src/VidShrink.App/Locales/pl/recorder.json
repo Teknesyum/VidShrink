@@ -44,6 +44,8 @@
   "recorder.audio.system": "Dźwięk systemowy",
   "recorder.audio.none": "Bez dźwięku",
   "recorder.audio.refresh": "Odśwież listę",
+  "recorder.audio.push-to-talk": "Naciśnij i mów",
+  "recorder.audio.push-to-talk.hint": "• Mikrofon jest nagrywany tylko podczas przytrzymania {0}.\n• Klawisz zmienisz w menu skrótów.",
   "recorder.audio.hint": "Wybranie obu opcji nagrywa dwa wejścia dźwięku i miksuje je w jedną ścieżkę.",
   "recorder.audio.loopback": "Dźwięk odtwarzany na tym komputerze",
   "recorder.audio.loopback.switched": "Urządzenie wyjściowe się zmieniło; dźwięk systemowy pochodzi teraz z nowego.",

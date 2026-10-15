@@ -44,6 +44,8 @@
   "recorder.audio.system": "Systemljud",
   "recorder.audio.none": "Inget ljud",
   "recorder.audio.refresh": "Uppdatera listan",
+  "recorder.audio.push-to-talk": "Tryck för att tala",
+  "recorder.audio.push-to-talk.hint": "• Mikrofonen spelas bara in medan {0} hålls nedtryckt.\n• Tangenten ändras i genvägsmenyn.",
   "recorder.audio.hint": "Att välja båda spelar in två källor och mixar dem till ett spår.",
   "recorder.audio.loopback": "Ljudet som spelas på den här datorn",
   "recorder.audio.loopback.switched": "Utenheten byttes; systemljudet kommer nu från den nya enheten.",

@@ -44,6 +44,8 @@
   "recorder.audio.system": "سسٹم کی آواز",
   "recorder.audio.none": "کوئی آواز نہیں",
   "recorder.audio.refresh": "فہرست تازہ کریں",
+  "recorder.audio.push-to-talk": "دبا کر بولیں",
+  "recorder.audio.push-to-talk.hint": "• مائیکروفون صرف اس وقت ریکارڈ ہوتا ہے جب {0} دبا ہوا ہو۔\n• کلید شارٹ کٹ مینو سے بدلی جا سکتی ہے۔",
   "recorder.audio.hint": "دونوں کا انتخاب کرنے سے دو ان پٹس ریکارڈ ہوتے ہیں اور ایک ٹریک میں ملا دیے جاتے ہیں۔",
   "recorder.audio.loopback": "اس کمپیوٹر پر چلنے والی آواز",
   "recorder.audio.loopback.switched": "آؤٹ پٹ آلہ بدل گیا؛ سسٹم کی آواز اب نئے آلے سے لی جا رہی ہے۔",

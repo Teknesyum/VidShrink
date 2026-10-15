@@ -44,6 +44,8 @@
   "recorder.audio.system": "System audio",
   "recorder.audio.none": "No sound",
   "recorder.audio.refresh": "Refresh the List",
+  "recorder.audio.push-to-talk": "Push to Talk",
+  "recorder.audio.push-to-talk.hint": "• The microphone is recorded only while {0} is held.\n• Change the key in the shortcuts menu.",
   "recorder.audio.hint": "Choosing both records two inputs and mixes them into one track.",
   "recorder.audio.loopback": "Sound playing on this PC",
   "recorder.audio.loopback.switched": "The output device changed; system audio now comes from the new one.",

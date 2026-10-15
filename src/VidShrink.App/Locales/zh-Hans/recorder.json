@@ -44,6 +44,8 @@
   "recorder.audio.system": "系统声音",
   "recorder.audio.none": "无声音",
   "recorder.audio.refresh": "刷新列表",
+  "recorder.audio.push-to-talk": "按键说话",
+  "recorder.audio.push-to-talk.hint": "• 仅在按住 {0} 时录制麦克风。\n• 可在快捷键菜单中更改按键。",
   "recorder.audio.hint": "同时选择两者会录制两路输入并混合为一条音轨。",
   "recorder.audio.loopback": "这台电脑正在播放的声音",
   "recorder.audio.loopback.switched": "输出设备已更换；系统声音现在取自新设备。",

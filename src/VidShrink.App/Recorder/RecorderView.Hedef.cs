@@ -156,13 +156,17 @@ internal partial class RecorderView
     /// deneme kaydının temel isteği otomatik kipin kararını taşımamalı, taşısa merdivenin
     /// her basamağı aynı ayarla ölçülürdü.
     /// </para>
+    /// <para>
+    /// <paramref name="pushToTalk"/> yalnız gerçek kaydın isteğinde doğru: tampon, anlık kare
+    /// ve ölçüm mikrofonu susturan süzgeci taşımaz, kısayolu dinleyen oturum yalnız kayıttır.
+    /// </para>
     /// </summary>
-    internal RecorderRequest? BuildRequest(bool applyAuto = true)
-        => ReadAdvanced() && BuildChosen(applyAuto) is { } request
+    internal RecorderRequest? BuildRequest(bool applyAuto = true, bool pushToTalk = false)
+        => ReadAdvanced() && BuildChosen(applyAuto, pushToTalk) is { } request
             ? request.Target == RecorderTargetKind.AudioOnly ? request with { PreviewPath = null } : WithPreview(FitToCodec(request))
             : null;
 
-    private RecorderRequest? BuildChosen(bool applyAuto)
+    private RecorderRequest? BuildChosen(bool applyAuto, bool pushToTalk)
     {
         if (!int.TryParse(TxtFps.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var fps))
         {
@@ -176,7 +180,7 @@ internal partial class RecorderView
             return null;
         }
 
-        if (AudioPlan() is not { } audio) return null;
+        if (AudioPlan(pushToTalk) is not { } audio) return null;
 
         var target = SelectedTarget;
         var audioOnly = target == RecorderTargetKind.AudioOnly;
@@ -329,7 +333,7 @@ internal partial class RecorderView
 
     internal (RecorderRequest Request, string Path)? PrepareRecording()
     {
-        if (BuildRequest() is not { } request) return null;
+        if (BuildRequest(pushToTalk: ChkPushToTalk.IsChecked == true) is not { } request) return null;
         StoreChoices();
         return (request, _settings.OutputPath(DateTime.Now));
     }

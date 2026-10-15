@@ -78,12 +78,18 @@ public enum AudioTrackLayout
 /// <param name="Limiter">
 /// <c>alimiter</c>: tepeyi tam olcegin altinda tutuyor; zincirin en sonunda.
 /// </param>
+/// <param name="PushToTalk">
+/// Bas-konus: mikrofon kolunun basina sessiz baslayan adli bir <c>volume</c> konur
+/// (<see cref="AudioCaptureArguments.PushToTalkTarget"/>); tus basiliyken kosan ffmpeg'e
+/// komutla acilir. Filtre sayilmaz, <see cref="IsSet"/>e girmez; mikrofon secilmemisse etkisiz.
+/// </param>
 public sealed record AudioFilterOptions(
     double GainDb = 0,
     bool NoiseGate = false,
     bool NoiseSuppression = false,
     bool Compressor = false,
-    bool Limiter = false)
+    bool Limiter = false,
+    bool PushToTalk = false)
 {
     /// <summary>Hicbir filtre kurulmayan hal.</summary>
     public static AudioFilterOptions None { get; } = new();
@@ -165,6 +171,21 @@ public static class AudioCaptureArguments
     public const double MaxGainDb = 30;
 
     /// <summary>
+    /// Bas-konus kapisinin adli filtre ornegi. Kosan ffmpeg'in standart girdisine yazilan
+    /// <c>c</c> komutu bu ada gider (<see cref="PushToTalkCommand"/>); olculen gecikme 235 ms
+    /// (<c>docs/olcumler/bas-konus-komut-gecikmesi.md</c>).
+    /// </summary>
+    public const string PushToTalkTarget = GainFilterName + "@ptt";
+
+    /// <summary>Kapiyi acan ya da kapatan tek satirlik ffmpeg komutu.</summary>
+    public static string PushToTalkCommand(bool open)
+        => $"c{PushToTalkTarget} -1 {GainFilterName} {(open ? 1 : 0)}\n";
+
+    /// <summary>Planin grafiginde bas-konus kapisi var mi.</summary>
+    public static bool UsesPushToTalk(AudioCapturePlan? plan)
+        => plan?.FilterComplex?.Contains(PushToTalkTarget, StringComparison.Ordinal) == true;
+
+    /// <summary>
     /// Secimi argumana cevirir. <paramref name="listed"/> o an listelenmis cihazlardir;
     /// secilen her cihaz bu kumede adiyla <b>ve</b> roluyle bulunmak zorundadir.
     /// <paramref name="firstInputIndex"/> ses girdilerinin ffmpeg girdi sirasindaki ilk
@@ -221,6 +242,9 @@ public static class AudioCaptureArguments
             _ => throw new ArgumentOutOfRangeException(nameof(layout), layout, "tanimsiz ses izi duzeni; arguman uretilmedi.")
         };
 
+        if (options.PushToTalk && selection.Microphone is not null)
+            return PushToTalkPlan(inputs, chosen.Count, firstInputIndex, chain, separate);
+
         if (chain is null && !separate && chosen.Count == 1)
             return new AudioCapturePlan(inputs, null, new[] { $"{firstInputIndex}:a" }, 1);
 
@@ -266,6 +290,37 @@ public static class AudioCaptureArguments
         var graph = string.Join(';', filtered)
                     + $";{mixInputs}{MixFilterName}=inputs={chosen.Count}:duration=longest:dropout_transition=0[{MixOutputLabel}]";
         return new AudioCapturePlan(inputs, graph, new[] { $"[{MixOutputLabel}]" }, chosen.Count);
+    }
+
+    /// <summary>
+    /// Bas-konus grafigi. Mikrofon her zaman ilk girdidir; kapi yalniz onun kolunda, sistem
+    /// sesi bugunku gibi kalir (zincir yoksa dogrudan eslenir ya da karisima girer).
+    /// </summary>
+    private static AudioCapturePlan PushToTalkPlan(List<string> inputs, int count, int first, string? chain, bool separate)
+    {
+        var micChain = $"{PushToTalkTarget}=0" + (chain is null ? string.Empty : "," + chain);
+        if (count == 1)
+            return new AudioCapturePlan(inputs, $"[{first}:a]{micChain}[{MixOutputLabel}]", new[] { $"[{MixOutputLabel}]" }, 1);
+
+        var system = first + 1;
+        if (separate)
+        {
+            var graph = $"[{first}:a]{micChain}[{MixOutputLabel}0]";
+            if (chain is null)
+                return new AudioCapturePlan(inputs, graph, new[] { $"[{MixOutputLabel}0]", $"{system}:a" }, count);
+            graph += $";[{system}:a]{chain}[{MixOutputLabel}1]";
+            return new AudioCapturePlan(inputs, graph, new[] { $"[{MixOutputLabel}0]", $"[{MixOutputLabel}1]" }, count);
+        }
+
+        var mixed = $"[{first}:a]{micChain}[{MixFilterName}0]";
+        var second = $"[{system}:a]";
+        if (chain is not null)
+        {
+            mixed += $";[{system}:a]{chain}[{MixFilterName}1]";
+            second = $"[{MixFilterName}1]";
+        }
+        mixed += $";[{MixFilterName}0]{second}{MixFilterName}=inputs={count}:duration=longest:dropout_transition=0[{MixOutputLabel}]";
+        return new AudioCapturePlan(inputs, mixed, new[] { $"[{MixOutputLabel}]" }, count);
     }
 
     /// <summary>

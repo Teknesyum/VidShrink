@@ -44,6 +44,8 @@
   "recorder.audio.system": "Järjestelmän ääni",
   "recorder.audio.none": "Ei ääntä",
   "recorder.audio.refresh": "Päivitä luettelo",
+  "recorder.audio.push-to-talk": "Paina ja puhu",
+  "recorder.audio.push-to-talk.hint": "• Mikrofoni tallentuu vain, kun {0} on painettuna.\n• Näppäimen voi vaihtaa pikanäppäinvalikosta.",
   "recorder.audio.hint": "Molempien valitseminen tallentaa kaksi lähdettä ja yhdistää ne yhdeksi ääniraidaksi.",
   "recorder.audio.loopback": "Tällä tietokoneella soiva ääni",
   "recorder.audio.loopback.switched": "Toistolaite vaihtui; järjestelmän ääni tulee nyt uudesta laitteesta.",

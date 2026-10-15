@@ -34,7 +34,7 @@ public sealed class KaydediciAyarGidisDonusTests
         ["Preset"] = "slow",
         ["ColorRange"] = "jpeg",
         ["AudioCodec"] = "libopus",
-        ["Hotkeys"] = "2:F1,2:F2,2:F3,2:F4,2:F5,2:F6"
+        ["Hotkeys"] = "2:F1,2:F2,2:F3,2:F4,2:F5,2:F6,2:F7"
     };
 
     private static readonly Dictionary<string, int> CokAnahtarli = new()

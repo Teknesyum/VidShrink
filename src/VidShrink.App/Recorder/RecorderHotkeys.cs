@@ -18,16 +18,41 @@ internal enum HotkeyAction
     Frame,
     Discard,
     ReplaySave,
-    Chapter
+    Chapter,
+    PushToTalk
 }
 
 internal sealed record HotkeyBinding(HotkeyAction Action, Key Key, uint VirtualKey, KeyModifiers Modifiers = KeyModifiers.None);
 
 internal interface IGlobalHotkeys
 {
-    IReadOnlyList<HotkeyBinding> Register(IReadOnlyList<HotkeyBinding> bindings, Action<HotkeyAction> pressed);
+    /// <summary>
+    /// Bağları kaydeder; kaydedilemeyenleri döndürür. <paramref name="released"/> tuş bırakılınca
+    /// bir kez çağrılır (bas konuş bunu dinler); öbür eylemler yalnız basışı kullanır.
+    /// </summary>
+    IReadOnlyList<HotkeyBinding> Register(IReadOnlyList<HotkeyBinding> bindings, Action<HotkeyAction> pressed, Action<HotkeyAction> released);
 
     void Unregister();
+}
+
+/// <summary>
+/// Basılı tutulan genel kısayollar. Win32 RegisterHotKey yalnız basışı bildirir; bırakış tuşun
+/// durumu yoklanarak bulunur ve her basışa bir kez döner.
+/// </summary>
+internal sealed class HeldHotkeys
+{
+    private readonly HashSet<int> _held = [];
+
+    internal bool Any => _held.Count > 0;
+
+    internal bool Press(int index) => _held.Add(index);
+
+    internal IReadOnlyList<int> Release(Func<int, bool> stillDown)
+    {
+        var released = _held.Where(i => !stillDown(i)).OrderBy(i => i).ToList();
+        foreach (var index in released) _held.Remove(index);
+        return released;
+    }
 }
 
 internal static class RecorderHotkeys
@@ -39,7 +64,8 @@ internal static class RecorderHotkeys
         new(HotkeyAction.Frame, Key.F9, 0x78),
         new(HotkeyAction.Discard, Key.F10, 0x79),
         new(HotkeyAction.ReplaySave, Key.F11, 0x7A),
-        new(HotkeyAction.Chapter, Key.F6, 0x75)
+        new(HotkeyAction.Chapter, Key.F6, 0x75),
+        new(HotkeyAction.PushToTalk, Key.F5, 0x74, KeyModifiers.Control)
     ];
 
     /// <summary>Bölüm işareti eklenmeden önceki ayarın taşıdığı eylem sayısı.</summary>
@@ -101,13 +127,14 @@ internal static class RecorderHotkeys
     /// <summary>
     /// Ayardaki yazımı bağlara çevirir. Eksik, tanınmayan ya da iki eyleme aynı tuşu veren yazım
     /// <c>null</c> döner; çağıran varsayılana düşer. Eski sürümün <see cref="LegacyCount"/> eylemli
-    /// yazımı geçerlidir: atamalar korunur, sonradan eklenen eylem varsayılan tuşunu alır; o tuş
-    /// eski atamalardan birindeyse yazım yine <c>null</c> döner.
+    /// ile <see cref="All"/> arasındaki her eylem sayılı yazımı geçerlidir: atamalar korunur,
+    /// sonradan eklenen eylem varsayılan tuşunu alır; o tuş eski atamalardan birindeyse yazım
+    /// yine <c>null</c> döner.
     /// </summary>
     internal static IReadOnlyList<HotkeyBinding>? Read(string? text)
     {
         var parts = (text ?? string.Empty).Split(',');
-        if (parts.Length != All.Count && parts.Length != LegacyCount) return null;
+        if (parts.Length < LegacyCount || parts.Length > All.Count) return null;
 
         var bindings = new List<HotkeyBinding>();
         for (var i = 0; i < parts.Length; i++)
@@ -135,7 +162,7 @@ internal static class RecorderHotkeys
 
 internal sealed class NoGlobalHotkeys : IGlobalHotkeys
 {
-    public IReadOnlyList<HotkeyBinding> Register(IReadOnlyList<HotkeyBinding> bindings, Action<HotkeyAction> pressed) => [];
+    public IReadOnlyList<HotkeyBinding> Register(IReadOnlyList<HotkeyBinding> bindings, Action<HotkeyAction> pressed, Action<HotkeyAction> released) => [];
 
     public void Unregister()
     {
@@ -146,6 +173,8 @@ internal sealed class Win32GlobalHotkeys : IGlobalHotkeys
 {
     private const uint WmHotkey = 0x0312;
     private const uint WmQuit = 0x0012;
+    private const uint WmTimer = 0x0113;
+    private const uint ReleasePollMs = 30;
     private const uint ModNoRepeat = 0x4000;
     private const uint ModAlt = 0x0001;
     private const uint ModControl = 0x0002;
@@ -154,12 +183,12 @@ internal sealed class Win32GlobalHotkeys : IGlobalHotkeys
     private Thread? _thread;
     private uint _threadId;
 
-    public IReadOnlyList<HotkeyBinding> Register(IReadOnlyList<HotkeyBinding> bindings, Action<HotkeyAction> pressed)
+    public IReadOnlyList<HotkeyBinding> Register(IReadOnlyList<HotkeyBinding> bindings, Action<HotkeyAction> pressed, Action<HotkeyAction> released)
     {
         Unregister();
 
         var ready = new TaskCompletionSource<IReadOnlyList<HotkeyBinding>>();
-        _thread = new Thread(() => Loop(bindings, pressed, ready)) { IsBackground = true };
+        _thread = new Thread(() => Loop(bindings, pressed, released, ready)) { IsBackground = true };
         _thread.Start();
         return ready.Task.GetAwaiter().GetResult();
     }
@@ -172,7 +201,7 @@ internal sealed class Win32GlobalHotkeys : IGlobalHotkeys
         _thread = null;
     }
 
-    private void Loop(IReadOnlyList<HotkeyBinding> bindings, Action<HotkeyAction> pressed, TaskCompletionSource<IReadOnlyList<HotkeyBinding>> ready)
+    private void Loop(IReadOnlyList<HotkeyBinding> bindings, Action<HotkeyAction> pressed, Action<HotkeyAction> released, TaskCompletionSource<IReadOnlyList<HotkeyBinding>> ready)
     {
         _threadId = GetCurrentThreadId();
         PeekMessageW(out _, 0, 0, 0, 0);
@@ -187,15 +216,37 @@ internal sealed class Win32GlobalHotkeys : IGlobalHotkeys
 
         ready.SetResult(failed);
 
+        var held = new HeldHotkeys();
+        nuint timer = 0;
         while (GetMessageW(out var message, 0, 0, 0) > 0)
         {
+            if (message.Message == WmTimer)
+            {
+                foreach (var up in held.Release(i => (GetAsyncKeyState((int)bindings[i].VirtualKey) & 0x8000) != 0))
+                {
+                    var upAction = bindings[up].Action;
+                    Dispatcher.UIThread.Post(() => released(upAction));
+                }
+
+                if (!held.Any && timer != 0)
+                {
+                    KillTimer(0, timer);
+                    timer = 0;
+                }
+
+                continue;
+            }
+
             if (message.Message != WmHotkey) continue;
             var index = (int)message.WParam - 1;
             if (index < 0 || index >= bindings.Count) continue;
+            if (!held.Press(index)) continue;
             var action = bindings[index].Action;
             Dispatcher.UIThread.Post(() => pressed(action));
+            if (timer == 0) timer = SetTimer(0, 0, ReleasePollMs, 0);
         }
 
+        if (timer != 0) KillTimer(0, timer);
         foreach (var id in registered) UnregisterHotKey(0, id);
     }
 
@@ -237,6 +288,16 @@ internal sealed class Win32GlobalHotkeys : IGlobalHotkeys
 
     [DllImport("kernel32.dll")]
     private static extern uint GetCurrentThreadId();
+
+    [DllImport("user32.dll")]
+    private static extern short GetAsyncKeyState(int virtualKey);
+
+    [DllImport("user32.dll")]
+    private static extern nuint SetTimer(nint hwnd, nuint id, uint elapse, nint callback);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool KillTimer(nint hwnd, nuint id);
 }
 
 internal enum HotkeyPlatform
@@ -276,6 +337,7 @@ internal sealed class MacGlobalHotkeys : IGlobalHotkeys
     private const string Carbon = "/System/Library/Frameworks/Carbon.framework/Carbon";
     internal const uint KeyboardClass = 0x6B657962;
     internal const uint HotKeyPressed = 5;
+    internal const uint HotKeyReleased = 6;
     internal const uint DirectObject = 0x2D2D2D2D;
     internal const uint HotKeyIdType = 0x686B6964;
     internal const uint Signature = 0x5653484B;
@@ -295,19 +357,25 @@ internal sealed class MacGlobalHotkeys : IGlobalHotkeys
     private readonly List<nint> _registered = [];
     private IReadOnlyList<HotkeyBinding> _bindings = [];
     private Action<HotkeyAction>? _pressed;
+    private Action<HotkeyAction>? _released;
     private nint _handlerRef;
 
     public MacGlobalHotkeys() => _handler = OnHotKey;
 
-    public IReadOnlyList<HotkeyBinding> Register(IReadOnlyList<HotkeyBinding> bindings, Action<HotkeyAction> pressed)
+    public IReadOnlyList<HotkeyBinding> Register(IReadOnlyList<HotkeyBinding> bindings, Action<HotkeyAction> pressed, Action<HotkeyAction> released)
     {
         Unregister();
         _bindings = bindings;
         _pressed = pressed;
+        _released = released;
 
         var target = GetApplicationEventTarget();
-        EventTypeSpec[] types = [new EventTypeSpec { EventClass = KeyboardClass, EventKind = HotKeyPressed }];
-        if (InstallEventHandler(target, Marshal.GetFunctionPointerForDelegate(_handler), 1, types, 0, out _handlerRef) != 0)
+        EventTypeSpec[] types =
+        [
+            new EventTypeSpec { EventClass = KeyboardClass, EventKind = HotKeyPressed },
+            new EventTypeSpec { EventClass = KeyboardClass, EventKind = HotKeyReleased }
+        ];
+        if (InstallEventHandler(target, Marshal.GetFunctionPointerForDelegate(_handler), (nuint)types.Length, types, 0, out _handlerRef) != 0)
         {
             _handlerRef = 0;
             return bindings;
@@ -341,9 +409,10 @@ internal sealed class MacGlobalHotkeys : IGlobalHotkeys
             || id.Signature != Signature)
             return -9874;
         var index = (int)id.Id - 1;
-        if (index < 0 || index >= _bindings.Count || _pressed is not { } pressed) return -9874;
+        var handler = GetEventKind(eventRef) == HotKeyReleased ? _released : _pressed;
+        if (index < 0 || index >= _bindings.Count || handler is null) return -9874;
         var action = _bindings[index].Action;
-        Dispatcher.UIThread.Post(() => pressed(action));
+        Dispatcher.UIThread.Post(() => handler(action));
         return 0;
     }
 
@@ -401,6 +470,9 @@ internal sealed class MacGlobalHotkeys : IGlobalHotkeys
 
     [DllImport(Carbon)]
     private static extern int GetEventParameter(nint eventRef, uint name, uint desiredType, nint actualType, nuint bufferSize, nint actualSize, out EventHotKeyId data);
+
+    [DllImport(Carbon)]
+    private static extern uint GetEventKind(nint eventRef);
 }
 
 internal sealed class X11GlobalHotkeys : IGlobalHotkeys
@@ -426,14 +498,14 @@ internal sealed class X11GlobalHotkeys : IGlobalHotkeys
     private Thread? _thread;
     private ManualResetEventSlim? _stop;
 
-    public IReadOnlyList<HotkeyBinding> Register(IReadOnlyList<HotkeyBinding> bindings, Action<HotkeyAction> pressed)
+    public IReadOnlyList<HotkeyBinding> Register(IReadOnlyList<HotkeyBinding> bindings, Action<HotkeyAction> pressed, Action<HotkeyAction> released)
     {
         Unregister();
 
         var ready = new TaskCompletionSource<IReadOnlyList<HotkeyBinding>>();
         var stop = new ManualResetEventSlim();
         _stop = stop;
-        _thread = new Thread(() => Loop(bindings, pressed, stop, ready)) { IsBackground = true };
+        _thread = new Thread(() => Loop(bindings, pressed, released, stop, ready)) { IsBackground = true };
         _thread.Start();
         return ready.Task.GetAwaiter().GetResult();
     }
@@ -448,7 +520,7 @@ internal sealed class X11GlobalHotkeys : IGlobalHotkeys
         _thread = null;
     }
 
-    private static void Loop(IReadOnlyList<HotkeyBinding> bindings, Action<HotkeyAction> pressed, ManualResetEventSlim stop, TaskCompletionSource<IReadOnlyList<HotkeyBinding>> ready)
+    private static void Loop(IReadOnlyList<HotkeyBinding> bindings, Action<HotkeyAction> pressed, Action<HotkeyAction> released, ManualResetEventSlim stop, TaskCompletionSource<IReadOnlyList<HotkeyBinding>> ready)
     {
         var display = XOpenDisplay(0);
         if (display == 0)
@@ -497,14 +569,17 @@ internal sealed class X11GlobalHotkeys : IGlobalHotkeys
             {
                 XNextEvent(display, report);
                 var (type, state, keycode) = ParseKey(report);
-                if (!Pressed(held, type, keycode)) continue;
+                var edge = Edge(held, type, keycode);
+                if (edge == 0) continue;
                 var clean = Clean(state);
                 foreach (var grab in grabbed)
                 {
-                    if (grab.Code != keycode || grab.Mask != clean) continue;
+                    if (grab.Code != keycode) continue;
+                    if (edge > 0 && grab.Mask != clean) continue;
                     var action = grab.Action;
-                    Dispatcher.UIThread.Post(() => pressed(action));
-                    break;
+                    var handler = edge > 0 ? pressed : released;
+                    Dispatcher.UIThread.Post(() => handler(action));
+                    if (edge > 0) break;
                 }
             }
 
@@ -521,6 +596,16 @@ internal sealed class X11GlobalHotkeys : IGlobalHotkeys
     {
         if (type == KeyRelease) held.Remove(keycode);
         return type == KeyPress && held.Add(keycode);
+    }
+
+    /// <summary>
+    /// Basışın ve bırakışın kenarı: yeni basış 1, basılı tuşun bırakılışı -1, yineleme ve
+    /// tutulmayan tuşun bırakılışı 0.
+    /// </summary>
+    internal static int Edge(HashSet<uint> held, int type, uint keycode)
+    {
+        if (type == KeyRelease) return held.Remove(keycode) ? -1 : 0;
+        return type == KeyPress && held.Add(keycode) ? 1 : 0;
     }
 
     /// <summary>XKeyEvent'in 64 bit yerleşimi: tür 0'da, durum 80'de, tuş kodu 84'te.</summary>
