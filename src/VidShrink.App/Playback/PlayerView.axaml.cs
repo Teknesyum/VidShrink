@@ -108,6 +108,8 @@ internal partial class PlayerView : UserControl
 
     internal double ZoomScale => _zoom.PanelScale;
 
+    internal bool FillMode => _zoom.Fill;
+
     internal double VolumeLevel => _volume;
 
     internal bool IsMuted => _muted;
@@ -151,6 +153,12 @@ internal partial class PlayerView : UserControl
                 _zoom.Wheel(command.Amount, Surface.Bounds.Width / 2, Surface.Bounds.Height / 2);
                 Resize();
                 _trace.Add("zoom " + Saat.Tani.Konum(command.Amount) + " -> " + Saat.Tani.Konum(_zoom.PanelScale));
+                break;
+            case PlayerCommandKind.ToggleFill:
+                _zoom.Fill = !_zoom.Fill;
+                ResetPan();
+                Resize();
+                _trace.Add("fill -> " + _zoom.Fill);
                 break;
             case PlayerCommandKind.TogglePlay:
                 TogglePlay();
@@ -442,6 +450,12 @@ internal partial class PlayerView : UserControl
         if (button == PlayerButton.Left)
         {
             if (EtkilesimliDenetim.Icinde(e.Source as Visual, this)) return;
+            if (e.Pointer.Type == PointerType.Touch)
+            {
+                DokunBas(e);
+                return;
+            }
+
             var at = point.Position;
             FarePress(e, at.X, at.Y);
             return;
@@ -902,13 +916,13 @@ internal partial class PlayerView : UserControl
     /// gelince ve pano yeniden boyutlanınca. Ikisi de buraya girer, boylece pencere
     /// buyudugunde duraklatilmis goruntu de buyur.
     /// Oynaticida panel terfisi yok: Alt+teker her kademede goruntuyu buyutur, bu yuzden
-    /// olcu <c>ZoomGesture.Scale</c>'den degil sigdirma olcegi carpi panel olceginden gelir.
+    /// olcu <c>ZoomGesture.Scale</c>'den degil taban olcek (sigdir ya da doldur) carpi panel olceginden gelir.
     /// </summary>
     private void Resize()
     {
         if (Frame.Source is null) return;
         _zoom.SetViewport(Surface.Bounds.Width, Surface.Bounds.Height);
-        var scale = _zoom.FitScale * _zoom.PanelScale;
+        var scale = _zoom.BaseScale * _zoom.PanelScale;
         Frame.Width = _zoom.SourceWidth * scale;
         Frame.Height = _zoom.SourceHeight * scale;
         Frame.InvalidateVisual();

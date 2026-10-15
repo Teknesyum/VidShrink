@@ -19,6 +19,7 @@
   "playback.control.pause": "一時停止",
   "playback.control.play": "再生",
   "player.view.aspect": "アスペクト比",
+  "player.view.fill": "塗りつぶしまたは全体表示",
   "player.view.rotate": "90°回転",
   "player.view.mirror": "ミラー",
   "player.view.topmost": "常に最前面に表示",

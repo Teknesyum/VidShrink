@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
+using VidShrink.Core;
 
 namespace VidShrink.App.Playback;
 
@@ -127,6 +128,12 @@ internal partial class PlayerView
 
     private void OnFarePointerMoved(object? sender, PointerEventArgs e)
     {
+        if (e.Pointer.Type == PointerType.Touch)
+        {
+            DokunOyna(e);
+            return;
+        }
+
         if (_windowDrag)
         {
             if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed || e.Pointer.Captured is null)
@@ -204,6 +211,12 @@ internal partial class PlayerView
 
     private void OnFarePointerReleased(object? sender, PointerReleasedEventArgs e)
     {
+        if (e.Pointer.Type == PointerType.Touch)
+        {
+            DokunBirak(e);
+            return;
+        }
+
         if (e.InitialPressMouseButton != MouseButton.Left) return;
         if (_windowDrag)
         {
@@ -214,5 +227,48 @@ internal partial class PlayerView
 
         if (IsSeekBarSource(e.Source)) return;
         FareRelease();
+    }
+
+    private readonly DokunmaHareketi _dokunma = new(ClickArbiter.DragThresholdDip);
+    private double _kistirmaOlcegi = 1;
+
+    private void DokunBas(PointerPressedEventArgs e)
+    {
+        var at = e.GetPosition(Surface);
+        _dokunma.Bas(e.Pointer.Id, at.X, at.Y);
+        if (_dokunma.Kip == DokunmaKipi.Kistirma) _kistirmaOlcegi = _zoom.PanelScale;
+        e.Handled = true;
+    }
+
+    private void DokunOyna(PointerEventArgs e)
+    {
+        var at = e.GetPosition(Surface);
+        var adim = _dokunma.Oyna(e.Pointer.Id, at.X, at.Y);
+        var en = Surface.Bounds.Width;
+        var boy = Surface.Bounds.Height;
+        switch (adim.Kip)
+        {
+            case DokunmaKipi.Atlama when en > 0:
+                Apply(new PlayerCommand(PlayerCommandKind.Seek, adim.Miktar / en * Keymap.Steps.Of(SeekStep.Medium)));
+                break;
+            case DokunmaKipi.Ses when boy > 0:
+                Apply(new PlayerCommand(PlayerCommandKind.Volume, adim.Miktar / boy * VolumeCeiling()));
+                break;
+            case DokunmaKipi.Kistirma:
+                _zoom.ScaleTo(_kistirmaOlcegi * adim.Miktar, _dokunma.OrtaX, _dokunma.OrtaY);
+                Resize();
+                _trace.Add("pinch " + Saat.Tani.Konum(adim.Miktar) + " -> " + Saat.Tani.Konum(_zoom.PanelScale));
+                break;
+            default:
+                return;
+        }
+
+        e.Handled = true;
+    }
+
+    private void DokunBirak(PointerReleasedEventArgs e)
+    {
+        if (_dokunma.Birak(e.Pointer.Id)) Apply(Keymap.ForPress(PlayerButton.Left));
+        e.Handled = true;
     }
 }

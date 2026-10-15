@@ -19,6 +19,7 @@
   "playback.control.pause": "Pause",
   "playback.control.play": "Play",
   "player.view.aspect": "Aspect ratio",
+  "player.view.fill": "Fill or fit",
   "player.view.rotate": "Rotate 90°",
   "player.view.mirror": "Mirror",
   "player.view.topmost": "Always on top",

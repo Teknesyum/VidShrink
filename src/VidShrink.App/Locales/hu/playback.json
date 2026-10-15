@@ -19,6 +19,7 @@
   "playback.control.pause": "Szünet",
   "playback.control.play": "Lejátszás",
   "player.view.aspect": "Képarány",
+  "player.view.fill": "Kitöltés vagy illesztés",
   "player.view.rotate": "Forgatás 90°-kal",
   "player.view.mirror": "Tükrözés",
   "player.view.topmost": "Mindig felül",

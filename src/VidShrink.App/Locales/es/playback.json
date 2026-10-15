@@ -19,6 +19,7 @@
   "playback.control.pause": "Pausa",
   "playback.control.play": "Reproducir",
   "player.view.aspect": "Relación de aspecto",
+  "player.view.fill": "Rellenar o ajustar",
   "player.view.rotate": "Girar 90°",
   "player.view.mirror": "Reflejar",
   "player.view.topmost": "Siempre visible",

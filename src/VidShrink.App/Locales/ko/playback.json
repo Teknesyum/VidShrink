@@ -19,6 +19,7 @@
   "playback.control.pause": "일시정지",
   "playback.control.play": "재생",
   "player.view.aspect": "화면 비율",
+  "player.view.fill": "채우기 또는 맞추기",
   "player.view.rotate": "90° 회전",
   "player.view.mirror": "미러링",
   "player.view.topmost": "항상 위에 표시",

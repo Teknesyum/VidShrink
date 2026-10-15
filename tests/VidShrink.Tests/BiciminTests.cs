@@ -1298,6 +1298,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, sistem temasi ve hareket ayari (AYR-P4): alti yeni anahtar (<c>settings-tab.follow-system-theme.*</c>, <c>settings-tab.theme.light</c>, <c>.dark</c>, <c>settings-tab.reduce-motion.*</c>); yalniz <c>settings-tab.follow-system-theme.label</c> 2 dilde kola giriyor (pt, sw), KOL dokumunden sayildi, en ve tr girmiyor: olculen 3516 + 2 = 3518, en 334, tr 110. Gezilen 70821 + 43 x 6 = 71079, <c>kayip</c> 0.</para>
     /// <para>2026-10-15, Donustur ses secenekleri (DON-P9): alti yeni anahtar (<c>main.convert.audio-loudnorm</c>, <c>.audio-channels</c>, <c>.audio-sample-rate</c>, <c>main.validation.audio-channels-positive</c>, <c>.mxf-sample-rate</c>, <c>.audio-sample-rate</c>), testin SAYIM satirindan olculdu: toplam 3520, en 334, tr 110.</para>
     /// <para>2026-10-15, Donustur'de goruntu suzgecleri (DON-P10): dokuz yeni <c>main.convert.*</c> anahtari (olcekleme, kare hizi kipi, dolgu, suzgec notu), testin SAYIM satirindan olculdu: toplam 3558, en 338, tr 110.</para>
+    /// <para>2026-10-15, doldurma kipi (OYA-P11): <c>player.view.fill</c> 3 dilde kola giriyor (en, nl, tr), KOL dokumunden sayildi: olculen 3652 + 3 = 3655, en 356 + 1 = 357, tr 118 + 1 = 119.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1323,9 +1324,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3652, toplam);
-        Assert.Equal(356, dilBasina["en"]);
-        Assert.Equal(118, dilBasina["tr"]);
+        Assert.Equal(3655, toplam);
+        Assert.Equal(357, dilBasina["en"]);
+        Assert.Equal(119, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1583,6 +1584,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, bolum yazma (DZA-P8): iki yeni anahtar (<c>editor.export.chapters</c>, <c>.tip</c>), dusen yok; olculen 70821 + 43 x 2 = 70907. <c>kayip</c> 0.</para>
     /// <para>2026-10-15, Donustur ses secenekleri (DON-P9): alti yeni anahtar (ses yuksekligi, kanal, ornekleme hizi ve uc dogrulama iletisi), dusen yok; olculen 70821 + 43 x 6 = 71079. <c>kayip</c> 0.</para>
     /// <para>2026-10-15, Donustur'de goruntu suzgecleri (DON-P10): dokuz yeni anahtar (<c>main.convert.scaler</c> ve uc yontem adi, <c>.fps-mode</c>, <c>.fps-mode.constant</c>, <c>.fps-mode.variable</c>, <c>.letterbox</c>, <c>main.convert.note.filters-reencode</c>), dusen yok; olculen 72068 + 43 x 9 = 72455. <c>kayip</c> 0.</para>
+    /// <para>2026-10-15, doldurma kipi (OYA-P11): bir yeni anahtar (<c>player.view.fill</c>), dusen yok; olculen 75422 + 43 = 75465. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1610,7 +1612,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(75422, gezilen);
+        Assert.Equal(75465, gezilen);
         Assert.Empty(kayip);
     }
 

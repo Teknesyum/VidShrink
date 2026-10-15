@@ -19,6 +19,7 @@
   "playback.control.pause": "Пауза",
   "playback.control.play": "Воспроизвести",
   "player.view.aspect": "Соотношение сторон",
+  "player.view.fill": "Заполнить или вписать",
   "player.view.rotate": "Повернуть на 90°",
   "player.view.mirror": "Отразить",
   "player.view.topmost": "Поверх всех окон",

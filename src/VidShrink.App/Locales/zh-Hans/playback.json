@@ -19,6 +19,7 @@
   "playback.control.pause": "暂停",
   "playback.control.play": "播放",
   "player.view.aspect": "宽高比",
+  "player.view.fill": "填充或适应",
   "player.view.rotate": "旋转 90°",
   "player.view.mirror": "镜像",
   "player.view.topmost": "始终置顶",

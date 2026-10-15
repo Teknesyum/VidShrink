@@ -138,6 +138,22 @@ internal sealed class ZoomGesture
         }
     }
 
+    /// <summary>Kaynagi yuzeyi kaplayacak kadar buyuten olcek; tasan kenar kirpilir.</summary>
+    internal double CoverScale
+    {
+        get
+        {
+            if (SourceWidth <= 0 || SourceHeight <= 0) return 1.0;
+            if (ViewportWidth <= 0 || ViewportHeight <= 0) return 1.0;
+            return Math.Max(ViewportWidth / SourceWidth, ViewportHeight / SourceHeight);
+        }
+    }
+
+    /// <summary>Doldur kipi: taban olcek sigdir yerine kaplama olcegidir.</summary>
+    internal bool Fill { get; set; }
+
+    internal double BaseScale => Fill ? CoverScale : FitScale;
+
     /// <summary>
     /// Görüntünün çizim ölçeği.
     ///
@@ -154,7 +170,7 @@ internal sealed class ZoomGesture
     /// yaklaşık iki katı, hemen üstünde panel bandın iki katı ve görüntü ona sığmış. Yani
     /// ekrandaki görünür boy sıçramıyor.
     /// </summary>
-    internal double Scale => Shelter == ShelterStage.Band ? FitScale * PanelScale : FitScale;
+    internal double Scale => Shelter == ShelterStage.Band ? BaseScale * PanelScale : BaseScale;
 
     internal double ContentWidth => SourceWidth * Scale;
 
