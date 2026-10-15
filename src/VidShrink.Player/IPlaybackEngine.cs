@@ -223,6 +223,12 @@ public interface IPlaybackEngine : IDisposable
     /// <summary>Duzenleyicinin EDL zamaninda <c>enable</c> pencereli solma ve ses zincirleri; <c>null</c> kaldirir.</summary>
     void SetEditTimed(string? video, string? audio) { }
 
+    /// <summary>Ses tepe olcerini acar ya da kapatir; motor olcemiyorsa <c>false</c>.</summary>
+    bool MeterAudio(bool on) => false;
+
+    /// <summary>Son ses penceresinin tepe duzeyi (dBFS); sessizlikte eksi sonsuz, olcer kapaliyken <c>NaN</c>.</summary>
+    double AudioPeakDb => double.NaN;
+
     void SetMirrored(bool mirrored) { }
 
     void SetAspectOverride(string ratio) { }

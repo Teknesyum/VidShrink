@@ -91,12 +91,28 @@ public static class ClipFilters
         return string.Join(",", parts);
     }
 
-    /// <summary>Kazanc ya da sessizlik, ardindan ses solmasi; zaman klip basindan.</summary>
+    public const string CompressorFilter = "acompressor=threshold=0.125:ratio=4:attack=20:release=250";
+
+    public const string LimiterFilter = "alimiter=limit=0.89:level=0";
+
+    /// <summary>
+    /// Ses zinciri, zaman klip basindan. Sessizse yalniz <c>volume=0</c>; degilse sabit sirayla gurultu azaltma,
+    /// uc bantli ekolayzir, kazanc, kompresor, yukseklik esitleme (ardindan 48 kHz'e geri ornekleme), sinirlayici;
+    /// en sonda ses solmasi.
+    /// </summary>
     public static string Audio(ClipEffects effects, long length)
     {
         var parts = new List<string>();
         if (effects.Muted) parts.Add("volume=0");
-        else if (effects.VolumeDb != 0) parts.Add("volume=" + Number(effects.VolumeDb) + "dB");
+        else
+        {
+            if (effects.Denoise) parts.Add(AudioCaptureArguments.NoiseSuppressionFilterName);
+            parts.AddRange(Equalizer(effects));
+            if (effects.VolumeDb != 0) parts.Add("volume=" + Number(effects.VolumeDb) + "dB");
+            if (effects.Compressor) parts.Add(CompressorFilter);
+            if (effects.Loudnorm) parts.Add(StreamMapping.LoudnormFilter + ",aresample=" + Int(StreamMapping.DefaultSampleRate));
+            if (effects.Limiter) parts.Add(LimiterFilter);
+        }
         var (fadeIn, fadeOut) = effects.Fades(length);
         if (fadeIn > 0) parts.Add("afade=t=in:st=0:d=" + Seconds(fadeIn));
         if (fadeOut > 0) parts.Add("afade=t=out:st=" + Seconds(length - fadeOut) + ":d=" + Seconds(fadeOut));
@@ -130,8 +146,14 @@ public static class ClipFilters
             if (tone.Length > 0) color.AddRange(tone.Split(',').Select(f => f + window));
 
             if (effects.Muted) audio.Add("volume=volume=0:enable='" + Between(start, end) + "'");
-            else if (effects.VolumeDb != 0)
-                audio.Add("volume=volume=" + Number(effects.VolumeDb) + "dB:enable='" + Between(start, end) + "'");
+            else
+            {
+                if (effects.Denoise) audio.Add(AudioCaptureArguments.NoiseSuppressionFilterName + "=enable='" + Between(start, end) + "'");
+                audio.AddRange(Equalizer(effects).Select(f => f + window));
+                if (effects.VolumeDb != 0)
+                    audio.Add("volume=volume=" + Number(effects.VolumeDb) + "dB:enable='" + Between(start, end) + "'");
+                if (effects.Limiter) audio.Add(LimiterFilter + window);
+            }
 
             if (part.Clip.Reversed)
             {
@@ -155,6 +177,15 @@ public static class ClipFilters
         video.Add("fade" + fade);
         audio.Add("afade" + fade);
     }
+
+    private static IEnumerable<string> Equalizer(ClipEffects effects)
+    {
+        if (effects.BassDb != 0) yield return Band(100, effects.BassDb);
+        if (effects.MidDb != 0) yield return Band(1000, effects.MidDb);
+        if (effects.TrebleDb != 0) yield return Band(8000, effects.TrebleDb);
+    }
+
+    private static string Band(int hz, double gain) => "equalizer=f=" + Int(hz) + ":t=o:w=2:g=" + Number(gain);
 
     private static string Between(double start, double end) => "gte(t," + Number(start) + ")*lt(t," + Number(end) + ")";
     private static string Seconds(long ticks) => Number(EditTime.ToSeconds(ticks));

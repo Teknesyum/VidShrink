@@ -340,6 +340,13 @@ public sealed class EditProject
             writer.WriteNumber("contrast", effects.Contrast);
             writer.WriteNumber("saturation", effects.Saturation);
             writer.WriteNumber("temperature", effects.Temperature);
+            writer.WriteBoolean("denoise", effects.Denoise);
+            writer.WriteBoolean("loudnorm", effects.Loudnorm);
+            writer.WriteBoolean("compressor", effects.Compressor);
+            writer.WriteBoolean("limiter", effects.Limiter);
+            writer.WriteNumber("bassDb", effects.BassDb);
+            writer.WriteNumber("midDb", effects.MidDb);
+            writer.WriteNumber("trebleDb", effects.TrebleDb);
             writer.WriteNumber("fadeIn", effects.FadeIn);
             writer.WriteNumber("fadeOut", effects.FadeOut);
             writer.WriteEndObject();
@@ -381,6 +388,13 @@ public sealed class EditProject
             Contrast = e.TryGetProperty("contrast", out var contrast) ? contrast.GetDouble() : 1,
             Saturation = e.TryGetProperty("saturation", out var saturation) ? saturation.GetDouble() : 1,
             Temperature = e.TryGetProperty("temperature", out var temperature) ? temperature.GetInt32() : ClipEffects.NeutralTemperature,
+            Denoise = e.TryGetProperty("denoise", out var denoise) && denoise.GetBoolean(),
+            Loudnorm = e.TryGetProperty("loudnorm", out var loudnorm) && loudnorm.GetBoolean(),
+            Compressor = e.TryGetProperty("compressor", out var compressor) && compressor.GetBoolean(),
+            Limiter = e.TryGetProperty("limiter", out var limiter) && limiter.GetBoolean(),
+            BassDb = e.TryGetProperty("bassDb", out var bass) ? bass.GetDouble() : 0,
+            MidDb = e.TryGetProperty("midDb", out var mid) ? mid.GetDouble() : 0,
+            TrebleDb = e.TryGetProperty("trebleDb", out var treble) ? treble.GetDouble() : 0,
         };
         return clip with { Effects = effects.Normalized() };
     }
