@@ -3358,7 +3358,7 @@ public partial class MainWindow : Window
         var options = CurrentOptions();
         options.ExternalSubtitles = Array.Empty<ExternalSubtitle>();
         options.ExternalAudio = null;
-        options.Filters = options.Filters with { BurnSubtitle = null, Crop = SuzgecOku(out _).Crop };
+        options.Filters = options.Filters with { BurnSubtitle = null, BurnFont = null, BurnFontSize = null, BurnBox = false, Crop = SuzgecOku(out _).Crop };
         return new(paths, options, !_chipSizeCapped && _info is not null, PresetLibrary.DeliveredExtension(_presetContainer), OtomatikKirpmaAcik);
     }
 

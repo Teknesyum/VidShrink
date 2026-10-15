@@ -281,6 +281,12 @@ public static class CliApp
             stderr.WriteLine(yakmaIletisi);
             return new FileRun(ExitCodes.Error, null, yakmaIletisi);
         }
+        if (request.AudioDenoise && !services.HasFilter(AudioCaptureArguments.NoiseSuppressionFilterName))
+        {
+            var temizlemeIletisi = text["error.no-afftdn"];
+            stderr.WriteLine(temizlemeIletisi);
+            return new FileRun(ExitCodes.Error, null, temizlemeIletisi);
+        }
         var yakilanDosya = request.BurnFile;
         if (PrepareBurnFile(ref request, services, scratch, out var okunanKodlama) is { } kodlamaHatasi)
         {

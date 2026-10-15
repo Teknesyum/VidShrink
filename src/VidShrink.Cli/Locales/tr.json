@@ -151,6 +151,7 @@
   "error.burn-style-needs-burn": "--yak-yazi-tipi, --yak-boyut ve --yak-kutu yakılan altyazının biçimidir; --yak, --yak-srt, --yak-ass ya da --altyazi-tara da verin.",
   "error.scan-burn-conflict": "--altyazi-tara yakılacak altyazıyı kendi seçer; --yak, --yak-srt ya da --yak-ass ile birlikte verilemez.",
   "error.no-libass": "Bu ffmpeg derlemesinde subtitles süzgeci yok (libass'sız derlenmiş); altyazı görüntüye yakılamaz.",
+  "error.no-afftdn": "Bu ffmpeg derlemesinde afftdn süzgeci yok; --ses-temizle kullanılamaz.",
   "error.burn-file-encoding": "Yakılacak altyazı dosyasının karakter kodlaması anlaşılamadı; dosyayı UTF-8 olarak kaydedip yeniden deneyin: {0}",
   "error.bad-subtitle-lang": "Altyazı dilleri virgülle ayrılmış iki ya da üç harfli kodlar olmalı: {0}",
   "result.attempts-delivered": "Deneme:    {0} (teslim edilen: {1}. deneme)",
