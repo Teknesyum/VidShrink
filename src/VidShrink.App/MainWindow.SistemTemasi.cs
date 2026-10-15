@@ -39,7 +39,11 @@ public partial class MainWindow
         Classes.Set("reduced-motion", reduced);
     }
 
-    private void OnMotionPreferenceChanged(object? sender, EventArgs e) => ApplyMotion();
+    private void OnMotionPreferenceChanged(object? sender, EventArgs e)
+    {
+        if (Avalonia.Threading.Dispatcher.UIThread.CheckAccess()) ApplyMotion();
+        else Avalonia.Threading.Dispatcher.UIThread.Post(ApplyMotion);
+    }
 
     private void OnReduceMotionChanged()
     {

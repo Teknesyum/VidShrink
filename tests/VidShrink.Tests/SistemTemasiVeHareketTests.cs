@@ -91,6 +91,35 @@ public sealed class SistemTemasiVeHareketTests
         }
     }
 
+    [Fact]
+    public void ArkaPlandanGelenHareketDegisimiPencereyiUiIsParcacigindaGunceller()
+    {
+        var onceki = MotionPreference.Source;
+        try
+        {
+            MotionPreference.Source = new SahteHareket { Windows = true, Mac = "0", Gnome = "true" };
+            MotionPreference.ResetForTest();
+            var window = AppHost.Run(() => new MainWindow());
+            var hata = Record.Exception(() => Task.Run(() => MotionPreference.UserReduced = true).GetAwaiter().GetResult());
+            var sinif = AppHost.Run(() =>
+            {
+                Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+                var azaltildi = window.Classes.Contains("reduced-motion");
+                window.Close();
+                return azaltildi;
+            });
+
+            Assert.Null(hata);
+            Assert.True(sinif);
+        }
+        finally
+        {
+            MotionPreference.UserReduced = false;
+            MotionPreference.Source = onceki;
+            MotionPreference.ResetForTest();
+        }
+    }
+
     [Theory]
     [InlineData(false, true, "Nord")]
     [InlineData(true, true, "Buz")]

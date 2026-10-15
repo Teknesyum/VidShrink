@@ -1510,7 +1510,7 @@
                     <WrapPanel x:Name="ConvertAudioProcessPanel" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
                         <TextBlock Text="{loc:Text main.convert.audio-channels}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
-                        <ComboBox x:Name="CmbConvertChannels" SelectedIndex="0"
+                        <ComboBox x:Name="CmbConvertChannels" SelectedIndex="0" MinWidth="{StaticResource FieldWidthSm}"
                                   auto:AutomationProperties.Name="{loc:Text main.convert.audio-channels}">
                           <ComboBoxItem Content="{loc:Text main.convert.source-option}"/>
                           <ComboBoxItem Content="{loc:Text main.advanced.audio-channels.stereo}" Tag="2"/>
@@ -1519,7 +1519,7 @@
                       </StackPanel>
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
                         <TextBlock Text="{loc:Text main.convert.audio-sample-rate}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
-                        <ComboBox x:Name="CmbConvertSampleRate" SelectedIndex="0"
+                        <ComboBox x:Name="CmbConvertSampleRate" SelectedIndex="0" MinWidth="{StaticResource FieldWidthSm}"
                                   auto:AutomationProperties.Name="{loc:Text main.convert.audio-sample-rate}">
                           <ComboBoxItem Content="{loc:Text main.convert.source-option}"/>
                           <ComboBoxItem Content="44100 Hz" Tag="44100"/>
@@ -1873,7 +1873,7 @@
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
                     <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
-                      <TextBlock Text="{loc:Text settings-tab.output-name.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                      <TextBlock Text="{loc:Text settings-tab.output-name.label}" Theme="{StaticResource Label}"/>
                       <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.output-name.label}">
                         <ToolTip.Tip>
                           <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.output-name.hint}"/>
