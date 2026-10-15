@@ -176,6 +176,7 @@ public partial class MainWindow
         ResetBurnStyle();
         RefreshBurnChoices();
         RefreshSubtitleList();
+        ResetConvertSubtitles();
         YuksekligiSifirla();
     }
 
@@ -191,13 +192,16 @@ public partial class MainWindow
     private void RefreshSubtitleList()
     {
         SubtitleList.Children.Clear();
-        for (var i = 0; i < _externalSubtitles.Count; i++) SubtitleList.Children.Add(SubtitleRow(i));
+        for (var i = 0; i < _externalSubtitles.Count; i++)
+        {
+            var index = i;
+            SubtitleList.Children.Add(SubtitleRow(_externalSubtitles[i], () => RemoveSubtitle(index)));
+        }
         SubtitleList.IsVisible = _externalSubtitles.Count > 0;
     }
 
-    private Grid SubtitleRow(int index)
+    private Grid SubtitleRow(ExternalSubtitle subtitle, Action onRemove)
     {
-        var subtitle = _externalSubtitles[index];
         var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), ColumnSpacing = TokenOf("SpaceXs") };
         var name = new TextBlock
         {
@@ -218,7 +222,7 @@ public partial class MainWindow
         if (this.FindResource("GhostButton") is Avalonia.Styling.ControlTheme ghost) remove.Theme = ghost;
         AutomationProperties.SetName(remove, Say("main.subtitles.remove"));
         ToolTip.SetTip(remove, Say("main.subtitles.remove"));
-        remove.Click += (_, _) => RemoveSubtitle(index);
+        remove.Click += (_, _) => onRemove();
         Grid.SetColumn(remove, 1);
         row.Children.Add(remove);
         return row;

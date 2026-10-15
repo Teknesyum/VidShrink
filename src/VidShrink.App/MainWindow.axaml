@@ -1194,7 +1194,7 @@
                     </Grid>
                   </StackPanel>
                   <Grid x:Name="ConvertForm" Grid.IsSharedSizeScope="True" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}" RowSpacing="{StaticResource SpaceLg}"
-                        RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                        RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
                     <Grid.Styles>
                       <Style Selector="Grid#ConvertForm > Grid">
                         <Setter Property="VerticalAlignment" Value="Top"/>
@@ -1466,6 +1466,18 @@
                         <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.drop-metadata.tip}"/>
                       </ToolTip.Tip>
                     </CheckBox>
+
+                    <StackPanel x:Name="ConvertSubtitlePanel" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Spacing="{StaticResource SpaceSm}" IsVisible="False">
+                      <TextBlock Text="{loc:Text main.convert.subtitles}" Theme="{StaticResource Label}" Margin="0"/>
+                      <TextBlock x:Name="TxtConvertSubtitleHint" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+                      <StackPanel x:Name="ConvertSubtitleTracks" Spacing="{StaticResource SpaceXs}"/>
+                      <Button x:Name="BtnConvertAddSubtitle" Theme="{StaticResource GhostButton}" Click="OnConvertAddSubtitle" HorizontalAlignment="Left"
+                              MinHeight="{StaticResource FieldMinHeight}"
+                              Padding="{StaticResource ButtonPaddingSm}" Content="{loc:Text main.subtitles.add}"/>
+                      <StackPanel x:Name="ConvertSubtitleList" Spacing="{StaticResource SpaceXs}" IsVisible="False"/>
+                      <TextBlock x:Name="TxtConvertSubtitleResult" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"
+                                 auto:AutomationProperties.LiveSetting="Polite"/>
+                    </StackPanel>
 
                   </Grid>
                 </StackPanel>

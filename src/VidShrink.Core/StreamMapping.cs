@@ -294,14 +294,7 @@ public sealed record StreamPlan(
             for (var i = 0; i < Audio.Count; i++)
                 a.AddRange(AudioCodecArguments(Audio[i], ":" + i.ToString(CultureInfo.InvariantCulture)));
 
-        if (Subtitles.Count > 0)
-        {
-            if (Subtitles.Select(track => track.Codec).Distinct().Count() == 1)
-                a.AddRange(new[] { "-c:s", Subtitles[0].Codec });
-            else
-                for (var i = 0; i < Subtitles.Count; i++)
-                    a.AddRange(new[] { "-c:s:" + i.ToString(CultureInfo.InvariantCulture), Subtitles[i].Codec });
-        }
+        a.AddRange(SubtitleCodecArguments(Subtitles));
 
         if (CoverMap is not null) a.AddRange(new[] { "-c:v:1", "copy", "-disposition:v:1", "attached_pic" });
         if (Attachments.Count > 0) a.AddRange(new[] { "-c:t", "copy" });
@@ -315,21 +308,42 @@ public sealed record StreamPlan(
                 a.AddRange(new[] { "-metadata:s:a:" + i.ToString(CultureInfo.InvariantCulture), "language=" + Audio[i].Language });
         }
 
-        for (var i = 0; i < Subtitles.Count; i++)
-        {
-            var index = i.ToString(CultureInfo.InvariantCulture);
-            if (!string.IsNullOrWhiteSpace(Subtitles[i].Title))
-                a.AddRange(new[] { "-metadata:s:s:" + index, "title=" + Subtitles[i].Title });
-            if (Subtitles[i].InputPath is not null && !string.IsNullOrWhiteSpace(Subtitles[i].Language))
-                a.AddRange(new[] { "-metadata:s:s:" + index, "language=" + Subtitles[i].Language });
-            a.AddRange(new[] { "-disposition:s:" + index, Subtitles[i].Disposition });
-        }
+        a.AddRange(SubtitleTagArguments(Subtitles));
 
         a.AddRange(StreamMapping.MetadataArguments(
             Request.DropMetadata,
             Audio.Select(track => track.Language).ToArray(),
             Subtitles.Select(track => track.InputPath is null ? track.Language : null).ToArray()));
         a.AddRange(new[] { "-map_chapters", dropChapters ? "-1" : "0" });
+        return a;
+    }
+
+    /// <summary>Altyazi izlerinin kodek argumanlari: hepsi ayniysa tek <c>-c:s</c>, degilse iz basina.</summary>
+    public static IReadOnlyList<string> SubtitleCodecArguments(IReadOnlyList<SubtitleTrack> subtitles)
+    {
+        var a = new List<string>();
+        if (subtitles.Count == 0) return a;
+        if (subtitles.Select(track => track.Codec).Distinct().Count() == 1)
+            a.AddRange(new[] { "-c:s", subtitles[0].Codec });
+        else
+            for (var i = 0; i < subtitles.Count; i++)
+                a.AddRange(new[] { "-c:s:" + i.ToString(CultureInfo.InvariantCulture), subtitles[i].Codec });
+        return a;
+    }
+
+    /// <summary>Altyazi izlerinin basligi, dis dosyanin dili ve bayragi (<c>-disposition:s:N</c>).</summary>
+    public static IReadOnlyList<string> SubtitleTagArguments(IReadOnlyList<SubtitleTrack> subtitles)
+    {
+        var a = new List<string>();
+        for (var i = 0; i < subtitles.Count; i++)
+        {
+            var index = i.ToString(CultureInfo.InvariantCulture);
+            if (!string.IsNullOrWhiteSpace(subtitles[i].Title))
+                a.AddRange(new[] { "-metadata:s:s:" + index, "title=" + subtitles[i].Title });
+            if (subtitles[i].InputPath is not null && !string.IsNullOrWhiteSpace(subtitles[i].Language))
+                a.AddRange(new[] { "-metadata:s:s:" + index, "language=" + subtitles[i].Language });
+            a.AddRange(new[] { "-disposition:s:" + index, subtitles[i].Disposition });
+        }
         return a;
     }
 
@@ -793,6 +807,53 @@ public static class StreamMapping
             audioCodec = sourceCodec;
         }
 
+        var subtitles = SubtitleTracks(info, request, container, audio.Count(track => track.InputPath is not null), notes,
+            audio.FirstOrDefault()?.Language);
+
+        string? coverMap = null;
+        var coverBytes = 0L;
+        if (CarriesCover(container) && !request.PlatformDelivery
+            && info.Streams.FirstOrDefault(stream => stream.IsAttachedPicture && CoverCodecs.Contains(stream.Codec, StringComparer.OrdinalIgnoreCase)) is { } cover)
+        {
+            coverMap = Map(cover);
+            coverBytes = cover.Bytes;
+        }
+        CoverAttachment? coverAttachment = null;
+        if (coverMap is null && container != OutputContainer.WebM && !request.PlatformDelivery
+            && info.Streams.FirstOrDefault(stream => stream.IsAttachedPicture) is { } picture)
+        {
+            coverAttachment = CoverAttachmentFor(container, picture);
+            if (coverAttachment is null) notes.Add(StreamNote.CoverDropped);
+            else coverBytes = coverAttachment.Bytes;
+        }
+        if (container == OutputContainer.WebM && !request.PlatformDelivery
+            && info.Streams.Any(stream => stream.IsAttachedPicture || stream.Kind == StreamKind.Attachment))
+            notes.Add(StreamNote.WebmStreamDropped);
+
+        var attachments = new List<string>();
+        var attachmentBytes = 0L;
+        if (keepAll && container == OutputContainer.Mkv)
+            foreach (var source in info.Streams.Where(stream => stream.Kind == StreamKind.Attachment))
+            {
+                attachments.Add(Map(source));
+                attachmentBytes += source.Bytes;
+            }
+
+        var subtitleBytes = subtitles.Sum(track => track.Bytes);
+        var sideK = audio.Sum(track => (double)track.BitrateK) + (subtitleBytes + attachmentBytes + coverBytes) * 8.0 / 1000.0 / duration;
+
+        return new StreamPlan(container, videoMap, audio, subtitles, attachments, notes.Distinct().ToList(), sideK, request, coverMap, coverAttachment);
+    }
+
+    /// <summary>
+    /// Ciktiya giden altyazi izleri: kaynak izleri kabin kurali ile (MP4 ailesinde metin <c>mov_text</c>,
+    /// resim duser; WebM'de <c>webvtt</c>; MKV kopyalar), sonra dis dosyalar ek <c>-i</c> girdisi olarak.
+    /// <paramref name="extraInputsBefore"/> dis altyazilardan once eklenen girdi sayisi; <paramref name="only"/>
+    /// verilirse yalniz o siradaki kaynak izleri (0 tabanli, ffmpeg'in <c>si</c>'si) tutulur.
+    /// </summary>
+    public static List<SubtitleTrack> SubtitleTracks(MediaInfo info, StreamRequest request, OutputContainer container,
+        int extraInputsBefore, List<StreamNote> notes, string? audioLanguage, IReadOnlyCollection<int>? only = null)
+    {
         var subtitles = new List<SubtitleTrack>();
         var subtitleOrdinal = -1;
         var subtitleChosen = false;
@@ -800,6 +861,7 @@ public static class StreamMapping
         {
             subtitleOrdinal++;
             if (request.BurnedSubtitle == subtitleOrdinal) continue;
+            if (only is not null && !only.Contains(subtitleOrdinal)) continue;
             if (request.SubtitleLanguages is { Count: > 0 } wanted
                 && !wanted.Any(language => LanguageMatches(source.Language, language))) continue;
             if (request.FirstSubtitleOnly && subtitleChosen) continue;
@@ -848,46 +910,12 @@ public static class StreamMapping
                 continue;
             }
             var codec = IsMp4Family(container) ? "mov_text" : container == OutputContainer.WebM ? "webvtt" : "copy";
-            var input = subtitles.Count(track => track.InputPath is not null) + 1 + audio.Count(track => track.InputPath is not null);
+            var input = subtitles.Count(track => track.InputPath is not null) + 1 + extraInputsBefore;
             subtitles.Add(new SubtitleTrack(input.ToString(CultureInfo.InvariantCulture) + ":0", codec, false, external.Language, external.Bytes,
                 InputPath: external.Path));
         }
 
-        subtitles = DefaultForced(subtitles, request.PreferredLanguage, audio.FirstOrDefault()?.Language);
-
-        string? coverMap = null;
-        var coverBytes = 0L;
-        if (CarriesCover(container) && !request.PlatformDelivery
-            && info.Streams.FirstOrDefault(stream => stream.IsAttachedPicture && CoverCodecs.Contains(stream.Codec, StringComparer.OrdinalIgnoreCase)) is { } cover)
-        {
-            coverMap = Map(cover);
-            coverBytes = cover.Bytes;
-        }
-        CoverAttachment? coverAttachment = null;
-        if (coverMap is null && container != OutputContainer.WebM && !request.PlatformDelivery
-            && info.Streams.FirstOrDefault(stream => stream.IsAttachedPicture) is { } picture)
-        {
-            coverAttachment = CoverAttachmentFor(container, picture);
-            if (coverAttachment is null) notes.Add(StreamNote.CoverDropped);
-            else coverBytes = coverAttachment.Bytes;
-        }
-        if (container == OutputContainer.WebM && !request.PlatformDelivery
-            && info.Streams.Any(stream => stream.IsAttachedPicture || stream.Kind == StreamKind.Attachment))
-            notes.Add(StreamNote.WebmStreamDropped);
-
-        var attachments = new List<string>();
-        var attachmentBytes = 0L;
-        if (keepAll && container == OutputContainer.Mkv)
-            foreach (var source in info.Streams.Where(stream => stream.Kind == StreamKind.Attachment))
-            {
-                attachments.Add(Map(source));
-                attachmentBytes += source.Bytes;
-            }
-
-        var subtitleBytes = subtitles.Sum(track => track.Bytes);
-        var sideK = audio.Sum(track => (double)track.BitrateK) + (subtitleBytes + attachmentBytes + coverBytes) * 8.0 / 1000.0 / duration;
-
-        return new StreamPlan(container, videoMap, audio, subtitles, attachments, notes.Distinct().ToList(), sideK, request, coverMap, coverAttachment);
+        return DefaultForced(subtitles, request.PreferredLanguage, audioLanguage);
     }
 
     /// <summary>

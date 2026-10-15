@@ -4814,7 +4814,9 @@ public partial class MainWindow : Window
             Start = ParseTime(TxtTrimStart.Text),
             End = ParseTime(TxtTrimEnd.Text),
             HdrPolicy = HdrPolicyIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve,
-            DropMetadata = ChkConvertDropMetadata.IsChecked == true
+            DropMetadata = ChkConvertDropMetadata.IsChecked == true,
+            SubtitleTracks = ConvertSubtitleChoice(),
+            ExternalSubtitles = _convertSubtitles.ToList()
         };
     }
 
@@ -4893,8 +4895,9 @@ public partial class MainWindow : Window
             errors.Add(LanguageCatalog.Validation(LanguageCatalog.TrimFormatError));
 
         var output = BuildUniqueOutputPath(_info.FilePath, "converted", plan.Container);
+        RefreshConvertSubtitleState(plan);
         TxtConvertValidation.Text = errors.Count == 0
-            ? string.Join("\n", ConversionArguments.Notes(plan).Select(note => Say(ConversionNoteKey(note))).Prepend(Say("main.convert.ready")))
+            ? string.Join("\n", ConversionArguments.Notes(plan).Select(note => Say(ConversionNoteKey(note))).Concat(ConvertSubtitleNotes(plan)).Prepend(Say("main.convert.ready")))
             : string.Join("\n", errors);
         BtnConvert.IsEnabled = errors.Count == 0 && _cts is null;
 

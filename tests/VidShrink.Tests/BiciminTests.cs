@@ -1267,6 +1267,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, kodlarken uyumama (SIK-P2): iki yeni <c>settings-tab.prevent-sleep.*</c> anahtarindan 5 kol 5 dilde, hepsi <c>label</c> (en hr hu pt sl), KOL dokumunden sayildi, tr girmiyor: 723bb1b8 agacinda olculen 3411 + 5 = 3416, en 324 + 1 = 325, tr 108.</para>
     /// <para>2026-10-15, kuyruk saklama (SIK-P9): yeni <c>main.shrink-job.restored</c> anahtarindan 8 kol 8 dilde (cs en hu it ro sk sl tr), KOL dokumunden sayildi: 3416 + 8 = 3424, en 325 + 1 = 326, tr 108 + 1 = 109.</para>
     /// <para>2026-10-15, tasinabilir kip (AYR-P8): iki yeni anahtardan 8 kol 8 dilde (<c>main.update.download-page</c>: es, fr, pt, ro; <c>settings.update.portable-effect</c>: bn, hi, th, ur), KOL dokumunden sayildi, en ve tr girmiyor: 3411 + 8 = 3419.</para>
+    /// <para>2026-10-14, Donustur'de altyazi izleri (DON-P2): yedi yeni <c>main.convert.subtitles.*</c> anahtarindan 14 kol 13 dilde (<c>main.convert.subtitles</c>: es, fr, pt, ro; <c>.extract</c>: cs, de, en, it, pl, sk; <c>.extract-failed</c>: en, hu, pt, ro), KOL dokumunden sayildi, tr girmiyor; olculen 3334 + 14 = 3348, en 322 + 2 = 324, tr 108.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1292,8 +1293,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3449, toplam);
-        Assert.Equal(328, dilBasina["en"]);
+        Assert.Equal(3463, toplam);
+        Assert.Equal(330, dilBasina["en"]);
         Assert.Equal(109, dilBasina["tr"]);
     }
 
@@ -1539,6 +1540,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, kodlarken uyumama (SIK-P2): iki yeni <c>settings-tab.prevent-sleep.*</c> anahtari (label, hint), dusen yok; 723bb1b8 agacinda olculen 67897 + 43 x 2 = 67983. <c>kayip</c> 0.</para>
     /// <para>2026-10-15, kuyruk saklama (SIK-P9): bir yeni <c>main.shrink-job.restored</c> anahtari, dusen yok; 67983 + 43 = 68026. <c>kayip</c> 0.</para>
     /// <para>2026-10-15, tasinabilir kip (AYR-P8): iki yeni anahtar (<c>main.update.download-page</c>, <c>settings.update.portable-effect</c>), dusen yok; olculen 67897 + 43 x 2 = 67983. <c>kayip</c> 0.</para>
+    /// <para>2026-10-14, Donustur'de altyazi izleri (DON-P2): yedi yeni <c>main.convert.subtitles.*</c> anahtari (bolum basligi, <c>.none</c>, <c>.not-carried</c>, <c>.extract</c>, <c>.extracted</c>, <c>.extract-failed</c>, <c>.image-dropped</c>), dusen yok; olculen 65188 + 43 x 7 = 65489. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1566,7 +1568,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(68241, gezilen);
+        Assert.Equal(68542, gezilen);
         Assert.Empty(kayip);
     }
 

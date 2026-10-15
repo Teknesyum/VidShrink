@@ -78,11 +78,19 @@ public static class ConversionArguments
         if (encodesVideo) a.AddRange(CodecModel.DeviceArgs(plan.VideoCodec));
         if (plan.Start is { } start) a.AddRange(new[] { "-ss", FormatTime(start) });
         a.AddRange(new[] { "-i", info.FilePath });
+        var subtitles = MapsStreams(info, plan) ? Subtitles(info, plan) : null;
+        foreach (var track in subtitles ?? new List<SubtitleTrack>())
+        {
+            if (track.InputPath is null) continue;
+            if (plan.Start is { } subtitleStart) a.AddRange(new[] { "-ss", FormatTime(subtitleStart) });
+            a.AddRange(new[] { "-i", track.InputPath });
+        }
         if (plan.End is { } end)
         {
             var trimSeconds = end.TotalSeconds - (plan.Start?.TotalSeconds ?? 0);
             a.AddRange(new[] { "-t", FormatTime(TimeSpan.FromSeconds(trimSeconds)) });
         }
+        if (subtitles is not null) a.AddRange(MapArguments(info, plan, subtitles));
 
         if (plan.AudioOnly)
         {
@@ -150,9 +158,16 @@ public static class ConversionArguments
             if (dolbyVision) a.AddRange(HdrResolver.DolbyVisionArgs);
         }
         AddAudio(a, plan);
+        if (subtitles is not null)
+        {
+            a.AddRange(StreamPlan.SubtitleCodecArguments(subtitles));
+            a.AddRange(StreamPlan.SubtitleTagArguments(plan.DropMetadata
+                ? subtitles.Select(track => track with { Title = null }).ToList()
+                : subtitles));
+        }
         if (plan.Container is "mp4" or "mov" or "m4a") a.AddRange(new[] { "-movflags", "+faststart" });
         if (dolbyVision && plan.Container is "mp4" or "mov") a.AddRange(HdrResolver.Mp4DolbyVisionArgs);
-        a.AddRange(MetadataArgs(info, plan));
+        a.AddRange(MetadataArgs(info, plan, subtitles));
         a.Add(outputPath);
         return a;
     }
@@ -189,21 +204,77 @@ public static class ConversionArguments
 
     /// <summary>
     /// Meta silme argümanları küçültmeyle aynı kaynaktan (<see cref="StreamMapping.MetadataArguments"/>).
-    /// Dönüştür akış eşlemez; çıktıya giren sesi ffmpeg seçer (<see cref="AutoAudio"/>) ve dili ondan
-    /// yazılır. Altyazı dili yalnız kaynakta tek altyazı izi varken yazılır: birden çok izde hangisinin
-    /// seçildiği kaba göre değişir. Kapalıyken hiçbir argüman eklenmez.
+    /// Çıktıya giren ses ffmpeg'in seçeceği izdir (<see cref="AutoAudio"/>) ve dili ondan yazılır.
+    /// Altyazılar açık eşlendiğinde (<paramref name="mapped"/>) dil her kaynak ize kendi sırasıyla yazılır;
+    /// eşlenmeyen planda yalnız kaynakta tek altyazı izi varken yazılır. Kapalıyken hiçbir argüman eklenmez.
     /// </summary>
-    private static IReadOnlyList<string> MetadataArgs(MediaInfo info, ConversionPlan plan)
+    private static IReadOnlyList<string> MetadataArgs(MediaInfo info, ConversionPlan plan, IReadOnlyList<SubtitleTrack>? mapped = null)
     {
         if (!plan.DropMetadata) return Array.Empty<string>();
         var audio = plan.CarriesAudio && plan.AudioCodec is not null
             ? new[] { AutoAudio(info)?.Language }
             : Array.Empty<string?>();
+        if (mapped is not null)
+            return StreamMapping.MetadataArguments(true, audio, mapped.Select(track => track.InputPath is null ? track.Language : null).ToArray());
         var subtitles = info.Streams.Where(stream => stream.Kind == StreamKind.Subtitle).ToArray();
         var subtitle = !plan.AudioOnly && !plan.AnimatedImage && subtitles.Length == 1
             ? new[] { subtitles[0].Language }
             : Array.Empty<string?>();
         return StreamMapping.MetadataArguments(true, audio, subtitle);
+    }
+
+    /// <summary>
+    /// Altyazi tasiyabilen cikti kabi; ses, GIF, hareketli gorsel, AVI ve MXF'te <c>null</c>.
+    /// </summary>
+    public static OutputContainer? SubtitleContainer(ConversionPlan plan)
+    {
+        if (plan.AudioOnly || plan.Gif || plan.AnimatedImage) return null;
+        return plan.Container switch
+        {
+            "mp4" => OutputContainer.Mp4,
+            "mov" => OutputContainer.Mov,
+            "mkv" => OutputContainer.Mkv,
+            "webm" => OutputContainer.WebM,
+            _ => null
+        };
+    }
+
+    /// <summary>
+    /// Komut akislari acik <c>-map</c> ile mi secer: altyazi tasiyan kapta kaynakta altyazi izi ya da
+    /// eklenmis dis dosya varken. Oteki planlarda komut eskisi gibi ffmpeg'in secimine birakilir.
+    /// </summary>
+    public static bool MapsStreams(MediaInfo info, ConversionPlan plan)
+        => SubtitleContainer(plan) is not null
+           && (plan.ExternalSubtitles.Count > 0 || info.Streams.Any(stream => stream.Kind == StreamKind.Subtitle));
+
+    /// <summary>
+    /// Ciktiya giden altyazi izleri, kucultmenin akis kuralindan (<see cref="StreamMapping.SubtitleTracks"/>):
+    /// kabin tasiyamadigi iz cevrilir ya da duser ve <paramref name="notes"/>'a yazilir.
+    /// </summary>
+    public static List<SubtitleTrack> Subtitles(MediaInfo info, ConversionPlan plan, List<StreamNote>? notes = null)
+    {
+        if (SubtitleContainer(plan) is not { } container) return new List<SubtitleTrack>();
+        var request = new StreamRequest(ExternalSubtitles: plan.ExternalSubtitles);
+        return StreamMapping.SubtitleTracks(info, request, container, 0, notes ?? new List<StreamNote>(),
+            AutoAudio(info)?.Language, plan.SubtitleTracks);
+    }
+
+    /// <summary>
+    /// Acik akis secimi: ilk video, ffmpeg'in <c>-map</c>'siz sececegi ses (<see cref="AutoAudio"/>), sonra altyazilar.
+    /// Ses secimi esleme yazilinca degismez.
+    /// </summary>
+    private static IReadOnlyList<string> MapArguments(MediaInfo info, ConversionPlan plan, IReadOnlyList<SubtitleTrack> subtitles)
+    {
+        var a = new List<string>();
+        var video = info.Streams.FirstOrDefault(stream => stream.Kind == StreamKind.Video && !stream.IsAttachedPicture);
+        a.AddRange(new[] { "-map", video is null ? "0:v:0" : "0:" + video.Index.ToString(CultureInfo.InvariantCulture) });
+        if (plan.CarriesAudio && plan.AudioCodec is not null)
+        {
+            if (AutoAudio(info) is { } audio) a.AddRange(new[] { "-map", "0:" + audio.Index.ToString(CultureInfo.InvariantCulture) });
+            else if (info.HasAudio) a.AddRange(new[] { "-map", "0:a:0?" });
+        }
+        foreach (var track in subtitles) a.AddRange(new[] { "-map", track.Map });
+        return a;
     }
 
     /// <summary>
