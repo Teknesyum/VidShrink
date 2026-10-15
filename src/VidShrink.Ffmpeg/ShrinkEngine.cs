@@ -119,6 +119,10 @@ public static class ShrinkEngine
             : name;
     }
 
+    /// <summary>SIK-13: desenin <c>{klasor}</c> değeri, kaynağın bulunduğu klasörün adı; kökte boş.</summary>
+    public static string KaynakKlasoru(string inputPath)
+        => Path.GetFileName(Path.GetDirectoryName(inputPath) ?? string.Empty);
+
     public static Task<EncodeResult> EncodeAsync(
         MediaInfo info,
         EncodePlan plan,
@@ -130,8 +134,9 @@ public static class ShrinkEngine
         ComplexityProfile? profile,
         RetryDecisionAsync? askBeforeRetry,
         SceneMap? scenes,
-        EncodePause? pause = null)
-        => new EncodeRunner { Pause = pause }.RunAsync(info, plan, outputPath, targetMb, progress, ct, fillPolicy, profile, askBeforeRetry, scenes);
+        EncodePause? pause = null,
+        bool kaynakTarihleriniKoru = false)
+        => new EncodeRunner { Pause = pause, KaynakTarihleriniKoru = kaynakTarihleriniKoru }.RunAsync(info, plan, outputPath, targetMb, progress, ct, fillPolicy, profile, askBeforeRetry, scenes);
 
     private static double PlanScale(MediaInfo info, EncodePlan plan)
         => info.Height <= 0 ? 1.0 : (double)plan.Height / info.Height;

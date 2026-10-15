@@ -150,13 +150,51 @@ public sealed class AdlandirmaDeseniTests
         Assert.Equal("klip_shrunk", AdlandirmaDeseni.Uygula(AdlandirmaDeseni.Varsayilan, Ornek()));
     }
 
-    /// <summary>Küme kapalı; tanınan altı ad dışında yer tutucu yok.</summary>
+    /// <summary>Küme kapalı; tanınan on bir ad dışında yer tutucu yok. SIK-13 son beşi ekledi.</summary>
     [Fact]
-    public void KumeTamOlarakAltiAd()
+    public void KumeTamOlarakOnBirAd()
     {
         Assert.Equal(
-            new[] { "ad", "hedef", "kalite", "cozunurluk", "kodek", "tarih" },
+            new[] { "ad", "hedef", "kalite", "cozunurluk", "kodek", "tarih", "saat", "bithizi", "karehizi", "klasor", "sayac" },
             AdlandirmaDeseni.YerTutucular.ToArray());
+    }
+
+    private static AdBilgisi YeniOrnek() => Ornek() with
+    {
+        Tarih = new DateTime(2026, 9, 19, 14, 5, 0),
+        KareHizi = 29.97,
+        KaynakKlasoru = "Tatil: 2026",
+        Sayac = 7
+    };
+
+    /// <summary>SIK-13: yeni beş yer tutucunun her biri kendi değerine açılır; klasör adından yasak işaret atılır.</summary>
+    [Theory]
+    [InlineData("{ad}_{saat}", "klip_14-05")]
+    [InlineData("{ad}_{bithizi}", "klip_2500kbps")]
+    [InlineData("{ad}_{karehizi}", "klip_29_97fps")]
+    [InlineData("{ad}_{klasor}", "klip_Tatil 2026")]
+    [InlineData("{ad}_{sayac}", "klip_007")]
+    [InlineData("{klasor}-{sayac}-{ad}", "Tatil 2026-007-klip")]
+    public void YeniYerTutucularDegereDonusuyor(string desen, string beklenen)
+    {
+        Assert.Null(AdlandirmaDeseni.Hata(desen));
+        Assert.Equal(beklenen, AdlandirmaDeseni.Uygula(desen, YeniOrnek()));
+    }
+
+    /// <summary>SIK-13: değeri olmayan yeni yer tutucu boşa düşer; tam sayı kare hızı ondalıksız yazılır.</summary>
+    [Fact]
+    public void YeniYerTutucularDegersizBosaDuser()
+    {
+        var bos = new AdBilgisi("klip");
+        Assert.Equal("klip", AdlandirmaDeseni.Uygula("{ad}_{bithizi}_{karehizi}_{klasor}_{sayac}", bos));
+        Assert.Equal("klip_30fps", AdlandirmaDeseni.Uygula("{ad}_{karehizi}", bos with { KareHizi = 30 }));
+    }
+
+    /// <summary>SIK-13: <c>{klasor}</c> kaynağın bir üst klasörünün adıdır.</summary>
+    [Fact]
+    public void KaynakKlasoruUstKlasorunAdi()
+    {
+        Assert.Equal("Tatil", ShrinkEngine.KaynakKlasoru(Path.Combine("C:", "Videolar", "Tatil", "klip.mp4")));
     }
 
     /// <summary><c>{ad}</c> kaynağın adını verir, eski <c>_shrunk</c> ekini tekrarlamaz.</summary>

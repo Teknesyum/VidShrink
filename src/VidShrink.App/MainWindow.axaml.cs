@@ -318,6 +318,7 @@ public partial class MainWindow : Window
         Watch(ChkFollowRecording, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkNotifyWhenDone, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkPreventSleep, ToggleButton.IsCheckedProperty, SaveAppSettings);
+        Watch(ChkKeepDates, ToggleButton.IsCheckedProperty, SaveAppSettings);
         CmbParallelJobs.ItemsSource = ParallelJobChoices(Environment.ProcessorCount);
         CmbParallelJobs.SelectedIndex = 0;
         Watch(CmbParallelJobs, SelectingItemsControl.SelectedIndexProperty, SaveAppSettings);
@@ -1649,6 +1650,7 @@ public partial class MainWindow : Window
             FollowRecording = ChkFollowRecording.IsChecked == true,
             NotifyWhenDone = ChkNotifyWhenDone.IsChecked == true,
             PreventSleepWhileEncoding = ChkPreventSleep.IsChecked == true,
+            KeepSourceDates = ChkKeepDates.IsChecked == true,
             ParallelJobs = Math.Max(0, CmbParallelJobs.SelectedIndex) + 1,
             EncodePriority = SelectedEncodePriority,
             EncoderThreads = SelectedEncoderThreads,
@@ -1707,6 +1709,7 @@ public partial class MainWindow : Window
             ChkFollowRecording.IsChecked = settings.FollowRecording;
             ChkNotifyWhenDone.IsChecked = settings.NotifyWhenDone;
             ChkPreventSleep.IsChecked = settings.PreventSleepWhileEncoding;
+            ChkKeepDates.IsChecked = settings.KeepSourceDates;
             CmbParallelJobs.SelectedIndex = ParallelJobs.Clamp(settings.ParallelJobs, Environment.ProcessorCount) - 1;
             RestoreEncodeLoad(settings);
 
@@ -1769,7 +1772,7 @@ public partial class MainWindow : Window
     /// <summary>Örnek satırın verileri; ekranda dosya yokken de desen okunabilmeli.</summary>
     private AdBilgisi OrnekAdBilgisi()
         => _info is null
-            ? new AdBilgisi("video") { HedefMb = ParseTargetMb(), Crf = 26, Yukseklik = 720, Kodek = "libx264" }
+            ? new AdBilgisi("video") { HedefMb = ParseTargetMb(), Crf = 26, VideoBitrateK = 1200, Yukseklik = 720, Kodek = "libx264", KareHizi = 30, KaynakKlasoru = "Videolar", Sayac = 1 }
             : AdBilgisiFor(_info.FilePath, ActivePlan);
 
     private AdBilgisi AdBilgisiFor(string inputPath, EncodePlan? plan)
@@ -1779,7 +1782,10 @@ public partial class MainWindow : Window
             Crf = plan?.Crf,
             VideoBitrateK = plan?.VideoBitrateK,
             Yukseklik = plan?.Height,
-            Kodek = plan?.Codec
+            Kodek = plan?.Codec,
+            KareHizi = plan?.Fps > 0 ? plan.Fps : null,
+            KaynakKlasoru = ShrinkEngine.KaynakKlasoru(inputPath),
+            Sayac = 1
         };
 
     private void OnFfmpegPathModeChanged()
@@ -4588,7 +4594,7 @@ public partial class MainWindow : Window
             var progress = new Progress<EncodeProgress>(ShowEncodeProgress);
 
             var plan = ActivePlan;
-            var result = await ShrinkEngine.EncodeAsync(_info, plan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync, _sceneMap?.Map, RunPause);
+            var result = await ShrinkEngine.EncodeAsync(_info, plan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync, _sceneMap?.Map, RunPause, ChkKeepDates.IsChecked == true);
             _lastOutput = result.OutputPath;
             RefreshPreviewSource();
 
@@ -4615,6 +4621,13 @@ public partial class MainWindow : Window
                 TxtOutSize.Text = "-";
                 TxtResult.Text = Say("main.run.over-ceiling",
                     Num(EncodeRunner.EffectiveTargetMb(targetMb, plan), "0.##"), result.Attempts, Num(result.OutputMb, "0.0"));
+            }
+            else if (result.Kusur is { } kusur)
+            {
+                TxtOutSize.Text = "-";
+                TxtResult.Text = kusur.Cozulemedi
+                    ? Say("main.run.output-unreadable")
+                    : Say("main.run.output-short", Num(kusur.OkunanSaniye!.Value, "0.#"), Num(kusur.BeklenenSaniye, "0.#"));
             }
             else
             {

@@ -1768,6 +1768,12 @@
                     </ToolTip.Tip>
                   </CheckBox>
 
+                  <CheckBox x:Name="ChkKeepDates" Theme="{StaticResource CheckStyle}" HorizontalAlignment="Left" Content="{loc:Text settings-tab.keep-dates.label}">
+                    <ToolTip.Tip>
+                      <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.keep-dates.hint}"/>
+                    </ToolTip.Tip>
+                  </CheckBox>
+
                   <StackPanel Spacing="{StaticResource SpaceSm}">
                     <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
                       <TextBlock Text="{loc:Text settings-tab.ffmpeg-path.label}" Theme="{StaticResource Label}"/>
@@ -1820,13 +1826,19 @@
                   </StackPanel>
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <TextBlock Text="{loc:Text settings-tab.output-name.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                    <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                      <TextBlock Text="{loc:Text settings-tab.output-name.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                      <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.output-name.label}">
+                        <ToolTip.Tip>
+                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.output-name.hint}"/>
+                        </ToolTip.Tip>
+                      </Button>
+                    </Grid>
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
                       <TextBox x:Name="TxtOutputName" FlowDirection="LeftToRight"/>
                       <Button Grid.Column="1" x:Name="BtnResetOutputName" Content="{loc:Text settings-tab.output-name.reset}" Theme="{StaticResource GhostButton}" Click="OnResetOutputName"/>
                     </Grid>
                     <TextBlock x:Name="LblOutputNamePreview" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
-                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.output-name.hint}"/>
                   </StackPanel>
 
                   <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}">
