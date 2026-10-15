@@ -70,6 +70,7 @@ internal partial class RecorderView : UserControl
         InitSaatliKayit();
         InitBitince();
         InitSonucKarti();
+        InitHizliKirpma();
         InitTampon();
         InitMini();
         InitImlec();
@@ -188,6 +189,7 @@ internal partial class RecorderView : UserControl
         BtnToMp4.IsVisible = VidShrink.Core.RecorderArguments.ContainerOf(result.OutputPath) == VidShrink.Core.RecorderContainer.Mkv;
         BtnTrimIdle.IsVisible = result.Ok && !result.Partial
                                 && VidShrink.Core.RecorderArguments.ContainerOf(result.OutputPath) != VidShrink.Core.RecorderContainer.Gif;
+        ResetQuickTrim(result);
         ResetShare();
         HideFinish();
         TxtResult.Text = Say(

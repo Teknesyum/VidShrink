@@ -72,6 +72,13 @@
       RecorderResultCardGap   <- SpaceLg (16). Kartın çalışma alanının köşesinden uzaklığı.
       RecorderResultCardHold  <- 6 sn. Kart bu süre sonunda kendiliğinden kapanır; imleç
                                  üstündeyken kapanmaz, imleç çıkınca süre baştan sayılır.
+
+    Sonuç panelindeki hızlı kırpma açılırı.
+
+      RecorderQuickTrimWidth       <- TipMaxWidth (420). Açılır bir ipucu balonu kadar geniş;
+                                      şerit ve iki tutamak aynı eni paylaşır.
+      RecorderQuickTrimThumbHeight <- PlaybackBarButtonSize (32). Düzenleyicinin küçük resim
+                                      şeridiyle aynı yükseklik.
   -->
 
   <Thickness x:Key="RecorderStripPadding">16,8</Thickness>
@@ -126,5 +133,7 @@
   <StaticResource x:Key="RecorderResultCardThumbHeight" ResourceKey="PlaybackThumbnailHeight"/>
   <StaticResource x:Key="RecorderResultCardGap" ResourceKey="SpaceLg"/>
   <sys:TimeSpan x:Key="RecorderResultCardHold">00:00:06</sys:TimeSpan>
+  <StaticResource x:Key="RecorderQuickTrimWidth" ResourceKey="TipMaxWidth"/>
+  <StaticResource x:Key="RecorderQuickTrimThumbHeight" ResourceKey="PlaybackBarButtonSize"/>
 
 </ResourceDictionary>

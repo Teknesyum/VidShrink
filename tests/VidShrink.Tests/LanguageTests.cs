@@ -568,6 +568,7 @@ public sealed class LanguageTests : IDisposable
     /// Türkçe arayüz de bunları İngilizcesiyle aynı yazar; başka dil kendi birimini yazar (fr <c>Mo</c>, ru <c>МБ</c>).
     /// Sağ tık hedef yongaları marka adı ve MB taşır (<c>WhatsApp (16 MB)</c>); Türkçesi de aynı yazılır.
     /// OYA-05 zamana git kutusunun ipucu örnek saattir (<c>0:00:00</c>); rakam ve iki nokta her dilde aynı.
+    /// Later 41 hızlı kırpmanın aralık satırı iki saat arasında yalnız tire taşır (<c>{0} – {1}</c>).
     /// </summary>
     private static readonly string[] SameInEveryLanguage =
     {
@@ -576,7 +577,7 @@ public sealed class LanguageTests : IDisposable
         "{0} ms",
         "MB", "{0} MB", "{0} - {1} MB", "{0} kbps", "{0} FPS", "{0}k", "/100", "{0}/100", "AI", "CRF {0}",
         "8 MB", "100 MB", "WhatsApp (16 MB)", "Discord (20 MB)", "Gmail (25 MB)", "Discord Nitro Basic (50 MB)",
-        "0:00:00"
+        "0:00:00", "{0} – {1}"
     };
 
     [Fact]

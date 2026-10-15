@@ -77,7 +77,12 @@ public sealed class KaydediciBasKonusTests
         Assert.Equal(RecorderHotkeys.All.Count, alti.Count);
         Assert.Equal(Key.K, RecorderHotkeys.Of(alti, HotkeyAction.ReplaySave).Key);
         Assert.Equal(bag, RecorderHotkeys.Of(alti, HotkeyAction.PushToTalk));
-        Assert.Null(RecorderHotkeys.Read("0:F1,0:F2,0:F3,0:F4,2:F5,0:F6"));
+        var cakisan = RecorderHotkeys.Read("0:F1,0:F2,0:F3,0:F4,2:F5,0:F6");
+        Assert.NotNull(cakisan);
+        Assert.Equal(new[] { Key.F1, Key.F2, Key.F3, Key.F4, Key.F5, Key.F6, Key.None }, cakisan!.Select(b => b.Key));
+        Assert.Equal(KeyModifiers.Control, RecorderHotkeys.Of(cakisan, HotkeyAction.ReplaySave).Modifiers);
+        Assert.False(RecorderHotkeys.IsAssigned(RecorderHotkeys.Of(cakisan, HotkeyAction.PushToTalk)));
+        Assert.Equal<HotkeyBinding>(cakisan, RecorderHotkeys.Read(RecorderHotkeys.Write(cakisan))!);
 
         var yazim = RecorderHotkeys.Write(RecorderHotkeys.All);
         Assert.EndsWith(",2:F5", yazim);
@@ -260,6 +265,26 @@ public sealed class KaydediciBasKonusTests
         Assert.Equal(new[] { true, false }, olcu.kapi);
         Assert.Contains("Ctrl+F5", olcu.ipucu?.Replace(" ", string.Empty));
         Assert.True(olcu.Kalici);
+    }
+
+    [Fact]
+    public void CakisandanBosKalanEylemSistemeKaydedilmezOtekilerKaydedilir()
+    {
+        using var ayar = new OzelAyar();
+        File.WriteAllText(ayar.Yol, "{\"hotkeys\":\"0:F1,0:F2,0:F3,0:F4,2:F5,0:F6\",\"pushToTalk\":true}");
+        var kayitli = AppHost.Run(() =>
+        {
+            var kanca = new SahteKanca();
+            var view = new RecorderView(ayar.Yol) { GlobalHotkeys = kanca };
+            view.ActivateHotkeys();
+            var liste = kanca.Kayitli!.ToList();
+            view.DeactivateHotkeys();
+            return liste;
+        });
+
+        Assert.DoesNotContain(kayitli, b => b.Key == Key.None);
+        Assert.Equal(6, kayitli.Count);
+        Assert.Contains(kayitli, b => b.Action == HotkeyAction.ReplaySave && b.Key == Key.F5 && b.Modifiers == KeyModifiers.Control);
     }
 
     [Fact]

@@ -246,6 +246,35 @@
                   Content="{loc:Text recorder.output.trim-idle}"
                   auto:AutomationProperties.Name="{loc:Text recorder.output.trim-idle}"
                   Click="OnTrimIdle"/>
+          <Button x:Name="BtnQuickTrim"
+                  Theme="{StaticResource GhostButton}"
+                  Margin="{StaticResource WrapItemMargin}"
+                  IsVisible="False"
+                  Content="{loc:Text recorder.output.quick-trim}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.output.quick-trim}">
+            <ToolTip.Tip>
+              <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text recorder.output.quick-trim.tip}"/>
+            </ToolTip.Tip>
+            <Button.Flyout>
+              <Flyout>
+                <StackPanel Spacing="{StaticResource SpaceSm}" Width="{StaticResource RecorderQuickTrimWidth}">
+                  <UniformGrid x:Name="QuickTrimStrip" Rows="1" Height="{StaticResource RecorderQuickTrimThumbHeight}"/>
+                  <TextBlock Text="{loc:Text recorder.output.quick-trim-start}" Theme="{StaticResource Label}"/>
+                  <Slider x:Name="SldTrimStart" Minimum="0" Maximum="1" IsSnapToTickEnabled="True"
+                          auto:AutomationProperties.Name="{loc:Text recorder.output.quick-trim-start}"/>
+                  <TextBlock Text="{loc:Text recorder.output.quick-trim-end}" Theme="{StaticResource Label}"/>
+                  <Slider x:Name="SldTrimEnd" Minimum="0" Maximum="1" Value="1"
+                          auto:AutomationProperties.Name="{loc:Text recorder.output.quick-trim-end}"/>
+                  <TextBlock x:Name="TxtTrimRange" TextWrapping="Wrap"/>
+                  <Button x:Name="BtnTrimCut"
+                          Theme="{StaticResource PrimaryButton}"
+                          IsEnabled="False"
+                          Content="{loc:Text recorder.output.quick-trim-cut}"
+                          auto:AutomationProperties.Name="{loc:Text recorder.output.quick-trim-cut}"/>
+                </StackPanel>
+              </Flyout>
+            </Button.Flyout>
+          </Button>
           <Button x:Name="BtnRecShare"
                   Theme="{StaticResource GhostButton}"
                   Margin="{StaticResource WrapItemMargin}"
