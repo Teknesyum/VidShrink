@@ -200,6 +200,9 @@
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
               <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.crop}"/>
               <ComboBox x:Name="CmbClipCrop" MinWidth="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.crop}"/>
+              <ToggleButton x:Name="BtnClipFit" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.clip.fit}" AutomationProperties.Name="{loc:Text editor.clip.fit}"/>
+              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.pad}"/>
+              <ComboBox x:Name="CmbClipPad" MinWidth="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.pad}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
               <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.volume}"/>

@@ -33,7 +33,8 @@ public static class ClipFilters
 
     /// <summary>
     /// Tek klibin geometri zinciri, basinda virgul olmadan. Tuval <c>null</c> ise bos. Klibin
-    /// boyutu tuvalden farkliysa oran korunarak kuculur ve ortalanarak doldurulur.
+    /// boyutu tuvalden farkliysa oran korunarak kuculur ve ortalanarak doldurulur. Sigdirmali klip once kendi oranina
+    /// olceklenip <see cref="ClipEffects.PadColor"/> ile doldurulur.
     /// </summary>
     public static string Geometry(ClipEffects effects, int width, int height, int parNum, int parDen, (int Width, int Height)? canvas)
     {
@@ -52,6 +53,18 @@ public static class ClipFilters
         var half = effects.Rotation == 180;
         if (half != effects.FlipH) parts.Add("hflip");
         if (half != effects.FlipV) parts.Add("vflip");
+
+        if (effects.HasFit)
+        {
+            var fit = effects.OutputSize(displayWidth, height);
+            if (fit != (effects with { FitNum = 0, FitDen = 0 }).OutputSize(displayWidth, height))
+            {
+                var fw = Int(fit.Width);
+                var fh = Int(fit.Height);
+                parts.Add("scale=" + fw + ":" + fh + ":force_original_aspect_ratio=decrease:force_divisible_by=2");
+                parts.Add("pad=" + fw + ":" + fh + ":(ow-iw)/2:(oh-ih)/2:color=0x" + effects.PadColor);
+            }
+        }
 
         if (effects.OutputSize(displayWidth, height) != target)
         {

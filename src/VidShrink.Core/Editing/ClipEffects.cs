@@ -5,7 +5,9 @@
 /// 90 adimli dondurme, yatay ve dikey cevirme, desibel ses kazanci, sessize alma ve cizelge
 /// tick'inde giris/cikis solmasi, parlaklik, kontrast, doygunluk ve renk sicakligi; ses temizleme (gurultu azaltma,
 /// uc bantli ekolayzir, kompresor, yukseklik esitleme, sinirlayici). Sirasi sabittir:
-/// kirp, dondur, cevir, renk. Hazir gorunumler renk alanlarinin kayitli degerleridir.
+/// kirp, dondur, cevir, sigdir, renk. Hazir gorunumler renk alanlarinin kayitli degerleridir. En-boy sigdirma
+/// (<see cref="FitNum"/>:<see cref="FitDen"/>) kirpmayi dislar: kare olcekle kuculur, kalan alan
+/// <see cref="PadColor"/> duz rengiyle dolar; renk veri olarak "RRGGBB" tutulur.
 /// </summary>
 public sealed record ClipEffects
 {
@@ -16,6 +18,8 @@ public sealed record ClipEffects
     public const int MaxTemperature = 40000;
     public const double MinEqDb = -12;
     public const double MaxEqDb = 12;
+    public const string DefaultPadColor = "000000";
+    public const double MaxFitRatio = 4;
 
     public static ClipEffects None { get; } = new();
 
@@ -67,13 +71,21 @@ public sealed record ClipEffects
 
     public double TrebleDb { get; init; }
 
+    public int FitNum { get; init; }
+
+    public int FitDen { get; init; }
+
+    public string PadColor { get; init; } = DefaultPadColor;
+
+    public bool HasFit => FitNum > 0 && FitDen > 0;
+
     public bool HasEqualizer => BassDb != 0 || MidDb != 0 || TrebleDb != 0;
 
     public bool HasCleanup => Denoise || Loudnorm || Compressor || Limiter || HasEqualizer;
 
     public bool HasCrop => CropLeft > 0 || CropTop > 0 || CropRight > 0 || CropBottom > 0;
 
-    public bool HasGeometry => HasCrop || Rotation != 0 || FlipH || FlipV;
+    public bool HasGeometry => HasCrop || HasFit || Rotation != 0 || FlipH || FlipV;
 
     public bool HasAudio => Muted || VolumeDb != 0 || HasCleanup;
 
@@ -83,7 +95,9 @@ public sealed record ClipEffects
 
     /// <summary>Degerleri gecerli araliga ceker: kirpma kenarlari toplamda karenin %95'ini asmaz, aci 90'in katina iner,
     /// renk alanlari araliga kirpilip iki ondaliga yuvarlanir; sayi olmayan renk degeri notre doner. Ekolayzir bantlari
-    /// <see cref="MinEqDb"/>..<see cref="MaxEqDb"/> araligina kirpilip bir ondaliga yuvarlanir.</summary>
+    /// <see cref="MinEqDb"/>..<see cref="MaxEqDb"/> araligina kirpilip bir ondaliga yuvarlanir. Sigdirma orani
+    /// 1/<see cref="MaxFitRatio"/>..<see cref="MaxFitRatio"/> disindaysa kalkar; dolgu rengi alti haneli buyuk harf onaltiliga
+    /// iner, okunamazsa siyah olur, sigdirma yoksa varsayilana doner.</summary>
     public ClipEffects Normalized()
     {
         static double Edge(double v) => double.IsFinite(v) ? Math.Clamp(v, 0, 0.95) : 0;
@@ -93,7 +107,7 @@ public sealed record ClipEffects
         var bottom = Math.Min(Edge(CropBottom), 0.95 - top);
         var rotation = ((Rotation / 90 * 90) % 360 + 360) % 360;
         var volume = double.IsFinite(VolumeDb) ? Math.Round(Math.Clamp(VolumeDb, MinVolumeDb, MaxVolumeDb), 1) : 0;
-        return this with
+        return FitOnly() with
         {
             CropLeft = left,
             CropRight = right,
@@ -125,11 +139,16 @@ public sealed record ClipEffects
         return (x, y, Math.Max(2, w), Math.Max(2, h));
     }
 
-    /// <summary>Kirpma ve dondurme sonrasi cikti boyutu; 90 ve 270'te genislik ile yukseklik yer degistirir.</summary>
+    /// <summary>Kirpma, dondurme ve sigdirma sonrasi cikti boyutu; 90 ve 270'te genislik ile yukseklik yer degistirir.
+    /// Sigdirmada uzun kenar kalir, oteki kenar orana gore cift sayiya iner.</summary>
     public (int Width, int Height) OutputSize(int width, int height)
     {
         var rect = CropRect(width, height);
-        return Rotation is 90 or 270 ? (rect.Height, rect.Width) : (rect.Width, rect.Height);
+        var (w, h) = Rotation is 90 or 270 ? (rect.Height, rect.Width) : (rect.Width, rect.Height);
+        if (!HasFit) return (w, h);
+        var side = Math.Max(w, h);
+        var ratio = (double)FitNum / FitDen;
+        return ratio >= 1 ? (side, Math.Max(2, Even(side / ratio))) : (Math.Max(2, Even(side * ratio)), side);
     }
 
     /// <summary>Uzunlugu <paramref name="length"/> olan klipte etkin giris ve cikis solmasi; ikisi toplamda klibi asmaz.</summary>
@@ -143,7 +162,7 @@ public sealed record ClipEffects
     /// <summary>Kaynak kareden <paramref name="num"/>:<paramref name="den"/> oranli, ortali kirpma; donmus goruntunun oranina gore.</summary>
     public ClipEffects WithAspect(int num, int den, int width, int height)
     {
-        var cleared = this with { CropLeft = 0, CropTop = 0, CropRight = 0, CropBottom = 0 };
+        var cleared = this with { CropLeft = 0, CropTop = 0, CropRight = 0, CropBottom = 0, FitNum = 0, FitDen = 0, PadColor = DefaultPadColor };
         if (num <= 0 || den <= 0 || width <= 0 || height <= 0) return cleared;
 
         var target = Rotation is 90 or 270 ? (double)den / num : (double)num / den;
@@ -160,6 +179,17 @@ public sealed record ClipEffects
         return cleared with { CropTop = vertical, CropBottom = vertical };
     }
 
+    /// <summary><paramref name="num"/>:<paramref name="den"/> oranli cikti kare; kirpma kalkar, goruntu butunuyle sigar ve
+    /// kalan alan <paramref name="color"/> ("RRGGBB") ile dolar. Oran gecersizse sigdirma da kirpma da kalkar.</summary>
+    public ClipEffects WithFit(int num, int den, string color)
+        => (this with { CropLeft = 0, CropTop = 0, CropRight = 0, CropBottom = 0, FitNum = num, FitDen = den, PadColor = color }).FitOnly();
+
+    private ClipEffects FitOnly()
+    {
+        var fit = FitNum > 0 && FitDen > 0 && (double)FitNum / FitDen is >= 1 / MaxFitRatio and <= MaxFitRatio;
+        return this with { FitNum = fit ? FitNum : 0, FitDen = fit ? FitDen : 0, PadColor = fit ? Hex(PadColor) : DefaultPadColor };
+    }
+
     /// <summary>Yalniz renk alanlarini <paramref name="look"/>'tan alir; geometri, ses ve solma kalir.</summary>
     public ClipEffects WithColor(ClipEffects look)
         => this with { Brightness = look.Brightness, Contrast = look.Contrast, Saturation = look.Saturation, Temperature = look.Temperature };
@@ -168,6 +198,12 @@ public sealed record ClipEffects
         => double.IsFinite(value) ? Math.Round(Math.Clamp(value, min, max), 2) : neutral;
 
     private static double Band(double value) => double.IsFinite(value) ? Math.Round(Math.Clamp(value, MinEqDb, MaxEqDb), 1) : 0;
+
+    private static string Hex(string? value)
+    {
+        var text = (value ?? string.Empty).Trim().TrimStart('#');
+        return text.Length == 6 && text.All(Uri.IsHexDigit) ? text.ToUpperInvariant() : DefaultPadColor;
+    }
 
     private static int Even(double value) => Math.Max(0, (int)Math.Round(value / 2, MidpointRounding.AwayFromZero) * 2);
 
