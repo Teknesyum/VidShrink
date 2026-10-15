@@ -1137,7 +1137,7 @@ public static class EditExport
             }
             else
             {
-                steps.Add(SmartEncode(info, encoding, keyframes, start, end - start, string.Empty, VideoPart(end - start)));
+                steps.Add(SmartEncode(info, encoding, keyframes, start, end - start, string.Empty, VideoPart(MotionListSeconds(info, end - start))));
             }
 
             for (var p = 0; p < count; p++) steps.Add(AudioCopy(info, start, end - start, AudioPart(p, end - start), tracks[p]));

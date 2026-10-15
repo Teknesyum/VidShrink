@@ -213,6 +213,56 @@ public sealed class ArsivApngGifTests
         Assert.Contains("dither=floyd_steinberg", komut, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// GIF'in döngü, renk ve dither seçimi ayar dosyasına yazılır, yeni pencerede geri gelir; "Ayarları sıfırla"
+    /// üçünü varsayılana döndürür. Ayar dosyası <c>.calisma</c> altındadır, test siler.
+    /// </summary>
+    [Fact]
+    public void GifSecimiAyaraYazilirGeriGelirSifirlanir()
+    {
+        var klasor = Path.Combine(TestPaths.OutputRoot, "gif-ayari", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(klasor);
+        var dosya = Path.Combine(klasor, "settings.json");
+        static string Etiket(ComboBox kutu) => (kutu.SelectedItem as ComboBoxItem)?.Tag as string ?? "?";
+        try
+        {
+            var (yazilan, geri, sifir) = AppHost.Run(() =>
+            {
+                var ilk = new MainWindow { SettingsPathOverride = dosya };
+                try
+                {
+                    ilk.CmbContainer.SelectedItem = Oge(ilk.CmbContainer, "gif");
+                    Dispatcher.UIThread.RunJobs();
+                    ilk.CmbConvertGifLoop.SelectedItem = Oge(ilk.CmbConvertGifLoop, "-1");
+                    ilk.CmbConvertGifColors.SelectedItem = Oge(ilk.CmbConvertGifColors, "32");
+                    ilk.CmbConvertGifDither.SelectedItem = Oge(ilk.CmbConvertGifDither, "floyd_steinberg");
+                    Dispatcher.UIThread.RunJobs();
+                }
+                finally { ilk.Close(); }
+                var metin = File.Exists(dosya) ? File.ReadAllText(dosya) : "{}";
+
+                var ikinci = new MainWindow { SettingsPathOverride = dosya };
+                try
+                {
+                    ikinci.RestoreAppSettingsForTest(AppSettings.Load(dosya));
+                    var donen = (Etiket(ikinci.CmbConvertGifLoop), Etiket(ikinci.CmbConvertGifColors), Etiket(ikinci.CmbConvertGifDither));
+                    ikinci.ConfirmResetSettingsForTest();
+                    return (metin, donen, (Etiket(ikinci.CmbConvertGifLoop), Etiket(ikinci.CmbConvertGifColors), Etiket(ikinci.CmbConvertGifDither)));
+                }
+                finally { ikinci.Close(); }
+            });
+
+            using var doc = System.Text.Json.JsonDocument.Parse(yazilan);
+            Assert.Equal("32", doc.RootElement.GetProperty("convertGifColors").GetString());
+            Assert.Equal(("-1", "32", "floyd_steinberg"), geri);
+            Assert.Equal(("", "", ""), sifir);
+        }
+        finally
+        {
+            Directory.Delete(klasor, true);
+        }
+    }
+
     [FfmpegFact]
     public async Task KisaKlipArsivApngVeGifOlur()
     {

@@ -88,7 +88,7 @@ public static class GifPalette
 
     /// <summary>
     /// Merdiveni iner: her basamakta palet ve kodlama koşar, çıktı ölçülür; hedefin altına inen ilk basamakta durur.
-    /// Son basamak da sığmazsa onu teslim eder. <paramref name="run"/>'ın ikinci argümanı palet geçişinde <c>true</c>.
+    /// Son basamak da sığmazsa onu teslim eder. Planın renk sayısı basamağın tavanıdır. <paramref name="run"/>'ın ikinci argümanı palet geçişinde <c>true</c>.
     /// </summary>
     public static async Task<GifFit> FitAsync(MediaInfo info, ConversionPlan plan, string outputPath, string palettePath,
         Func<IReadOnlyList<string>, bool, Task> run, Func<string, long> sizeOf, IEncoderAvailability? availability = null)
@@ -100,7 +100,7 @@ public static class GifPalette
         while (true)
         {
             var step = steps[current];
-            var stepPlan = plan with { Fps = step.Fps, Width = step.Width, Height = step.Height, GifColors = step.Colors };
+            var stepPlan = plan with { Fps = step.Fps, Width = step.Width, Height = step.Height, GifColors = Math.Min(step.Colors, plan.GifColors ?? step.Colors) };
             await run(ConversionArguments.Build(info, stepPlan, palettePath, availability: availability), true);
             await run(ConversionArguments.Build(info, stepPlan, outputPath, palettePath, availability), false);
             attempts++;

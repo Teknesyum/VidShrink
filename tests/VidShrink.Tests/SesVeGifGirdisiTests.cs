@@ -154,6 +154,24 @@ public sealed class SesVeGifGirdisiTests
         Assert.Equal(GifPalette.Ladder(Gif, plan)[^1], sigmaz.Step);
     }
 
+    /// <summary>Kullanicinin sectigi renk sayisi merdivenin tavanidir: basamak onu asamaz, daha azini isterse azi kalir.</summary>
+    [Fact]
+    public async Task SigdirmaKullanicininRenkSayisiniAsmaz()
+    {
+        var plan = new ConversionPlan { Container = "gif", TargetBytes = 1_000_000, GifColors = 64 };
+        var renkler = new List<int>();
+        await GifPalette.FitAsync(Gif, plan, @"C:\o\c.gif", @"C:\o\p.png",
+            (args, palet) =>
+            {
+                if (palet) renkler.Add(int.Parse(Deger(args, "max_colors"), CultureInfo.InvariantCulture));
+                return Task.CompletedTask;
+            }, _ => 5_000_000_000);
+
+        Assert.Equal(64, renkler[0]);
+        Assert.All(renkler, r => Assert.True(r <= 64, r.ToString(CultureInfo.InvariantCulture)));
+        Assert.Equal(GifPalette.Ladder(Gif, plan)[^1].Colors, renkler[^1]);
+    }
+
     [Fact]
     public void GifHedefiYalnizGifKaynaktanGifCiktiyaVerilir()
     {

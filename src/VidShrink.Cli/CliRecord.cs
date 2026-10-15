@@ -63,6 +63,9 @@ public sealed record CliRecordSettings
     public double AudioGainDb { get; init; }
     public bool AudioNoiseGate { get; init; }
     public bool AudioNoiseSuppression { get; init; }
+    public bool AudioCompressor { get; init; }
+    public bool AudioLimiter { get; init; }
+    public string AudioCodec { get; init; } = RecorderArguments.DefaultAudioCodec;
     public IReadOnlyList<RecorderRegion> PrivacyMasks { get; init; } = Array.Empty<RecorderRegion>();
 
     /// <summary>Pencerenin ayar klasöründeki dosya; <c>VIDSHRINK_SETTINGS_PATH</c> ana ayarı nereye alıyorsa oraya.</summary>
@@ -160,6 +163,9 @@ public sealed record CliRecordSettings
                 AudioGainDb = (double?)root["audioGainDb"] ?? 0,
                 AudioNoiseGate = (bool?)root["audioNoiseGate"] ?? false,
                 AudioNoiseSuppression = (bool?)root["audioNoiseSuppression"] ?? false,
+                AudioCompressor = (bool?)root["audioCompressor"] ?? false,
+                AudioLimiter = (bool?)root["audioLimiter"] ?? false,
+                AudioCodec = (string?)root["audioCodec"] == RecorderArguments.OpusAudioCodec ? RecorderArguments.OpusAudioCodec : RecorderArguments.DefaultAudioCodec,
                 PrivacyMasks = masks
             };
         }
@@ -285,7 +291,7 @@ public static class CliRecord
         var audio = AudioCapturePlan.Silent;
         if (selection.Count > 0
             && !AudioCaptureArguments.TryBuild(selection, machine.AudioDevices, RecorderArguments.AudioFirstInputIndexFor(saved.Target),
-                saved.AudioLayout, new AudioFilterOptions(saved.AudioGainDb, saved.AudioNoiseGate, saved.AudioNoiseSuppression),
+                saved.AudioLayout, new AudioFilterOptions(saved.AudioGainDb, saved.AudioNoiseGate, saved.AudioNoiseSuppression, saved.AudioCompressor, saved.AudioLimiter),
                 out audio, out var reason))
         {
             errorKey = "error.record-audio";
@@ -350,7 +356,11 @@ public static class CliRecord
         if (!saved.ManualMode) request = Auto(request, saved, machine, selection.Count);
 
         var container = cli.Output is { } named ? RecorderArguments.ContainerOf(named)!.Value : request.Container;
-        request = FitToCodec(request) with { Container = container };
+        request = FitToCodec(request) with
+        {
+            Container = container,
+            AudioCodec = RecorderArguments.AudioCodecsFor(container).Contains(saved.AudioCodec, StringComparer.Ordinal) ? saved.AudioCodec : RecorderArguments.DefaultAudioCodec
+        };
         if (cli.RecordSeconds is { } limit) request = request with { MaxDuration = TimeSpan.FromSeconds(limit) };
 
         var output = cli.Output is { } path ? Path.GetFullPath(path) : saved.OutputPath(now, container);

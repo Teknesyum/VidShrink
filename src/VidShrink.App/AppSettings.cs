@@ -38,6 +38,15 @@ public sealed class AppSettings
     /// <summary>Dönüştür sekmesindeki meta silme kutusu; eski dosyada anahtar yoktur ve kapalı okunur.</summary>
     public bool ConvertDropMetadata { get; set; }
 
+    /// <summary>Dönüştür'ün GIF döngü kutusunun etiketi; boş ise varsayılan (sonsuz).</summary>
+    public string ConvertGifLoop { get; set; } = "";
+
+    /// <summary>Dönüştür'ün GIF renk sayısı kutusunun etiketi; boş ise varsayılan (256).</summary>
+    public string ConvertGifColors { get; set; } = "";
+
+    /// <summary>Dönüştür'ün GIF dither kutusunun etiketi; boş ise varsayılan (Sierra-2-4A).</summary>
+    public string ConvertGifDither { get; set; } = "";
+
     /// <summary>Düzenleyici teslimindeki meta silme kutusu; eski dosyada anahtar yoktur ve kapalı okunur.</summary>
     public bool EditorDropMetadata { get; set; }
 
@@ -171,6 +180,9 @@ public sealed class AppSettings
             ReadBool(root, "advKeepTracks", value => settings.AdvKeepTracks = value);
             ReadBool(root, "advDropMetadata", value => settings.AdvDropMetadata = value);
             ReadBool(root, "convertDropMetadata", value => settings.ConvertDropMetadata = value);
+            ReadString(root, "convertGifLoop", value => settings.ConvertGifLoop = value);
+            ReadString(root, "convertGifColors", value => settings.ConvertGifColors = value);
+            ReadString(root, "convertGifDither", value => settings.ConvertGifDither = value);
             ReadBool(root, "editorDropMetadata", value => settings.EditorDropMetadata = value);
             ReadBool(root, "editorClipChapters", value => settings.EditorClipChapters = value);
             ReadString(root, "editorPartNamePattern", value => settings.EditorPartNamePattern = value);
@@ -268,6 +280,9 @@ public sealed class AppSettings
         root["advKeepTracks"] = AdvKeepTracks;
         root["advDropMetadata"] = AdvDropMetadata;
         root["convertDropMetadata"] = ConvertDropMetadata;
+        root["convertGifLoop"] = ConvertGifLoop;
+        root["convertGifColors"] = ConvertGifColors;
+        root["convertGifDither"] = ConvertGifDither;
         root["editorDropMetadata"] = EditorDropMetadata;
         root["editorClipChapters"] = EditorClipChapters;
         root["editorPartNamePattern"] = EditorPartNamePattern;
