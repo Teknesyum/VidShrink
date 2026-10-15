@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Hali ya kasi ya fremu",
   "main.convert.fps-mode.constant": "Thabiti",
   "main.convert.fps-mode.variable": "Inayobadilika",
+  "main.convert.interpolate": "Tengeneza fremu za kati",
+  "main.convert.interpolate.tip": "• Kasi ya fremu ikiongezeka, fremu mpya hujengwa kutokana na mwendo badala ya kurudia fremu.\n• Mwendo huonekana laini zaidi, lakini usimbaji huwa polepole sana.",
   "main.convert.letterbox": "Hifadhi uwiano, jaza kwa mistari myeusi",
   "main.convert.note.filters-reencode": "Vichujio vya picha vimewashwa: video inasimbwa upya badala ya kunakiliwa.",
 

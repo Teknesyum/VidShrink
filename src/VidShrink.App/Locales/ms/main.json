@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Mod kadar bingkai",
   "main.convert.fps-mode.constant": "Malar",
   "main.convert.fps-mode.variable": "Berubah-ubah",
+  "main.convert.interpolate": "Jana bingkai perantara",
+  "main.convert.interpolate.tip": "• Apabila kadar bingkai naik, bingkai baharu dibina daripada gerakan dan bukan diulang.\n• Gerakan kelihatan lebih lancar, tetapi pengekodan jauh lebih perlahan.",
   "main.convert.letterbox": "Kekalkan nisbah aspek, isi dengan jalur hitam",
   "main.convert.note.filters-reencode": "Penapis gambar dihidupkan: video dikodkan semula, bukan disalin.",
 

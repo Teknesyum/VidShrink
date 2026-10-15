@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Mode laju bingkai",
   "main.convert.fps-mode.constant": "Konstan",
   "main.convert.fps-mode.variable": "Variabel",
+  "main.convert.interpolate": "Buat bingkai sela",
+  "main.convert.interpolate.tip": "• Saat laju bingkai naik, bingkai baru dibuat dari gerakan alih-alih mengulang bingkai.\n• Gerakan terlihat lebih halus, tetapi pengodean jauh lebih lambat.",
   "main.convert.letterbox": "Pertahankan rasio aspek, isi dengan pita hitam",
   "main.convert.note.filters-reencode": "Filter gambar aktif: video dikodekan ulang, bukan disalin.",
 

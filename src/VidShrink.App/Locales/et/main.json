@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Kaadrisageduse režiim",
   "main.convert.fps-mode.constant": "Püsiv",
   "main.convert.fps-mode.variable": "Muutuv",
+  "main.convert.interpolate": "Loo vahekaadreid",
+  "main.convert.interpolate.tip": "• Kaadrisageduse tõstmisel arvutatakse uued kaadrid liikumisest, mitte ei korrata kaadreid.\n• Liikumine on sujuvam, kuid kodeerimine on palju aeglasem.",
   "main.convert.letterbox": "Säilita kuvasuhe, täida mustade ribadega",
   "main.convert.note.filters-reencode": "Pildifiltrid on sees: video kodeeritakse uuesti, mitte ei kopeerita.",
 

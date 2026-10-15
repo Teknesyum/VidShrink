@@ -97,6 +97,9 @@ public sealed record ConversionPlan
     /// <summary>Kare hızı kipi: sabit <c>cfr</c>, değişken tavanlı <c>vfr</c>; otomatik bugünkü komut.</summary>
     public FrameRateMode FrameRate { get; init; } = FrameRateMode.Auto;
 
+    /// <summary>Kare hızı değişiminde kareleri çoğaltıp atmak yerine hareketten ara kare üretir (<c>minterpolate</c>).</summary>
+    public bool Interpolate { get; init; }
+
     /// <summary>Dolgu yalnız iki boyut birlikte verilince okunur.</summary>
     public bool PadsToFrame => Letterbox && Width is not null && Height is not null;
 

@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Képkockasebesség módja",
   "main.convert.fps-mode.constant": "Állandó",
   "main.convert.fps-mode.variable": "Változó",
+  "main.convert.interpolate": "Köztes képkockák készítése",
+  "main.convert.interpolate.tip": "• Magasabb képkockasebességnél az új képkockák a mozgásból készülnek ismétlés helyett.\n• A mozgás simább, de a kódolás jóval lassabb.",
   "main.convert.letterbox": "Képarány megtartása, kitöltés fekete sávokkal",
   "main.convert.note.filters-reencode": "A képszűrők be vannak kapcsolva: a videó újrakódolódik másolás helyett.",
 

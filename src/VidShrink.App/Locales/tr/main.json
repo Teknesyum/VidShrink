@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Kare hızı kipi",
   "main.convert.fps-mode.constant": "Sabit",
   "main.convert.fps-mode.variable": "Değişken",
+  "main.convert.interpolate": "Ara kare üret",
+  "main.convert.interpolate.tip": "• Kare hızı artınca kareleri çoğaltmak yerine hareketten yeni kareler üretir.\n• Hareket daha akıcı görünür, kodlama belirgin biçimde yavaşlar.",
   "main.convert.letterbox": "Oranı koru, siyah bantla doldur",
   "main.convert.note.filters-reencode": "Görüntü süzgeçleri açık: görüntü kopyalanmaz, yeniden kodlanır.",
 

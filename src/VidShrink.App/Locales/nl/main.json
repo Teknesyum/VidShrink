@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Beeldsnelheidsmodus",
   "main.convert.fps-mode.constant": "Constant",
   "main.convert.fps-mode.variable": "Variabel",
+  "main.convert.interpolate": "Tussenbeelden maken",
+  "main.convert.interpolate.tip": "• Bij een hogere beeldsnelheid worden nieuwe beelden uit de beweging berekend in plaats van beelden te herhalen.\n• Beweging oogt vloeiender, maar coderen duurt veel langer.",
   "main.convert.letterbox": "Beeldverhouding behouden, opvullen met zwarte balken",
   "main.convert.note.filters-reencode": "Beeldfilters staan aan: de video wordt opnieuw gecodeerd in plaats van gekopieerd.",
 

@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "फ़्रेम दर मोड",
   "main.convert.fps-mode.constant": "स्थिर",
   "main.convert.fps-mode.variable": "परिवर्तनशील",
+  "main.convert.interpolate": "बीच के फ़्रेम बनाएँ",
+  "main.convert.interpolate.tip": "• फ़्रेम दर बढ़ने पर फ़्रेम दोहराने के बजाय गति से नए फ़्रेम बनाए जाते हैं।\n• गति ज़्यादा सहज दिखती है, पर एन्कोडिंग काफ़ी धीमी होती है।",
   "main.convert.letterbox": "अनुपात बनाए रखें, काली पट्टियों से भरें",
   "main.convert.note.filters-reencode": "चित्र फ़िल्टर चालू हैं: वीडियो कॉपी होने के बजाय फिर से एनकोड होता है।",
 

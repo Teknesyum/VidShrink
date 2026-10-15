@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Режим частоты кадров",
   "main.convert.fps-mode.constant": "Постоянная",
   "main.convert.fps-mode.variable": "Переменная",
+  "main.convert.interpolate": "Создавать промежуточные кадры",
+  "main.convert.interpolate.tip": "• При повышении частоты новые кадры строятся по движению, а не повторяются.\n• Движение выглядит плавнее, но кодирование заметно медленнее.",
   "main.convert.letterbox": "Сохранить пропорции, дополнить чёрными полосами",
   "main.convert.note.filters-reencode": "Фильтры изображения включены: видео перекодируется, а не копируется.",
 

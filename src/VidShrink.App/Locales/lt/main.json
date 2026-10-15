@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Kadrų dažnio režimas",
   "main.convert.fps-mode.constant": "Pastovus",
   "main.convert.fps-mode.variable": "Kintamas",
+  "main.convert.interpolate": "Kurti tarpinius kadrus",
+  "main.convert.interpolate.tip": "• Padidinus kadrų dažnį, nauji kadrai apskaičiuojami iš judesio, o ne kartojami.\n• Judesys atrodo sklandesnis, bet kodavimas gerokai lėtesnis.",
   "main.convert.letterbox": "Išlaikyti proporcijas, užpildyti juodomis juostomis",
   "main.convert.note.filters-reencode": "Vaizdo filtrai įjungti: vaizdo įrašas perkoduojamas, o ne kopijuojamas.",
 

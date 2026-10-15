@@ -1290,6 +1290,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, DON-P10 birlesmesinden sonra: dalin kaymasi eklendi, dusen yok; olculen toplam 3587 + 16 = 3603, en 344 + 1 = 345, tr 110, gezilen 73229 + 387 = 73616.</para>
     /// <para>2026-10-15, SIK-P7 birlesmesinden sonra: dalin kaymasi eklendi, dusen yok; olculen toplam 3603 + 19 = 3622, en 345 + 6 = 351, tr 110 + 1 = 111, gezilen 73616 + 602 = 74218.</para>
     /// <para>2026-10-15, DZB-P5 ve OYB-P8 birlesmelerinden sonra: iki dalin kaymasi toplandi, dusen yok; olculen toplam 3622 + 2 + 28 = 3652, en 351 + 5 = 356, tr 111 + 7 = 118, gezilen 74218 + 344 + 860 = 75422.</para>
+    /// <para>2026-10-15, ara kare (ARC-P4): iki yeni anahtar (<c>main.convert.interpolate</c>, <c>main.convert.interpolate.tip</c>), toplam ve en/tr kaymadi; olculen gezilen 75422 + 43 x 2 = 75508.</para>
     /// <para>2026-10-15, ses temizleme ve duzey (DZB-P5): sekiz yeni <c>editor.clip.*</c> anahtari (gurultu, ses esitleme, sikistirici, sinirlayici, uc bant, duzey olcer), testin SAYIM satirindan olculdu: toplam 3622 + 2 = 3624, gezilen 74218 + 344 = 74562.</para>
     /// <para>2026-10-15, yer imi listesi, sik kullanilanlar ve acilista sorma (later 49 + 159): yirmi yeni anahtar (<c>player.bookmarks.*</c>, <c>player.favorites.*</c>, <c>player.view.resume-*</c>, <c>player.resume.*</c>), KOL dokumunden ve SAYIM satirindan olculdu: toplam 3622 + 28 = 3650, en 351 + 5 = 356, tr 111 + 7 = 118, gezilen 74218 + 860 = 75078.</para>
     /// <para>2026-10-15, kuyrukta zamanlama, duzenleme ve bitis (SIK-P7): on dort yeni anahtar (<c>main.shrink-job.*</c> 12, <c>settings-tab.finish-sound.*</c> 2), testin SAYIM satirindan olculdu: toplam 3542 + 19 = 3561, en 337 + 6 = 343, tr 110 + 1 = 111, gezilen 72068 + 43 x 14 = 72670.</para>
@@ -1610,7 +1611,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(75422, gezilen);
+        Assert.Equal(75508, gezilen);
         Assert.Empty(kayip);
     }
 

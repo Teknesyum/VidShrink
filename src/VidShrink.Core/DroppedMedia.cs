@@ -41,4 +41,27 @@ public static class DroppedMedia
         }
         return found.ToList();
     }
+
+    /// <summary>
+    /// Bırakılan resimler ya da klasörün üst düzeyindeki resimler numaralı bir dizi oluşturuyorsa onu verir
+    /// (<see cref="ImageSequence.Detect"/>); dizi yoksa <c>null</c>.
+    /// </summary>
+    public static ImageSequence? Sequence(IEnumerable<string> paths)
+        => Sequence(paths, Directory.Exists, folder => Directory.EnumerateFiles(folder));
+
+    internal static ImageSequence? Sequence(IEnumerable<string> paths, Func<string, bool> isFolder, Func<string, IEnumerable<string>> filesIn)
+    {
+        var files = new List<string>();
+        foreach (var path in paths)
+        {
+            if (!isFolder(path))
+            {
+                files.Add(path);
+                continue;
+            }
+            try { files.AddRange(filesIn(path)); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+        }
+        return ImageSequence.Detect(files);
+    }
 }

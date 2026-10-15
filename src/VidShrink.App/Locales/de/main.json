@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Bildratenmodus",
   "main.convert.fps-mode.constant": "Konstant",
   "main.convert.fps-mode.variable": "Variabel",
+  "main.convert.interpolate": "Zwischenbilder erzeugen",
+  "main.convert.interpolate.tip": "• Bei höherer Bildrate werden neue Bilder aus der Bewegung berechnet statt Bilder zu wiederholen.\n• Bewegung wirkt flüssiger, die Kodierung dauert aber deutlich länger.",
   "main.convert.letterbox": "Seitenverhältnis halten, mit schwarzen Balken auffüllen",
   "main.convert.note.filters-reencode": "Bildfilter sind aktiv: Das Video wird neu kodiert statt kopiert.",
 

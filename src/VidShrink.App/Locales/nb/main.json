@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Bildefrekvensmodus",
   "main.convert.fps-mode.constant": "Konstant",
   "main.convert.fps-mode.variable": "Variabel",
+  "main.convert.interpolate": "Lag mellombilder",
+  "main.convert.interpolate.tip": "• Når bildefrekvensen øker, beregnes nye bilder fra bevegelsen i stedet for å gjenta bilder.\n• Bevegelse ser jevnere ut, men kodingen tar mye lengre tid.",
   "main.convert.letterbox": "Behold sideforholdet, fyll ut med svarte felt",
   "main.convert.note.filters-reencode": "Bildefiltre er på: videoen kodes på nytt i stedet for å kopieres.",
 

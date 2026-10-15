@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Frame rate mode",
   "main.convert.fps-mode.constant": "Constant",
   "main.convert.fps-mode.variable": "Variable",
+  "main.convert.interpolate": "Generate In-Between Frames",
+  "main.convert.interpolate.tip": "• When the frame rate goes up, new frames are built from motion instead of repeating frames.\n• Motion looks smoother, but encoding is much slower.",
   "main.convert.letterbox": "Keep Aspect Ratio with Black Bars",
   "main.convert.note.filters-reencode": "Picture filters are on: the video is re-encoded instead of copied.",
 

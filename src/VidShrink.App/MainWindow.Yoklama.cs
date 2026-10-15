@@ -395,6 +395,7 @@ public partial class MainWindow
         ApplyFastGpuTip();
         KapSecenekleriniYokla();
         RefreshAudioDenoise();
+        RefreshConvertInterpolate();
         var textBurn = TextBurnAvailable;
         if (textBurn != _textBurnOffered)
         {

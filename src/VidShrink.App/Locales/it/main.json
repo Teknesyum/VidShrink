@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Modalità frequenza fotogrammi",
   "main.convert.fps-mode.constant": "Costante",
   "main.convert.fps-mode.variable": "Variabile",
+  "main.convert.interpolate": "Genera fotogrammi intermedi",
+  "main.convert.interpolate.tip": "• Quando la frequenza aumenta, i nuovi fotogrammi vengono creati dal movimento invece di ripeterli.\n• Il movimento è più fluido, ma la codifica è molto più lenta.",
   "main.convert.letterbox": "Mantieni le proporzioni, riempi con bande nere",
   "main.convert.note.filters-reencode": "I filtri immagine sono attivi: il video viene ricodificato invece che copiato.",
 

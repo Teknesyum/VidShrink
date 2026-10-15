@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Kuvataajuustila",
   "main.convert.fps-mode.constant": "Vakio",
   "main.convert.fps-mode.variable": "Vaihteleva",
+  "main.convert.interpolate": "Luo välikuvia",
+  "main.convert.interpolate.tip": "• Kun kuvataajuus kasvaa, uudet kuvat lasketaan liikkeestä kuvien toistamisen sijaan.\n• Liike näyttää sulavammalta, mutta koodaus on paljon hitaampaa.",
   "main.convert.letterbox": "Säilytä kuvasuhde, täytä mustilla palkeilla",
   "main.convert.note.filters-reencode": "Kuvasuodattimet ovat käytössä: video koodataan uudelleen kopioinnin sijaan.",
 

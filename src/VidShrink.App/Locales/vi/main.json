@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Chế độ tốc độ khung hình",
   "main.convert.fps-mode.constant": "Cố định",
   "main.convert.fps-mode.variable": "Thay đổi",
+  "main.convert.interpolate": "Tạo khung hình trung gian",
+  "main.convert.interpolate.tip": "• Khi tăng tốc độ khung hình, khung mới được tạo từ chuyển động thay vì lặp lại khung.\n• Chuyển động mượt hơn, nhưng mã hóa chậm hơn nhiều.",
   "main.convert.letterbox": "Giữ tỉ lệ khung hình, lấp bằng dải đen",
   "main.convert.note.filters-reencode": "Bộ lọc hình ảnh đang bật: video được mã hóa lại thay vì sao chép.",
 
