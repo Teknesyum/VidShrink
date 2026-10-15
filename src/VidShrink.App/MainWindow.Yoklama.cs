@@ -396,6 +396,7 @@ public partial class MainWindow
         KapSecenekleriniYokla();
         RefreshAudioDenoise();
         _recorderPane?.ApplyNoiseSuppressionProbe(AudioDenoiseAvailable);
+        RefreshConvertInterpolate();
         var textBurn = TextBurnAvailable;
         if (textBurn != _textBurnOffered)
         {

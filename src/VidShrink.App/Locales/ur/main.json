@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "فریم ریٹ موڈ",
   "main.convert.fps-mode.constant": "مستقل",
   "main.convert.fps-mode.variable": "متغیر",
+  "main.convert.interpolate": "درمیانی فریم بنائیں",
+  "main.convert.interpolate.tip": "• فریم ریٹ بڑھنے پر فریم دہرانے کے بجائے حرکت سے نئے فریم بنائے جاتے ہیں۔\n• حرکت زیادہ ہموار لگتی ہے، لیکن انکوڈنگ کافی سست ہو جاتی ہے۔",
   "main.convert.letterbox": "تناسب برقرار رکھیں، سیاہ پٹیوں سے بھریں",
   "main.convert.note.filters-reencode": "تصویری فلٹر آن ہیں: ویڈیو نقل ہونے کے بجائے دوبارہ انکوڈ ہوتی ہے۔",
 

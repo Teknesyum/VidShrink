@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Kadru nomaiņas ātruma režīms",
   "main.convert.fps-mode.constant": "Nemainīgs",
   "main.convert.fps-mode.variable": "Mainīgs",
+  "main.convert.interpolate": "Veidot starpkadrus",
+  "main.convert.interpolate.tip": "• Palielinot kadru ātrumu, jaunie kadri tiek aprēķināti no kustības, nevis atkārtoti.\n• Kustība izskatās plūstošāka, bet kodēšana ir daudz lēnāka.",
   "main.convert.letterbox": "Saglabāt malu attiecību, aizpildīt ar melnām joslām",
   "main.convert.note.filters-reencode": "Attēla filtri ir ieslēgti: video tiek pārkodēts, nevis kopēts.",
 

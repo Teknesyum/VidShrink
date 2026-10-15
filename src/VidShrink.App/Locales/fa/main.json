@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "حالت نرخ فریم",
   "main.convert.fps-mode.constant": "ثابت",
   "main.convert.fps-mode.variable": "متغیر",
+  "main.convert.interpolate": "ساخت فریم‌های میانی",
+  "main.convert.interpolate.tip": "• با افزایش نرخ فریم، فریم‌های تازه از روی حرکت ساخته می‌شوند نه با تکرار فریم‌ها.\n• حرکت نرم‌تر دیده می‌شود، اما رمزگذاری بسیار کندتر است.",
   "main.convert.letterbox": "حفظ نسبت تصویر، پر کردن با نوارهای سیاه",
   "main.convert.note.filters-reencode": "فیلترهای تصویر روشن هستند: ویدیو به‌جای کپی دوباره رمزگذاری می‌شود.",
 

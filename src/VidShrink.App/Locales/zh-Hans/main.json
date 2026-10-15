@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "帧率模式",
   "main.convert.fps-mode.constant": "恒定",
   "main.convert.fps-mode.variable": "可变",
+  "main.convert.interpolate": "生成中间帧",
+  "main.convert.interpolate.tip": "• 提高帧率时，根据运动生成新帧，而不是重复已有帧。\n• 画面更流畅，但编码会明显变慢。",
   "main.convert.letterbox": "保持宽高比，用黑边填充",
   "main.convert.note.filters-reencode": "已开启画面滤镜：视频将重新编码，而不是复制。",
 

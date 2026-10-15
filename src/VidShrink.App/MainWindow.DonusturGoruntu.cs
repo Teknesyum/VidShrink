@@ -12,11 +12,23 @@ public partial class MainWindow
 
     private bool DonusturKirpmaAcik => ChkConvertAutoCrop.IsChecked == true;
 
+    /// <summary>ARC-P4: ffmpeg yapısında <c>minterpolate</c> yoksa ara kare kutusu gizlenir; yoklama gelmeden görünür.</summary>
+    internal bool InterpolateAvailable => _encoders is not VidShrink.Ffmpeg.EncoderCapabilities { Loaded: true } loaded
+        || loaded.HasFilter(VideoFilterChain.InterpolateFilterName);
+
+    private void RefreshConvertInterpolate()
+    {
+        var available = InterpolateAvailable;
+        ChkConvertInterpolate.IsVisible = available;
+        if (!available) ChkConvertInterpolate.IsChecked = false;
+    }
+
     private void InitializeConvertFilterUi()
     {
         foreach (var box in new[] { CmbConvertDeinterlace, CmbConvertDenoise, CmbConvertRotate, CmbConvertScaler, CmbConvertFpsMode })
             Watch(box, SelectingItemsControl.SelectedIndexProperty, OnConvertChanged);
         Watch(ChkConvertAutoCrop, ToggleButton.IsCheckedProperty, OnConvertChanged);
+        Watch(ChkConvertInterpolate, ToggleButton.IsCheckedProperty, OnConvertChanged);
         Watch(ChkConvertLetterbox, ToggleButton.IsCheckedProperty, OnConvertChanged);
     }
 

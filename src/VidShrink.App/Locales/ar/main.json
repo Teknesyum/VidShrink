@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "وضع معدل الإطارات",
   "main.convert.fps-mode.constant": "ثابت",
   "main.convert.fps-mode.variable": "متغير",
+  "main.convert.interpolate": "توليد إطارات وسيطة",
+  "main.convert.interpolate.tip": "• عند رفع معدل الإطارات تُبنى إطارات جديدة من الحركة بدلًا من تكرار الإطارات.\n• تبدو الحركة أنعم، لكن الترميز أبطأ بكثير.",
   "main.convert.letterbox": "الحفاظ على النسبة مع ملء بأشرطة سوداء",
   "main.convert.note.filters-reencode": "مرشحات الصورة مفعّلة: يُعاد ترميز الفيديو بدلًا من نسخه.",
 

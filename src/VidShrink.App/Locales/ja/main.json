@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "フレームレートモード",
   "main.convert.fps-mode.constant": "固定",
   "main.convert.fps-mode.variable": "可変",
+  "main.convert.interpolate": "中間フレームを生成",
+  "main.convert.interpolate.tip": "• フレームレートを上げるとき、フレームを繰り返す代わりに動きから新しいフレームを作ります。\n• 動きは滑らかになりますが、エンコードはかなり遅くなります。",
   "main.convert.letterbox": "縦横比を保ち、黒帯で埋める",
   "main.convert.note.filters-reencode": "映像フィルターがオンです: 映像はコピーされず再エンコードされます。",
 

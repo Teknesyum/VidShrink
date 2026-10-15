@@ -492,7 +492,7 @@ public static class ConversionArguments
             if (info.IsAnamorphic) after.Add(VideoFilterChain.SquarePixelFilter);
         }
         if (plan.FrameRate != FrameRateMode.Peak && plan.Fps is { } fps && Math.Abs(fps - info.Fps) > 0.01)
-            after.Add($"fps={fps.ToString("0.###", CultureInfo.InvariantCulture)}");
+            after.Add(plan.Interpolate ? VideoFilterChain.Interpolate(fps) : $"fps={fps.ToString("0.###", CultureInfo.InvariantCulture)}");
         return (before, after);
     }
 

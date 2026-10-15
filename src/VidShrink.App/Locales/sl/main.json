@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Način hitrosti sličic",
   "main.convert.fps-mode.constant": "Konstantna",
   "main.convert.fps-mode.variable": "Spremenljiva",
+  "main.convert.interpolate": "Ustvari vmesne sličice",
+  "main.convert.interpolate.tip": "• Pri višji hitrosti sličic se nove sličice izračunajo iz gibanja namesto ponavljanja.\n• Gibanje je bolj tekoče, kodiranje pa precej počasnejše.",
   "main.convert.letterbox": "Ohrani razmerje, zapolni s črnimi pasovi",
   "main.convert.note.filters-reencode": "Slikovni filtri so vklopljeni: video se znova kodira namesto kopira.",
 

@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "โหมดอัตราเฟรม",
   "main.convert.fps-mode.constant": "คงที่",
   "main.convert.fps-mode.variable": "ผันแปร",
+  "main.convert.interpolate": "สร้างเฟรมแทรก",
+  "main.convert.interpolate.tip": "• เมื่อเพิ่มอัตราเฟรม ระบบจะสร้างเฟรมใหม่จากการเคลื่อนไหวแทนการทำซ้ำเฟรม\n• การเคลื่อนไหวดูลื่นขึ้น แต่การเข้ารหัสช้าลงมาก",
   "main.convert.letterbox": "คงอัตราส่วน เติมด้วยแถบดำ",
   "main.convert.note.filters-reencode": "ตัวกรองภาพเปิดอยู่: วิดีโอจะถูกเข้ารหัสใหม่แทนการคัดลอก",
 

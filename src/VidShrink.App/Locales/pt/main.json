@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Modo de taxa de quadros",
   "main.convert.fps-mode.constant": "Constante",
   "main.convert.fps-mode.variable": "Variável",
+  "main.convert.interpolate": "Gerar quadros intermediários",
+  "main.convert.interpolate.tip": "• Ao aumentar a taxa, novos quadros são criados a partir do movimento em vez de repetir quadros.\n• O movimento fica mais suave, mas a codificação fica bem mais lenta.",
   "main.convert.letterbox": "Manter a proporção, preencher com faixas pretas",
   "main.convert.note.filters-reencode": "Os filtros de imagem estão ativos: o vídeo é recodificado em vez de copiado.",
 

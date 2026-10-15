@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "מצב קצב פריימים",
   "main.convert.fps-mode.constant": "קבוע",
   "main.convert.fps-mode.variable": "משתנה",
+  "main.convert.interpolate": "יצירת פריימי ביניים",
+  "main.convert.interpolate.tip": "• כשקצב הפריימים עולה, נבנים פריימים חדשים מהתנועה במקום לחזור על פריימים.\n• התנועה נראית חלקה יותר, אבל הקידוד איטי בהרבה.",
   "main.convert.letterbox": "שמור על יחס הממדים, מלא בפסים שחורים",
   "main.convert.note.filters-reencode": "מסנני התמונה פעילים: הווידאו מקודד מחדש במקום להיות מועתק.",
 

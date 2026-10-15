@@ -1552,6 +1552,13 @@
                           <ComboBoxItem Content="{loc:Text main.convert.fps-mode.variable}" Tag="variable"/>
                         </ComboBox>
                       </StackPanel>
+                      <CheckBox x:Name="ChkConvertInterpolate" Theme="{StaticResource CheckStyle}" IsChecked="False" VerticalAlignment="Center"
+                                MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
+                                Content="{loc:Text main.convert.interpolate}">
+                        <ToolTip.Tip>
+                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.interpolate.tip}"/>
+                        </ToolTip.Tip>
+                      </CheckBox>
                       <CheckBox x:Name="ChkConvertAutoCrop" Theme="{StaticResource CheckStyle}" IsChecked="False" VerticalAlignment="Center"
                                 MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
                                 Content="{loc:Text main.advanced.filters.autocrop}"/>

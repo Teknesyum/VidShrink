@@ -150,8 +150,12 @@ public static class VideoFilterChain
     public const string GrayscaleFilter = "hue=s=0";
     public const string DeblockFilter = "deblock=filter=strong:block=8";
     public const string DebandFilter = "deband";
+    public const string InterpolateFilterName = "minterpolate";
     public const int BurnFontSizeMin = 6;
     public const int BurnFontSizeMax = 200;
+
+    /// <summary>Hareket kestirimiyle verilen kare hızına ara kare üreten süzgeç.</summary>
+    public static string Interpolate(double fps) => InterpolateFilterName + "=fps=" + fps.ToString("0.###", CultureInfo.InvariantCulture);
 
     /// <summary>SIK-P5: arayüzün sunduğu yazı tipleri; CLI <see cref="IsBurnFontName"/> geçen her adı alır.</summary>
     public static readonly IReadOnlyList<string> BurnFontChoices = new[] { "Arial", "Verdana", "Tahoma", "Segoe UI", "Times New Roman", "Courier New", "Georgia" };

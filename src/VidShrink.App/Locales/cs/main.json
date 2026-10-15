@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Režim snímkové frekvence",
   "main.convert.fps-mode.constant": "Konstantní",
   "main.convert.fps-mode.variable": "Proměnná",
+  "main.convert.interpolate": "Vytvářet mezisnímky",
+  "main.convert.interpolate.tip": "• Při vyšší snímkové frekvenci se nové snímky počítají z pohybu místo opakování snímků.\n• Pohyb je plynulejší, ale kódování je výrazně pomalejší.",
   "main.convert.letterbox": "Zachovat poměr stran, doplnit černými pruhy",
   "main.convert.note.filters-reencode": "Obrazové filtry jsou zapnuté: video se znovu kóduje místo kopírování.",
 

@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Mode de fréquence d'images",
   "main.convert.fps-mode.constant": "Constante",
   "main.convert.fps-mode.variable": "Variable",
+  "main.convert.interpolate": "Générer des images intermédiaires",
+  "main.convert.interpolate.tip": "• Quand la fréquence augmente, de nouvelles images sont calculées à partir du mouvement au lieu de répéter des images.\n• Le mouvement est plus fluide, mais l'encodage est bien plus lent.",
   "main.convert.letterbox": "Conserver les proportions, compléter par des bandes noires",
   "main.convert.note.filters-reencode": "Les filtres d'image sont actifs : la vidéo est réencodée au lieu d'être copiée.",
 

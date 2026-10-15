@@ -1291,6 +1291,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, SIK-P7 birlesmesinden sonra: dalin kaymasi eklendi, dusen yok; olculen toplam 3603 + 19 = 3622, en 345 + 6 = 351, tr 110 + 1 = 111, gezilen 73616 + 602 = 74218.</para>
     /// <para>2026-10-15, DZB-P5 ve OYB-P8 birlesmelerinden sonra: iki dalin kaymasi toplandi, dusen yok; olculen toplam 3622 + 2 + 28 = 3652, en 351 + 5 = 356, tr 111 + 7 = 118, gezilen 74218 + 344 + 860 = 75422.</para>
     /// <para>2026-10-15, medya havuzu ve araya ekleme (DZB-P11): bes yeni <c>editor.media.*</c> anahtari; 4 kol (<c>editor.media.mode</c>: en; <c>editor.media.open</c>: es, pt, sw), KOL dokumunden ve SAYIM satirindan olculdu: toplam 3652 + 4 = 3656, en 356 + 1 = 357, tr 118, gezilen 75422 + 43 x 5 = 75637.</para>
+    /// <para>2026-10-15, ara kare (ARC-P4): iki yeni anahtar (<c>main.convert.interpolate</c>, <c>main.convert.interpolate.tip</c>), toplam ve en/tr kaymadi; olculen gezilen 75422 + 43 x 2 = 75508.</para>
     /// <para>2026-10-15, ses temizleme ve duzey (DZB-P5): sekiz yeni <c>editor.clip.*</c> anahtari (gurultu, ses esitleme, sikistirici, sinirlayici, uc bant, duzey olcer), testin SAYIM satirindan olculdu: toplam 3622 + 2 = 3624, gezilen 74218 + 344 = 74562.</para>
     /// <para>2026-10-15, yer imi listesi, sik kullanilanlar ve acilista sorma (later 49 + 159): yirmi yeni anahtar (<c>player.bookmarks.*</c>, <c>player.favorites.*</c>, <c>player.view.resume-*</c>, <c>player.resume.*</c>), KOL dokumunden ve SAYIM satirindan olculdu: toplam 3622 + 28 = 3650, en 351 + 5 = 356, tr 111 + 7 = 118, gezilen 74218 + 860 = 75078.</para>
     /// <para>2026-10-15, kuyrukta zamanlama, duzenleme ve bitis (SIK-P7): on dort yeni anahtar (<c>main.shrink-job.*</c> 12, <c>settings-tab.finish-sound.*</c> 2), testin SAYIM satirindan olculdu: toplam 3542 + 19 = 3561, en 337 + 6 = 343, tr 110 + 1 = 111, gezilen 72068 + 43 x 14 = 72670.</para>
@@ -1587,6 +1588,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, Donustur ses secenekleri (DON-P9): alti yeni anahtar (ses yuksekligi, kanal, ornekleme hizi ve uc dogrulama iletisi), dusen yok; olculen 70821 + 43 x 6 = 71079. <c>kayip</c> 0.</para>
     /// <para>2026-10-15, Donustur'de goruntu suzgecleri (DON-P10): dokuz yeni anahtar (<c>main.convert.scaler</c> ve uc yontem adi, <c>.fps-mode</c>, <c>.fps-mode.constant</c>, <c>.fps-mode.variable</c>, <c>.letterbox</c>, <c>main.convert.note.filters-reencode</c>), dusen yok; olculen 72068 + 43 x 9 = 72455. <c>kayip</c> 0.</para>
     /// <para>2026-10-15, doldurma kipi (OYA-P11): bir yeni anahtar (<c>player.view.fill</c>), dusen yok; olculen 75422 + 43 = 75465. <c>kayip</c> 0.</para>
+    /// <para>2026-10-15, ARC-P4 birlesmesinden sonra: toplam, en ve tr kaymadi; olculen gezilen 75680 + 43 x 2 = 75766.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1614,7 +1616,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(75680, gezilen);
+        Assert.Equal(75766, gezilen);
         Assert.Empty(kayip);
     }
 

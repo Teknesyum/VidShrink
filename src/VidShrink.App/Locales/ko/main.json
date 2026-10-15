@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "프레임 속도 모드",
   "main.convert.fps-mode.constant": "고정",
   "main.convert.fps-mode.variable": "가변",
+  "main.convert.interpolate": "중간 프레임 생성",
+  "main.convert.interpolate.tip": "• 프레임 속도를 높일 때 프레임을 반복하지 않고 움직임으로 새 프레임을 만듭니다.\n• 움직임이 더 부드럽지만 인코딩이 훨씬 느려집니다.",
   "main.convert.letterbox": "화면비를 유지하고 검은 띠로 채우기",
   "main.convert.note.filters-reencode": "영상 필터가 켜져 있습니다: 영상은 복사되지 않고 다시 인코딩됩니다.",
 

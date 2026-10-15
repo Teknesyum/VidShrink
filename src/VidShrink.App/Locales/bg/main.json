@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Режим на кадровата честота",
   "main.convert.fps-mode.constant": "Постоянна",
   "main.convert.fps-mode.variable": "Променлива",
+  "main.convert.interpolate": "Създавай междинни кадри",
+  "main.convert.interpolate.tip": "• При по-висока честота новите кадри се изчисляват от движението вместо да се повтарят.\n• Движението е по-плавно, но кодирането е много по-бавно.",
   "main.convert.letterbox": "Запази съотношението, допълни с черни ленти",
   "main.convert.note.filters-reencode": "Филтрите за образ са включени: видеото се прекодира, вместо да се копира.",
 

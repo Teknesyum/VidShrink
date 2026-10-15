@@ -3324,7 +3324,7 @@ public partial class MainWindow : Window
     {
         _dropBatch ??= DroppedBatch(e);
         var accepted = _cts is null && (TryGetDroppedFile(e) is not null || _dropBatch.Count > 1
-            || _info is not null && DroppedSubtitles(e).Count > 0);
+            || _info is not null && DroppedSubtitles(e).Count > 0 || DroppedSequence(e, _dropBatch) is not null);
         e.DragEffects = accepted ? DragDropEffects.Copy : DragDropEffects.None;
         SetDropVisual(accepted ? DropVisual.Accept : DropVisual.Reject);
         e.Handled = true;
@@ -3346,7 +3346,16 @@ public partial class MainWindow : Window
         SetDropVisual(DropVisual.Idle);
         if (_cts is not null) return;
         if (_info is not null && DroppedSubtitles(e) is { Count: > 0 } subtitles) AddSubtitleFiles(subtitles);
+        else if (file is null && DroppedSequence(e, batch) is { } sequence) await LoadSequenceAsync(sequence.Files);
         else await OpenSourcesAsync(file, batch);
+    }
+
+    /// <summary>ARC-P4: Dönüştür'e video içermeyen numaralı resimler ya da klasör bırakılınca tek dizi kaynağı olur.</summary>
+    private ImageSequence? DroppedSequence(DragEventArgs e, IReadOnlyList<string> batch)
+    {
+        if (!TabConvert.IsSelected || batch.Count > 0) return null;
+        var paths = e.DataTransfer.TryGetFiles()?.Select(item => item.TryGetLocalPath()).OfType<string>().ToList();
+        return paths is { Count: > 0 } ? DroppedMedia.Sequence(paths) : null;
     }
 
     /// <summary>
@@ -4847,6 +4856,7 @@ public partial class MainWindow : Window
             Filters = DonusturSuzgecleri(),
             Letterbox = resolutionTag == "custom" && ChkConvertLetterbox.IsChecked == true,
             FrameRate = DonusturKareHiziKipi(),
+            Interpolate = ChkConvertInterpolate.IsVisible && ChkConvertInterpolate.IsChecked == true,
             TargetBytes = _sequence is null ? GifPalette.TargetFor(_info ?? _sesKaynagi, container, ParseTargetMb()) : null
         };
     }

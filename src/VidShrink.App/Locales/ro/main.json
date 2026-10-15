@@ -452,6 +452,8 @@
   "main.convert.fps-mode": "Mod rată de cadre",
   "main.convert.fps-mode.constant": "Constantă",
   "main.convert.fps-mode.variable": "Variabilă",
+  "main.convert.interpolate": "Generează cadre intermediare",
+  "main.convert.interpolate.tip": "• Când crește frecvența, cadrele noi sunt calculate din mișcare în loc să fie repetate.\n• Mișcarea pare mai fluidă, dar codarea este mult mai lentă.",
   "main.convert.letterbox": "Păstrează proporțiile, completează cu benzi negre",
   "main.convert.note.filters-reencode": "Filtrele de imagine sunt active: videoclipul este recodat în loc să fie copiat.",
 
