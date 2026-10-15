@@ -122,6 +122,7 @@ single spelling.
 | `--ses-bit-hizi` | `--audio-bitrate` |
 | `--disa-aktar` | `--export` |
 | `--ek-arguman` | `--extra-args` |
+| `--kip` | `--mode` |
 
 Exit codes: `0` in band, `2` under the band (quality saturated, the smaller file kept), `3`
 size ceiling exceeded (the smallest result is still written; JSON carries `output` and `overTarget: true`), `1` error, `64` wrong usage, `130` cancelled.
@@ -209,6 +210,31 @@ local ffmpeg lacks gives `1`.
 
 The CLI does not carry the tab's GIF-from-GIF size target, its audio track picker or its
 external audio file.
+
+## Export A Project
+
+`teslim` (`export`) exports a project the editor saved (`.vsproj.json`) without the window.
+The timeline is built from the project (`EditProject.ToJob`): every clip, text, music track,
+audio track choice and added source; planning and running are the editor's own export path
+(`EditExportRunner`). The CLI's `--kes` cuts a single range; a multi-part cut is repeated with
+this command from a project saved in the editor.
+
+```bash
+vidshrink teslim cut.vsproj.json
+vidshrink teslim cut.vsproj.json --cikti final.mp4 --kip tam --json
+```
+
+Options: `--kip hizli|akilli|tam` (`--mode fast|smart|full`; without it the mode saved in the
+project, smart when that is not known), `--cikti <path>` (default
+`<name>-duzenlenmis.<ext>` beside the first source), `--meta-yok`, `--json`. Text, effects,
+music or more than one source turn the mode to full as they do in the editor; stdout names
+the mode applied.
+
+When a source's size or write time changed after the project was saved, or the source is
+missing, the export does not start and the exit code is `1`; an unreadable project, an empty
+timeline and a reversed clip over the memory limit give `1` too. An output path that is a
+source or the project itself gives `64`. Writing clips to separate files and a queued batch
+export are not part of this command.
 
 ## Progress As NDJSON
 

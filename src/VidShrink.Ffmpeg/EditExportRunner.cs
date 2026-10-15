@@ -36,6 +36,17 @@ public static class EditExportRunner
     }
 
     /// <summary>
+    /// Pencere acmadan proje teslimi: <see cref="EditProject.ToJob"/> isinin kaynaklari, cizelgesi, kipi ve ses izi
+    /// tek dosyalik plana iner. Bellek butcesi duzenleyicininkiyle ayni kuraldir: kullanilabilir bellegin yarisi.
+    /// </summary>
+    public static Task<ExportPlan> PrepareAsync(EditProjectJob job, string outputPath, bool dropMetadata = false, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(job);
+        return PrepareAsync(job.Sources, job.Timeline, job.Mode, outputPath, Math.Max(1, GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 2),
+            dropMetadata, ct, audioTrack: job.AudioTrack);
+    }
+
+    /// <summary>
     /// Her parcayi ayri dosyaya yazan planlar. Adlar <see cref="EditOutputName.Segments"/> ile
     /// <paramref name="outputPath"/>'ten turer; <paramref name="partPattern"/> klibin etiketini ve cizelgedeki
     /// basini ada katar. Her parcanin kendi yarim dosyasi ve is klasoru olur.
