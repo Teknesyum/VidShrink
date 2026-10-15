@@ -336,6 +336,9 @@ public sealed class LanguageTests : IDisposable
         "GIF palette colors must be between 2 and 256.",
         "GIF loop count must be between -1 and 65535.",
         "The GIF dither mode is not supported.",
+        "Cover art must be a PNG or JPEG image.",
+        "Cover art can be written only to MP4 or MKV.",
+        "Cover art in MP4 requires video stream copy.",
         "^The (.+) audio encoder does not support (.+) Hz.$",
         "Localization key ' ' is missing in ' ' and in ' '."
     };

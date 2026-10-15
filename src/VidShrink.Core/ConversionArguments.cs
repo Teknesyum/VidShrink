@@ -70,6 +70,14 @@ public static class ConversionArguments
             if (plan.GifLoop is < -1 or > 65535) errors.Add("GIF loop count must be between -1 and 65535.");
             if (plan.GifDither is { } dither && !GifDithers.Contains(dither)) errors.Add("The GIF dither mode is not supported.");
         }
+        if (!string.IsNullOrWhiteSpace(plan.CoverPath))
+        {
+            if (CoverImage(plan.CoverPath) is null) errors.Add("Cover art must be a PNG or JPEG image.");
+            if (plan.AudioOnly || plan.Gif || plan.AnimatedImage || plan.ImageSequenceOutput || plan.Container is not ("mp4" or "mkv"))
+                errors.Add("Cover art can be written only to MP4 or MKV.");
+            else if (plan.Container == "mp4" && plan.VideoCodec != "copy")
+                errors.Add("Cover art in MP4 requires video stream copy.");
+        }
         if (plan.BurnSubtitle is not null || !plan.AudioOnly) errors.AddRange(VideoFilterChain.Validate(info, plan.BurnOptions));
         return errors;
     }
@@ -135,6 +143,7 @@ public static class ConversionArguments
         var encodesVideo = !plan.AudioOnly && !plan.Gif && !plan.AnimatedImage && !plan.ImageSequenceOutput && plan.VideoCodec != "copy";
         if (encodesVideo) a.AddRange(CodecModel.DeviceArgs(plan.VideoCodec));
         if (plan.Start is { } start) a.AddRange(new[] { "-ss", FormatTime(start) });
+        if (plan.Repair) a.AddRange(RepairInputArgs);
         a.AddRange(info.Sequence is { } sequence ? sequence.InputArgs(info.Fps) : new[] { "-i", info.FilePath });
         if (AddedAudio(plan) is { } external)
         {
@@ -144,11 +153,20 @@ public static class ConversionArguments
         var subtitles = MapsStreams(info, plan) ? Subtitles(info, plan) : null;
         var burnsImage = encodesVideo && VideoFilterChain.ImageBurnStream(info, plan.BurnOptions) is not null;
         if (burnsImage) subtitles ??= new List<SubtitleTrack>();
+        var coverTrack = !plan.AudioOnly && plan.Container == "mp4" && !string.IsNullOrWhiteSpace(plan.CoverPath);
+        if (coverTrack) subtitles ??= new List<SubtitleTrack>();
+        string? coverMap = null;
         foreach (var track in subtitles ?? new List<SubtitleTrack>())
         {
             if (track.InputPath is null) continue;
             if (plan.Start is { } subtitleStart) a.AddRange(new[] { "-ss", FormatTime(subtitleStart) });
             a.AddRange(new[] { "-i", track.InputPath });
+        }
+        if (coverTrack)
+        {
+            var coverInput = 1 + (AddedAudio(plan) is null ? 0 : 1) + subtitles!.Count(track => track.InputPath is not null);
+            a.AddRange(new[] { "-i", plan.CoverPath! });
+            coverMap = coverInput.ToString(CultureInfo.InvariantCulture) + ":v:0";
         }
         if (plan.End is { } end)
         {
@@ -156,12 +174,15 @@ public static class ConversionArguments
             a.AddRange(new[] { "-t", FormatTime(TimeSpan.FromSeconds(trimSeconds)) });
         }
         if (subtitles is not null) a.AddRange(MapArguments(info, plan, subtitles, burnsImage));
+        if (coverMap is not null) a.AddRange(new[] { "-map", coverMap });
 
         if (plan.AudioOnly)
         {
             a.Add("-vn");
             AddAudio(a, info, plan);
+            if (plan.Repair) a.AddRange(RepairOutputArgs);
             a.AddRange(MetadataArgs(info, plan, subtitles));
+            a.AddRange(TagArgs(plan));
             if (plan.EndAtShortest && AddedAudio(plan) is not null) a.Add("-shortest");
             a.AddRange(plan.ExtraArgs);
             a.Add(outputPath);
@@ -212,6 +233,7 @@ public static class ConversionArguments
         {
             if (filters.Count > 0) a.AddRange(new[] { "-vf", string.Join(',', filters) });
             a.AddRange(new[] { "-c:v", "copy" });
+            if (coverMap is not null) a.AddRange(new[] { "-c:v:1", "copy", "-disposition:v:1", "attached_pic" });
         }
         else
         {
@@ -258,7 +280,11 @@ public static class ConversionArguments
         }
         if (plan.Container is "mp4" or "mov" or "m4a") a.AddRange(new[] { "-movflags", "+faststart" });
         if (dolbyVision && plan.Container is "mp4" or "mov") a.AddRange(HdrResolver.Mp4DolbyVisionArgs);
+        if (plan.Container == "mkv" && CoverImage(plan.CoverPath) is { } attached)
+            a.AddRange(new[] { "-attach", plan.CoverPath!, "-metadata:s:t:0", "mimetype=" + attached.Mime, "-metadata:s:t:0", "filename=cover." + attached.Extension });
+        if (plan.Repair) a.AddRange(RepairOutputArgs);
         a.AddRange(MetadataArgs(info, plan, subtitles));
+        a.AddRange(TagArgs(plan));
         if (plan.EndAtShortest && AddedAudio(plan) is not null) a.Add("-shortest");
         a.AddRange(plan.ExtraArgs);
         a.Add(outputPath);
@@ -318,6 +344,34 @@ public static class ConversionArguments
     /// <summary>Resim dizisi çıktısının <c>image2</c> deseni: <c>klasör/ad_%05d.uzantı</c>. Addaki <c>%</c> kaçırılır.</summary>
     public static string SequenceOutputPattern(string folder, string stem, string container)
         => Path.Combine(folder, ImageSequence.Escape(stem) + "_%05d." + container);
+
+    /// <summary>Onar'ın girdi bayrakları: eksik zaman damgası üretilir, bozuk paket atılır, çözme hatası hoş görülür.</summary>
+    public static readonly IReadOnlyList<string> RepairInputArgs = new[] { "-fflags", "+genpts+discardcorrupt", "-err_detect", "ignore_err" };
+
+    /// <summary>Onar'ın çıktı bayrağı: negatif zaman damgası sıfırdan başlatılır.</summary>
+    public static readonly IReadOnlyList<string> RepairOutputArgs = new[] { "-avoid_negative_ts", "make_zero" };
+
+    /// <summary>
+    /// Kullanıcının yazdığı kap etiketleri; meta silme dizisinden sonra yazılır, yoksa <c>-map_metadata -1</c>
+    /// onları da silerdi. Boş ya da yalnız boşluk olan alan anahtar yazmaz, değerin baş ve son boşluğu atılır.
+    /// </summary>
+    private static IReadOnlyList<string> TagArgs(ConversionPlan plan)
+    {
+        var a = new List<string>();
+        foreach (var (key, value) in new[] { ("title", plan.Title), ("artist", plan.Artist), ("date", plan.Year), ("comment", plan.Comment) })
+            if (!string.IsNullOrWhiteSpace(value)) a.AddRange(new[] { "-metadata", key + "=" + value.Trim() });
+        return a;
+    }
+
+    /// <summary>Kapak dosyasının MIME türü ve ek uzantısı; png ve jpeg dışında <c>null</c>.</summary>
+    private static (string Mime, string Extension)? CoverImage(string? path)
+        => string.IsNullOrWhiteSpace(path) ? null
+            : Path.GetExtension(path).ToLowerInvariant() switch
+            {
+                ".png" => ("image/png", "png"),
+                ".jpg" or ".jpeg" => ("image/jpeg", "jpg"),
+                _ => null
+            };
 
     /// <summary>
     /// Meta silme argümanları küçültmeyle aynı kaynaktan (<see cref="StreamMapping.MetadataArguments"/>).

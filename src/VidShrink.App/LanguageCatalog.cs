@@ -417,7 +417,10 @@ internal static class LanguageCatalog
             ["The MXF container carries only 48000 Hz audio."] = "main.validation.mxf-sample-rate",
             ["GIF palette colors must be between 2 and 256."] = "main.validation.gif-colors",
             ["GIF loop count must be between -1 and 65535."] = "main.validation.gif-loop",
-            ["The GIF dither mode is not supported."] = "main.validation.gif-dither"
+            ["The GIF dither mode is not supported."] = "main.validation.gif-dither",
+            ["Cover art must be a PNG or JPEG image."] = "main.validation.cover-image",
+            ["Cover art can be written only to MP4 or MKV."] = "main.validation.cover-container",
+            ["Cover art in MP4 requires video stream copy."] = "main.validation.cover-copy"
         };
 
     private static readonly (Regex Pattern, string Key)[] ValidationPatternKeys =

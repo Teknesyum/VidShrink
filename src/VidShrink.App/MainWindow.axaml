@@ -1170,12 +1170,18 @@
                   <Button x:Name="BtnBrowseSequence" Content="{loc:Text main.convert.sequence.browse}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" Click="OnBrowseSequence"/>
                   <StackPanel Spacing="{StaticResource SpaceXs}">
                     <TextBlock Text="{loc:Text main.convert.preset.label}" Theme="{StaticResource Label}"/>
-                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
                       <ComboBox x:Name="CmbConvertPreset" HorizontalAlignment="Stretch"
                                 PlaceholderText="{loc:Text main.convert.preset.placeholder}"
                                 AutomationProperties.Name="{loc:Text main.convert.preset.label}"
                                 SelectionChanged="OnConvertPresetChanged"/>
-                      <Button x:Name="BtnConvertPresetAdd" Grid.Column="1" Content="+" Theme="{StaticResource ChipButton}" Classes="eylem"
+                      <Button x:Name="BtnConvertRepairPreset" Grid.Column="1" Content="{loc:Text main.convert.repair.preset}" Theme="{StaticResource ChipButton}"
+                              Click="OnConvertRepairPreset">
+                        <ToolTip.Tip>
+                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.repair.preset.tip}"/>
+                        </ToolTip.Tip>
+                      </Button>
+                      <Button x:Name="BtnConvertPresetAdd" Grid.Column="2" Content="+" Theme="{StaticResource ChipButton}" Classes="eylem"
                               AutomationProperties.Name="{loc:Text main.preset.add.name}">
                         <ToolTip.Tip>
                           <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.preset.add.tip}"/>
@@ -1480,11 +1486,49 @@
                       <TextBox Grid.Row="1" x:Name="TxtTrimEnd"/>
                     </Grid>
 
-                    <CheckBox x:Name="ChkConvertDropMetadata" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Theme="{StaticResource CheckStyle}" IsChecked="False" HorizontalAlignment="Left" Content="{loc:Text main.advanced.drop-metadata.label}">
-                      <ToolTip.Tip>
-                        <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.drop-metadata.tip}"/>
-                      </ToolTip.Tip>
-                    </CheckBox>
+                    <WrapPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                      <CheckBox x:Name="ChkConvertDropMetadata" Theme="{StaticResource CheckStyle}" IsChecked="False" VerticalAlignment="Center" Content="{loc:Text main.advanced.drop-metadata.label}">
+                        <ToolTip.Tip>
+                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.drop-metadata.tip}"/>
+                        </ToolTip.Tip>
+                      </CheckBox>
+                      <CheckBox x:Name="ChkConvertRepair" Theme="{StaticResource CheckStyle}" IsChecked="False" VerticalAlignment="Center" Content="{loc:Text main.convert.repair}">
+                        <ToolTip.Tip>
+                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.repair.tip}"/>
+                        </ToolTip.Tip>
+                      </CheckBox>
+                      <Button x:Name="BtnConvertTags" Content="{loc:Text main.convert.tags}" Theme="{StaticResource ChipButton}" VerticalAlignment="Center">
+                        <ToolTip.Tip>
+                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.tags.tip}"/>
+                        </ToolTip.Tip>
+                        <Button.Flyout>
+                          <Flyout>
+                            <StackPanel Spacing="{StaticResource SpaceSm}" MinWidth="{StaticResource FieldWidth}">
+                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.convert.tags.title}"/>
+                              <TextBox x:Name="TxtConvertTagTitle" auto:AutomationProperties.Name="{loc:Text main.convert.tags.title}"/>
+                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.convert.tags.artist}"/>
+                              <TextBox x:Name="TxtConvertTagArtist" auto:AutomationProperties.Name="{loc:Text main.convert.tags.artist}"/>
+                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.convert.tags.year}"/>
+                              <TextBox x:Name="TxtConvertTagYear" MaxLength="10" auto:AutomationProperties.Name="{loc:Text main.convert.tags.year}"/>
+                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.convert.tags.comment}"/>
+                              <TextBox x:Name="TxtConvertTagComment" auto:AutomationProperties.Name="{loc:Text main.convert.tags.comment}"/>
+                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.convert.tags.cover}"/>
+                              <TextBlock x:Name="TxtConvertCoverName" Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text main.convert.tags.cover.none}"/>
+                              <WrapPanel>
+                                <Button x:Name="BtnConvertCoverPick" Content="{loc:Text main.convert.tags.cover.pick}" Theme="{StaticResource GhostButton}"
+                                        Margin="{StaticResource WrapItemMargin}" Click="OnConvertCoverPick">
+                                  <ToolTip.Tip>
+                                    <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.tags.cover.tip}"/>
+                                  </ToolTip.Tip>
+                                </Button>
+                                <Button x:Name="BtnConvertCoverClear" Content="{loc:Text main.convert.tags.cover.clear}" Theme="{StaticResource GhostButton}"
+                                        Margin="{StaticResource WrapItemMargin}" Click="OnConvertCoverClear"/>
+                              </WrapPanel>
+                            </StackPanel>
+                          </Flyout>
+                        </Button.Flyout>
+                      </Button>
+                    </WrapPanel>
 
                     <CheckBox x:Name="ChkConvertSingleFrame" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Theme="{StaticResource CheckStyle}" IsChecked="False" IsVisible="False" HorizontalAlignment="Left" Content="{loc:Text main.convert.single-frame}">
                       <ToolTip.Tip>
