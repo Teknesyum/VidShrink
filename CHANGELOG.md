@@ -7,6 +7,33 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.18] - 2026-10-15
+
+The `v1.2.17` tag was cut before the winget and Scoop manifests were updated, so its release did
+not publish; everything listed under 1.2.17 ships with this release.
+
+### Added
+
+- The recorder warns while recording when the output drive runs low, and an unfinished
+  `.yakalama.mkv` found in the output folder can be recovered with "Recover".
+- The player remembers, per file, the audio track, subtitle track, second subtitle, both delays
+  and the speed. Ctrl+G opens "Go to time".
+- Shrink: "Keep the Source File's Dates" gives the output the source's creation and modification
+  dates (off by default). Output names accept `{saat}`, `{bithizi}`, `{karehizi}`, `{klasor}` and
+  `{sayac}`. A failed job in the job window has "Queue again". Before the finished file is
+  delivered its length is checked against the source; a file that cannot be read or is clearly
+  too short is reported and the file already at the target is left alone.
+- Editor: "Write Chapters From Clips" names a chapter after each clip's label; when off, the
+  source's chapters are kept and shifted to follow the cuts.
+- Settings: "Follow System Theme" switches between a light and a dark palette you pick, and "Turn
+  Off Animations" stops interface motion (the system's reduce-motion setting is followed on macOS
+  and Linux).
+- Convert audio options: Opus, OGG, AIFF and AC3 audio containers; AC3 and E-AC3 encoders;
+  "Normalize Loudness" (`loudnorm`), channels (source, stereo, mono) and sample rate (source,
+  44100, 48000 Hz). Choosing any of the three turns the audio copy off. In an audio container the
+  source audio is extracted without re-encoding when it fits the container (M4A takes AAC and ALAC
+  this way); MP4 now copies AC3, E-AC3 and Opus audio.
+
 ## [1.2.17] - 2026-10-15
 
 ### Added
