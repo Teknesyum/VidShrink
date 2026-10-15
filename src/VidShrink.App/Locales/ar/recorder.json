@@ -288,5 +288,10 @@
   "recorder.mask.draw": "ارسم قناعًا",
   "recorder.mask.draw-hint": "اسحب بالماوس فوق المنطقة التي يجب أن تظهر ضبابية في التسجيل؛ Esc يلغي.",
   "recorder.mask.clear": "أزل الأقنعة",
-  "recorder.mask.count": "الأقنعة: {0}"
+  "recorder.mask.count": "الأقنعة: {0}",
+  "recorder.disk.low": "لم يتبق على القرص سوى {0}؛ قد يتوقف التسجيل قبل اكتماله.",
+  "recorder.recover.found": "تم العثور على تسجيل غير مكتمل: {0}",
+  "recorder.recover.action": "استرداد",
+  "recorder.recover.done": "تم استرداد التسجيل: {0}",
+  "recorder.recover.failed": "تعذر استرداد التسجيل؛ ملف الالتقاط باقٍ في مكانه: {0}"
 }

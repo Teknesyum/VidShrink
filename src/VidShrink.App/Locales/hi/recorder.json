@@ -288,5 +288,10 @@
   "recorder.mask.draw": "मास्क बनाएं",
   "recorder.mask.draw-hint": "माउस से उस क्षेत्र पर खींचें जो रिकॉर्डिंग में धुंधला दिखना चाहिए; Esc रद्द करता है।",
   "recorder.mask.clear": "मास्क हटाएं",
-  "recorder.mask.count": "मास्क: {0}"
+  "recorder.mask.count": "मास्क: {0}",
+  "recorder.disk.low": "डिस्क पर केवल {0} खाली जगह बची है; रिकॉर्डिंग बीच में रुक सकती है।",
+  "recorder.recover.found": "अधूरी रिकॉर्डिंग मिली: {0}",
+  "recorder.recover.action": "पुनर्प्राप्त करें",
+  "recorder.recover.done": "रिकॉर्डिंग पुनर्प्राप्त हुई: {0}",
+  "recorder.recover.failed": "रिकॉर्डिंग पुनर्प्राप्त नहीं हो सकी; कैप्चर फ़ाइल अपनी जगह पर है: {0}"
 }

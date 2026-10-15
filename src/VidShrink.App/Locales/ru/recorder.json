@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Нарисовать маску",
   "recorder.mask.draw-hint": "Проведите мышью по области, которая должна быть размыта в записи; Esc отменяет.",
   "recorder.mask.clear": "Удалить маски",
-  "recorder.mask.count": "Маски: {0}"
+  "recorder.mask.count": "Маски: {0}",
+  "recorder.disk.low": "На диске осталось всего {0}; запись может прерваться.",
+  "recorder.recover.found": "Найдена незавершённая запись: {0}",
+  "recorder.recover.action": "Восстановить",
+  "recorder.recover.done": "Запись восстановлена: {0}",
+  "recorder.recover.failed": "Не удалось восстановить запись; файл захвата остался на месте: {0}"
 }

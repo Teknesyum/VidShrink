@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Desenhar máscara",
   "recorder.mask.draw-hint": "Arraste com o rato sobre a área que deve aparecer desfocada na gravação; Esc cancela.",
   "recorder.mask.clear": "Remover máscaras",
-  "recorder.mask.count": "Máscaras: {0}"
+  "recorder.mask.count": "Máscaras: {0}",
+  "recorder.disk.low": "Restam apenas {0} livres no disco; a gravação pode ser interrompida.",
+  "recorder.recover.found": "Gravação inacabada encontrada: {0}",
+  "recorder.recover.action": "Recuperar",
+  "recorder.recover.done": "Gravação recuperada: {0}",
+  "recorder.recover.failed": "Não foi possível recuperar a gravação; o arquivo de captura continua no lugar: {0}"
 }

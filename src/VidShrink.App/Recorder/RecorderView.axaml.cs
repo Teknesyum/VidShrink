@@ -95,6 +95,7 @@ internal partial class RecorderView : UserControl
         ActivateTray();
         ActivateHotkeys();
         ActivateLevels();
+        if (_session is null) ScanOrphans(_settings.ResolveFolder());
         _ = MeasureOnOpenAsync(Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime);
     }
 
@@ -147,6 +148,7 @@ internal partial class RecorderView : UserControl
         TxtNotice.Text = string.Empty;
         ResultPanel.IsVisible = false;
         WarningRow.IsVisible = false;
+        DiskRow.IsVisible = false;
         _lastRecording = null;
         ResetShare();
         HideFinish();

@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Rita mask",
   "recorder.mask.draw-hint": "Dra med musen över området som ska synas suddigt i inspelningen; Esc avbryter.",
   "recorder.mask.clear": "Ta bort masker",
-  "recorder.mask.count": "Masker: {0}"
+  "recorder.mask.count": "Masker: {0}",
+  "recorder.disk.low": "Endast {0} ledigt på disken; inspelningen kan avbrytas.",
+  "recorder.recover.found": "Ofullständig inspelning hittades: {0}",
+  "recorder.recover.action": "Återställ",
+  "recorder.recover.done": "Inspelningen återställdes: {0}",
+  "recorder.recover.failed": "Inspelningen kunde inte återställas; inspelningsfilen finns kvar: {0}"
 }

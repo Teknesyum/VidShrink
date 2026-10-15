@@ -288,5 +288,10 @@
   "recorder.mask.draw": "মাস্ক আঁকুন",
   "recorder.mask.draw-hint": "রেকর্ডিংয়ে যে অংশ ঝাপসা দেখাবে তার ওপর মাউস দিয়ে টানুন; Esc বাতিল করে।",
   "recorder.mask.clear": "মাস্ক সরান",
-  "recorder.mask.count": "মাস্ক: {0}"
+  "recorder.mask.count": "মাস্ক: {0}",
+  "recorder.disk.low": "ডিস্কে মাত্র {0} খালি জায়গা আছে; রেকর্ডিং মাঝপথে থেমে যেতে পারে।",
+  "recorder.recover.found": "অসম্পূর্ণ রেকর্ডিং পাওয়া গেছে: {0}",
+  "recorder.recover.action": "পুনরুদ্ধার",
+  "recorder.recover.done": "রেকর্ডিং পুনরুদ্ধার হয়েছে: {0}",
+  "recorder.recover.failed": "রেকর্ডিং পুনরুদ্ধার করা যায়নি; ক্যাপচার ফাইলটি জায়গামতো আছে: {0}"
 }

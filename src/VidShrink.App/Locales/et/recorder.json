@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Joonista mask",
   "recorder.mask.draw-hint": "Lohista hiirega üle ala, mis peab salvestisel uduselt paistma; Esc tühistab.",
   "recorder.mask.clear": "Eemalda maskid",
-  "recorder.mask.count": "Maske: {0}"
+  "recorder.mask.count": "Maske: {0}",
+  "recorder.disk.low": "Kettal on vaba ainult {0}; salvestus võib pooleli jääda.",
+  "recorder.recover.found": "Leiti lõpetamata salvestus: {0}",
+  "recorder.recover.action": "Taasta",
+  "recorder.recover.done": "Salvestus taastatud: {0}",
+  "recorder.recover.failed": "Salvestust ei õnnestunud taastada; salvestusfail on alles: {0}"
 }

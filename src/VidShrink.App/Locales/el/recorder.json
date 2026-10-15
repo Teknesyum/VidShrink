@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Σχεδίαση μάσκας",
   "recorder.mask.draw-hint": "Σύρετε με το ποντίκι πάνω από την περιοχή που πρέπει να φαίνεται θολή στην εγγραφή· το Esc ακυρώνει.",
   "recorder.mask.clear": "Αφαίρεση μασκών",
-  "recorder.mask.count": "Μάσκες: {0}"
+  "recorder.mask.count": "Μάσκες: {0}",
+  "recorder.disk.low": "Απομένουν μόνο {0} ελεύθερα στον δίσκο· η εγγραφή μπορεί να διακοπεί.",
+  "recorder.recover.found": "Βρέθηκε ημιτελής εγγραφή: {0}",
+  "recorder.recover.action": "Ανάκτηση",
+  "recorder.recover.done": "Η εγγραφή ανακτήθηκε: {0}",
+  "recorder.recover.failed": "Δεν ήταν δυνατή η ανάκτηση της εγγραφής· το αρχείο λήψης παραμένει στη θέση του: {0}"
 }

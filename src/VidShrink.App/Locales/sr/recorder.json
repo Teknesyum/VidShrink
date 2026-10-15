@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Nacrtaj masku",
   "recorder.mask.draw-hint": "Mišem prevucite preko oblasti koja u snimku treba da bude zamućena; Esc odustaje.",
   "recorder.mask.clear": "Ukloni maske",
-  "recorder.mask.count": "Maske: {0}"
+  "recorder.mask.count": "Maske: {0}",
+  "recorder.disk.low": "На диску је остало само {0} слободног простора; снимање би могло да се прекине.",
+  "recorder.recover.found": "Пронађен је недовршен снимак: {0}",
+  "recorder.recover.action": "Поврати",
+  "recorder.recover.done": "Снимак је враћен: {0}",
+  "recorder.recover.failed": "Снимак није могуће вратити; датотека снимања остаје на месту: {0}"
 }

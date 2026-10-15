@@ -418,10 +418,7 @@ public sealed class RecorderSession : IAsyncDisposable
         {
             if (!File.Exists(file)) continue;
             var target = RecorderArguments.MatroskaDeliveryPath(file, _remuxExtension!);
-            var run = await FfmpegRunner.RunAsync(new[]
-            {
-                "-hide_banner", "-y", "-nostdin", "-i", file, "-map", "0", "-c", "copy", "-movflags", "+faststart", target
-            }, ct);
+            var run = await FfmpegRunner.RunAsync(RecorderArguments.BuildMatroskaDelivery(file, target), ct);
             if (!run.Ok || !File.Exists(target))
                 return capture with { Ok = false, ExitCode = run.ExitCode, StandardError = run.StandardError };
             TryDelete(file);
@@ -430,6 +427,45 @@ public sealed class RecorderSession : IAsyncDisposable
 
         if (delivered.Count == 0) return capture;
         return capture with { OutputPath = delivered[0], OutputMb = delivered.Sum(SizeMb), Files = delivered };
+    }
+
+    /// <summary>
+    /// EKA-20: klasorde teslim edilmeden kalmis Matroska yakalamalarini bulur. Hala yazilan
+    /// (paylasimsiz acilamayan) dosya atlanir; klasor yoksa bos doner.
+    /// </summary>
+    public static IReadOnlyList<string> FindOrphanCaptures(string folder)
+    {
+        if (string.IsNullOrWhiteSpace(folder) || !Directory.Exists(folder)) return Array.Empty<string>();
+        var found = new List<string>();
+        foreach (var file in Directory.EnumerateFiles(folder, "*.mkv"))
+        {
+            if (!RecorderArguments.IsMatroskaCapture(file)) continue;
+            try
+            {
+                using (new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.None)) { }
+            }
+            catch (IOException) { continue; }
+            catch (UnauthorizedAccessException) { continue; }
+            found.Add(file);
+        }
+        found.Sort(StringComparer.OrdinalIgnoreCase);
+        return found;
+    }
+
+    /// <summary>
+    /// EKA-20: yarim kalan yakalamayi hedef kaba kopyalayarak aktarir. Yalniz aktarma basarili
+    /// ve hedef diskteyse yakalama dosyasi silinir; dusus yakalamayi yerinde birakir.
+    /// </summary>
+    public static async Task<bool> RecoverAsync(
+        string capturePath, string targetPath, Func<IReadOnlyList<string>, Task<bool>> run, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(run);
+        ct.ThrowIfCancellationRequested();
+        if (!File.Exists(capturePath)) return false;
+        var ok = await run(RecorderArguments.BuildMatroskaDelivery(capturePath, targetPath));
+        if (!ok || !File.Exists(targetPath)) return false;
+        TryDelete(capturePath);
+        return true;
     }
 
     private Task<RecordResult> ConvertToGifAsync(RecordResult capture, CancellationToken ct)

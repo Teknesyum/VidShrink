@@ -288,5 +288,10 @@
   "recorder.mask.draw": "کشیدن ماسک",
   "recorder.mask.draw-hint": "با ماوس روی ناحیه‌ای بکشید که باید در ضبط تار دیده شود؛ Esc لغو می‌کند.",
   "recorder.mask.clear": "حذف ماسک‌ها",
-  "recorder.mask.count": "ماسک‌ها: {0}"
+  "recorder.mask.count": "ماسک‌ها: {0}",
+  "recorder.disk.low": "فقط {0} فضای خالی روی دیسک مانده است؛ ممکن است ضبط نیمه‌کاره بماند.",
+  "recorder.recover.found": "ضبط ناتمام پیدا شد: {0}",
+  "recorder.recover.action": "بازیابی",
+  "recorder.recover.done": "ضبط بازیابی شد: {0}",
+  "recorder.recover.failed": "بازیابی ضبط ممکن نشد؛ فایل ضبط سر جایش مانده است: {0}"
 }

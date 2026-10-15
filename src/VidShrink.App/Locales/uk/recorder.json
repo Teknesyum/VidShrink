@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Намалювати маску",
   "recorder.mask.draw-hint": "Проведіть мишею по області, яка має бути розмитою в записі; Esc скасовує.",
   "recorder.mask.clear": "Видалити маски",
-  "recorder.mask.count": "Маски: {0}"
+  "recorder.mask.count": "Маски: {0}",
+  "recorder.disk.low": "На диску залишилося лише {0}; запис може перерватися.",
+  "recorder.recover.found": "Знайдено незавершений запис: {0}",
+  "recorder.recover.action": "Відновити",
+  "recorder.recover.done": "Запис відновлено: {0}",
+  "recorder.recover.failed": "Не вдалося відновити запис; файл захоплення залишився на місці: {0}"
 }

@@ -131,6 +131,8 @@ internal partial class RecorderView
             return;
         }
 
+        BeginDiskWatch(Path.GetDirectoryName(path) ?? _settings.ResolveFolder());
+
         request = await ChooseCaptureAsync(request);
         if (_session is not null) return;
 
@@ -311,6 +313,7 @@ internal partial class RecorderView
         TxtFrames.Text = progress.Frames.ToString("N0", Strings.Culture);
         TxtDropped.Text = progress.DroppedFrames.ToString("N0", Strings.Culture);
         ShowSystemAudio(_session?.SystemAudio);
+        CheckDiskWhileRecording();
         RefreshMini();
         SyncTray();
     }

@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Maske çiz",
   "recorder.mask.draw-hint": "Kayıtta bulanık görünecek alanı fareyle sürükleyerek seç; Esc vazgeçer.",
   "recorder.mask.clear": "Maskeleri kaldır",
-  "recorder.mask.count": "Maske: {0}"
+  "recorder.mask.count": "Maske: {0}",
+  "recorder.disk.low": "Diskte {0} boş alan kaldı; kayıt yarıda kalabilir.",
+  "recorder.recover.found": "Yarım kalmış kayıt bulundu: {0}",
+  "recorder.recover.action": "Kurtar",
+  "recorder.recover.done": "Kayıt kurtarıldı: {0}",
+  "recorder.recover.failed": "Kayıt kurtarılamadı, yakalama dosyası yerinde duruyor: {0}"
 }

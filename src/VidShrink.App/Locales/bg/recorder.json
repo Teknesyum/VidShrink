@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Начертай маска",
   "recorder.mask.draw-hint": "Плъзнете с мишката върху областта, която трябва да е размазана в записа; Esc отказва.",
   "recorder.mask.clear": "Премахни маските",
-  "recorder.mask.count": "Маски: {0}"
+  "recorder.mask.count": "Маски: {0}",
+  "recorder.disk.low": "На диска остават само {0} свободни; записът може да прекъсне.",
+  "recorder.recover.found": "Открит е незавършен запис: {0}",
+  "recorder.recover.action": "Възстанови",
+  "recorder.recover.done": "Записът е възстановен: {0}",
+  "recorder.recover.failed": "Записът не можа да бъде възстановен; файлът със записа остава на мястото си: {0}"
 }

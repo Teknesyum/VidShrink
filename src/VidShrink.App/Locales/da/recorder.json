@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Tegn maske",
   "recorder.mask.draw-hint": "Træk med musen hen over det område, der skal være sløret i optagelsen; Esc annullerer.",
   "recorder.mask.clear": "Fjern masker",
-  "recorder.mask.count": "Masker: {0}"
+  "recorder.mask.count": "Masker: {0}",
+  "recorder.disk.low": "Kun {0} ledig plads på disken; optagelsen kan stoppe undervejs.",
+  "recorder.recover.found": "Ufærdig optagelse fundet: {0}",
+  "recorder.recover.action": "Gendan",
+  "recorder.recover.done": "Optagelsen er gendannet: {0}",
+  "recorder.recover.failed": "Optagelsen kunne ikke gendannes; optagefilen ligger der stadig: {0}"
 }

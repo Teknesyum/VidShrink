@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Draw mask",
   "recorder.mask.draw-hint": "Drag with the mouse over the area that should appear blurred in the recording; Esc cancels.",
   "recorder.mask.clear": "Remove masks",
-  "recorder.mask.count": "Masks: {0}"
+  "recorder.mask.count": "Masks: {0}",
+  "recorder.disk.low": "Only {0} free on the disk; the recording may stop partway.",
+  "recorder.recover.found": "Unfinished recording found: {0}",
+  "recorder.recover.action": "Recover",
+  "recorder.recover.done": "Recording recovered: {0}",
+  "recorder.recover.failed": "Could not recover the recording; the capture file is still in place: {0}"
 }

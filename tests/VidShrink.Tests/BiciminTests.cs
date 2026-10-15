@@ -1276,6 +1276,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, origin/main birlesmesinden sonra (EKB-P14 dali): main tarafinin pimi 3449 / en 328 / tr 109 ile bu dalin artislari bir arada; testin kendi SAYIM satirindan olculdu: toplam 3477, en 330, tr 110.</para>
     /// <para>2026-10-15, ses dosyasi ve GIF girdisi (ARC-P3): uc yeni anahtardan (<c>main.convert.note.gif-target</c>, <c>main.error.audio-only-shrink</c>, <c>main.validation.no-video-container</c>) 4 kol, KOL dokumunden sayildi, en ve tr girmiyor: olculen 3479 + 4 = 3483, en 331, tr 109.</para>
     /// <para>2026-10-15, altyazi gomme ve bicemi (DON-P3): alti yeni anahtar (<c>main.subtitles.style.color.*</c> bes renk, <c>main.validation.burn-encode</c>), dusen yok; olculen 70563 + 43 x 6 = 70821. <c>kayip</c> 0.</para>
+    /// <para>2026-10-15, kaydedici disk uyarisi ve kayit kurtarma (EKA-P1): bes yeni anahtar (<c>recorder.disk.low</c>, <c>recorder.recover.*</c> dort), dusen yok; olculen 70821 + 43 x 5 = 71036. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1584,7 +1585,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(70821, gezilen);
+        Assert.Equal(71036, gezilen);
         Assert.Empty(kayip);
     }
 

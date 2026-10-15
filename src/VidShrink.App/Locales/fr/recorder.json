@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Dessiner un masque",
   "recorder.mask.draw-hint": "Faites glisser la souris sur la zone qui doit apparaître floue dans l'enregistrement ; Échap annule.",
   "recorder.mask.clear": "Supprimer les masques",
-  "recorder.mask.count": "Masques : {0}"
+  "recorder.mask.count": "Masques : {0}",
+  "recorder.disk.low": "Plus que {0} d'espace libre sur le disque ; l'enregistrement risque de s'interrompre.",
+  "recorder.recover.found": "Enregistrement inachevé trouvé : {0}",
+  "recorder.recover.action": "Récupérer",
+  "recorder.recover.done": "Enregistrement récupéré : {0}",
+  "recorder.recover.failed": "Impossible de récupérer l'enregistrement ; le fichier de capture est conservé : {0}"
 }
