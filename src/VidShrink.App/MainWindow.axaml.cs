@@ -1231,6 +1231,7 @@ public partial class MainWindow : Window
         RefreshEncodeLoadTexts();
         UpdateToolStatus();
         RefreshPlatforms();
+        SonDenetimiYaz();
         if (!_performanceRunning) ShowPerformanceResult(_performanceShown);
         if (_info is not null) { ShowInfo(_info); Recalculate(); RefreshConversion(); }
         else RefreshQualityPanels();
@@ -1517,26 +1518,10 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Gunlugu dosya yoneticisinde gosterir. Kullaniciya tam yol gosterilmez: durum
-    /// satirinda yalniz dosya adi durur, yolu klasor penceresi zaten tasiyor.
+    /// Günlüğü uygulama içindeki tanılama penceresinde açar (<see cref="ShowDiagnostics"/>);
+    /// dosya yöneticisinde gösterme oradaki düğmede.
     /// </summary>
-    private void OnOpenLog(object? sender, RoutedEventArgs e)
-    {
-        try
-        {
-            if (!File.Exists(Gunluk.Dosya))
-            {
-                TxtSystemStatus.Text = Say("settings.log.empty");
-                return;
-            }
-            Platform.Reveal(Gunluk.Dosya);
-            TxtSystemStatus.Text = $"{Say("settings.log.opened")}: {Path.GetFileName(Gunluk.Dosya)}";
-        }
-        catch (Exception ex)
-        {
-            TxtSystemStatus.Text = $"{Say("main.error.folder")}: {ex.Message}";
-        }
-    }
+    private void OnOpenLog(object? sender, RoutedEventArgs e) => ShowDiagnostics();
 
     private void OnResetSettings(object? sender, RoutedEventArgs e)
         => ResetSettingsConfirm.IsVisible = true;
@@ -1922,6 +1907,7 @@ public partial class MainWindow : Window
 
         RefreshUpdateTexts();
         RefreshPlatforms();
+        SonDenetimiYaz();
         ReportAppliedUpdate();
     }
 

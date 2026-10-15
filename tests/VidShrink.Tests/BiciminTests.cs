@@ -1285,6 +1285,8 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, AYR-P4 birlesmesi: olculen toplam 3536 + 2 = 3538, en 337, tr 110, gezilen 71552 + 258 = 71810.</para>
     /// <para>2026-10-15, DON-P9 birlesmesi: olculen toplam 3538 + 4 = 3542, en 337, tr 110, gezilen 71810 + 258 = 72068.</para>
     /// <para>2026-10-15, OYA-P10: olculen toplam 3542 + 16 = 3558, en 338, tr 110, gezilen 72068 + 215 = 72283.</para>
+    /// <para>2026-10-15, guncelleme, hakkinda ve tanilama (AYR-P3): yirmi iki yeni anahtar (<c>settings.log.report</c>, <c>settings.diag.*</c>, <c>main.about.notes</c>, <c>.licenses</c>, <c>.privacy</c>, <c>main.about.check.*</c>, <c>main.update.whats-new</c>), KOL dokumunden ve SAYIM satirindan olculdu: toplam 3542 + 29 = 3571, en 337 + 6 = 343, tr 110, gezilen 72068 + 43 x 22 = 73014.</para>
+    /// <para>2026-10-15, OYA-P10 ile AYR-P3 birlesmesinden sonra: iki dalin kaymasi toplandi, dusen yok; olculen toplam 3542 + 16 + 29 = 3587, en 337 + 1 + 6 = 344, tr 110, gezilen 72068 + 215 + 946 = 73229.</para>
     /// <para>2026-10-15, cikti tarihi, adi ve dogrulamasi (SIK-P6): alti yeni anahtardan (<c>main.shrink-job.failed</c>, <c>.retry</c>, <c>main.run.output-unreadable</c>, <c>.output-short</c>, <c>settings-tab.keep-dates.label</c>, <c>.hint</c>) 10 kol (<c>main.shrink-job.retry</c>: es, hu, it, nl, pl, pt; <c>settings-tab.keep-dates.label</c>: en, es, hu, pt), KOL dokumunden sayildi, tr girmiyor: olculen 3516 + 10 = 3526, en 334 + 1 = 335, tr 110.</para>
     /// <para>2026-10-15, bolum yazma (DZA-P8): iki yeni anahtardan (<c>editor.export.chapters</c>, <c>.tip</c>) yalniz <c>editor.export.chapters</c> 3 dilde kola giriyor (en, hu, pt), KOL dokumunden sayildi, tr girmiyor: olculen 3516 + 3 = 3519, en 334 + 1 = 335, tr 110.</para>
     /// <para>2026-10-15, sistem temasi ve hareket ayari (AYR-P4): alti yeni anahtar (<c>settings-tab.follow-system-theme.*</c>, <c>settings-tab.theme.light</c>, <c>.dark</c>, <c>settings-tab.reduce-motion.*</c>); yalniz <c>settings-tab.follow-system-theme.label</c> 2 dilde kola giriyor (pt, sw), KOL dokumunden sayildi, en ve tr girmiyor: olculen 3516 + 2 = 3518, en 334, tr 110. Gezilen 70821 + 43 x 6 = 71079, <c>kayip</c> 0.</para>
@@ -1314,8 +1316,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3558, toplam);
-        Assert.Equal(338, dilBasina["en"]);
+        Assert.Equal(3587, toplam);
+        Assert.Equal(344, dilBasina["en"]);
         Assert.Equal(110, dilBasina["tr"]);
     }
 
@@ -1600,7 +1602,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(72283, gezilen);
+        Assert.Equal(73229, gezilen);
         Assert.Empty(kayip);
     }
 

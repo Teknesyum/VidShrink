@@ -1,0 +1,43 @@
+name: Bug report
+description: Something in VidShrink does not work as it should.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Settings → Diagnostic log → Report a Problem opens this form with the version, the operating system and the log location already filled in.
+        The log never contains file paths, so it can be shared as is. The diagnostic package (a zip from the same window) holds the log and a short system summary; attach it below if you saved one.
+  - type: input
+    id: version
+    attributes:
+      label: VidShrink version
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+    validations:
+      required: true
+  - type: input
+    id: log-path
+    attributes:
+      label: Log location
+      description: Where the diagnostic log lives on your machine. Your user folder is shortened to ~.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, what you expected and what you saw instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+  - type: textarea
+    id: log
+    attributes:
+      label: Log or diagnostic package
+      description: Paste the log (Copy in the diagnostics window) or drag the diagnostic package zip here.

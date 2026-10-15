@@ -50,7 +50,7 @@ public sealed class SettingsTabTests
     /// kendi sekmesinden cikip Ayarlar'in en altina paneli olarak girdi; olcu artik sekmeyi
     /// degil paneli ariyor.
     /// </summary>
-    private static string Panel(string name)
+    internal static string Panel(string name)
     {
         var xaml = WindowXaml();
         var start = xaml.IndexOf($"<Border x:Name=\"{name}\"", StringComparison.Ordinal);
