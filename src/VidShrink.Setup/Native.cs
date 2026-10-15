@@ -391,4 +391,11 @@ internal static class Native
 
     [DllImport("ole32.dll")]
     public static extern void CoTaskMemFree(IntPtr memory);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern IntPtr SendMessageTimeoutW(IntPtr hwnd, uint message, IntPtr wParam, string lParam, uint flags, uint timeout, out IntPtr result);
+
+    /// <summary>Kullanıcı PATH'i değişti; açık Gezgin ve yeni konsollar <c>WM_SETTINGCHANGE</c> ile tazelenir.</summary>
+    public static void BroadcastEnvironmentChanged() =>
+        SendMessageTimeoutW(new IntPtr(0xffff), 0x001A, IntPtr.Zero, "Environment", 0x0002, 5000, out _);
 }

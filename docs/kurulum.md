@@ -28,7 +28,22 @@ rounds in which VidShrink still holds the folder it closes it and waits up to 12
 VidShrink-Setup.exe                  install or update
 VidShrink-Setup.exe --uninstall      remove shortcuts, right-click entries, associations and the install
 VidShrink-Setup.exe --help           every switch
+VidShrink-Setup.exe --silent         no window, no question; on an error exit non-zero without waiting
+VidShrink-Setup.exe --add-to-path    also put <install root>\bin on the user PATH (off by default)
+VidShrink-Setup.exe --uninstall --remove-settings   also delete the settings folder (%APPDATA%\VidShrink)
 ```
+
+The installer registers VidShrink under Windows Settings → Apps → Installed apps (per user,
+`HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\VidShrink`). The entry's uninstall
+command calls a copy of the installer kept at `%LOCALAPPDATA%\VidShrink\VidShrink-Setup.exe`,
+so removing the downloaded file does not break it; the quiet uninstall string adds `--silent`.
+Uninstalling deletes the entry. The entry's version is the one installed by the setup; an
+in-app update does not rewrite it.
+
+`--add-to-path` puts only `<install root>\bin` on the user PATH. That folder holds one file,
+`vidshrink.cmd`, a single line that calls the installed command-line tool
+(`app\vidshrink.exe`). The existing PATH entries and the value's type are kept, the folder is
+not added twice, and uninstalling takes it off PATH again. Open a new terminal to see the change.
 
 The release's `checksums-win-x64.txt` lists `VidShrink-Setup.exe` too.
 

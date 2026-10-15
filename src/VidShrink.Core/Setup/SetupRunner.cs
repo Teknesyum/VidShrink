@@ -192,6 +192,9 @@ public static class SetupRunner
             }
             Mark("kabuk");
 
+            RegisterApp(options, host, root, version);
+            Mark("uygulama-kaydi");
+
             if (aside is not null) TryDelete(aside);
             SweepAsides(root);
 
@@ -235,6 +238,8 @@ public static class SetupRunner
             }
         }
 
+        UnregisterApp(options, host, root);
+
         if (UnderPrograms(root, options.LocalAppData))
         {
             if (Directory.Exists(root))
@@ -245,6 +250,63 @@ public static class SetupRunner
         else
         {
             host.Log(SetupText.Get("setup.uninstall.outside-programs", root));
+        }
+
+        if (options.RemoveSettings && !string.IsNullOrEmpty(options.SettingsFolder) && Directory.Exists(options.SettingsFolder))
+        {
+            Directory.Delete(options.SettingsFolder, recursive: true);
+            host.Log(SetupText.Get("setup.settings.removed", options.SettingsFolder));
+        }
+
+        var setupCopy = UninstallEntry.SetupCopy(options.LocalAppData);
+        if (File.Exists(setupCopy) && !SamePath(host.SetupExecutable, setupCopy))
+        {
+            try { File.Delete(setupCopy); }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
+        }
+    }
+
+    private static bool SamePath(string? a, string b) =>
+        !string.IsNullOrEmpty(a) && string.Equals(Path.GetFullPath(a), Path.GetFullPath(b), StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Ayarlar'daki kaldırma kaydı ve isteğe bağlı PATH girdisi. Gerçek köke yalnız kurucu yazar;
+    /// başka süreçte kapı kapalıysa adım atlanır, kurulum düşmez.
+    /// </summary>
+    [SupportedOSPlatform("windows")]
+    private static void RegisterApp(SetupOptions options, SetupHost host, string root, string version)
+    {
+        if (!options.RegisterUninstall && !options.AddToPath) return;
+        if (!ShellRegistration.WriteAllowed(Environment.ProcessPath, options.ClassesRoot))
+        {
+            host.Log(SetupText.Get("setup.uninstall-entry.skipped", ShellRegistration.SetupExecutableName, options.ClassesRoot));
+            return;
+        }
+
+        if (options.RegisterUninstall && UninstallEntry.Write(options, host, root, version) is not null)
+            host.Log(SetupText.Get("setup.uninstall-entry.written", options.UninstallKey));
+
+        var bin = CommandShim.Folder(root);
+        if (options.AddToPath || UserPath.Contains(UserPathRegistry.Read(options.EnvironmentKey), bin))
+            CommandShim.Write(root);
+        if (options.AddToPath && UserPathRegistry.Add(options.EnvironmentKey, bin))
+        {
+            host.Log(SetupText.Get("setup.path.added", bin));
+            if (options.DefaultRegistry) host.EnvironmentChanged();
+        }
+    }
+
+    [SupportedOSPlatform("windows")]
+    private static void UnregisterApp(SetupOptions options, SetupHost host, string root)
+    {
+        if (!ShellRegistration.WriteAllowed(Environment.ProcessPath, options.ClassesRoot)) return;
+        if (UninstallEntry.Remove(options))
+            host.Log(SetupText.Get("setup.uninstall-entry.removed", options.UninstallKey));
+        var bin = CommandShim.Folder(root);
+        if (UserPathRegistry.Remove(options.EnvironmentKey, bin))
+        {
+            host.Log(SetupText.Get("setup.path.removed", bin));
+            if (options.DefaultRegistry) host.EnvironmentChanged();
         }
     }
 

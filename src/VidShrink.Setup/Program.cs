@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using VidShrink.Core;
 using VidShrink.Core.Setup;
 
 namespace VidShrink.Setup;
@@ -11,6 +12,8 @@ internal static partial class Program
     {
         Console.OutputEncoding = new UTF8Encoding(false);
         var ownConsole = GetConsoleProcessList(new uint[2], 2) == 1;
+        var silent = SetupLaunch.IsSilent(args);
+        if (silent && ownConsole) Native.ShowWindow(Native.GetConsoleWindow(), Native.SW_HIDE);
         try
         {
             SetupText.Use(UserLocaleName());
@@ -28,7 +31,7 @@ internal static partial class Program
         {
             Write(SetupLaunch.FailureMessage(exception), ConsoleColor.Red);
             var window = Native.GetConsoleWindow();
-            if (SetupLaunch.PauseOnError(ownConsole, window != IntPtr.Zero && Native.IsWindowVisible(window), Console.IsInputRedirected))
+            if (SetupLaunch.PauseOnError(ownConsole, window != IntPtr.Zero && Native.IsWindowVisible(window), Console.IsInputRedirected, silent))
             {
                 Console.WriteLine(SetupText.Get("setup.console.press-enter"));
                 Console.ReadLine();
@@ -79,6 +82,7 @@ internal static partial class Program
         var registryRoot = @"HKCU:\Software\Classes";
         var language = "auto";
         bool skip = false, noLaunch = false, uninstall = false, timings = false, downloadFfmpeg = false;
+        bool addToPath = false, removeSettings = false;
         string? tag = null, assetSource = null, shortcutDirectory = null;
 
         for (var i = 0; i < args.Length; i++)
@@ -101,6 +105,9 @@ internal static partial class Program
                 case "--asset-source": assetSource = Path.GetFullPath(Next()); break;
                 case "--download-ffmpeg": downloadFfmpeg = true; break;
                 case "--timings": timings = true; break;
+                case "--silent": noLaunch = true; break;
+                case "--add-to-path": addToPath = true; break;
+                case "--remove-settings": removeSettings = true; break;
                 case "--console" or "--panel": break;
                 default: throw new SetupException(SetupText.Get("setup.arg.unknown-option", args[i]));
             }
@@ -118,7 +125,10 @@ internal static partial class Program
             Tag = tag,
             AssetSource = assetSource,
             ShortcutDirectory = shortcutDirectory,
-            ForceFfmpegDownload = downloadFfmpeg
+            ForceFfmpegDownload = downloadFfmpeg,
+            AddToPath = addToPath,
+            RemoveSettings = removeSettings,
+            SettingsFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), UpdateSettings.FolderName)
         };
         return (options, uninstall, timings);
     }
@@ -135,6 +145,8 @@ internal static partial class Program
         UiLanguage = UserLocaleName,
         Launch = path => Process.Start(new ProcessStartInfo(path) { UseShellExecute = true, WorkingDirectory = Path.GetDirectoryName(path) })?.Dispose(),
         AssociationChanged = ShellRegistration.NotifyAssociationChanged,
+        SetupExecutable = rehearsal ? null : Environment.ProcessPath,
+        EnvironmentChanged = Native.BroadcastEnvironmentChanged,
         DesktopDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
         ProgramsDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Programs)
     };
