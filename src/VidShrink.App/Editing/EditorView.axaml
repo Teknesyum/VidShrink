@@ -434,6 +434,8 @@
                   <MenuItem x:Name="MnuProjectOpen" Header="{loc:Text editor.project.open}"/>
                   <MenuItem x:Name="MnuCutListExport" Header="{loc:Text editor.cutlist.export}"/>
                   <MenuItem x:Name="MnuCutListImport" Header="{loc:Text editor.cutlist.import}"/>
+                  <MenuItem x:Name="MnuSubtitleImport" Header="{loc:Text editor.subtitle.import}"/>
+                  <MenuItem x:Name="MnuSubtitleExport" Header="{loc:Text editor.subtitle.export}"/>
                 </ContextMenu>
               </editing:EditorTimeline.ContextMenu>
             </editing:EditorTimeline>
