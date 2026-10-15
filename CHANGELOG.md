@@ -7,6 +7,40 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.21] - 2026-10-15
+
+### Added
+
+- Recorder: "Audio Only" target records just the microphone and system sound; the audio codec can
+  be AAC or Opus (where the container carries it), and a compressor and a limiter join the
+  advanced audio options.
+- CLI: `kaydet` / `record` starts a recording from the saved recorder settings without opening the
+  window, with a duration limit and output path.
+- Editor: "Fit" aspect mode scales the frame down and pads the rest with black or white instead of
+  cropping.
+- Editor: "Remux…" rewrites the container without re-encoding, with per-track language, name and
+  default flag, a track delay and the rotation flag.
+- Editor text: set the position from the panel or by dragging on the monitor; slide-in, slide-out
+  and typewriter motions.
+- Convert: FFV1 and CineForm codecs, APNG output, and GIF loop count, colour count and dither.
+- Installer script: `-Silent`, `-AddToPath` and `-RemoveSettings`.
+- Recorder: push-to-talk keeps the microphone muted until the hotkey (Ctrl+F5 by default) is held.
+- Recorder: scheduled start at a set time, once, daily or weekly, while the app is open.
+- Editor: import and export SRT, VTT and ASS subtitles.
+- Editor: "Remux…" can add, extract and drop tracks and attach a cover image.
+- Convert: extra ffmpeg arguments, also as `--extra-args` on the command line.
+- Settings: "Above normal" encoding priority, a custom finish sound, and system notifications
+  on macOS and Linux.
+- CLI: `kaydet` takes the audio codec, compressor and limiter options.
+
+### Fixed
+
+- Speed-changed clips are rounded to a whole frame in the export length.
+- The advanced recorder card fits a 1060 px tall window again after the new audio options.
+- Text style changes (outline, shadow, box) now refresh the export preview.
+- GIF colour count no longer exceeds the chosen palette size.
+- GIF settings are remembered between sessions.
+
 ## [1.2.20] - 2026-10-15
 
 ### Added
