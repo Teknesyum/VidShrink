@@ -10,21 +10,21 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 **Dalga 2 — Karar Gerekmez, Küçük İş Öncelik 2 Ya Da Orta İş Öncelik 1**
 
-## 40. Komut Satırı Ve Toplu Teslim
+## 40. Düzenleyicide Proje Sırası Ve Toplu Teslim
 
-13 Ekim 2026 · "bulduklarını later a eklersin" · DZA-P9 · Düzenleyici · iş büyük · öncelik 1 · karar gerekmez
+13 Ekim 2026 · "bulduklarını later a eklersin" · DZA-P9 · Düzenleyici · iş orta · öncelik 1 · karar gerekmez
 
-- Satırlar (DZA-P9): DZA-28 Komut satırında çok parçalı kesim; DZA-09 Toplu teslim. [Tablo](piyasa/2026-10-13/duzenleyici-kesim-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Cli/CliRequest.cs, src/VidShrink.Core/Editing/EditProject.cs, src/VidShrink.Core/Editing/EditExport.cs, src/VidShrink.Core/JobPump.cs, src/VidShrink.App/Editing/
-- Plan: Önce pencere açmadan "proje dosyası girer, teslim çıkar" koşan çekirdek işlev ayrılır ve komut satırına bağlanır; bugün komut satırı yalnız tek aralık kesiyor (CliRequest.cs:425-435). Sonra düzenleyiciye proje ve dosya sırası gelir; sıra Küçült'ün iş pompasıyla (JobPump.cs:8) art arda koşar, bir işin düşmesi ötekileri durdurmaz. Bölünecekse önce komut satırı (orta), sonra sıra. Doğrulama: komut satırı argüman testleri ve sahte teslimle sıra testi.
+- İlk adım 16 Ekim 2026'da main'de: `vidshrink teslim <proje>` pencere açmadan proje dosyasını teslim ediyor (`src/VidShrink.Cli/CliEdit.cs`, `EditProject.ToJob`).
+- Kalan (DZA-09 Toplu teslim): düzenleyiciye proje ve dosya sırası gelir; sıra Küçült'ün iş pompasıyla (`src/VidShrink.Core/JobPump.cs`) art arda koşar, bir işin düşmesi ötekileri durdurmaz. Doğrulama: sahte teslimle sıra testi.
+- Ölçülmeyen: komut satırı tesliminde hızlı ve akıllı kip, çok kaynaklı ve müzikli proje uçtan uca gerçek ffmpeg ile.
 
-## 41. Hızlı Kırpma Ve Kayıt Geçmişi
+## 41. Kayıt Geçmişi
 
-13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P6 · Kaydedici · iş büyük · öncelik 1 · karar gerekmez
+13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P6 · Kaydedici · iş orta · öncelik 1 · karar gerekmez
 
-- Satırlar (EKB-P6): EKB-09 Hızlı kırpma; EKB-25 Kayıt geçmişi. [Tablo](piyasa/2026-10-13/kaydedici-sunum-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Recorder/RecorderView.axaml, src/VidShrink.App/Recorder/RecorderView.axaml.cs, src/VidShrink.App/Recorder/, src/VidShrink.App/Playback/ClipExport.cs, src/VidShrink.App/Recorder/RecorderSettings.cs, src/VidShrink.App/Locales/
-- Plan: Sonuç paneline küçük resim şeridi ve iki tutamak eklenir; kesim yeniden kodlamadan `-ss`, `-t` ve `-c copy` ile yapılır ve en yakın anahtar kareye (tek başına çözülebilen kare) oturur; bu yol oynatıcıda var (ClipExport.cs:65-71). Aynı küçük resim üretimi son kayıtların listesinde kullanılır: ad, süre, boyut; aç, paylaş, sil. İki adımda teslim edilebilir: önce kırpma, sonra geçmiş. Kesilen dosyanın süresi ffprobe ile, liste sahte klasörle ölçülür.
+- Hızlı kırpma 16 Ekim 2026'da main'de (`RecorderQuickTrim`, sonuç panelinde "Hızlı kırp").
+- Kalan (EKB-25 Kayıt geçmişi): hızlı kırpmanın küçük resim üretimi son kayıtların listesinde kullanılır: ad, süre, boyut; aç, paylaş, sil. Liste sahte klasörle ölçülür.
+- Yan bulgu: bas-konuş kısayolu atanmamışken ipucunda tuş adı boş kalıyor; yer saptanmadı.
 
 ## 42. Ekrana Çizim Ve Prompter
 
@@ -34,22 +34,13 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.App/Recorder/, src/VidShrink.App/Recorder/CaptureAffinity.cs, src/VidShrink.App/Recorder/RecorderView.Kisayol.cs, src/VidShrink.App/Recorder/RecorderSettings.cs, src/VidShrink.App/Locales/
 - Plan: Çizim için ekranı kaplayan saydam bir pencere açılır; kısayolla çizim kipine girilir, kalem, ok, kutu, numara ve yazı çizilir, pencere kayda girer. Prompter (konuşma metnini akıtan pencere) ayrı penceredir ve `CaptureAffinity.Exclude` ile kayıttan çıkarılır; Windows 10 2004 öncesinde pencere kayıttan çıkmadığı için orada uyarı gösterilir (CaptureAffinity.cs:16-20). İki adımda teslim edilebilir: önce çizim, sonra prompter. Çizim araçları başsız pencere testiyle, kayıttan çıkarma bayrağı pencere başına ölçülür.
 
-## 43. Yerel Denetim Borusu Ve Kayıt Komutu
+## 44. Bölüm Düzenleyici
 
-13 Ekim 2026 · "bulduklarını later a eklersin" · DAG-P4 · Dağıtım Ve Otomasyon · iş büyük · öncelik 1 · karar gerekmez
+13 Ekim 2026 · "bulduklarını later a eklersin" · ARC-P5 = DON-P14 · Bizde Olmayan Araçlar · iş orta · öncelik 1 · karar gerekmez
 
-- Satırlar (DAG-P4): DAG-35 Denetim arabirimi; DAG-31 Komut satırında ekran kaydı. [Tablo](piyasa/2026-10-13/dagitim-otomasyon-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/SingleInstanceChannel.cs, src/VidShrink.Core/ShrinkRequest.cs, src/VidShrink.App/Integration/, src/VidShrink.App/Recorder/, src/VidShrink.Cli/, docs/
-- Plan: Tek örnek borusu (ikinci kopyanın ilk kopyaya dosya yolu ilettiği, yalnız aynı kullanıcıya açık adlandırılmış boru) belgeli bir komut kanalına genişletilir: satır başına bir JSON komutu ve yanıtı (oynat, duraklat, konum, dosya aç, kaydı başlat ve durdur, kuyruğa küçültme ekle, durum sor). Yeni komutlar Ayarlar'daki bir anahtar ya da başlatma bayrağı açılmadıkça reddedilir; ağ soketi açılmaz, yeni paket eklenmez. Komut satırına bu kanalın istemcisi olan kayıt başlatma, kayıt durdurma ve durum komutları gelir; protokol docs/ altında belgelenir. Doğrulama: boru üstünden komut ve yanıt testleri, kapalıyken reddetme testi, elle de komutla kayıt başlatıp durdurma.
-
-## 44. Etiket, Bölüm Ve Onarma
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · ARC-P5 = DON-P14 · Bizde Olmayan Araçlar · iş büyük · öncelik 1 · karar gerekmez
-
-- Satırlar (ARC-P5): ARC-14 Etiket düzenleyici; ARC-15 Bölüm düzenleyici; ARC-16 Yeniden sararak onarma. [Tablo](piyasa/2026-10-13/eksik-araclar-dogrulanmis.md)
-- Satırlar (DON-P14): DON-29 Meta veri düzenleme; DON-30 Bölüm düzenleme; DON-31 İz etiketleri. [Tablo](piyasa/2026-10-13/donustur-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/RecorderChapters.cs, src/VidShrink.Core/StreamMapping.cs, src/VidShrink.Core/ConversionPlan.cs, src/VidShrink.Core/ConversionArguments.cs, src/VidShrink.App/MainWindow.axaml, src/VidShrink.Cli/CliRequest.cs
-- Plan: Üçü de Dönüştür'de "Kopyala" seçiliyken, yani yeniden kodlamadan yapılır; sırayla ayrı ayrı teslim edilebilir. Etiket için "Meta veriyi sil" kutusunun yanına başlık, sanatçı, yıl, açıklama ve kapak alanları gelir; bölüm için kaydedicinin bölüm yazan yolu ortak hâle getirilir ve kaynağın bölümleri eklenip adlandırılıp silinebilen liste olur; onarma için akışları kopyalayan, bozuk zaman damgasını hoş gören bayraklarla "Onar" hazır ayarı eklenir. Doğrulama: MetaSilDonusturTests ve KayitBolumIsaretiTests'teki gibi ffprobe ile etiket ve bölüm okunur; boş alan anahtarı hiç yazmaz.
+- Etiketler ve "Onar" hazır ayarı 16 Ekim 2026'da main'de (`MainWindow.DonusturEtiket.cs`).
+- Kalan (ARC-15, DON-30): kaydedicinin bölüm yazan yolu (`src/VidShrink.Core/RecorderChapters.cs`) ortak hâle getirilir; kaynağın bölümleri Dönüştür'de eklenip adlandırılıp silinebilen liste olur. Doğrulama: ffprobe ile bölüm okunur.
+- Açık kalanlar: etiketler ayara yazılmıyor, komut satırı yüzü yok, Onar gerçek bozuk dosyada ölçülmedi.
 
 ## 50. Mac Ortam Denetimi Bağlantısı
 
@@ -58,14 +49,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (OYB-P9): OYB-30 macOS Now Playing. [Tablo](piyasa/2026-10-13/oynatici-kitaplik-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Player/MpvEngine.cs, src/VidShrink.App/Playback/
 - Plan: mpv'nin ortam tuşları seçeneği (`input-media-keys`) gömülü kullanımda varsayılan kapalıdır; önce macOS'ta açılır ve klavye ortam tuşlarının, Denetim Merkezi'ndeki çalan ortam alanının oynatıcıyı yönetip yönetmediği ölçülür. Yetmezse macOS'un ortam denetimi arayüzüne ayrı bir bağ yazılır. Sonraki ve önceki tuşu yine uygulamanın kuyruğuna bağlanır. Bu iş Windows makinesinde doğrulanamaz; Mac'te koşan bir işçi ister.
-
-## 57. Önizlemede Elle Kırpma
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · SIK-P8 · Küçült · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (SIK-P8): SIK-12 Görsel elle kırpma. [Tablo](piyasa/2026-10-13/kucult-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/MainWindow.axaml (önizleme alanı ve `ChkFltAutoCrop` çevresi), src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.Core/VideoFilterChain.cs, src/VidShrink.App/Locales/
-- Plan: Önizleme karesinin üstüne tutamaçlı bir dikdörtgen çizilir; kullanıcı fareyle sürükler, sonuç kaynak pikseline çevrilip var olan `crop` süzgeç yoluna yazılır (`src/VidShrink.Core/VideoFilterChain.cs:330`). Elle kırpma seçiliyken otomatik siyah bant kırpma kapanır; genişlik ve yükseklik kodlayıcının istediği çift sayıya yuvarlanır. Doğrulama: ekran koordinatından kaynak pikseline çeviriyi ölçen test ve çıktı çözünürlüğünü ffprobe ile okuyan test.
 
 ## 60. Kodlayıcı, HDR Ve Renk Ayarları
 
@@ -634,10 +617,3 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Sahibin kararı: uygulamaya betik motoru (yeni bağımlılık) eklensin ve sürümler arası korunacak bir eklenti arabirimi sözü verilsin mi.
 - Plan: DAG-P4'ten önce başlanmaz: dış süreçten gelen komut kanalı, eklenti isteklerinin kumanda ve otomasyon kısmını bağımlılık eklemeden karşılar. Evet denirse ilk adım dar tutulur: kullanıcı klasöründeki betikler oynatıcı ve kuyruk olaylarına abone olur ve komut kanalındaki komutları çağırır; arayüze parça ekleyen eklenti sonraya kalır. Betik dili ve motoru kararın parçasıdır. Doğrulama: örnek betikle olay ve komut testi, betik hatasının uygulamayı düşürmediğinin testi.
 
-## 153. Kısayol Okuması Çakışmada Bütün Atamaları Siliyor
-
-15 Ekim 2026 · later 68 yan bulgusu · Kaydedici · iş küçük · öncelik 1 · karar gerekmez
-
-- Yer: src/VidShrink.App/Recorder/RecorderHotkeys.cs:134-160 (`Read` içindeki `All.Skip` döngüsü).
-- Sorun: eski 6 parçalı ayar zaten Ctrl+F5 içeriyorsa okuma çakışma görüp `null` dönüyor; kullanıcının bütün özel tuşları varsayılana düşüyor.
-- Plan: eksik yedinci parça varsayılanla doldurulurken çakışırsa yalnız o parça boş bırakılır, diğer atamalar korunur. Ölçü: 6 parçalı Ctrl+F5 içeren ayarla okuma testi.

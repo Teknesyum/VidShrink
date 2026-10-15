@@ -7,6 +7,27 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.22] - 2026-10-16
+
+### Added
+
+- CLI: `teslim` / `export` exports a saved editor project without opening the window, with every
+  segment, text layer, music track and extra source; it stops if a source changed since the
+  project was saved.
+- CLI: `denetim` / `control` starts and stops a recording or reports status in an open window
+  started with `--control-channel`; the channel is a named pipe open only to the same user.
+- Recorder: "Quick trim" on the result panel cuts the start and end of a recording without
+  re-encoding, snapping the start to the previous keyframe.
+- Shrink: draw a crop rectangle on the preview; manual crop turns automatic black-bar crop off.
+- Convert: title, artist, year, description and cover image tags, and a "Repair" preset that
+  remuxes with tolerant timestamp flags.
+
+### Fixed
+
+- Editor: exporting from the window no longer drops the music track.
+- Recorder: a hotkey clash in old settings clears only the clashing action instead of resetting
+  every custom hotkey.
+
 ## [1.2.21] - 2026-10-15
 
 ### Added
