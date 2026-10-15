@@ -44,6 +44,8 @@
   "recorder.audio.system": "Son système",
   "recorder.audio.none": "Aucun son",
   "recorder.audio.refresh": "Actualiser la liste",
+  "recorder.audio.push-to-talk": "Appuyer pour parler",
+  "recorder.audio.push-to-talk.hint": "• Le micro n'est enregistré que pendant l'appui sur {0}.\n• La touche se change dans le menu des raccourcis.",
   "recorder.audio.hint": "Choisir les deux enregistre deux entrées et les mélange en une seule piste.",
   "recorder.audio.loopback": "Son diffusé par ce PC",
   "recorder.audio.loopback.switched": "Le périphérique de sortie a changé ; le son système vient maintenant du nouveau.",

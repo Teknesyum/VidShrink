@@ -1315,6 +1315,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, kesim listesi (DZA-P10): sekiz yeni <c>editor.cutlist.*</c> anahtarindan 35 kol (en 2, es 7, fr 6, hu 2, pt 7, ro 6, sw 5), KOL dokumunden ve SAYIM satirindan olculdu, tr girmiyor: toplam 3668 + 35 = 3703, en 359 + 2 = 361, tr 119.</para>
     /// <para>2026-10-15, metin konumu ve hareketi (later 86): on dort yeni <c>editor.text.*</c> anahtarindan 8 kol (es, it, pl, pt <c>.motion.typewriter</c>; hr <c>.keyframe</c>; ro <c>.motion.bottom</c>, <c>.motion.top</c>, <c>.motion.typewriter</c>), KOL dokumunden sayildi, en ve tr girmiyor: olculen 3714 + 8 = 3722, en 361, tr 119.</para>
     /// <para>2026-10-15, later 64 yalniz ses ve ses secenekleri: dort yeni kaydedici anahtari 3 kol ekliyor, en ve tr degismedi; olculen toplam 3714 + 3 = 3717, gezilen 76454 + 172 = 76626.</para>
+    /// <para>2026-10-15, bas konus (later 68): iki yeni anahtar (<c>recorder.audio.push-to-talk</c>, <c>.hint</c>) 6 kol ekliyor (en <c>push-to-talk</c> dahil), tr degismedi; testin SAYIM satirindan olculdu: toplam 3733 + 6 = 3739, en 361 + 1 = 362, tr 120.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1340,8 +1341,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3733, toplam);
-        Assert.Equal(361, dilBasina["en"]);
+        Assert.Equal(3739, toplam);
+        Assert.Equal(362, dilBasina["en"]);
         Assert.Equal(120, dilBasina["tr"]);
     }
 
@@ -1607,6 +1608,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, later 86 birlesmesinden sonra: metin konumu anahtarlarinin kaymasi main'in uzerine toplandi, dusen yok; olculen toplam 3721 + 8 = 3729, en 361, tr 119, gezilen 77357 + 602 = 77959.</para>
     /// <para>2026-10-15, later 64 birlesmesinden sonra: kaydedici ses anahtarlarinin kaymasi main'in uzerine toplandi, dusen yok; olculen toplam 3729 + 3 = 3732, en 361, tr 119, gezilen 77959 + 172 = 78131.</para>
     /// <para>2026-10-15, later 61 birlesmesinden sonra: arsiv kodegi ve GIF anahtarlarinin kaymasi main'in uzerine toplandi, dusen yok; olculen toplam 3732 + 1 = 3733, en 361, tr 119 + 1 = 120, gezilen 78131 + 473 = 78604.</para>
+    /// <para>2026-10-15, bas konus (later 68): iki yeni anahtar (<c>recorder.audio.push-to-talk</c>, <c>.hint</c>), dusen yok; olculen 78604 + 43 x 2 = 78690. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1634,7 +1636,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(78604, gezilen);
+        Assert.Equal(78690, gezilen);
         Assert.Empty(kayip);
     }
 

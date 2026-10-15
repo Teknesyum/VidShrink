@@ -44,6 +44,8 @@
   "recorder.audio.system": "Системен звук",
   "recorder.audio.none": "Без звук",
   "recorder.audio.refresh": "Опресни списъка",
+  "recorder.audio.push-to-talk": "Натисни и говори",
+  "recorder.audio.push-to-talk.hint": "• Микрофонът се записва само докато {0} е натиснат.\n• Клавишът се сменя от менюто с клавишни комбинации.",
   "recorder.audio.hint": "Избирането на двете записва два входа и ги смесва в една писта.",
   "recorder.audio.loopback": "Звукът, който свири на този компютър",
   "recorder.audio.loopback.switched": "Изходното устройство се смени; системният звук вече идва от новото.",

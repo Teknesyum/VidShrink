@@ -44,6 +44,8 @@
   "recorder.audio.system": "Zvuk systému",
   "recorder.audio.none": "Bez zvuku",
   "recorder.audio.refresh": "Obnovit seznam",
+  "recorder.audio.push-to-talk": "Stiskni a mluv",
+  "recorder.audio.push-to-talk.hint": "• Mikrofon se nahrává jen při podržení {0}.\n• Klávesu změníte v nabídce zkratek.",
   "recorder.audio.hint": "Výběr obou zaznamená dva vstupy a smíchá je do jedné stopy.",
   "recorder.audio.loopback": "Zvuk přehrávaný na tomto počítači",
   "recorder.audio.loopback.switched": "Výstupní zařízení se změnilo; zvuk systému se teď bere z nového.",

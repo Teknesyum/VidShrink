@@ -784,7 +784,14 @@
              yalnız "sessiz" öğesiyle açılıyor ve kayıt sessiz sürüyor. -->
         <Border x:Name="PanelAudio" Theme="{StaticResource Panel}">
           <StackPanel Spacing="{StaticResource SpaceMd}">
-            <TextBlock Text="{loc:Text recorder.audio.title}" Theme="{StaticResource H2}"/>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+              <TextBlock Text="{loc:Text recorder.audio.title}" Theme="{StaticResource H2}"/>
+              <CheckBox x:Name="ChkPushToTalk" Grid.Column="1"
+                        Theme="{StaticResource CheckStyle}"
+                        VerticalAlignment="Center"
+                        Content="{loc:Text recorder.audio.push-to-talk}"
+                        auto:AutomationProperties.Name="{loc:Text recorder.audio.push-to-talk}"/>
+            </Grid>
 
             <izi:SutunIzgara MaxColumns="2" Uniform="True"
                              ColumnSpacing="{StaticResource SpaceMd}"
@@ -825,7 +832,6 @@
             </izi:SutunIzgara>
 
             <Button x:Name="BtnAudioRefresh"
-                    HorizontalAlignment="Left"
                     Theme="{StaticResource GhostButton}"
                     Content="{loc:Text recorder.audio.refresh}"
                     auto:AutomationProperties.Name="{loc:Text recorder.audio.refresh}"

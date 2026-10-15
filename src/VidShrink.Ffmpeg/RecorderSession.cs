@@ -141,6 +141,7 @@ public sealed class RecorderSession : IAsyncDisposable
     private readonly SemaphoreSlim _turn = new(1, 1);
 
     private Process? _process;
+    private bool _microphoneOpen;
     private LoopbackFeed? _feed;
     private Func<ISystemAudioCapture?> _openSystemAudio = SystemAudioCapture.Open;
     private Task? _stdoutPump;
@@ -286,6 +287,47 @@ public sealed class RecorderSession : IAsyncDisposable
     public void DropMarks()
     {
         lock (_marks) _marks.Clear();
+    }
+
+    /// <summary>
+    /// Bas konus: mikrofonun kayda girip girmedigini koşan ffmpeg'e komutla soyler
+    /// (<see cref="AudioCaptureArguments.PushToTalkCommand"/>). Durum saklanir; yeni parca
+    /// baslarken acik kalan mikrofon yeniden acilir. Istek bas konus hedefi tasimiyorsa ya da
+    /// surec yoksa <c>false</c> doner.
+    /// </summary>
+    public bool SetMicrophone(bool open)
+    {
+        _microphoneOpen = open;
+        if (!AudioCaptureArguments.UsesPushToTalk(_request.Audio)) return false;
+        var process = _process;
+        if (process is null) return false;
+        try
+        {
+            if (process.HasExited) return false;
+            return WriteMicrophone(process.StandardInput, open);
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
+    }
+
+    internal static bool WriteMicrophone(TextWriter input, bool open)
+    {
+        try
+        {
+            input.Write(AudioCaptureArguments.PushToTalkCommand(open));
+            input.Flush();
+            return true;
+        }
+        catch (IOException)
+        {
+            return false;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
     }
 
     private bool Splits => _request.Split is { IsSet: true };
@@ -565,6 +607,7 @@ public sealed class RecorderSession : IAsyncDisposable
         if (bittiSayilir)
         {
             State = RecorderState.Running;
+            if (_microphoneOpen) SetMicrophone(true);
             _ = WatchExitAsync(process);
             return;
         }

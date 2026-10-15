@@ -44,6 +44,8 @@
   "recorder.audio.system": "Sistēmas skaņa",
   "recorder.audio.none": "Bez skaņas",
   "recorder.audio.refresh": "Atsvaidzināt sarakstu",
+  "recorder.audio.push-to-talk": "Nospied un runā",
+  "recorder.audio.push-to-talk.hint": "• Mikrofons tiek ierakstīts tikai, kamēr {0} ir nospiests.\n• Taustiņu var mainīt īsinājumtaustiņu izvēlnē.",
   "recorder.audio.hint": "Izvēloties abus, tiek ierakstītas divas ievades un sajauktas vienā celiņā.",
   "recorder.audio.loopback": "Šajā datorā skanošā skaņa",
   "recorder.audio.loopback.switched": "Izvades ierīce mainījās; sistēmas skaņa tagad nāk no jaunās ierīces.",

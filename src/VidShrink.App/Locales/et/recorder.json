@@ -44,6 +44,8 @@
   "recorder.audio.system": "Süsteemiheli",
   "recorder.audio.none": "Heli puudub",
   "recorder.audio.refresh": "Värskenda loendit",
+  "recorder.audio.push-to-talk": "Vajuta ja räägi",
+  "recorder.audio.push-to-talk.hint": "• Mikrofoni salvestatakse ainult siis, kui {0} on all hoitud.\n• Klahvi saab muuta otseteede menüüs.",
   "recorder.audio.hint": "Mõlema valimisel salvestatakse kaks sisendit ja segatakse need üheks helirajaks.",
   "recorder.audio.loopback": "Selles arvutis mängiv heli",
   "recorder.audio.loopback.switched": "Väljundseade vahetus; süsteemiheli tuleb nüüd uuest seadmest.",

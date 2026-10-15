@@ -44,6 +44,8 @@
   "recorder.audio.system": "صوت النظام",
   "recorder.audio.none": "بلا صوت",
   "recorder.audio.refresh": "تحديث القائمة",
+  "recorder.audio.push-to-talk": "اضغط للتحدث",
+  "recorder.audio.push-to-talk.hint": "• يُسجَّل الميكروفون فقط أثناء الضغط على {0}.\n• يمكن تغيير المفتاح من قائمة الاختصارات.",
   "recorder.audio.hint": "اختيار كليهما يسجل مدخلين ويمزجهما في مسار صوتي واحد.",
   "recorder.audio.loopback": "الصوت الذي يشغّله هذا الحاسوب",
   "recorder.audio.loopback.switched": "تغيّر جهاز الإخراج؛ يُلتقط صوت النظام الآن من الجهاز الجديد.",

@@ -44,6 +44,8 @@
   "recorder.audio.system": "Sistemski zvok",
   "recorder.audio.none": "Brez zvoka",
   "recorder.audio.refresh": "Osveži seznam",
+  "recorder.audio.push-to-talk": "Pritisni in govori",
+  "recorder.audio.push-to-talk.hint": "• Mikrofon se snema samo, dokler držite {0}.\n• Tipko spremenite v meniju bližnjic.",
   "recorder.audio.hint": "Če izbereš oboje, se snemata oba vira in združita v eno zvočno sled.",
   "recorder.audio.loopback": "Zvok, ki se predvaja na tem računalniku",
   "recorder.audio.loopback.switched": "Izhodna naprava se je zamenjala; sistemski zvok zdaj prihaja iz nove.",

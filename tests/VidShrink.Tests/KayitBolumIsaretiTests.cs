@@ -38,7 +38,7 @@ public sealed class KayitBolumIsaretiTests
 
         public IReadOnlyList<HotkeyBinding>? Kayitli { get; private set; }
 
-        public IReadOnlyList<HotkeyBinding> Register(IReadOnlyList<HotkeyBinding> bindings, Action<HotkeyAction> pressed)
+        public IReadOnlyList<HotkeyBinding> Register(IReadOnlyList<HotkeyBinding> bindings, Action<HotkeyAction> pressed, Action<HotkeyAction> released)
         {
             _basildi = pressed;
             Kayitli = bindings;

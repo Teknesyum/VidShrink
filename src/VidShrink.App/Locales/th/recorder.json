@@ -44,6 +44,8 @@
   "recorder.audio.system": "เสียงระบบ",
   "recorder.audio.none": "ไม่มีเสียง",
   "recorder.audio.refresh": "รีเฟรชรายการ",
+  "recorder.audio.push-to-talk": "กดเพื่อพูด",
+  "recorder.audio.push-to-talk.hint": "• ไมโครโฟนจะถูกบันทึกเฉพาะขณะกด {0} ค้างไว้\n• เปลี่ยนปุ่มได้ในเมนูทางลัด",
   "recorder.audio.hint": "การเลือกทั้งสองอย่างจะบันทึกสองแหล่งเสียงและผสมรวมเป็นแทร็กเดียว",
   "recorder.audio.loopback": "เสียงที่เล่นอยู่บนพีซีเครื่องนี้",
   "recorder.audio.loopback.switched": "อุปกรณ์เอาต์พุตเปลี่ยนไป เสียงระบบมาจากอุปกรณ์ใหม่แล้ว",

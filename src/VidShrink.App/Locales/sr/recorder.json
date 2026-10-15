@@ -44,6 +44,8 @@
   "recorder.audio.system": "Sistemski zvuk",
   "recorder.audio.none": "Bez zvuka",
   "recorder.audio.refresh": "Osveži listu",
+  "recorder.audio.push-to-talk": "Pritisni i govori",
+  "recorder.audio.push-to-talk.hint": "• Mikrofon se snima samo dok je {0} pritisnut.\n• Taster se menja u meniju prečica.",
   "recorder.audio.hint": "Ako izaberete oba, snimaju se dva ulaza i mešaju u jednu zvučnu traku.",
   "recorder.audio.loopback": "Zvuk koji svira na ovom računaru",
   "recorder.audio.loopback.switched": "Izlazni uređaj se promenio; sistemski zvuk sada dolazi sa novog.",

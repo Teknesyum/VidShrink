@@ -136,14 +136,14 @@ internal partial class RecorderView
     /// <see cref="AudioCapturePlan.Silent"/>, yani sessiz kayıt; seçim doğrulanamazsa
     /// <c>null</c> ve sebebi ekranda.
     /// </summary>
-    private AudioCapturePlan? AudioPlan()
+    private AudioCapturePlan? AudioPlan(bool pushToTalk)
     {
         var selection = Selection;
         if (selection.Count == 0) return AudioCapturePlan.Silent;
 
         if (AudioCaptureArguments.TryBuild(
                 selection, _devices, RecorderArguments.AudioFirstInputIndexFor(SelectedTarget),
-                _settings.AudioLayout, _settings.AudioFilters, out var plan, out var reason))
+                _settings.AudioLayout, _settings.AudioFilters with { PushToTalk = pushToTalk }, out var plan, out var reason))
             return plan;
 
         ShowError(Say("recorder.error.audio", reason ?? string.Empty));

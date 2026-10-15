@@ -44,6 +44,8 @@
   "recorder.audio.system": "सिस्टम ऑडियो",
   "recorder.audio.none": "कोई ध्वनि नहीं",
   "recorder.audio.refresh": "सूची ताज़ा करें",
+  "recorder.audio.push-to-talk": "दबाकर बोलें",
+  "recorder.audio.push-to-talk.hint": "• माइक्रोफ़ोन केवल तभी रिकॉर्ड होता है जब {0} दबा हो।\n• कुंजी शॉर्टकट मेनू से बदली जा सकती है।",
   "recorder.audio.hint": "दोनों चुनने पर दो इनपुट रिकॉर्ड होते हैं और एक ही ट्रैक में मिश्रित होते हैं।",
   "recorder.audio.loopback": "इस कंप्यूटर पर बज रही ध्वनि",
   "recorder.audio.loopback.switched": "आउटपुट डिवाइस बदल गया; सिस्टम ऑडियो अब नए डिवाइस से आ रहा है।",

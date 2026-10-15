@@ -53,8 +53,31 @@ internal partial class RecorderView
     internal string HotkeyError(HotkeyAction action)
         => _hotkeyErrors[action].IsVisible ? _hotkeyErrors[action].Text ?? string.Empty : string.Empty;
 
+    private Func<bool, bool>? _microphoneGate;
+
+    /// <summary>Bas konuş kapısı: basışta açar, bırakışta kapatır; ölçüm sahte kapı verir.</summary>
+    internal Func<bool, bool> MicrophoneGate
+    {
+        get => _microphoneGate ?? (open => _session?.SetMicrophone(open) ?? false);
+        set => _microphoneGate = value;
+    }
+
+    /// <summary>Sisteme kaydedilen atamalar: bas konuş kutusu kapalıyken onun tuşu kaydedilmez, başka uygulamada serbest kalır.</summary>
+    private IReadOnlyList<HotkeyBinding> Registered(IReadOnlyList<HotkeyBinding> bindings)
+        => ChkPushToTalk.IsChecked == true ? bindings : bindings.Where(b => b.Action != HotkeyAction.PushToTalk).ToList();
+
     private void InitKisayol()
     {
+        ChkPushToTalk.IsChecked = _settings.PushToTalk;
+        ChkPushToTalk.IsCheckedChanged += (_, _) =>
+        {
+            _settings.PushToTalk = ChkPushToTalk.IsChecked == true;
+            _settings.Save(_settingsPath);
+            if (!HotkeysActive || _hotkeysSuspended) return;
+            HotkeyConflicts = GlobalHotkeys.Register(Registered(_hotkeys), PressHotkey, ReleaseHotkey);
+            ShowHotkeyConflicts();
+            RefreshHotkeyRows();
+        };
         _hotkeys = RecorderHotkeys.Read(_settings.Hotkeys) ?? RecorderHotkeys.All;
         _hotkeyRows.Spacing = HotkeyToken("SpaceSm");
         var flyout = new Flyout { Content = _hotkeyRows };
@@ -68,7 +91,7 @@ internal partial class RecorderView
     {
         if (HotkeysActive) return;
         HotkeysActive = true;
-        HotkeyConflicts = GlobalHotkeys.Register(_hotkeys, PressHotkey);
+        HotkeyConflicts = GlobalHotkeys.Register(Registered(_hotkeys), PressHotkey, ReleaseHotkey);
         ShowHotkeyConflicts();
         RefreshHotkeyRows();
     }
@@ -81,7 +104,16 @@ internal partial class RecorderView
         _hotkeysSuspended = false;
     }
 
-    private void PressHotkey(HotkeyAction action) => _ = RunHotkeyAsync(action);
+    private void PressHotkey(HotkeyAction action)
+    {
+        if (action == HotkeyAction.PushToTalk) MicrophoneGate(true);
+        else _ = RunHotkeyAsync(action);
+    }
+
+    private void ReleaseHotkey(HotkeyAction action)
+    {
+        if (action == HotkeyAction.PushToTalk) MicrophoneGate(false);
+    }
 
     /// <summary>
     /// Yakalama kutusu açıkken genel kayıt bırakılır: kayıtlı tuş pencereye hiç ulaşmaz ve
@@ -102,7 +134,7 @@ internal partial class RecorderView
             _hotkeysSuspended = false;
             if (HotkeysActive)
             {
-                HotkeyConflicts = GlobalHotkeys.Register(_hotkeys, PressHotkey);
+                HotkeyConflicts = GlobalHotkeys.Register(Registered(_hotkeys), PressHotkey, ReleaseHotkey);
                 ShowHotkeyConflicts();
             }
         }
@@ -144,11 +176,11 @@ internal partial class RecorderView
         var conflicts = HotkeyConflicts.Where(b => b.Action != action).ToList() as IReadOnlyList<HotkeyBinding>;
         if (HotkeysActive)
         {
-            conflicts = GlobalHotkeys.Register(next, PressHotkey);
+            conflicts = GlobalHotkeys.Register(Registered(next), PressHotkey, ReleaseHotkey);
             if (conflicts.Any(b => b.Action == action))
             {
                 if (_hotkeysSuspended) GlobalHotkeys.Unregister();
-                else HotkeyConflicts = GlobalHotkeys.Register(_hotkeys, PressHotkey);
+                else HotkeyConflicts = GlobalHotkeys.Register(Registered(_hotkeys), PressHotkey, ReleaseHotkey);
                 return RejectHotkey(action, () => Say("recorder.hotkeys.rejected", RecorderHotkeys.Gesture(binding)));
             }
 
@@ -185,6 +217,7 @@ internal partial class RecorderView
         HotkeyAction.Frame => Say("recorder.hotkeys.frame"),
         HotkeyAction.Discard => Say("recorder.hotkeys.discard"),
         HotkeyAction.Chapter => Say("recorder.hotkeys.chapter"),
+        HotkeyAction.PushToTalk => Say("recorder.audio.push-to-talk"),
         _ => Say("recorder.hotkeys.replay-save")
     };
 
@@ -194,6 +227,7 @@ internal partial class RecorderView
         var replay = Core.Bicim.Satir.Bagla(Say("recorder.replay.hint", HotkeyName(HotkeyAction.ReplaySave)));
         ToolTip.SetTip(CmbReplaySeconds, replay);
         ToolTip.SetTip(BtnReplay, replay);
+        ToolTip.SetTip(ChkPushToTalk, Core.Bicim.Satir.Bagla(Say("recorder.audio.push-to-talk.hint", HotkeyName(HotkeyAction.PushToTalk))));
         _regionEditor.HideKey = HotkeyName(HotkeyAction.Frame);
         RefreshHotkeyRows();
     }
@@ -263,6 +297,7 @@ internal partial class RecorderView
     {
         HotkeyAction.ReplaySave => ReplayRunning,
         HotkeyAction.Chapter => CanMarkChapter,
+        HotkeyAction.PushToTalk => false,
         _ => action is not (HotkeyAction.Stop or HotkeyAction.Discard) || HasSession || CountingDown
     };
 

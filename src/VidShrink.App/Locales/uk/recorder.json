@@ -44,6 +44,8 @@
   "recorder.audio.system": "Системний звук",
   "recorder.audio.none": "Без звуку",
   "recorder.audio.refresh": "Оновити список",
+  "recorder.audio.push-to-talk": "Натисни й говори",
+  "recorder.audio.push-to-talk.hint": "• Мікрофон записується, лише поки утримується {0}.\n• Клавішу можна змінити в меню сполучень клавіш.",
   "recorder.audio.hint": "Якщо вибрати обидва, записуються два джерела і змішуються в одну звукову доріжку.",
   "recorder.audio.loopback": "Звук, який грає на цьому ПК",
   "recorder.audio.loopback.switched": "Пристрій виводу змінився; системний звук тепер береться з нового.",

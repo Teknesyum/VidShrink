@@ -44,6 +44,8 @@
   "recorder.audio.system": "Systeemgeluid",
   "recorder.audio.none": "Geen geluid",
   "recorder.audio.refresh": "Lijst vernieuwen",
+  "recorder.audio.push-to-talk": "Push-to-talk",
+  "recorder.audio.push-to-talk.hint": "• De microfoon wordt alleen opgenomen zolang {0} ingedrukt is.\n• Wijzig de toets in het sneltoetsenmenu.",
   "recorder.audio.hint": "Als u beide kiest, worden twee bronnen opgenomen en gemengd tot één spoor.",
   "recorder.audio.loopback": "Geluid dat deze pc afspeelt",
   "recorder.audio.loopback.switched": "Het uitvoerapparaat is gewisseld; het systeemgeluid komt nu van het nieuwe apparaat.",

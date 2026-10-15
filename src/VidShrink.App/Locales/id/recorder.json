@@ -44,6 +44,8 @@
   "recorder.audio.system": "Audio sistem",
   "recorder.audio.none": "Tanpa suara",
   "recorder.audio.refresh": "Segarkan daftar",
+  "recorder.audio.push-to-talk": "Tekan untuk bicara",
+  "recorder.audio.push-to-talk.hint": "• Mikrofon hanya direkam selama {0} ditahan.\n• Ubah tombolnya di menu pintasan.",
   "recorder.audio.hint": "Memilih keduanya merekam dua input dan mencampurnya menjadi satu trek.",
   "recorder.audio.loopback": "Suara yang diputar komputer ini",
   "recorder.audio.loopback.switched": "Perangkat keluaran berganti; audio sistem kini diambil dari perangkat baru.",

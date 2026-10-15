@@ -44,6 +44,8 @@
   "recorder.audio.system": "Áudio do sistema",
   "recorder.audio.none": "Sem som",
   "recorder.audio.refresh": "Atualizar a lista",
+  "recorder.audio.push-to-talk": "Pressionar para falar",
+  "recorder.audio.push-to-talk.hint": "• O microfone só é gravado enquanto {0} estiver pressionado.\n• A tecla muda no menu de atalhos.",
   "recorder.audio.hint": "Escolher ambos grava duas entradas e as mescla em uma única faixa.",
   "recorder.audio.loopback": "Som reproduzido neste PC",
   "recorder.audio.loopback.switched": "O dispositivo de saída mudou; o áudio do sistema vem agora do novo.",

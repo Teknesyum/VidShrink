@@ -44,6 +44,8 @@
   "recorder.audio.system": "Âm thanh hệ thống",
   "recorder.audio.none": "Không có âm thanh",
   "recorder.audio.refresh": "Làm mới danh sách",
+  "recorder.audio.push-to-talk": "Nhấn để nói",
+  "recorder.audio.push-to-talk.hint": "• Micrô chỉ được ghi khi giữ {0}.\n• Đổi phím trong menu phím tắt.",
   "recorder.audio.hint": "Chọn cả hai sẽ ghi hai nguồn đầu vào và trộn chúng thành một track duy nhất.",
   "recorder.audio.loopback": "Âm thanh đang phát trên máy này",
   "recorder.audio.loopback.switched": "Thiết bị đầu ra đã đổi; âm thanh hệ thống giờ lấy từ thiết bị mới.",

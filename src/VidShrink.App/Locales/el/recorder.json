@@ -44,6 +44,8 @@
   "recorder.audio.system": "Ήχος συστήματος",
   "recorder.audio.none": "Χωρίς ήχο",
   "recorder.audio.refresh": "Ανανέωση λίστας",
+  "recorder.audio.push-to-talk": "Πάτα για ομιλία",
+  "recorder.audio.push-to-talk.hint": "• Το μικρόφωνο καταγράφεται μόνο όσο κρατάτε πατημένο το {0}.\n• Το πλήκτρο αλλάζει από το μενού συντομεύσεων.",
   "recorder.audio.hint": "Η επιλογή και των δύο καταγράφει δύο εισόδους και τις αναμειγνύει σε ένα κομμάτι.",
   "recorder.audio.loopback": "Ο ήχος που παίζει σε αυτόν τον υπολογιστή",
   "recorder.audio.loopback.switched": "Η συσκευή εξόδου άλλαξε· ο ήχος συστήματος λαμβάνεται πλέον από τη νέα.",
