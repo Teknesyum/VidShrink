@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Anulat",
   "main.convert-queue.summary": "{0} gata, {1} eșuate, {2} anulate.",
   "main.convert.note.webp-bitrate-ignored": "WebP nu are mod de rată de biți: valoarea ratei de biți este ignorată și se folosește calitatea implicită a codorului.",
+  "main.convert.note.gif-target": "Sursă GIF: rata de cadre, lățimea și numărul de culori sunt reduse până când ieșirea coboară sub dimensiunea țintă din „Micșorare”.",
 
   "main.stage.encoding": "Se codează",
   "main.stage.converting": "Se convertește",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Acest fișier nu poate fi folosit",
   "main.error.generic": "Operația nu a putut fi încheiată. Detaliul raportat de ffmpeg este mai jos.",
   "main.error.disk-full": "Unitatea țintă a rămas fără spațiu. Eliberează loc sau scrie rezultatul pe altă unitate.",
+  "main.error.audio-only-shrink": "„Micșorare” acceptă doar video; acest fișier audio este deschis în fila „Conversie”.",
   "main.error.encoder-container": "Codorul și containerul alese nu se potrivesc. Setează containerul la MP4 și codecul video la H.264, apoi încearcă din nou.",
   "main.error.undecodable": "Fișierul sursă nu a putut fi decodat; poate fi deteriorat sau această versiune de ffmpeg nu cunoaște formatul.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "Ieșirea ca secvență de imagini necesită codare video și nu poate folosi copierea fluxului.",
   "main.validation.no-audio-copy": "Sursa nu are flux audio de copiat.",
   "main.validation.no-audio-extract": "Sursa nu are flux audio de extras.",
+  "main.validation.no-video-container": "Sursa nu are flux video; alegeți un container audio.",
   "main.validation.trim-order": "Sfârșitul tăierii trebuie să vină după începutul ei.",
   "main.validation.container-video-encoder": "Containerul {0} nu acceptă codorul video {1} ales.",
   "main.validation.container-audio-encoder": "Containerul {0} nu acceptă codorul audio {1} ales.",

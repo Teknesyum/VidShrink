@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Annullato",
   "main.convert-queue.summary": "{0} fatti, {1} non riusciti, {2} annullati.",
   "main.convert.note.webp-bitrate-ignored": "WebP non ha una modalità bitrate: il valore di bitrate viene ignorato e si usa la qualità predefinita del codificatore.",
+  "main.convert.note.gif-target": "Sorgente GIF: frequenza dei fotogrammi, larghezza e numero di colori vengono ridotti finché l'uscita non scende sotto la dimensione obiettivo di \"Riduci\".",
 
   "main.stage.encoding": "Codifica",
   "main.stage.converting": "Conversione",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Questo file non può essere usato",
   "main.error.generic": "L'operazione non è stata completata. Il dettaglio riportato da ffmpeg è qui sotto.",
   "main.error.disk-full": "L'unità di destinazione ha esaurito lo spazio. Libera spazio, o scrivi l'output su un'altra unità.",
+  "main.error.audio-only-shrink": "\"Riduci\" accetta solo video; questo file audio è aperto nella scheda \"Converti\".",
   "main.error.encoder-container": "L'encoder e il contenitore scelti non sono compatibili. Imposta il contenitore su MP4 e il codec video su H.264, poi riprova.",
   "main.error.undecodable": "Il file sorgente non è stato decodificato; potrebbe essere danneggiato, o questa build di ffmpeg non conosce il formato.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "L'uscita come sequenza di immagini richiede la codifica video e non può usare la copia del flusso.",
   "main.validation.no-audio-copy": "La sorgente non ha alcun flusso audio da copiare.",
   "main.validation.no-audio-extract": "La sorgente non ha alcun flusso audio da estrarre.",
+  "main.validation.no-video-container": "La sorgente non ha un flusso video; scegli un contenitore audio.",
   "main.validation.trim-order": "La fine del taglio deve venire dopo l'inizio del taglio.",
   "main.validation.container-video-encoder": "Il contenitore {0} non supporta l'encoder video {1} selezionato.",
   "main.validation.container-audio-encoder": "Il contenitore {0} non supporta l'encoder audio {1} selezionato.",

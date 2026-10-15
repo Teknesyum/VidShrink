@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Tühistatud",
   "main.convert-queue.summary": "{0} valmis, {1} ebaõnnestus, {2} tühistatud.",
   "main.convert.note.webp-bitrate-ignored": "WebP-l pole bitikiiruse režiimi: bitikiiruse väärtust eiratakse ja kasutatakse kodeerija vaikekvaliteeti.",
+  "main.convert.note.gif-target": "GIF-allikas: kaadrisagedust, laiust ja värvide arvu vähendatakse, kuni väljund jääb alla vahekaardi „Tihenda“ sihtsuuruse.",
 
   "main.stage.encoding": "Kodeerimine",
   "main.stage.converting": "Teisendamine",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Seda faili ei saa kasutada",
   "main.error.generic": "Toimingut ei saanud lõpetada. ffmpegi teatatud üksikasi on allpool.",
   "main.error.disk-full": "Sihtkettal sai ruum otsa. Vabasta ruumi või kirjuta väljund teisele kettale.",
+  "main.error.audio-only-shrink": "„Tihenda“ võtab vastu ainult videot; see helifail on avatud vahekaardil „Teisenda“.",
   "main.error.encoder-container": "Valitud kodeerija ja konteiner ei sobi kokku. Sea konteineriks MP4 ja videokoodekiks H.264, seejärel proovi uuesti.",
   "main.error.undecodable": "Lähtefaili ei saanud dekodeerida; see võib olla vigane või see ffmpegi ehitus ei tunne vormingut.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "Pildijadana väljastamine nõuab video kodeerimist ega saa kasutada voo koopiat.",
   "main.validation.no-audio-copy": "Allikal pole kopeeritavat helivoogu.",
   "main.validation.no-audio-extract": "Allikal pole eraldatavat helivoogu.",
+  "main.validation.no-video-container": "Allikas pole videovoogu; valige helikonteiner.",
   "main.validation.trim-order": "Kärpimise lõpp peab olema pärast kärpimise algust.",
   "main.validation.container-video-encoder": "Konteiner {0} ei toeta valitud videokodeerijat {1}.",
   "main.validation.container-audio-encoder": "Konteiner {0} ei toeta valitud helikodeerijat {1}.",

@@ -14,6 +14,8 @@ public sealed record MediaInfo
     public long AudioBitrateBps { get; init; }
     public int AudioChannels { get; init; }
     public bool HasAudio => AudioCodec is not null;
+    public bool IsAudioOnly { get; init; }
+    public bool IsGifSource => VideoCodec.Equals("gif", StringComparison.OrdinalIgnoreCase);
     public bool IsHdr { get; init; }
     public string? PixelFormat { get; init; }
     public string? ColorPrimaries { get; init; }

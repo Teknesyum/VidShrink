@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Dibatalkan",
   "main.convert-queue.summary": "{0} selesai, {1} gagal, {2} dibatalkan.",
   "main.convert.note.webp-bitrate-ignored": "WebP tiada mod kadar bit: nilai kadar bit diabaikan dan kualiti lalai pengekod digunakan.",
+  "main.convert.note.gif-target": "Sumber GIF: kadar bingkai, lebar dan bilangan warna dikurangkan sehingga output berada di bawah saiz sasaran daripada \"Kecilkan\".",
 
   "main.stage.encoding": "Mengekod",
   "main.stage.converting": "Menukar",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Fail ini tidak boleh digunakan",
   "main.error.generic": "Operasi tidak dapat diselesaikan. Perincian yang dilaporkan ffmpeg ada di bawah.",
   "main.error.disk-full": "Pemacu sasaran kehabisan ruang. Kosongkan sedikit ruang, atau tulis output ke pemacu lain.",
+  "main.error.audio-only-shrink": "\"Kecilkan\" hanya menerima video; fail audio ini dibuka dalam tab \"Tukar\".",
   "main.error.encoder-container": "Pengekod dan bekas yang dipilih tidak sepadan. Tetapkan bekas ke MP4 dan kodek video ke H.264, kemudian cuba lagi.",
   "main.error.undecodable": "Fail sumber tidak dapat dinyahkod; ia mungkin rosak, atau binaan ffmpeg ini tidak mengenali formatnya.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "Output jujukan imej memerlukan pengekodan video dan tidak boleh menggunakan salinan strim.",
   "main.validation.no-audio-copy": "Sumber tiada strim audio untuk disalin.",
   "main.validation.no-audio-extract": "Sumber tiada strim audio untuk diekstrak.",
+  "main.validation.no-video-container": "Sumber tiada strim video; pilih bekas audio.",
   "main.validation.trim-order": "Tamat pemangkasan mesti selepas mula pemangkasan.",
   "main.validation.container-video-encoder": "Bekas {0} tidak menyokong pengekod video {1} yang dipilih.",
   "main.validation.container-audio-encoder": "Bekas {0} tidak menyokong pengekod audio {1} yang dipilih.",

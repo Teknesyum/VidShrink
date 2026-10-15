@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "रद्द",
   "main.convert-queue.summary": "{0} पूर्ण, {1} विफल, {2} रद्द।",
   "main.convert.note.webp-bitrate-ignored": "WebP में बिटरेट मोड नहीं है: बिटरेट मान को अनदेखा किया जाता है और एन्कोडर की डिफ़ॉल्ट गुणवत्ता उपयोग होती है।",
+  "main.convert.note.gif-target": "GIF स्रोत: आउटपुट \"सिकोड़ें\" के लक्ष्य आकार से नीचे आने तक फ़्रेम दर, चौड़ाई और रंगों की संख्या घटाई जाती है।",
 
   "main.stage.encoding": "एन्कोडिंग",
   "main.stage.converting": "रूपांतरण",
@@ -476,6 +477,7 @@
   "main.error.unusable": "यह फ़ाइल उपयोग नहीं हो सकती",
   "main.error.generic": "कार्य पूरा नहीं हो सका। ffmpeg का बताया विवरण नीचे है।",
   "main.error.disk-full": "लक्ष्य ड्राइव की जगह खत्म हो गई। कुछ जगह खाली करें, या आउटपुट दूसरी ड्राइव पर लिखें।",
+  "main.error.audio-only-shrink": "\"सिकोड़ें\" केवल वीडियो लेता है; यह ऑडियो फ़ाइल \"बदलें\" टैब में खुली है।",
   "main.error.encoder-container": "चुना गया एन्कोडर और कंटेनर एक साथ नहीं बैठते। कंटेनर MP4 और वीडियो कोडेक H.264 करें, फिर कोशिश करें।",
   "main.error.undecodable": "स्रोत फ़ाइल डिकोड नहीं हो सकी; यह क्षतिग्रस्त हो सकती है, या यह ffmpeg बिल्ड प्रारूप नहीं जानता।",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "छवि अनुक्रम आउटपुट को वीडियो एन्कोडिंग चाहिए और स्ट्रीम कॉपी उपयोग नहीं हो सकता।",
   "main.validation.no-audio-copy": "स्रोत में कॉपी करने को कोई ऑडियो स्ट्रीम नहीं है।",
   "main.validation.no-audio-extract": "स्रोत में निकालने को कोई ऑडियो स्ट्रीम नहीं है।",
+  "main.validation.no-video-container": "स्रोत में कोई वीडियो स्ट्रीम नहीं है; कोई ऑडियो कंटेनर चुनें।",
   "main.validation.trim-order": "ट्रिम अंत ट्रिम शुरू के बाद होना चाहिए।",
   "main.validation.container-video-encoder": "{0} कंटेनर चुने {1} वीडियो एन्कोडर का समर्थन नहीं करता।",
   "main.validation.container-audio-encoder": "{0} कंटेनर चुने {1} ऑडियो एन्कोडर का समर्थन नहीं करता।",

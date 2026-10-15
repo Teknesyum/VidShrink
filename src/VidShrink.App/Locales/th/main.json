@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "ยกเลิกแล้ว",
   "main.convert-queue.summary": "เสร็จ {0} ล้มเหลว {1} ยกเลิก {2}",
   "main.convert.note.webp-bitrate-ignored": "WebP ไม่มีโหมดบิตเรต: ค่าบิตเรตจะถูกละเว้นและใช้คุณภาพเริ่มต้นของตัวเข้ารหัส",
+  "main.convert.note.gif-target": "ต้นฉบับ GIF: ลดอัตราเฟรม ความกว้าง และจำนวนสีลงจนกว่าผลลัพธ์จะต่ำกว่าขนาดเป้าหมายจาก \"ย่อ\"",
 
   "main.stage.encoding": "กำลังเข้ารหัส",
   "main.stage.converting": "กำลังแปลง",
@@ -476,6 +477,7 @@
   "main.error.unusable": "ใช้ไฟล์นี้ไม่ได้",
   "main.error.generic": "ดำเนินการไม่สำเร็จ รายละเอียดที่ ffmpeg รายงานอยู่ด้านล่าง",
   "main.error.disk-full": "ไดรฟ์ปลายทางเต็ม เพิ่มพื้นที่ว่างหรือเขียนผลลัพธ์ไปไดรฟ์อื่น",
+  "main.error.audio-only-shrink": "\"ย่อ\" รับเฉพาะวิดีโอ ไฟล์เสียงนี้เปิดอยู่ในแท็บ \"แปลง\"",
   "main.error.encoder-container": "ตัวเข้ารหัสและคอนเทนเนอร์ที่เลือกไม่เข้ากัน ตั้งคอนเทนเนอร์เป็น MP4 และโคเดกวิดีโอเป็น H.264 แล้วลองใหม่",
   "main.error.undecodable": "ถอดรหัสไฟล์ต้นฉบับไม่ได้ อาจเสียหาย หรือ ffmpeg รุ่นนี้ไม่รู้จักรูปแบบ",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "การส่งออกเป็นลำดับภาพต้องเข้ารหัสวิดีโอ ใช้การคัดลอกสตรีมไม่ได้",
   "main.validation.no-audio-copy": "ต้นฉบับไม่มีสตรีมเสียงให้คัดลอก",
   "main.validation.no-audio-extract": "ต้นฉบับไม่มีสตรีมเสียงให้แยกออก",
+  "main.validation.no-video-container": "ต้นฉบับไม่มีสตรีมวิดีโอ เลือกคอนเทนเนอร์เสียง",
   "main.validation.trim-order": "จุดจบการตัดต้องอยู่หลังจุดเริ่มการตัด",
   "main.validation.container-video-encoder": "คอนเทนเนอร์ {0} ไม่รองรับตัวเข้ารหัสวิดีโอ {1} ที่เลือก",
   "main.validation.container-audio-encoder": "คอนเทนเนอร์ {0} ไม่รองรับตัวเข้ารหัสเสียง {1} ที่เลือก",

@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "בוטל",
   "main.convert-queue.summary": "{0} הושלמו, {1} נכשלו, {2} בוטלו.",
   "main.convert.note.webp-bitrate-ignored": "ל-WebP אין מצב קצב סיביות: ערך קצב הסיביות נזנח ונעשה שימוש באיכות ברירת המחדל של המקודד.",
+  "main.convert.note.gif-target": "מקור GIF: קצב הפריימים, הרוחב ומספר הצבעים יורדים עד שהפלט קטן מגודל היעד של „כיווץ“.",
 
   "main.stage.encoding": "מקודד",
   "main.stage.converting": "ממיר",
@@ -476,6 +477,7 @@
   "main.error.unusable": "אי אפשר להשתמש בקובץ זה",
   "main.error.generic": "לא ניתן להשלים את הפעולה. הפירוט ש-ffmpeg דיווח מופיע למטה.",
   "main.error.disk-full": "בכונן היעד נגמר המקום. פנה מקום, או כתוב את הפלט לכונן אחר.",
+  "main.error.audio-only-shrink": "„כיווץ“ מקבל וידאו בלבד; קובץ השמע הזה פתוח בלשונית „המרה“.",
   "main.error.encoder-container": "המקודד והמכל שנבחרו אינם מתאימים זה לזה. הגדר את המכל ל-MP4 ואת קודק הווידאו ל-H.264, ואז נסה שוב.",
   "main.error.undecodable": "לא ניתן לפענח את קובץ המקור; ייתכן שהוא פגום, או שגרסת ffmpeg זו אינה מכירה את הפורמט.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "פלט כרצף תמונות דורש קידוד וידאו ואינו יכול להשתמש בהעתקת זרם.",
   "main.validation.no-audio-copy": "למקור אין זרם שמע להעתקה.",
   "main.validation.no-audio-extract": "למקור אין זרם שמע לחילוץ.",
+  "main.validation.no-video-container": "במקור אין זרם וידאו; בחרו מכל שמע.",
   "main.validation.trim-order": "סוף החיתוך חייב לבוא אחרי תחילת החיתוך.",
   "main.validation.container-video-encoder": "המכל {0} אינו תומך במקודד הווידאו {1} שנבחר.",
   "main.validation.container-audio-encoder": "המכל {0} אינו תומך במקודד השמע {1} שנבחר.",

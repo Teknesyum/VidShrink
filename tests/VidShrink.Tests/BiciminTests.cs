@@ -1274,6 +1274,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, tus gosterimi suzgeci (EKB-P1): on bir yeni <c>recorder.keys.*</c> anahtarindan 5 satir kola giriyor (hr <c>.place.top</c>; it <c>.place.bottom</c>, <c>.place.top</c>, <c>.title</c>; pt <c>.size</c>), KOL dokumunden sayildi, en ve tr girmiyor: taban pimi 3420 + 5 = 3425, en 325, tr 108.</para>
     /// <para>2026-10-15, kayan sonuc karti (EKB-P14): dort yeni <c>recorder.card.*</c> anahtarindan 14 satir kola giriyor (en <c>.show</c>; es, fr, hu <c>.show</c> ve <c>.never</c>; hr, sl, sr, tr <c>.never</c>; nl, pt, sw <c>.show</c>), KOL dokumunden sayildi: taban pimi 3425 + 14 = 3439, en 325 + 1 = 326, tr 108 + 1 = 109.</para>
     /// <para>2026-10-15, origin/main birlesmesinden sonra (EKB-P14 dali): main tarafinin pimi 3449 / en 328 / tr 109 ile bu dalin artislari bir arada; testin kendi SAYIM satirindan olculdu: toplam 3477, en 330, tr 110.</para>
+    /// <para>2026-10-15, ses dosyasi ve GIF girdisi (ARC-P3): uc yeni anahtardan (<c>main.convert.note.gif-target</c>, <c>main.error.audio-only-shrink</c>, <c>main.validation.no-video-container</c>) 4 kol, KOL dokumunden sayildi, en ve tr girmiyor: olculen 3479 + 4 = 3483, en 331, tr 109.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1299,7 +1300,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3507, toplam);
+        Assert.Equal(3511, toplam);
         Assert.Equal(333, dilBasina["en"]);
         Assert.Equal(110, dilBasina["tr"]);
     }
@@ -1554,6 +1555,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, tus gosterimi suzgeci (EKB-P1): on bir yeni <c>recorder.keys.*</c> anahtari, dusen yok; taban pimi 68026 + 43 x 11 = 68499.</para>
     /// <para>2026-10-15, kayan sonuc karti (EKB-P14): dort yeni <c>recorder.card.*</c> anahtari, dusen yok; taban pimi 68499 + 43 x 4 = 68671.</para>
     /// <para>2026-10-15, origin/main birlesmesinden sonra (EKB-P14 dali): main tarafinin pimi 68241 ile bu dalin anahtarlari bir arada, dusen yok; olculen gezilen 69015.</para>
+    /// <para>2026-10-15, ses dosyasi ve GIF girdisi (ARC-P3): uc yeni anahtar (<c>main.convert.note.gif-target</c>, <c>main.error.audio-only-shrink</c>, <c>main.validation.no-video-container</c>), dusen yok; olculen 69402 + 43 x 3 = 69531. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1581,7 +1583,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(70176, gezilen);
+        Assert.Equal(70305, gezilen);
         Assert.Empty(kayip);
     }
 

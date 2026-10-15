@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "キャンセル済み",
   "main.convert-queue.summary": "完了 {0} 件、失敗 {1} 件、キャンセル {2} 件。",
   "main.convert.note.webp-bitrate-ignored": "WebP にはビットレートモードがありません。ビットレートの値は無視され、エンコーダーの既定の品質が使われます。",
+  "main.convert.note.gif-target": "GIF ソース: 出力が「圧縮」の目標サイズを下回るまで、フレームレート、幅、色数を下げます。",
 
   "main.stage.encoding": "エンコード中",
   "main.stage.converting": "変換中",
@@ -476,6 +477,7 @@
   "main.error.unusable": "このファイルは使用できません",
   "main.error.generic": "操作を完了できませんでした。ffmpegが報告した詳細は以下のとおりです。",
   "main.error.disk-full": "出力先ドライブの容量が不足しました。空き容量を確保するか、別のドライブに出力してください。",
+  "main.error.audio-only-shrink": "「圧縮」は動画のみ扱います。この音声ファイルは「変換」タブで開いています。",
   "main.error.encoder-container": "選択したエンコーダーとコンテナは組み合わせられません。コンテナをMP4、映像コーデックをH.264にしてもう一度お試しください。",
   "main.error.undecodable": "ソースファイルをデコードできませんでした。破損しているか、このffmpegビルドが形式を認識できません。",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "連番画像の出力には映像エンコードが必要で、ストリームコピーは使えません。",
   "main.validation.no-audio-copy": "ソースにコピーする音声ストリームがありません。",
   "main.validation.no-audio-extract": "ソースに抽出する音声ストリームがありません。",
+  "main.validation.no-video-container": "ソースに映像ストリームがありません。音声コンテナーを選んでください。",
   "main.validation.trim-order": "トリム終了はトリム開始より後である必要があります。",
   "main.validation.container-video-encoder": "{0}コンテナは選択した{1}映像エンコーダーに対応していません。",
   "main.validation.container-audio-encoder": "{0}コンテナは選択した{1}音声エンコーダーに対応していません。",

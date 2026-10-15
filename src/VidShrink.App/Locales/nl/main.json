@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Geannuleerd",
   "main.convert-queue.summary": "{0} klaar, {1} mislukt, {2} geannuleerd.",
   "main.convert.note.webp-bitrate-ignored": "WebP heeft geen bitratemodus: de bitratewaarde wordt genegeerd en de standaardkwaliteit van de encoder wordt gebruikt.",
+  "main.convert.note.gif-target": "GIF-bron: framesnelheid, breedte en aantal kleuren worden verlaagd tot de uitvoer onder de doelgrootte van ‘Verkleinen’ valt.",
 
   "main.stage.encoding": "Coderen",
   "main.stage.converting": "Converteren",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Dit bestand kan niet worden gebruikt",
   "main.error.generic": "De bewerking kon niet worden voltooid. Het detail dat ffmpeg meldde staat hieronder.",
   "main.error.disk-full": "De doelschijf is vol. Maak ruimte vrij, of schrijf de uitvoer naar een andere schijf.",
+  "main.error.audio-only-shrink": "‘Verkleinen’ neemt alleen video aan; dit audiobestand is geopend op het tabblad ‘Converteren’.",
   "main.error.encoder-container": "De gekozen encoder en container passen niet bij elkaar. Zet de container op MP4 en de videocodec op H.264, en probeer opnieuw.",
   "main.error.undecodable": "Het bronbestand kon niet worden gedecodeerd; het is mogelijk beschadigd, of deze ffmpeg-build kent het formaat niet.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "Uitvoer als beeldreeks vereist videocodering en kan geen streamkopie gebruiken.",
   "main.validation.no-audio-copy": "De bron heeft geen audiostream om te kopiëren.",
   "main.validation.no-audio-extract": "De bron heeft geen audiostream om uit te pakken.",
+  "main.validation.no-video-container": "De bron heeft geen videostream; kies een audiocontainer.",
   "main.validation.trim-order": "Het einde van het bijsnijden moet na het begin komen.",
   "main.validation.container-video-encoder": "De container {0} ondersteunt de gekozen video-encoder {1} niet.",
   "main.validation.container-audio-encoder": "De container {0} ondersteunt de gekozen audio-encoder {1} niet.",

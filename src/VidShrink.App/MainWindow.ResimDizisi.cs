@@ -25,7 +25,7 @@ public partial class MainWindow
     /// </summary>
     private MediaInfo? ConvertInfo => _sequence is { } sequence && _sequenceFrame is { } frame
         ? sequence.ToMediaInfo(frame, ReadConversionPlan().Fps is { } fps and > 0 ? fps : ImageSequence.DefaultFps)
-        : _info;
+        : _info ?? _sesKaynagi;
 
     private async void OnBrowseSequence(object? sender, RoutedEventArgs e) => await BrowseSequenceAsync();
 
@@ -76,6 +76,7 @@ public partial class MainWindow
         _sequence = sequence;
         _sequenceFrame = frame;
         ShowSourceName();
+        KapSecenekleriniYokla();
         RefreshConversion();
         return true;
     }

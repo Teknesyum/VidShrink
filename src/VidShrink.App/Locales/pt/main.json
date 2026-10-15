@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Cancelado",
   "main.convert-queue.summary": "{0} concluídos, {1} com falha, {2} cancelados.",
   "main.convert.note.webp-bitrate-ignored": "O WebP não tem modo de taxa de bits: o valor da taxa de bits é ignorado e é usada a qualidade predefinida do codificador.",
+  "main.convert.note.gif-target": "Origem GIF: a taxa de quadros, a largura e o número de cores são reduzidos até que a saída fique abaixo do tamanho-alvo de \"Reduzir\".",
 
   "main.stage.encoding": "Codificando",
   "main.stage.converting": "Convertendo",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Este arquivo não pode ser usado",
   "main.error.generic": "A operação não pôde ser concluída. O detalhe relatado pelo ffmpeg está abaixo.",
   "main.error.disk-full": "A unidade de destino ficou sem espaço. Libere espaço ou grave a saída em outra unidade.",
+  "main.error.audio-only-shrink": "\"Reduzir\" aceita apenas vídeo; este arquivo de áudio está aberto na aba \"Converter\".",
   "main.error.encoder-container": "O codificador e o contêiner escolhidos não combinam. Defina o contêiner como MP4 e o codec de vídeo como H.264, depois tente de novo.",
   "main.error.undecodable": "O arquivo de origem não pôde ser decodificado; pode estar danificado, ou esta build do ffmpeg não conhece o formato.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "A saída em sequência de imagens exige codificação de vídeo e não pode usar cópia de fluxo.",
   "main.validation.no-audio-copy": "A fonte não tem fluxo de áudio para copiar.",
   "main.validation.no-audio-extract": "A fonte não tem fluxo de áudio para extrair.",
+  "main.validation.no-video-container": "A origem não tem fluxo de vídeo; escolha um contêiner de áudio.",
   "main.validation.trim-order": "O fim do corte deve vir depois do início.",
   "main.validation.container-video-encoder": "O contêiner {0} não aceita o codificador de vídeo {1} selecionado.",
   "main.validation.container-audio-encoder": "O contêiner {0} não aceita o codificador de áudio {1} selecionado.",

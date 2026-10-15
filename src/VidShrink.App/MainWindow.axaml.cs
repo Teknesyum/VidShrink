@@ -3282,7 +3282,7 @@ public partial class MainWindow : Window
         try
         {
             var paths = await (SourcePicker ?? PickSourcesAsync)(multiple);
-            await OpenSourcesAsync(paths.Count == 1 ? paths[0] : null, DroppedMedia.Collect(paths));
+            await OpenSourcesAsync(paths.Count == 1 ? paths[0] : null, DroppedMedia.Collect(paths, TabConvert.IsSelected));
         }
         catch (Exception ex)
         {
@@ -3371,11 +3371,11 @@ public partial class MainWindow : Window
         => e.DataTransfer.TryGetFiles()?.Select(item => item.TryGetLocalPath()).OfType<string>().Where(IsSubtitleFile).ToList()
             ?? (IReadOnlyList<string>)Array.Empty<string>();
 
-    private static IReadOnlyList<string> DroppedBatch(DragEventArgs e)
+    private IReadOnlyList<string> DroppedBatch(DragEventArgs e)
     {
         var items = e.DataTransfer.TryGetFiles();
         if (items is null) return Array.Empty<string>();
-        return DroppedMedia.Collect(items.Select(item => item.TryGetLocalPath()).OfType<string>());
+        return DroppedMedia.Collect(items.Select(item => item.TryGetLocalPath()).OfType<string>(), TabConvert.IsSelected);
     }
 
     private void SetDropVisual(DropVisual state)
@@ -3460,13 +3460,14 @@ public partial class MainWindow : Window
     {
         TxtFileName.Text = _sourceName ?? Say("main.source.placeholder");
         TxtConvertSource.Text = _sequence is { } sequence ? SequenceSourceText(sequence)
-            : _info is null ? Say("main.convert.source-empty") : _sourceName;
+            : _info is null && _sesKaynagi is null ? Say("main.convert.source-empty") : _sourceName;
         ApplyDropText();
     }
 
     private async Task LoadAsync(string path)
     {
         _sequence = null;
+        _sesKaynagi = null;
         _sourceName = Path.GetFileName(path);
         ShowSourceName();
         Fade(SourceCard, true);
@@ -3486,6 +3487,12 @@ public partial class MainWindow : Window
             RefreshQualityPanels();
             RefreshQualityTargetAvailability();
             ReportSourceError($"{Say("main.error.unusable")}: {DescribeFailure(ex)}");
+            return;
+        }
+
+        if (probed.IsAudioOnly)
+        {
+            SesKaynaginiYukle(probed);
             return;
         }
 
@@ -3662,6 +3669,7 @@ public partial class MainWindow : Window
         Recalculate();
         RefreshQualityTargetAvailability();
         DeriveQualityFromTarget();
+        KapSecenekleriniYokla();
         RefreshConversion();
     }
 
@@ -4820,7 +4828,8 @@ public partial class MainWindow : Window
             DropMetadata = ChkConvertDropMetadata.IsChecked == true,
             SubtitleTracks = ConvertSubtitleChoice(),
             ExternalSubtitles = _convertSubtitles.ToList(),
-            SingleFrame = ChkConvertSingleFrame.IsChecked == true
+            SingleFrame = ChkConvertSingleFrame.IsChecked == true,
+            TargetBytes = _sequence is null ? GifPalette.TargetFor(_info ?? _sesKaynagi, container, ParseTargetMb()) : null
         };
     }
 

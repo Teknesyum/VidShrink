@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Avbruten",
   "main.convert-queue.summary": "{0} klara, {1} misslyckades, {2} avbrutna.",
   "main.convert.note.webp-bitrate-ignored": "WebP har inget bithastighetsläge: bithastighetsvärdet ignoreras och kodarens standardkvalitet används.",
+  "main.convert.note.gif-target": "GIF-källa: bildfrekvens, bredd och antal färger sänks tills utdata ligger under målstorleken från ”Krymp”.",
 
   "main.stage.encoding": "Kodar",
   "main.stage.converting": "Konverterar",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Den här filen kan inte användas",
   "main.error.generic": "Åtgärden kunde inte slutföras. Detaljen ffmpeg rapporterade finns nedan.",
   "main.error.disk-full": "Målenheten fick slut på utrymme. Frigör plats, eller skriv utdatan till en annan enhet.",
+  "main.error.audio-only-shrink": "”Krymp” tar bara video; den här ljudfilen är öppen på fliken ”Konvertera”.",
   "main.error.encoder-container": "Den valda kodaren och behållaren passar inte ihop. Sätt behållaren till MP4 och videokodeken till H.264, försök sedan igen.",
   "main.error.undecodable": "Källfilen kunde inte avkodas; den kan vara skadad, eller så känner det här ffmpeg-bygget inte formatet.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "Utdata som bildsekvens kräver videokodning och kan inte använda strömkopiering.",
   "main.validation.no-audio-copy": "Källan har ingen ljudström att kopiera.",
   "main.validation.no-audio-extract": "Källan har ingen ljudström att extrahera.",
+  "main.validation.no-video-container": "Källan har ingen videoström; välj en ljudbehållare.",
   "main.validation.trim-order": "Klippslutet måste komma efter klippstarten.",
   "main.validation.container-video-encoder": "Behållaren {0} stöder inte den valda videokodaren {1}.",
   "main.validation.container-audio-encoder": "Behållaren {0} stöder inte den valda ljudkodaren {1}.",

@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Dibatalkan",
   "main.convert-queue.summary": "{0} selesai, {1} gagal, {2} dibatalkan.",
   "main.convert.note.webp-bitrate-ignored": "WebP tidak memiliki mode bitrate: nilai bitrate diabaikan dan kualitas bawaan encoder digunakan.",
+  "main.convert.note.gif-target": "Sumber GIF: laju bingkai, lebar, dan jumlah warna diturunkan sampai keluaran berada di bawah ukuran target dari \"Perkecil\".",
 
   "main.stage.encoding": "Encoding",
   "main.stage.converting": "Mengonversi",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Berkas ini tidak dapat dipakai",
   "main.error.generic": "Operasi tidak dapat diselesaikan. Detail yang dilaporkan ffmpeg ada di bawah.",
   "main.error.disk-full": "Drive tujuan kehabisan ruang. Kosongkan sebagian, atau tulis keluaran ke drive lain.",
+  "main.error.audio-only-shrink": "\"Perkecil\" hanya menerima video; file audio ini dibuka di tab \"Konversi\".",
   "main.error.encoder-container": "Encoder dan kontainer yang dipilih tidak cocok. Atur kontainer ke MP4 dan codec video ke H.264, lalu coba lagi.",
   "main.error.undecodable": "Berkas sumber tidak dapat didekode; mungkin rusak, atau build ffmpeg ini tidak mengenal formatnya.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "Keluaran urutan gambar membutuhkan encoding video dan tidak bisa memakai salin stream.",
   "main.validation.no-audio-copy": "Sumber tidak punya stream audio untuk disalin.",
   "main.validation.no-audio-extract": "Sumber tidak punya stream audio untuk diekstrak.",
+  "main.validation.no-video-container": "Sumber tidak memiliki aliran video; pilih wadah audio.",
   "main.validation.trim-order": "Akhir pemangkasan harus setelah awal pemangkasan.",
   "main.validation.container-video-encoder": "Kontainer {0} tidak mendukung encoder video {1} yang dipilih.",
   "main.validation.container-audio-encoder": "Kontainer {0} tidak mendukung encoder audio {1} yang dipilih.",

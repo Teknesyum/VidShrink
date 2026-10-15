@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "취소됨",
   "main.convert-queue.summary": "완료 {0}개, 실패 {1}개, 취소 {2}개.",
   "main.convert.note.webp-bitrate-ignored": "WebP에는 비트레이트 모드가 없습니다. 비트레이트 값은 무시되고 인코더의 기본 품질이 사용됩니다.",
+  "main.convert.note.gif-target": "GIF 원본: 출력이 \"축소\"의 목표 크기보다 작아질 때까지 프레임 속도, 너비, 색 수를 낮춥니다.",
 
   "main.stage.encoding": "인코딩",
   "main.stage.converting": "변환 중",
@@ -476,6 +477,7 @@
   "main.error.unusable": "이 파일은 사용할 수 없습니다",
   "main.error.generic": "작업을 완료할 수 없습니다. ffmpeg가 보고한 세부 내용은 아래에 있습니다.",
   "main.error.disk-full": "대상 드라이브의 공간이 부족합니다. 공간을 확보하거나 다른 드라이브에 출력하세요.",
+  "main.error.audio-only-shrink": "\"축소\"는 동영상만 받습니다. 이 오디오 파일은 \"변환\" 탭에서 열려 있습니다.",
   "main.error.encoder-container": "선택한 인코더와 컨테이너가 맞지 않습니다. 컨테이너를 MP4, 비디오 코덱을 H.264로 설정하고 다시 시도하세요.",
   "main.error.undecodable": "원본 파일을 디코딩할 수 없습니다. 손상되었거나 이 ffmpeg 빌드가 형식을 모릅니다.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "이미지 시퀀스 출력은 비디오 인코딩이 필요하며 스트림 복사를 쓸 수 없습니다.",
   "main.validation.no-audio-copy": "원본에 복사할 오디오 스트림이 없습니다.",
   "main.validation.no-audio-extract": "원본에 추출할 오디오 스트림이 없습니다.",
+  "main.validation.no-video-container": "원본에 비디오 스트림이 없습니다. 오디오 컨테이너를 선택하세요.",
   "main.validation.trim-order": "자르기 끝은 자르기 시작보다 뒤여야 합니다.",
   "main.validation.container-video-encoder": "{0} 컨테이너는 선택한 {1} 비디오 인코더를 지원하지 않습니다.",
   "main.validation.container-audio-encoder": "{0} 컨테이너는 선택한 {1} 오디오 인코더를 지원하지 않습니다.",

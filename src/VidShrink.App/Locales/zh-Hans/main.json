@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "已取消",
   "main.convert-queue.summary": "完成 {0} 个，失败 {1} 个，取消 {2} 个。",
   "main.convert.note.webp-bitrate-ignored": "WebP 没有码率模式：码率值会被忽略，使用编码器的默认质量。",
+  "main.convert.note.gif-target": "GIF 源：逐步降低帧率、宽度和颜色数，直到输出小于“压缩”中的目标大小。",
 
   "main.stage.encoding": "编码中",
   "main.stage.converting": "转换中",
@@ -476,6 +477,7 @@
   "main.error.unusable": "此文件无法使用",
   "main.error.generic": "操作无法完成。ffmpeg 报告的详细信息如下。",
   "main.error.disk-full": "目标驱动器空间已用尽。请释放一些空间，或将输出写入其他驱动器。",
+  "main.error.audio-only-shrink": "“压缩”只接受视频；此音频文件已在“转换”选项卡中打开。",
   "main.error.encoder-container": "所选编码器与容器不匹配。请将容器设为 MP4、视频编码设为 H.264，然后重试。",
   "main.error.undecodable": "源文件无法解码；可能已损坏，或此 ffmpeg 构建不认识该格式。",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "图像序列输出需要视频编码，不能使用流复制。",
   "main.validation.no-audio-copy": "源没有可复制的音频流。",
   "main.validation.no-audio-extract": "源没有可提取的音频流。",
+  "main.validation.no-video-container": "源没有视频流；请选择音频容器。",
   "main.validation.trim-order": "裁剪结束必须在裁剪开始之后。",
   "main.validation.container-video-encoder": "{0} 容器不支持所选的 {1} 视频编码器。",
   "main.validation.container-audio-encoder": "{0} 容器不支持所选的 {1} 音频编码器。",

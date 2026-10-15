@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Anulowano",
   "main.convert-queue.summary": "Gotowe: {0}, błędy: {1}, anulowane: {2}.",
   "main.convert.note.webp-bitrate-ignored": "WebP nie ma trybu przepływności: wartość przepływności jest pomijana i używana jest domyślna jakość kodera.",
+  "main.convert.note.gif-target": "Źródło GIF: liczba klatek na sekundę, szerokość i liczba kolorów są obniżane, aż wynik zmieści się poniżej rozmiaru docelowego z karty „Zmniejsz”.",
 
   "main.stage.encoding": "Kodowanie",
   "main.stage.converting": "Konwersja",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Tego pliku nie można użyć",
   "main.error.generic": "Nie udało się ukończyć operacji. Szczegół zgłoszony przez ffmpeg jest poniżej.",
   "main.error.disk-full": "Na dysku docelowym zabrakło miejsca. Zwolnij trochę miejsca lub zapisz wynik na innym dysku.",
+  "main.error.audio-only-shrink": "„Zmniejsz” przyjmuje tylko wideo; ten plik dźwiękowy jest otwarty na karcie „Konwertuj”.",
   "main.error.encoder-container": "Wybrany koder i kontener nie pasują do siebie. Ustaw kontener na MP4 i kodek wideo na H.264, potem spróbuj ponownie.",
   "main.error.undecodable": "Nie udało się zdekodować pliku źródłowego; może być uszkodzony albo ta wersja ffmpeg nie zna formatu.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "Wyjście jako sekwencja obrazów wymaga kodowania wideo i nie może użyć kopii strumienia.",
   "main.validation.no-audio-copy": "Źródło nie ma strumienia dźwięku do skopiowania.",
   "main.validation.no-audio-extract": "Źródło nie ma strumienia dźwięku do wyodrębnienia.",
+  "main.validation.no-video-container": "Źródło nie ma strumienia wideo; wybierz kontener audio.",
   "main.validation.trim-order": "Koniec przycięcia musi być po jego początku.",
   "main.validation.container-video-encoder": "Kontener {0} nie obsługuje wybranego kodera wideo {1}.",
   "main.validation.container-audio-encoder": "Kontener {0} nie obsługuje wybranego kodera dźwięku {1}.",

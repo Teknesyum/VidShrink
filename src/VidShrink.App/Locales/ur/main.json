@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "منسوخ",
   "main.convert-queue.summary": "{0} مکمل، {1} ناکام، {2} منسوخ۔",
   "main.convert.note.webp-bitrate-ignored": "WebP میں بٹ ریٹ موڈ نہیں ہے: بٹ ریٹ کی قدر نظر انداز کی جاتی ہے اور انکوڈر کا طے شدہ معیار استعمال ہوتا ہے۔",
+  "main.convert.note.gif-target": "GIF ماخذ: جب تک آؤٹ پٹ \"سکیڑیں\" کے ہدف سائز سے نیچے نہ آئے، فریم ریٹ، چوڑائی اور رنگوں کی تعداد کم کی جاتی ہے۔",
 
   "main.stage.encoding": "انکوڈنگ",
   "main.stage.converting": "تبدیل ہو رہا ہے",
@@ -476,6 +477,7 @@
   "main.error.unusable": "یہ فائل استعمال نہیں ہو سکتی",
   "main.error.generic": "عمل مکمل نہ ہو سکا۔ ffmpeg کی بتائی تفصیل نیچے ہے۔",
   "main.error.disk-full": "ہدف ڈرائیو کی جگہ ختم ہو گئی۔ کچھ جگہ خالی کریں، یا نتیجہ دوسری ڈرائیو پر لکھیں۔",
+  "main.error.audio-only-shrink": "\"سکیڑیں\" صرف ویڈیو لیتا ہے؛ یہ آڈیو فائل \"تبدیل\" ٹیب میں کھلی ہے۔",
   "main.error.encoder-container": "چنا گیا انکوڈر اور کنٹینر آپس میں نہیں بیٹھتے۔ کنٹینر MP4 اور ویڈیو کوڈیک H.264 کریں، پھر دوبارہ کوشش کریں۔",
   "main.error.undecodable": "ماخذ فائل ڈی کوڈ نہ ہو سکی؛ شاید خراب ہے، یا یہ ffmpeg بلڈ فارمیٹ نہیں جانتا۔",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "تصویری ترتیب کی آؤٹ پٹ کو ویڈیو انکوڈنگ چاہیے اور سٹریم کاپی استعمال نہیں ہو سکتی۔",
   "main.validation.no-audio-copy": "ماخذ میں کاپی کرنے کو کوئی آڈیو سٹریم نہیں۔",
   "main.validation.no-audio-extract": "ماخذ میں نکالنے کو کوئی آڈیو سٹریم نہیں۔",
+  "main.validation.no-video-container": "ماخذ میں کوئی ویڈیو اسٹریم نہیں؛ کوئی آڈیو کنٹینر منتخب کریں۔",
   "main.validation.trim-order": "ٹرم اختتام ٹرم آغاز کے بعد ہونا چاہیے۔",
   "main.validation.container-video-encoder": "{0} کنٹینر چنے گئے {1} ویڈیو انکوڈر کو سپورٹ نہیں کرتا۔",
   "main.validation.container-audio-encoder": "{0} کنٹینر چنے گئے {1} آڈیو انکوڈر کو سپورٹ نہیں کرتا۔",

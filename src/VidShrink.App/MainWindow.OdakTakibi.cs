@@ -21,7 +21,7 @@ public partial class MainWindow
     /// Yoklama dikişi. Ölçüm sahte yoklayıcıyı buraya takar; üretimde ffprobe.
     /// </summary>
     internal Func<string, CancellationToken, Task<MediaInfo>> Prober { get; set; }
-        = FfprobeClient.ProbeAsync;
+        = (path, ct) => FfprobeClient.ProbeAsync(path, allowAudioOnly: true, ct);
 
     /// <summary>
     /// Ortak odakta o dosyanın tazeliği doğrulanmış çözümlemesi varsa ffprobe çağrılmaz.

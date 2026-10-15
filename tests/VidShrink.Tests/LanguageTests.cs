@@ -317,6 +317,7 @@ public sealed class LanguageTests : IDisposable
         "Image sequence output requires video encoding and cannot use stream copy.",
         "The source has no audio stream to copy.",
         "The source has no audio stream to extract.",
+        "The source has no video stream; choose an audio container.",
         "The trim end must come after the trim start.",
         "^The (.+) container does not support the selected (.+) video encoder.$",
         "^The (.+) container does not support the selected (.+) audio encoder.$",

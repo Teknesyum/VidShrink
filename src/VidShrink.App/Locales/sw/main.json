@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Imeghairiwa",
   "main.convert-queue.summary": "{0} zimekamilika, {1} zimeshindwa, {2} zimeghairiwa.",
   "main.convert.note.webp-bitrate-ignored": "WebP haina hali ya kasi ya biti: thamani ya kasi ya biti hupuuzwa na ubora chaguomsingi wa kisimbaji hutumika.",
+  "main.convert.note.gif-target": "Chanzo cha GIF: kasi ya fremu, upana na idadi ya rangi hupunguzwa hadi tokeo liwe chini ya ukubwa lengwa wa \"Finyaza\".",
 
   "main.stage.encoding": "Inasimba",
   "main.stage.converting": "Inageuza",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Faili hii haiwezi kutumika",
   "main.error.generic": "Operesheni haikuweza kukamilika. Maelezo ffmpeg iliyoripoti yako hapa chini.",
   "main.error.disk-full": "Diski lengwa imeishiwa nafasi. Achia nafasi, au andika matokeo kwenye diski nyingine.",
+  "main.error.audio-only-shrink": "\"Finyaza\" hupokea video tu; faili hili la sauti limefunguliwa kwenye kichupo cha \"Geuza\".",
   "main.error.encoder-container": "Kisimbaji na kontena vilivyochaguliwa havilingani. Weka kontena kuwa MP4 na kodeki ya video kuwa H.264, kisha jaribu tena.",
   "main.error.undecodable": "Faili ya chanzo haikuweza kusimbuliwa; huenda imeharibika, au ujenzi huu wa ffmpeg haujui umbizo.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "Towe la mfuatano wa picha linahitaji usimbaji wa video na haliwezi kutumia nakala ya mtiririko.",
   "main.validation.no-audio-copy": "Chanzo hakina mtiririko wa sauti wa kunakili.",
   "main.validation.no-audio-extract": "Chanzo hakina mtiririko wa sauti wa kutoa.",
+  "main.validation.no-video-container": "Chanzo hakina mkondo wa video; chagua chombo cha sauti.",
   "main.validation.trim-order": "Mwisho wa kukata lazima uwe baada ya mwanzo wa kukata.",
   "main.validation.container-video-encoder": "Kontena ya {0} haiungi mkono kisimbaji cha video cha {1} kilichochaguliwa.",
   "main.validation.container-audio-encoder": "Kontena ya {0} haiungi mkono kisimbaji cha sauti cha {1} kilichochaguliwa.",

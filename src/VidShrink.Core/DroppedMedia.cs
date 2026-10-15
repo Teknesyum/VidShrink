@@ -3,15 +3,26 @@ namespace VidShrink.Core;
 /// <summary>
 /// Pencereye bırakılan yolları küçültülecek videolara indirir. Dosya <see cref="WatchFolder.IsCandidate"/>
 /// ise alınır; klasörün yalnız üst düzeyi taranır, alt klasöre inilmez. Sonuç ad sırasında ve tekrarsız.
+/// <paramref name="includeAudio"/> açıkken (Dönüştür) <see cref="ShellIntegration.IsAudio"/> olan gizli olmayan dosya da alınır.
 /// </summary>
 public static class DroppedMedia
 {
     public static IReadOnlyList<string> Collect(IEnumerable<string> paths)
-        => Collect(paths, Directory.Exists, File.Exists, folder => Directory.EnumerateFiles(folder));
+        => Collect(paths, includeAudio: false);
+
+    public static IReadOnlyList<string> Collect(IEnumerable<string> paths, bool includeAudio)
+        => Collect(paths, includeAudio, Directory.Exists, File.Exists, folder => Directory.EnumerateFiles(folder));
 
     internal static IReadOnlyList<string> Collect(IEnumerable<string> paths, Func<string, bool> isFolder,
         Func<string, bool> isFile, Func<string, IEnumerable<string>> filesIn)
+        => Collect(paths, false, isFolder, isFile, filesIn);
+
+    internal static IReadOnlyList<string> Collect(IEnumerable<string> paths, bool includeAudio, Func<string, bool> isFolder,
+        Func<string, bool> isFile, Func<string, IEnumerable<string>> filesIn)
     {
+        bool Alinir(string file) => WatchFolder.IsCandidate(file)
+            || (includeAudio && ShellIntegration.IsAudio(file) && !Path.GetFileName(file).StartsWith('.'));
+
         var found = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var path in paths)
         {
@@ -21,9 +32,9 @@ public static class DroppedMedia
                 try { files = filesIn(path).ToList(); }
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { continue; }
                 foreach (var file in files)
-                    if (WatchFolder.IsCandidate(file)) found.Add(file);
+                    if (Alinir(file)) found.Add(file);
             }
-            else if (isFile(path) && WatchFolder.IsCandidate(path))
+            else if (isFile(path) && Alinir(path))
             {
                 found.Add(path);
             }

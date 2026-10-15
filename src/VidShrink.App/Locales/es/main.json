@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "Cancelado",
   "main.convert-queue.summary": "{0} listos, {1} con error, {2} cancelados.",
   "main.convert.note.webp-bitrate-ignored": "WebP no tiene modo de tasa de bits: el valor de tasa de bits se ignora y se usa la calidad predeterminada del codificador.",
+  "main.convert.note.gif-target": "Origen GIF: la velocidad de fotogramas, el ancho y el número de colores se reducen hasta que la salida quede por debajo del tamaño objetivo de «Reducir».",
 
   "main.stage.encoding": "Codificando",
   "main.stage.converting": "Convirtiendo",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Este archivo no se puede usar",
   "main.error.generic": "La operación no pudo completarse. Abajo está el detalle que informó ffmpeg.",
   "main.error.disk-full": "La unidad de destino se quedó sin espacio. Libera espacio o escribe la salida en otra unidad.",
+  "main.error.audio-only-shrink": "«Reducir» solo acepta vídeo; este archivo de audio está abierto en la pestaña «Convertir».",
   "main.error.encoder-container": "El codificador y el contenedor elegidos no encajan. Pon el contenedor en MP4 y el códec de vídeo en H.264, y vuelve a intentarlo.",
   "main.error.undecodable": "No se pudo decodificar el archivo fuente; puede estar dañado, o esta compilación de ffmpeg no conoce el formato.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "La salida como secuencia de imágenes requiere codificar el vídeo y no puede usar copia de flujo.",
   "main.validation.no-audio-copy": "La fuente no tiene flujo de audio que copiar.",
   "main.validation.no-audio-extract": "La fuente no tiene flujo de audio que extraer.",
+  "main.validation.no-video-container": "El origen no tiene pista de vídeo; elija un contenedor de audio.",
   "main.validation.trim-order": "El fin del recorte debe ir después del inicio.",
   "main.validation.container-video-encoder": "El contenedor {0} no admite el codificador de vídeo {1} elegido.",
   "main.validation.container-audio-encoder": "El contenedor {0} no admite el codificador de audio {1} elegido.",

@@ -415,6 +415,7 @@
   "main.convert-queue.cancelled": "İptal edildi",
   "main.convert-queue.summary": "{0} bitti, {1} hatalı, {2} iptal edildi.",
   "main.convert.note.webp-bitrate-ignored": "WebP'de bit hızı kipi yok: bit hızı değeri yok sayılır, kodlayıcının varsayılan kalitesi kullanılır.",
+  "main.convert.note.gif-target": "GIF kaynağı: çıktı, Küçült'teki hedef boyutun altına inene dek kare hızı, genişlik ve renk sayısı düşürülür.",
 
   "main.stage.encoding": "Kodlama",
   "main.stage.converting": "Dönüştürme",
@@ -476,6 +477,7 @@
   "main.error.unusable": "Bu dosya kullanılamıyor",
   "main.error.generic": "İşlem tamamlanamadı. Ffmpeg'in bildirdiği ayrıntı aşağıda.",
   "main.error.disk-full": "Hedef sürücüde yer kalmadı. Yer açın ya da çıktıyı başka bir sürücüye alın.",
+  "main.error.audio-only-shrink": "Küçült yalnız video alır; bu ses dosyası Dönüştür sekmesinde açık.",
   "main.error.encoder-container": "Seçilen kodlayıcı ile kapsayıcı birbirine uymuyor. Kapsayıcıyı MP4, video kodeğini H.264 yapıp yeniden deneyin.",
   "main.error.undecodable": "Kaynak dosya çözülemedi; bozuk olabilir ya da bu ffmpeg sürümü bu biçimi tanımıyor.",
 
@@ -597,6 +599,7 @@
   "main.validation.sequence-copy": "Görüntü dizisi çıktısı video kodlaması gerektirir, akış kopyalama kullanamaz.",
   "main.validation.no-audio-copy": "Kaynakta kopyalanacak bir ses akışı yok.",
   "main.validation.no-audio-extract": "Kaynakta çıkarılacak bir ses akışı yok.",
+  "main.validation.no-video-container": "Kaynakta görüntü yok; bir ses kabı seçin.",
   "main.validation.trim-order": "Kırpma bitişi kırpma başlangıcından sonra olmalı.",
   "main.validation.container-video-encoder": "{0} kapsayıcısı seçilen {1} video kodlayıcısını desteklemiyor.",
   "main.validation.container-audio-encoder": "{0} kapsayıcısı seçilen {1} ses kodlayıcısını desteklemiyor.",

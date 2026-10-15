@@ -7,7 +7,14 @@ namespace VidShrink.Ffmpeg;
 
 public static class FfprobeClient
 {
-    public static async Task<MediaInfo> ProbeAsync(string filePath, CancellationToken ct = default)
+    public static Task<MediaInfo> ProbeAsync(string filePath, CancellationToken ct = default)
+        => ProbeAsync(filePath, allowAudioOnly: false, ct);
+
+    /// <summary>
+    /// <paramref name="allowAudioOnly"/> açıkken görüntüsü olmayan, sesi olan dosya reddedilmez, <see cref="MediaInfo.IsAudioOnly"/>
+    /// işaretli döner. Kapalı yol (Küçült, kuyruk, CLI, düzenleyici) eskisi gibi atar.
+    /// </summary>
+    public static async Task<MediaInfo> ProbeAsync(string filePath, bool allowAudioOnly, CancellationToken ct = default)
     {
         if (!File.Exists(filePath))
             throw new FileNotFoundException("Input file not found.", filePath);
@@ -42,8 +49,10 @@ public static class FfprobeClient
             else if (type == "audio" && (audio is null || (!Disposition(audio.Value, "default") && Disposition(s, "default")))) audio = s;
         }
 
-        if (video is null)
+        if (video is null && (audio is null || !allowAudioOnly))
             throw new InvalidOperationException("The file contains no video stream.");
+        if (video is null)
+            return SesKaynagi(filePath, root, format, streams, audio!.Value);
 
         var v = video.Value;
         var fileSize = new FileInfo(filePath).Length;
@@ -106,6 +115,41 @@ public static class FfprobeClient
             Streams = inventory,
             Chapters = chapters,
             Titles = titles
+        };
+    }
+
+    /// <summary>
+    /// Görüntü akışı olmayan, sesi olan dosya: reddedilmez, "yalnız ses" kaynağı olarak döner. Boyut ve kare hızı 0,
+    /// kodek "none"; süre kaptan, yoksa ses akışından okunur.
+    /// </summary>
+    private static MediaInfo SesKaynagi(string filePath, JsonElement root, JsonElement format, JsonElement streams, JsonElement a)
+    {
+        var fileSize = new FileInfo(filePath).Length;
+        var duration = ParseDouble(format, "duration") ?? ParseDouble(a, "duration") ?? 0;
+        if (duration <= 0)
+            throw new InvalidOperationException("Duration could not be determined; the file may be corrupt.");
+        var inventory = Inventory(streams, duration);
+        var chapters = root.TryGetProperty("chapters", out var chapterList) && chapterList.ValueKind == JsonValueKind.Array
+            ? ChapterMarks(chapterList)
+            : (IReadOnlyList<ChapterMark>)Array.Empty<ChapterMark>();
+        return new MediaInfo
+        {
+            FilePath = filePath,
+            FileSizeBytes = fileSize,
+            DurationSeconds = duration,
+            Width = 0,
+            Height = 0,
+            Fps = 0,
+            VideoCodec = "none",
+            TotalBitrateBps = ParseLong(format, "bit_rate") ?? (long)(fileSize * 8 / duration),
+            FormatName = GetString(format, "format_name"),
+            AudioCodec = GetString(a, "codec_name"),
+            AudioBitrateBps = ParseLong(a, "bit_rate") ?? 128_000,
+            AudioChannels = GetInt(a, "channels") ?? 2,
+            IsAudioOnly = true,
+            Streams = inventory,
+            Chapters = chapters,
+            Titles = Basliklar(root, duration, (0, 0), inventory.Count, chapters.Count)
         };
     }
 

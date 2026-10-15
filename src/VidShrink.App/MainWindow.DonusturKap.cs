@@ -27,6 +27,7 @@ public partial class MainWindow
     internal static string ConversionNoteKey(ConversionNote note) => note switch
     {
         ConversionNote.WebpBitrateIgnored => "main.convert.note.webp-bitrate-ignored",
+        ConversionNote.GifFitsTarget => "main.convert.note.gif-target",
         _ => "main.convert.ready"
     };
 
@@ -37,7 +38,7 @@ public partial class MainWindow
         var encoders = _encoders is EncoderCapabilities { Loaded: false } ? null : _encoders;
         foreach (var item in CmbContainer.Items.OfType<ComboBoxItem>())
         {
-            var available = ConversionArguments.ContainerAvailable(item.Tag as string ?? "", encoders);
+            var available = ConversionArguments.ContainerAvailable(item.Tag as string ?? "", encoders) && KapKaynagaUyar(item);
             item.IsVisible = available;
             item.IsEnabled = available;
         }
@@ -48,10 +49,15 @@ public partial class MainWindow
 
         DonanimKodlayicilariniYokla();
 
-        if (CmbContainer.SelectedItem is not ComboBoxItem { IsVisible: false }) return;
+        if (CmbContainer.SelectedItem is not ComboBoxItem { IsVisible: false } hidden)
+        {
+            SesOncesiKabiGeriKoy();
+            return;
+        }
+        if (ConvertInfo is { IsAudioOnly: true }) _sesOncesiKap ??= hidden.Tag as string;
         var wasSyncing = _syncing;
         _syncing = true;
-        CmbContainer.SelectedIndex = 0;
+        CmbContainer.SelectedIndex = IlkGorunurKap();
         _syncing = wasSyncing;
         OzelDonusturAlanlari();
         RefreshConversion();
