@@ -110,6 +110,8 @@ public static class CliCompletion
                 ConvertValues.Concat(Language).ToList(), convertValues, Array.Empty<string>()),
             new Command(new[] { "kaydet", "record" }, RecordFlags.Concat(RecordValues).Concat(Language).ToList(),
                 RecordValues.Concat(Language).ToList(), Pairs((Language, CliText.Languages)), Array.Empty<string>()),
+            new Command(new[] { "denetim", "control" }, new[] { "--json" }.Concat(Language).ToList(), Language,
+                Pairs((Language, CliText.Languages)), CliControl.Actions.SelectMany(a => new[] { a.Turkish, a.English }).ToList()),
             new Command(new[] { "profiller", "presets" }, ExportValues.Concat(Language).ToList(), ExportValues.Concat(Language).ToList(),
                 Pairs((Language, CliText.Languages)), Array.Empty<string>()),
             new Command(new[] { "tamamlama", "completion" }, Array.Empty<string>(), Array.Empty<string>(),
