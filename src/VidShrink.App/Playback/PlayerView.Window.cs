@@ -447,6 +447,7 @@ internal partial class PlayerView
         _settingsFolder = folder;
         _settings = PlayerSettings.Load(SettingsFile());
         _recent = RecentFiles.Load(RecentFile());
+        if (folder is not null) Keymap.Steps = _settings.SeekSteps;
     }
 
     private string? SettingsFolder()

@@ -150,6 +150,7 @@ public sealed class KeymapTests
         [PlayerCommandKind.PasteUrl] = "paste -> ",
         [PlayerCommandKind.Stop] = "stop -> ",
         [PlayerCommandKind.GoToStart] = "tostart",
+        [PlayerCommandKind.GoToTime] = "goto -> ",
         [PlayerCommandKind.Edit] = "edit -> ",
         [PlayerCommandKind.SubtitleVisibility] = "subvisible -> ",
         [PlayerCommandKind.SubtitleLine] = "subline ",

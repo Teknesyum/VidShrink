@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using Avalonia.Input;
 using VidShrink.App.Localization;
 
@@ -36,9 +37,12 @@ internal readonly record struct PlayerInput(
         => new(PlayerInputKind.Press, Key.None, null, button, KeyModifiers.None);
 }
 
-internal sealed record PlayerAction(PlayerCommandKind Command, double Amount, string LabelKey)
+internal sealed record PlayerAction(PlayerCommandKind Command, double Amount, string LabelKey, SeekStep Step = SeekStep.None)
 {
-    internal PlayerCommand ToCommand(double scale = 1) => new(Command, Amount * scale);
+    /// <summary>Atlama adımına bağlı satırın tutarı ayardaki adımdan gelir (<see cref="Keymap.Steps"/>); yön <see cref="Amount"/>'un işaretidir.</summary>
+    internal double Effective => Step == SeekStep.None ? Amount : Math.Sign(Amount) * Keymap.Steps.Of(Step);
+
+    internal PlayerCommand ToCommand(double scale = 1) => new(Command, Effective * scale);
 }
 
 internal sealed record KeymapRow(PlayerInput Input, PlayerAction Action);
@@ -58,10 +62,20 @@ internal static class Keymap
     internal const double WheelSpeedStep = 0.1;
     internal const double WheelFactor = 10;
 
+    private static SeekSteps _steps = SeekSteps.Default;
+
+    /// <summary>Oynatıcı ayarındaki atlama adımları; ayar dosyası olan oynatıcı yazar, düzenleyicinin önizlemesi de aynısını kullanır.</summary>
+    internal static SeekSteps Steps
+    {
+        get => Volatile.Read(ref _steps);
+        set => Volatile.Write(ref _steps, value ?? SeekSteps.Default);
+    }
+
     internal static readonly PlayerAction Settings = new(PlayerCommandKind.OpenSettings, 0, "main.player.menu.settings");
     internal static readonly PlayerAction PlayPause = new(PlayerCommandKind.TogglePlay, 0, "main.player.menu.playpause");
     internal static readonly PlayerAction Stop = new(PlayerCommandKind.Stop, 0, "main.player.menu.stop");
     internal static readonly PlayerAction GoToStart = new(PlayerCommandKind.GoToStart, 0, "main.player.menu.tostart");
+    internal static readonly PlayerAction GoToTime = new(PlayerCommandKind.GoToTime, 0, "main.player.menu.goto");
     internal static readonly PlayerAction Fullscreen = new(PlayerCommandKind.ToggleFullscreen, 0, "main.player.menu.fullscreen");
     internal static readonly PlayerAction CompactOrFullscreen = new(PlayerCommandKind.CompactOrFullscreen, 0, "main.player.menu.fullscreen");
     internal static readonly PlayerAction ResetZoom = new(PlayerCommandKind.ResetZoom, 0, "main.player.menu.reset");
@@ -96,7 +110,7 @@ internal static class Keymap
     internal static readonly PlayerAction Zoom = new(PlayerCommandKind.Zoom, 1, "main.player.menu.zoom");
     internal static readonly PlayerAction Edit = new(PlayerCommandKind.Edit, 0, "player.menu.edit");
 
-    private static PlayerAction Seek(double seconds) => new(PlayerCommandKind.Seek, seconds, "main.player.menu.seek");
+    private static PlayerAction Seek(double seconds, SeekStep step = SeekStep.None) => new(PlayerCommandKind.Seek, seconds, "main.player.menu.seek", step);
 
     private static PlayerAction Volume(double step) => new(PlayerCommandKind.Volume, step, "main.player.menu.volume");
 
@@ -115,18 +129,19 @@ internal static class Keymap
         new(PlayerInput.OnKey(Key.P, KeyModifiers.Control), PlayPause),
         new(PlayerInput.OnKey(Key.Space, KeyModifiers.Control), Stop),
         new(PlayerInput.OnKey(Key.Back), GoToStart),
+        new(PlayerInput.OnKey(Key.G, KeyModifiers.Control), GoToTime),
         new(PlayerInput.OnKey(Key.Enter), Fullscreen),
         new(PlayerInput.OnKey(Key.Enter, KeyModifiers.Alt), Fullscreen),
         new(PlayerInput.OnKey(Key.Escape), LeaveFullscreen),
         new(PlayerInput.OnKey(Key.Apps), OpenMenu),
-        new(PlayerInput.OnKey(Key.Right), Seek(SeekSmall)),
-        new(PlayerInput.OnKey(Key.Left), Seek(-SeekSmall)),
-        new(PlayerInput.OnKey(Key.Right, KeyModifiers.Control), Seek(SeekMedium)),
-        new(PlayerInput.OnKey(Key.Left, KeyModifiers.Control), Seek(-SeekMedium)),
-        new(PlayerInput.OnKey(Key.Right, KeyModifiers.Shift), Seek(SeekLarge)),
-        new(PlayerInput.OnKey(Key.Left, KeyModifiers.Shift), Seek(-SeekLarge)),
-        new(PlayerInput.OnKey(Key.Right, KeyModifiers.Alt), Seek(SeekFine)),
-        new(PlayerInput.OnKey(Key.Left, KeyModifiers.Alt), Seek(-SeekFine)),
+        new(PlayerInput.OnKey(Key.Right), Seek(SeekSmall, SeekStep.Small)),
+        new(PlayerInput.OnKey(Key.Left), Seek(-SeekSmall, SeekStep.Small)),
+        new(PlayerInput.OnKey(Key.Right, KeyModifiers.Control), Seek(SeekMedium, SeekStep.Medium)),
+        new(PlayerInput.OnKey(Key.Left, KeyModifiers.Control), Seek(-SeekMedium, SeekStep.Medium)),
+        new(PlayerInput.OnKey(Key.Right, KeyModifiers.Shift), Seek(SeekLarge, SeekStep.Large)),
+        new(PlayerInput.OnKey(Key.Left, KeyModifiers.Shift), Seek(-SeekLarge, SeekStep.Large)),
+        new(PlayerInput.OnKey(Key.Right, KeyModifiers.Alt), Seek(SeekFine, SeekStep.Fine)),
+        new(PlayerInput.OnKey(Key.Left, KeyModifiers.Alt), Seek(-SeekFine, SeekStep.Fine)),
         new(PlayerInput.OnKey(Key.Up), Volume(VolumeStep)),
         new(PlayerInput.OnKey(Key.Down), Volume(-VolumeStep)),
         new(PlayerInput.OnKey(Key.M), Mute),
@@ -248,7 +263,7 @@ internal static class Keymap
     {
         Faster, Slower, NormalSpeed, null,
         NextFrame, PreviousFrame, null,
-        NextChapter, PreviousChapter, null,
+        NextChapter, PreviousChapter, GoToTime, null,
         PreviousFile, NextFile, Shuffle, RepeatCycle
     };
 
@@ -331,7 +346,7 @@ internal static class Keymap
         var action = row.Action;
         return action.Command switch
         {
-            PlayerCommandKind.Seek or PlayerCommandKind.Volume or PlayerCommandKind.SubtitleDelay or PlayerCommandKind.AudioDelay => Strings.Get(action.LabelKey, Signed(action.Amount, row.Input.Kind == PlayerInputKind.Wheel)),
+            PlayerCommandKind.Seek or PlayerCommandKind.Volume or PlayerCommandKind.SubtitleDelay or PlayerCommandKind.AudioDelay => Strings.Get(action.LabelKey, Signed(action.Effective, row.Input.Kind == PlayerInputKind.Wheel)),
             _ => Strings.Get(action.LabelKey)
         };
     }

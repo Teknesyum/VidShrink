@@ -45,7 +45,48 @@ internal partial class PlayerView
         engine.SetSecondarySubtitleTrack(0);
         ApplyTrackLanguage(engine);
         LoadSidecarSubtitles(engine);
+        RestoreTracks(engine);
     }
+
+    /// <summary>
+    /// OYA-05: aynı dosya yeniden açılınca en son seçilen izler, gecikmeler ve hız geri gelir; dil tercihinin
+    /// ve yan altyazının seçiminin üstüne yazılır. Artık olmayan iz atlanır, kayıt yalnız aynı dosyaya döner.
+    /// </summary>
+    private void RestoreTracks(IPlaybackEngine engine)
+    {
+        if (_path is not { } path || HistoryPath is null || _history.TracksFor(path, engine.DurationSeconds) is not { } memory) return;
+        var tracks = engine.Tracks;
+        bool Has(PlaybackTrackKind kind, long id) => tracks.Any(track => track.Kind == kind && track.Id == id);
+
+        if (memory.Audio > 0 && Has(PlaybackTrackKind.Audio, memory.Audio)) engine.SetAudioTrack(memory.Audio);
+        if (memory.Subtitle == 0 || Has(PlaybackTrackKind.Subtitle, memory.Subtitle)) SetPrimarySubtitle(engine, memory.Subtitle);
+        if (memory.SecondarySubtitle == 0 || (memory.SecondarySubtitle != engine.SubtitleTrack && Has(PlaybackTrackKind.Subtitle, memory.SecondarySubtitle)))
+            engine.SetSecondarySubtitleTrack(memory.SecondarySubtitle);
+
+        _subtitles.ShiftSubtitleDelay(memory.SubtitleDelay);
+        _subtitles.ShiftAudioDelay(memory.AudioDelay);
+        engine.SetSubtitleDelay(_subtitles.SubtitleDelay);
+        engine.SetAudioDelay(_subtitles.AudioDelay);
+
+        if (double.IsFinite(memory.Speed) && memory.Speed >= Keymap.MinimumSpeed && memory.Speed <= Keymap.MaximumSpeed && memory.Speed != _speed)
+        {
+            _speed = memory.Speed;
+            engine.SetSpeed(_speed);
+        }
+
+        _trace.Add("memory -> " + string.Join(" ",
+            memory.Audio.ToString(CultureInfo.InvariantCulture),
+            memory.Subtitle.ToString(CultureInfo.InvariantCulture),
+            memory.SecondarySubtitle.ToString(CultureInfo.InvariantCulture),
+            Saat.Tani.Konum(_subtitles.SubtitleDelay),
+            Saat.Tani.Konum(_subtitles.AudioDelay),
+            Saat.Tani.Konum(_speed)));
+    }
+
+    private TrackMemory? CurrentTracks()
+        => _engine is { IsOpen: true } engine
+            ? new TrackMemory(engine.AudioTrack, engine.SubtitleTrack, engine.SecondarySubtitleTrack, _subtitles.SubtitleDelay, _subtitles.AudioDelay, _speed)
+            : null;
 
     private void ApplyTrackLanguage(IPlaybackEngine engine)
     {

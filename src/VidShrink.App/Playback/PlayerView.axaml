@@ -169,6 +169,18 @@
                      Foreground="{StaticResource EmberBlaze}"/>
         </Border>
 
+        <Border x:Name="GoToBox"
+                Theme="{StaticResource PlaybackBadge}"
+                Margin="{StaticResource PlaybackBadgeMargin}"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                IsVisible="False">
+          <TextBox x:Name="GoToText"
+                   Width="{StaticResource NumberBoxWidth}"
+                   PlaceholderText="{loc:Text player.goto.hint}"
+                   auto:AutomationProperties.Name="{loc:Text main.player.menu.goto}"/>
+        </Border>
+
         <Border x:Name="MediaTitle" Theme="{StaticResource PlaybackMediaTitle}" Classes="reveal">
           <TextBlock x:Name="TxtMediaTitle" Theme="{StaticResource PlaybackMediaTitleText}"/>
         </Border>

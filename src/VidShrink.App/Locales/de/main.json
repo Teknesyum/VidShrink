@@ -721,6 +721,7 @@
   "main.player.menu.chapters": "Kapitel",
   "main.player.menu.stop": "Stopp",
   "main.player.menu.tostart": "Zum Anfang",
+  "main.player.menu.goto": "Zu Zeitpunkt springen",
   "main.player.input.wheel": "Mausrad",
   "main.player.input.left": "Linksklick",
   "main.player.input.middle": "Mittelklick",

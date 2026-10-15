@@ -721,6 +721,7 @@
   "main.player.menu.chapters": "章节列表",
   "main.player.menu.stop": "停止",
   "main.player.menu.tostart": "转到开头",
+  "main.player.menu.goto": "跳转到时间",
   "main.player.input.wheel": "滚轮",
   "main.player.input.left": "左键单击",
   "main.player.input.middle": "中键单击",

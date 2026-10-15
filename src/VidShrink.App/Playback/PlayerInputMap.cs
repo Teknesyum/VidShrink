@@ -63,7 +63,8 @@ internal enum PlayerCommandKind
     SubtitleVisibility,
     SubtitleLine,
     SubtitleStep,
-    SubtitleCopy
+    SubtitleCopy,
+    GoToTime
 }
 
 internal readonly record struct PlayerCommand(PlayerCommandKind Kind, double Amount)
