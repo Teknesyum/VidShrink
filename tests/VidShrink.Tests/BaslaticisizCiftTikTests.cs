@@ -90,7 +90,7 @@ public sealed class BaslaticisizCiftTikTests : IDisposable
         var runMain = program[program.IndexOf("private static int RunMain(", StringComparison.Ordinal)..];
         runMain = runMain[..runMain.IndexOf("internal static Task WarmPlayback()", StringComparison.Ordinal)];
 
-        var sahip = runMain.IndexOf("instance.StartListening(files.Receive);", StringComparison.Ordinal);
+        var sahip = runMain.IndexOf("instance.StartListening(files.Receive", StringComparison.Ordinal);
         var bakim = runMain.IndexOf("StartLauncherMaintenance();", StringComparison.Ordinal);
         Assert.True(sahip > 0 && bakim > sahip);
         Assert.Single(System.Text.RegularExpressions.Regex.Matches(program, @"StartLauncherMaintenance\(\);"));
