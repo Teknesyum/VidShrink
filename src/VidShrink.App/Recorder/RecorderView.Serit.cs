@@ -344,6 +344,7 @@ internal partial class RecorderView
         TxtState.Text = counting ? Say("recorder.countdown.left", CountdownLeft)
             : running ? Say("recorder.strip.live")
             : paused ? Say("recorder.strip.paused")
+            : ScheduleUpcoming is { } planned ? Say("recorder.schedule.armed", ScheduleClockText(planned))
             : Say("recorder.strip.idle");
 
         SyncFrame();

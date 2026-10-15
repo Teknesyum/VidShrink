@@ -549,7 +549,36 @@
                              ColumnSpacing="{StaticResource SpaceMd}"
                              RowSpacing="{StaticResource SpaceMd}">
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.countdown.title}" Theme="{StaticResource Label}"/>
+                <Grid ColumnDefinitions="Auto,Auto" HorizontalAlignment="Left">
+                  <TextBlock Text="{loc:Text recorder.countdown.title}" Theme="{StaticResource Label}"/>
+                  <Button x:Name="BtnSchedule" Grid.Column="1" Theme="{StaticResource GhostButton}"
+                          Width="{StaticResource InfoBadgeSize}" Height="{StaticResource InfoBadgeSize}"
+                          MinHeight="0" Padding="0" Margin="{StaticResource InfoBadgeLabelMargin}"
+                          CornerRadius="{StaticResource RadiusChip}" VerticalAlignment="Center"
+                          auto:AutomationProperties.Name="{loc:Text recorder.schedule.open}">
+                    <ToolTip.Tip>
+                      <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text recorder.schedule.hint}"/>
+                    </ToolTip.Tip>
+                    <Path Width="{StaticResource InfoBadgeGlyphSize}" Height="{StaticResource InfoBadgeGlyphSize}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
+                    <Button.Flyout>
+                      <Flyout>
+                        <StackPanel Spacing="{StaticResource SpaceSm}" Width="{StaticResource FieldWidth}">
+                          <TextBlock Text="{loc:Text recorder.schedule.open}" Theme="{StaticResource Label}"/>
+                          <TextBlock Text="{loc:Text recorder.schedule.repeat}" Theme="{StaticResource Hint}"/>
+                          <ComboBox x:Name="CmbScheduleRepeat" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.schedule.repeat}"/>
+                          <TextBlock Text="{loc:Text recorder.schedule.time}" Theme="{StaticResource Hint}"/>
+                          <TextBox x:Name="TxtScheduleTime" FontFamily="{StaticResource FontMono}" auto:AutomationProperties.Name="{loc:Text recorder.schedule.time}"/>
+                          <StackPanel x:Name="PanelScheduleDay" Spacing="{StaticResource SpaceSm}" IsVisible="False">
+                            <TextBlock Text="{loc:Text recorder.schedule.day}" Theme="{StaticResource Hint}"/>
+                            <ComboBox x:Name="CmbScheduleDay" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.schedule.day}"/>
+                          </StackPanel>
+                          <TextBlock x:Name="TxtScheduleError" Theme="{StaticResource StatusError}" TextWrapping="Wrap" IsVisible="False"/>
+                          <TextBlock x:Name="TxtScheduleNext" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+                        </StackPanel>
+                      </Flyout>
+                    </Button.Flyout>
+                  </Button>
+                </Grid>
                 <ComboBox x:Name="CmbCountdown"
                           HorizontalAlignment="Stretch"
                           ToolTip.Tip="{loc:Text recorder.countdown.hint}"

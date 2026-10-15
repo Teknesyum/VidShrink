@@ -47,6 +47,11 @@ internal sealed class RecorderSettings
 
     internal int CountdownSeconds { get; set; }
 
+    internal RecorderRepeat ScheduleRepeat { get; set; } = RecorderRepeat.Off;
+
+    /// <summary>Saatli kaydın ilk oluşumu, yerel saatle; yineleme bu çapadan sayılır.</summary>
+    internal DateTime ScheduleAt { get; set; }
+
     /// <summary>Kullanıcının istediği tahmini süre; verilmediyse <c>null</c>.</summary>
     internal int? TargetSeconds { get; set; }
 
@@ -283,6 +288,9 @@ internal sealed class RecorderSettings
             settings.ManualMode = (bool?)root["manualMode"] ?? !((bool?)root["autoMode"] ?? true);
             settings.AdvancedMode = (bool?)root["advancedMode"] ?? settings.ManualMode;
             if ((int?)root["countdownSeconds"] is { } countdown && Array.IndexOf(CountdownChoices, countdown) >= 0) settings.CountdownSeconds = countdown;
+            if (Enum.TryParse<RecorderRepeat>((string?)root["scheduleRepeat"], true, out var repeat) && Enum.IsDefined(repeat)) settings.ScheduleRepeat = repeat;
+            if (DateTime.TryParseExact((string?)root["scheduleAt"], "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out var at)) settings.ScheduleAt = at;
+            if (settings.ScheduleAt == default) settings.ScheduleRepeat = RecorderRepeat.Off;
             if ((int?)root["targetSeconds"] is { } targetSeconds && targetSeconds > 0) settings.TargetSeconds = targetSeconds;
             if ((double?)root["targetMegabytes"] is { } targetMegabytes && targetMegabytes > 0) settings.TargetMegabytes = targetMegabytes;
             if ((int?)root["fps"] is { } fps && fps > 0) settings.Fps = fps;
@@ -411,6 +419,8 @@ internal sealed class RecorderSettings
                 writer.WriteBoolean("manualMode", ManualMode);
                 writer.WriteBoolean("advancedMode", AdvancedMode);
                 writer.WriteNumber("countdownSeconds", CountdownSeconds);
+                writer.WriteString("scheduleRepeat", ScheduleRepeat.ToString());
+                writer.WriteString("scheduleAt", ScheduleAt.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture));
                 if (TargetSeconds is { } ts) writer.WriteNumber("targetSeconds", ts);
                 else writer.WriteNull("targetSeconds");
                 if (TargetMegabytes is { } tm) writer.WriteNumber("targetMegabytes", tm);
