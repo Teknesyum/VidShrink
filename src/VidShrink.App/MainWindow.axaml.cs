@@ -288,8 +288,9 @@ public partial class MainWindow : Window
         Watch(TxtQuality, TextBox.TextProperty, OnQualityTextChanged);
         foreach (var box in new[] { CmbQualityMode, CmbConvertCodec })
             Watch(box, SelectingItemsControl.SelectedIndexProperty, OnQualityRangeChanged);
-        foreach (var box in new[] { CmbContainer, CmbResolution, CmbConvertFps, CmbConvertAudio })
+        foreach (var box in new[] { CmbContainer, CmbResolution, CmbConvertFps, CmbConvertAudio, CmbConvertChannels, CmbConvertSampleRate })
             Watch(box, SelectingItemsControl.SelectedIndexProperty, OnConvertChanged);
+        Watch(ChkConvertLoudnorm, ToggleButton.IsCheckedProperty, OnConvertChanged);
         Watch(ChkConvertDropMetadata, ToggleButton.IsCheckedProperty, OnConvertChanged);
         Watch(ChkConvertSingleFrame, ToggleButton.IsCheckedProperty, OnConvertChanged);
         Watch(ChkConvertAudioReplace, ToggleButton.IsCheckedProperty, OnConvertChanged);
@@ -4834,6 +4835,9 @@ public partial class MainWindow : Window
             Fps = fps,
             AudioCodec = audio,
             AudioBitrateK = audioK > 0 ? audioK : ConversionDefaults.AudioBitrateK,
+            AudioLoudnorm = ChkConvertLoudnorm.IsChecked == true,
+            AudioChannels = ConvertAudioNumber(CmbConvertChannels),
+            AudioSampleRate = ConvertAudioNumber(CmbConvertSampleRate),
             Start = ParseTime(TxtTrimStart.Text),
             End = ParseTime(TxtTrimEnd.Text),
             HdrPolicy = HdrPolicyIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve,

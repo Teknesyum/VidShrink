@@ -9,6 +9,7 @@ public static class ConversionArguments
 
     public static IReadOnlyList<string> Validate(MediaInfo info, ConversionPlan plan)
     {
+        plan = ResolveAudio(info, plan);
         var errors = new List<string>();
         if (plan.Start is { } startValue && startValue < TimeSpan.Zero) errors.Add("Start time cannot be negative.");
         if (plan.End is { } endValue && endValue <= TimeSpan.Zero) errors.Add("End time must be greater than zero.");
@@ -46,10 +47,20 @@ public static class ConversionArguments
         if (plan.CarriesAudio && plan.AudioCodec is not null && (plan.AudioTracks is not null || plan.ExternalAudio is not null))
         {
             var selected = SourceAudio(info, plan).Count + (AddedAudio(plan) is null ? 0 : 1);
-            if (selected > 1 && plan.Container is "mp3" or "wav" or "flac")
+            if (selected > 1 && plan.Container is "mp3" or "wav" or "flac" or "opus" or "ogg" or "aiff" or "ac3")
                 errors.Add($"The {plan.Container.ToUpperInvariant()} container carries only one audio track.");
             if (selected == 0 && plan.AudioOnly && info.HasAudio)
                 errors.Add("No audio track is selected.");
+        }
+        if (plan.CarriesAudio && plan.AudioCodec is { } processed && processed != "copy")
+        {
+            if (plan.AudioChannels is <= 0) errors.Add("Audio channel count must be positive.");
+            if (plan.AudioSampleRate is { } rate)
+            {
+                if (plan.Container == "mxf" && rate != 48000) errors.Add("The MXF container carries only 48000 Hz audio.");
+                else if (!StreamMapping.SampleRates.Contains(rate) || StreamMapping.SampleRatesFor(processed) is { } rates && !rates.Contains(rate))
+                    errors.Add($"The {processed} audio encoder does not support {rate.ToString(CultureInfo.InvariantCulture)} Hz.");
+            }
         }
         if (plan.BurnSubtitle is not null)
         {
@@ -98,6 +109,7 @@ public static class ConversionArguments
     public static IReadOnlyList<string> Build(MediaInfo info, ConversionPlan plan, string outputPath, string? palettePath = null, IEncoderAvailability? availability = null)
     {
         var errors = Validate(info, plan);
+        plan = ResolveAudio(info, plan);
         if (errors.Count > 0) throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
         if (WritesIntermediate(plan) && IntermediateCodecs.Find(plan.VideoCodec, plan.VideoProfile) is null)
             throw new ArgumentException($"Unsupported {plan.VideoCodec} profile: {plan.VideoProfile ?? "none"}", nameof(plan));
@@ -398,12 +410,32 @@ public static class ConversionArguments
     /// <summary>Kopya kipinde kabin almadigi dis sesin kodlayicisi.</summary>
     private static string FallbackAudioEncoder(string container) => container switch
     {
-        "webm" or "mkv" => "libopus",
+        "webm" or "mkv" or "opus" or "ogg" => "libopus",
         "mp3" or "avi" => "libmp3lame",
         "wav" or "mxf" => "pcm_s16le",
         "flac" => "flac",
+        "aiff" => "pcm_s16be",
+        "ac3" => "ac3",
         _ => "aac"
     };
+
+    /// <summary>
+    /// Planın gerçekte yazacağı ses kodeği. Ses yüksekliği, kanal ya da örnekleme hızı seçilince kopya kapanır ve
+    /// kap kendi kodlayıcısıyla yazar. Ses kabında kabın kendi kodlayıcısı seçiliyken işleme ve dış ses yoksa,
+    /// kaynağın kaba sığan sesi yeniden kodlanmadan çıkarılır; M4A yalnız AAC ve ALAC'ı böyle çıkarır, MP3'ü AAC'a kodlar.
+    /// </summary>
+    public static ConversionPlan ResolveAudio(MediaInfo info, ConversionPlan plan)
+    {
+        if (!plan.CarriesAudio || plan.AudioCodec is null) return plan;
+        if (plan.AudioCodec == "copy")
+            return plan.ProcessesAudio ? plan with { AudioCodec = FallbackAudioEncoder(plan.Container) } : plan;
+        if (!plan.AudioOnly || plan.ProcessesAudio || plan.ExternalAudio is not null
+            || plan.AudioCodec != ConversionPresetPlan.AudioCodecForAudioContainer(plan.Container)) return plan;
+        var source = SourceAudio(info, plan);
+        return source.Count > 0 && source.All(stream => AudioCopyCompatible(plan.Container, stream.Codec) && (plan.Container != "m4a" || stream.Codec is "aac" or "alac"))
+            ? plan with { AudioCodec = "copy" }
+            : plan;
+    }
 
     /// <summary>
     /// <c>-map</c> verilmeyince ffmpeg'in seçtiği ses izi: varsayılan işaretli iz, yoksa en çok kanallı,
@@ -457,8 +489,18 @@ public static class ConversionArguments
                 if (encoder is not "pcm_s16le" and not "flac") args.AddRange(new[] { "-b:a:" + stream, $"{plan.AudioBitrateK}k" });
             }
         }
-        else args.AddRange(new[] { "-c:a", plan.AudioCodec, "-b:a", $"{plan.AudioBitrateK}k" });
-        if (plan.Container == "mxf" && plan.AudioCodec is not null && !args.Contains("-an")) args.AddRange(MxfAudioArgs);
+        else
+        {
+            args.AddRange(new[] { "-c:a", plan.AudioCodec, "-b:a", $"{plan.AudioBitrateK}k" });
+            if (plan.AudioLoudnorm)
+            {
+                var rate = plan.AudioSampleRate ?? SourceAudio(info, plan).Select(stream => stream.SampleRate).FirstOrDefault(value => value > 0);
+                args.AddRange(new[] { "-af", StreamMapping.LoudnormFilter + ",aresample=" + (rate > 0 ? rate : StreamMapping.DefaultSampleRate).ToString(CultureInfo.InvariantCulture) });
+            }
+            if (plan.AudioChannels is { } channels) args.AddRange(new[] { "-ac", channels.ToString(CultureInfo.InvariantCulture) });
+            if (plan.AudioSampleRate is { } sampleRate) args.AddRange(new[] { "-ar", sampleRate.ToString(CultureInfo.InvariantCulture) });
+        }
+        if (plan.Container == "mxf" && plan.AudioCodec is not null && !args.Contains("-an") && !args.Contains("-ar")) args.AddRange(MxfAudioArgs);
     }
 
     /// <summary>
@@ -484,13 +526,17 @@ public static class ConversionArguments
 
     private static bool AudioCopyCompatible(string container, string? codec) => container switch
     {
-        "mp4" => codec is "aac" or "alac" or "mp3" or "flac",
+        "mp4" => codec is "aac" or "alac" or "mp3" or "flac" or "ac3" or "eac3" or "opus",
         "mov" or "m4a" => codec is "aac" or "alac" or "mp3",
         "webm" => codec is "opus" or "vorbis",
         "mp3" => codec == "mp3",
         "wav" => codec is "pcm_s16le" or "pcm_s24le" or "pcm_f32le",
         "avi" => codec is "mp3" or "aac" or "pcm_s16le",
         "flac" => codec == "flac",
+        "opus" => codec == "opus",
+        "ogg" => codec is "opus" or "vorbis" or "flac",
+        "aiff" => codec is "pcm_s16be" or "pcm_s24be",
+        "ac3" => codec == "ac3",
         "mkv" => true,
         _ => false
     };
@@ -514,16 +560,20 @@ public static class ConversionArguments
 
     private static bool AudioEncodeCompatible(string container, string codec) => container switch
     {
-        "mp4" => codec is "aac" or "libmp3lame" or "flac",
+        "mp4" => codec is "aac" or "libmp3lame" or "flac" or "ac3" or "eac3",
         "m4a" => codec is "aac" or "libmp3lame",
-        "mov" => codec is "aac" or "libmp3lame" or "pcm_s16le",
+        "mov" => codec is "aac" or "libmp3lame" or "pcm_s16le" or "ac3" or "eac3",
         "mxf" => codec is "pcm_s16le",
         "webm" => codec is "libopus",
         "mp3" => codec is "libmp3lame",
         "wav" => codec is "pcm_s16le",
         "avi" => codec is "libmp3lame" or "pcm_s16le",
         "flac" => codec == "flac",
-        "mkv" => codec is "aac" or "libopus" or "libmp3lame" or "pcm_s16le" or "flac",
+        "opus" => codec is "libopus",
+        "ogg" => codec is "libopus" or "flac",
+        "aiff" => codec is "pcm_s16be",
+        "ac3" => codec is "ac3",
+        "mkv" => codec is "aac" or "libopus" or "libmp3lame" or "pcm_s16le" or "flac" or "ac3" or "eac3",
         _ => false
     };
 

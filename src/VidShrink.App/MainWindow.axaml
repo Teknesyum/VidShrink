@@ -1233,6 +1233,10 @@
                         <ComboBoxItem Content="MXF" Tag="mxf"/>
                         <ComboBoxItem Content="{loc:Text main.convert.container.png-sequence}" Tag="png"/>
                         <ComboBoxItem Content="{loc:Text main.convert.container.jpg-sequence}" Tag="jpg"/>
+                        <ComboBoxItem Content="Opus" Tag="opus"/>
+                        <ComboBoxItem Content="OGG" Tag="ogg"/>
+                        <ComboBoxItem Content="AIFF" Tag="aiff"/>
+                        <ComboBoxItem Content="AC3" Tag="ac3"/>
                       </ComboBox>
                     </Grid>
 
@@ -1415,6 +1419,8 @@
                         <ComboBoxItem Content="FLAC" Tag="flac"/>
                         <ComboBoxItem Content="{loc:Text main.convert.copy}" Tag="copy"/>
                         <ComboBoxItem Content="{loc:Text main.convert.drop}"/>
+                        <ComboBoxItem Content="AC3" Tag="ac3"/>
+                        <ComboBoxItem Content="E-AC3" Tag="eac3"/>
                       </ComboBox>
                     </Grid>
 
@@ -1501,6 +1507,29 @@
                                 Content="{loc:Text main.convert.audio-external.shortest}"/>
                     </WrapPanel>
                     <StackPanel x:Name="ConvertAudioFileList" Spacing="{StaticResource SpaceXs}" IsVisible="False"/>
+                    <WrapPanel x:Name="ConvertAudioProcessPanel" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                      <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+                        <TextBlock Text="{loc:Text main.convert.audio-channels}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="CmbConvertChannels" SelectedIndex="0"
+                                  auto:AutomationProperties.Name="{loc:Text main.convert.audio-channels}">
+                          <ComboBoxItem Content="{loc:Text main.convert.source-option}"/>
+                          <ComboBoxItem Content="{loc:Text main.advanced.audio-channels.stereo}" Tag="2"/>
+                          <ComboBoxItem Content="{loc:Text main.advanced.audio-channels.mono}" Tag="1"/>
+                        </ComboBox>
+                      </StackPanel>
+                      <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+                        <TextBlock Text="{loc:Text main.convert.audio-sample-rate}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="CmbConvertSampleRate" SelectedIndex="0"
+                                  auto:AutomationProperties.Name="{loc:Text main.convert.audio-sample-rate}">
+                          <ComboBoxItem Content="{loc:Text main.convert.source-option}"/>
+                          <ComboBoxItem Content="44100 Hz" Tag="44100"/>
+                          <ComboBoxItem Content="48000 Hz" Tag="48000"/>
+                        </ComboBox>
+                      </StackPanel>
+                      <CheckBox x:Name="ChkConvertLoudnorm" Theme="{StaticResource CheckStyle}" IsChecked="False" VerticalAlignment="Center"
+                                MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
+                                Content="{loc:Text main.convert.audio-loudnorm}"/>
+                    </WrapPanel>
                   </StackPanel>
                 </Border>
                 <Border x:Name="ConvertSubtitlePanel" Theme="{StaticResource Panel}" IsVisible="False">

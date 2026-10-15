@@ -144,6 +144,9 @@ public static class ConversionPresetPlan
         "mp3" => "libmp3lame",
         "wav" => "pcm_s16le",
         "flac" => "flac",
+        "opus" or "ogg" => "libopus",
+        "aiff" => "pcm_s16be",
+        "ac3" => "ac3",
         _ => "aac"
     };
 }

@@ -73,6 +73,7 @@ public partial class MainWindow
     {
         var carried = plan.CarriesAudio && plan.AudioCodec is not null;
         foreach (var check in _convertAudioChecks) check.IsEnabled = carried;
+        ChkConvertLoudnorm.IsEnabled = CmbConvertChannels.IsEnabled = CmbConvertSampleRate.IsEnabled = carried;
         BtnConvertAudioFile.IsEnabled = carried;
         ChkConvertAudioReplace.IsEnabled = ChkConvertAudioShortest.IsEnabled = carried && _convertExternalAudio is not null;
         var hint = !carried ? Say("main.convert.audio-tracks.not-carried")
@@ -81,6 +82,10 @@ public partial class MainWindow
         TxtConvertAudioHint.Text = hint;
         TxtConvertAudioHint.IsVisible = hint.Length > 0;
     }
+
+    /// <summary>DON-P9: kanal ve örnekleme hızı kutusunun sayısı; "Kaynak" <c>null</c>.</summary>
+    private static int? ConvertAudioNumber(ComboBox box)
+        => SelectedTag(box) is { } tag && int.TryParse(tag, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out var value) ? value : null;
 
     internal ExternalAudio? ConvertExternalAudio
         => _convertExternalAudio is { } audio ? audio with { Replace = ChkConvertAudioReplace.IsChecked == true } : null;

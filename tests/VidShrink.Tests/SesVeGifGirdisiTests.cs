@@ -199,13 +199,13 @@ public sealed class SesVeGifGirdisiTests
             finally { window.Close(); }
         });
 
-        Assert.Equal(new[] { "flac", "m4a", "mp3", "wav" }, olcu.olcum.gorunen.Order().ToArray());
+        Assert.Equal(new[] { "ac3", "aiff", "flac", "m4a", "mp3", "ogg", "opus", "wav" }, olcu.olcum.gorunen.Order().ToArray());
         Assert.All(olcu.olcum.gorunen, kap => Assert.True(new ConversionPlan { Container = kap }.AudioOnly, kap));
         Assert.True(new ConversionPlan { Container = olcu.olcum.secili }.AudioOnly, olcu.olcum.secili);
         Assert.False(olcu.olcum.Item3);
         Assert.True(olcu.olcum.Item4, olcu.olcum.Item6);
         Assert.Equal(VidShrink.App.Localization.Strings.Get("main.error.audio-only-shrink"), olcu.olcum.Item5);
-        Assert.True(olcu.sonra > 4, olcu.sonra.ToString(CultureInfo.InvariantCulture));
+        Assert.True(olcu.sonra > 8, olcu.sonra.ToString(CultureInfo.InvariantCulture));
         Assert.Equal("mp4", olcu.sonraSecili);
         try { Directory.Delete(Path.GetDirectoryName(Path.GetDirectoryName(ayar))!, true); } catch (IOException) { }
     }

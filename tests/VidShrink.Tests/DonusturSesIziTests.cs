@@ -81,9 +81,9 @@ public sealed class DonusturSesIziTests
     [Fact]
     public void KopyadaKabinAlmadigiIzUyarir()
     {
-        var info = Ornek(Video, Mono, Opus);
+        var info = Ornek(Video, Mono, Opus with { Codec = "vorbis" });
         var hatalar = ConversionArguments.Validate(info, new ConversionPlan { Container = "mp4", AudioCodec = "copy", AudioTracks = new[] { 0, 1 } });
-        Assert.Contains("The MP4 container does not support copying the source opus audio stream.", hatalar);
+        Assert.Contains("The MP4 container does not support copying the source vorbis audio stream.", hatalar);
 
         Assert.Empty(ConversionArguments.Validate(info, new ConversionPlan { Container = "mp4", AudioCodec = "copy", AudioTracks = new[] { 0 } }));
         Assert.Empty(ConversionArguments.Validate(info, new ConversionPlan { Container = "mkv", AudioCodec = "copy", AudioTracks = new[] { 0, 1 } }));
@@ -175,11 +175,11 @@ public sealed class DonusturSesIziTests
     public void SecimsizKopyaFfmpeginSececegiIziDenetler()
     {
         var ilkAac = new SourceStream(1, StreamKind.Audio, "aac", "eng", Channels: 2, BitrateBps: 128_000);
-        var seciliOpus = new SourceStream(2, StreamKind.Audio, "opus", "tur", IsDefault: true, Channels: 6, BitrateBps: 256_000);
-        var ilkOpus = new SourceStream(1, StreamKind.Audio, "opus", "eng", Channels: 2, BitrateBps: 128_000);
+        var seciliOpus = new SourceStream(2, StreamKind.Audio, "vorbis", "tur", IsDefault: true, Channels: 6, BitrateBps: 256_000);
+        var ilkOpus = new SourceStream(1, StreamKind.Audio, "vorbis", "eng", Channels: 2, BitrateBps: 128_000);
         var seciliAac = new SourceStream(2, StreamKind.Audio, "aac", "tur", IsDefault: true, Channels: 6, BitrateBps: 256_000);
         var plan = new ConversionPlan { Container = "mp4", AudioCodec = "copy" };
-        var hata = "The MP4 container does not support copying the source opus audio stream.";
+        var hata = "The MP4 container does not support copying the source vorbis audio stream.";
 
         var info = Ornek(Video, ilkAac, seciliOpus);
         Assert.Equal("aac", info.AudioCodec);
@@ -187,7 +187,7 @@ public sealed class DonusturSesIziTests
         Assert.Contains(hata, ConversionArguments.Validate(info, plan));
 
         var ters = Ornek(Video, ilkOpus, seciliAac);
-        Assert.Equal("opus", ters.AudioCodec);
+        Assert.Equal("vorbis", ters.AudioCodec);
         Assert.DoesNotContain(ConversionArguments.Validate(ters, plan), e => e.Contains("does not support copying"));
     }
 }

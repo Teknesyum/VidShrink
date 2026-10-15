@@ -23,6 +23,18 @@ public sealed record ConversionPlan
     public double? Fps { get; init; }
     public string? AudioCodec { get; init; } = "aac";
     public int AudioBitrateK { get; init; } = 128;
+
+    /// <summary>Ses yüksekliği <c>loudnorm</c> ile eşitlenir. Seçilince ses kopyası kapanır.</summary>
+    public bool AudioLoudnorm { get; init; }
+
+    /// <summary>Çıktı ses kanal sayısı (<c>-ac</c>); <c>null</c> kaynağınki. Seçilince ses kopyası kapanır.</summary>
+    public int? AudioChannels { get; init; }
+
+    /// <summary>Çıktı örnekleme hızı, Hz (<c>-ar</c>); <c>null</c> kaynağınki. Seçilince ses kopyası kapanır.</summary>
+    public int? AudioSampleRate { get; init; }
+
+    /// <summary>Ses yüksekliği, kanal ya da örnekleme hızından biri seçili mi.</summary>
+    public bool ProcessesAudio => AudioLoudnorm || AudioChannels is not null || AudioSampleRate is not null;
     public TimeSpan? Start { get; init; }
     public TimeSpan? End { get; init; }
     public HdrPolicy HdrPolicy { get; init; } = HdrPolicy.Preserve;
@@ -77,7 +89,7 @@ public sealed record ConversionPlan
     public VideoFilterOptions BurnOptions => BurnSubtitle is null
         ? VideoFilterOptions.Default
         : VideoFilterOptions.Default with { BurnSubtitle = BurnSubtitle, BurnFont = BurnFont, BurnFontSize = BurnFontSize, BurnColor = BurnColor, BurnBox = BurnBox };
-    public bool AudioOnly => Container is "mp3" or "m4a" or "wav" or "flac";
+    public bool AudioOnly => Container is "mp3" or "m4a" or "wav" or "flac" or "opus" or "ogg" or "aiff" or "ac3";
     public bool Gif => Container == "gif";
     public bool AnimatedImage => Container is "webp" or "avif";
 
