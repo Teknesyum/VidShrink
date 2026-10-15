@@ -10,46 +10,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 **Dalga 2 — Karar Gerekmez, Küçük İş Öncelik 2 Ya Da Orta İş Öncelik 1**
 
-## 18. İz Seçim Paneli
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DZA-P5 · Düzenleyici · iş orta · öncelik 1 · karar gerekmez
-
-- Satırlar (DZA-P5): DZA-03 İz seçim paneli; DZA-10 Önizlemede iz değiştirme. [Tablo](piyasa/2026-10-13/duzenleyici-kesim-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/Editing/EditExport.cs, src/VidShrink.Core/Editing/EditProject.cs, src/VidShrink.App/Editing/EditorView.Teslim.cs, src/VidShrink.App/Editing/EditorView.Monitor.cs, src/VidShrink.App/Playback/PlayerView.Tracks.cs
-- Plan: Teslim kutusuna kaynağın izlerini listeleyen panel gelir; varsayılan bugünkü gibi ilk görüntü ve ilk ses kalır, bu yüzden karar gerekmez. Seçim teslimin elle yazılmış `-map` satırlarına taşınır (EditExport.cs:541-542, :580-581, :656-657; ses parçası :725) ve projeye yazılır. Monitöre dinlenen iz için görünür düğme eklenir; oynatıcının var olan seçimi kullanılır (PlayerView.Tracks.cs:111-113) ve önizleme yeniden yüklenince korunur. Doğrulama: seçimden çıkan argümanları ölçen birim testleri ve çıktıda ffprobe ile iz sayımı.
-
-## 24. Dönüştür'de Altyazı İzleri
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DON-P2 · Dönüştür · iş orta · öncelik 1 · karar gerekmez
-
-- Satırlar (DON-P2): DON-02 Altyazı izlerini taşıma; DON-10 Harici altyazı dosyası ekleme; DON-11 Altyazıyı dosyaya çıkarma. [Tablo](piyasa/2026-10-13/donustur-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/ConversionArguments.cs, src/VidShrink.Core/ConversionPlan.cs, src/VidShrink.Core/StreamMapping.cs, src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.App/MainWindow.Izler.cs, src/VidShrink.App/Locales/, tests/VidShrink.Tests/
-- Plan: Dönüştür planına altyazı alanı eklenir ve komut, Küçült'ün akış planından (`StreamMapping.cs:255`) açık `-map` ve `-c:s` alır; kabın anlamadığı altyazı oradaki kuralla çevrilir ya da düşer. Dış .srt ve .ass dosyası aynı planın ek girdisi olarak bağlanır (`StreamMapping.cs:798`). Çıkarma, seçilen izi tek başına altyazı dosyasına yazan ayrı ve kısa bir komuttur. Doğrulama: kap başına argüman testleri (en az MP4, MKV ve WebM) ve açık `-map` yazılınca ses seçiminin değişmediğini gösteren test.
-
-## 25. Dönüştür'de Altyazı Gömme
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DON-P3 · Dönüştür · iş orta · öncelik 1 · karar gerekmez
-
-- Satırlar (DON-P3): DON-03 Altyazıyı görüntüye gömme; DON-09 Gömme altyazıda biçem. [Tablo](piyasa/2026-10-13/donustur-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/ConversionArguments.cs, src/VidShrink.Core/ConversionPlan.cs, src/VidShrink.Core/VideoFilterChain.cs, src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/MainWindow.Izler.cs, src/VidShrink.App/Locales/, tests/VidShrink.Tests/
-- Plan: Dönüştür'ün kendi süzgeç listesi (`ConversionArguments.cs:229`) yerine Küçült'ün zinciri (`VideoFilterChain.cs:321`) çağrılır; yakma süzgeci (`VideoFilterChain.cs:233`) ve resim altyazı bindirmesi böylece hazır gelir. Arayüzde Küçült'teki yakma seçimi (`MainWindow.Izler.cs:48`) Dönüştür'e de konur. Biçem için süzgece `force_style` (yazı tipi, boyut, renk, kutu) yazılır; bu yalnız metin altyazıda çalışır. Doğrulama: süzgeç metni testleri ve libass (altyazıyı çizen kitaplık) yoksa seçeneğin gizlendiğini gösteren test.
-
-## 28. Harici Ses Dosyası Ekleme
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DON-P7 · Dönüştür · iş orta · öncelik 1 · karar gerekmez
-
-- Satırlar (DON-P7): DON-07 Harici ses dosyası ekleme. [Tablo](piyasa/2026-10-13/donustur-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/ConversionArguments.cs, src/VidShrink.Core/ConversionPlan.cs, src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.App/Locales/, tests/VidShrink.Tests/
-- Plan: Dönüştür'de ikinci girdi olarak bir ses dosyası seçilir; iki kip sunulur: sesi onunla değiştir ya da ek iz olarak ekle. Komut ikinci `-i` ve açık `-map` yazar; görüntü kopyalanabiliyorsa yeniden kodlanmaz. Süreler tutmuyorsa kısa olanda bitirme seçeneği konur. Doğrulama: iki kip için argüman testleri ve kabın o sesi kabul etmediği durumda yeniden kodlamaya düşüş testi.
-
-## 29. Görüntü Dizisi Girdisi Ve Çıktısı
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DON-P8 · Dönüştür · iş orta · öncelik 1 · karar gerekmez
-
-- Satırlar (DON-P8): DON-08 Görüntü dizisinden video; DON-23 Görüntü dizisi çıktısı; DON-44 Tek kare kaydetme. [Tablo](piyasa/2026-10-13/donustur-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/ConversionArguments.cs, src/VidShrink.Core/ConversionPlan.cs, src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.App/MainWindow.DonusturKap.cs, src/VidShrink.App/Locales/, tests/VidShrink.Tests/
-- Plan: Girdi yönünde numaralı resim klasörü seçilir, kare hızı sorulur ve ffmpeg'in resim dizisi okuyucusuyla (`image2`) tek videoya çevrilir. Çıktı yönünde kap listesine PNG dizisi ve JPEG dizisi eklenir, kareler bir klasöre numaralı yazılır; tek kare kaydetme aynı yolun tek karelik halidir. Doğrulama: desen ve kare hızı argüman testleri, numarasında boşluk olan dizide davranış testi.
-
 ## 32. Kamera Biçimi Ve Konumu
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P5 · Kaydedici · iş orta · öncelik 1 · karar gerekmez
@@ -66,14 +26,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.Core/MediaInfo.cs, src/VidShrink.Ffmpeg/FfprobeClient.cs, src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.App/Playback/PlayerView.Window.cs, src/VidShrink.Core/Editing/SilenceCut.cs, src/VidShrink.App/Editing/EditorView.Sessizlik.cs
 - Plan: Küçült'ün kaynak paneline ve oynatıcının bilgi katmanına "tüm ayrıntılar" düğmesi eklenir; açılan pencere ffprobe'un zaten okuduğu akışları ve bölümleri tek tek gösterir, "kopyala" ve "metin olarak kaydet" verir. Aynı pencerenin ikinci bölümü düzenleyicinin sessizlik, siyah kare ve sahne taramasını çağırıp sonucu zaman kodlu liste olarak verir; düzenleyicinin tarama paneline de "listeyi kaydet" eklenir. Doğrulama: StreamMappingTests'in ürettiği çok izli, bölümlü 3 saniyelik dosyada dökümün her izi ve bölümü içerdiği; sahte tarayıcıyla listenin tarama sonucuyla birebir aynı olduğu sınanır.
 
-## 35. Ses Dosyası Ve GIF Girdisi
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · ARC-P3 · Bizde Olmayan Araçlar · iş orta · öncelik 1 · karar gerekmez
-
-- Satırlar (ARC-P3): ARC-19 Ses dosyası girdisi; ARC-12 GIF girdisi. [Tablo](piyasa/2026-10-13/eksik-araclar-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Ffmpeg/FfprobeClient.cs, src/VidShrink.Core/WatchFolder.cs, src/VidShrink.Core/DroppedMedia.cs, src/VidShrink.Core/ConversionPlan.cs, src/VidShrink.Core/ConversionArguments.cs, src/VidShrink.Core/GifPalette.cs, src/VidShrink.App/MainWindow.axaml.cs
-- Plan: Dosya okuyucusu görüntüsü olmayan dosyayı reddetmek yerine "yalnız ses" kaynağı olarak tanır (FfprobeClient.cs:45); Dönüştür bu kaynakta kap listesini ses kaplarına daraltır, Küçült almamaya devam eder. GIF bırakmada ve klasör taramasında da kabul edilir; kaynağı GIF olan işte GIF çıktısı kare hızı, genişlik ve renk sayısı düşürülerek hedef boyutun altına indirilir. Doğrulama: ffmpeg'in ürettiği mp3, flac, wav ve GIF örnekleriyle canlı kol; ses kaynağında video kabının seçilemediği, GIF çıktısının hedefin altında kaldığı ölçülür.
-
 ## 36. Resim Dizisi Girdisi Ve Ara Kare
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · ARC-P4 · Bizde Olmayan Araçlar · iş orta · öncelik 1 · karar gerekmez
@@ -81,14 +33,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (ARC-P4): ARC-09 Resim dizisi girdisi; ARC-13 Resimlerden GIF; ARC-28 Kare ara değerleme. [Tablo](piyasa/2026-10-13/eksik-araclar-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Core/ConversionPlan.cs, src/VidShrink.Core/ConversionArguments.cs, src/VidShrink.Core/DroppedMedia.cs, src/VidShrink.Core/VideoFilterChain.cs, src/VidShrink.App/MainWindow.axaml
 - Plan: Üçü de Dönüştür'ün kare hızı yoluna dokunur. Bir klasör ya da numaralı resimler bırakılınca dosyalar ada göre sıralanıp ffmpeg'in resim dizisi okuyucusuyla tek kaynak sayılır; kare hızı kutusu dizinin hızını belirler, GIF kabı seçilince resimlerden GIF de aynı yoldan çıkar. Kare hızı kutusuna "ara kare üret" seçeneği eklenir (minterpolate süzgeci; yapıda yoksa seçenek gizlenir). Doğrulama: üretilmiş 30 karelik PNG dizisinde çıktının kare sayısı ve süresi beklenene eşit; ara karede çıktının kare sayısı hedef hıza uyar.
-
-## 37. Klip Gruplama Ve Pano
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DZB-P4 · Düzenleyici · iş küçük · öncelik 2 · karar gerekmez
-
-- Satırlar (DZB-P4): DZB-12 Klipleri gruplama; DZB-11 Klip kopyala, kes, yapıştır ve çoğalt. [Tablo](piyasa/2026-10-13/duzenleyici-kurgu-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/Editing/EditTimeline.cs, src/VidShrink.App/Editing/EditorTimeline.cs, src/VidShrink.App/Editing/EditorKeymap.cs, src/VidShrink.App/Editing/EditorView.axaml, src/VidShrink.App/Locales/, tests/VidShrink.Tests/
-- Plan: Kliplere grup kimliği eklenir; taşıma ve silme grubun bütününe uygulanır (çoklu silme hazır: EditTimeline.cs:362). Kopyala, kes, yapıştır ve çoğalt seçili klipleri bir tampona alıp oynatma başına koyar; komutlar EditorKeymap'e ve çizelgenin sağ tık menüsüne girer. Doğrulama: EditTimeline birim testleri ve her işlemin tek adımda geri alınması.
 
 ## 38. İşlemeyen Kutuları Gizleme
 
@@ -149,14 +93,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.Core/RecorderChapters.cs, src/VidShrink.Core/StreamMapping.cs, src/VidShrink.Core/ConversionPlan.cs, src/VidShrink.Core/ConversionArguments.cs, src/VidShrink.App/MainWindow.axaml, src/VidShrink.Cli/CliRequest.cs
 - Plan: Üçü de Dönüştür'de "Kopyala" seçiliyken, yani yeniden kodlamadan yapılır; sırayla ayrı ayrı teslim edilebilir. Etiket için "Meta veriyi sil" kutusunun yanına başlık, sanatçı, yıl, açıklama ve kapak alanları gelir; bölüm için kaydedicinin bölüm yazan yolu ortak hâle getirilir ve kaynağın bölümleri eklenip adlandırılıp silinebilen liste olur; onarma için akışları kopyalayan, bozuk zaman damgasını hoş gören bayraklarla "Onar" hazır ayarı eklenir. Doğrulama: MetaSilDonusturTests ve KayitBolumIsaretiTests'teki gibi ffprobe ile etiket ve bölüm okunur; boş alan anahtarı hiç yazmaz.
 
-## 45. Dosya Başına Hatırlama Ve Gezinme
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · OYA-P9 · Oynatıcı · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (OYA-P9): OYA-05 Dosya başına seçimleri hatırlama; OYA-10 Zamana git; OYA-55 Atlama adımını ayarlama. [Tablo](piyasa/2026-10-13/oynatici-cekirdek-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Playback/PlaybackHistory.cs, src/VidShrink.App/Playback/PlayerView.Tracks.cs, src/VidShrink.App/Playback/Keymap.cs, src/VidShrink.App/Playback/PlayerSettings.cs, src/VidShrink.App/Playback/PlayerView.Serit.cs
-- Plan: `PlaybackHistory.Entry`'ye ses izi, altyazı izi, ikincil altyazı, gecikmeler ve hız eklenir; `ApplyTrackOptions` bugün her açılışta sıfırladığı bu değerleri kayıttan geri yükler. Zamana git için küçük bir giriş kutusu ve tuşu eklenir; yazılan saat `_seek.GoTo` ile uygulanır. Atlama adımları (1, 10, 60 ve 300 sn) sabit olmaktan çıkıp `PlayerSettings`'ten okunur; `Keymap` satırları ve şerit düğmeleri aynı değeri kullanır, varsayılanlar değişmez. Doğrulama: kayıt gidiş-dönüş testi, eski kayıt dosyasının okunabildiği test, ayarlı adımla atlama testi.
-
 ## 46. Altyazı Biçemi Ve Kare Kaydı
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · OYA-P10 · Oynatıcı · iş orta · öncelik 2 · karar gerekmez
@@ -197,14 +133,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.Player/MpvEngine.cs, src/VidShrink.App/Playback/
 - Plan: mpv'nin ortam tuşları seçeneği (`input-media-keys`) gömülü kullanımda varsayılan kapalıdır; önce macOS'ta açılır ve klavye ortam tuşlarının, Denetim Merkezi'ndeki çalan ortam alanının oynatıcıyı yönetip yönetmediği ölçülür. Yetmezse macOS'un ortam denetimi arayüzüne ayrı bir bağ yazılır. Sonraki ve önceki tuşu yine uygulamanın kuyruğuna bağlanır. Bu iş Windows makinesinde doğrulanamaz; Mac'te koşan bir işçi ister.
 
-## 51. Bölüm Yazma Ve Koruma
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DZA-P8 · Düzenleyici · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (DZA-P8): DZA-08 Parçalardan bölüm yazma; DZA-13 Kaynak bölümlerini koruma; DZA-14 Bölümleri kesim noktası olarak içe alma. [Tablo](piyasa/2026-10-13/duzenleyici-kesim-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/Editing/EditExport.cs, src/VidShrink.Core/RecorderChapters.cs, src/VidShrink.Core/MediaInfo.cs, src/VidShrink.Ffmpeg/FfprobeClient.cs, src/VidShrink.App/Editing/EditorView.Kaynak.cs
-- Plan: Çizelgeden bölüm listesi üreten saf bir işlev yazılır: parça sınırları (ad, DZA-P2 yapıldıysa parça etiketinden gelir) ve kaynağın kesimle kaymış bölümleri. Liste, Kaydedici'nin kullandığı yoldan (ffmpeg'in üst veri dosyası, RecorderChapters.cs:91 ve :109) teslimin son adımına girer. Açılışta kaynağın bölümleri (MediaInfo.cs:61) işaretçi ya da kesim noktası olarak önerilir; önce defterdeki Türkçe bölüm adı kusuru (.claude/acik.md:14) kapanır. Doğrulama: kaymış zaman hesabı birim testleri ve çıktıda ffprobe ile bölüm sayımı.
-
 ## 52. Akıllı Kipte MPEG-2
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · DZA-P12 · Düzenleyici · iş orta · öncelik 2 · karar gerekmez
@@ -229,14 +157,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.App/Editing/EditorView.Kaynak.cs, src/VidShrink.App/Editing/EditorView.axaml, src/VidShrink.App/Editing/EditorTimeline.cs, src/VidShrink.Core/Editing/EditTimeline.cs, src/VidShrink.Core/Editing/EditProject.cs, src/VidShrink.App/Locales/, tests/VidShrink.Tests/DuzenleyiciCokKaynakTests.cs
 - Plan: Projeye alınan kaynaklar bir listede görünür (proje dosyası ek kaynakları zaten tutuyor: EditProject.cs:68); listeden çizelgeye sürüklenen klip bırakıldığı yere girer. Araya ekleme sonraki klipleri iter, üstüne yazma aynı süreyi silip yerine koyar (aralık silme hazır: EditTimeline.cs:148). Dosya ekleyince çizelgenin sonuna gitme davranışı varsayılan kalır, o yüzden karar gerekmez. Doğrulama: DuzenleyiciCokKaynakTests'e iki kipin süre ve sıra ölçüleri.
 
-## 55. Çıktı Tarihi, Adı Ve Doğrulaması
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · SIK-P6 · Küçült · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (SIK-P6): SIK-11 Kaynak dosyanın tarihini koruma; SIK-13 Adlandırma değişkenleri; SIK-18 Çıktıyı doğrulama; SIK-24 Başarısız işi yeniden deneme. [Tablo](piyasa/2026-10-13/kucult-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Ffmpeg/EncodeRunner.cs, src/VidShrink.Core/AdlandirmaDeseni.cs, src/VidShrink.App/ShrinkJobWindow.axaml.cs, src/VidShrink.App/MainWindow.axaml (Ayarlar), src/VidShrink.App/AppSettings.cs, src/VidShrink.App/Locales/
-- Plan: Kısmi dosya asıl ada taşınmadan önce (`src/VidShrink.Ffmpeg/EncodeRunner.cs:463`) çıktı ffprobe ile okunur; süre kaynaktan belirgin kısaysa ya da dosya çözülemiyorsa iş hatalı sayılır ve hedef dosya ezilmez. Taşımadan sonra, varsayılan kapalı gelen bir ayar açıksa kaynağın oluşturma ve değiştirme tarihi çıktıya yazılır. Adlandırma desenine saat, bit hızı, kare hızı, kaynak klasörü ve sayaç yer tutucuları eklenir (`src/VidShrink.Core/AdlandirmaDeseni.cs:21`); hata veren iş satırına tek tıkla yeniden sıraya alan düğme konur. Doğrulama: kasıtlı kısaltılmış çıktının hata verdiğini, tarihin taşındığını ve her yeni yer tutucunun açıldığını ölçen testler.
-
 ## 56. Kuyrukta Zamanlama, Düzenleme Ve Bitiş
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · SIK-P7 · Küçült · iş orta · öncelik 2 · karar gerekmez
@@ -252,14 +172,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (SIK-P8): SIK-12 Görsel elle kırpma. [Tablo](piyasa/2026-10-13/kucult-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.App/MainWindow.axaml (önizleme alanı ve `ChkFltAutoCrop` çevresi), src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.Core/VideoFilterChain.cs, src/VidShrink.App/Locales/
 - Plan: Önizleme karesinin üstüne tutamaçlı bir dikdörtgen çizilir; kullanıcı fareyle sürükler, sonuç kaynak pikseline çevrilip var olan `crop` süzgeç yoluna yazılır (`src/VidShrink.Core/VideoFilterChain.cs:330`). Elle kırpma seçiliyken otomatik siyah bant kırpma kapanır; genişlik ve yükseklik kodlayıcının istediği çift sayıya yuvarlanır. Doğrulama: ekran koordinatından kaynak pikseline çeviriyi ölçen test ve çıktı çözünürlüğünü ffprobe ile okuyan test.
-
-## 58. Dönüştür'de Ses Seçenekleri
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DON-P9 · Dönüştür · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (DON-P9): DON-16 Ses yüksekliği normalizasyonu; DON-17 AC3 ve E-AC3 kodlama; DON-18 Ek ses dosyası biçimleri; DON-19 Sesi yeniden kodlamadan çıkarma; DON-20 MP4'e AC3, E-AC3 ve Opus kopyası; DON-39 Kanal indirgeme; DON-40 Örnekleme hızı seçimi. [Tablo](piyasa/2026-10-13/donustur-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/ConversionArguments.cs, src/VidShrink.Core/ConversionPlan.cs, src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.App/MainWindow.DonusturKap.cs, src/VidShrink.App/Locales/, tests/VidShrink.Tests/
-- Plan: Önce tablolar: ses listesine AC3 ve E-AC3, ses kaplarına Opus, OGG, AIFF ve AC3 eklenir; MP4 kopya tablosu Küçült'ünkiyle eşitlenir (`StreamMapping.cs:430`); ses kabı seçilince kaynak ses o kaba sığıyorsa kopyalanır. Sonra işleme: ses yüksekliği (`loudnorm`), kanal (`-ac`) ve örnekleme hızı (`-ar`) plana alan olarak girer; karşılıkları Küçült yolunda yazılı (`StreamMapping.cs:316`, `:317`). Bu üçünden biri seçilince ses kopyası kapanır. Doğrulama: kap ve kodek uyum tablosu testleri, her yeni kodlayıcının iki ffmpeg derlemesinde yoklanması.
 
 ## 59. Dönüştür'de Görüntü Süzgeçleri
 
@@ -292,14 +204,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (DON-P13): DON-27 Özel ffmpeg argümanı; DON-28 Komut satırından dönüştürme. [Tablo](piyasa/2026-10-13/donustur-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Cli/CliRequest.cs, src/VidShrink.Cli/, src/VidShrink.Core/ConversionArguments.cs, src/VidShrink.Core/ConversionPlan.cs, src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.App/Locales/, tests/VidShrink.Tests/
 - Plan: Dönüştür paneline "ek argüman" kutusu konur; yazılan seçenekler komutta çıktı yolundan önce yer alır ve salt okunur komut önizlemesinde görünür (`MainWindow.axaml:1371`). Komut satırına ayrı bir dönüştürme komutu eklenir: kap, kodek, kalite ve kesit bayrakları Dönüştür planına çevrilir; GIF ve ara kodek (ProRes, DNxHR) çıktısı buradan da alınır. Doğrulama: bayrak ayrıştırma testleri ve arayüzle komut satırının aynı plandan aynı argümanı ürettiğini gösteren test.
-
-## 63. Disk Uyarısı Ve Kayıt Kurtarma
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · EKA-P1 · Kaydedici · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (EKA-P1): EKA-11 Düşük disk uyarısı; EKA-20 Yarım kalan kaydı kurtarma. [Tablo](piyasa/2026-10-13/kaydedici-yakalama-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Ffmpeg/DiskSpaceGuard.cs, src/VidShrink.Ffmpeg/RecorderSession.cs, src/VidShrink.Core/RecorderArguments.cs, src/VidShrink.App/Recorder/RecorderView.Yakalama.cs, src/VidShrink.App/Locales/
-- Plan: Kayıt başlamadan önce ve kayıt sürerken belirli aralıkla `DiskSpaceGuard` çağrılır; boş alan eşiğin altına inince durum satırında uyarı çıkar. Kaydedici açılırken çıktı klasöründe sahipsiz `.yakalama.mkv` dosyası aranır ve var olan Matroska'dan aktarma yoluyla (`RecorderSession.cs:213`) istenen biçime çevirmek önerilir. İki davranış da sahte disk ve sahte klasörle ölçülür; `tests/VidShrink.Tests/DiskSpaceGuardTests.cs` örnek alınır.
 
 ## 64. Yalnız Ses Ve Ses Seçenekleri
 
@@ -389,14 +293,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (AYR-P3): AYR-06 Yenilikler Ekranı; AYR-07 Hata Bildirme Yolu; AYR-10 Uygulama İçi Günlük Görüntüleyici; AYR-47 Elle Güncelleme Denetimi; AYR-11 Lisanslar Sayfası; AYR-27 Tanılama Paketi; AYR-29 Gizlilik Beyanı Bağlantısı. [Tablo](piyasa/2026-10-13/ayarlar-kabuk-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.App/MainWindow.Guncelleme.cs, src/VidShrink.Core/Gunluk.cs, .github/ISSUE_TEMPLATE/, src/VidShrink.App/Locales/
 - Plan: Güncelleme kartına otomatik güncelleme açıkken de çalışan "şimdi denetle" düğmesi ve son denetimin sonucu eklenir; güncellemeden sonraki ilk açılışta sürüm notlarına giden kısa bir bildirim gösterilir. Hakkında'ya sürüm notları, lisanslar ve gizlilik beyanı bağlantıları konur. Tanılama kartında günlük uygulama içinde okunur ve kopyalanır; "hata bildir" düğmesi sürümü, işletim sistemini ve günlük yolunu taşıyan hazır kaydı açar, yanındaki düğme günlüğü ve sistem bilgisini tek zip'e toplar. Doğrulama: her düğmenin açtığı adresi ve ürettiği metni ölçen testler ile 42 dilde dizgi tamlığı testi.
-
-## 75. Sistem Teması Ve Hareket Ayarı
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · AYR-P4 · Ayarlar Ve Kabuk · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (AYR-P4): AYR-02 Sistem Temasını İzleme; AYR-14 Canlandırmaları Kapatma Anahtarı; AYR-15 macOS Ve Linux'ta Azaltılmış Hareketi İzleme. [Tablo](piyasa/2026-10-13/ayarlar-kabuk-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Themes/PaletteCatalog.cs, src/VidShrink.App/AppSettings.cs, src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.App/Playback/HoverZone.cs
-- Plan: Görünüm kartına kapalı gelen "sistem temasını izle" seçeneği eklenir; açıkken kullanıcının seçtiği bir açık ve bir koyu palet arasında Avalonia'nın sistem renk olayıyla geçilir, geçiş yine yalnız `PaletteCatalog.Use` üstünden yapılır. `AnimationsAllowed` iki kopyadan tek yere toplanır, macOS ve Linux'ta sistemin "hareketi azalt" ayarını okur ve Ayarlar'daki elle "canlandırmaları kapat" anahtarını da dinler. Doğrulama: palet geçişi ve üç işletim sistemi kolu için birim testleri; sistem ayarı teste sahte kaynakla verilir.
 
 ## 76. Uzun İşte Öncelik, Bildirim Ve Ses
 
@@ -639,15 +535,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.Core/Editing/EditTimeline.cs, src/VidShrink.Core/Editing/EditExport.cs, src/VidShrink.Core/Editing/EdlPreview.cs, src/VidShrink.Core/Editing/EditProject.cs, src/VidShrink.App/Editing/EditorTimeline.cs, src/VidShrink.App/Editing/EditorView.Kaynak.cs, src/VidShrink.Player/MpvEngine.cs, tests/VidShrink.Tests/
 - Sahibin kararı: Düzenleyici tek şeritten çıkıp videonun altına ikinci bir ses izi (müzik, anlatım) alsın mı?
 - Plan: Çizelgeye A2 izi eklenir; görüntüsü olmayan dosya artık reddedilmez (EditorView.Kaynak.cs:89-93), bu ize başlangıç anı ve düzeyiyle konur. Teslimde iki ses ffmpeg `amix` süzgeciyle karıştırılır. Önizlemede iki sesi birlikte duymanın yolu ölçülmedi: mpv tek ses izi çalar, karıştırma `lavfi-complex` ister ve bunun `edl://` ile çalışması ilk iş denenir. Doğrulama: teslim dosyasında iki sesin de duyulduğunu gösteren düzey ölçümü ve proje dosyasını yazıp geri okuma testi.
-
-## 104. Dönüştür'de Ses İzi Seçimi
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DON-P4 · Dönüştür · iş orta · öncelik 1 · karar sahibin
-
-- Satırlar (DON-P4): DON-01 Ses izi seçimi. [Tablo](piyasa/2026-10-13/donustur-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/StreamMapping.cs, src/VidShrink.Core/ConversionArguments.cs, src/VidShrink.Core/ConversionPlan.cs, src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.App/Locales/, tests/VidShrink.Tests/
-- Sahibin kararı: Dönüştür varsayılan olarak tek ses mi çıkarsın, yoksa kabın taşıyabildiği bütün sesleri mi taşısın.
-- Plan: DON-P2'nin bağladığı akış planına dayanır. Akış isteğine seçilen ses izlerinin listesi eklenir; bugün yalnız "tüm izleri koru" ve dil tercihi var (`StreamMapping.cs:140`). Arayüzde kaynağın ses izleri işaret kutulu liste olarak gösterilir, kopya kipinde kabın kabul etmediği ses için uyarı verilir. Doğrulama: iki sesli kaynakla argüman testleri; varsayılan, sahibin kararına göre testle sabitlenir.
 
 ## 105. Uygulama Başına Ses
 
