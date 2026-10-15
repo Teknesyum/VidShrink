@@ -24,6 +24,7 @@ public sealed class GorselDenetimYapiTests
         public void Reveal(string path) { }
         public void Sleep() { }
         public void PowerOff() { }
+        public void Quit() { }
     }
 
     /// <summary>
@@ -603,7 +604,7 @@ public sealed class GorselDenetimYapiTests
 
         foreach (var (ad, sapma) in sapmalar) _output.WriteLine($"{ad}: {sapma:0.##}");
         _output.WriteLine(duraklatildi);
-        Assert.Equal(9, sapmalar.Length);
+        Assert.Equal(12, sapmalar.Length);
         var enKotu = sapmalar.MaxBy(s => s.sapma);
         Assert.True(enKotu.sapma <= 1, $"{enKotu.ad}: simgenin mürekkebi düğmenin ortasından {enKotu.sapma:0.##} px kayık.");
         Assert.Equal(VidShrink.App.Localization.Strings.GetIn(dil, "main.shrink-job.paused"), duraklatildi.Replace("\u00A0", " ", StringComparison.Ordinal).Replace("\u2060", "", StringComparison.Ordinal));

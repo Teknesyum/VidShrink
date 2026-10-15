@@ -11,7 +11,8 @@ internal enum QueueEndChoice
     Nothing,
     OpenFolder,
     Sleep,
-    PowerOff
+    PowerOff,
+    Quit
 }
 
 /// <summary>
@@ -23,6 +24,7 @@ internal interface IQueueEndActions
     void Reveal(string path);
     void Sleep();
     void PowerOff();
+    void Quit();
 }
 
 /// <summary>Gerçek sistem çağrıları; her işletim sisteminin kendi aracıyla.</summary>
@@ -50,6 +52,12 @@ internal sealed class SystemQueueEndActions : IQueueEndActions
         if (OperatingSystem.IsWindows()) Start("shutdown.exe", "/s /t 0");
         else if (OperatingSystem.IsMacOS()) Start("osascript", "-e \"tell application \\\"System Events\\\" to shut down\"");
         else Start("systemctl", "poweroff");
+    }
+
+    public void Quit()
+    {
+        if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime masaustu)
+            masaustu.Shutdown();
     }
 
     private static void Start(string file, string arguments)

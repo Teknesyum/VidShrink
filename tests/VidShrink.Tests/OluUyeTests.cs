@@ -589,6 +589,8 @@ public sealed class OluUyeTests
             "Rozet sayiyi tasiyan her kolu ayni yazar (PanelHost.RozetMetni: 'Crf is { } crf' => 'CRF x'); Kesin ile Yaklasik'i ayirmak kullanicinin 09-07 kararina aykiri olurdu. Adiyla sorulan tek uye sayi uretemeyen Desteklenmiyor. Olcum docs/olcumler/k8-onizleme-rozeti-2026-09-19.md."),
         new("QualityTargetBound.Matched", "varsayilan-kol", Legitimate,
             "Hedefe varildi demek; arayuz yalniz sapmalari yaziyor (MainWindow.axaml.cs:2517-2519: BelowFloor, AboveSourceCeiling, '_ => \"\"'). Varildiginda gosterilecek bir cumle yok, o yuzden okuyan da yok."),
+        new("QueueStartMode.At", "yalniz-disarida", Legitimate,
+            "Zamanlamanin iki kipinin olumsuz kolu. ShrinkJobWindow.Zamanlama.cs secim kutusunun sirasini (QueueStartMode)SelectedIndex diye ture ceviriyor; QueueSchedule.Resolve yalniz After'i adiyla soruyor, saat kipi onun else'i."),
         new("RecorderCapture.Gdigrab", "varsayilan-kol", Legitimate,
             "Iki degerli yakalama yolunun olumsuz kolu ve varsayilani. Uc okuma yeri (RecorderArguments.cs:994, 1120, 1429) 'Capture == RecorderCapture.Ddagrab' diye soruyor; gdigrab o kosulun else'i, ayrica adlandirilmasi ayni dali ikiye bolerdi."),
         new("RecordingImpact.HardwareOffload", "varsayilan-kol", Legitimate,

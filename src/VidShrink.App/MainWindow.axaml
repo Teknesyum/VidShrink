@@ -1808,6 +1808,12 @@
                     </ToolTip.Tip>
                   </CheckBox>
 
+                  <CheckBox x:Name="ChkFinishSound" Theme="{StaticResource CheckStyle}" HorizontalAlignment="Left" Content="{loc:Text settings-tab.finish-sound.label}">
+                    <ToolTip.Tip>
+                      <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.finish-sound.hint}"/>
+                    </ToolTip.Tip>
+                  </CheckBox>
+
                   <CheckBox x:Name="ChkPreventSleep" Theme="{StaticResource CheckStyle}" IsChecked="True" HorizontalAlignment="Left" Content="{loc:Text settings-tab.prevent-sleep.label}">
                     <ToolTip.Tip>
                       <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.prevent-sleep.hint}"/>

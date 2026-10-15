@@ -43,6 +43,7 @@ public sealed class KuyrukIzlemeTests : IDisposable
         public void Reveal(string path) { }
         public void Sleep() { }
         public void PowerOff() { }
+        public void Quit() { }
     }
 
     private string Dusur(string ad, string icerik = "video")

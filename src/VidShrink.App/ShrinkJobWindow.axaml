@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:auto="using:Avalonia.Automation"
         xmlns:loc="using:VidShrink.App.Localization"
@@ -113,6 +113,33 @@
         </ScrollViewer>
       </StackPanel>
 
+      <Border x:Name="EditPanel" Theme="{StaticResource Panel}" IsVisible="False">
+        <StackPanel Spacing="{StaticResource SpaceXs}">
+          <TextBlock x:Name="TxtEditTitle"
+                     FontSize="{StaticResource FontSizeSm}"
+                     FontWeight="SemiBold"
+                     TextTrimming="CharacterEllipsis"/>
+          <TextBlock Text="{loc:Text main.shrink-job.edit.target}"
+                     FontSize="{StaticResource FontSizeSm}"
+                     Foreground="{StaticResource TextBody}"
+                     TextWrapping="Wrap"/>
+          <TextBox x:Name="TxtEditTarget"
+                   auto:AutomationProperties.Name="{loc:Text main.shrink-job.edit.target}"/>
+          <ComboBox x:Name="CmbEditCodec"
+                    auto:AutomationProperties.Name="{loc:Text main.shrink-job.edit}"
+                    MaxDropDownHeight="{StaticResource DropDownMaxHeight}"
+                    HorizontalAlignment="Stretch"/>
+          <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceXs}">
+            <Button Theme="{StaticResource GhostButton}" x:Name="BtnEditSave"
+                    Content="{loc:Text main.shrink-job.edit.save}"
+                    Padding="{StaticResource ButtonPaddingSm}"/>
+            <Button Theme="{StaticResource GhostButton}" x:Name="BtnEditCancel"
+                    Content="{loc:Text main.action.cancel}"
+                    Padding="{StaticResource ButtonPaddingSm}"/>
+          </WrapPanel>
+        </StackPanel>
+      </Border>
+
       <StackPanel x:Name="FailedPanel" Spacing="{StaticResource SpaceXs}" IsVisible="False">
         <TextBlock x:Name="TxtFailed"
                    FontSize="{StaticResource FontSizeSm}"
@@ -136,6 +163,27 @@
                     auto:AutomationProperties.Name="{loc:Text main.shrink-job.when-done}"
                     MaxDropDownHeight="{StaticResource DropDownMaxHeight}"
                     HorizontalAlignment="Stretch"/>
+        </StackPanel>
+        <StackPanel Spacing="{StaticResource SpaceXs}">
+          <TextBlock Text="{loc:Text main.shrink-job.start}"
+                     FontSize="{StaticResource FontSizeSm}"
+                     Foreground="{StaticResource TextBody}"
+                     TextWrapping="Wrap"/>
+          <ComboBox x:Name="CmbStartAt"
+                    auto:AutomationProperties.Name="{loc:Text main.shrink-job.start}"
+                    MaxDropDownHeight="{StaticResource DropDownMaxHeight}"
+                    HorizontalAlignment="Stretch"/>
+          <TextBox x:Name="TxtStartAt"
+                   PlaceholderText="{loc:Text main.shrink-job.start.hint}"
+                   auto:AutomationProperties.Name="{loc:Text main.shrink-job.start.hint}"/>
+          <Button Theme="{StaticResource GhostButton}" x:Name="BtnSchedule"
+                  Content="{loc:Text main.shrink-job.schedule}"
+                  Padding="{StaticResource ButtonPaddingSm}"/>
+          <TextBlock x:Name="TxtScheduleError"
+                     Theme="{StaticResource StatusError}"
+                     FontSize="{StaticResource FontSizeSm}"
+                     TextWrapping="Wrap"
+                     IsVisible="False"/>
         </StackPanel>
         <StackPanel x:Name="WatchPanel" Spacing="{StaticResource SpaceXs}" IsVisible="False">
           <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceXs}">

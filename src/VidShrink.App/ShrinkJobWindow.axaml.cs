@@ -185,6 +185,7 @@ public partial class ShrinkJobWindow : Window
     {
         var karar = IsBittiBildirimi.Karar(_bitenler.ToList(), PencereEtkin(), _appSettings.NotifyWhenDone,
             (key, args) => string.Format(Strings.CultureOf(_language), Say(key), args));
+        if (IsBittiBildirimi.SesKarari(_bitenler.ToList(), BitisSesi) is bool hata) Ses.Cal(hata);
         _bitenler.Clear();
         if (karar is not null) Bildirim.Bildir(this, karar);
     }
@@ -200,6 +201,7 @@ public partial class ShrinkJobWindow : Window
         _pump = new JobPump<ShrinkRequest>(RunAwakeAsync, () => ParallelLimit);
         _pump.Changed += SaveQueue;
         UykuyuEngelle = _appSettings.PreventSleepWhileEncoding;
+        BitisSesi = _appSettings.FinishSound;
         _pump.Drained += OnDrained;
 
         var language = MainWindow.ResolveLanguage(null, CultureInfo.CurrentUICulture.Name);
@@ -231,16 +233,23 @@ public partial class ShrinkJobWindow : Window
         BtnShareCancel.Click += OnShareCancel;
         BtnShareCopy.Click += OnCopyShareLink;
         BtnPause.Click += (_, _) => SetPaused(!_paused);
-        BtnCountdownCancel.Click += (_, _) => CancelCountdown();
+        BtnCountdownCancel.Click += (_, _) =>
+        {
+            if (_scheduleAt is not null) CancelSchedule();
+            else CancelCountdown();
+        };
         BtnOvershootAccept.Click += (_, _) => AnswerOvershoot(true);
         BtnOvershootStop.Click += (_, _) => AnswerOvershoot(false);
         WireWatch();
+        WireSchedule();
+        WireEdit();
         CmbWhenDone.ItemsSource = new[]
         {
             Say("main.shrink-job.done.nothing"),
             Say("main.shrink-job.done.open-folder"),
             Say("main.shrink-job.done.sleep"),
-            Say("main.shrink-job.done.power-off")
+            Say("main.shrink-job.done.power-off"),
+            Say("main.shrink-job.done.quit")
         };
         CmbWhenDone.SelectedIndex = 0;
         CmbWhenDone.SelectionChanged += (_, _) => _whenDone = (QueueEndChoice)Math.Max(0, CmbWhenDone.SelectedIndex);
@@ -291,7 +300,8 @@ public partial class ShrinkJobWindow : Window
     }
 
     private SavedJob Saved(ShrinkRequest request)
-        => _geriGelen.TryGetValue(request, out var job) ? job
+        => _duzenlenen.TryGetValue(request, out var edited) ? new SavedJob(request.Path, edited.Mb, false)
+            : _geriGelen.TryGetValue(request, out var job) ? job
             : _template is null ? new SavedJob(request.Path, request.TargetMegabytes, false)
             : new SavedJob(request.Path, _template.TargetMb, _ceilingTarget);
 
@@ -326,6 +336,7 @@ public partial class ShrinkJobWindow : Window
     /// <summary>İsteğin plan seçenekleri ve hedefi. Kabuk isteği yalnız hedefi taşır; bırakılan kuyruk pencerenin ayarlarını.</summary>
     internal (PlanOptions Options, double TargetMb) OptionsFor(ShrinkRequest request, MediaInfo info)
     {
+        if (_duzenlenen.TryGetValue(request, out var edited)) return (EditedOptions(edited.Mb, edited.Codec), edited.Mb);
         if (_geriGelen.TryGetValue(request, out var saved))
         {
             var hedef = saved.CeilingTarget ? PlanCalculator.QualityCeilingTargetMb(info) : saved.TargetMb;
@@ -480,7 +491,11 @@ public partial class ShrinkJobWindow : Window
     /// C1-2, SIK-P3: duraklatılan kuyrukta koşan kodlama askıya alınır, sıradaki başlamaz. Sürdürünce
     /// askı kalkar ve pompa yeniden açılır.
     /// </summary>
-    internal void SetPaused(bool paused) => SetPaused(paused, Say("main.shrink-job.paused"));
+    internal void SetPaused(bool paused)
+    {
+        if (!paused) ClearSchedule();
+        SetPaused(paused, Say("main.shrink-job.paused"));
+    }
 
     private void SetPaused(bool paused, string text)
     {
@@ -583,7 +598,7 @@ public partial class ShrinkJobWindow : Window
 
     private Grid PendingRow(IReadOnlyList<ShrinkRequest> pending, int index)
     {
-        var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto,Auto,Auto"), ColumnSpacing = Token("SpaceXs") };
+        var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto,Auto,Auto,Auto"), ColumnSpacing = Token("SpaceXs") };
         var name = new TextBlock
         {
             Text = Path.GetFileName(pending[index].Path),
@@ -597,7 +612,8 @@ public partial class ShrinkJobWindow : Window
         row.Children.Add(name);
         AddRowButton(row, 1, "IconChevronUp", "main.shrink-job.move-up", index > 0, () => MovePending(index, -1));
         AddRowButton(row, 2, "IconChevronDown", "main.shrink-job.move-down", index < pending.Count - 1, () => MovePending(index, 1));
-        AddRowButton(row, 3, "IconClose", "main.shrink-job.remove", true, () => RemovePending(index));
+        AddRowButton(row, 3, "IconSettings", "main.shrink-job.edit", true, () => BeginEdit(index));
+        AddRowButton(row, 4, "IconClose", "main.shrink-job.remove", true, () => RemovePending(index));
         return row;
     }
 
@@ -735,6 +751,12 @@ public partial class ShrinkJobWindow : Window
             case QueueEndChoice.Sleep:
             case QueueEndChoice.PowerOff:
                 StartCountdown();
+                return;
+            case QueueEndChoice.Quit:
+                if (_quitAsked) return;
+                _quitAsked = true;
+                ReleaseSleep();
+                Actions.Quit();
                 return;
             case QueueEndChoice.OpenFolder when _outputs.Count > 0:
                 Reveal(_outputs[^1]);
@@ -1047,6 +1069,7 @@ public partial class ShrinkJobWindow : Window
     {
         _closeTimer?.Stop();
         _countdown?.Stop();
+        _scheduleTimer?.Stop();
         _diskTimer?.Stop();
         StopWatch();
         _closed = true;

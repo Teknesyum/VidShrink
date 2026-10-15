@@ -65,6 +65,63 @@ internal static class IsBittiBildirimi
            && Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime
             ? SistemIsBildirimYuzu.Instance
             : SessizIsBildirimYuzu.Instance;
+
+    /// <summary>
+    /// "İş bitince ses çal" kararı: ayar kapalıyken ya da yalnız iptal edilen işlerde <c>null</c>,
+    /// yoksa sesin hata sesi olup olmadığı. Pencerenin önde olmasına bakmaz.
+    /// </summary>
+    internal static bool? SesKarari(IReadOnlyList<BitenIs> isler, bool ayarAcik)
+    {
+        if (!ayarAcik) return null;
+        var sayilan = isler.Where(i => i.Sonuc != IsSonucu.Iptal).ToList();
+        if (sayilan.Count == 0) return null;
+        return sayilan.Any(i => i.Sonuc == IsSonucu.Hatali);
+    }
+
+    /// <summary>Sesin sistem yüzü; test konağında sessiz olan gelir, hoparlörden ses çıkmaz.</summary>
+    internal static IBitisSesi VarsayilanSes()
+        => OperatingSystem.IsWindows()
+           && Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime
+            ? SistemBitisSesi.Instance
+            : SessizBitisSesi.Instance;
+}
+
+/// <summary>Bitiş sesinin sistem yüzü. Pencere bunu çağırır, testler sahtesini verir.</summary>
+internal interface IBitisSesi
+{
+    void Cal(bool hata);
+}
+
+/// <summary>Ses çalmayan yüz: test konağı ve Windows dışı.</summary>
+internal sealed class SessizBitisSesi : IBitisSesi
+{
+    internal static SessizBitisSesi Instance { get; } = new();
+
+    public void Cal(bool hata)
+    {
+    }
+}
+
+/// <summary>Windows: <c>MessageBeep</c> ile sistemin bilgi ya da hata sesi. Hata dışarı sızmaz.</summary>
+internal sealed class SistemBitisSesi : IBitisSesi
+{
+    private const uint HataSesi = 0x10;
+    private const uint BilgiSesi = 0x40;
+
+    internal static SistemBitisSesi Instance { get; } = new();
+
+    public void Cal(bool hata)
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        try { MessageBeep(hata ? HataSesi : BilgiSesi); }
+        catch (Exception ex) when (ex is DllNotFoundException or EntryPointNotFoundException)
+        {
+        }
+    }
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool MessageBeep(uint tur);
 }
 
 /// <summary>Haberin sistem yüzü. Pencere bunu çağırır, testler sahtesini verir.</summary>

@@ -17,6 +17,7 @@ public sealed class KuyrukDuzenlemeTests
         public void Reveal(string path) => Cagrilar.Add("reveal:" + path);
         public void Sleep() => Cagrilar.Add("sleep");
         public void PowerOff() => Cagrilar.Add("power-off");
+        public void Quit() => Cagrilar.Add("quit");
     }
 
     private static ShrinkJobWindow Pencere(SahteEylem eylem, params string[] yollar)
