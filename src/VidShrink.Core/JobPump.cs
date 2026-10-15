@@ -27,6 +27,9 @@ public sealed class JobPump<T> where T : class
     /// <summary>Koşturucunun yakalamadığı istisna; iptal buraya düşmez.</summary>
     public event Action<T, Exception>? Failed;
 
+    /// <summary>SIK-P9: koşan ve bekleyenlerin birleşik listesi değişti; iş eklendi, çıktı, kaydı ya da bitti.</summary>
+    public event Action? Changed;
+
     public IReadOnlyList<T> Pending
     {
         get { lock (_gate) return _pending.ToArray(); }
@@ -60,6 +63,7 @@ public sealed class JobPump<T> where T : class
     public void Enqueue(T job)
     {
         lock (_gate) _pending.Add(job);
+        Changed?.Invoke();
         Pump();
     }
 
@@ -69,8 +73,9 @@ public sealed class JobPump<T> where T : class
         {
             if (index < 0 || index >= _pending.Count) return false;
             _pending.RemoveAt(index);
-            return true;
         }
+        Changed?.Invoke();
+        return true;
     }
 
     public bool MovePending(int index, int delta)
@@ -80,8 +85,9 @@ public sealed class JobPump<T> where T : class
             var target = index + delta;
             if (index < 0 || index >= _pending.Count || target < 0 || target >= _pending.Count) return false;
             (_pending[index], _pending[target]) = (_pending[target], _pending[index]);
-            return true;
         }
+        Changed?.Invoke();
+        return true;
     }
 
     /// <summary>Koşan tek işi iptal eder; ötekilere ve sıraya dokunmaz.</summary>
@@ -107,6 +113,7 @@ public sealed class JobPump<T> where T : class
             _pending.Clear();
             hepsi = _running.Select(slot => slot.Cts).ToArray();
         }
+        Changed?.Invoke();
         foreach (var cts in hepsi) Iptal(cts);
     }
 
@@ -164,6 +171,7 @@ public sealed class JobPump<T> where T : class
             }
             cts.Dispose();
         }
+        Changed?.Invoke();
         Pump();
     }
 }

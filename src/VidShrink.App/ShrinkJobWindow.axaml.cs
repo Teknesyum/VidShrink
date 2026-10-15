@@ -132,6 +132,20 @@ public partial class ShrinkJobWindow : Window
     /// <summary>Şu an koşan istekler, başlama sırasıyla.</summary>
     internal IReadOnlyList<ShrinkRequest> RunningJobs => _pump.Running;
 
+    /// <summary>SIK-P2: kodlama boyunca tutulan uyku isteği; testler sahte katmanlı nöbet verir.</summary>
+    internal SleepGuard Uyku { get; set; } = SleepGuard.Shared;
+
+    /// <summary>SIK-P2: Ayarlar'daki "kodlarken uyuma" kutusu; açılışta ayardan okunur.</summary>
+    internal bool UykuyuEngelle { get; set; }
+
+    private IDisposable? _uykuIstegi;
+
+    /// <summary>SIK-P9: kuyruğun defteri; test konağında <c>null</c>, testler kendi klasörlü defterini verir.</summary>
+    internal QueueJournal? Defter { get; set; } = QueueJournal.Shared;
+
+    private readonly Dictionary<ShrinkRequest, SavedJob> _geriGelen = new(ReferenceEqualityComparer.Instance);
+    private volatile bool _defterKapandi;
+
     /// <summary>K6: koşan tek işi iptal eder; ötekiler ve sıra sürer.</summary>
     internal bool CancelJob(ShrinkRequest request) => _pump.Cancel(request);
 
@@ -182,7 +196,9 @@ public partial class ShrinkJobWindow : Window
     {
         _startup = startup;
         _queue = queue;
-        _pump = new JobPump<ShrinkRequest>((request, ct) => (Kosturucu ?? RunOneAsync)(request, ct), () => ParallelLimit);
+        _pump = new JobPump<ShrinkRequest>(RunAwakeAsync, () => ParallelLimit);
+        _pump.Changed += SaveQueue;
+        UykuyuEngelle = _appSettings.PreventSleepWhileEncoding;
         _pump.Drained += OnDrained;
 
         var language = MainWindow.ResolveLanguage(null, CultureInfo.CurrentUICulture.Name);
@@ -254,6 +270,48 @@ public partial class ShrinkJobWindow : Window
     private bool _autoCrop;
 
     /// <summary>
+    /// SIK-P9: ölmüş süreçten kalan kuyruk. Soru sorulmaz: pencere kendiliğinden, duraklatılmış açılır;
+    /// koşarken kesilen iş baştan ve en önde gelir. Defter boş ya da bozuksa <c>null</c>.
+    /// </summary>
+    internal static ShrinkJobWindow? Restore(QueueJournal journal, Func<int, bool> alive)
+    {
+        var jobs = journal.TakeOrphans(alive);
+        if (jobs.Count == 0) return null;
+        var pairs = jobs.Select(job => (new ShrinkRequest((int)Math.Ceiling(job.TargetMb), job.Path), job)).ToList();
+        return new ShrinkJobWindow(pairs) { Defter = journal };
+    }
+
+    private ShrinkJobWindow(IReadOnlyList<(ShrinkRequest Request, SavedJob Job)> jobs)
+        : this(new ShellShrinkStartup(jobs.Select(pair => pair.Request).ToList(), null, jobs[0].Job.Path), null)
+    {
+        foreach (var (request, job) in jobs) _geriGelen[request] = job;
+        TxtHeadline.Text = Say("main.shrink-job.batch", jobs.Count);
+        SetPaused(true, Say("main.shrink-job.restored"));
+    }
+
+    private SavedJob Saved(ShrinkRequest request)
+        => _geriGelen.TryGetValue(request, out var job) ? job
+            : _template is null ? new SavedJob(request.Path, request.TargetMegabytes, false)
+            : new SavedJob(request.Path, _template.TargetMb, _ceilingTarget);
+
+    private void SaveQueue()
+    {
+        if (_defterKapandi || Defter is not { } defter) return;
+        defter.Update(this, _pump.Running.Concat(_pump.Pending).Select(Saved).ToList());
+    }
+
+    /// <summary>
+    /// SIK-P9: pencere deftere son kez dokunur. Kullanıcı kapattıysa kuyruk silinir; uygulama ya da
+    /// sistem kapanırken (<paramref name="keep"/>) dosya kalır ki açılışta geri gelsin.
+    /// </summary>
+    internal void CloseJournal(bool keep)
+    {
+        if (_defterKapandi) return;
+        _defterKapandi = true;
+        if (!keep) Defter?.Remove(this);
+    }
+
+    /// <summary>
     /// HB #36: kuyruk "Siyah bantları kırp" kutusunu bayrak olarak taşır, dikdörtgeni değil —
     /// bantlar dosyaya özgü. Her dosya kendi yoklamasıyla kırpılır; elle yazılmış <c>crop=</c> korunur.
     /// </summary>
@@ -267,6 +325,16 @@ public partial class ShrinkJobWindow : Window
     /// <summary>İsteğin plan seçenekleri ve hedefi. Kabuk isteği yalnız hedefi taşır; bırakılan kuyruk pencerenin ayarlarını.</summary>
     internal (PlanOptions Options, double TargetMb) OptionsFor(ShrinkRequest request, MediaInfo info)
     {
+        if (_geriGelen.TryGetValue(request, out var saved))
+        {
+            var hedef = saved.CeilingTarget ? PlanCalculator.QualityCeilingTargetMb(info) : saved.TargetMb;
+            return (new PlanOptions
+            {
+                TargetMb = hedef,
+                Priority = _appSettings.EncodePriority,
+                EncoderThreads = _appSettings.EncoderThreads > 0 ? _appSettings.EncoderThreads : null
+            }, hedef);
+        }
         if (_template is null)
             return (new PlanOptions
             {
@@ -654,6 +722,7 @@ public partial class ShrinkJobWindow : Window
         }
         var choice = _whenDone;
         CancelCountdown();
+        ReleaseSleep();
         if (choice == QueueEndChoice.Sleep) Actions.Sleep();
         else if (choice == QueueEndChoice.PowerOff) Actions.PowerOff();
     }
@@ -670,6 +739,29 @@ public partial class ShrinkJobWindow : Window
         CountdownRow.IsVisible = true;
         TxtCountdown.Text = Core.Bicim.Satir.Bagla(Say(_whenDone == QueueEndChoice.Sleep ? "main.shrink-job.countdown.sleep" : "main.shrink-job.countdown.power-off", _countdownLeft));
     }
+
+    /// <summary>
+    /// SIK-P2: istek ilk iş başlarken alınır. Sıradaki iş hemen başlayacaksa bırakılmaz; son koşan iş
+    /// bitince, iptalde ya da duraklatılmış kuyrukta koşan kalmayınca geri verilir.
+    /// </summary>
+    private async Task RunAwakeAsync(ShrinkRequest request, CancellationToken ct)
+    {
+        if (UykuyuEngelle && Volatile.Read(ref _uykuIstegi) is null)
+        {
+            var istek = Uyku.Hold();
+            if (Interlocked.CompareExchange(ref _uykuIstegi, istek, null) is not null) istek.Dispose();
+        }
+        try
+        {
+            await (Kosturucu ?? RunOneAsync)(request, ct);
+        }
+        finally
+        {
+            if (_pump.RunningCount <= 1 && (_pump.PendingCount == 0 || _pump.Paused)) ReleaseSleep();
+        }
+    }
+
+    private void ReleaseSleep() => Interlocked.Exchange(ref _uykuIstegi, null)?.Dispose();
 
     private async Task RunOneAsync(ShrinkRequest request, CancellationToken ct)
     {
@@ -911,7 +1003,9 @@ public partial class ShrinkJobWindow : Window
         _diskTimer?.Stop();
         StopWatch();
         _closed = true;
+        CloseJournal(e.CloseReason is WindowCloseReason.ApplicationShutdown or WindowCloseReason.OSShutdown);
         _pump.CancelAll();
+        ReleaseSleep();
         _shareFlow?.Cancel();
         _queue?.Dispose();
         base.OnClosing(e);

@@ -16,6 +16,8 @@ internal static class TestAyarYolu
         VidShrink.Ffmpeg.AudioLevelSource.Disabled = true;
         VidShrink.Ffmpeg.DdagrabProbe.Disabled = true;
         VidShrink.App.Editing.EditorView.StripDisabled = true;
+        VidShrink.App.SystemSleepBlocker.Disabled = true;
+        VidShrink.Core.QueueJournal.Disabled = true;
         if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(VidShrink.Core.Setup.ShortcutIcons.DirectoryVariable)))
             Environment.SetEnvironmentVariable(VidShrink.Core.Setup.ShortcutIcons.DirectoryVariable,
                 Path.Combine(TestPaths.OutputRoot, "kisayol", Environment.ProcessId.ToString(System.Globalization.CultureInfo.InvariantCulture)));
