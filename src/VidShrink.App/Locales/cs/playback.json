@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "snímek zkopírován do schránky",
   "player.view.screenshot-copy-failed": "snímek se nepodařilo zkopírovat",
   "player.view.screenshot-jpg": "Ukládat snímky obrazovky jako JPG",
+  "player.view.screenshot-subtitles": "Zahrnout titulky do snímků obrazovky",
   "player.view.keep-history": "Uchovávat historii",
   "player.view.resume": "Pokračovat tam, kde jsem skončil",
   "player.view.seek-steps": "Kroky přeskočení",

@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "quadro copiado para a área de transferência",
   "player.view.screenshot-copy-failed": "não foi possível copiar o quadro",
   "player.view.screenshot-jpg": "Salvar capturas de tela como JPG",
+  "player.view.screenshot-subtitles": "Incluir legendas nas capturas de ecrã",
   "player.view.keep-history": "Manter histórico",
   "player.view.resume": "Retomar de onde parei",
   "player.view.seek-steps": "Passos de salto",

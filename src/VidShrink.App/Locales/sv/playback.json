@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "bildrutan kopierad till urklipp",
   "player.view.screenshot-copy-failed": "bildrutan kunde inte kopieras",
   "player.view.screenshot-jpg": "Spara skärmbilder som JPG",
+  "player.view.screenshot-subtitles": "Ta med undertexter i skärmbilder",
   "player.view.keep-history": "Spara historik",
   "player.view.resume": "Fortsätt där jag slutade",
   "player.view.seek-steps": "Hoppsteg",

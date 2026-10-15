@@ -1284,6 +1284,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, DZA-P8 birlesmesi: olculen toplam 3533 + 3 = 3536, en 337, tr 110, gezilen 71466 + 86 = 71552.</para>
     /// <para>2026-10-15, AYR-P4 birlesmesi: olculen toplam 3536 + 2 = 3538, en 337, tr 110, gezilen 71552 + 258 = 71810.</para>
     /// <para>2026-10-15, DON-P9 birlesmesi: olculen toplam 3538 + 4 = 3542, en 337, tr 110, gezilen 71810 + 258 = 72068.</para>
+    /// <para>2026-10-15, OYA-P10: olculen toplam 3542 + 16 = 3558, en 338, tr 110, gezilen 72068 + 215 = 72283.</para>
     /// <para>2026-10-15, cikti tarihi, adi ve dogrulamasi (SIK-P6): alti yeni anahtardan (<c>main.shrink-job.failed</c>, <c>.retry</c>, <c>main.run.output-unreadable</c>, <c>.output-short</c>, <c>settings-tab.keep-dates.label</c>, <c>.hint</c>) 10 kol (<c>main.shrink-job.retry</c>: es, hu, it, nl, pl, pt; <c>settings-tab.keep-dates.label</c>: en, es, hu, pt), KOL dokumunden sayildi, tr girmiyor: olculen 3516 + 10 = 3526, en 334 + 1 = 335, tr 110.</para>
     /// <para>2026-10-15, bolum yazma (DZA-P8): iki yeni anahtardan (<c>editor.export.chapters</c>, <c>.tip</c>) yalniz <c>editor.export.chapters</c> 3 dilde kola giriyor (en, hu, pt), KOL dokumunden sayildi, tr girmiyor: olculen 3516 + 3 = 3519, en 334 + 1 = 335, tr 110.</para>
     /// <para>2026-10-15, sistem temasi ve hareket ayari (AYR-P4): alti yeni anahtar (<c>settings-tab.follow-system-theme.*</c>, <c>settings-tab.theme.light</c>, <c>.dark</c>, <c>settings-tab.reduce-motion.*</c>); yalniz <c>settings-tab.follow-system-theme.label</c> 2 dilde kola giriyor (pt, sw), KOL dokumunden sayildi, en ve tr girmiyor: olculen 3516 + 2 = 3518, en 334, tr 110. Gezilen 70821 + 43 x 6 = 71079, <c>kayip</c> 0.</para>
@@ -1313,8 +1314,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3542, toplam);
-        Assert.Equal(337, dilBasina["en"]);
+        Assert.Equal(3558, toplam);
+        Assert.Equal(338, dilBasina["en"]);
         Assert.Equal(110, dilBasina["tr"]);
     }
 
@@ -1599,7 +1600,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(72068, gezilen);
+        Assert.Equal(72283, gezilen);
         Assert.Empty(kayip);
     }
 

@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "フレームをクリップボードにコピーしました",
   "player.view.screenshot-copy-failed": "フレームをコピーできませんでした",
   "player.view.screenshot-jpg": "スクリーンショットを JPG で保存",
+  "player.view.screenshot-subtitles": "スクリーンショットに字幕を含める",
   "player.view.keep-history": "履歴を保存",
   "player.view.resume": "前回の位置から再開",
   "player.view.seek-steps": "スキップ幅",

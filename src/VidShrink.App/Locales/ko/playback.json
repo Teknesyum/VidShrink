@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "프레임이 클립보드에 복사되었습니다",
   "player.view.screenshot-copy-failed": "프레임을 복사하지 못했습니다",
   "player.view.screenshot-jpg": "스크린샷을 JPG로 저장",
+  "player.view.screenshot-subtitles": "스크린샷에 자막 포함",
   "player.view.keep-history": "기록 보관",
   "player.view.resume": "마지막 위치부터 이어 보기",
   "player.view.seek-steps": "건너뛰기 간격",

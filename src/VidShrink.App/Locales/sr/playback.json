@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "кадар копиран у оставу",
   "player.view.screenshot-copy-failed": "кадар није могао да се копира",
   "player.view.screenshot-jpg": "Чувај снимке екрана као JPG",
+  "player.view.screenshot-subtitles": "Укључи титлове у снимке екрана",
   "player.view.keep-history": "Čuvaj istoriju",
   "player.view.resume": "Nastavi gde sam stao",
   "player.view.seek-steps": "Кораци премотавања",

@@ -71,7 +71,11 @@ public sealed record SubtitleStyle(
     string? Color = null,
     double? Outline = null,
     double? Shadow = null,
-    string? Background = null)
+    string? Background = null,
+    bool OverrideAss = false,
+    bool HideSdh = false,
+    bool Bold = false,
+    bool Italic = false)
 {
     public static SubtitleStyle Inherited { get; } = new();
 

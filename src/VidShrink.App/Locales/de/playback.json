@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "Bild in die Zwischenablage kopiert",
   "player.view.screenshot-copy-failed": "Bild konnte nicht kopiert werden",
   "player.view.screenshot-jpg": "Screenshots als JPG speichern",
+  "player.view.screenshot-subtitles": "Untertitel in Screenshots einbeziehen",
   "player.view.keep-history": "Verlauf speichern",
   "player.view.resume": "Dort fortsetzen, wo ich aufgehört habe",
   "player.view.seek-steps": "Sprungweiten",

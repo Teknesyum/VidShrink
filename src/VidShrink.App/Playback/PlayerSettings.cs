@@ -89,6 +89,8 @@ internal sealed class PlayerSettings
 
     internal ScreenshotFormat ScreenshotFormat { get; set; }
 
+    internal bool ScreenshotSubtitles { get; set; }
+
     internal string ScreenshotExtension => ScreenshotFormat == ScreenshotFormat.Jpg ? JpgExtension : PngExtension;
 
     internal RepeatMode Repeat { get; set; }
@@ -143,6 +145,7 @@ internal sealed class PlayerSettings
             settings.ScreenshotFolder = (string?)root["screenshotFolder"];
             if ((string?)root["screenshotPattern"] is { Length: > 0 } pattern) settings.ScreenshotPattern = pattern;
             if (Enum.TryParse<ScreenshotFormat>((string?)root["screenshotFormat"], true, out var format) && Enum.IsDefined(format)) settings.ScreenshotFormat = format;
+            settings.ScreenshotSubtitles = (bool?)root["screenshotSubtitles"] ?? false;
             if (Enum.TryParse<RepeatMode>((string?)root["repeat"], true, out var repeat)) settings.Repeat = repeat;
             settings.Shuffle = (bool?)root["shuffle"] ?? false;
             settings.ShowRemaining = (bool?)root["showRemaining"] ?? false;
@@ -190,6 +193,7 @@ internal sealed class PlayerSettings
                 else writer.WriteString("screenshotFolder", ScreenshotFolder);
                 writer.WriteString("screenshotPattern", ScreenshotPattern);
                 writer.WriteString("screenshotFormat", ScreenshotFormat.ToString());
+                writer.WriteBoolean("screenshotSubtitles", ScreenshotSubtitles);
                 writer.WriteString("repeat", Repeat.ToString());
                 writer.WriteBoolean("shuffle", Shuffle);
                 writer.WriteBoolean("showRemaining", ShowRemaining);

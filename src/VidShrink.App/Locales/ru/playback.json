@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "кадр скопирован в буфер обмена",
   "player.view.screenshot-copy-failed": "не удалось скопировать кадр",
   "player.view.screenshot-jpg": "Сохранять снимки экрана в JPG",
+  "player.view.screenshot-subtitles": "Включать субтитры в снимки экрана",
   "player.view.keep-history": "Сохранять историю",
   "player.view.resume": "Продолжать с места остановки",
   "player.view.seek-steps": "Шаги перемотки",

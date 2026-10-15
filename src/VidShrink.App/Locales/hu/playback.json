@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "képkocka a vágólapra másolva",
   "player.view.screenshot-copy-failed": "a képkockát nem sikerült másolni",
   "player.view.screenshot-jpg": "Képernyőképek mentése JPG-ként",
+  "player.view.screenshot-subtitles": "Feliratok belefoglalása a képernyőképekbe",
   "player.view.keep-history": "Előzmények megőrzése",
   "player.view.resume": "Folytatás ott, ahol abbahagytam",
   "player.view.seek-steps": "Ugrási lépések",
