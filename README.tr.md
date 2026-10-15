@@ -57,6 +57,13 @@ VidShrink'i hangi yolla kurulursa kurulsun engeller.
 **Kaldırma.** `VidShrink-Setup.exe --uninstall` kısayolları, sağ tık girdilerini, Birlikte aç
 kaydını ve kurulum klasörünü siliyor.
 
+**Taşınabilir.** [Son sürümdeki](https://github.com/Teknesyum/VidShrink/releases/latest)
+`VidShrink-Portable-win-x64.zip` (ya da `-win-arm64`) kurulmadan çalışır: herhangi bir yere,
+USB belleğe de açın ve `VidShrink.App.exe`'yi başlatın. Exe'nin yanındaki `VidShrink.portable`
+dosyası ayarları ve günlüğü yanındaki `data` klasöründe tutar. Taşınabilir kopya kendini
+güncellemez, kısayol eklemez, kayıt defterine yazmaz; yeni sürüm çıkınca güncelleme düğmesi
+indirme sayfasını açar.
+
 ### macOS Ve Linux'a Kurulum
 
 ```bash

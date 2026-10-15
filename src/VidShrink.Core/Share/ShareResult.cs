@@ -156,11 +156,7 @@ public sealed class ShareLedger
 
     public ShareLedger(string? path = null) => _path = path ?? DefaultPath;
 
-    public static string DefaultPath =>
-        Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "VidShrink",
-            "paylasimlar.json");
+    public static string DefaultPath => Path.Combine(PortableMode.RoamingFolder, "paylasimlar.json");
 
     public IReadOnlyList<ShareLink> Load()
     {

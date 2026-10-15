@@ -54,6 +54,7 @@
   "settings.update.auto": "خودکار اپ ڈیٹ",
   "settings.update.auto-effect": "آن ہو تو نیا ورژن پس منظر میں ڈاؤن لوڈ ہوتا ہے اور VidShrink بند ہونے پر انسٹال ہوتا ہے۔ آف ہو تو نئے ورژن کی اطلاع اوپر کی پٹی میں دی جاتی ہے اور بٹن سے انسٹال ہوتا ہے۔",
   "settings.update.no-self-effect": "اس سسٹم پر VidShrink خود اپ ڈیٹ نہیں ہوتا: صرف بتاتا ہے کہ نیا ورژن موجود ہے اور اسے نصب کرنے والی کمانڈ دکھاتا ہے۔",
+  "settings.update.portable-effect": "پورٹیبل کاپی: VidShrink خود کو اپ ڈیٹ نہیں کرتا۔ اپ ڈیٹ بٹن ڈاؤن لوڈ صفحہ کھولتا ہے۔",
   "settings.default-app.suggestion": "VidShrink ویڈیوز کے لیے طے شدہ پروگرام نہیں ہے۔ آپ اسے Windows کے طے شدہ ایپس صفحے پر چن سکتے ہیں۔",
   "settings.default-app.all": "سب سیٹ کریں",
   "settings.default-app.all-copied": "کمانڈ کلپ بورڈ پر کاپی ہو گئی۔ PowerShell ونڈو کھولیں اور اسے پیسٹ کریں؛ VidShrink تمام آڈیو اور ویڈیو فارمیٹس کے لیے ڈیفالٹ بن جائے گا۔",

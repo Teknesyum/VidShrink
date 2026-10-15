@@ -142,7 +142,7 @@ public partial class App : Application
     /// </summary>
     private static void RegisterFileTypes()
     {
-        if (!OperatingSystem.IsWindows()) return;
+        if (!OperatingSystem.IsWindows() || PortableMode.Active) return;
 
         try
         {

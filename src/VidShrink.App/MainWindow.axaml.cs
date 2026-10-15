@@ -369,7 +369,7 @@ public partial class MainWindow : Window
     /// </summary>
     private void ShowDefaultAppSuggestion()
     {
-        if (!OperatingSystem.IsWindows()) return;
+        if (!OperatingSystem.IsWindows() || Tasinabilir) return;
 
         var executable = Environment.ProcessPath;
         if (string.IsNullOrEmpty(executable)) return;
@@ -1904,7 +1904,7 @@ public partial class MainWindow : Window
 
     private void InitializeUpdateUi(UpdateSettings? settings = null)
     {
-        AutoUpdateRow.IsVisible = UpdateCheck.CanSelfUpdate;
+        AutoUpdateRow.IsVisible = UpdateCheck.CanSelfUpdate && !Tasinabilir;
 
         _updateUiSyncing = true;
         try { ChkAutoUpdate.IsChecked = (settings ?? UpdateSettings.Load(SettingsPathOverride)).AutoUpdate; }
@@ -2038,7 +2038,8 @@ public partial class MainWindow : Window
 
     private void RefreshUpdateTexts()
     {
-        TxtAutoUpdateEffect.Text = Say(UpdateCheck.CanSelfUpdate ? "settings.update.auto-effect" : "settings.update.no-self-effect");
+        TxtAutoUpdateEffect.Text = Say(Tasinabilir ? "settings.update.portable-effect"
+            : UpdateCheck.CanSelfUpdate ? "settings.update.auto-effect" : "settings.update.no-self-effect");
         RefreshUpdateNoticeButton();
     }
 
