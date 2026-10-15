@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 using Avalonia.Media;
 using VidShrink.App.Localization;
 using VidShrink.Core;
@@ -18,6 +21,14 @@ internal partial class EditorView
     private const int FallbackWidth = 1920;
     private const int FallbackHeight = 1080;
     private static readonly long DefaultTextLength = EditTime.TicksPerSecond * 3;
+    private static readonly long DefaultMotionLength = EditTime.TicksPerSecond / 2;
+    private static readonly string[] MotionKeys = { "none", "left", "right", "bottom", "top", "typewriter" };
+    private const double DragPad = 0.02;
+
+    private int _dragIndex = -1;
+    private TextLayer? _dragOrigin;
+    private TextLayer? _dragText;
+    private (double X, double Y) _dragGrab;
 
     private long _overlayId;
     private string? _overlayFonts;
@@ -63,7 +74,186 @@ internal partial class EditorView
         TxtTextOutline.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, CommitTextOutline);
         TxtTextShadow.LostFocus += (_, _) => CommitTextShadow();
         TxtTextShadow.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, CommitTextShadow);
+        TxtTextX.LostFocus += (_, _) => CommitTextPosition();
+        TxtTextX.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, CommitTextPosition);
+        TxtTextY.LostFocus += (_, _) => CommitTextPosition();
+        TxtTextY.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, CommitTextPosition);
+        BtnTextKeyframe.Click += (_, _) => { if (_showingText) ToggleTextKeyframe(BtnTextKeyframe.IsChecked == true); };
+        foreach (var combo in new[] { CmbTextMotionIn, CmbTextMotionOut })
+        {
+            combo.Items.Clear();
+            foreach (var key in MotionKeys) combo.Items.Add(new ComboBoxItem { Content = Strings.Get("editor.text.motion." + key) });
+        }
+
+        CmbTextMotionIn.SelectionChanged += (_, _) => { if (_showingText && CmbTextMotionIn.SelectedIndex >= 0) CommitTextMotion(true); };
+        CmbTextMotionOut.SelectionChanged += (_, _) => { if (_showingText && CmbTextMotionOut.SelectedIndex >= 0) CommitTextMotion(false); };
+        TxtTextMotionIn.LostFocus += (_, _) => CommitTextMotionLength(true);
+        TxtTextMotionIn.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitTextMotionLength(true));
+        TxtTextMotionOut.LostFocus += (_, _) => CommitTextMotionLength(false);
+        TxtTextMotionOut.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitTextMotionLength(false));
+        AddHandler(PointerPressedEvent, OnMonitorTextPressed, RoutingStrategies.Tunnel);
+        AddHandler(PointerMovedEvent, OnMonitorTextMoved, RoutingStrategies.Tunnel);
+        AddHandler(PointerReleasedEvent, OnMonitorTextReleased, RoutingStrategies.Tunnel);
+        AddHandler(PointerCaptureLostEvent, (_, _) => EndTextDrag(), RoutingStrategies.Direct | RoutingStrategies.Bubble, true);
         ShowTextPanel();
+    }
+
+    private long TextOffset(TextLayer text) => Math.Clamp(Timeline.Playhead - text.Start, 0, text.Length);
+
+    private static bool TryReadPercent(string? input, out double fraction)
+    {
+        fraction = 0;
+        if (!TryReadAmount(input, out var value) || value is not { } percent) return false;
+        fraction = Math.Clamp(Math.Round(percent, 1), 0, 100) / 100;
+        return true;
+    }
+
+    private void CommitTextPosition()
+    {
+        if (!_showingText) return;
+        if (!TryReadPercent(TxtTextX.Text, out var x) || !TryReadPercent(TxtTextY.Text, out var y)
+            || !UpdateSelectedText(t => t.WithPositionAt(TextOffset(t), x, y)))
+            ShowTextPanel();
+    }
+
+    private void ToggleTextKeyframe(bool on)
+    {
+        var tolerance = Timeline.KeyframeTolerance;
+        if (!UpdateSelectedText(t => on ? t.WithKeyframeAt(TextOffset(t)) : t.WithoutKeyframeNear(TextOffset(t), tolerance))) ShowTextPanel();
+    }
+
+    private void CommitTextMotion(bool entrance)
+    {
+        var motion = (TextMotion)(entrance ? CmbTextMotionIn : CmbTextMotionOut).SelectedIndex;
+        if (!UpdateSelectedText(t =>
+            {
+                var room = t.Length - (entrance ? t.MotionOutLength : t.MotionInLength);
+                var current = entrance ? t.MotionInLength : t.MotionOutLength;
+                var length = motion == TextMotion.None ? 0 : Math.Min(current > 0 ? current : DefaultMotionLength, room);
+                return entrance ? t with { MotionIn = motion, MotionInLength = length } : t with { MotionOut = motion, MotionOutLength = length };
+            }))
+            ShowTextPanel();
+    }
+
+    private void CommitTextMotionLength(bool entrance)
+    {
+        if (!_showingText) return;
+        if (!TryReadAmount((entrance ? TxtTextMotionIn : TxtTextMotionOut).Text, out var seconds) || seconds is null)
+        {
+            ShowTextPanel();
+            return;
+        }
+
+        var ticks = EditTime.FromSeconds(Math.Round(seconds.Value, 2));
+        if (!UpdateSelectedText(t => entrance
+                ? t with { MotionInLength = t.MotionIn == TextMotion.None ? 0 : Math.Min(ticks, t.Length - t.MotionOutLength) }
+                : t with { MotionOutLength = t.MotionOut == TextMotion.None ? 0 : Math.Min(ticks, t.Length - t.MotionInLength) }))
+            ShowTextPanel();
+    }
+
+    /// <summary>Oynatma basi degisince konum kutulari ve anahtar kare dugmesi o ana esitlenir.</summary>
+    private void ShowTextPosition(bool force = false)
+    {
+        var index = Timeline.SelectedText;
+        if (!_showingText || _model is not { } model || index < 0 || index >= model.Texts.Count) return;
+        var text = _dragIndex == index && _dragText is { } dragged ? dragged : model.Texts[index];
+        var offset = TextOffset(text);
+        var (x, y) = text.KeyframePositionAt(offset);
+        if (force || !TxtTextX.IsFocused) TxtTextX.Text = (x * 100).ToString("0.#", Strings.Culture);
+        if (force || !TxtTextY.IsFocused) TxtTextY.Text = (y * 100).ToString("0.#", Strings.Culture);
+        BtnTextKeyframe.IsChecked = text.HasKeyframeNear(offset, Timeline.KeyframeTolerance);
+    }
+
+    /// <summary>
+    /// Monitorde secili metne basilirsa surukleme baslar. Kesirler karenin genisligine ve
+    /// yuksekligine goredir; isabet kutusu yazi boyutundan kestirilir.
+    /// </summary>
+    internal bool BeginTextDrag(double fx, double fy)
+    {
+        var index = Timeline.SelectedText;
+        if (!_showingText || _model is not { } model || index < 0 || index >= model.Texts.Count) return false;
+        var text = model.Texts[index];
+        if (!text.Covers(Timeline.Playhead)) return false;
+        var offset = TextOffset(text);
+        var (width, height) = Preview.Engine is { } engine ? FrameSize(engine) : (FallbackWidth, FallbackHeight);
+        var (sx, sy) = text.PositionAt(offset);
+        var px = AssWriter.FontPixels(text, height);
+        var lines = text.Text.Split('\n');
+        var widest = lines.Max(l => new StringInfo(l.TrimEnd('\r')).LengthInTextElements);
+        var halfWidth = widest * 0.3 * px / width + DragPad;
+        var halfHeight = lines.Length * 0.6 * px / height + DragPad;
+        if (Math.Abs(fx - sx) > halfWidth || Math.Abs(fy - sy) > halfHeight) return false;
+
+        var (kx, ky) = text.KeyframePositionAt(offset);
+        _dragIndex = index;
+        _dragOrigin = text;
+        _dragText = null;
+        _dragGrab = (fx - kx, fy - ky);
+        return true;
+    }
+
+    internal bool DragTextTo(double fx, double fy)
+    {
+        if (_dragOrigin is not { } origin) return false;
+        var x = Math.Clamp(fx - _dragGrab.X, 0, 1);
+        var y = Math.Clamp(fy - _dragGrab.Y, 0, 1);
+        _dragText = origin.WithPositionAt(TextOffset(origin), x, y);
+        RefreshOverlay();
+        ShowTextPosition();
+        return true;
+    }
+
+    internal bool EndTextDrag()
+    {
+        if (_dragOrigin is not { } origin) return false;
+        var after = _dragText;
+        var index = _dragIndex;
+        _dragOrigin = null;
+        _dragText = null;
+        _dragIndex = -1;
+        if (after is null || after.Equals(origin) || index != Timeline.SelectedText || !UpdateSelectedText(_ => after))
+        {
+            RefreshOverlay();
+            ShowTextPanel();
+        }
+
+        return true;
+    }
+
+    private bool MonitorFraction(PointerEventArgs e, out double fx, out double fy)
+    {
+        fx = fy = 0;
+        var frame = Preview.Frame;
+        var size = frame.Bounds.Size;
+        if (!frame.IsVisible || size.Width <= 0 || size.Height <= 0) return false;
+        var at = e.GetPosition(frame);
+        fx = at.X / size.Width;
+        fy = at.Y / size.Height;
+        return true;
+    }
+
+    private void OnMonitorTextPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (!_showingText || e.Source is not Visual source || !(ReferenceEquals(source, Preview.Surface) || Preview.Surface.IsVisualAncestorOf(source))) return;
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed || !MonitorFraction(e, out var fx, out var fy)) return;
+        if (!BeginTextDrag(fx, fy)) return;
+        e.Pointer.Capture(Preview.Surface);
+        e.Handled = true;
+    }
+
+    private void OnMonitorTextMoved(object? sender, PointerEventArgs e)
+    {
+        if (_dragOrigin is null) return;
+        if (MonitorFraction(e, out var fx, out var fy)) DragTextTo(fx, fy);
+        e.Handled = true;
+    }
+
+    private void OnMonitorTextReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (_dragOrigin is null) return;
+        e.Pointer.Capture(null);
+        EndTextDrag();
+        e.Handled = true;
     }
 
     private static void CommitOnEnter(KeyEventArgs e, KeyModifiers needed, Action commit)
@@ -266,8 +456,15 @@ internal partial class EditorView
         TxtTextOutline.Text = text.Outline is { } outline ? outline.ToString("0.#", Strings.Culture) : string.Empty;
         TxtTextShadow.Text = text.Shadow.ToString("0.#", Strings.Culture);
         BtnTextBox.IsChecked = text.Box;
+        CmbTextMotionIn.SelectedIndex = (int)text.MotionIn;
+        CmbTextMotionOut.SelectedIndex = (int)text.MotionOut;
+        TxtTextMotionIn.Text = EditTime.ToSeconds(text.MotionInLength).ToString("0.##", Strings.Culture);
+        TxtTextMotionOut.Text = EditTime.ToSeconds(text.MotionOutLength).ToString("0.##", Strings.Culture);
+        TxtTextMotionIn.IsEnabled = text.MotionIn != TextMotion.None;
+        TxtTextMotionOut.IsEnabled = text.MotionOut != TextMotion.None;
         TextPanel.IsVisible = true;
         _showingText = true;
+        ShowTextPosition(true);
     }
 
     /// <summary>
@@ -286,7 +483,10 @@ internal partial class EditorView
         }
 
         var (width, height) = FrameSize(engine);
-        var document = AssWriter.WritePreview(model.Texts, width, height, driver.Preview);
+        var texts = _dragText is { } dragged && _dragIndex >= 0 && _dragIndex < model.Texts.Count
+            ? model.Texts.Select((t, i) => i == _dragIndex ? dragged : t).ToList()
+            : model.Texts;
+        var document = AssWriter.WritePreview(texts, width, height, driver.Preview);
         try
         {
             Directory.CreateDirectory(OverlayRoot);
