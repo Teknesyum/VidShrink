@@ -195,5 +195,22 @@
   "editor.export.audio-track": "Ääniraita",
   "editor.export.audio-track.all": "Kaikki raidat",
   "editor.export.audio-track.none": "Ei ääntä",
-  "editor.monitor.audio-track": "Vaihda ääniraitaa"
+  "editor.monitor.audio-track": "Vaihda ääniraitaa",
+  "editor.remux.file-title": "Tiedoston otsikko",
+  "editor.remux.track": "Raita",
+  "editor.remux.language": "Kieli",
+  "editor.remux.track-title": "Raidan nimi",
+  "editor.remux.offset": "Siirto (ms)",
+  "editor.remux.rotation": "Kierto",
+  "editor.remux.rotation.keep": "Säilytä",
+  "editor.remux.default": "Oletusraita",
+  "editor.remux.run": "Pakkaa uudelleen…",
+  "editor.remux.tip": "• Kirjoittaa lähteen uuteen tiedostoon ilman uudelleenkoodausta.\n• Kieli, nimi, lippu, siirto ja kierto koskevat raitaa.",
+  "editor.remux.invalid": "Raita {0}: kielen on oltava kolmikirjaiminen koodi ja siirron kokonaisia millisekunteja.",
+  "editor.remux.same-file": "Tuloste ei voi korvata lähdettä.",
+  "editor.remux.save-title": "Tallenna uudelleen pakattu tiedosto",
+  "editor.remux.kind.video": "Video",
+  "editor.remux.kind.audio": "Ääni",
+  "editor.remux.kind.subtitle": "Tekstitys",
+  "editor.remux.kind.attachment": "Liite"
 }

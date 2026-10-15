@@ -195,5 +195,22 @@
   "editor.export.audio-track": "Zvučni zapis",
   "editor.export.audio-track.all": "Svi zapisi",
   "editor.export.audio-track.none": "Bez zvuka",
-  "editor.monitor.audio-track": "Promijeni zvučni zapis"
+  "editor.monitor.audio-track": "Promijeni zvučni zapis",
+  "editor.remux.file-title": "Naslov datoteke",
+  "editor.remux.track": "Zapis",
+  "editor.remux.language": "Jezik",
+  "editor.remux.track-title": "Naziv zapisa",
+  "editor.remux.offset": "Pomak (ms)",
+  "editor.remux.rotation": "Zakretanje",
+  "editor.remux.rotation.keep": "Zadrži",
+  "editor.remux.default": "Zadani zapis",
+  "editor.remux.run": "Prepakiraj…",
+  "editor.remux.tip": "• Zapisuje izvor u novu datoteku bez ponovnog kodiranja.\n• Jezik, naziv, oznaka, pomak i zakretanje vrijede po zapisu.",
+  "editor.remux.invalid": "Zapis {0}: jezik mora biti troslovni kod, a pomak cijele milisekunde.",
+  "editor.remux.same-file": "Izlaz ne smije prebrisati izvor.",
+  "editor.remux.save-title": "Spremi prepakiranu datoteku",
+  "editor.remux.kind.video": "Video",
+  "editor.remux.kind.audio": "Zvuk",
+  "editor.remux.kind.subtitle": "Titlovi",
+  "editor.remux.kind.attachment": "Privitak"
 }

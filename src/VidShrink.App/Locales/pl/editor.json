@@ -195,5 +195,22 @@
   "editor.export.audio-track": "Ścieżka dźwiękowa",
   "editor.export.audio-track.all": "Wszystkie ścieżki",
   "editor.export.audio-track.none": "Bez dźwięku",
-  "editor.monitor.audio-track": "Przełącz ścieżkę dźwiękową"
+  "editor.monitor.audio-track": "Przełącz ścieżkę dźwiękową",
+  "editor.remux.file-title": "Tytuł pliku",
+  "editor.remux.track": "Ścieżka",
+  "editor.remux.language": "Język",
+  "editor.remux.track-title": "Nazwa ścieżki",
+  "editor.remux.offset": "Przesunięcie (ms)",
+  "editor.remux.rotation": "Obrót",
+  "editor.remux.rotation.keep": "Zachowaj",
+  "editor.remux.default": "Ścieżka domyślna",
+  "editor.remux.run": "Przepakuj…",
+  "editor.remux.tip": "• Zapisuje źródło do nowego pliku bez ponownego kodowania.\n• Język, nazwa, flaga, przesunięcie i obrót dotyczą ścieżki.",
+  "editor.remux.invalid": "Ścieżka {0}: język musi być trzyliterowym kodem, a przesunięcie pełnymi milisekundami.",
+  "editor.remux.same-file": "Wynik nie może nadpisać źródła.",
+  "editor.remux.save-title": "Zapisz przepakowany plik",
+  "editor.remux.kind.video": "Wideo",
+  "editor.remux.kind.audio": "Dźwięk",
+  "editor.remux.kind.subtitle": "Napisy",
+  "editor.remux.kind.attachment": "Załącznik"
 }

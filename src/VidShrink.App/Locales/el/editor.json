@@ -195,5 +195,22 @@
   "editor.export.audio-track": "Κομμάτι ήχου",
   "editor.export.audio-track.all": "Όλα τα κομμάτια",
   "editor.export.audio-track.none": "Χωρίς ήχο",
-  "editor.monitor.audio-track": "Αλλαγή κομματιού ήχου"
+  "editor.monitor.audio-track": "Αλλαγή κομματιού ήχου",
+  "editor.remux.file-title": "Τίτλος αρχείου",
+  "editor.remux.track": "Κομμάτι",
+  "editor.remux.language": "Γλώσσα",
+  "editor.remux.track-title": "Όνομα κομματιού",
+  "editor.remux.offset": "Μετατόπιση (ms)",
+  "editor.remux.rotation": "Περιστροφή",
+  "editor.remux.rotation.keep": "Διατήρηση",
+  "editor.remux.default": "Προεπιλεγμένο κομμάτι",
+  "editor.remux.run": "Επανασυσκευασία…",
+  "editor.remux.tip": "• Γράφει την πηγή σε νέο αρχείο χωρίς επανακωδικοποίηση.\n• Γλώσσα, όνομα, σημαία, μετατόπιση και περιστροφή ισχύουν ανά κομμάτι.",
+  "editor.remux.invalid": "Κομμάτι {0}: η γλώσσα πρέπει να είναι τριγράμματος κωδικός και η μετατόπιση ακέραια χιλιοστά.",
+  "editor.remux.same-file": "Η έξοδος δεν μπορεί να αντικαταστήσει την πηγή.",
+  "editor.remux.save-title": "Αποθήκευση επανασυσκευασμένου αρχείου",
+  "editor.remux.kind.video": "Βίντεο",
+  "editor.remux.kind.audio": "Ήχος",
+  "editor.remux.kind.subtitle": "Υπότιτλοι",
+  "editor.remux.kind.attachment": "Συνημμένο"
 }

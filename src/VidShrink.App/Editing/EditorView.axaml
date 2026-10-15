@@ -147,6 +147,32 @@
                         <Button x:Name="BtnExportPresetSave" Theme="{StaticResource GhostButton}" VerticalAlignment="Center" Content="{loc:Text main.preset.save}"/>
                       </StackPanel>
                       <TextBlock x:Name="TxtExportPresetError" Theme="{StaticResource StatusError}" TextWrapping="Wrap" MaxWidth="{StaticResource FieldWidth}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                      <Grid x:Name="RemuxGrid" ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}" RowSpacing="{StaticResource SpaceSm}">
+                        <TextBlock Grid.Row="0" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.file-title}"/>
+                        <TextBox x:Name="TxtRemuxFileTitle" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.remux.file-title}"/>
+                        <TextBlock Grid.Row="1" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.track}"/>
+                        <ComboBox x:Name="CmbRemuxTrack" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" MinWidth="{StaticResource EditorExportModeWidth}" AutomationProperties.Name="{loc:Text editor.remux.track}"/>
+                        <TextBlock Grid.Row="2" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.language}"/>
+                        <TextBox x:Name="TxtRemuxLanguage" Grid.Row="2" Grid.Column="1" Width="{StaticResource FieldWidthSm}" MaxLength="3" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.remux.language}"/>
+                        <TextBlock Grid.Row="2" Grid.Column="2" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.track-title}"/>
+                        <TextBox x:Name="TxtRemuxTrackTitle" Grid.Row="2" Grid.Column="3" Width="{StaticResource FieldWidthSm}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.remux.track-title}"/>
+                        <TextBlock Grid.Row="3" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.offset}"/>
+                        <TextBox x:Name="TxtRemuxOffset" Grid.Row="3" Grid.Column="1" Width="{StaticResource FieldWidthSm}" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.remux.offset}"/>
+                        <TextBlock Grid.Row="3" Grid.Column="2" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.rotation}"/>
+                        <ComboBox x:Name="CmbRemuxRotation" Grid.Row="3" Grid.Column="3" Width="{StaticResource FieldWidthSm}" AutomationProperties.Name="{loc:Text editor.remux.rotation}" SelectedIndex="0">
+                          <ComboBoxItem Content="{loc:Text editor.remux.rotation.keep}"/>
+                          <ComboBoxItem Content="0°"/>
+                          <ComboBoxItem Content="90°"/>
+                          <ComboBoxItem Content="180°"/>
+                          <ComboBoxItem Content="270°"/>
+                        </ComboBox>
+                        <CheckBox x:Name="ChkRemuxDefault" Grid.Row="4" Grid.ColumnSpan="2" Theme="{StaticResource CheckStyle}" Content="{loc:Text editor.remux.default}"/>
+                        <Button x:Name="BtnRemux" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="2" Theme="{StaticResource GhostButton}" HorizontalAlignment="Right" IsEnabled="False" Content="{loc:Text editor.remux.run}">
+                          <ToolTip.Tip>
+                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text editor.remux.tip}"/>
+                          </ToolTip.Tip>
+                        </Button>
+                      </Grid>
                     </StackPanel>
                   </Flyout>
                 </Button.Flyout>

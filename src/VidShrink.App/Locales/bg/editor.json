@@ -195,5 +195,22 @@
   "editor.export.audio-track": "Аудиопътечка",
   "editor.export.audio-track.all": "Всички пътечки",
   "editor.export.audio-track.none": "Без звук",
-  "editor.monitor.audio-track": "Смяна на аудиопътечката"
+  "editor.monitor.audio-track": "Смяна на аудиопътечката",
+  "editor.remux.file-title": "Заглавие на файла",
+  "editor.remux.track": "Писта",
+  "editor.remux.language": "Език",
+  "editor.remux.track-title": "Име на пистата",
+  "editor.remux.offset": "Отместване (ms)",
+  "editor.remux.rotation": "Завъртане",
+  "editor.remux.rotation.keep": "Запази",
+  "editor.remux.default": "Писта по подразбиране",
+  "editor.remux.run": "Препакетирай…",
+  "editor.remux.tip": "• Записва източника в нов файл без прекодиране.\n• Език, име, флаг, отместване и завъртане важат за пистата.",
+  "editor.remux.invalid": "Писта {0}: езикът трябва да е трибуквен код, а отместването цели милисекунди.",
+  "editor.remux.same-file": "Изходът не може да презапише източника.",
+  "editor.remux.save-title": "Запази препакетирания файл",
+  "editor.remux.kind.video": "Видео",
+  "editor.remux.kind.audio": "Аудио",
+  "editor.remux.kind.subtitle": "Субтитри",
+  "editor.remux.kind.attachment": "Прикачен файл"
 }

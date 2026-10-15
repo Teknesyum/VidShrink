@@ -195,5 +195,22 @@
   "editor.export.audio-track": "Rãnh âm thanh",
   "editor.export.audio-track.all": "Tất cả các rãnh",
   "editor.export.audio-track.none": "Không có âm thanh",
-  "editor.monitor.audio-track": "Đổi rãnh âm thanh"
+  "editor.monitor.audio-track": "Đổi rãnh âm thanh",
+  "editor.remux.file-title": "Tiêu đề tệp",
+  "editor.remux.track": "Rãnh",
+  "editor.remux.language": "Ngôn ngữ",
+  "editor.remux.track-title": "Tên rãnh",
+  "editor.remux.offset": "Độ lệch (ms)",
+  "editor.remux.rotation": "Xoay",
+  "editor.remux.rotation.keep": "Giữ nguyên",
+  "editor.remux.default": "Rãnh mặc định",
+  "editor.remux.run": "Đóng gói lại…",
+  "editor.remux.tip": "• Ghi nguồn vào tệp mới mà không mã hóa lại.\n• Ngôn ngữ, tên, cờ, độ lệch và xoay áp dụng theo rãnh.",
+  "editor.remux.invalid": "Rãnh {0}: ngôn ngữ phải là mã ba chữ cái và độ lệch là số mili giây nguyên.",
+  "editor.remux.same-file": "Đầu ra không thể ghi đè nguồn.",
+  "editor.remux.save-title": "Lưu tệp đã đóng gói lại",
+  "editor.remux.kind.video": "Video",
+  "editor.remux.kind.audio": "Âm thanh",
+  "editor.remux.kind.subtitle": "Phụ đề",
+  "editor.remux.kind.attachment": "Tệp đính kèm"
 }

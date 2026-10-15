@@ -195,5 +195,22 @@
   "editor.export.audio-track": "Piste audio",
   "editor.export.audio-track.all": "Toutes les pistes",
   "editor.export.audio-track.none": "Sans audio",
-  "editor.monitor.audio-track": "Changer de piste audio"
+  "editor.monitor.audio-track": "Changer de piste audio",
+  "editor.remux.file-title": "Titre du fichier",
+  "editor.remux.track": "Piste",
+  "editor.remux.language": "Langue",
+  "editor.remux.track-title": "Nom de la piste",
+  "editor.remux.offset": "Décalage (ms)",
+  "editor.remux.rotation": "Rotation",
+  "editor.remux.rotation.keep": "Conserver",
+  "editor.remux.default": "Piste par défaut",
+  "editor.remux.run": "Remuxer…",
+  "editor.remux.tip": "• Écrit la source dans un nouveau fichier sans réencodage.\n• Langue, nom, indicateur, décalage et rotation s'appliquent par piste.",
+  "editor.remux.invalid": "Piste {0} : la langue doit être un code de trois lettres et le décalage des millisecondes entières.",
+  "editor.remux.same-file": "La sortie ne peut pas écraser la source.",
+  "editor.remux.save-title": "Enregistrer le fichier remuxé",
+  "editor.remux.kind.video": "Vidéo",
+  "editor.remux.kind.audio": "Audio",
+  "editor.remux.kind.subtitle": "Sous-titres",
+  "editor.remux.kind.attachment": "Pièce jointe"
 }

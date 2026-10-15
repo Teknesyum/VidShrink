@@ -195,5 +195,22 @@
   "editor.export.audio-track": "Pistă audio",
   "editor.export.audio-track.all": "Toate pistele",
   "editor.export.audio-track.none": "Fără sunet",
-  "editor.monitor.audio-track": "Schimbă pista audio"
+  "editor.monitor.audio-track": "Schimbă pista audio",
+  "editor.remux.file-title": "Titlul fișierului",
+  "editor.remux.track": "Pistă",
+  "editor.remux.language": "Limbă",
+  "editor.remux.track-title": "Numele pistei",
+  "editor.remux.offset": "Decalaj (ms)",
+  "editor.remux.rotation": "Rotire",
+  "editor.remux.rotation.keep": "Păstrează",
+  "editor.remux.default": "Pistă implicită",
+  "editor.remux.run": "Reîmpachetează…",
+  "editor.remux.tip": "• Scrie sursa într-un fișier nou fără recodare.\n• Limba, numele, marcajul, decalajul și rotirea se aplică pe pistă.",
+  "editor.remux.invalid": "Pista {0}: limba trebuie să fie un cod din trei litere, iar decalajul milisecunde întregi.",
+  "editor.remux.same-file": "Ieșirea nu poate suprascrie sursa.",
+  "editor.remux.save-title": "Salvează fișierul reîmpachetat",
+  "editor.remux.kind.video": "Video",
+  "editor.remux.kind.audio": "Audio",
+  "editor.remux.kind.subtitle": "Subtitrări",
+  "editor.remux.kind.attachment": "Atașament"
 }

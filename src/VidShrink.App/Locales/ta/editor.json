@@ -195,5 +195,22 @@
   "editor.export.audio-track": "ஒலித் தடம்",
   "editor.export.audio-track.all": "அனைத்து தடங்களும்",
   "editor.export.audio-track.none": "ஒலி இல்லை",
-  "editor.monitor.audio-track": "ஒலித் தடத்தை மாற்று"
+  "editor.monitor.audio-track": "ஒலித் தடத்தை மாற்று",
+  "editor.remux.file-title": "கோப்புத் தலைப்பு",
+  "editor.remux.track": "தடம்",
+  "editor.remux.language": "மொழி",
+  "editor.remux.track-title": "தடத்தின் பெயர்",
+  "editor.remux.offset": "நகர்வு (ms)",
+  "editor.remux.rotation": "சுழற்சி",
+  "editor.remux.rotation.keep": "மாற்ற வேண்டாம்",
+  "editor.remux.default": "இயல்புத் தடம்",
+  "editor.remux.run": "மீண்டும் பொதி…",
+  "editor.remux.tip": "• மறுகுறியாக்கம் இல்லாமல் மூலத்தைப் புதிய கோப்பில் எழுதும்.\n• மொழி, பெயர், கொடி, நகர்வு, சுழற்சி ஒவ்வொரு தடத்துக்கும்.",
+  "editor.remux.invalid": "தடம் {0}: மொழி மூன்றெழுத்துக் குறியீடு, நகர்வு முழு மில்லிவினாடி ஆக இருக்க வேண்டும்.",
+  "editor.remux.same-file": "வெளியீடு மூலத்தை மேலெழுத முடியாது.",
+  "editor.remux.save-title": "மீண்டும் பொதிந்த கோப்பைச் சேமி",
+  "editor.remux.kind.video": "காணொளி",
+  "editor.remux.kind.audio": "ஒலி",
+  "editor.remux.kind.subtitle": "வசனம்",
+  "editor.remux.kind.attachment": "இணைப்பு"
 }

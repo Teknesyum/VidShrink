@@ -195,5 +195,22 @@
   "editor.export.audio-track": "Ses izi",
   "editor.export.audio-track.all": "Tüm izler",
   "editor.export.audio-track.none": "Ses yok",
-  "editor.monitor.audio-track": "Ses izini değiştir"
+  "editor.monitor.audio-track": "Ses izini değiştir",
+  "editor.remux.file-title": "Dosya başlığı",
+  "editor.remux.track": "İz",
+  "editor.remux.language": "Dil",
+  "editor.remux.track-title": "İz adı",
+  "editor.remux.offset": "Kaydırma (ms)",
+  "editor.remux.rotation": "Döndürme",
+  "editor.remux.rotation.keep": "Değiştirme",
+  "editor.remux.default": "Varsayılan İz",
+  "editor.remux.run": "Yeniden Paketle…",
+  "editor.remux.tip": "• Kaynağı yeniden kodlamadan yeni dosyaya yazar.\n• Dil, ad, bayrak, kaydırma ve dönüş iz başına uygulanır.",
+  "editor.remux.invalid": "İz {0}: dil üç harfli kod, kaydırma tam sayı milisaniye olmalı.",
+  "editor.remux.same-file": "Çıktı kaynağın üstüne yazılamaz.",
+  "editor.remux.save-title": "Yeniden Paketlenen Dosyayı Kaydet",
+  "editor.remux.kind.video": "Görüntü",
+  "editor.remux.kind.audio": "Ses",
+  "editor.remux.kind.subtitle": "Altyazı",
+  "editor.remux.kind.attachment": "Ek"
 }

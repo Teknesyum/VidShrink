@@ -195,5 +195,22 @@
   "editor.export.audio-track": "音声トラック",
   "editor.export.audio-track.all": "すべてのトラック",
   "editor.export.audio-track.none": "音声なし",
-  "editor.monitor.audio-track": "音声トラックを切り替え"
+  "editor.monitor.audio-track": "音声トラックを切り替え",
+  "editor.remux.file-title": "ファイルのタイトル",
+  "editor.remux.track": "トラック",
+  "editor.remux.language": "言語",
+  "editor.remux.track-title": "トラック名",
+  "editor.remux.offset": "オフセット (ms)",
+  "editor.remux.rotation": "回転",
+  "editor.remux.rotation.keep": "変更しない",
+  "editor.remux.default": "既定のトラック",
+  "editor.remux.run": "再パッケージ…",
+  "editor.remux.tip": "• 再エンコードせずにソースを新しいファイルへ書き出します。\n• 言語、名前、フラグ、オフセット、回転はトラックごとです。",
+  "editor.remux.invalid": "トラック {0}: 言語は3文字のコード、オフセットは整数のミリ秒で指定してください。",
+  "editor.remux.same-file": "出力でソースを上書きすることはできません。",
+  "editor.remux.save-title": "再パッケージしたファイルを保存",
+  "editor.remux.kind.video": "映像",
+  "editor.remux.kind.audio": "音声",
+  "editor.remux.kind.subtitle": "字幕",
+  "editor.remux.kind.attachment": "添付"
 }

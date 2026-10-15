@@ -195,5 +195,22 @@
   "editor.export.audio-track": "רצועת שמע",
   "editor.export.audio-track.all": "כל הרצועות",
   "editor.export.audio-track.none": "ללא שמע",
-  "editor.monitor.audio-track": "החלפת רצועת שמע"
+  "editor.monitor.audio-track": "החלפת רצועת שמע",
+  "editor.remux.file-title": "כותרת הקובץ",
+  "editor.remux.track": "רצועה",
+  "editor.remux.language": "שפה",
+  "editor.remux.track-title": "שם הרצועה",
+  "editor.remux.offset": "היסט (ms)",
+  "editor.remux.rotation": "סיבוב",
+  "editor.remux.rotation.keep": "השאר",
+  "editor.remux.default": "רצועת ברירת מחדל",
+  "editor.remux.run": "אריזה מחדש…",
+  "editor.remux.tip": "• כותב את המקור לקובץ חדש ללא קידוד מחדש.\n• שפה, שם, דגל, היסט וסיבוב חלים לכל רצועה.",
+  "editor.remux.invalid": "רצועה {0}: השפה חייבת להיות קוד בן שלוש אותיות וההיסט אלפיות שלמות.",
+  "editor.remux.same-file": "הפלט לא יכול לדרוס את המקור.",
+  "editor.remux.save-title": "שמירת הקובץ הארוז מחדש",
+  "editor.remux.kind.video": "וידאו",
+  "editor.remux.kind.audio": "שמע",
+  "editor.remux.kind.subtitle": "כתוביות",
+  "editor.remux.kind.attachment": "קובץ מצורף"
 }

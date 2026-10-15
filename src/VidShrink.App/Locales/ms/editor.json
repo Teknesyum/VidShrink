@@ -195,5 +195,22 @@
   "editor.export.audio-track": "Trek audio",
   "editor.export.audio-track.all": "Semua trek",
   "editor.export.audio-track.none": "Tiada audio",
-  "editor.monitor.audio-track": "Tukar trek audio"
+  "editor.monitor.audio-track": "Tukar trek audio",
+  "editor.remux.file-title": "Tajuk fail",
+  "editor.remux.track": "Trek",
+  "editor.remux.language": "Bahasa",
+  "editor.remux.track-title": "Nama trek",
+  "editor.remux.offset": "Ofset (ms)",
+  "editor.remux.rotation": "Putaran",
+  "editor.remux.rotation.keep": "Kekalkan",
+  "editor.remux.default": "Trek lalai",
+  "editor.remux.run": "Bungkus semula…",
+  "editor.remux.tip": "• Menulis sumber ke fail baharu tanpa pengekodan semula.\n• Bahasa, nama, bendera, ofset dan putaran digunakan setiap trek.",
+  "editor.remux.invalid": "Trek {0}: bahasa mesti kod tiga huruf dan ofset milisaat bulat.",
+  "editor.remux.same-file": "Output tidak boleh menimpa sumber.",
+  "editor.remux.save-title": "Simpan fail yang dibungkus semula",
+  "editor.remux.kind.video": "Video",
+  "editor.remux.kind.audio": "Audio",
+  "editor.remux.kind.subtitle": "Sari kata",
+  "editor.remux.kind.attachment": "Lampiran"
 }

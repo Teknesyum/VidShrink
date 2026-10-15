@@ -1308,6 +1308,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, later 65 kare hizi kipi: <c>recorder.advanced.frame-rate-mode</c> 6 dilde kola giriyor (es, fr, ms, pt, ro, sw), KOL dokumunden sayildi; en ve tr degismedi. Olculen toplam 3668 + 6 = 3674, gezilen 75809 + 215 = 76024.</para>
     /// <para>2026-10-15, later 82 ve later 65 birlesmesinden sonra: iki dalin kaymasi toplandi, dusen yok; olculen toplam 3668 + 5 + 6 = 3679, en 359, tr 119, gezilen 75809 + 86 + 215 = 76110.</para>
     /// <para>2026-10-15, later 84 birlesmesinden sonra: kesim listesi anahtarlarinin kaymasi main'in uzerine toplandi, dusen yok; olculen toplam 3679 + 35 = 3714, en 359 + 2 = 361, tr 119, gezilen 76110 + 344 = 76454.</para>
+    /// <para>2026-10-15, kap ici iz isleri (DZA-85 ilk yarisi): on yedi yeni <c>editor.remux.*</c> anahtarindan 7 kol (bn, hi, ur <c>invalid</c>; es, fr, pt <c>track-title</c>; pt <c>file-title</c>), KOL dokumunden ve SAYIM satirindan olculdu, en ve tr girmiyor: toplam 3714 + 7 = 3721, en 361, tr 119, gezilen 76454 + 43 x 17 = 77185.</para>
     /// <para>2026-10-15, kesim listesi (DZA-P10): sekiz yeni <c>editor.cutlist.*</c> anahtarindan 35 kol (en 2, es 7, fr 6, hu 2, pt 7, ro 6, sw 5), KOL dokumunden ve SAYIM satirindan olculdu, tr girmiyor: toplam 3668 + 35 = 3703, en 359 + 2 = 361, tr 119.</para>
     /// </summary>
     [Fact]
@@ -1334,7 +1335,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3714, toplam);
+        Assert.Equal(3721, toplam);
         Assert.Equal(361, dilBasina["en"]);
         Assert.Equal(119, dilBasina["tr"]);
     }
@@ -1624,7 +1625,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(76454, gezilen);
+        Assert.Equal(77185, gezilen);
         Assert.Empty(kayip);
     }
 

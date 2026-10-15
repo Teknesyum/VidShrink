@@ -195,5 +195,22 @@
   "editor.export.audio-track": "Audio celiņš",
   "editor.export.audio-track.all": "Visi celiņi",
   "editor.export.audio-track.none": "Bez skaņas",
-  "editor.monitor.audio-track": "Pārslēgt audio celiņu"
+  "editor.monitor.audio-track": "Pārslēgt audio celiņu",
+  "editor.remux.file-title": "Faila nosaukums",
+  "editor.remux.track": "Celiņš",
+  "editor.remux.language": "Valoda",
+  "editor.remux.track-title": "Celiņa nosaukums",
+  "editor.remux.offset": "Nobīde (ms)",
+  "editor.remux.rotation": "Pagriešana",
+  "editor.remux.rotation.keep": "Saglabāt",
+  "editor.remux.default": "Noklusējuma celiņš",
+  "editor.remux.run": "Pārpakot…",
+  "editor.remux.tip": "• Ieraksta avotu jaunā failā bez pārkodēšanas.\n• Valoda, nosaukums, karodziņš, nobīde un pagriešana attiecas uz celiņu.",
+  "editor.remux.invalid": "Celiņš {0}: valodai jābūt trīs burtu kodam, nobīdei veselās milisekundēs.",
+  "editor.remux.same-file": "Izvade nevar pārrakstīt avotu.",
+  "editor.remux.save-title": "Saglabāt pārpakoto failu",
+  "editor.remux.kind.video": "Video",
+  "editor.remux.kind.audio": "Audio",
+  "editor.remux.kind.subtitle": "Subtitri",
+  "editor.remux.kind.attachment": "Pielikums"
 }

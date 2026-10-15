@@ -195,5 +195,22 @@
   "editor.export.audio-track": "Lydspor",
   "editor.export.audio-track.all": "Alle spor",
   "editor.export.audio-track.none": "Ingen lyd",
-  "editor.monitor.audio-track": "Bytt lydspor"
+  "editor.monitor.audio-track": "Bytt lydspor",
+  "editor.remux.file-title": "Filtittel",
+  "editor.remux.track": "Spor",
+  "editor.remux.language": "Språk",
+  "editor.remux.track-title": "Spornavn",
+  "editor.remux.offset": "Forskyvning (ms)",
+  "editor.remux.rotation": "Rotasjon",
+  "editor.remux.rotation.keep": "Behold",
+  "editor.remux.default": "Standardspor",
+  "editor.remux.run": "Pakk om…",
+  "editor.remux.tip": "• Skriver kilden til en ny fil uten omkoding.\n• Språk, navn, flagg, forskyvning og rotasjon gjelder per spor.",
+  "editor.remux.invalid": "Spor {0}: språket må være en kode på tre bokstaver og forskyvningen hele millisekunder.",
+  "editor.remux.same-file": "Utdata kan ikke overskrive kilden.",
+  "editor.remux.save-title": "Lagre ompakket fil",
+  "editor.remux.kind.video": "Video",
+  "editor.remux.kind.audio": "Lyd",
+  "editor.remux.kind.subtitle": "Undertekster",
+  "editor.remux.kind.attachment": "Vedlegg"
 }
