@@ -40,11 +40,12 @@ public static class SmartCutCodec
     private const string EightBit = "yuv420p";
     private const string TenBit = "yuv420p10le";
 
-    public static IReadOnlyList<string> Codecs { get; } = new[] { "h264", "hevc", "av1", "vp9" };
+    public static IReadOnlyList<string> Codecs { get; } = new[] { "h264", "hevc", "av1", "vp9", "mpeg2video" };
 
     public static SmartCutEncoding? Resolve(MediaInfo info, Func<string, bool>? hasEncoder = null)
     {
-        if (info.IsInterlaced) return null;
+        var mpeg2 = info.VideoCodec.Equals("mpeg2video", StringComparison.OrdinalIgnoreCase);
+        if (info.IsInterlaced && !mpeg2) return null;
         var pixel = info.PixelFormat;
         if (pixel is not (EightBit or TenBit)) return null;
         if ((pixel == TenBit) != (info.BitDepth > 8)) return null;
@@ -55,6 +56,7 @@ public static class SmartCutCodec
             "hevc" => Hevc(info, pixel),
             "av1" => Av1(info, pixel),
             "vp9" => Vp9(info, pixel),
+            "mpeg2video" => Mpeg2(info, pixel),
             _ => null
         };
         if (encoding is null) return null;
@@ -62,17 +64,20 @@ public static class SmartCutCodec
     }
 
     /// <summary>
-    /// Govde kopyasinin arama payi. PTS ile arayan kapta (mp4 ailesi) ve B karesiz akista 1 ms;
+    /// Govde kopyasinin arama payi. PTS ile arayan kapta (mp4 ailesi, mpegts) ve B karesiz akista 1 ms;
     /// otekilerde ffmpeg'in geri cektigi 3/23 sn'nin 1 ms ustu, yoksa kopya bir onceki anahtar
-    /// kareden baslar.
+    /// kareden baslar. mpegts'te 3/23 sn pay kopyayi bir sonraki anahtar kareye itiyor.
     /// </summary>
     public static double CopySeekNudge(MediaInfo info)
         => SeeksByPts(info.FormatName) || info.VideoDelayFrames == 0
             ? SeekNudgeSeconds
             : DtsHeuristicSeconds + SeekNudgeSeconds;
 
+    public static bool SeekOvershoots(string? formatName)
+        => formatName is not null && formatName.Split(',').Any(n => n.Trim() == "mpegts");
+
     public static bool SeeksByPts(string? formatName)
-        => formatName is not null && formatName.Split(',').Any(n => n.Trim() is "mov" or "mp4");
+        => formatName is not null && formatName.Split(',').Any(n => n.Trim() is "mov" or "mp4" or "mpegts");
 
     /// <summary>
     /// Kodlama sirasindaki paket dokumunden govde sinirlari. Anahtar kareden sonra cozulup ondan
@@ -145,6 +150,33 @@ public static class SmartCutCodec
         if (!string.IsNullOrEmpty(info.VideoProfile) && info.VideoProfile != "Main") return null;
         var args = new[] { "-c:v", "libsvtav1", "-preset", "10", "-crf", EditExport.FullCrf, "-pix_fmt", pixel };
         return new SmartCutEncoding("libsvtav1", args, Mp4, ".mp4", null);
+    }
+
+    /// <summary>
+    /// Kenar kaynagin profili ve goruntu bit hiziyla (toplamdan ses dusulur) yazilir; kare hizi kaynaktan
+    /// gecer. Bit hizi okunamazsa sabit nicem. Taramali kaynakta alanlar ayri kodlanir; alan sirasi
+    /// kap etiketinden degil, cozucunun her kareye yazdigi bayraktan gelir (mkv <c>tt</c> akisi <c>tb</c> bildiriyor).
+    /// </summary>
+    private static SmartCutEncoding? Mpeg2(MediaInfo info, string pixel)
+    {
+        if (pixel != EightBit) return null;
+        var profile = info.VideoProfile switch
+        {
+            null or "" => string.Empty,
+            "Main" => "4",
+            "Simple" => "5",
+            _ => null
+        };
+        if (profile is null) return null;
+        var args = new List<string> { "-c:v", "mpeg2video" };
+        var bitrate = info.TotalBitrateBps - info.AudioBitrateBps;
+        if (bitrate >= 200_000) args.AddRange(new[] { "-b:v", bitrate.ToString(CultureInfo.InvariantCulture) });
+        else args.AddRange(new[] { "-q:v", "2" });
+        if (profile.Length > 0) args.AddRange(new[] { "-profile:v", profile });
+        if (profile == "5") args.AddRange(new[] { "-bf", "0" });
+        args.AddRange(new[] { "-pix_fmt", pixel });
+        if (info.IsInterlaced) args.AddRange(new[] { "-flags", "+ildct+ilme" });
+        return new SmartCutEncoding("mpeg2video", args, TransportStream, ".ts", null);
     }
 
     private static SmartCutEncoding? Vp9(MediaInfo info, string pixel)

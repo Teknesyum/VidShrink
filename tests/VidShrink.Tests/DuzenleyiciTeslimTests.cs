@@ -152,7 +152,7 @@ public sealed class DuzenleyiciTeslimTests
 
         var bas = plan.Steps[0].Args;
         Assert.Equal("1", Deger(bas, "-ss"));
-        Assert.Equal("1", Deger(bas, "-t"));
+        Assert.Equal("0.983333", Deger(bas, "-t"));
         Assert.Equal("libx264", Deger(bas, "-c:v"));
         Assert.Equal("mpegts", Deger(bas, "-f"));
         Assert.Contains("-an", bas);

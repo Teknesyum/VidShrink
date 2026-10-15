@@ -131,6 +131,37 @@ public static class EditExport
 
     private const double SeekNudgeSeconds = 0.001;
 
+    /// <summary>
+    /// Akilli kesimde bas kenarin kodlamasi anahtar kareden yarim kare once biter. Goruntu akisi
+    /// kabin baslangicindan gec baslayan TS kaynakta (bench kaynaginda 23,2 ms) <c>-t</c> o kadar gec kesiyor,
+    /// anahtar kareyi de kapsiyor ve parca bir kare uzuyordu.
+    /// </summary>
+    private static double HeadMarginSeconds(MediaInfo info) => 0.5 / (info.Fps > 0 ? info.Fps : 30);
+
+    /// <summary>
+    /// Bas kenarin listedeki suresi tam kare sayisidir. Kesim kare arasindan baslayinca kenarin ilk karesi
+    /// sifira cekilir; liste kesimden anahtar kareye kadar yazilirsa aradaki bosluk son kareyi uzatir ve
+    /// birlesik akista kare hizi 48/1 okunuyordu (TS kaynakta goruntu kabin basindan 23,2 ms gec).
+    /// </summary>
+    private static double HeadListSeconds(MediaInfo info, double span)
+    {
+        if (info.Fps <= 0) return span;
+        var frames = Math.Floor(span * info.Fps + 1e-3);
+        return frames > 0 ? frames / info.Fps : span;
+    }
+
+    /// <summary>
+    /// Kuyruk kenari anahtar karede baslar ve kesimden onceki her kareyi kodlar; listedeki suresi bu karelerin
+    /// sayisidir. Kesim kare arasina dusunce liste kesime kadar yazilirsa sonraki parca son karenin ustune biner
+    /// (TS kaynakta birlesimde yinelenen dts, cikti 48/1 okunuyordu).
+    /// </summary>
+    private static double TailListSeconds(MediaInfo info, double span)
+    {
+        if (info.Fps <= 0) return span;
+        var frames = Math.Ceiling(span * info.Fps - 1e-3);
+        return frames > 0 ? frames / info.Fps : span;
+    }
+
     private static readonly IReadOnlyDictionary<string, string> MatchingEncoders = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
         ["h264"] = "libx264",
@@ -1074,7 +1105,7 @@ public static class EditExport
             if (NeedsReencode(clip))
             {
                 var length = EditTime.ToSeconds(clip.TimelineLength);
-                steps.Add(SmartEncode(info, encoding, start, end - start, VideoMotion(clip, info), VideoPart(length)));
+                steps.Add(SmartEncode(info, encoding, keyframes, start, end - start, VideoMotion(clip, info), VideoPart(length)));
                 for (var p = 0; p < count; p++) steps.Add(AudioEncode(info, start, end - start, AudioMotion(clip), AudioPart(p, length), tracks[p]));
                 expected += length;
                 continue;
@@ -1082,13 +1113,13 @@ public static class EditExport
 
             if (SmartBody(cuts, keyframes, start, end, nudge) is var (a, b))
             {
-                if (a.Time > start + 1e-6) steps.Add(SmartEncode(info, encoding, start, a.Time - start, string.Empty, VideoPart(a.Time - start)));
+                if (a.Time > start + 1e-6) steps.Add(SmartEncode(info, encoding, keyframes, start, a.Time - start - HeadMarginSeconds(info), string.Empty, VideoPart(HeadListSeconds(info, a.Time - start))));
                 steps.Add(SmartCopy(info, encoding, a.Time + nudge, b.Time - a.Time, b.Packet - a.Packet, VideoPart(b.Time - a.Time)));
-                if (end > b.Time + 1e-6) steps.Add(SmartEncode(info, encoding, b.Time, end - b.Time, string.Empty, VideoPart(end - b.Time)));
+                if (end > b.Time + 1e-6) steps.Add(SmartEncode(info, encoding, keyframes, b.Time, end - b.Time, string.Empty, VideoPart(TailListSeconds(info, end - b.Time))));
             }
             else
             {
-                steps.Add(SmartEncode(info, encoding, start, end - start, string.Empty, VideoPart(end - start)));
+                steps.Add(SmartEncode(info, encoding, keyframes, start, end - start, string.Empty, VideoPart(end - start)));
             }
 
             for (var p = 0; p < count; p++) steps.Add(AudioCopy(info, start, end - start, AudioPart(p, end - start), tracks[p]));
@@ -1138,11 +1169,30 @@ public static class EditExport
         return (a, b);
     }
 
-    private static ExportStep SmartEncode(MediaInfo info, SmartCutEncoding encoding, double start, double length, string motion, string target)
+    /// <summary>
+    /// mpegts'te girdi aramasi hedefin ardindaki anahtar kareye iniyor (olculen: 0,5 sn hedef 0,92 sn'deki
+    /// anahtar kareden basladi, on kare kayboldu). Orada arama hedefin onundeki anahtar karenin hemen
+    /// onune yapilir, kenar <c>trim</c> suzgecinde kare zamanina gore kesilir.
+    /// </summary>
+    private static ExportStep SmartEncode(MediaInfo info, SmartCutEncoding encoding, IReadOnlyList<double> keyframes, double start, double length, string motion, string target)
     {
         var args = new List<string> { "-hide_banner", "-nostdin", "-y" };
-        if (start > 0) args.AddRange(new[] { "-ss", Number(start) });
-        args.AddRange(new[] { "-t", Number(length), "-i", info.FilePath, "-map", "0:v:0", "-an", "-vf", "setpts=PTS-STARTPTS" + motion });
+        var trim = string.Empty;
+        if (SmartCutCodec.SeekOvershoots(info.FormatName))
+        {
+            var anchor = keyframes.Where(k => k <= start + 1e-6).DefaultIfEmpty(0).Max();
+            if (anchor - SeekNudgeSeconds > 0) args.AddRange(new[] { "-ss", Number(anchor - SeekNudgeSeconds) });
+            var offset = Math.Max(0, start - anchor);
+            args.AddRange(new[] { "-t", Number(offset + length + SeekNudgeSeconds), "-i", info.FilePath });
+            trim = $",trim=start={Number(offset)}:duration={Number(length)},setpts=PTS-STARTPTS";
+        }
+        else
+        {
+            if (start > 0) args.AddRange(new[] { "-ss", Number(start) });
+            args.AddRange(new[] { "-t", Number(length), "-i", info.FilePath });
+        }
+
+        args.AddRange(new[] { "-map", "0:v:0", "-an", "-vf", "setpts=PTS-STARTPTS" + trim + motion });
         args.AddRange(encoding.VideoArgs);
         args.AddRange(Intermediate(encoding, target));
         return new ExportStep(args, length);

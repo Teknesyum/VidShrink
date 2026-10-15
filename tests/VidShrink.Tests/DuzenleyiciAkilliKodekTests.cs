@@ -59,7 +59,8 @@ public sealed class DuzenleyiciAkilliKodekTests
 
     private static MediaInfo Bilgi(
         string kodek = "h264", string? profil = null, string piksel = "yuv420p", int bit = 8, string? etiket = null,
-        string? kap = "mov,mp4,m4a,3gp,3g2,mj2", int gecikme = 0, string? ses = "aac", bool taramali = false) => new()
+        string? kap = "mov,mp4,m4a,3gp,3g2,mj2", int gecikme = 0, string? ses = "aac", bool taramali = false, string? alan = null,
+        long bitHizi = 1, long sesBitHizi = 0) => new()
     {
         FilePath = "kaynak.mp4",
         FileSizeBytes = 1,
@@ -68,15 +69,17 @@ public sealed class DuzenleyiciAkilliKodekTests
         Height = 1080,
         Fps = 30,
         VideoCodec = kodek,
-        TotalBitrateBps = 1,
+        TotalBitrateBps = bitHizi,
         AudioCodec = ses,
+        AudioBitrateBps = sesBitHizi,
         PixelFormat = piksel,
         BitDepth = bit,
         VideoProfile = profil,
         VideoCodecTag = etiket,
         FormatName = kap,
         VideoDelayFrames = gecikme,
-        IsInterlaced = taramali
+        IsInterlaced = taramali,
+        FieldOrder = alan
     };
 
     private static string Deger(IReadOnlyList<string> args, string anahtar) => args[args.ToList().IndexOf(anahtar) + 1];
@@ -92,6 +95,7 @@ public sealed class DuzenleyiciAkilliKodekTests
     [InlineData("hevc", "libx265")]
     [InlineData("av1", "libsvtav1")]
     [InlineData("vp9", "libvpx-vp9")]
+    [InlineData("mpeg2video", "mpeg2video")]
     public void OlcumuGecenKodekKapidanGecerKenariKendiKodegiyleKodlar(string kodek, string kodlayici)
     {
         var plan = Plan(Bilgi(kodek));
@@ -106,7 +110,7 @@ public sealed class DuzenleyiciAkilliKodekTests
 
     [Theory]
     [InlineData("mpeg4")]
-    [InlineData("mpeg2video")]
+    [InlineData("mpeg1video")]
     [InlineData("prores")]
     [InlineData("uydurma-kodek")]
     [InlineData("")]
@@ -122,8 +126,61 @@ public sealed class DuzenleyiciAkilliKodekTests
     }
 
     [Fact]
-    public void KapiTamDortKodekTasir()
-        => Assert.Equal(new[] { "av1", "h264", "hevc", "vp9" }, SmartCutCodec.Codecs.OrderBy(k => k, StringComparer.Ordinal));
+    public void KapiTamBesKodekTasir()
+        => Assert.Equal(new[] { "av1", "h264", "hevc", "mpeg2video", "vp9" }, SmartCutCodec.Codecs.OrderBy(k => k, StringComparer.Ordinal));
+
+    [Fact]
+    public void Mpeg2KenarKaynaginBitHiziVeProfiliyleKodlanir()
+    {
+        var ana = SmartCutCodec.Resolve(Bilgi("mpeg2video", "Main", bitHizi: 8_000_000, sesBitHizi: 192_000))!;
+        Assert.Equal("mpeg2video", ana.Encoder);
+        Assert.Equal("mpeg2video", Deger(ana.VideoArgs, "-c:v"));
+        Assert.Equal("7808000", Deger(ana.VideoArgs, "-b:v"));
+        Assert.Equal("4", Deger(ana.VideoArgs, "-profile:v"));
+        Assert.Equal("yuv420p", Deger(ana.VideoArgs, "-pix_fmt"));
+        Assert.DoesNotContain("-flags", ana.VideoArgs);
+        Assert.Equal(SmartCutCodec.TransportStream, ana.Container);
+
+        var basit = SmartCutCodec.Resolve(Bilgi("mpeg2video", "Simple", bitHizi: 4_000_000))!;
+        Assert.Equal("5", Deger(basit.VideoArgs, "-profile:v"));
+        Assert.Equal("0", Deger(basit.VideoArgs, "-bf"));
+        Assert.Equal("4000000", Deger(basit.VideoArgs, "-b:v"));
+
+        var okunamayan = SmartCutCodec.Resolve(Bilgi("mpeg2video", bitHizi: 100_000, sesBitHizi: 192_000))!;
+        Assert.DoesNotContain("-b:v", okunamayan.VideoArgs);
+        Assert.DoesNotContain("-profile:v", okunamayan.VideoArgs);
+        Assert.Equal("2", Deger(okunamayan.VideoArgs, "-q:v"));
+
+        Assert.Null(SmartCutCodec.Resolve(Bilgi("mpeg2video", "High", bitHizi: 8_000_000)));
+        Assert.Null(SmartCutCodec.Resolve(Bilgi("mpeg2video", "4:2:2", "yuv422p", bitHizi: 8_000_000)));
+        Assert.Null(SmartCutCodec.Resolve(Bilgi("mpeg2video", "Main", "yuv420p10le", 10, bitHizi: 8_000_000)));
+        Assert.Null(SmartCutCodec.Resolve(Bilgi("mpeg2video", "Main", bitHizi: 8_000_000), ad => ad != "mpeg2video"));
+    }
+
+    [Theory]
+    [InlineData("tt")]
+    [InlineData("bb")]
+    [InlineData("tb")]
+    [InlineData("bt")]
+    public void TaramaliMpeg2AlanlariAyriKodlanir(string alan)
+    {
+        var esleme = SmartCutCodec.Resolve(Bilgi("mpeg2video", "Main", taramali: true, alan: alan, bitHizi: 8_000_000))!;
+
+        Assert.Equal("+ildct+ilme", Deger(esleme.VideoArgs, "-flags"));
+        Assert.Equal(ExportMode.Smart, Plan(Bilgi("mpeg2video", "Main", taramali: true, alan: alan, bitHizi: 8_000_000)).Effective);
+        Assert.DoesNotContain("-flags", SmartCutCodec.Resolve(Bilgi("mpeg2video", "Main", bitHizi: 8_000_000))!.VideoArgs);
+    }
+
+    [Theory]
+    [InlineData("h264", "tt")]
+    [InlineData("hevc", "bb")]
+    [InlineData("av1", "tb")]
+    [InlineData("vp9", "bt")]
+    public void Mpeg2DisindakiTaramaliKaynakTamKipeDuser(string kodek, string alan)
+    {
+        Assert.Null(SmartCutCodec.Resolve(Bilgi(kodek, taramali: true, alan: alan, bitHizi: 8_000_000)));
+        Assert.Equal(ExportMode.Full, Plan(Bilgi(kodek, taramali: true, alan: alan, bitHizi: 8_000_000)).Effective);
+    }
 
     [Fact]
     public void KodlayiciMakinedeYoksaTamKipeDuser()
@@ -429,12 +486,71 @@ public sealed class DuzenleyiciAkilliKodekTests
         Assert.Equal(3.0 / 23.0 + 0.001, SmartCutCodec.CopySeekNudge(mkv), 9);
         Assert.Equal(0.001, SmartCutCodec.CopySeekNudge(Bilgi("hevc", gecikme: 2)), 9);
         Assert.Equal(0.001, SmartCutCodec.CopySeekNudge(Bilgi("vp9", kap: "matroska,webm", gecikme: 0)), 9);
-        Assert.Equal(3.0 / 23.0 + 0.001, SmartCutCodec.CopySeekNudge(Bilgi("h264", kap: "mpegts", gecikme: 1)), 9);
+        Assert.Equal(0.001, SmartCutCodec.CopySeekNudge(Bilgi("h264", kap: "mpegts", gecikme: 1)), 9);
+        Assert.Equal(0.001, SmartCutCodec.CopySeekNudge(Bilgi("mpeg2video", kap: "mpegts", gecikme: 2)), 9);
         Assert.Equal(3.0 / 23.0 + 0.001, SmartCutCodec.CopySeekNudge(Bilgi("h264", kap: null, gecikme: 1)), 9);
 
         var govde = Plan(mkv, "c.mkv").Steps[1].Args;
         Assert.InRange(double.Parse(Deger(govde, "-ss"), CultureInfo.InvariantCulture), beklenen - 0.00001, beklenen + 0.00001);
         Assert.Equal("4", Deger(govde, "-t"));
+    }
+
+    [Fact]
+    public void BasKenarAnahtarKaredenOnceBiterListeSuresiSinirdaKalir()
+    {
+        var plan = Plan(Bilgi());
+
+        var bas = double.Parse(Deger(plan.Steps[0].Args, "-t"), CultureInfo.InvariantCulture);
+        Assert.Equal(1 - 0.5 / 30, bas, 5);
+        Assert.Contains("\nduration 1\n", plan.Steps[^1].ListContent, StringComparison.Ordinal);
+        Assert.Equal("1", Deger(plan.Steps[2].Args, "-t"));
+    }
+
+    [Fact]
+    public void KareArasindanBaslayanBasKenarListedeTamKareSuresiAlir()
+    {
+        var plan = Plan(Bilgi(), cizelge: new EditTimeline(new[] { new EditClip(S(1.01), S(7)) }));
+
+        Assert.Contains("\nduration 0.966667\n", plan.Steps[^1].ListContent, StringComparison.Ordinal);
+        Assert.DoesNotContain("\nduration 0.99\n", plan.Steps[^1].ListContent, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void KareArasindaBitenKuyrukKenarListedeKodlananKareSayisiKadarSurer()
+    {
+        var plan = Plan(Bilgi(), cizelge: new EditTimeline(new[] { new EditClip(S(1.01), S(6.99)) }));
+        var liste = plan.Steps[^1].ListContent;
+
+        Assert.Contains("\nduration 0.966667\nfile", liste, StringComparison.Ordinal);
+        Assert.Contains("\nduration 4\nfile", liste, StringComparison.Ordinal);
+        Assert.EndsWith("\nduration 1\n", liste, StringComparison.Ordinal);
+        Assert.DoesNotContain("\nduration 0.99\n", liste, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TsKaynaktaKenarOncekiAnahtarKaredenAranirCiktidaKesilir()
+    {
+        static (string? Once, string? Sonra) Arama(IReadOnlyList<string> args)
+        {
+            var girdi = args.ToList().IndexOf("-i");
+            string? Bul(int bas, int son)
+            {
+                for (var i = bas; i < son - 1; i++) if (args[i] == "-ss") return args[i + 1];
+                return null;
+            }
+            return (Bul(0, girdi), Bul(girdi, args.Count));
+        }
+
+        var ts = Plan(Bilgi("mpeg2video", kap: "mpegts", gecikme: 2), "c.mkv");
+        Assert.Equal((null, null), Arama(ts.Steps[0].Args));
+        Assert.StartsWith("setpts=PTS-STARTPTS,trim=start=1:duration=", Deger(ts.Steps[0].Args, "-vf"));
+        Assert.Equal(("5.999", null), Arama(ts.Steps[2].Args));
+        Assert.StartsWith("setpts=PTS-STARTPTS,trim=start=0:duration=", Deger(ts.Steps[2].Args, "-vf"));
+
+        var mp4 = Plan(Bilgi("mpeg2video", gecikme: 2), "c.mkv");
+        Assert.Equal(("1", null), Arama(mp4.Steps[0].Args));
+        Assert.Equal(("6", null), Arama(mp4.Steps[2].Args));
+        Assert.DoesNotContain("trim=", Deger(mp4.Steps[0].Args, "-vf"));
     }
 
     [Fact]
@@ -557,13 +673,13 @@ public sealed class DuzenleyiciAkilliKodekTests
         if (say) args.AddRange(new[] { "-count_packets", "-count_frames" });
         args.AddRange(new[]
         {
-            "-show_entries", "stream=codec_name,profile,pix_fmt,codec_tag_string,nb_read_packets,nb_read_frames:format=duration",
+            "-show_entries", "stream=codec_name,profile,pix_fmt,codec_tag_string,field_order,r_frame_rate,nb_read_packets,nb_read_frames:format=duration",
             "-of", "default=noprint_wrappers=1", dosya
         });
         var (kod, cikti, err) = Kos("ffprobe", klasor, args.ToArray());
         Assert.True(kod == 0, err);
         hata = err;
-        return cikti.Split('\n').Select(s => s.Trim().Split('=', 2)).Where(p => p.Length == 2).ToDictionary(p => p[0], p => p[1]);
+        return cikti.Split('\n').Select(s => s.Trim().Split('=', 2)).Where(p => p.Length == 2).GroupBy(p => p[0]).ToDictionary(g => g.Key, g => g.First()[1]);
     }
 
     private static ExportPlan IkiIzlekli(ExportPlan plan)
@@ -586,9 +702,17 @@ public sealed class DuzenleyiciAkilliKodekTests
         return (degerler.Count(d => d == "inf"), sonlu.Min(), satirlar.Length);
     }
 
+    private static IReadOnlyList<string> Alanlar(string klasor, string dosya)
+    {
+        var (kod, cikti, hata) = Kos("ffprobe", klasor, "-v", "error", "-select_streams", "v:0", "-show_entries",
+            "frame=interlaced_frame,top_field_first", "-of", "csv=p=0", dosya);
+        Assert.True(kod == 0, hata);
+        return cikti.Split('\n').Select(s => s.Trim()).Where(s => s.Length > 0).ToArray();
+    }
+
     private sealed record Kol(
         string Ad, string Uzanti, string[] Kodlayici, string CiktiUzanti, bool Govde = true, string? Etiket = null, string Ses = "aac",
-        string SesKodek = "opus", int PaketAlt = 199, int PaketUst = 201);
+        string SesKodek = "opus", int PaketAlt = 199, int PaketUst = 201, string? Alan = null, int GovdeKare = 72);
 
     private static (string Kodek, int Paket, double Sure) SesOku(string klasor, string dosya)
     {
@@ -615,7 +739,7 @@ public sealed class DuzenleyiciAkilliKodekTests
             var plan = IkiIzlekli(await EditExportRunner.PrepareAsync(new[] { kaynak }, cizelge, ExportMode.Smart, cikti, 8 * Gb));
             Assert.Equal(ExportMode.Smart, plan.Effective);
             var kopya = plan.Steps.Where(s => s.Args.Contains("-frames:v")).ToArray();
-            if (kol.Govde) Assert.Equal("72", Deger(Assert.Single(kopya).Args, "-frames:v"));
+            if (kol.Govde) Assert.Equal(kol.GovdeKare.ToString(CultureInfo.InvariantCulture), Deger(Assert.Single(kopya).Args, "-frames:v"));
             else Assert.Empty(kopya);
 
             await EditExportRunner.RunAsync(plan, null);
@@ -627,7 +751,7 @@ public sealed class DuzenleyiciAkilliKodekTests
             var (cozKod, _, cozHata) = Kos("ffmpeg", klasor, "-hide_banner", "-nostdin", "-v", "error", "-threads", "2", "-i", cikti, "-f", "null", "-");
             var (birebir, enDusuk, satir) = Psnr(klasor, cikti, kaynak, 12, 96);
 
-            _cikti.WriteLine($"akilli kesme kolu kostu: {kol.Ad} kodek={olcu["codec_name"]} profil={olcu["profile"]} piksel={olcu["pix_fmt"]} " +
+            _cikti.WriteLine($"akilli kesme kolu kostu: {kol.Ad} kodek={olcu["codec_name"]} profil={olcu["profile"]} piksel={olcu["pix_fmt"]} alan={olcu.GetValueOrDefault("field_order")} " +
                              $"etiket={olcu["codec_tag_string"]} sure={olcu["duration"]} paket={olcu["nb_read_packets"]} kare={olcu["nb_read_frames"]} " +
                              $"birebir={birebir} enDusukPsnr={enDusuk.ToString("0.00", CultureInfo.InvariantCulture)} adim={plan.Steps.Count}");
 
@@ -644,8 +768,20 @@ public sealed class DuzenleyiciAkilliKodekTests
             Assert.Equal(kaynakBilgi["codec_name"], olcu["codec_name"]);
             Assert.Equal(kaynakBilgi["profile"], olcu["profile"]);
             Assert.Equal(kaynakBilgi["pix_fmt"], olcu["pix_fmt"]);
+            Assert.Equal(kaynakBilgi["r_frame_rate"], olcu["r_frame_rate"]);
+            if (kol.Alan is not null)
+            {
+                Assert.Equal(kol.Alan, kaynakBilgi["field_order"]);
+                Assert.Contains(olcu["field_order"], new[] { "tt", "bb", "tb", "bt" });
+                var kaynakAlan = Alanlar(klasor, kaynak);
+                var ciktiAlan = Alanlar(klasor, cikti);
+                _cikti.WriteLine($"akilli kesme kolu alanlari: {kol.Ad} kaynak={string.Join("", kaynakAlan.Distinct())} cikti={string.Join("", ciktiAlan.Distinct())} kare={ciktiAlan.Count}");
+                Assert.Equal(96, ciktiAlan.Count);
+                Assert.Equal(kaynakAlan.Skip(12).Take(96), ciktiAlan);
+                Assert.Single(ciktiAlan.Distinct());
+            }
             if (kol.Etiket is not null) Assert.Equal(kol.Etiket, olcu["codec_tag_string"]);
-            Assert.Equal(kol.Govde ? 72 : 0, birebir);
+            Assert.Equal(kol.Govde ? kol.GovdeKare : 0, birebir);
             Assert.True(enDusuk > 30, $"en dusuk PSNR {enDusuk}");
 
             if (kol.Ses == "aac") return;
@@ -722,6 +858,31 @@ public sealed class DuzenleyiciAkilliKodekTests
     [AkilliKodekFact("libx264", "libmp3lame")]
     public Task CanliH264Mp3MovCiktidaSesKopyalanirDortOlcutuGecer()
         => Olc(new Kol("h264-mp3", "mp4", X264, "mov", Ses: "libmp3lame", SesKodek: "mp3", PaketAlt: 152, PaketUst: 155));
+
+    /// <summary>Kapali GOP'lu mpeg2video 24 yerine 22 karede anahtar kare koyuyor: 0,917 ile 3,667 sn arasi 66 kare.</summary>
+    private const int Mpeg2Govde = 66;
+
+    private static readonly string[] Mpeg2Kapali = { "-c:v", "mpeg2video", "-b:v", "2M", "-bf", "2", "-flags", "+cgop", "-sc_threshold", "1000000000" };
+
+    [AkilliKodekFact("mpeg2video")]
+    public Task CanliMpeg2KapaliGopBKareliKaynaktaDortOlcutuGecer()
+        => Olc(new Kol("mpeg2-mp4", "mp4", Mpeg2Kapali, "mp4", GovdeKare: Mpeg2Govde));
+
+    [AkilliKodekFact("mpeg2video", "ac3")]
+    public Task CanliMpeg2Ac3TsKaynaktaDortOlcutuGecer()
+        => Olc(new Kol("mpeg2-ts-ac3", "ts", Mpeg2Kapali, "mkv", Ses: "ac3", SesKodek: "ac3", PaketAlt: 114, PaketUst: 116, GovdeKare: Mpeg2Govde));
+
+    [AkilliKodekFact("mpeg2video")]
+    public Task CanliMpeg2TaramaliKaynakAlanSirasiniKoruyarakDortOlcutuGecer()
+        => Olc(new Kol("mpeg2-taramali", "mkv", Mpeg2Kapali.Concat(new[] { "-flags", "+cgop+ildct+ilme", "-vf", "setfield=tff" }).ToArray(), "mkv", Alan: "tb", GovdeKare: Mpeg2Govde));
+
+    [AkilliKodekFact("mpeg2video")]
+    public Task CanliMpeg2AltAlanOncelikliTsKaynakAlanSirasiniKorur()
+        => Olc(new Kol("mpeg2-taramali-bb", "ts", Mpeg2Kapali.Concat(new[] { "-flags", "+cgop+ildct+ilme", "-vf", "setfield=bff" }).ToArray(), "mp4", Alan: "bb", GovdeKare: Mpeg2Govde));
+
+    [AkilliKodekFact("mpeg2video")]
+    public Task CanliMpeg2AcikGopKaynaktaGovdeKopyalanmazCiktiSaglamKalir()
+        => Olc(new Kol("mpeg2-acik", "mp4", new[] { "-c:v", "mpeg2video", "-b:v", "2M", "-bf", "2" }, "mp4", Govde: false));
 
     [AkilliKodekFact("libx264")]
     public async Task CanliHizDegisenKlipAkilliKipteKalirSureVeKareSayisiTutar()
