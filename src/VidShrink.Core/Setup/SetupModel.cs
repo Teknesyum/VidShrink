@@ -135,6 +135,34 @@ public sealed record SetupOptions
 
     public FfmpegPin? Ffmpeg { get; init; }
 
+    public bool RegisterUninstall { get; init; } = true;
+
+    public bool AddToPath { get; init; }
+
+    public bool RemoveSettings { get; init; }
+
+    public string? SettingsFolder { get; init; }
+
+    public const string DefaultUninstallKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\VidShrink";
+
+    public const string DefaultEnvironmentKey = "Environment";
+
+    /// <summary>
+    /// Ayarlar listesindeki kaldırma kaydı. Varsayılan kökte Windows'un yeri; test ya da
+    /// prova kökünde sınıf kökünün kardeşi, ki gerçek listeye dokunulmasın.
+    /// </summary>
+    public string UninstallKey => DefaultRegistry ? DefaultUninstallKey : Sibling(@"Uninstall\VidShrink");
+
+    /// <summary>Kullanıcı PATH'inin durduğu anahtar; varsayılan dışında sınıf kökünün kardeşi.</summary>
+    public string EnvironmentKey => DefaultRegistry ? DefaultEnvironmentKey : Sibling("Environment");
+
+    private string Sibling(string name)
+    {
+        var trimmed = ClassesRoot.TrimEnd('\\');
+        var slash = trimmed.LastIndexOf('\\');
+        return slash < 0 ? name : trimmed[..slash] + @"\" + name;
+    }
+
     public bool DefaultRegistry => IsDefaultClassesRoot(ClassesRoot);
 
     public static bool IsDefaultClassesRoot(string root) =>
@@ -207,6 +235,11 @@ public sealed class SetupHost
     public Action<string> Launch { get; init; } = _ => { };
 
     public Action AssociationChanged { get; init; } = () => { };
+
+    /// <summary>Kaldırma kaydının çağıracağı kurucu; yoksa kayıt yazılmaz.</summary>
+    public string? SetupExecutable { get; init; }
+
+    public Action EnvironmentChanged { get; init; } = () => { };
 
     public string DesktopDirectory { get; init; } = "";
 

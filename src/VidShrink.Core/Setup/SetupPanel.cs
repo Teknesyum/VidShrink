@@ -253,15 +253,19 @@ public static class SetupLaunch
     {
         if (args.Count == 0) return true;
         var flags = args.Select(a => a.ToLowerInvariant()).ToArray();
-        if (flags.Contains("--console")) return false;
+        if (flags.Contains("--console") || flags.Contains("--silent")) return false;
         if (!flags.Contains("--panel")) return false;
         return !flags.Any(f => f is "--uninstall" or "--help" or "-h" or "/?");
     }
 
+    /// <summary><c>--silent</c>: pencere yok, soru yok, hatada bekleme yok.</summary>
+    public static bool IsSilent(IReadOnlyList<string> args) =>
+        args.Any(a => string.Equals(a, "--silent", StringComparison.OrdinalIgnoreCase));
+
     public static bool RehearsalRequested(string? value) => !string.IsNullOrWhiteSpace(value);
 
-    public static bool PauseOnError(bool ownConsole, bool consoleVisible, bool inputRedirected) =>
-        ownConsole && consoleVisible && !inputRedirected;
+    public static bool PauseOnError(bool ownConsole, bool consoleVisible, bool inputRedirected, bool silent = false) =>
+        !silent && ownConsole && consoleVisible && !inputRedirected;
 
     public static string FailureMessage(Exception exception) => exception switch
     {
@@ -283,7 +287,10 @@ public static class SetupLaunch
         ClassesRoot = @"Software\VidShrink-Prova\Classes",
         SkipShortcuts = true,
         NoLaunch = true,
-        ShortcutDirectory = null
+        ShortcutDirectory = null,
+        RegisterUninstall = false,
+        AddToPath = false,
+        RemoveSettings = false
     };
 
     public static string LogPath(string localAppData) => Path.Combine(localAppData, "VidShrink", LogFileName);

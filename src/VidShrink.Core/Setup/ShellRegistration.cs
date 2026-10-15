@@ -39,7 +39,7 @@ public static class ShellRegistration
         !SetupOptions.IsDefaultClassesRoot(classesRoot) ||
         string.Equals(Path.GetFileName(processPath), SetupExecutableName, StringComparison.OrdinalIgnoreCase);
 
-    private static void RequireWriteAllowed(string classesRoot)
+    internal static void RequireWriteAllowed(string classesRoot)
     {
         if (!WriteAllowed(Environment.ProcessPath, classesRoot))
             throw new SetupException(SetupText.Get("setup.registry.only-setup-writes", SetupExecutableName, classesRoot));

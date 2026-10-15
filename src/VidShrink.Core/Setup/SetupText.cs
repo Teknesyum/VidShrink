@@ -99,6 +99,27 @@ public static class SetupText
         ["setup.uninstall.menus-removed"] = (
             "Sağ tık menüsü ({0} uzantı, {1} paket) ve dosya ilişkilendirmesi ({2} uzantı) kaldırıldı.",
             "The context menu ({0} extensions, {1} package) and the file association ({2} extensions) were removed."),
+        ["setup.uninstall-entry.written"] = (
+            "Ayarlar'daki uygulama kaydı yazıldı: {0}",
+            "The app entry in Settings was written: {0}"),
+        ["setup.uninstall-entry.removed"] = (
+            "Ayarlar'daki uygulama kaydı kaldırıldı: {0}",
+            "The app entry in Settings was removed: {0}"),
+        ["setup.uninstall-entry.no-setup"] = (
+            "Kurucu dosyası bulunamadı; Ayarlar'daki uygulama kaydı yazılmadı.",
+            "The setup file was not found; the app entry in Settings was not written."),
+        ["setup.uninstall-entry.skipped"] = (
+            "Uygulama kaydı ve PATH yalnız {0} tarafından yazılır; {1} atlandı.",
+            "The app entry and PATH are written only by {0}; {1} was skipped."),
+        ["setup.path.added"] = (
+            "Kullanıcı PATH'ine eklendi: {0}",
+            "Added to the user PATH: {0}"),
+        ["setup.path.removed"] = (
+            "Kullanıcı PATH'inden çıkarıldı: {0}",
+            "Removed from the user PATH: {0}"),
+        ["setup.settings.removed"] = (
+            "Ayar klasörü silindi: {0}",
+            "The settings folder was deleted: {0}"),
         ["setup.uninstalled"] = (
             "VidShrink kaldırıldı: {0}",
             "VidShrink was removed: {0}"),
@@ -321,7 +342,10 @@ public static class SetupText
 
             Kullanım: VidShrink-Setup.exe [seçenekler]
 
-              --uninstall             Kısayolları, sağ tık menüsünü, ilişkilendirmeyi ve kurulumu kaldırır.
+              --uninstall             Kısayolları, sağ tık menüsünü, ilişkilendirmeyi, uygulama kaydını ve kurulumu kaldırır.
+              --remove-settings       Kaldırırken ayar klasörünü (%APPDATA%\VidShrink) de siler.
+              --silent                Pencere açmaz, soru sormaz; hata olursa beklemeden 1 ile çıkar.
+              --add-to-path           Kullanıcı PATH'ine <kurulum>\bin eklenir; vidshrink komutu her konsolda çalışır.
               --install-root <yol>    Kurulum klasörü (varsayılan %LOCALAPPDATA%\Programs\VidShrink).
               --registry-root <kök>   Kayıt kökü (varsayılan HKCU:\Software\Classes).
               --menu-language <dil>   auto, tr ya da en.
@@ -342,7 +366,10 @@ public static class SetupText
 
             Usage: VidShrink-Setup.exe [options]
 
-              --uninstall             Removes the shortcuts, context menu, association and the installation.
+              --uninstall             Removes the shortcuts, context menu, association, app entry and the installation.
+              --remove-settings       Also deletes the settings folder (%APPDATA%\VidShrink) on removal.
+              --silent                Opens no window and asks nothing; on error exits with 1 without waiting.
+              --add-to-path           Adds <install>\bin to the user PATH so the vidshrink command works in any console.
               --install-root <path>   Install folder (default %LOCALAPPDATA%\Programs\VidShrink).
               --registry-root <root>  Registry root (default HKCU:\Software\Classes).
               --menu-language <lang>  auto, tr or en.
