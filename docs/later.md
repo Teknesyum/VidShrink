@@ -34,14 +34,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.Core/ConversionPlan.cs, src/VidShrink.Core/ConversionArguments.cs, src/VidShrink.Core/DroppedMedia.cs, src/VidShrink.Core/VideoFilterChain.cs, src/VidShrink.App/MainWindow.axaml
 - Plan: Üçü de Dönüştür'ün kare hızı yoluna dokunur. Bir klasör ya da numaralı resimler bırakılınca dosyalar ada göre sıralanıp ffmpeg'in resim dizisi okuyucusuyla tek kaynak sayılır; kare hızı kutusu dizinin hızını belirler, GIF kabı seçilince resimlerden GIF de aynı yoldan çıkar. Kare hızı kutusuna "ara kare üret" seçeneği eklenir (minterpolate süzgeci; yapıda yoksa seçenek gizlenir). Doğrulama: üretilmiş 30 karelik PNG dizisinde çıktının kare sayısı ve süresi beklenene eşit; ara karede çıktının kare sayısı hedef hıza uyar.
 
-## 38. İşlemeyen Kutuları Gizleme
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · PLT-P2 · Platform Eşitliği · iş küçük · öncelik 2 · karar gerekmez
-
-- Satırlar (PLT-P2): PLT-14 İşlemeyen kutuları gizleme. [Tablo](piyasa/2026-10-13/platform-esitligi-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Recorder/RecorderView.axaml, src/VidShrink.App/Recorder/RecorderMini.axaml, src/VidShrink.App/Recorder/RecorderView.Girdi.cs, tests/VidShrink.Tests
-- Plan: Tıklama, tıklama sesi, tuş ve büyüteç kutuları kamera panelindeki gibi platform kapısına bağlanır ve Windows dışında gizlenir; hem ana görünümde hem mini şeritte. Kayıtlı ayarda açık gelen seçenek Windows dışında isteğe taşınmaz. Başsız arayüz testi, kapı kapalıyken dört kutunun da görünmediğini ölçer.
-
 ## 39. macOS Tıklama İşareti
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · PLT-P3 · Platform Eşitliği · iş küçük · öncelik 2 · karar gerekmez
