@@ -263,7 +263,7 @@ public sealed class DonusturSesSecenekleriTests
             window.CmbConvertSampleRate.SelectedIndex = 0;
             window.ChkConvertLoudnorm.IsChecked = false;
             var ogg = window.TxtConvertCommand.Text ?? "";
-            var kaplar = window.CmbContainer.Items.OfType<ComboBoxItem>().Select(item => (string?)item.Tag).TakeLast(4).ToArray();
+            var kaplar = window.CmbContainer.Items.OfType<ComboBoxItem>().Select(item => (string?)item.Tag).SkipWhile(tag => tag != "opus").Take(4).ToArray();
             var kodlayicilar = window.CmbConvertAudio.Items.OfType<ComboBoxItem>().Select(item => (string?)item.Tag).TakeLast(2).ToArray();
             return (once, plan, sonra, gifAcik, ogg, kaplar, kodlayicilar);
         });
