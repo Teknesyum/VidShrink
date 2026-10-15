@@ -230,5 +230,18 @@
   "editor.remux.kind.video": "Видео",
   "editor.remux.kind.audio": "Аудио",
   "editor.remux.kind.subtitle": "Субтитры",
-  "editor.remux.kind.attachment": "Вложение"
+  "editor.remux.kind.attachment": "Вложение",
+  "editor.remux.include": "Включить в файл",
+  "editor.remux.add": "Добавить дорожки…",
+  "editor.remux.add.tip": "• Добавляет в список дорожки другого файла.\n• Чтобы заменить звук, исключите исходный звук.",
+  "editor.remux.add-title": "Выберите файл, из которого добавить дорожки",
+  "editor.remux.extract": "Сохранить дорожку отдельно…",
+  "editor.remux.extract.tip": "• Записывает выбранную дорожку в отдельный файл без перекодирования.",
+  "editor.remux.extract-title": "Сохранить дорожку",
+  "editor.remux.cover": "Обложка…",
+  "editor.remux.cover.tip": "• Прикрепляет обложку PNG или JPEG; только MP4 и MKV.\n• Отмена выбора удаляет обложку.",
+  "editor.remux.cover-title": "Выберите изображение обложки",
+  "editor.remux.cover.set": "Обложка: {0}",
+  "editor.remux.cover.unsupported": "Этот контейнер не поддерживает обложку; выберите MP4 или MKV.",
+  "editor.remux.empty": "В файл должна входить хотя бы одна дорожка."
 }

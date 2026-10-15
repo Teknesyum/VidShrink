@@ -230,5 +230,18 @@
   "editor.remux.kind.video": "Video",
   "editor.remux.kind.audio": "Audio",
   "editor.remux.kind.subtitle": "Subtitri",
-  "editor.remux.kind.attachment": "Pielikums"
+  "editor.remux.kind.attachment": "Pielikums",
+  "editor.remux.include": "Iekļaut failā",
+  "editor.remux.add": "Pievienot celiņus…",
+  "editor.remux.add.tip": "• Pievieno sarakstam cita faila celiņus.\n• Lai aizstātu skaņu, izlaidiet avota skaņu.",
+  "editor.remux.add-title": "Izvēlieties failu, no kura pievienot celiņus",
+  "editor.remux.extract": "Saglabāt celiņu atsevišķi…",
+  "editor.remux.extract.tip": "• Ieraksta atlasīto celiņu atsevišķā failā bez pārkodēšanas.",
+  "editor.remux.extract-title": "Saglabāt celiņu",
+  "editor.remux.cover": "Vāciņš…",
+  "editor.remux.cover.tip": "• Pievieno PNG vai JPEG vāciņu; tikai MP4 un MKV.\n• Izvēles atcelšana noņem vāciņu.",
+  "editor.remux.cover-title": "Izvēlieties vāciņa attēlu",
+  "editor.remux.cover.set": "Vāciņš: {0}",
+  "editor.remux.cover.unsupported": "Šis konteiners nevar saturēt vāciņu; izvēlieties MP4 vai MKV.",
+  "editor.remux.empty": "Failā jāiekļauj vismaz viens celiņš."
 }

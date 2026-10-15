@@ -230,5 +230,18 @@
   "editor.remux.kind.video": "Video",
   "editor.remux.kind.audio": "Lyd",
   "editor.remux.kind.subtitle": "Undertekster",
-  "editor.remux.kind.attachment": "Vedlegg"
+  "editor.remux.kind.attachment": "Vedlegg",
+  "editor.remux.include": "Ta med i filen",
+  "editor.remux.add": "Legg til spor…",
+  "editor.remux.add.tip": "• Legger til en annen fils spor i listen.\n• Utelat kildelyden for å erstatte lyden.",
+  "editor.remux.add-title": "Velg fil å legge til spor fra",
+  "editor.remux.extract": "Lagre spor separat…",
+  "editor.remux.extract.tip": "• Skriver det valgte sporet til en egen fil uten omkoding.",
+  "editor.remux.extract-title": "Lagre spor",
+  "editor.remux.cover": "Omslag…",
+  "editor.remux.cover.tip": "• Legger ved et PNG- eller JPEG-omslag; kun MP4 og MKV.\n• Å avbryte valget fjerner omslaget.",
+  "editor.remux.cover-title": "Velg omslagsbilde",
+  "editor.remux.cover.set": "Omslag: {0}",
+  "editor.remux.cover.unsupported": "Denne beholderen kan ikke bære omslag; velg MP4 eller MKV.",
+  "editor.remux.empty": "Minst ett spor må tas med i filen."
 }

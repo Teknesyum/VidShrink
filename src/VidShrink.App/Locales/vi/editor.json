@@ -230,5 +230,18 @@
   "editor.remux.kind.video": "Video",
   "editor.remux.kind.audio": "Âm thanh",
   "editor.remux.kind.subtitle": "Phụ đề",
-  "editor.remux.kind.attachment": "Tệp đính kèm"
+  "editor.remux.kind.attachment": "Tệp đính kèm",
+  "editor.remux.include": "Đưa vào tệp",
+  "editor.remux.add": "Thêm rãnh…",
+  "editor.remux.add.tip": "• Thêm các rãnh của tệp khác vào danh sách.\n• Để thay âm thanh, bỏ âm thanh nguồn ra.",
+  "editor.remux.add-title": "Chọn tệp để thêm rãnh",
+  "editor.remux.extract": "Lưu rãnh riêng…",
+  "editor.remux.extract.tip": "• Ghi rãnh đã chọn vào tệp riêng mà không mã hóa lại.",
+  "editor.remux.extract-title": "Lưu rãnh",
+  "editor.remux.cover": "Ảnh bìa…",
+  "editor.remux.cover.tip": "• Đính kèm ảnh bìa PNG hoặc JPEG; chỉ MP4 và MKV.\n• Hủy lựa chọn sẽ gỡ ảnh bìa.",
+  "editor.remux.cover-title": "Chọn ảnh bìa",
+  "editor.remux.cover.set": "Ảnh bìa: {0}",
+  "editor.remux.cover.unsupported": "Định dạng chứa này không mang được ảnh bìa; chọn MP4 hoặc MKV.",
+  "editor.remux.empty": "Phải đưa ít nhất một rãnh vào tệp."
 }

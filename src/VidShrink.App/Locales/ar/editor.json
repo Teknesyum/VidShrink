@@ -230,5 +230,18 @@
   "editor.remux.kind.video": "فيديو",
   "editor.remux.kind.audio": "صوت",
   "editor.remux.kind.subtitle": "ترجمة",
-  "editor.remux.kind.attachment": "مرفق"
+  "editor.remux.kind.attachment": "مرفق",
+  "editor.remux.include": "تضمين في الملف",
+  "editor.remux.add": "إضافة مسارات…",
+  "editor.remux.add.tip": "• يضيف مسارات ملف آخر إلى القائمة.\n• لاستبدال الصوت، استبعد صوت المصدر.",
+  "editor.remux.add-title": "اختيار ملف لإضافة مسارات منه",
+  "editor.remux.extract": "حفظ المسار منفصلًا…",
+  "editor.remux.extract.tip": "• يكتب المسار المحدد في ملف خاص به دون إعادة ترميز.",
+  "editor.remux.extract-title": "حفظ المسار",
+  "editor.remux.cover": "الغلاف…",
+  "editor.remux.cover.tip": "• يرفق غلافًا بصيغة PNG أو JPEG؛ في MP4 وMKV فقط.\n• إلغاء الاختيار يزيل الغلاف.",
+  "editor.remux.cover-title": "اختيار صورة الغلاف",
+  "editor.remux.cover.set": "الغلاف: {0}",
+  "editor.remux.cover.unsupported": "هذه الحاوية لا تحمل غلافًا؛ اختر MP4 أو MKV.",
+  "editor.remux.empty": "يجب تضمين مسار واحد على الأقل في الملف."
 }

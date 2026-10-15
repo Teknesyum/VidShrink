@@ -230,5 +230,18 @@
   "editor.remux.kind.video": "Vidéo",
   "editor.remux.kind.audio": "Audio",
   "editor.remux.kind.subtitle": "Sous-titres",
-  "editor.remux.kind.attachment": "Pièce jointe"
+  "editor.remux.kind.attachment": "Pièce jointe",
+  "editor.remux.include": "Inclure dans le fichier",
+  "editor.remux.add": "Ajouter des pistes…",
+  "editor.remux.add.tip": "• Ajoute à la liste les pistes d'un autre fichier.\n• Pour remplacer l'audio, laisser de côté l'audio source.",
+  "editor.remux.add-title": "Choisir le fichier dont ajouter les pistes",
+  "editor.remux.extract": "Enregistrer la piste à part…",
+  "editor.remux.extract.tip": "• Écrit la piste sélectionnée dans son propre fichier sans réencodage.",
+  "editor.remux.extract-title": "Enregistrer la piste",
+  "editor.remux.cover": "Couverture…",
+  "editor.remux.cover.tip": "• Joint une couverture PNG ou JPEG ; MP4 et MKV uniquement.\n• Annuler le choix retire la couverture.",
+  "editor.remux.cover-title": "Choisir l'image de couverture",
+  "editor.remux.cover.set": "Couverture : {0}",
+  "editor.remux.cover.unsupported": "Ce conteneur ne peut pas porter de couverture ; choisir MP4 ou MKV.",
+  "editor.remux.empty": "Au moins une piste doit être incluse dans le fichier."
 }

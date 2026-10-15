@@ -230,5 +230,18 @@
   "editor.remux.kind.video": "ویڈیو",
   "editor.remux.kind.audio": "آڈیو",
   "editor.remux.kind.subtitle": "سب ٹائٹل",
-  "editor.remux.kind.attachment": "منسلکہ"
+  "editor.remux.kind.attachment": "منسلکہ",
+  "editor.remux.include": "فائل میں شامل کریں",
+  "editor.remux.add": "ٹریک شامل کریں…",
+  "editor.remux.add.tip": "• کسی دوسری فائل کے ٹریک فہرست میں شامل کرتا ہے۔\n• آواز بدلنے کے لیے ماخذ کی آواز شامل نہ کریں۔",
+  "editor.remux.add-title": "ٹریک شامل کرنے کے لیے فائل منتخب کریں",
+  "editor.remux.extract": "ٹریک الگ محفوظ کریں…",
+  "editor.remux.extract.tip": "• منتخب ٹریک کو دوبارہ انکوڈ کیے بغیر اس کی اپنی فائل میں لکھتا ہے۔",
+  "editor.remux.extract-title": "ٹریک محفوظ کریں",
+  "editor.remux.cover": "سرورق…",
+  "editor.remux.cover.tip": "• PNG یا JPEG سرورق منسلک کرتا ہے؛ صرف MP4 اور MKV۔\n• انتخاب منسوخ کرنے سے سرورق ہٹ جاتا ہے۔",
+  "editor.remux.cover-title": "سرورق کی تصویر منتخب کریں",
+  "editor.remux.cover.set": "سرورق: {0}",
+  "editor.remux.cover.unsupported": "یہ کنٹینر سرورق نہیں رکھ سکتا؛ MP4 یا MKV منتخب کریں۔",
+  "editor.remux.empty": "فائل میں کم از کم ایک ٹریک شامل ہونا چاہیے۔"
 }

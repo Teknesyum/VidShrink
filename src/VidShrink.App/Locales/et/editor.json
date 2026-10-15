@@ -230,5 +230,18 @@
   "editor.remux.kind.video": "Video",
   "editor.remux.kind.audio": "Heli",
   "editor.remux.kind.subtitle": "Subtiitrid",
-  "editor.remux.kind.attachment": "Manus"
+  "editor.remux.kind.attachment": "Manus",
+  "editor.remux.include": "Kaasa faili",
+  "editor.remux.add": "Lisa radu…",
+  "editor.remux.add.tip": "• Lisab loendisse teise faili rajad.\n• Heli asendamiseks jäta lähteheli välja.",
+  "editor.remux.add-title": "Vali fail, millest radu lisada",
+  "editor.remux.extract": "Salvesta rada eraldi…",
+  "editor.remux.extract.tip": "• Kirjutab valitud raja ümberkodeerimata omaette faili.",
+  "editor.remux.extract-title": "Salvesta rada",
+  "editor.remux.cover": "Kaanepilt…",
+  "editor.remux.cover.tip": "• Lisab PNG või JPEG kaanepildi; ainult MP4 ja MKV.\n• Valikust loobumine eemaldab kaanepildi.",
+  "editor.remux.cover-title": "Vali kaanepilt",
+  "editor.remux.cover.set": "Kaanepilt: {0}",
+  "editor.remux.cover.unsupported": "See konteiner ei saa kaanepilti kanda; vali MP4 või MKV.",
+  "editor.remux.empty": "Faili peab kaasama vähemalt ühe raja."
 }

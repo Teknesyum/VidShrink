@@ -230,5 +230,18 @@
   "editor.remux.kind.video": "Video",
   "editor.remux.kind.audio": "Ljud",
   "editor.remux.kind.subtitle": "Undertexter",
-  "editor.remux.kind.attachment": "Bilaga"
+  "editor.remux.kind.attachment": "Bilaga",
+  "editor.remux.include": "Ta med i filen",
+  "editor.remux.add": "Lägg till spår…",
+  "editor.remux.add.tip": "• Lägger till en annan fils spår i listan.\n• Utelämna källjudet för att ersätta ljudet.",
+  "editor.remux.add-title": "Välj fil att lägga till spår från",
+  "editor.remux.extract": "Spara spår separat…",
+  "editor.remux.extract.tip": "• Skriver det valda spåret till en egen fil utan omkodning.",
+  "editor.remux.extract-title": "Spara spår",
+  "editor.remux.cover": "Omslag…",
+  "editor.remux.cover.tip": "• Bifogar ett PNG- eller JPEG-omslag; endast MP4 och MKV.\n• Att avbryta valet tar bort omslaget.",
+  "editor.remux.cover-title": "Välj omslagsbild",
+  "editor.remux.cover.set": "Omslag: {0}",
+  "editor.remux.cover.unsupported": "Den här behållaren kan inte bära omslag; välj MP4 eller MKV.",
+  "editor.remux.empty": "Minst ett spår måste tas med i filen."
 }

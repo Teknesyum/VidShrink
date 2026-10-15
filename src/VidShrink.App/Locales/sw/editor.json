@@ -230,5 +230,18 @@
   "editor.remux.kind.video": "Video",
   "editor.remux.kind.audio": "Sauti",
   "editor.remux.kind.subtitle": "Manukuu",
-  "editor.remux.kind.attachment": "Kiambatisho"
+  "editor.remux.kind.attachment": "Kiambatisho",
+  "editor.remux.include": "Jumuisha kwenye faili",
+  "editor.remux.add": "Ongeza nyimbo…",
+  "editor.remux.add.tip": "• Huongeza nyimbo za faili nyingine kwenye orodha.\n• Ili kubadilisha sauti, acha sauti ya chanzo nje.",
+  "editor.remux.add-title": "Chagua faili ya kuongeza nyimbo",
+  "editor.remux.extract": "Hifadhi wimbo kando…",
+  "editor.remux.extract.tip": "• Huandika wimbo uliochaguliwa kwenye faili lake bila kusimba upya.",
+  "editor.remux.extract-title": "Hifadhi wimbo",
+  "editor.remux.cover": "Jalada…",
+  "editor.remux.cover.tip": "• Huambatisha jalada la PNG au JPEG; MP4 na MKV pekee.\n• Kughairi chaguo huondoa jalada.",
+  "editor.remux.cover-title": "Chagua picha ya jalada",
+  "editor.remux.cover.set": "Jalada: {0}",
+  "editor.remux.cover.unsupported": "Chombo hiki hakiwezi kubeba jalada; chagua MP4 au MKV.",
+  "editor.remux.empty": "Angalau wimbo mmoja lazima ujumuishwe kwenye faili."
 }

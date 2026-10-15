@@ -230,5 +230,18 @@
   "editor.remux.kind.video": "Video",
   "editor.remux.kind.audio": "Zvuk",
   "editor.remux.kind.subtitle": "Titulky",
-  "editor.remux.kind.attachment": "Príloha"
+  "editor.remux.kind.attachment": "Príloha",
+  "editor.remux.include": "Zahrnúť do súboru",
+  "editor.remux.add": "Pridať stopy…",
+  "editor.remux.add.tip": "• Pridá do zoznamu stopy iného súboru.\n• Na nahradenie zvuku vynechajte zdrojový zvuk.",
+  "editor.remux.add-title": "Vybrať súbor, z ktorého pridať stopy",
+  "editor.remux.extract": "Uložiť stopu zvlášť…",
+  "editor.remux.extract.tip": "• Zapíše vybranú stopu do vlastného súboru bez prekódovania.",
+  "editor.remux.extract-title": "Uložiť stopu",
+  "editor.remux.cover": "Obal…",
+  "editor.remux.cover.tip": "• Pripojí obal PNG alebo JPEG; len MP4 a MKV.\n• Zrušenie výberu obal odstráni.",
+  "editor.remux.cover-title": "Vybrať obrázok obalu",
+  "editor.remux.cover.set": "Obal: {0}",
+  "editor.remux.cover.unsupported": "Tento kontajner nemôže niesť obal; zvoľte MP4 alebo MKV.",
+  "editor.remux.empty": "Do súboru musí byť zahrnutá aspoň jedna stopa."
 }

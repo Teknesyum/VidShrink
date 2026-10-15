@@ -230,5 +230,18 @@
   "editor.remux.kind.video": "비디오",
   "editor.remux.kind.audio": "오디오",
   "editor.remux.kind.subtitle": "자막",
-  "editor.remux.kind.attachment": "첨부"
+  "editor.remux.kind.attachment": "첨부",
+  "editor.remux.include": "파일에 포함",
+  "editor.remux.add": "트랙 추가…",
+  "editor.remux.add.tip": "• 다른 파일의 트랙을 목록에 추가합니다.\n• 오디오를 바꾸려면 원본 오디오를 제외하세요.",
+  "editor.remux.add-title": "트랙을 추가할 파일 선택",
+  "editor.remux.extract": "트랙 따로 저장…",
+  "editor.remux.extract.tip": "• 선택한 트랙을 다시 인코딩하지 않고 별도 파일로 씁니다.",
+  "editor.remux.extract-title": "트랙 저장",
+  "editor.remux.cover": "커버…",
+  "editor.remux.cover.tip": "• PNG 또는 JPEG 커버를 첨부합니다. MP4와 MKV만 가능합니다.\n• 선택을 취소하면 커버가 제거됩니다.",
+  "editor.remux.cover-title": "커버 이미지 선택",
+  "editor.remux.cover.set": "커버: {0}",
+  "editor.remux.cover.unsupported": "이 컨테이너는 커버를 담을 수 없습니다. MP4 또는 MKV를 선택하세요.",
+  "editor.remux.empty": "파일에 트랙을 하나 이상 포함해야 합니다."
 }

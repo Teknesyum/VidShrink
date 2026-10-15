@@ -230,5 +230,18 @@
   "editor.remux.kind.video": "Video",
   "editor.remux.kind.audio": "Audio",
   "editor.remux.kind.subtitle": "Subtitrări",
-  "editor.remux.kind.attachment": "Atașament"
+  "editor.remux.kind.attachment": "Atașament",
+  "editor.remux.include": "Include în fișier",
+  "editor.remux.add": "Adaugă piste…",
+  "editor.remux.add.tip": "• Adaugă în listă pistele altui fișier.\n• Pentru a înlocui sunetul, omite sunetul sursei.",
+  "editor.remux.add-title": "Alege fișierul din care adaugi piste",
+  "editor.remux.extract": "Salvează pista separat…",
+  "editor.remux.extract.tip": "• Scrie pista selectată în propriul fișier fără recodare.",
+  "editor.remux.extract-title": "Salvează pista",
+  "editor.remux.cover": "Copertă…",
+  "editor.remux.cover.tip": "• Atașează o copertă PNG sau JPEG; doar MP4 și MKV.\n• Anularea alegerii elimină coperta.",
+  "editor.remux.cover-title": "Alege imaginea de copertă",
+  "editor.remux.cover.set": "Copertă: {0}",
+  "editor.remux.cover.unsupported": "Acest container nu poate purta copertă; alege MP4 sau MKV.",
+  "editor.remux.empty": "Cel puțin o pistă trebuie inclusă în fișier."
 }

@@ -230,5 +230,18 @@
   "editor.remux.kind.video": "Відео",
   "editor.remux.kind.audio": "Аудіо",
   "editor.remux.kind.subtitle": "Субтитри",
-  "editor.remux.kind.attachment": "Вкладення"
+  "editor.remux.kind.attachment": "Вкладення",
+  "editor.remux.include": "Включити у файл",
+  "editor.remux.add": "Додати доріжки…",
+  "editor.remux.add.tip": "• Додає до списку доріжки іншого файлу.\n• Щоб замінити звук, виключіть вихідний звук.",
+  "editor.remux.add-title": "Виберіть файл, з якого додати доріжки",
+  "editor.remux.extract": "Зберегти доріжку окремо…",
+  "editor.remux.extract.tip": "• Записує вибрану доріжку в окремий файл без перекодування.",
+  "editor.remux.extract-title": "Зберегти доріжку",
+  "editor.remux.cover": "Обкладинка…",
+  "editor.remux.cover.tip": "• Прикріплює обкладинку PNG або JPEG; лише MP4 і MKV.\n• Скасування вибору прибирає обкладинку.",
+  "editor.remux.cover-title": "Виберіть зображення обкладинки",
+  "editor.remux.cover.set": "Обкладинка: {0}",
+  "editor.remux.cover.unsupported": "Цей контейнер не підтримує обкладинку; виберіть MP4 або MKV.",
+  "editor.remux.empty": "До файлу має входити принаймні одна доріжка."
 }

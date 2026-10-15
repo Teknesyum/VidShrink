@@ -230,5 +230,18 @@
   "editor.remux.kind.video": "Video",
   "editor.remux.kind.audio": "Zvuk",
   "editor.remux.kind.subtitle": "Titlovi",
-  "editor.remux.kind.attachment": "Prilog"
+  "editor.remux.kind.attachment": "Prilog",
+  "editor.remux.include": "Uključi u datoteku",
+  "editor.remux.add": "Dodaj zapise…",
+  "editor.remux.add.tip": "• Dodaje na listu zapise druge datoteke.\n• Za zamenu zvuka izostavite izvorni zvuk.",
+  "editor.remux.add-title": "Izaberite datoteku iz koje dodati zapise",
+  "editor.remux.extract": "Sačuvaj zapis zasebno…",
+  "editor.remux.extract.tip": "• Upisuje izabrani zapis u sopstvenu datoteku bez ponovnog kodiranja.",
+  "editor.remux.extract-title": "Sačuvaj zapis",
+  "editor.remux.cover": "Naslovna slika…",
+  "editor.remux.cover.tip": "• Prilaže naslovnu sliku PNG ili JPEG; samo MP4 i MKV.\n• Otkazivanje izbora uklanja naslovnu sliku.",
+  "editor.remux.cover-title": "Izaberite naslovnu sliku",
+  "editor.remux.cover.set": "Naslovna slika: {0}",
+  "editor.remux.cover.unsupported": "Ovaj kontejner ne može nositi naslovnu sliku; izaberite MP4 ili MKV.",
+  "editor.remux.empty": "U datoteku mora biti uključen bar jedan zapis."
 }

@@ -230,5 +230,18 @@
   "editor.remux.kind.video": "Video",
   "editor.remux.kind.audio": "Lyd",
   "editor.remux.kind.subtitle": "Undertekster",
-  "editor.remux.kind.attachment": "Vedhæftning"
+  "editor.remux.kind.attachment": "Vedhæftning",
+  "editor.remux.include": "Medtag i filen",
+  "editor.remux.add": "Tilføj spor…",
+  "editor.remux.add.tip": "• Tilføjer en anden fils spor til listen.\n• Udelad kildelyden for at erstatte lyden.",
+  "editor.remux.add-title": "Vælg fil at tilføje spor fra",
+  "editor.remux.extract": "Gem spor separat…",
+  "editor.remux.extract.tip": "• Skriver det valgte spor til sin egen fil uden omkodning.",
+  "editor.remux.extract-title": "Gem spor",
+  "editor.remux.cover": "Omslag…",
+  "editor.remux.cover.tip": "• Vedhæfter et PNG- eller JPEG-omslag; kun MP4 og MKV.\n• At annullere valget fjerner omslaget.",
+  "editor.remux.cover-title": "Vælg omslagsbillede",
+  "editor.remux.cover.set": "Omslag: {0}",
+  "editor.remux.cover.unsupported": "Denne container kan ikke bære et omslag; vælg MP4 eller MKV.",
+  "editor.remux.empty": "Mindst ét spor skal medtages i filen."
 }

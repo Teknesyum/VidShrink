@@ -230,5 +230,18 @@
   "editor.remux.kind.video": "Video",
   "editor.remux.kind.audio": "Audio",
   "editor.remux.kind.subtitle": "Ondertitels",
-  "editor.remux.kind.attachment": "Bijlage"
+  "editor.remux.kind.attachment": "Bijlage",
+  "editor.remux.include": "Opnemen in bestand",
+  "editor.remux.add": "Sporen toevoegen…",
+  "editor.remux.add.tip": "• Voegt de sporen van een ander bestand aan de lijst toe.\n• Laat de bronaudio weg om de audio te vervangen.",
+  "editor.remux.add-title": "Bestand kiezen om sporen uit toe te voegen",
+  "editor.remux.extract": "Spoor apart opslaan…",
+  "editor.remux.extract.tip": "• Schrijft het gekozen spoor zonder hercodering naar een eigen bestand.",
+  "editor.remux.extract-title": "Spoor opslaan",
+  "editor.remux.cover": "Omslag…",
+  "editor.remux.cover.tip": "• Voegt een PNG- of JPEG-omslag toe; alleen MP4 en MKV.\n• De keuze annuleren verwijdert de omslag.",
+  "editor.remux.cover-title": "Omslagafbeelding kiezen",
+  "editor.remux.cover.set": "Omslag: {0}",
+  "editor.remux.cover.unsupported": "Deze container kan geen omslag bevatten; kies MP4 of MKV.",
+  "editor.remux.empty": "Er moet minstens één spoor in het bestand worden opgenomen."
 }

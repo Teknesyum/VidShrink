@@ -147,7 +147,7 @@
                         <Button x:Name="BtnExportPresetSave" Theme="{StaticResource GhostButton}" VerticalAlignment="Center" Content="{loc:Text main.preset.save}"/>
                       </StackPanel>
                       <TextBlock x:Name="TxtExportPresetError" Theme="{StaticResource StatusError}" TextWrapping="Wrap" MaxWidth="{StaticResource FieldWidth}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-                      <Grid x:Name="RemuxGrid" ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}" RowSpacing="{StaticResource SpaceSm}">
+                      <Grid x:Name="RemuxGrid" ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}" RowSpacing="{StaticResource SpaceSm}">
                         <TextBlock Grid.Row="0" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.file-title}"/>
                         <TextBox x:Name="TxtRemuxFileTitle" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.remux.file-title}"/>
                         <TextBlock Grid.Row="1" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.track}"/>
@@ -166,12 +166,32 @@
                           <ComboBoxItem Content="180°"/>
                           <ComboBoxItem Content="270°"/>
                         </ComboBox>
-                        <CheckBox x:Name="ChkRemuxDefault" Grid.Row="4" Grid.ColumnSpan="2" Theme="{StaticResource CheckStyle}" Content="{loc:Text editor.remux.default}"/>
+                        <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                          <CheckBox x:Name="ChkRemuxInclude" Theme="{StaticResource CheckStyle}" Content="{loc:Text editor.remux.include}"/>
+                          <CheckBox x:Name="ChkRemuxDefault" Theme="{StaticResource CheckStyle}" Content="{loc:Text editor.remux.default}"/>
+                        </StackPanel>
                         <Button x:Name="BtnRemux" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="2" Theme="{StaticResource GhostButton}" HorizontalAlignment="Right" IsEnabled="False" Content="{loc:Text editor.remux.run}">
                           <ToolTip.Tip>
                             <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text editor.remux.tip}"/>
                           </ToolTip.Tip>
                         </Button>
+                        <StackPanel Grid.Row="5" Grid.ColumnSpan="4" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                          <Button x:Name="BtnRemuxAdd" Theme="{StaticResource GhostButton}" IsEnabled="False" Content="{loc:Text editor.remux.add}">
+                            <ToolTip.Tip>
+                              <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text editor.remux.add.tip}"/>
+                            </ToolTip.Tip>
+                          </Button>
+                          <Button x:Name="BtnRemuxExtract" Theme="{StaticResource GhostButton}" IsEnabled="False" Content="{loc:Text editor.remux.extract}">
+                            <ToolTip.Tip>
+                              <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text editor.remux.extract.tip}"/>
+                            </ToolTip.Tip>
+                          </Button>
+                          <Button x:Name="BtnRemuxCover" Theme="{StaticResource GhostButton}" IsEnabled="False" Content="{loc:Text editor.remux.cover}">
+                            <ToolTip.Tip>
+                              <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text editor.remux.cover.tip}"/>
+                            </ToolTip.Tip>
+                          </Button>
+                        </StackPanel>
                       </Grid>
                     </StackPanel>
                   </Flyout>
