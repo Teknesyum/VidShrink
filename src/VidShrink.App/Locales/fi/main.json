@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Keskeytä jono",
   "main.shrink-job.resume": "Jatka jonoa",
   "main.shrink-job.paused": "Keskeytetty: käynnissä oleva tiedosto on pysäytetty, seuraava odottaa",
+  "main.shrink-job.restored": "Keskeneräinen jono palautettiin ja keskeytettiin",
   "main.shrink-job.disk-paused": "Keskeytetty: kohdeasemalla on vapaata tilaa enää {0} Mt. Vapauta tilaa ja jatka.",
   "main.shrink-job.when-done": "Kun valmis",
   "main.shrink-job.done.nothing": "Älä tee mitään",

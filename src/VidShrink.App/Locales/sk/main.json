@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Pozastaviť rad",
   "main.shrink-job.resume": "Obnoviť rad",
   "main.shrink-job.paused": "Pozastavené: bežiaci súbor stojí, ďalší čaká",
+  "main.shrink-job.restored": "Nedokončený rad obnovený a pozastavený",
   "main.shrink-job.disk-paused": "Pozastavené: na cieľovej jednotke zostáva len {0} MB voľného miesta. Uvoľnite miesto a pokračujte.",
   "main.shrink-job.when-done": "Po dokončení",
   "main.shrink-job.done.nothing": "Nerobiť nič",

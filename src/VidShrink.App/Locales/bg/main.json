@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Пауза на опашката",
   "main.shrink-job.resume": "Продължаване на опашката",
   "main.shrink-job.paused": "На пауза: текущият файл е задържан, следващият изчаква",
+  "main.shrink-job.restored": "Незавършената опашка е възстановена и поставена на пауза",
   "main.shrink-job.disk-paused": "На пауза: на целевото устройство са останали само {0} MB свободно място. Освободете място и продължете.",
   "main.shrink-job.when-done": "След приключване",
   "main.shrink-job.done.nothing": "Без действие",

@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Tạm dừng hàng đợi",
   "main.shrink-job.resume": "Tiếp tục hàng đợi",
   "main.shrink-job.paused": "Đã tạm dừng: tệp đang chạy được giữ lại, tệp tiếp theo đang chờ",
+  "main.shrink-job.restored": "Đã khôi phục hàng đợi chưa xong và tạm dừng",
   "main.shrink-job.disk-paused": "Đã tạm dừng: ổ đích chỉ còn {0} MB trống. Hãy giải phóng dung lượng rồi tiếp tục.",
   "main.shrink-job.when-done": "Khi xong",
   "main.shrink-job.done.nothing": "Không làm gì",

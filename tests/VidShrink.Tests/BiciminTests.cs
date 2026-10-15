@@ -1263,6 +1263,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, kamera bicimi ve konumu (EKB-P5): kaldirilan dort kose anahtarindan (<c>recorder.webcam.top-left</c>, <c>.top-right</c>, <c>.bottom-left</c>, <c>.bottom-right</c>) 12 kol 4 dilde gitti (es 4, hr 2, it 4, sr 2); bes yeni anahtar (<c>recorder.webcam.shape</c>, <c>.shape.rectangle</c>, <c>.shape.rounded</c>, <c>.shape.circle</c>, <c>.mirror</c>) hicbir dilde kola girmiyor. Taban dil dosyalariyla ve yenileriyle iki KOL dokumunden sayildi: 3334 - 12 = 3322, en 322, tr 108.</para>
     /// <para>2026-10-14, iz secim paneli (DZA-P5): uc yeni anahtardan (<c>editor.export.audio-track</c>, <c>.none</c>, <c>editor.monitor.audio-track</c>) 6 kol 4 dilde (es: export ve monitor; fr: monitor; lt: none; pt: export ve monitor), KOL dokumunden sayildi, en ve tr girmiyor: taban pimi 3334 + 6 = 3340, en 322, tr 108.</para>
     /// <para>2026-10-15, kodlarken uyumama (SIK-P2): iki yeni <c>settings-tab.prevent-sleep.*</c> anahtarindan 5 kol 5 dilde, hepsi <c>label</c> (en hr hu pt sl), KOL dokumunden sayildi, tr girmiyor: 723bb1b8 agacinda olculen 3411 + 5 = 3416, en 324 + 1 = 325, tr 108.</para>
+    /// <para>2026-10-15, kuyruk saklama (SIK-P9): yeni <c>main.shrink-job.restored</c> anahtarindan 8 kol 8 dilde (cs en hu it ro sk sl tr), KOL dokumunden sayildi: 3416 + 8 = 3424, en 325 + 1 = 326, tr 108 + 1 = 109.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1288,9 +1289,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3416, toplam);
-        Assert.Equal(325, dilBasina["en"]);
-        Assert.Equal(108, dilBasina["tr"]);
+        Assert.Equal(3424, toplam);
+        Assert.Equal(326, dilBasina["en"]);
+        Assert.Equal(109, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1531,6 +1532,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, kamera bicimi ve konumu (EKB-P5): yedi anahtar dustu (<c>recorder.webcam.size</c>, <c>.width</c>, <c>.corner</c> ve dort kose), bes yeni geldi (<c>recorder.webcam.shape</c>, <c>.shape.rectangle</c>, <c>.shape.rounded</c>, <c>.shape.circle</c>, <c>.mirror</c>); 43 x (5 - 7) = -86, olculen 65188 - 86 = 65102. <c>kayip</c> 0.</para>
     /// <para>2026-10-14, iz secim paneli (DZA-P5): uc yeni anahtar (<c>editor.export.audio-track</c>, <c>.none</c>, <c>editor.monitor.audio-track</c>), dusen yok; taban pimi 65188 + 43 x 3 = 65317. <c>kayip</c> 0.</para>
     /// <para>2026-10-15, kodlarken uyumama (SIK-P2): iki yeni <c>settings-tab.prevent-sleep.*</c> anahtari (label, hint), dusen yok; 723bb1b8 agacinda olculen 67897 + 43 x 2 = 67983. <c>kayip</c> 0.</para>
+    /// <para>2026-10-15, kuyruk saklama (SIK-P9): bir yeni <c>main.shrink-job.restored</c> anahtari, dusen yok; 67983 + 43 = 68026. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1558,7 +1560,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(67983, gezilen);
+        Assert.Equal(68026, gezilen);
         Assert.Empty(kayip);
     }
 

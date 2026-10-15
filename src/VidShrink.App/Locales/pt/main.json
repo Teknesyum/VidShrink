@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Pausar fila",
   "main.shrink-job.resume": "Retomar fila",
   "main.shrink-job.paused": "Em pausa: o arquivo em andamento está suspenso, o próximo espera",
+  "main.shrink-job.restored": "Fila inacabada restaurada e em pausa",
   "main.shrink-job.disk-paused": "Em pausa: restam apenas {0} MB livres na unidade de destino. Libere espaço e retome.",
   "main.shrink-job.when-done": "Ao terminar",
   "main.shrink-job.done.nothing": "Não fazer nada",

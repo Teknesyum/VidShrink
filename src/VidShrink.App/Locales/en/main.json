@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Pause queue",
   "main.shrink-job.resume": "Resume queue",
   "main.shrink-job.paused": "Paused: the running file is on hold, the next one waits",
+  "main.shrink-job.restored": "Unfinished queue restored and paused",
   "main.shrink-job.disk-paused": "Paused: only {0} MB left free on the target drive. Free up space, then resume.",
   "main.shrink-job.when-done": "When done",
   "main.shrink-job.done.nothing": "Do nothing",

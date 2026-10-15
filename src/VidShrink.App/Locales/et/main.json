@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Peata järjekord",
   "main.shrink-job.resume": "Jätka järjekorda",
   "main.shrink-job.paused": "Peatatud: käimasolev fail on ootel, järgmine ootab",
+  "main.shrink-job.restored": "Lõpetamata järjekord taastati ja peatati",
   "main.shrink-job.disk-paused": "Peatatud: sihtkettal on vaba ruumi alles vaid {0} MB. Vabasta ruumi ja jätka.",
   "main.shrink-job.when-done": "Kui valmis",
   "main.shrink-job.done.nothing": "Ära tee midagi",

@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Jeda baris gilir",
   "main.shrink-job.resume": "Sambung semula baris gilir",
   "main.shrink-job.paused": "Dijeda: fail yang sedang berjalan ditahan, yang berikutnya menunggu",
+  "main.shrink-job.restored": "Baris gilir yang belum selesai dipulihkan dan dijeda",
   "main.shrink-job.disk-paused": "Dijeda: hanya tinggal {0} MB ruang kosong pada pemacu sasaran. Kosongkan ruang, kemudian sambung.",
   "main.shrink-job.when-done": "Selepas selesai",
   "main.shrink-job.done.nothing": "Jangan buat apa-apa",

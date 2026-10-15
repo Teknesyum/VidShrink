@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Sırayı duraklat",
   "main.shrink-job.resume": "Sırayı sürdür",
   "main.shrink-job.paused": "Duraklatıldı: koşan dosya bekletiliyor, sıradaki bekler",
+  "main.shrink-job.restored": "Yarım kalan kuyruk geri yüklendi ve duraklatıldı",
   "main.shrink-job.disk-paused": "Duraklatıldı: hedef sürücüde yalnız {0} MB boş alan kaldı. Yer açın, sonra sürdürün.",
   "main.shrink-job.when-done": "Bitince",
   "main.shrink-job.done.nothing": "Hiçbir şey yapma",

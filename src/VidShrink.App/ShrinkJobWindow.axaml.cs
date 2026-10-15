@@ -140,6 +140,12 @@ public partial class ShrinkJobWindow : Window
 
     private IDisposable? _uykuIstegi;
 
+    /// <summary>SIK-P9: kuyruğun defteri; test konağında <c>null</c>, testler kendi klasörlü defterini verir.</summary>
+    internal QueueJournal? Defter { get; set; } = QueueJournal.Shared;
+
+    private readonly Dictionary<ShrinkRequest, SavedJob> _geriGelen = new(ReferenceEqualityComparer.Instance);
+    private volatile bool _defterKapandi;
+
     /// <summary>K6: koşan tek işi iptal eder; ötekiler ve sıra sürer.</summary>
     internal bool CancelJob(ShrinkRequest request) => _pump.Cancel(request);
 
@@ -191,6 +197,7 @@ public partial class ShrinkJobWindow : Window
         _startup = startup;
         _queue = queue;
         _pump = new JobPump<ShrinkRequest>(RunAwakeAsync, () => ParallelLimit);
+        _pump.Changed += SaveQueue;
         UykuyuEngelle = _appSettings.PreventSleepWhileEncoding;
         _pump.Drained += OnDrained;
 
@@ -263,6 +270,48 @@ public partial class ShrinkJobWindow : Window
     private bool _autoCrop;
 
     /// <summary>
+    /// SIK-P9: ölmüş süreçten kalan kuyruk. Soru sorulmaz: pencere kendiliğinden, duraklatılmış açılır;
+    /// koşarken kesilen iş baştan ve en önde gelir. Defter boş ya da bozuksa <c>null</c>.
+    /// </summary>
+    internal static ShrinkJobWindow? Restore(QueueJournal journal, Func<int, bool> alive)
+    {
+        var jobs = journal.TakeOrphans(alive);
+        if (jobs.Count == 0) return null;
+        var pairs = jobs.Select(job => (new ShrinkRequest((int)Math.Ceiling(job.TargetMb), job.Path), job)).ToList();
+        return new ShrinkJobWindow(pairs) { Defter = journal };
+    }
+
+    private ShrinkJobWindow(IReadOnlyList<(ShrinkRequest Request, SavedJob Job)> jobs)
+        : this(new ShellShrinkStartup(jobs.Select(pair => pair.Request).ToList(), null, jobs[0].Job.Path), null)
+    {
+        foreach (var (request, job) in jobs) _geriGelen[request] = job;
+        TxtHeadline.Text = Say("main.shrink-job.batch", jobs.Count);
+        SetPaused(true, Say("main.shrink-job.restored"));
+    }
+
+    private SavedJob Saved(ShrinkRequest request)
+        => _geriGelen.TryGetValue(request, out var job) ? job
+            : _template is null ? new SavedJob(request.Path, request.TargetMegabytes, false)
+            : new SavedJob(request.Path, _template.TargetMb, _ceilingTarget);
+
+    private void SaveQueue()
+    {
+        if (_defterKapandi || Defter is not { } defter) return;
+        defter.Update(this, _pump.Running.Concat(_pump.Pending).Select(Saved).ToList());
+    }
+
+    /// <summary>
+    /// SIK-P9: pencere deftere son kez dokunur. Kullanıcı kapattıysa kuyruk silinir; uygulama ya da
+    /// sistem kapanırken (<paramref name="keep"/>) dosya kalır ki açılışta geri gelsin.
+    /// </summary>
+    internal void CloseJournal(bool keep)
+    {
+        if (_defterKapandi) return;
+        _defterKapandi = true;
+        if (!keep) Defter?.Remove(this);
+    }
+
+    /// <summary>
     /// HB #36: kuyruk "Siyah bantları kırp" kutusunu bayrak olarak taşır, dikdörtgeni değil —
     /// bantlar dosyaya özgü. Her dosya kendi yoklamasıyla kırpılır; elle yazılmış <c>crop=</c> korunur.
     /// </summary>
@@ -276,6 +325,16 @@ public partial class ShrinkJobWindow : Window
     /// <summary>İsteğin plan seçenekleri ve hedefi. Kabuk isteği yalnız hedefi taşır; bırakılan kuyruk pencerenin ayarlarını.</summary>
     internal (PlanOptions Options, double TargetMb) OptionsFor(ShrinkRequest request, MediaInfo info)
     {
+        if (_geriGelen.TryGetValue(request, out var saved))
+        {
+            var hedef = saved.CeilingTarget ? PlanCalculator.QualityCeilingTargetMb(info) : saved.TargetMb;
+            return (new PlanOptions
+            {
+                TargetMb = hedef,
+                Priority = _appSettings.EncodePriority,
+                EncoderThreads = _appSettings.EncoderThreads > 0 ? _appSettings.EncoderThreads : null
+            }, hedef);
+        }
         if (_template is null)
             return (new PlanOptions
             {
@@ -944,6 +1003,7 @@ public partial class ShrinkJobWindow : Window
         _diskTimer?.Stop();
         StopWatch();
         _closed = true;
+        CloseJournal(e.CloseReason is WindowCloseReason.ApplicationShutdown or WindowCloseReason.OSShutdown);
         _pump.CancelAll();
         ReleaseSleep();
         _shareFlow?.Cancel();

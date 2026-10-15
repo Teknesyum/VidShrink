@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Приостановить очередь",
   "main.shrink-job.resume": "Продолжить очередь",
   "main.shrink-job.paused": "Приостановлено: текущий файл остановлен, следующий ждёт",
+  "main.shrink-job.restored": "Незавершённая очередь восстановлена и приостановлена",
   "main.shrink-job.disk-paused": "Приостановлено: на целевом диске осталось всего {0} МБ свободного места. Освободите место и продолжите.",
   "main.shrink-job.when-done": "После завершения",
   "main.shrink-job.done.nothing": "Ничего не делать",

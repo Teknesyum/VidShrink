@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "대기열 일시 중지",
   "main.shrink-job.resume": "대기열 재개",
   "main.shrink-job.paused": "일시 중지됨: 실행 중인 파일은 멈춰 있고 다음 파일은 대기합니다",
+  "main.shrink-job.restored": "끝나지 않은 대기열을 복원하고 일시 정지했습니다",
   "main.shrink-job.disk-paused": "일시 중지됨: 대상 드라이브에 남은 여유 공간이 {0}MB뿐입니다. 공간을 확보한 뒤 재개하세요.",
   "main.shrink-job.when-done": "완료되면",
   "main.shrink-job.done.nothing": "아무 작업도 하지 않음",

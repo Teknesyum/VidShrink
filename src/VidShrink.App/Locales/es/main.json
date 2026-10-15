@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Pausar la cola",
   "main.shrink-job.resume": "Reanudar la cola",
   "main.shrink-job.paused": "En pausa: el archivo en curso está detenido, el siguiente espera",
+  "main.shrink-job.restored": "Cola sin terminar restaurada y en pausa",
   "main.shrink-job.disk-paused": "En pausa: solo quedan {0} MB libres en la unidad de destino. Libera espacio y reanuda.",
   "main.shrink-job.when-done": "Al terminar",
   "main.shrink-job.done.nothing": "No hacer nada",

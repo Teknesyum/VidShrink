@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Metti in pausa la coda",
   "main.shrink-job.resume": "Riprendi la coda",
   "main.shrink-job.paused": "In pausa: il file in corso è sospeso, il successivo attende",
+  "main.shrink-job.restored": "Coda incompleta ripristinata e in pausa",
   "main.shrink-job.disk-paused": "In pausa: sull’unità di destinazione restano solo {0} MB liberi. Libera spazio, poi riprendi.",
   "main.shrink-job.when-done": "Al termine",
   "main.shrink-job.done.nothing": "Non fare nulla",

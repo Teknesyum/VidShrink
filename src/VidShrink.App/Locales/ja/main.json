@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "キューを一時停止",
   "main.shrink-job.resume": "キューを再開",
   "main.shrink-job.paused": "一時停止中: 実行中のファイルは保留され、次のファイルは待機します",
+  "main.shrink-job.restored": "未完了のキューを復元し、一時停止しました",
   "main.shrink-job.disk-paused": "一時停止中: 保存先ドライブの空き容量が {0} MB しか残っていません。空き容量を確保してから再開してください。",
   "main.shrink-job.when-done": "完了時",
   "main.shrink-job.done.nothing": "何もしない",

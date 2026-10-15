@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "השהיית התור",
   "main.shrink-job.resume": "המשך התור",
   "main.shrink-job.paused": "מושהה: הקובץ הנוכחי עצור, הבא מחכה",
+  "main.shrink-job.restored": "התור שלא הושלם שוחזר והושהה",
   "main.shrink-job.disk-paused": "מושהה: נותרו רק {0} MB פנויים בכונן היעד. פנו מקום ואז המשיכו.",
   "main.shrink-job.when-done": "בסיום",
   "main.shrink-job.done.nothing": "לא לעשות כלום",

@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Pauziraj red",
   "main.shrink-job.resume": "Nastavi red",
   "main.shrink-job.paused": "Pauzirano: trenutna datoteka je zaustavljena, sljedeća čeka",
+  "main.shrink-job.restored": "Nedovršeni red vraćen i pauziran",
   "main.shrink-job.disk-paused": "Pauzirano: na odredišnom pogonu preostalo je samo {0} MB slobodnog prostora. Oslobodite prostor pa nastavite.",
   "main.shrink-job.when-done": "Kad završi",
   "main.shrink-job.done.nothing": "Ne radi ništa",

@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "قطار موقوف کریں",
   "main.shrink-job.resume": "قطار جاری کریں",
   "main.shrink-job.paused": "موقوف: چلتی فائل روکی ہوئی ہے، اگلی انتظار میں ہے",
+  "main.shrink-job.restored": "ادھوری قطار بحال کر کے روک دی گئی",
   "main.shrink-job.disk-paused": "موقوف: منزل ڈرائیو پر صرف {0} MB خالی جگہ بچی ہے۔ جگہ خالی کریں، پھر دوبارہ شروع کریں۔",
   "main.shrink-job.when-done": "مکمل ہونے پر",
   "main.shrink-job.done.nothing": "کچھ نہ کریں",

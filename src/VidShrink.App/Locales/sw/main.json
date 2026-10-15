@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Simamisha foleni",
   "main.shrink-job.resume": "Endelea na foleni",
   "main.shrink-job.paused": "Imesimamishwa: faili linaloendelea limesitishwa, linalofuata linasubiri",
+  "main.shrink-job.restored": "Foleni ambayo haijakamilika imerejeshwa na kusitishwa",
   "main.shrink-job.disk-paused": "Imesimamishwa: zimebaki MB {0} tu za nafasi kwenye diski lengwa. Toa nafasi, kisha endelea.",
   "main.shrink-job.when-done": "Ikikamilika",
   "main.shrink-job.done.nothing": "Usifanye chochote",

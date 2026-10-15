@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "إيقاف القائمة مؤقتًا",
   "main.shrink-job.resume": "استئناف القائمة",
   "main.shrink-job.paused": "متوقف مؤقتًا: الملف الجاري معلّق، وينتظر التالي",
+  "main.shrink-job.restored": "استُعيدت قائمة الانتظار غير المكتملة وأُوقفت مؤقتًا",
   "main.shrink-job.disk-paused": "متوقف مؤقتًا: بقي {0} ميغابايت فقط من المساحة الحرة على محرك الوجهة. حرّر بعض المساحة ثم استأنف.",
   "main.shrink-job.when-done": "عند الانتهاء",
   "main.shrink-job.done.nothing": "عدم القيام بأي شيء",

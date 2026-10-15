@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "সারি বিরতি দিন",
   "main.shrink-job.resume": "সারি চালু করুন",
   "main.shrink-job.paused": "বিরতি দেওয়া হয়েছে: চলতি ফাইলটি থেমে আছে, পরেরটি অপেক্ষা করবে",
+  "main.shrink-job.restored": "অসম্পূর্ণ সারি পুনরুদ্ধার করে বিরতি দেওয়া হয়েছে",
   "main.shrink-job.disk-paused": "বিরতি দেওয়া হয়েছে: লক্ষ্য ড্রাইভে মাত্র {0} MB খালি জায়গা বাকি। জায়গা খালি করে আবার শুরু করুন।",
   "main.shrink-job.when-done": "শেষ হলে",
   "main.shrink-job.done.nothing": "কিছু করবেন না",

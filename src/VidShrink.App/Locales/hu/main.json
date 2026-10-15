@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Sor szüneteltetése",
   "main.shrink-job.resume": "Sor folytatása",
   "main.shrink-job.paused": "Szüneteltetve: a futó fájl áll, a következő vár",
+  "main.shrink-job.restored": "A befejezetlen sor visszaállítva és szüneteltetve",
   "main.shrink-job.disk-paused": "Szüneteltetve: a célmeghajtón már csak {0} MB szabad hely maradt. Szabadítson fel helyet, majd folytassa.",
   "main.shrink-job.when-done": "Ha kész",
   "main.shrink-job.done.nothing": "Ne csináljon semmit",

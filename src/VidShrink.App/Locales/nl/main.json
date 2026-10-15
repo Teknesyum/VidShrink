@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Wachtrij onderbreken",
   "main.shrink-job.resume": "Wachtrij hervatten",
   "main.shrink-job.paused": "Onderbroken: het lopende bestand staat stil, het volgende wacht",
+  "main.shrink-job.restored": "Onvoltooide wachtrij hersteld en gepauzeerd",
   "main.shrink-job.disk-paused": "Onderbroken: er is nog maar {0} MB vrij op het doelstation. Maak ruimte vrij en hervat.",
   "main.shrink-job.when-done": "Als het klaar is",
   "main.shrink-job.done.nothing": "Niets doen",

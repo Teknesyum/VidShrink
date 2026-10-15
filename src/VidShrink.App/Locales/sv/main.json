@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Pausa kön",
   "main.shrink-job.resume": "Återuppta kön",
   "main.shrink-job.paused": "Pausad: den pågående filen står still, nästa väntar",
+  "main.shrink-job.restored": "Ofullständig kö återställd och pausad",
   "main.shrink-job.disk-paused": "Pausad: bara {0} MB ledigt kvar på målenheten. Frigör utrymme och återuppta sedan.",
   "main.shrink-job.when-done": "Efter avslut",
   "main.shrink-job.done.nothing": "Gör ingenting",

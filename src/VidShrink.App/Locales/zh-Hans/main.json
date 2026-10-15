@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "暂停队列",
   "main.shrink-job.resume": "继续队列",
   "main.shrink-job.paused": "已暂停：正在处理的文件已挂起，下一个文件等待",
+  "main.shrink-job.restored": "已恢复未完成的队列并暂停",
   "main.shrink-job.disk-paused": "已暂停：目标驱动器仅剩 {0} MB 可用空间。请释放空间后继续。",
   "main.shrink-job.when-done": "完成后",
   "main.shrink-job.done.nothing": "不执行任何操作",

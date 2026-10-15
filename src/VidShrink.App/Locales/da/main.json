@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Sæt køen på pause",
   "main.shrink-job.resume": "Genoptag køen",
   "main.shrink-job.paused": "På pause: den aktuelle fil står stille, den næste venter",
+  "main.shrink-job.restored": "Ufærdig kø gendannet og sat på pause",
   "main.shrink-job.disk-paused": "På pause: der er kun {0} MB ledig plads tilbage på destinationsdrevet. Frigør plads, og genoptag.",
   "main.shrink-job.when-done": "Når færdig",
   "main.shrink-job.done.nothing": "Gør ingenting",

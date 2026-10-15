@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Pristabdyti eilę",
   "main.shrink-job.resume": "Tęsti eilę",
   "main.shrink-job.paused": "Pristabdyta: vykdomas failas sustabdytas, kitas laukia",
+  "main.shrink-job.restored": "Nebaigta eilė atkurta ir pristabdyta",
   "main.shrink-job.disk-paused": "Pristabdyta: tiksliniame diske liko tik {0} MB laisvos vietos. Atlaisvinkite vietos ir tęskite.",
   "main.shrink-job.when-done": "Kai baigta",
   "main.shrink-job.done.nothing": "Nedaryti nieko",

@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Призупинити черзу",
   "main.shrink-job.resume": "Продовжити черзу",
   "main.shrink-job.paused": "Призупинено: поточний файл зупинено, наступний чекає",
+  "main.shrink-job.restored": "Незавершену чергу відновлено й призупинено",
   "main.shrink-job.disk-paused": "Призупинено: на цільовому диску залишилося лише {0} МБ вільного місця. Звільніть місце й продовжте.",
   "main.shrink-job.when-done": "Після завершення",
   "main.shrink-job.done.nothing": "Нічого не робити",

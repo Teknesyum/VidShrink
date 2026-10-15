@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Jeda antrean",
   "main.shrink-job.resume": "Lanjutkan antrean",
   "main.shrink-job.paused": "Dijeda: file yang berjalan ditahan, berikutnya menunggu",
+  "main.shrink-job.restored": "Antrean yang belum selesai dipulihkan dan dijeda",
   "main.shrink-job.disk-paused": "Dijeda: ruang kosong di drive tujuan tinggal {0} MB. Kosongkan ruang, lalu lanjutkan.",
   "main.shrink-job.when-done": "Setelah selesai",
   "main.shrink-job.done.nothing": "Jangan lakukan apa pun",

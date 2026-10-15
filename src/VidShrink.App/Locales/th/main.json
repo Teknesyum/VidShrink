@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "หยุดคิวชั่วคราว",
   "main.shrink-job.resume": "ดำเนินคิวต่อ",
   "main.shrink-job.paused": "หยุดชั่วคราว: ไฟล์ที่กำลังทำงานถูกพักไว้ ไฟล์ถัดไปรออยู่",
+  "main.shrink-job.restored": "กู้คืนคิวที่ยังไม่เสร็จและหยุดชั่วคราวแล้ว",
   "main.shrink-job.disk-paused": "หยุดชั่วคราว: ไดรฟ์ปลายทางเหลือพื้นที่ว่างเพียง {0} MB โปรดเพิ่มพื้นที่ว่างแล้วดำเนินการต่อ",
   "main.shrink-job.when-done": "เมื่อเสร็จแล้ว",
   "main.shrink-job.done.nothing": "ไม่ทำอะไร",

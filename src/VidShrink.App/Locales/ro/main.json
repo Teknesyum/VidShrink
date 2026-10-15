@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Pune coada pe pauză",
   "main.shrink-job.resume": "Continuă coada",
   "main.shrink-job.paused": "În pauză: fișierul curent este oprit, următorul așteaptă",
+  "main.shrink-job.restored": "Coada neterminată a fost restaurată și pusă pe pauză",
   "main.shrink-job.disk-paused": "În pauză: pe unitatea de destinație au mai rămas doar {0} MB liberi. Eliberați spațiu, apoi reluați.",
   "main.shrink-job.when-done": "La finalizare",
   "main.shrink-job.done.nothing": "Nu face nimic",

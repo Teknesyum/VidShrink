@@ -260,6 +260,7 @@
   "main.shrink-job.pause": "Zaustavi vrsto",
   "main.shrink-job.resume": "Nadaljuj vrsto",
   "main.shrink-job.paused": "Zaustavljeno: trenutna datoteka miruje, naslednja čaka",
+  "main.shrink-job.restored": "Nedokončana čakalna vrsta obnovljena in zaustavljena",
   "main.shrink-job.disk-paused": "Zaustavljeno: na ciljnem pogonu je ostalo le še {0} MB prostora. Sprostite prostor in nadaljujte.",
   "main.shrink-job.when-done": "Ko je končano",
   "main.shrink-job.done.nothing": "Ne stori ničesar",
