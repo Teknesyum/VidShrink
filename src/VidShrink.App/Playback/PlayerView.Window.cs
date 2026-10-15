@@ -356,18 +356,18 @@ internal partial class PlayerView
         if (_engine is not { IsOpen: true } engine || _path is not { } media) return "no";
         EnsureSettings();
         var target = _settings.ScreenshotPath(media, CurrentPosition());
-        _lastShot = SaveScreenshotAsync(engine, target);
+        _lastShot = SaveScreenshotAsync(engine, target, _settings.ScreenshotSubtitles);
         return target;
     }
 
-    private async Task<string?> SaveScreenshotAsync(IPlaybackEngine engine, string target)
+    private async Task<string?> SaveScreenshotAsync(IPlaybackEngine engine, string target, bool withSubtitles)
     {
         var saved = false;
         try
         {
             var folder = Path.GetDirectoryName(target);
             if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
-            saved = await engine.SaveScreenshotAsync(target).ConfigureAwait(true);
+            saved = await engine.SaveScreenshotAsync(target, withSubtitles).ConfigureAwait(true);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ObjectDisposedException)
         {
@@ -436,6 +436,15 @@ internal partial class PlayerView
         _settings.ScreenshotFormat = _settings.ScreenshotFormat == ScreenshotFormat.Jpg ? ScreenshotFormat.Png : ScreenshotFormat.Jpg;
         SaveSettings();
         _trace.Add("screenshotformat -> " + _settings.ScreenshotFormat);
+        AdvancedChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    internal void ToggleScreenshotSubtitles()
+    {
+        EnsureSettings();
+        _settings.ScreenshotSubtitles = !_settings.ScreenshotSubtitles;
+        SaveSettings();
+        _trace.Add("screenshotsubtitles -> " + _settings.ScreenshotSubtitles);
         AdvancedChanged?.Invoke(this, EventArgs.Empty);
     }
 

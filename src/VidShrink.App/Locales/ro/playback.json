@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "cadru copiat în clipboard",
   "player.view.screenshot-copy-failed": "cadrul nu a putut fi copiat",
   "player.view.screenshot-jpg": "Salvează capturile de ecran ca JPG",
+  "player.view.screenshot-subtitles": "Include subtitrările în capturile de ecran",
   "player.view.keep-history": "Păstrează istoricul",
   "player.view.resume": "Reia de unde am rămas",
   "player.view.seek-steps": "Pași de salt",

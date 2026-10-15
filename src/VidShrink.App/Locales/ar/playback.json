@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "تم نسخ الإطار إلى الحافظة",
   "player.view.screenshot-copy-failed": "تعذر نسخ الإطار",
   "player.view.screenshot-jpg": "حفظ لقطات الشاشة بصيغة JPG",
+  "player.view.screenshot-subtitles": "تضمين الترجمة في لقطات الشاشة",
   "player.view.keep-history": "الاحتفاظ بالسجل",
   "player.view.resume": "المتابعة من حيث توقفت",
   "player.view.seek-steps": "خطوات التقديم",

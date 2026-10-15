@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "คัดลอกเฟรมไปยังคลิปบอร์ดแล้ว",
   "player.view.screenshot-copy-failed": "ไม่สามารถคัดลอกเฟรมได้",
   "player.view.screenshot-jpg": "บันทึกภาพหน้าจอเป็น JPG",
+  "player.view.screenshot-subtitles": "รวมคำบรรยายในภาพหน้าจอ",
   "player.view.keep-history": "เก็บประวัติ",
   "player.view.resume": "เล่นต่อจากจุดที่ค้างไว้",
   "player.view.seek-steps": "ระยะการข้าม",

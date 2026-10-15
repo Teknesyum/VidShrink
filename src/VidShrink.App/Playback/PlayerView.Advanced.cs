@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Media;
 using VidShrink.App.Localization;
 using VidShrink.Player;
 
@@ -29,6 +30,10 @@ internal partial class PlayerView
     internal const string SubtitleBackgroundOff = "#00000000";
 
     internal static readonly IReadOnlyList<string> SubtitleFonts = new[] { "sans-serif", "serif", "monospace" };
+
+    private static IReadOnlyList<string>? _subtitleFontChoices;
+
+    internal static IReadOnlyList<string> SubtitleFontChoices => _subtitleFontChoices ??= ReadSubtitleFontChoices();
 
     internal static readonly IReadOnlyList<(string Key, string Value)> SubtitleColors = new[]
     {
@@ -248,6 +253,38 @@ internal partial class PlayerView
         Settle("subback -> " + (_advanced.Style.Background ?? "default"));
     }
 
+    internal void ToggleSubtitleOverride()
+    {
+        EnsureAdvanced();
+        _advanced.Style = _advanced.Style with { OverrideAss = !_advanced.Style.OverrideAss };
+        _engine?.SetSubtitleStyle(_advanced.Style);
+        Settle("suboverride -> " + _advanced.Style.OverrideAss);
+    }
+
+    internal void ToggleSubtitleSdh()
+    {
+        EnsureAdvanced();
+        _advanced.Style = _advanced.Style with { HideSdh = !_advanced.Style.HideSdh };
+        _engine?.SetSubtitleStyle(_advanced.Style);
+        Settle("subsdh -> " + _advanced.Style.HideSdh);
+    }
+
+    internal void ToggleSubtitleBold()
+    {
+        EnsureAdvanced();
+        _advanced.Style = _advanced.Style with { Bold = !_advanced.Style.Bold };
+        _engine?.SetSubtitleStyle(_advanced.Style);
+        Settle("subbold -> " + _advanced.Style.Bold);
+    }
+
+    internal void ToggleSubtitleItalic()
+    {
+        EnsureAdvanced();
+        _advanced.Style = _advanced.Style with { Italic = !_advanced.Style.Italic };
+        _engine?.SetSubtitleStyle(_advanced.Style);
+        Settle("subitalic -> " + _advanced.Style.Italic);
+    }
+
     internal void ResetSubtitleStyle()
     {
         EnsureAdvanced();
@@ -391,7 +428,7 @@ internal partial class PlayerView
         var style = Advanced.Style;
         var items = new List<Control>
         {
-            Submenu(Strings.Get("player.advanced.font"), SubtitleFonts
+            Submenu(Strings.Get("player.advanced.font"), SubtitleFontChoices
                 .Select(font => (Control)Choice(font, string.Equals(style.Font, font, StringComparison.OrdinalIgnoreCase), () => UseSubtitleFont(font)))
                 .ToList()),
             Submenu(Strings.Get("player.advanced.color"), SubtitleColors
@@ -408,9 +445,34 @@ internal partial class PlayerView
                 Plain(Strings.Get("player.advanced.less"), () => NudgeSubtitleShadow(-1))
             }),
             Switch(Strings.Get("player.advanced.background"), string.Equals(style.Background, SubtitleBackgroundOn, StringComparison.OrdinalIgnoreCase), ToggleSubtitleBackground),
+            Switch(Strings.Get("player.advanced.bold"), style.Bold, ToggleSubtitleBold),
+            Switch(Strings.Get("player.advanced.italic"), style.Italic, ToggleSubtitleItalic),
+            Switch(Strings.Get("player.advanced.ass-override"), style.OverrideAss, ToggleSubtitleOverride),
+            Switch(Strings.Get("player.advanced.hide-sdh"), style.HideSdh, ToggleSubtitleSdh),
             Plain(Strings.Get("player.advanced.subtitle-reset"), ResetSubtitleStyle)
         };
         return items;
+    }
+
+    private static IReadOnlyList<string> ReadSubtitleFontChoices()
+    {
+        var system = new List<string>();
+        try
+        {
+            system.AddRange(FontManager.Current.SystemFonts
+                .Select(family => family.Name)
+                .Where(name => !string.IsNullOrWhiteSpace(name) && !name.StartsWith('@')));
+        }
+        catch (Exception ex) when (ex is InvalidOperationException)
+        {
+        }
+
+        return SubtitleFonts
+            .Concat(system
+                .Where(name => !SubtitleFonts.Contains(name, StringComparer.OrdinalIgnoreCase))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(name => name, StringComparer.OrdinalIgnoreCase))
+            .ToList();
     }
 
     private static MenuItem Switch(string header, bool on, Action act)

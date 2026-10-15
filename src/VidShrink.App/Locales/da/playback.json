@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "billedet er kopieret til udklipsholderen",
   "player.view.screenshot-copy-failed": "billedet kunne ikke kopieres",
   "player.view.screenshot-jpg": "Gem skærmbilleder som JPG",
+  "player.view.screenshot-subtitles": "Medtag undertekster i skærmbilleder",
   "player.view.keep-history": "Gem historik",
   "player.view.resume": "Fortsæt hvor jeg slap",
   "player.view.seek-steps": "Spoletrin",

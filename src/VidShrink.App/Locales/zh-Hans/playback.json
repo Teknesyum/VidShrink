@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "画面已复制到剪贴板",
   "player.view.screenshot-copy-failed": "无法复制画面",
   "player.view.screenshot-jpg": "将截图保存为 JPG",
+  "player.view.screenshot-subtitles": "截图时包含字幕",
   "player.view.keep-history": "保留历史记录",
   "player.view.resume": "从上次停止处继续",
   "player.view.seek-steps": "跳转步长",

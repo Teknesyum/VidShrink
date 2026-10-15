@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "кадърът е копиран в клипборда",
   "player.view.screenshot-copy-failed": "кадърът не можа да бъде копиран",
   "player.view.screenshot-jpg": "Записвай екранните снимки като JPG",
+  "player.view.screenshot-subtitles": "Включване на субтитрите в екранните снимки",
   "player.view.keep-history": "Запазване на историята",
   "player.view.resume": "Продължаване оттам, докъдето спрях",
   "player.view.seek-steps": "Стъпки на превъртане",

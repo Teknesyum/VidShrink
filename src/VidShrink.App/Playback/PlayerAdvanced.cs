@@ -72,7 +72,11 @@ internal sealed class PlayerAdvanced
                 Text(root["subColor"]),
                 (double?)root["subOutline"],
                 (double?)root["subShadow"],
-                Text(root["subBack"]));
+                Text(root["subBack"]),
+                (bool?)root["subOverride"] ?? false,
+                (bool?)root["subSdh"] ?? false,
+                (bool?)root["subBold"] ?? false,
+                (bool?)root["subItalic"] ?? false);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or FormatException)
         {
@@ -112,6 +116,10 @@ internal sealed class PlayerAdvanced
                 WriteNumber(writer, "subOutline", Style.Outline);
                 WriteNumber(writer, "subShadow", Style.Shadow);
                 WriteText(writer, "subBack", Style.Background);
+                writer.WriteBoolean("subOverride", Style.OverrideAss);
+                writer.WriteBoolean("subSdh", Style.HideSdh);
+                writer.WriteBoolean("subBold", Style.Bold);
+                writer.WriteBoolean("subItalic", Style.Italic);
                 writer.WriteEndObject();
             }
             File.Move(temp, file, true);

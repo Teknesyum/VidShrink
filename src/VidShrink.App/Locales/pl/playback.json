@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "klatka skopiowana do schowka",
   "player.view.screenshot-copy-failed": "nie udało się skopiować klatki",
   "player.view.screenshot-jpg": "Zapisuj zrzuty ekranu jako JPG",
+  "player.view.screenshot-subtitles": "Dołączaj napisy do zrzutów ekranu",
   "player.view.keep-history": "Zachowuj historię",
   "player.view.resume": "Wznawiaj od miejsca, w którym skończyłem",
   "player.view.seek-steps": "Kroki przewijania",

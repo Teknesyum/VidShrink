@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "fotograma copiado al portapapeles",
   "player.view.screenshot-copy-failed": "no se pudo copiar el fotograma",
   "player.view.screenshot-jpg": "Guardar capturas de pantalla como JPG",
+  "player.view.screenshot-subtitles": "Incluir subtítulos en las capturas de pantalla",
   "player.view.keep-history": "Guardar historial",
   "player.view.resume": "Reanudar donde lo dejé",
   "player.view.seek-steps": "Pasos de salto",

@@ -505,6 +505,7 @@ internal partial class PlayerView : UserControl
         folder.Click += OnPickScreenshotFolder;
         items.Add(folder);
         items.Add(Switch(Strings.Get("player.view.screenshot-jpg"), Settings.ScreenshotFormat == ScreenshotFormat.Jpg, ToggleScreenshotJpg));
+        items.Add(Switch(Strings.Get("player.view.screenshot-subtitles"), Settings.ScreenshotSubtitles, ToggleScreenshotSubtitles));
         items.Add(Switch(Strings.Get("player.view.keep-history"), Settings.KeepHistory, ToggleKeepHistory));
         items.Add(Switch(Strings.Get("player.view.resume"), Settings.Resume, ToggleResume));
         items.Add(Switch(Strings.Get("player.view.audio-language"), Settings.AudioInInterfaceLanguage, ToggleAudioLanguage));

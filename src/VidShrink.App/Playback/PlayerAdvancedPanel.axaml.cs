@@ -125,6 +125,7 @@ internal partial class PlayerAdvancedPanel : UserControl
         Switches.Children.Add(Toggle("player.advanced.exclusive", player.AudioOutput.Exclusive, player.ToggleAudioExclusive));
         Switches.Children.Add(Toggle("player.advanced.stereo", player.AudioOutput.Stereo, player.ToggleAudioStereo));
         Switches.Children.Add(Toggle("player.view.screenshot-jpg", player.Settings.ScreenshotFormat == ScreenshotFormat.Jpg, player.ToggleScreenshotJpg));
+        Switches.Children.Add(Toggle("player.view.screenshot-subtitles", player.Settings.ScreenshotSubtitles, player.ToggleScreenshotSubtitles));
 
         var state = player.Advanced.State().Select(part => Strings.Get(PlayerView.StateKey(part))).ToList();
         TxtSummary.Text = state.Count == 0 ? Strings.Get("player.advanced.state-off") : string.Join(", ", state);

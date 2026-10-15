@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "ruutu kopioitu leikepöydälle",
   "player.view.screenshot-copy-failed": "ruutua ei voitu kopioida",
   "player.view.screenshot-jpg": "Tallenna kuvakaappaukset JPG-muodossa",
+  "player.view.screenshot-subtitles": "Sisällytä tekstitykset kuvakaappauksiin",
   "player.view.keep-history": "Säilytä historia",
   "player.view.resume": "Jatka siitä, mihin jäin",
   "player.view.seek-steps": "Siirtymäaskeleet",

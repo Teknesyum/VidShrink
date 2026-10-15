@@ -310,6 +310,7 @@ public sealed class OynaticiGelismisTests
 
     /// <summary>
     /// <para>2026-10-14, OYA-P4: panele uc ses cikis anahtari (passthrough, ozel kip, stereo) girdi; olculen satir sayisi 12'den 15'e, <c>Knobs.Count + 8</c>.</para>
+    /// <para>2026-10-15, OYA-P10: panele altyazili kare anahtari girdi; olculen satir sayisi 15'ten 16'ya, <c>Knobs.Count + 9</c>.</para>
     /// </summary>
     [Fact]
     public void AyarlarSayfasindakiGelismisKumesiAyniYollariCagirir()
@@ -326,7 +327,7 @@ public sealed class OynaticiGelismisTests
             var body = new StringBuilder();
             body.AppendLine($"satirlar: {string.Join(" | ", panel.Shown)}");
             body.AppendLine("ozet: " + panel.Summary);
-            Assert.Equal(PlayerView.Knobs.Count + 8, panel.Shown.Count);
+            Assert.Equal(PlayerView.Knobs.Count + 9, panel.Shown.Count);
             Assert.False(panel.IsOpen);
             Assert.Equal(Strings.Get("player.advanced.state-off"), panel.Summary);
 

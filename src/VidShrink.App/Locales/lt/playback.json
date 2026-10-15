@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "kadras nukopijuotas į iškarpinę",
   "player.view.screenshot-copy-failed": "kadro nepavyko nukopijuoti",
   "player.view.screenshot-jpg": "Saugoti ekrano nuotraukas JPG formatu",
+  "player.view.screenshot-subtitles": "Įtraukti subtitrus į ekrano kopijas",
   "player.view.keep-history": "Saugoti istoriją",
   "player.view.resume": "Tęsti nuo ten, kur baigiau",
   "player.view.seek-steps": "Peršokimo žingsniai",

@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "kaader kopeeritud lõikelauale",
   "player.view.screenshot-copy-failed": "kaadrit ei saanud kopeerida",
   "player.view.screenshot-jpg": "Salvesta ekraanipildid JPG-na",
+  "player.view.screenshot-subtitles": "Lisa subtiitrid ekraanipiltidesse",
   "player.view.keep-history": "Säilita ajalugu",
   "player.view.resume": "Jätka sealt, kus pooleli jäi",
   "player.view.seek-steps": "Hüppe sammud",

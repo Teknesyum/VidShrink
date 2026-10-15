@@ -69,7 +69,11 @@ public sealed partial class MpvEngine
         GetProperty("sub-color"),
         Reading(BorderName),
         Reading("sub-shadow-offset"),
-        GetProperty("sub-back-color"));
+        GetProperty("sub-back-color"),
+        GetProperty("sub-ass-override") == "force",
+        GetProperty("sub-filter-sdh") == "yes",
+        GetProperty("sub-bold") == "yes",
+        GetProperty("sub-italic") == "yes");
 
     public double VolumeCeiling => Finite(GetDouble("volume-max"), SoundAdjust.PlainCeiling);
 
@@ -119,6 +123,10 @@ public sealed partial class MpvEngine
         Write(BorderName, style.Outline is { } outline ? F(outline) : null);
         Write("sub-shadow-offset", style.Shadow is { } shadow ? F(shadow) : null);
         Write("sub-back-color", style.Background);
+        Write("sub-ass-override", style.OverrideAss ? "force" : null);
+        Write("sub-filter-sdh", style.HideSdh ? "yes" : null);
+        Write("sub-bold", style.Bold ? "yes" : null);
+        Write("sub-italic", style.Italic ? "yes" : null);
     }
 
     /// <summary>

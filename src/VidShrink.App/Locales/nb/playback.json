@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "bildet er kopiert til utklippstavlen",
   "player.view.screenshot-copy-failed": "bildet kunne ikke kopieres",
   "player.view.screenshot-jpg": "Lagre skjermbilder som JPG",
+  "player.view.screenshot-subtitles": "Ta med undertekster i skjermbilder",
   "player.view.keep-history": "Behold historikk",
   "player.view.resume": "Fortsett der jeg slapp",
   "player.view.seek-steps": "Hoppesteg",

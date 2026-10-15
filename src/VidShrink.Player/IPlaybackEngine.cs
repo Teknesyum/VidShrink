@@ -236,6 +236,9 @@ public interface IPlaybackEngine : IDisposable
 
     Task<bool> SaveScreenshotAsync(string path, CancellationToken ct = default) => Task.FromResult(false);
 
+    /// <summary>Kareyi altyaziyla (<paramref name="withSubtitles"/>) ya da yalniz goruntuyle kaydeder.</summary>
+    Task<bool> SaveScreenshotAsync(string path, bool withSubtitles, CancellationToken ct = default) => SaveScreenshotAsync(path, ct);
+
     PictureAdjust Picture => PictureAdjust.Neutral;
 
     SoundAdjust Sound => SoundAdjust.Neutral;

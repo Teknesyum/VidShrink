@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "frame copied to clipboard",
   "player.view.screenshot-copy-failed": "frame could not be copied",
   "player.view.screenshot-jpg": "Save Screenshots as JPG",
+  "player.view.screenshot-subtitles": "Include Subtitles in Screenshots",
   "player.view.keep-history": "Keep History",
   "player.view.resume": "Resume Where I Left Off",
   "player.view.seek-steps": "Seek Steps",

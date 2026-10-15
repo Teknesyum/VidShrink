@@ -554,7 +554,9 @@ public sealed partial class MpvEngine : IPlaybackEngine
 
     public void SetRepeatFile(bool repeat) => TrySet("loop-file", repeat ? "inf" : "no");
 
-    public async Task<bool> SaveScreenshotAsync(string path, CancellationToken ct = default)
+    public Task<bool> SaveScreenshotAsync(string path, CancellationToken ct = default) => SaveScreenshotAsync(path, false, ct);
+
+    public async Task<bool> SaveScreenshotAsync(string path, bool withSubtitles, CancellationToken ct = default)
     {
         if (!_isOpen || Volatile.Read(ref _disposed) != 0) return false;
         var target = Path.GetFullPath(path);
@@ -562,7 +564,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
         Interlocked.Exchange(ref _shot, done)?.TrySetResult(false);
         TrySet("screenshot-jpeg-quality", ScreenshotJpegQuality.ToString(CultureInfo.InvariantCulture));
 
-        if (CommandRc(ShotTag, "screenshot-to-file", target, "video") < 0)
+        if (CommandRc(ShotTag, "screenshot-to-file", target, withSubtitles ? "subtitles" : "video") < 0)
         {
             Interlocked.CompareExchange(ref _shot, null, done);
             return false;

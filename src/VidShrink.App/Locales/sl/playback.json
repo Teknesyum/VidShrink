@@ -31,6 +31,7 @@
   "player.view.screenshot-copied": "sličica kopirana v odložišče",
   "player.view.screenshot-copy-failed": "sličice ni bilo mogoče kopirati",
   "player.view.screenshot-jpg": "Shranjuj posnetke zaslona kot JPG",
+  "player.view.screenshot-subtitles": "Vključi podnapise v posnetke zaslona",
   "player.view.keep-history": "Hrani zgodovino",
   "player.view.resume": "Nadaljuj, kjer sem končal",
   "player.view.seek-steps": "Koraki preskoka",
