@@ -55,6 +55,8 @@
   "editor.export.separate": "Exportar clips como archivos separados",
   "editor.export.segments-done": "{0} clips exportados en: {1}",
   "editor.export.segment-failed": "El clip {0} falló, el resto se omitió: {1}",
+  "editor.export.chapters": "Escribir capítulos desde los clips",
+  "editor.export.chapters.tip": "Cada clip se convierte en un capítulo del archivo exportado, con el nombre de su etiqueta. Si está desactivado, se conservan los capítulos de la fuente, desplazados según los cortes.",
   "editor.tool.selection": "Herramienta de selección",
   "editor.tool.razor": "Herramienta de cuchilla",
   "editor.tool.ripple": "Herramienta de edición de rizo",

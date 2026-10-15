@@ -55,6 +55,8 @@
   "editor.export.separate": "Esporta le clip come file separati",
   "editor.export.segments-done": "{0} clip esportate in: {1}",
   "editor.export.segment-failed": "La clip {0} non è riuscita, le restanti sono state saltate: {1}",
+  "editor.export.chapters": "Scrivi capitoli dalle clip",
+  "editor.export.chapters.tip": "Ogni clip diventa un capitolo del file esportato, con il nome della sua etichetta. Se disattivato, i capitoli della sorgente vengono mantenuti e spostati secondo i tagli.",
   "editor.tool.selection": "Strumento Selezione",
   "editor.tool.razor": "Strumento Taglierina",
   "editor.tool.ripple": "Strumento Modifica a effetto domino",

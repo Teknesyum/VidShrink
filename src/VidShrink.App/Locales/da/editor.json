@@ -55,6 +55,8 @@
   "editor.export.separate": "Eksportér klip som separate filer",
   "editor.export.segments-done": "{0} klip eksporteret til: {1}",
   "editor.export.segment-failed": "Klip {0} mislykkedes, resten blev sprunget over: {1}",
+  "editor.export.chapters": "Skriv kapitler fra klip",
+  "editor.export.chapters.tip": "Hvert klip bliver et kapitel i den eksporterede fil, opkaldt efter sin etiket. Når det er slået fra, bevares kildens kapitler og forskydes efter klippene.",
   "editor.tool.selection": "Markeringsværktøj",
   "editor.tool.razor": "Barberbladsværktøj",
   "editor.tool.ripple": "Ringredigeringsværktøj",

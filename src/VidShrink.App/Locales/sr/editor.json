@@ -55,6 +55,8 @@
   "editor.export.separate": "Извези клипове као засебне датотеке",
   "editor.export.segments-done": "Извезено клипова: {0}, у: {1}",
   "editor.export.segment-failed": "Клип {0} није успео, остали су прескочени: {1}",
+  "editor.export.chapters": "Упиши поглавља из клипова",
+  "editor.export.chapters.tip": "Сваки клип постаје поглавље у извезеној датотеци, названо по својој ознаци. Када је искључено, поглавља извора се чувају и померају према резовима.",
   "editor.tool.selection": "Alatka za izbor",
   "editor.tool.razor": "Alatka žilet",
   "editor.tool.ripple": "Alatka za talasasto uređivanje",

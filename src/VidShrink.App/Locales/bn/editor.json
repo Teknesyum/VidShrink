@@ -55,6 +55,8 @@
   "editor.export.separate": "ক্লিপগুলো আলাদা ফাইলে রপ্তানি করুন",
   "editor.export.segments-done": "{0}টি ক্লিপ রপ্তানি হয়েছে: {1}",
   "editor.export.segment-failed": "ক্লিপ {0} ব্যর্থ হয়েছে, বাকিগুলো বাদ দেওয়া হয়েছে: {1}",
+  "editor.export.chapters": "ক্লিপ থেকে অধ্যায় লিখুন",
+  "editor.export.chapters.tip": "প্রতিটি ক্লিপ রপ্তানি করা ফাইলে একটি অধ্যায় হয় এবং তার লেবেলের নাম পায়। বন্ধ থাকলে উৎসের অধ্যায়গুলো রাখা হয় এবং কাটের সাথে সরানো হয়।",
   "editor.tool.selection": "নির্বাচন টুল",
   "editor.tool.razor": "রেজার টুল",
   "editor.tool.ripple": "রিপল এডিট টুল",

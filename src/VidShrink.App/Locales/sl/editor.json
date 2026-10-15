@@ -55,6 +55,8 @@
   "editor.export.separate": "Izvozi posnetke kot ločene datoteke",
   "editor.export.segments-done": "Izvoženih posnetkov: {0}, v: {1}",
   "editor.export.segment-failed": "Posnetek {0} ni uspel, preostali so bili preskočeni: {1}",
+  "editor.export.chapters": "Zapiši poglavja iz posnetkov",
+  "editor.export.chapters.tip": "Vsak posnetek postane poglavje v izvoženi datoteki, poimenovano po svoji oznaki. Ko je izklopljeno, se poglavja vira ohranijo in zamaknejo glede na reze.",
   "editor.tool.selection": "Orodje za izbiro",
   "editor.tool.razor": "Orodje britvica",
   "editor.tool.ripple": "Orodje za valovito urejanje",

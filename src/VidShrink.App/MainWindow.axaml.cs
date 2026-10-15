@@ -1642,6 +1642,7 @@ public partial class MainWindow : Window
             AdvDropMetadata = ChkAdvDropMetadata.IsChecked == true,
             ConvertDropMetadata = ChkConvertDropMetadata.IsChecked == true,
             EditorDropMetadata = _editorPane?.DropMetadata ?? _editorDropMetadata,
+            EditorClipChapters = _editorPane?.ClipChapters ?? _editorClipChapters,
             EditorPartNamePattern = _editorPartNamePattern,
             OutputFolderMode = OutputFolderModeIndex,
             OutputFolder = TxtOutputFolder.Text ?? "",
@@ -1690,6 +1691,8 @@ public partial class MainWindow : Window
             ChkConvertDropMetadata.IsChecked = settings.ConvertDropMetadata;
             _editorDropMetadata = settings.EditorDropMetadata;
             if (_editorPane is not null) _editorPane.DropMetadata = settings.EditorDropMetadata;
+            _editorClipChapters = settings.EditorClipChapters;
+            if (_editorPane is not null) _editorPane.ClipChapters = settings.EditorClipChapters;
             _editorPartNamePattern = settings.EditorPartNamePattern;
             if (_editorPane is not null) _editorPane.PartNamePattern = settings.EditorPartNamePattern;
 

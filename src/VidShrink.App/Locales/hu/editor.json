@@ -55,6 +55,8 @@
   "editor.export.separate": "Klipek exportálása külön fájlokba",
   "editor.export.segments-done": "{0} klip exportálva ide: {1}",
   "editor.export.segment-failed": "A(z) {0}. klip sikertelen, a többi kimaradt: {1}",
+  "editor.export.chapters": "Fejezetek írása a klipekből",
+  "editor.export.chapters.tip": "Minden klip fejezet lesz az exportált fájlban, a címkéje szerinti névvel. Kikapcsolva a forrás fejezetei megmaradnak, a vágásokhoz igazítva eltolva.",
   "editor.tool.selection": "Kijelölő eszköz",
   "editor.tool.razor": "Borotva eszköz",
   "editor.tool.ripple": "Hullámszerkesztő eszköz",

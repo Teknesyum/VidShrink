@@ -55,6 +55,8 @@
   "editor.export.separate": "Hamisha klipu kama faili tofauti",
   "editor.export.segments-done": "Klipu {0} zimehamishwa hadi: {1}",
   "editor.export.segment-failed": "Klipu {0} imeshindwa, zilizobaki zimerukwa: {1}",
+  "editor.export.chapters": "Andika sura kutoka klipu",
+  "editor.export.chapters.tip": "Kila klipu inakuwa sura katika faili iliyohamishwa, ikipewa jina la lebo yake. Ikizimwa, sura za chanzo zinahifadhiwa na kusogezwa kufuata mikato.",
   "editor.tool.selection": "Zana ya kuchagua",
   "editor.tool.razor": "Zana ya wembe",
   "editor.tool.ripple": "Zana ya uhariri wa mawimbi",

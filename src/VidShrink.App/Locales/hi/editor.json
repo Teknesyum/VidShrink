@@ -55,6 +55,8 @@
   "editor.export.separate": "क्लिप को अलग-अलग फ़ाइलों में निर्यात करें",
   "editor.export.segments-done": "{0} क्लिप निर्यात हुए: {1}",
   "editor.export.segment-failed": "क्लिप {0} विफल रहा, बाकी छोड़ दिए गए: {1}",
+  "editor.export.chapters": "क्लिप से अध्याय लिखें",
+  "editor.export.chapters.tip": "हर क्लिप निर्यात की गई फ़ाइल में एक अध्याय बनती है और अपने लेबल का नाम लेती है। बंद होने पर स्रोत के अध्याय रखे जाते हैं और कट के अनुसार खिसकाए जाते हैं।",
   "editor.tool.selection": "चयन टूल",
   "editor.tool.razor": "रेज़र टूल",
   "editor.tool.ripple": "रिपल संपादन टूल",

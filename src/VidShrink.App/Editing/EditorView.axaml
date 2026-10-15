@@ -97,6 +97,7 @@
                           <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.drop-metadata.tip}"/>
                         </ToolTip.Tip>
                       </CheckBox>
+                      <CheckBox x:Name="ChkExportChapters" Theme="{StaticResource CheckStyle}" Content="{loc:Text editor.export.chapters}" ToolTip.Tip="{loc:Text editor.export.chapters.tip}"/>
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                         <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.part-name}"/>
                         <TextBox x:Name="TxtPartName" Width="{StaticResource FieldWidth}" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.export.part-name}" ToolTip.Tip="{loc:Text editor.export.part-name.hint}"/>

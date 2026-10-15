@@ -55,6 +55,8 @@
   "editor.export.separate": "Eksportuoti klipus kaip atskirus failus",
   "editor.export.segments-done": "Eksportuota klipų: {0}, į: {1}",
   "editor.export.segment-failed": "Klipas {0} nepavyko, likusieji praleisti: {1}",
+  "editor.export.chapters": "Rašyti skyrius iš klipų",
+  "editor.export.chapters.tip": "Kiekvienas klipas eksportuotame faile tampa skyriumi, pavadintu pagal jo žymę. Išjungus šaltinio skyriai išsaugomi ir paslenkami pagal kirpimus.",
   "editor.tool.selection": "Žymėjimo įrankis",
   "editor.tool.razor": "Skustuvo įrankis",
   "editor.tool.ripple": "Bangavimo redagavimo įrankis",

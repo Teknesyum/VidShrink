@@ -55,6 +55,8 @@
   "editor.export.separate": "将片段导出为单独的文件",
   "editor.export.segments-done": "已导出 {0} 个片段至：{1}",
   "editor.export.segment-failed": "片段 {0} 失败，其余已跳过：{1}",
+  "editor.export.chapters": "由片段写入章节",
+  "editor.export.chapters.tip": "每个片段在导出文件中成为一个章节，以其标签命名。关闭时保留源文件的章节，并随剪切位置平移。",
   "editor.tool.selection": "选择工具",
   "editor.tool.razor": "剃刀工具",
   "editor.tool.ripple": "波纹编辑工具",

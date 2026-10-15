@@ -55,6 +55,8 @@
   "editor.export.separate": "Izvezi isječke kao zasebne datoteke",
   "editor.export.segments-done": "Izvezeno isječaka: {0}, u: {1}",
   "editor.export.segment-failed": "Isječak {0} nije uspio, ostali su preskočeni: {1}",
+  "editor.export.chapters": "Zapiši poglavlja iz isječaka",
+  "editor.export.chapters.tip": "Svaki isječak postaje poglavlje u izvezenoj datoteci, nazvano po svojoj oznaci. Kad je isključeno, poglavlja izvora se čuvaju i pomiču prema rezovima.",
   "editor.tool.selection": "Alat za odabir",
   "editor.tool.razor": "Alat britva",
   "editor.tool.ripple": "Alat za valovito uređivanje",

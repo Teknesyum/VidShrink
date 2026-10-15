@@ -55,6 +55,8 @@
   "editor.export.separate": "Xuất các clip thành tệp riêng",
   "editor.export.segments-done": "Đã xuất {0} clip vào: {1}",
   "editor.export.segment-failed": "Clip {0} thất bại, phần còn lại đã bị bỏ qua: {1}",
+  "editor.export.chapters": "Ghi chương từ các đoạn",
+  "editor.export.chapters.tip": "Mỗi đoạn trở thành một chương trong tệp xuất, mang tên nhãn của nó. Khi tắt, các chương của nguồn được giữ và dịch theo các vết cắt.",
   "editor.tool.selection": "Công cụ chọn",
   "editor.tool.razor": "Công cụ dao cạo",
   "editor.tool.ripple": "Công cụ chỉnh sửa gợn sóng",
