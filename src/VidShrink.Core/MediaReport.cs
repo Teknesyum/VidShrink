@@ -26,7 +26,7 @@ public static class MediaReport
     /// Dökümün üretebildiği her alan adı ve evet/hayır değeri. Etiket anahtarı bu adlardan kurulur;
     /// ölü çeviri sayımı anahtarı derlemede göremediği için kümeyi buradan okur.
     /// </summary>
-    public static readonly IReadOnlyList<string> FieldKeys = new[]
+    internal static readonly IReadOnlyList<string> FieldKeys = new[]
     {
         "file", "size", "duration", "format", "bitrate", "streams", "chapters", "titles",
         "codec", "profile", "tag", "resolution", "par", "fps", "pixel-format", "bit-depth", "color",
@@ -34,7 +34,7 @@ public static class MediaReport
         "title", "default", "forced", "cover", "start", "end", "yes", "no",
     };
 
-    public static IEnumerable<string> SectionKeys
+    internal static IEnumerable<string> SectionKeys
         => new[] { "general", "chapter" }.Concat(Enum.GetValues<StreamKind>().Select(k => k.ToString().ToLowerInvariant()));
 
     public static IReadOnlyList<ReportSection> Build(MediaInfo info, CultureInfo culture)
