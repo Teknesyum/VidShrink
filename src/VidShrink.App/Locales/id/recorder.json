@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Gambar masker",
   "recorder.mask.draw-hint": "Seret mouse di atas area yang harus tampak buram dalam rekaman; Esc membatalkan.",
   "recorder.mask.clear": "Hapus masker",
-  "recorder.mask.count": "Masker: {0}"
+  "recorder.mask.count": "Masker: {0}",
+  "recorder.disk.low": "Ruang kosong di disk tinggal {0}; rekaman bisa berhenti di tengah jalan.",
+  "recorder.recover.found": "Rekaman yang belum selesai ditemukan: {0}",
+  "recorder.recover.action": "Pulihkan",
+  "recorder.recover.done": "Rekaman dipulihkan: {0}",
+  "recorder.recover.failed": "Rekaman tidak dapat dipulihkan; berkas tangkapan tetap ada: {0}"
 }

@@ -12,6 +12,14 @@ public static class DiskSpaceGuard
 
     public static bool ShouldPause(long freeBytes) => freeBytes < PauseBelowBytes;
 
+    /// <summary>EKA-11: kaydedicinin uyari esigi; kaydin boyu onceden bilinmedigi icin kuyruktan genis tutulur.</summary>
+    public static readonly long RecorderLowBelowBytes = (long)(1000 * Megabayt.Bayt);
+
+    /// <summary>EKA-11: kayit surerken bos alanin yeniden okunma araligi.</summary>
+    public static readonly TimeSpan RecorderCheckInterval = TimeSpan.FromSeconds(10);
+
+    public static bool IsLowForRecording(long freeBytes) => freeBytes < RecorderLowBelowBytes;
+
     public static long RequiredBytes(double targetMb)
         => (long)((targetMb * Multiplier + ExtraBufferMb) * Megabayt.Bayt);
 

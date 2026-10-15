@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Tegn maske",
   "recorder.mask.draw-hint": "Dra med musen over området som skal vises uskarpt i opptaket; Esc avbryter.",
   "recorder.mask.clear": "Fjern masker",
-  "recorder.mask.count": "Masker: {0}"
+  "recorder.mask.count": "Masker: {0}",
+  "recorder.disk.low": "Bare {0} ledig på disken; opptaket kan stoppe underveis.",
+  "recorder.recover.found": "Uferdig opptak funnet: {0}",
+  "recorder.recover.action": "Gjenopprett",
+  "recorder.recover.done": "Opptaket er gjenopprettet: {0}",
+  "recorder.recover.failed": "Kunne ikke gjenopprette opptaket; opptaksfilen ligger der fortsatt: {0}"
 }

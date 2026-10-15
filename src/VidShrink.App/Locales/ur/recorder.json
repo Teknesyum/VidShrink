@@ -288,5 +288,10 @@
   "recorder.mask.draw": "ماسک بنائیں",
   "recorder.mask.draw-hint": "ماؤس سے اس حصے پر گھسیٹیں جو ریکارڈنگ میں دھندلا دکھائی دے؛ Esc منسوخ کرتا ہے۔",
   "recorder.mask.clear": "ماسک ہٹائیں",
-  "recorder.mask.count": "ماسک: {0}"
+  "recorder.mask.count": "ماسک: {0}",
+  "recorder.disk.low": "ڈسک پر صرف {0} خالی جگہ باقی ہے؛ ریکارڈنگ درمیان میں رک سکتی ہے۔",
+  "recorder.recover.found": "ادھوری ریکارڈنگ ملی: {0}",
+  "recorder.recover.action": "بحال کریں",
+  "recorder.recover.done": "ریکارڈنگ بحال ہو گئی: {0}",
+  "recorder.recover.failed": "ریکارڈنگ بحال نہیں ہو سکی؛ کیپچر فائل اپنی جگہ موجود ہے: {0}"
 }

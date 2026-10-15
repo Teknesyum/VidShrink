@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Disegna maschera",
   "recorder.mask.draw-hint": "Trascina con il mouse sull'area che deve apparire sfocata nella registrazione; Esc annulla.",
   "recorder.mask.clear": "Rimuovi maschere",
-  "recorder.mask.count": "Maschere: {0}"
+  "recorder.mask.count": "Maschere: {0}",
+  "recorder.disk.low": "Restano solo {0} liberi sul disco; la registrazione potrebbe interrompersi.",
+  "recorder.recover.found": "Trovata una registrazione incompleta: {0}",
+  "recorder.recover.action": "Recupera",
+  "recorder.recover.done": "Registrazione recuperata: {0}",
+  "recorder.recover.failed": "Impossibile recuperare la registrazione; il file di acquisizione è ancora al suo posto: {0}"
 }

@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Zīmēt masku",
   "recorder.mask.draw-hint": "Velciet ar peli pāri apgabalam, kam ierakstā jābūt izplūdušam; Esc atceļ.",
   "recorder.mask.clear": "Noņemt maskas",
-  "recorder.mask.count": "Maskas: {0}"
+  "recorder.mask.count": "Maskas: {0}",
+  "recorder.disk.low": "Diskā brīvi palikuši tikai {0}; ieraksts var pārtrūkt.",
+  "recorder.recover.found": "Atrasts nepabeigts ieraksts: {0}",
+  "recorder.recover.action": "Atjaunot",
+  "recorder.recover.done": "Ieraksts atjaunots: {0}",
+  "recorder.recover.failed": "Ierakstu neizdevās atjaunot; uztveršanas fails paliek vietā: {0}"
 }

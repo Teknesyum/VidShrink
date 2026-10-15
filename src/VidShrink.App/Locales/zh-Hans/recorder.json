@@ -288,5 +288,10 @@
   "recorder.mask.draw": "绘制遮罩",
   "recorder.mask.draw-hint": "用鼠标拖选录制中需要模糊显示的区域；按 Esc 取消。",
   "recorder.mask.clear": "移除遮罩",
-  "recorder.mask.count": "遮罩：{0}"
+  "recorder.mask.count": "遮罩：{0}",
+  "recorder.disk.low": "磁盘仅剩 {0} 可用空间；录制可能中途停止。",
+  "recorder.recover.found": "发现未完成的录制：{0}",
+  "recorder.recover.action": "恢复",
+  "recorder.recover.done": "录制已恢复：{0}",
+  "recorder.recover.failed": "无法恢复录制；捕获文件仍保留在原处：{0}"
 }

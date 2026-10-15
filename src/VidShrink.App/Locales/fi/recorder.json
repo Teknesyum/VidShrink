@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Piirrä maski",
   "recorder.mask.draw-hint": "Vedä hiirellä alueen yli, jonka pitää näkyä tallenteessa sumeana; Esc peruu.",
   "recorder.mask.clear": "Poista maskit",
-  "recorder.mask.count": "Maskit: {0}"
+  "recorder.mask.count": "Maskit: {0}",
+  "recorder.disk.low": "Levyllä on vapaana vain {0}; tallennus voi keskeytyä.",
+  "recorder.recover.found": "Keskeneräinen tallenne löytyi: {0}",
+  "recorder.recover.action": "Palauta",
+  "recorder.recover.done": "Tallenne palautettu: {0}",
+  "recorder.recover.failed": "Tallennetta ei voitu palauttaa; kaappaustiedosto on yhä paikallaan: {0}"
 }

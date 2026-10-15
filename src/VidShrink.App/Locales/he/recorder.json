@@ -288,5 +288,10 @@
   "recorder.mask.draw": "צייר מסכה",
   "recorder.mask.draw-hint": "גרור עם העכבר מעל האזור שצריך להופיע מטושטש בהקלטה; Esc מבטל.",
   "recorder.mask.clear": "הסר מסכות",
-  "recorder.mask.count": "מסכות: {0}"
+  "recorder.mask.count": "מסכות: {0}",
+  "recorder.disk.low": "נותרו בדיסק רק {0} פנויים; ההקלטה עלולה להיעצר באמצע.",
+  "recorder.recover.found": "נמצאה הקלטה שלא הושלמה: {0}",
+  "recorder.recover.action": "שחזור",
+  "recorder.recover.done": "ההקלטה שוחזרה: {0}",
+  "recorder.recover.failed": "לא ניתן לשחזר את ההקלטה; קובץ הלכידה נשאר במקומו: {0}"
 }

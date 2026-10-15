@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Masker tekenen",
   "recorder.mask.draw-hint": "Sleep met de muis over het gebied dat in de opname vervaagd moet zijn; Esc annuleert.",
   "recorder.mask.clear": "Maskers verwijderen",
-  "recorder.mask.count": "Maskers: {0}"
+  "recorder.mask.count": "Maskers: {0}",
+  "recorder.disk.low": "Nog maar {0} vrij op de schijf; de opname kan halverwege stoppen.",
+  "recorder.recover.found": "Onvoltooide opname gevonden: {0}",
+  "recorder.recover.action": "Herstellen",
+  "recorder.recover.done": "Opname hersteld: {0}",
+  "recorder.recover.failed": "Opname kon niet worden hersteld; het opnamebestand staat er nog: {0}"
 }

@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Nakreslit masku",
   "recorder.mask.draw-hint": "Přetáhněte myší přes oblast, která má být v nahrávce rozmazaná; Esc zruší.",
   "recorder.mask.clear": "Odebrat masky",
-  "recorder.mask.count": "Masky: {0}"
+  "recorder.mask.count": "Masky: {0}",
+  "recorder.disk.low": "Na disku zbývá jen {0} volného místa; nahrávání se může přerušit.",
+  "recorder.recover.found": "Nalezen nedokončený záznam: {0}",
+  "recorder.recover.action": "Obnovit",
+  "recorder.recover.done": "Záznam obnoven: {0}",
+  "recorder.recover.failed": "Záznam se nepodařilo obnovit; soubor záznamu zůstává na místě: {0}"
 }

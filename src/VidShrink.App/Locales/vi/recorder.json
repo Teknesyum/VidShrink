@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Vẽ mặt nạ",
   "recorder.mask.draw-hint": "Kéo chuột qua vùng cần làm mờ trong bản ghi; Esc để hủy.",
   "recorder.mask.clear": "Xóa mặt nạ",
-  "recorder.mask.count": "Mặt nạ: {0}"
+  "recorder.mask.count": "Mặt nạ: {0}",
+  "recorder.disk.low": "Đĩa chỉ còn trống {0}; bản ghi có thể dừng giữa chừng.",
+  "recorder.recover.found": "Tìm thấy bản ghi chưa hoàn tất: {0}",
+  "recorder.recover.action": "Khôi phục",
+  "recorder.recover.done": "Đã khôi phục bản ghi: {0}",
+  "recorder.recover.failed": "Không thể khôi phục bản ghi; tệp ghi vẫn còn nguyên: {0}"
 }

@@ -288,5 +288,10 @@
   "recorder.mask.draw": "マスクを描く",
   "recorder.mask.draw-hint": "録画でぼかす範囲をマウスでドラッグして選択します。Esc で取り消し。",
   "recorder.mask.clear": "マスクを削除",
-  "recorder.mask.count": "マスク: {0}"
+  "recorder.mask.count": "マスク: {0}",
+  "recorder.disk.low": "ディスクの空き容量が {0} しかありません。録画が途中で止まる可能性があります。",
+  "recorder.recover.found": "未完了の録画が見つかりました: {0}",
+  "recorder.recover.action": "復元",
+  "recorder.recover.done": "録画を復元しました: {0}",
+  "recorder.recover.failed": "録画を復元できませんでした。キャプチャファイルはそのまま残っています: {0}"
 }

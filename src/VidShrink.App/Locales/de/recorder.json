@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Maske zeichnen",
   "recorder.mask.draw-hint": "Ziehe mit der Maus über den Bereich, der in der Aufnahme unscharf erscheinen soll; Esc bricht ab.",
   "recorder.mask.clear": "Masken entfernen",
-  "recorder.mask.count": "Masken: {0}"
+  "recorder.mask.count": "Masken: {0}",
+  "recorder.disk.low": "Nur noch {0} frei auf dem Datenträger; die Aufnahme könnte abbrechen.",
+  "recorder.recover.found": "Unvollständige Aufnahme gefunden: {0}",
+  "recorder.recover.action": "Wiederherstellen",
+  "recorder.recover.done": "Aufnahme wiederhergestellt: {0}",
+  "recorder.recover.failed": "Aufnahme konnte nicht wiederhergestellt werden; die Aufnahmedatei bleibt erhalten: {0}"
 }

@@ -323,6 +323,30 @@
                TextWrapping="Wrap"
                IsVisible="False"/>
 
+    <Grid x:Name="DiskRow" Classes="reveal" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceXs}" IsVisible="False">
+      <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}"
+            Stretch="Uniform" VerticalAlignment="Top"
+            Data="{StaticResource IconWarning}" Fill="{StaticResource TextBody}"/>
+      <TextBlock x:Name="TxtDisk" Grid.Column="1"
+                 Theme="{StaticResource StatusWarning}"
+                 TextWrapping="Wrap"/>
+    </Grid>
+
+    <Grid x:Name="RecoverRow" Classes="reveal" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceXs}" IsVisible="False">
+      <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}"
+            Stretch="Uniform" VerticalAlignment="Center"
+            Data="{StaticResource IconWarning}" Fill="{StaticResource TextBody}"/>
+      <TextBlock x:Name="TxtRecover" Grid.Column="1"
+                 Theme="{StaticResource StatusWarning}"
+                 VerticalAlignment="Center"
+                 TextWrapping="Wrap"/>
+      <Button x:Name="BtnRecover" Grid.Column="2"
+              Theme="{StaticResource GhostButton}"
+              Content="{loc:Text recorder.recover.action}"
+              auto:AutomationProperties.Name="{loc:Text recorder.recover.action}"
+              Click="OnRecover"/>
+    </Grid>
+
     <TextBlock x:Name="TxtWizardSummary"
                Theme="{StaticResource Hint}"
                TextWrapping="Wrap"

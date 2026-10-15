@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Piešti kaukę",
   "recorder.mask.draw-hint": "Pele pertempkite per sritį, kuri įraše turi būti sulieta; Esc atšaukia.",
   "recorder.mask.clear": "Pašalinti kaukes",
-  "recorder.mask.count": "Kaukės: {0}"
+  "recorder.mask.count": "Kaukės: {0}",
+  "recorder.disk.low": "Diske liko tik {0} laisvos vietos; įrašymas gali nutrūkti.",
+  "recorder.recover.found": "Rastas nebaigtas įrašas: {0}",
+  "recorder.recover.action": "Atkurti",
+  "recorder.recover.done": "Įrašas atkurtas: {0}",
+  "recorder.recover.failed": "Įrašo atkurti nepavyko; įrašymo failas liko vietoje: {0}"
 }

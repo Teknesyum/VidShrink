@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Chora kinyago",
   "recorder.mask.draw-hint": "Buruta kwa panya juu ya eneo linalopaswa kuonekana na ukungu kwenye rekodi; Esc hughairi.",
   "recorder.mask.clear": "Ondoa vinyago",
-  "recorder.mask.count": "Vinyago: {0}"
+  "recorder.mask.count": "Vinyago: {0}",
+  "recorder.disk.low": "Nafasi iliyobaki kwenye diski ni {0} tu; kurekodi kunaweza kusimama katikati.",
+  "recorder.recover.found": "Rekodi ambayo haijakamilika imepatikana: {0}",
+  "recorder.recover.action": "Rejesha",
+  "recorder.recover.done": "Rekodi imerejeshwa: {0}",
+  "recorder.recover.failed": "Imeshindwa kurejesha rekodi; faili ya kunasa bado ipo: {0}"
 }

@@ -288,5 +288,10 @@
   "recorder.mask.draw": "마스크 그리기",
   "recorder.mask.draw-hint": "녹화에서 흐리게 보일 영역을 마우스로 끌어 선택하세요. Esc를 누르면 취소됩니다.",
   "recorder.mask.clear": "마스크 제거",
-  "recorder.mask.count": "마스크: {0}"
+  "recorder.mask.count": "마스크: {0}",
+  "recorder.disk.low": "디스크 여유 공간이 {0}만 남았습니다. 녹화가 중간에 멈출 수 있습니다.",
+  "recorder.recover.found": "완료되지 않은 녹화를 찾았습니다: {0}",
+  "recorder.recover.action": "복구",
+  "recorder.recover.done": "녹화를 복구했습니다: {0}",
+  "recorder.recover.failed": "녹화를 복구하지 못했습니다. 캡처 파일은 그대로 남아 있습니다: {0}"
 }

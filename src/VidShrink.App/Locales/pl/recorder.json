@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Rysuj maskę",
   "recorder.mask.draw-hint": "Przeciągnij myszą po obszarze, który ma być rozmyty w nagraniu; Esc anuluje.",
   "recorder.mask.clear": "Usuń maski",
-  "recorder.mask.count": "Maski: {0}"
+  "recorder.mask.count": "Maski: {0}",
+  "recorder.disk.low": "Na dysku zostało tylko {0} wolnego miejsca; nagrywanie może zostać przerwane.",
+  "recorder.recover.found": "Znaleziono niedokończone nagranie: {0}",
+  "recorder.recover.action": "Odzyskaj",
+  "recorder.recover.done": "Nagranie odzyskane: {0}",
+  "recorder.recover.failed": "Nie udało się odzyskać nagrania; plik przechwytywania pozostał na miejscu: {0}"
 }

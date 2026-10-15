@@ -586,6 +586,35 @@ public static class RecorderArguments
         return Path.Combine(Path.GetDirectoryName(capturePath) ?? string.Empty, stem + extension);
     }
 
+    /// <summary>
+    /// EKA-20: dosya adi Matroska yakalamasinin isaretini (<c>&lt;ad&gt;.yakalama.mkv</c>) tasiyor mu.
+    /// Teslimden sonra bu ad diskte kalmaz; kalmissa kayit cokmus ya da kesilmistir.
+    /// </summary>
+    public static bool IsMatroskaCapture(string path)
+        => !string.IsNullOrWhiteSpace(path)
+           && Path.GetFileName(path).EndsWith(CaptureMark + ".mkv", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Yarim kalan yakalamanin kurtarma hedefi: MP4 ya da MOV seciliyse o kap, degilse MP4
+    /// (yakalama yalniz bu iki kap icin yazilir). Ad doluysa <c>_2</c>, <c>_3</c> eklenir.
+    /// </summary>
+    public static string RecoveryTarget(string capturePath, RecorderContainer container, Func<string, bool> exists)
+    {
+        ArgumentNullException.ThrowIfNull(exists);
+        var extension = "." + Extension(container is RecorderContainer.Mov ? RecorderContainer.Mov : RecorderContainer.Mp4);
+        var first = MatroskaDeliveryPath(capturePath, extension);
+        var folder = Path.GetDirectoryName(first) ?? string.Empty;
+        var stem = Path.GetFileNameWithoutExtension(first);
+        var candidate = first;
+        for (var index = 2; exists(candidate); index++)
+            candidate = Path.Combine(folder, stem + "_" + index.ToString(CultureInfo.InvariantCulture) + extension);
+        return candidate;
+    }
+
+    /// <summary>Matroska yakalamasini teslim kabina <c>-c copy -movflags +faststart</c> ile aktarir.</summary>
+    public static IReadOnlyList<string> BuildMatroskaDelivery(string source, string target)
+        => new[] { "-hide_banner", "-y", "-nostdin", "-i", source, "-map", "0", "-c", "copy", "-movflags", "+faststart", target };
+
     public static RecorderRequest CaptureRequest(RecorderRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);

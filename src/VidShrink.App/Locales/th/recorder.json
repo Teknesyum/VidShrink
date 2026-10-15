@@ -288,5 +288,10 @@
   "recorder.mask.draw": "วาดมาสก์",
   "recorder.mask.draw-hint": "ลากเมาส์ครอบพื้นที่ที่ต้องการให้เบลอในการบันทึก กด Esc เพื่อยกเลิก",
   "recorder.mask.clear": "ลบมาสก์",
-  "recorder.mask.count": "มาสก์: {0}"
+  "recorder.mask.count": "มาสก์: {0}",
+  "recorder.disk.low": "เหลือพื้นที่ว่างบนดิสก์เพียง {0} การบันทึกอาจหยุดกลางคัน",
+  "recorder.recover.found": "พบการบันทึกที่ยังไม่เสร็จ: {0}",
+  "recorder.recover.action": "กู้คืน",
+  "recorder.recover.done": "กู้คืนการบันทึกแล้ว: {0}",
+  "recorder.recover.failed": "กู้คืนการบันทึกไม่ได้ ไฟล์จับภาพยังอยู่ที่เดิม: {0}"
 }

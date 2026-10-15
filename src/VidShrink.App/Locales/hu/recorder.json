@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Maszk rajzolása",
   "recorder.mask.draw-hint": "Húzza az egeret a terület fölé, amely a felvételen elmosódva jelenjen meg; az Esc megszakítja.",
   "recorder.mask.clear": "Maszkok eltávolítása",
-  "recorder.mask.count": "Maszkok: {0}"
+  "recorder.mask.count": "Maszkok: {0}",
+  "recorder.disk.low": "Csak {0} szabad hely maradt a lemezen; a felvétel félbeszakadhat.",
+  "recorder.recover.found": "Befejezetlen felvétel található: {0}",
+  "recorder.recover.action": "Helyreállítás",
+  "recorder.recover.done": "Felvétel helyreállítva: {0}",
+  "recorder.recover.failed": "A felvételt nem sikerült helyreállítani; a rögzítési fájl a helyén maradt: {0}"
 }

@@ -288,5 +288,10 @@
   "recorder.mask.draw": "Desenează mască",
   "recorder.mask.draw-hint": "Trage cu mausul peste zona care trebuie să apară estompată în înregistrare; Esc anulează.",
   "recorder.mask.clear": "Elimină măștile",
-  "recorder.mask.count": "Măști: {0}"
+  "recorder.mask.count": "Măști: {0}",
+  "recorder.disk.low": "Au mai rămas doar {0} liberi pe disc; înregistrarea s-ar putea opri.",
+  "recorder.recover.found": "S-a găsit o înregistrare neterminată: {0}",
+  "recorder.recover.action": "Recuperează",
+  "recorder.recover.done": "Înregistrare recuperată: {0}",
+  "recorder.recover.failed": "Înregistrarea nu a putut fi recuperată; fișierul de captură rămâne pe loc: {0}"
 }
