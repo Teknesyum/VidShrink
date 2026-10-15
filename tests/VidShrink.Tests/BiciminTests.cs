@@ -1533,6 +1533,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-14, iz secim paneli (DZA-P5): uc yeni anahtar (<c>editor.export.audio-track</c>, <c>.none</c>, <c>editor.monitor.audio-track</c>), dusen yok; taban pimi 65188 + 43 x 3 = 65317. <c>kayip</c> 0.</para>
     /// <para>2026-10-15, tum izleri varsayilan tasima (DZA-P7): yeni anahtar <c>editor.export.audio-track.all</c>, dusen yok; taban pimi 67897 + 43 = 67940. <c>kayip</c> 0.</para>
     /// <para>2026-10-15, capraz gecis teslimi (DZB-P6): sekiz yeni anahtar, dusen yok; taban pimi 67940 + 43 x 8 = 68284. <c>kayip</c> 0.</para>
+    /// <para>2026-10-15, muzik izi (DZB-P7): bir yeni anahtar, dusen yok; taban pimi 68284 + 43 = 68327. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1560,7 +1561,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(68284, gezilen);
+        Assert.Equal(68327, gezilen);
         Assert.Empty(kayip);
     }
 

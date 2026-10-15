@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "Laiko juostos šaltiniuose nėra garso, nėra ką eksportuoti.",
   "editor.export.settings-full": "Eksporto nuostatoms reikia perkodavimo; perjungta į Visą.",
   "editor.export.transitions-full": "Perėjimams reikia perkodavimo; perjungta į Visą.",
+  "editor.export.music-full": "Muzikos takeliui reikia perkodavimo; perjungta į Visą.",
   "editor.copy": "Kopijuoti",
   "editor.cut": "Iškirpti",
   "editor.paste": "Įklijuoti",

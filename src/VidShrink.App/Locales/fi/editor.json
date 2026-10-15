@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "Aikajanan lähteissä ei ole ääntä, joten vietävää ei ole.",
   "editor.export.settings-full": "Vientiasetukset vaativat uudelleenkoodauksen; vaihdettiin Täyteen.",
   "editor.export.transitions-full": "Siirtymät vaativat uudelleenkoodauksen; vaihdettiin Täyteen.",
+  "editor.export.music-full": "Musiikkiraita vaatii uudelleenkoodauksen; vaihdettiin Täyteen.",
   "editor.copy": "Kopioi",
   "editor.cut": "Leikkaa",
   "editor.paste": "Liitä",

@@ -717,6 +717,19 @@ public sealed class EditTimeline
 
     public bool HasText => _texts.Count > 0;
 
+    /// <summary>A2 muzik izi; yoksa <c>null</c>. Kaynak sesinin ustune karisir, klip duzenlemeleri onu tasimaz.</summary>
+    public EditMusic? Music { get; private set; }
+
+    public bool HasMusic => Music is not null;
+
+    /// <summary>Muzik izini koyar, degistirir ya da (<c>null</c>) kaldirir. Tek adimda geri alinir; degisiklik yoksa <c>false</c>.</summary>
+    public bool SetMusic(EditMusic? music)
+    {
+        if (music == Music) return false;
+        Execute(new MusicCommand(m => Music = m, Music, music));
+        return true;
+    }
+
     /// <summary>Metni sona ekler ve sirasini dondurur. Tek adimda geri alinir.</summary>
     public int AddText(TextLayer text)
     {
@@ -775,6 +788,24 @@ public sealed class EditTimeline
         if (nextClips.SequenceEqual(_clips) && nextTexts.SequenceEqual(_texts)) return false;
 
         Execute(new RestoreCommand(_texts, _clips.ToArray(), _texts.ToArray(), nextClips, nextTexts));
+        return true;
+    }
+
+    /// <summary>Parcalar, metinler ve muzik izi birlikte tek geri alma adimi olarak yuklenir. Durum zaten ayniysa <c>false</c>.</summary>
+    public bool Restore(IEnumerable<EditClip> clips, IEnumerable<TextLayer> texts, EditMusic? music)
+    {
+        ArgumentNullException.ThrowIfNull(clips);
+        ArgumentNullException.ThrowIfNull(texts);
+        var nextClips = clips.ToArray();
+        var nextTexts = texts.ToArray();
+        if (nextClips.Any(c => c is null))
+            throw new ArgumentException("Listede bos parca var", nameof(clips));
+        foreach (var text in nextTexts) text.Validate();
+        var sameBody = nextClips.SequenceEqual(_clips) && nextTexts.SequenceEqual(_texts);
+        if (sameBody && music == Music) return false;
+
+        var musicStep = new MusicCommand(m => Music = m, Music, music);
+        Execute(sameBody ? musicStep : new CompositeCommand(new IEditCommand[] { new RestoreCommand(_texts, _clips.ToArray(), _texts.ToArray(), nextClips, nextTexts), musicStep }));
         return true;
     }
 

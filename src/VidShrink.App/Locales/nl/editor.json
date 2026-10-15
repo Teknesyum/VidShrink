@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "De bronnen van de tijdlijn hebben geen geluid, er is niets om te exporteren.",
   "editor.export.settings-full": "De exportinstellingen vereisen hercodering; overgeschakeld naar Volledig.",
   "editor.export.transitions-full": "Overgangen vereisen hercodering; overgeschakeld naar Volledig.",
+  "editor.export.music-full": "Het muziekspoor vereist hercodering; overgeschakeld naar Volledig.",
   "editor.copy": "Kopiëren",
   "editor.cut": "Knippen",
   "editor.paste": "Plakken",

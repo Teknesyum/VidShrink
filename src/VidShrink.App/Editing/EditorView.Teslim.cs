@@ -401,6 +401,7 @@ internal partial class EditorView
         else if (plan.AudioForcedFull) lines.Add(Strings.Get("editor.export.audio-full"));
         else if (plan.SettingsForcedFull) lines.Add(Strings.Get("editor.export.settings-full"));
         else if (plan.TransitionsForcedFull) lines.Add(Strings.Get("editor.export.transitions-full"));
+        else if (plan.MusicForcedFull) lines.Add(Strings.Get("editor.export.music-full"));
         else if (plan.FellBackToFull) lines.Add(Strings.Get("editor.export.fallback"));
         else if (plans.Any(p => p.Effective != ExportMode.Full) && motion.Length > 0)
             lines.Add(string.Format(Strings.Culture, Strings.Get("editor.export.reencoded"), ClipNumbers(motion)));
@@ -414,10 +415,11 @@ internal partial class EditorView
 
     private static string ClipNumbers(IEnumerable<int> indexes) => string.Join(", ", indexes.Select(i => (i + 1).ToString(Strings.Culture)));
 
-    private static string Fingerprint(EditTimeline model)
-        => string.Join(";", model.Clips.Select(c => $"{c.Source}:{c.SourceStart}-{c.SourceEnd}-{c.Speed}-{c.Reversed}-{c.Effects}"))
+    internal static string Fingerprint(EditTimeline model)
+        => string.Join(";", model.Clips.Select(c => $"{c.Source}:{c.SourceStart}-{c.SourceEnd}-{c.Speed}-{c.Reversed}-{c.Effects}-{c.Transition}"))
            + "|" + string.Join(";", model.Texts.Select(t => $"{t.Start}-{t.End}-{t.Size}-{t.Color}-{t.Bold}-{t.Italic}-{t.FontName}-{t.FadeIn}-{t.FadeOut}-"
-               + string.Join(",", t.Keyframes.Select(k => $"{k.Offset}:{k.X}:{k.Y}")) + "-" + t.Text.Length + ":" + t.Text));
+               + string.Join(",", t.Keyframes.Select(k => $"{k.Offset}:{k.X}:{k.Y}")) + "-" + t.Text.Length + ":" + t.Text))
+           + "|" + model.Music;
 
     private async Task<string?> PickOutputAsync()
     {

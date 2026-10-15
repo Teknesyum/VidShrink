@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "Źródła osi czasu nie mają dźwięku, nie ma czego eksportować.",
   "editor.export.settings-full": "Ustawienia eksportu wymagają ponownego kodowania; przełączono na Pełny.",
   "editor.export.transitions-full": "Przejścia wymagają ponownego kodowania; przełączono na Pełny.",
+  "editor.export.music-full": "Ścieżka muzyczna wymaga ponownego kodowania; przełączono na Pełny.",
   "editor.copy": "Kopiuj",
   "editor.cut": "Wytnij",
   "editor.paste": "Wklej",

@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "Tidslinjens kilder har ingen lyd, så der er intet at eksportere.",
   "editor.export.settings-full": "Eksportindstillingerne kræver genkodning; skiftet til Fuld.",
   "editor.export.transitions-full": "Overgange kræver genkodning; skiftet til Fuld.",
+  "editor.export.music-full": "Musiksporet kræver genkodning; skiftet til Fuld.",
   "editor.copy": "Kopiér",
   "editor.cut": "Klip",
   "editor.paste": "Indsæt",

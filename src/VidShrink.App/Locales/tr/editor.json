@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "Çizelgenin kaynaklarında ses yok, dışa aktarılacak bir şey kalmadı.",
   "editor.export.settings-full": "Dışa aktarma ayarları yeniden kodlama ister; Tam kipine geçildi.",
   "editor.export.transitions-full": "Geçişler yeniden kodlama ister; Tam kipine geçildi.",
+  "editor.export.music-full": "Müzik izi yeniden kodlama ister; Tam kipine geçildi.",
   "editor.copy": "Kopyala",
   "editor.cut": "Kes",
   "editor.paste": "Yapıştır",

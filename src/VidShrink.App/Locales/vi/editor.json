@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "Các nguồn trên dòng thời gian không có âm thanh, không có gì để xuất.",
   "editor.export.settings-full": "Cài đặt xuất cần mã hóa lại; đã chuyển sang Đầy đủ.",
   "editor.export.transitions-full": "Chuyển cảnh cần mã hóa lại; đã chuyển sang Đầy đủ.",
+  "editor.export.music-full": "Rãnh nhạc cần mã hóa lại; đã chuyển sang Đầy đủ.",
   "editor.copy": "Sao chép",
   "editor.cut": "Cắt",
   "editor.paste": "Dán",

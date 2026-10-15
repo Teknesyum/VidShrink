@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "The timeline's sources have no audio, so there is nothing to export.",
   "editor.export.settings-full": "Export settings need a re-encode; switched to Full.",
   "editor.export.transitions-full": "Transitions need a re-encode; switched to Full.",
+  "editor.export.music-full": "The music track needs a re-encode; switched to Full.",
   "editor.copy": "Copy",
   "editor.cut": "Cut",
   "editor.paste": "Paste",

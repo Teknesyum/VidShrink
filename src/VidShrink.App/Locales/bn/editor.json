@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "টাইমলাইনের উৎসগুলোতে অডিও নেই, রপ্তানি করার কিছু নেই।",
   "editor.export.settings-full": "রপ্তানি সেটিংয়ে আবার এনকোড করা দরকার; পূর্ণ মোডে বদলানো হয়েছে।",
   "editor.export.transitions-full": "ট্রানজিশনে আবার এনকোড করা দরকার; পূর্ণ মোডে বদলানো হয়েছে।",
+  "editor.export.music-full": "মিউজিক ট্র্যাকে আবার এনকোড করা দরকার; পূর্ণ মোডে বদলানো হয়েছে।",
   "editor.copy": "কপি",
   "editor.cut": "কাটুন",
   "editor.paste": "পেস্ট",

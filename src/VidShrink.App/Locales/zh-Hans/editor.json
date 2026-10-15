@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "时间线上的源没有音频，没有可导出的内容。",
   "editor.export.settings-full": "导出设置需要重新编码；已切换到完整模式。",
   "editor.export.transitions-full": "转场需要重新编码；已切换到完整模式。",
+  "editor.export.music-full": "音乐轨道需要重新编码；已切换到完整模式。",
   "editor.copy": "复制",
   "editor.cut": "剪切",
   "editor.paste": "粘贴",

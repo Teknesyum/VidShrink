@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "Sumber linimasa tidak memiliki audio, tidak ada yang bisa diekspor.",
   "editor.export.settings-full": "Pengaturan ekspor memerlukan pengodean ulang; beralih ke Penuh.",
   "editor.export.transitions-full": "Transisi memerlukan pengodean ulang; beralih ke Penuh.",
+  "editor.export.music-full": "Trek musik memerlukan pengodean ulang; beralih ke Penuh.",
   "editor.copy": "Salin",
   "editor.cut": "Potong",
   "editor.paste": "Tempel",

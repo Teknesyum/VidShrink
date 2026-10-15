@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "منابع خط زمانی صدا ندارند، چیزی برای برون‌بری نیست.",
   "editor.export.settings-full": "تنظیمات برون‌بری به کدگذاری دوباره نیاز دارد؛ به حالت کامل رفت.",
   "editor.export.transitions-full": "گذارها به کدگذاری دوباره نیاز دارند؛ به حالت کامل رفت.",
+  "editor.export.music-full": "ترک موسیقی به کدگذاری دوباره نیاز دارد؛ به حالت کامل رفت.",
   "editor.copy": "کپی",
   "editor.cut": "برش",
   "editor.paste": "چسباندن",

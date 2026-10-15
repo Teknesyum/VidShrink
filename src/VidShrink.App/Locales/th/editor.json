@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "แหล่งที่มาในไทม์ไลน์ไม่มีเสียง จึงไม่มีอะไรให้ส่งออก",
   "editor.export.settings-full": "การตั้งค่าส่งออกต้องเข้ารหัสใหม่ จึงเปลี่ยนเป็นแบบเต็ม",
   "editor.export.transitions-full": "การเปลี่ยนฉากต้องเข้ารหัสใหม่ จึงเปลี่ยนเป็นแบบเต็ม",
+  "editor.export.music-full": "แทร็กเพลงต้องเข้ารหัสใหม่ จึงเปลี่ยนเป็นแบบเต็ม",
   "editor.copy": "คัดลอก",
   "editor.cut": "ตัด",
   "editor.paste": "วาง",

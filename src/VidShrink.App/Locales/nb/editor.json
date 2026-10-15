@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "Kildene på tidslinjen har ingen lyd, så det er ingenting å eksportere.",
   "editor.export.settings-full": "Eksportinnstillingene krever omkoding; byttet til Full.",
   "editor.export.transitions-full": "Overganger krever omkoding; byttet til Full.",
+  "editor.export.music-full": "Musikksporet krever omkoding; byttet til Full.",
   "editor.copy": "Kopier",
   "editor.cut": "Klipp ut",
   "editor.paste": "Lim inn",

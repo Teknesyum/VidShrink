@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "Laika joslas avotiem nav skaņas, nav ko eksportēt.",
   "editor.export.settings-full": "Eksporta iestatījumiem nepieciešama pārkodēšana; pārslēgts uz Pilns.",
   "editor.export.transitions-full": "Pārejām nepieciešama pārkodēšana; pārslēgts uz Pilns.",
+  "editor.export.music-full": "Mūzikas celiņam nepieciešama pārkodēšana; pārslēgts uz Pilns.",
   "editor.copy": "Kopēt",
   "editor.cut": "Izgriezt",
   "editor.paste": "Ielīmēt",

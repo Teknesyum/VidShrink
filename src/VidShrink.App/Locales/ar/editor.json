@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "مصادر المخطط الزمني لا تحتوي على صوت، لا يوجد ما يُصدَّر.",
   "editor.export.settings-full": "إعدادات التصدير تتطلب إعادة الترميز؛ تم التبديل إلى الكامل.",
   "editor.export.transitions-full": "الانتقالات تتطلب إعادة الترميز؛ تم التبديل إلى الكامل.",
+  "editor.export.music-full": "مسار الموسيقى يتطلب إعادة الترميز؛ تم التبديل إلى الكامل.",
   "editor.copy": "نسخ",
   "editor.cut": "قص",
   "editor.paste": "لصق",

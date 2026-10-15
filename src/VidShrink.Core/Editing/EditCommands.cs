@@ -187,3 +187,21 @@ internal sealed class CompositeCommand : IEditCommand
         for (var i = _steps.Count - 1; i >= 0; i--) _steps[i].Revert(clips);
     }
 }
+
+internal sealed class MusicCommand : IEditCommand
+{
+    private readonly Action<EditMusic?> _set;
+    private readonly EditMusic? _before;
+    private readonly EditMusic? _after;
+
+    public MusicCommand(Action<EditMusic?> set, EditMusic? before, EditMusic? after)
+    {
+        _set = set;
+        _before = before;
+        _after = after;
+    }
+
+    public void Apply(List<EditClip> clips) => _set(_after);
+
+    public void Revert(List<EditClip> clips) => _set(_before);
+}

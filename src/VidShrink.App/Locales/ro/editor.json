@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "Sursele cronologiei nu au sunet, nu este nimic de exportat.",
   "editor.export.settings-full": "Setările de export necesită recodare; s-a trecut la Complet.",
   "editor.export.transitions-full": "Tranzițiile necesită recodare; s-a trecut la Complet.",
+  "editor.export.music-full": "Pista muzicală necesită recodare; s-a trecut la Complet.",
   "editor.copy": "Copiază",
   "editor.cut": "Taie",
   "editor.paste": "Lipește",

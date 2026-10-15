@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "Die Quellen der Zeitleiste haben keinen Ton, es gibt nichts zu exportieren.",
   "editor.export.settings-full": "Die Exporteinstellungen erfordern eine Neukodierung; auf Voll umgestellt.",
   "editor.export.transitions-full": "Übergänge erfordern eine Neukodierung; auf Voll umgestellt.",
+  "editor.export.music-full": "Die Musikspur erfordert eine Neukodierung; auf Voll umgestellt.",
   "editor.copy": "Kopieren",
   "editor.cut": "Ausschneiden",
   "editor.paste": "Einfügen",

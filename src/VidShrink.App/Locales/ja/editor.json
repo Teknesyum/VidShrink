@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "タイムラインのソースに音声がないため、書き出すものがありません。",
   "editor.export.settings-full": "書き出し設定には再エンコードが必要なため、フルに切り替えました。",
   "editor.export.transitions-full": "トランジションには再エンコードが必要なため、フルに切り替えました。",
+  "editor.export.music-full": "音楽トラックには再エンコードが必要なため、フルに切り替えました。",
   "editor.copy": "コピー",
   "editor.cut": "切り取り",
   "editor.paste": "貼り付け",

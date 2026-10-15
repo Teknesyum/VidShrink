@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "As fontes da linha do tempo não têm áudio, não há nada para exportar.",
   "editor.export.settings-full": "As configurações de exportação exigem recodificação; mudou para Completa.",
   "editor.export.transitions-full": "As transições exigem recodificação; mudou para Completa.",
+  "editor.export.music-full": "A faixa de música exige recodificação; mudou para Completa.",
   "editor.copy": "Copiar",
   "editor.cut": "Recortar",
   "editor.paste": "Colar",

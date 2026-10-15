@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "Viri časovnice nimajo zvoka, ni ničesar za izvoz.",
   "editor.export.settings-full": "Nastavitve izvoza zahtevajo ponovno kodiranje; preklopljeno na Polno.",
   "editor.export.transitions-full": "Prehodi zahtevajo ponovno kodiranje; preklopljeno na Polno.",
+  "editor.export.music-full": "Glasbena sled zahteva ponovno kodiranje; preklopljeno na Polno.",
   "editor.copy": "Kopiraj",
   "editor.cut": "Izreži",
   "editor.paste": "Prilepi",

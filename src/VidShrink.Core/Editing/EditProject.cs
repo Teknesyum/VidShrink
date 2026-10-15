@@ -45,8 +45,9 @@ public sealed class EditProject
     private static readonly UTF8Encoding Utf8 = new(false);
 
     private EditProject(SourceStamp source, long sourceDuration, IReadOnlyList<EditClip> clips, IReadOnlyList<TextLayer> texts, string? exportMode,
-        IReadOnlyList<ExtraSource> extraSources, IReadOnlyList<EditMarker> markers, int audioTrack)
+        IReadOnlyList<ExtraSource> extraSources, IReadOnlyList<EditMarker> markers, int audioTrack, EditMusic? music)
     {
+        Music = music;
         AudioTrack = audioTrack;
         Markers = markers;
         ExtraSources = extraSources;
@@ -75,6 +76,9 @@ public sealed class EditProject
     /// <summary>Teslime giden ses izi (<see cref="EditAudioTrack"/>). Varsayilan iz dosyaya yazilmaz.</summary>
     public int AudioTrack { get; }
 
+    /// <summary>Muzik izi (<see cref="EditMusic"/>). Yoksa dosyaya yazilmaz; alani olmayan proje muziksiz acilir.</summary>
+    public EditMusic? Music { get; }
+
     /// <summary>
     /// <paramref name="extraSources"/> cizelgenin ek kaynaklariyla ayni sirada ve ayni sayida olmalidir.
     /// </summary>
@@ -89,7 +93,7 @@ public sealed class EditProject
         var duration = timeline.SourceDuration ?? timeline.Clips.Where(c => c.Source == 0).Select(c => c.SourceEnd).DefaultIfEmpty(1).Max();
         var extras = stamps.Select((stamp, i) => new ExtraSource(stamp, timeline.ExtraSources[i])).ToArray();
         return new EditProject(source, duration, timeline.Clips.ToArray(), timeline.Texts.ToArray(), exportMode, extras, Sorted(markers ?? Array.Empty<EditMarker>()),
-            audioTrack);
+            audioTrack, timeline.Music);
     }
 
     /// <summary>
@@ -155,6 +159,16 @@ public sealed class EditProject
                 writer.WriteEndArray();
             }
 
+            if (Music is { } music)
+            {
+                writer.WriteStartObject("music");
+                writer.WriteString("path", music.Path);
+                writer.WriteNumber("duration", music.Duration);
+                writer.WriteNumber("start", music.Start);
+                writer.WriteNumber("level", music.LevelDb);
+                writer.WriteEndObject();
+            }
+
             writer.WriteEndObject();
         }
 
@@ -190,7 +204,11 @@ public sealed class EditProject
             _ = new EditTimeline(clips, duration, texts, extras.Select(e => e.Duration));
             var track = root.TryGetProperty("audioTrack", out var trackValue) && trackValue.ValueKind == JsonValueKind.Number
                 && trackValue.TryGetInt32(out var parsed) ? parsed : EditAudioTrack.Default;
-            var project = new EditProject(stamp, duration, clips, texts, mode, extras, markers, track);
+            var music = root.TryGetProperty("music", out var tune) && tune.ValueKind == JsonValueKind.Object
+                ? new EditMusic(tune.GetProperty("path").GetString() ?? "", tune.GetProperty("duration").GetInt64(),
+                    tune.TryGetProperty("start", out var at) ? at.GetInt64() : 0, tune.TryGetProperty("level", out var db) ? db.GetDouble() : 0)
+                : null;
+            var project = new EditProject(stamp, duration, clips, texts, mode, extras, markers, track, music);
             return project.FitsIn(duration) ? project : null;
         }
         catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException or FormatException or ArgumentException or OverflowException)

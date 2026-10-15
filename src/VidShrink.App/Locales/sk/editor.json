@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "Zdroje časovej osi nemajú zvuk, nie je čo exportovať.",
   "editor.export.settings-full": "Nastavenia exportu vyžadujú prekódovanie; prepnuté na Plný.",
   "editor.export.transitions-full": "Prechody vyžadujú prekódovanie; prepnuté na Plný.",
+  "editor.export.music-full": "Hudobná stopa vyžaduje prekódovanie; prepnuté na Plný.",
   "editor.copy": "Kopírovať",
   "editor.cut": "Vystrihnúť",
   "editor.paste": "Prilepiť",

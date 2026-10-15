@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "Tidslinjens källor saknar ljud, så det finns inget att exportera.",
   "editor.export.settings-full": "Exportinställningarna kräver omkodning; bytte till Full.",
   "editor.export.transitions-full": "Övergångar kräver omkodning; bytte till Full.",
+  "editor.export.music-full": "Musikspåret kräver omkodning; bytte till Full.",
   "editor.copy": "Kopiera",
   "editor.cut": "Klipp ut",
   "editor.paste": "Klistra in",

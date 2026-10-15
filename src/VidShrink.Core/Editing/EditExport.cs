@@ -61,6 +61,9 @@ public sealed record ExportPlan(
     /// <summary>Kliplerin arasinda capraz gecis oldugu icin <c>-c copy</c> yolu birakilip Tam'a gecildi.</summary>
     public bool TransitionsForcedFull { get; init; }
 
+    /// <summary>Cizelgede muzik izi oldugu icin <c>-c copy</c> yolu birakilip Tam'a gecildi.</summary>
+    public bool MusicForcedFull { get; init; }
+
     /// <summary>Metin varsa <c>ass=</c> suzgecinin okudugu belge; kosucu calismadan once BOM'lu yazar.</summary>
     public string? SubtitlePath { get; init; }
 
@@ -259,7 +262,9 @@ public static class EditExport
         var settingsForced = mode != ExportMode.Full && effective != ExportMode.Full && !timeline.HasText && !timeline.HasEffects && !settings.IsDefault;
         var transitionsForced = mode != ExportMode.Full && effective != ExportMode.Full && !timeline.HasText && !timeline.HasEffects && settings.IsDefault
             && timeline.HasTransitions;
-        if (timeline.HasText || timeline.HasEffects || !settings.IsDefault || timeline.HasTransitions) effective = ExportMode.Full;
+        var musicForced = mode != ExportMode.Full && effective != ExportMode.Full && !timeline.HasText && !timeline.HasEffects && settings.IsDefault
+            && !timeline.HasTransitions && timeline.HasMusic;
+        if (timeline.HasText || timeline.HasEffects || !settings.IsDefault || timeline.HasTransitions || timeline.HasMusic) effective = ExportMode.Full;
 
         var limit = ReverseLimitSeconds(info, memoryBudgetBytes);
         var over = ReverseOverLimit(timeline, info, memoryBudgetBytes);
@@ -278,6 +283,7 @@ public static class EditExport
             ? CarriedSubtitles(whole, outputPath)
             : Array.Empty<(int Position, SourceStream Stream)>();
         if (subtitles.Count > 0) plan = WithSubtitles(plan, timeline, whole, subtitles, outputPath, workDirectory);
+        if (timeline.Music is { } music) plan = WithMusic(plan, music, settings, outputPath);
         if (settings.AudioOnly && effective == ExportMode.Full) languages = languages.Take(1).ToArray();
         if (dropMetadata)
             plan = plan with { Steps = WithoutMetadata(plan.Steps, info, languages, subtitles.Select(s => s.Stream.Language).ToArray()) };
@@ -288,8 +294,53 @@ public static class EditExport
             EffectsForcedFull = effectsForced,
             AudioForcedFull = audioForced,
             SettingsForcedFull = settingsForced,
-            TransitionsForcedFull = transitionsForced
+            TransitionsForcedFull = transitionsForced,
+            MusicForcedFull = musicForced
         };
+    }
+
+    /// <summary>
+    /// Muzik izini son adima ekler: dosya son girdinin ardina <c>-i</c> olarak girer, grafige
+    /// <c>volume</c> + ortak bicim + <c>adelay</c> + <c>apad</c> + <c>atrim</c> zinciri baglanir. Kaynak sesi varsa ilk ses cikisi
+    /// (<c>[aout]</c>) muzikle <c>amix</c> (<c>duration=first</c>, <c>normalize=0</c>; iki duzey oldugu gibi toplanir) ile karisip
+    /// <c>[amix]</c> olarak eslenir; yoksa muzik tek basina ses izi olur. Ikinci ve sonraki ses izlerine dokunulmaz.
+    /// </summary>
+    private static ExportPlan WithMusic(ExportPlan plan, EditMusic music, EditExportSettings settings, string output)
+    {
+        var last = plan.Steps[^1];
+        var args = last.Args.ToList();
+        var index = args.Count(a => a == "-i");
+        var input = args.LastIndexOf("-i") + 2;
+        args.InsertRange(input, new[] { "-i", music.Path });
+        var graphAt = args.IndexOf("-filter_complex") + 1;
+        if (graphAt <= 0) throw new InvalidOperationException("Muzik yalniz suzgec grafigi kuran adima eklenir");
+        var duration = Number(last.DurationSeconds);
+        var chain = new StringBuilder(";[").Append(index.ToString(CultureInfo.InvariantCulture)).Append(":a:0]volume=")
+            .Append(music.LevelDb.ToString("0.0", CultureInfo.InvariantCulture)).Append("dB,").Append(MergeAudioFormat)
+            .Append(",adelay=").Append(Math.Round(EditTime.ToSeconds(music.Start) * 1000).ToString(CultureInfo.InvariantCulture)).Append(":all=1")
+            .Append(",apad,atrim=duration=").Append(duration).Append(",asetpts=PTS-STARTPTS[mus]");
+        var mapped = MapIndex(args, "[aout]");
+        if (mapped >= 0)
+        {
+            chain.Append(";[aout]").Append(MergeAudioFormat).Append("[asrc];[asrc][mus]amix=inputs=2:duration=first:dropout_transition=0:normalize=0[amix]");
+            args[mapped] = "[amix]";
+        }
+        else
+        {
+            var video = MapIndex(args, "[vout]");
+            args.InsertRange(video >= 0 ? video + 1 : graphAt + 1, new[] { "-map", "[mus]" });
+            args.InsertRange(args.Count - 1, new[] { "-c:a", settings.AudioOnly ? EditExportSettings.AudioOnlyCodec(output) : AudioCodec, "-b:a", settings.AudioBitrate });
+        }
+
+        args[graphAt] += chain.ToString();
+        return plan with { Steps = plan.Steps.Take(plan.Steps.Count - 1).Append(last with { Args = args }).ToArray() };
+    }
+
+    private static int MapIndex(IReadOnlyList<string> args, string label)
+    {
+        for (var i = 1; i < args.Count; i++)
+            if (args[i] == label && args[i - 1] == "-map") return i;
+        return -1;
     }
 
     /// <summary>Cizelgedeki parcalarin geldigi kaynaklarin siralari, kucukten buyuge.</summary>
@@ -310,8 +361,11 @@ public static class EditExport
         if (timeline.Clips.Count == 0) throw new ArgumentException("Cizelge bos", nameof(timeline));
         var used = UsedSources(timeline);
         if (used.Count > 1)
-            return Merge(timeline, WithTrack(sources, audioTrack, out var track), used, mode, outputPath, workDirectory, memoryBudgetBytes, dropMetadata,
+        {
+            var merged = Merge(timeline, WithTrack(sources, audioTrack, out var track), used, mode, outputPath, workDirectory, memoryBudgetBytes, dropMetadata,
                 settings ?? EditExportSettings.Default, track);
+            return timeline.Music is { } music ? WithMusic(merged, music, settings ?? EditExportSettings.Default, outputPath) : merged;
+        }
 
         var only = SourceOf(sources, used[0]);
         return Build(timeline, only.Info, only.Keyframes, only.StartTime, mode, outputPath, workDirectory, memoryBudgetBytes,

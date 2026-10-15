@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "Az idővonal forrásaiban nincs hang, nincs mit exportálni.",
   "editor.export.settings-full": "Az exportálási beállítások újrakódolást igényelnek; Teljes módra váltva.",
   "editor.export.transitions-full": "Az áttűnések újrakódolást igényelnek; Teljes módra váltva.",
+  "editor.export.music-full": "A zenesáv újrakódolást igényel; Teljes módra váltva.",
   "editor.copy": "Másolás",
   "editor.cut": "Kivágás",
   "editor.paste": "Beillesztés",

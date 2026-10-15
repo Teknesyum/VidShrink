@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "Les sources de la timeline n'ont pas de son, il n'y a rien à exporter.",
   "editor.export.settings-full": "Les réglages d'export exigent un réencodage ; passage en mode Complet.",
   "editor.export.transitions-full": "Les transitions exigent un réencodage ; passage en mode Complet.",
+  "editor.export.music-full": "La piste musicale exige un réencodage ; passage en mode Complet.",
   "editor.copy": "Copier",
   "editor.cut": "Couper",
   "editor.paste": "Coller",

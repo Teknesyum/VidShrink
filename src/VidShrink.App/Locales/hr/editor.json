@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "Izvori vremenske crte nemaju zvuk, nema ničega za izvoz.",
   "editor.export.settings-full": "Postavke izvoza zahtijevaju ponovno kodiranje; prebačeno na Puno.",
   "editor.export.transitions-full": "Prijelazi zahtijevaju ponovno kodiranje; prebačeno na Puno.",
+  "editor.export.music-full": "Glazbena traka zahtijeva ponovno kodiranje; prebačeno na Puno.",
   "editor.copy": "Kopiraj",
   "editor.cut": "Izreži",
   "editor.paste": "Zalijepi",

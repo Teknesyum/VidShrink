@@ -162,6 +162,7 @@
   "editor.export.audio-only.no-audio": "ٹائم لائن کے ماخذوں میں آواز نہیں، برآمد کرنے کو کچھ نہیں۔",
   "editor.export.settings-full": "برآمد کی ترتیبات کو دوبارہ انکوڈنگ درکار ہے؛ مکمل پر منتقل کیا گیا۔",
   "editor.export.transitions-full": "منتقلیوں کو دوبارہ انکوڈنگ درکار ہے؛ مکمل پر منتقل کیا گیا۔",
+  "editor.export.music-full": "موسیقی ٹریک کو دوبارہ انکوڈنگ درکار ہے؛ مکمل پر منتقل کیا گیا۔",
   "editor.copy": "کاپی کریں",
   "editor.cut": "کاٹیں",
   "editor.paste": "چسپاں کریں",
