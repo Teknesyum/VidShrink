@@ -566,6 +566,22 @@ public sealed class DuzenleyiciAkilliKodekTests
         Assert.DoesNotContain("\nduration 0.99\n", liste, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Hizi degismis klip <c>fps=</c> suzgeciyle kodlanir ve tam kare sayisi verir: 1 sn'lik kaynak 1,3x hizda
+    /// 30 kare/sn'de 23 kare (ffmpeg 1,3/1,7/1,1/0,7x icin 23/18/27/43 kare, en yakin tam kareye yuvarlama).
+    /// Liste suresi bu kare sayisindan yazilir; ham cizelge suresi (0,769231) sonraki parcayi son karenin ustune bindirir.
+    /// </summary>
+    [Fact]
+    public void HiziDegismisKlipListedeKodlananKareSayisiKadarSurer()
+    {
+        var plan = Plan(Bilgi(), cizelge: new EditTimeline(new[] { new EditClip(S(1), S(2), 1.3m), new EditClip(S(2), S(4)) }));
+        var liste = plan.Steps[^1].ListContent;
+
+        Assert.StartsWith("ffconcat version 1.0\nfile ", liste, StringComparison.Ordinal);
+        Assert.Contains("\nduration 0.766667\nfile", liste, StringComparison.Ordinal);
+        Assert.DoesNotContain("\nduration 0.769231\n", liste, StringComparison.Ordinal);
+    }
+
     [Fact]
     public void TsKaynaktaKenarOncekiAnahtarKaredenAranirCiktidaKesilir()
     {

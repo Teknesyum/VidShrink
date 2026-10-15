@@ -400,4 +400,41 @@ public sealed class InstallerTests
         foreach (var parameter in new[] { "$InstallRoot", "$NoLaunch", "$SkipShortcuts" })
             Assert.Contains(parameter, WindowsInstaller, StringComparison.Ordinal);
     }
+
+    /// <summary>
+    /// Betik kurucunun <c>--silent</c>, <c>--add-to-path</c>, <c>--remove-settings</c> seceneklerini ayni adla tasir;
+    /// PATH sarmali ve kaldirma kaydinin anahtari <see cref="CommandShim"/> ve <see cref="SetupOptions"/> ile ayni.
+    /// </summary>
+    [Fact]
+    public void TheWindowsInstallerCarriesTheSetupOptionsOfTheExe()
+    {
+        var parameters = WindowsInstaller[..WindowsInstaller.IndexOf("\n)", StringComparison.Ordinal)];
+        foreach (var parameter in new[] { "[switch]$Silent", "[switch]$AddToPath", "[switch]$RemoveSettings" })
+            Assert.Contains(parameter, parameters, StringComparison.Ordinal);
+
+        Assert.Contains($"'{CommandShim.Line}'", WindowsInstaller, StringComparison.Ordinal);
+        Assert.Contains($"'{CommandShim.FolderName}'", WindowsInstaller, StringComparison.Ordinal);
+        Assert.Contains($"'{CommandShim.FileName}'", WindowsInstaller, StringComparison.Ordinal);
+        Assert.Contains($"'{SetupOptions.DefaultUninstallKey}'", WindowsInstaller, StringComparison.Ordinal);
+        Assert.Contains($"'{ShellRegistration.SetupExecutableName}'", WindowsInstaller, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Kaldirma kolu kurucunun <c>UnregisterApp</c>'i gibi "Yuklu uygulamalar" kaydini ve PATH'teki <c>bin</c> girdisini
+    /// siler; <c>-RemoveSettings</c> verilince ayar klasorunu de.
+    /// </summary>
+    [Fact]
+    public void TheWindowsInstallerUninstallClearsTheEntryAndThePath()
+    {
+        var start = WindowsInstaller.IndexOf("\nif ($Uninstall) {", StringComparison.Ordinal);
+        Assert.True(start >= 0);
+        var end = WindowsInstaller.IndexOf("\n    return\n}", start, StringComparison.Ordinal);
+        if (end < 0) end = WindowsInstaller.IndexOf("\n    return\r\n}", start, StringComparison.Ordinal);
+        Assert.True(end > start);
+        var block = WindowsInstaller[start..end];
+
+        Assert.Contains("Remove-UninstallEntry $RegistryRoot", block, StringComparison.Ordinal);
+        Assert.Contains("Remove-UserPathEntry $RegistryRoot", block, StringComparison.Ordinal);
+        Assert.Contains("if ($RemoveSettings)", block, StringComparison.Ordinal);
+    }
 }

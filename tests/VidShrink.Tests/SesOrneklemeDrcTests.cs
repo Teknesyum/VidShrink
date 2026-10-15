@@ -361,12 +361,19 @@ public sealed class SesOrneklemeDrcTests(ITestOutputHelper cikti)
     {
         var dis = Path.Combine(Klasor, "dis-ses.m4a");
         File.WriteAllText(dis, "x");
-        var (_, eklenen, _) = await PlanAsync(Kaynak(600, Video), Tr, "--ses-hizi", "8", "--ses-drc", "2", "--ses-dosyasi", dis);
-        var (_, eksiz, _) = await PlanAsync(Kaynak(600, Video), Tr, "--ses-hizi", "8", "--ses-drc", "2");
+        try
+        {
+            var (_, eklenen, _) = await PlanAsync(Kaynak(600, Video), Tr, "--ses-hizi", "8", "--ses-drc", "2", "--ses-dosyasi", dis);
+            var (_, eksiz, _) = await PlanAsync(Kaynak(600, Video), Tr, "--ses-hizi", "8", "--ses-drc", "2");
 
-        Assert.DoesNotContain(Tr["note.arate-no-audio"], eklenen);
-        Assert.DoesNotContain(Tr["note.drc-no-audio"], eklenen);
-        Assert.Contains(Tr["note.arate-no-audio"], eksiz);
+            Assert.DoesNotContain(Tr["note.arate-no-audio"], eklenen);
+            Assert.DoesNotContain(Tr["note.drc-no-audio"], eklenen);
+            Assert.Contains(Tr["note.arate-no-audio"], eksiz);
+        }
+        finally
+        {
+            KanitKapanisi.Kapat(Klasor, "dis-ses.m4a");
+        }
     }
 
     [Fact]

@@ -225,7 +225,7 @@ public sealed class AltyaziTaramaTests
         }
         finally
         {
-            Directory.Delete(klasor, recursive: true);
+            KanitKapanisi.Kapat(Path.GetDirectoryName(klasor)!, Path.GetFileName(klasor));
         }
     }
 
