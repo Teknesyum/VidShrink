@@ -3,7 +3,6 @@ using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using Avalonia;
 using Avalonia.Animation;
@@ -45,7 +44,6 @@ public partial class MainWindow : Window
 {
     private const double WhatsAppTargetMb = 16;
     private const double MacTrafficLightInset = 80;
-    private const uint ClientAreaAnimationQuery = 0x1042;
 
     // Ayar kapalıyken açılışta bir kez sorulur. Ağ yoksa bekleyen tek şey bu arka plan işi;
     // pencere zaten açılmış olur.
@@ -208,8 +206,7 @@ public partial class MainWindow : Window
 
         ShowScrollOnlyOnHover(TxtCommand, TxtAiJson, TxtConvertCommand);
 
-        _motionReduced = !AnimationsAllowed();
-        if (_motionReduced) Classes.Add("reduced-motion");
+        ApplyMotion();
         ApplyStartupSize();
         PencereKonumunuIzle();
         PreparePanelEntrance();
@@ -311,6 +308,7 @@ public partial class MainWindow : Window
         Watch(TxtDefaultTargetMb, TextBox.TextProperty, OnDefaultTargetMbChanged);
         Watch(CmbLanguage, SelectingItemsControl.SelectedIndexProperty, OnLanguageChosen);
         Watch(CmbTheme, SelectingItemsControl.SelectedIndexProperty, OnThemeChosen);
+        WatchSystemThemeAndMotion();
         Watch(RbOutputFixed, ToggleButton.IsCheckedProperty, OnOutputFolderModeChanged);
         Watch(TxtOutputFolder, TextBox.TextProperty, SaveAppSettings);
         Watch(TxtOutputName, TextBox.TextProperty, OnOutputNameChanged);
@@ -387,23 +385,6 @@ public partial class MainWindow : Window
         if (AppliedNotice.Parent is not Panel host) return;
 
         host.Children.Add(new Integration.DefaultAppSuggestionBar(SettingsPathOverride));
-    }
-
-    [DllImport("user32.dll", EntryPoint = "SystemParametersInfoW", SetLastError = true)]
-    private static extern bool SystemParametersInfoW(uint action, uint param, ref int value, uint update);
-
-    private static bool AnimationsAllowed()
-    {
-        if (!OperatingSystem.IsWindows()) return true;
-        try
-        {
-            var enabled = 1;
-            return !SystemParametersInfoW(ClientAreaAnimationQuery, 0, ref enabled, 0) || enabled != 0;
-        }
-        catch (Exception)
-        {
-            return true;
-        }
     }
 
     private TimeSpan Motion(string key, double fallbackMs)
@@ -746,6 +727,7 @@ public partial class MainWindow : Window
     {
         _kapandi = true;
         HoldSleep(false);
+        ReleaseSystemThemeAndMotion();
         base.OnClosed(e);
     }
 
@@ -1065,8 +1047,10 @@ public partial class MainWindow : Window
         try
         {
             _themeOrder = PaletteCatalog.Names;
-            CmbTheme.ItemsSource = _themeOrder.Select(PaletteCatalog.Label).ToArray();
+            var labels = _themeOrder.Select(PaletteCatalog.Label).ToArray();
+            CmbTheme.ItemsSource = labels;
             MarkChosenTheme();
+            FillThemePairLists(labels);
         }
         finally
         {
@@ -1093,7 +1077,8 @@ public partial class MainWindow : Window
         var chosen = CmbTheme.SelectedIndex;
         if (chosen < 0 || chosen >= _themeOrder.Count) return;
 
-        _theme = PaletteCatalog.Use(_themeOrder[chosen]);
+        _theme = PaletteCatalog.Pick(_themeOrder[chosen], false, null, null, null);
+        ApplyTheme();
         SaveAppSettings();
     }
 
@@ -1659,7 +1644,11 @@ public partial class MainWindow : Window
             FfmpegPath = TxtFfmpegPath.Text ?? "",
             OpenSubtitlesApiKey = (TxtOpenSubtitlesKey.Text ?? "").Trim(),
             OpenSubtitlesUser = (TxtOpenSubtitlesUser.Text ?? "").Trim(),
-            Theme = _theme
+            Theme = _theme,
+            FollowSystemTheme = ChkFollowSystemTheme.IsChecked == true,
+            LightTheme = _lightTheme,
+            DarkTheme = _darkTheme,
+            ReduceMotion = ChkReduceMotion.IsChecked == true
         };
     }
 
@@ -1704,8 +1693,7 @@ public partial class MainWindow : Window
             OutputFolderPickerRow.IsVisible = settings.OutputFolderMode == 1;
             RefreshOutputNamePreview();
 
-            _theme = PaletteCatalog.Use(settings.Theme);
-            MarkChosenTheme();
+            RestoreSystemThemeAndMotion(settings);
 
             ChkAdvancedDefaultOpen.IsChecked = settings.AdvancedDefaultOpen;
             if (settings.AdvancedDefaultOpen) ExpandAdvanced();

@@ -90,6 +90,18 @@ public sealed class AppSettings
     /// <summary>Yürürlükteki paletin adı; boş kalırsa varsayılan palet açılır.</summary>
     public string Theme { get; set; } = "";
 
+    /// <summary>AYR-P4: sistem temasını izle. Alanı olmayan eski dosya kapalı okunur.</summary>
+    public bool FollowSystemTheme { get; set; }
+
+    /// <summary>İzlerken açık sistemde kullanılan palet.</summary>
+    public string LightTheme { get; set; } = Themes.PaletteCatalog.DefaultLight;
+
+    /// <summary>İzlerken koyu sistemde kullanılan palet.</summary>
+    public string DarkTheme { get; set; } = Themes.PaletteCatalog.Default;
+
+    /// <summary>Ayarlar'daki "canlandırmaları kapat" anahtarı; sistem ayarına ek olarak hareketi azaltır.</summary>
+    public bool ReduceMotion { get; set; }
+
     /// <summary>
     /// Varsayılanın Teknesyum olduğu sürümden sonra yazılmış dosyanın işareti. İşaretsiz dosyada
     /// kayıtlı <see cref="LegacyDefaultTheme"/> eski varsayılandır, kullanıcının seçimi değil;
@@ -163,6 +175,10 @@ public sealed class AppSettings
             ReadString(root, "outputFolder", value => settings.OutputFolder = value);
             ReadString(root, "outputNamePattern", value => settings.OutputNamePattern = value);
             ReadString(root, "theme", value => settings.Theme = value);
+            ReadBool(root, "followSystemTheme", value => settings.FollowSystemTheme = value);
+            ReadString(root, "lightTheme", value => settings.LightTheme = value);
+            ReadString(root, "darkTheme", value => settings.DarkTheme = value);
+            ReadBool(root, "reduceMotion", value => settings.ReduceMotion = value);
             ReadBool(root, "advancedDefaultOpen", value => settings.AdvancedDefaultOpen = value);
             ReadBool(root, "followRecording", value => settings.FollowRecording = value);
             ReadBool(root, "notifyWhenDone", value => settings.NotifyWhenDone = value);
@@ -253,6 +269,10 @@ public sealed class AppSettings
         root["editorPartNamePattern"] = EditorPartNamePattern;
         root["theme"] = Theme;
         root[ThemeMigrationMarker] = true;
+        root["followSystemTheme"] = FollowSystemTheme;
+        root["lightTheme"] = LightTheme;
+        root["darkTheme"] = DarkTheme;
+        root["reduceMotion"] = ReduceMotion;
         root["outputFolderMode"] = OutputFolderMode;
         root["outputFolder"] = OutputFolder;
         root["outputNamePattern"] = OutputNamePattern;

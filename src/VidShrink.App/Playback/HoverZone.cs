@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Avalonia.Threading;
 
 namespace VidShrink.App.Playback;
@@ -59,10 +58,6 @@ internal sealed class DispatcherHoverClock : IHoverClock
 /// </summary>
 internal sealed class HoverZone
 {
-    private const uint ClientAreaAnimationQuery = 0x1042;
-
-    private static bool? _motionReduced;
-
     private readonly Func<TimeSpan> _showDelay;
     private readonly Func<TimeSpan> _hideDelay;
     private readonly Action<bool> _apply;
@@ -97,13 +92,13 @@ internal sealed class HoverZone
     }
 
     /// <summary>
-    /// K5: azaltılmış hareket ayarını okuyan tek yer. Karşılaştırma paneli de buraya bağlı;
-    /// ikinci kopya yok. Ayar oturum boyunca bir kez okunur.
+    /// K5: azaltılmış hareketin oynatıcı tarafındaki kapısı. Karar <see cref="MotionPreference"/>'ta;
+    /// sistem ayarı ile Ayarlar'daki elle anahtar orada birleşir.
     /// </summary>
     internal static bool MotionReduced
     {
-        get => _motionReduced ??= !AnimationsAllowed();
-        set => _motionReduced = value;
+        get => MotionPreference.Reduced;
+        set => MotionPreference.Reduced = value;
     }
 
     /// <summary>Bölgenin panel yüksekliğine oranı.</summary>
@@ -252,22 +247,5 @@ internal sealed class HoverZone
     {
         _visible = visible;
         _apply(visible);
-    }
-
-    [DllImport("user32.dll", EntryPoint = "SystemParametersInfoW", SetLastError = true)]
-    private static extern bool SystemParametersInfoW(uint action, uint param, ref int value, uint update);
-
-    private static bool AnimationsAllowed()
-    {
-        if (!OperatingSystem.IsWindows()) return true;
-        try
-        {
-            var enabled = 1;
-            return !SystemParametersInfoW(ClientAreaAnimationQuery, 0, ref enabled, 0) || enabled != 0;
-        }
-        catch (Exception)
-        {
-            return true;
-        }
     }
 }
