@@ -20,8 +20,8 @@ public static class ConversionArguments
         if (plan.VideoCodec == "copy" && (plan.Height is not null || plan.Width is not null || plan.Fps is not null)) errors.Add("Stream copy cannot change resolution or frame rate.");
         if (plan.VideoCodec == "copy" && plan.Container == "gif") errors.Add("GIF requires video encoding and cannot use stream copy.");
         if (plan.VideoCodec == "copy" && plan.ImageSequenceOutput) errors.Add("Image sequence output requires video encoding and cannot use stream copy.");
-        if (plan.CarriesAudio && plan.AudioCodec == "copy" && !info.HasAudio) errors.Add("The source has no audio stream to copy.");
-        if (plan.AudioOnly && !info.HasAudio) errors.Add("The source has no audio stream to extract.");
+        if (plan.CarriesAudio && plan.AudioCodec == "copy" && !info.HasAudio && AddedAudio(plan) is null) errors.Add("The source has no audio stream to copy.");
+        if (plan.AudioOnly && !info.HasAudio && plan.ExternalAudio is null) errors.Add("The source has no audio stream to extract.");
 
         if (!plan.AudioOnly && !plan.Gif && !plan.AnimatedImage && !plan.ImageSequenceOutput && plan.VideoCodec != "copy" && !VideoEncodeCompatible(plan.Container, plan.VideoCodec))
             errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support the selected {plan.VideoCodec} video encoder.");
@@ -35,15 +35,16 @@ public static class ConversionArguments
             errors.Add("The trim end must come after the trim start.");
         if (plan.CarriesAudio && plan.AudioCodec == "copy")
         {
-            var copied = plan.AudioTracks is null
-                ? new[] { info.AudioCodec }
+            var copied = plan.ExternalAudio is { Replace: true } ? Array.Empty<string?>()
+                : plan.AudioTracks is null
+                ? plan.ExternalAudio is not null && !info.HasAudio ? Array.Empty<string?>() : new[] { info.AudioCodec }
                 : SourceAudio(info, plan).Select(stream => (string?)stream.Codec).Distinct().ToArray();
             foreach (var codec in copied.Where(codec => !AudioCopyCompatible(plan.Container, codec)))
                 errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support copying the source {codec} audio stream.");
         }
-        if (plan.CarriesAudio && plan.AudioCodec is not null && plan.AudioTracks is not null)
+        if (plan.CarriesAudio && plan.AudioCodec is not null && (plan.AudioTracks is not null || plan.ExternalAudio is not null))
         {
-            var selected = SourceAudio(info, plan).Count;
+            var selected = SourceAudio(info, plan).Count + (AddedAudio(plan) is null ? 0 : 1);
             if (selected > 1 && plan.Container is "mp3" or "wav" or "flac")
                 errors.Add($"The {plan.Container.ToUpperInvariant()} container carries only one audio track.");
             if (selected == 0 && plan.AudioOnly && info.HasAudio)
@@ -93,6 +94,11 @@ public static class ConversionArguments
         if (encodesVideo) a.AddRange(CodecModel.DeviceArgs(plan.VideoCodec));
         if (plan.Start is { } start) a.AddRange(new[] { "-ss", FormatTime(start) });
         a.AddRange(info.Sequence is { } sequence ? sequence.InputArgs(info.Fps) : new[] { "-i", info.FilePath });
+        if (AddedAudio(plan) is { } external)
+        {
+            if (plan.Start is { } audioStart) a.AddRange(new[] { "-ss", FormatTime(audioStart) });
+            a.AddRange(new[] { "-i", external.Path });
+        }
         var subtitles = MapsStreams(info, plan) ? Subtitles(info, plan) : null;
         foreach (var track in subtitles ?? new List<SubtitleTrack>())
         {
@@ -112,6 +118,7 @@ public static class ConversionArguments
             a.Add("-vn");
             AddAudio(a, info, plan);
             a.AddRange(MetadataArgs(info, plan, subtitles));
+            if (plan.EndAtShortest && AddedAudio(plan) is not null) a.Add("-shortest");
             a.Add(outputPath);
             return a;
         }
@@ -191,6 +198,7 @@ public static class ConversionArguments
         if (plan.Container is "mp4" or "mov" or "m4a") a.AddRange(new[] { "-movflags", "+faststart" });
         if (dolbyVision && plan.Container is "mp4" or "mov") a.AddRange(HdrResolver.Mp4DolbyVisionArgs);
         a.AddRange(MetadataArgs(info, plan, subtitles));
+        if (plan.EndAtShortest && AddedAudio(plan) is not null) a.Add("-shortest");
         a.Add(outputPath);
         return a;
     }
@@ -252,8 +260,13 @@ public static class ConversionArguments
     /// </summary>
     private static IReadOnlyList<string> MetadataArgs(MediaInfo info, ConversionPlan plan, IReadOnlyList<SubtitleTrack>? mapped = null)
     {
-        if (!plan.DropMetadata) return Array.Empty<string>();
-        var audio = SourceAudio(info, plan).Select(stream => stream.Language).ToArray();
+        var languages = SourceAudio(info, plan).Select(stream => stream.Language).ToList();
+        if (AddedAudio(plan) is { } external) languages.Add(external.Language);
+        if (!plan.DropMetadata)
+            return AddedAudio(plan)?.Language is { } language
+                ? new[] { "-metadata:s:a:" + (languages.Count - 1).ToString(CultureInfo.InvariantCulture), "language=" + language }
+                : Array.Empty<string>();
+        var audio = languages.ToArray();
         if (mapped is not null)
             return StreamMapping.MetadataArguments(true, audio, mapped.Select(track => track.InputPath is null ? track.Language : null).ToArray());
         var subtitles = info.Streams.Where(stream => stream.Kind == StreamKind.Subtitle).ToArray();
@@ -286,7 +299,7 @@ public static class ConversionArguments
     public static bool MapsStreams(MediaInfo info, ConversionPlan plan)
         => SubtitleContainer(plan) is not null
            && (plan.ExternalSubtitles.Count > 0 || info.Streams.Any(stream => stream.Kind == StreamKind.Subtitle))
-           || plan.AudioTracks is not null && plan.CarriesAudio && plan.AudioCodec is not null;
+           || (plan.AudioTracks is not null || plan.ExternalAudio is not null) && plan.CarriesAudio && plan.AudioCodec is not null;
 
     /// <summary>
     /// Ciktiya giden kaynak ses izleri, kaynak sirasiyla. Secim yokken (<see cref="ConversionPlan.AudioTracks"/>
@@ -295,7 +308,7 @@ public static class ConversionArguments
     /// </summary>
     public static IReadOnlyList<SourceStream> SourceAudio(MediaInfo info, ConversionPlan plan)
     {
-        if (!plan.CarriesAudio || plan.AudioCodec is null) return Array.Empty<SourceStream>();
+        if (!plan.CarriesAudio || plan.AudioCodec is null || plan.ExternalAudio is { Replace: true }) return Array.Empty<SourceStream>();
         var audio = info.Streams.Where(stream => stream.Kind == StreamKind.Audio).ToList();
         if (plan.AudioTracks is null) return AutoAudio(info) is { } auto ? new[] { auto } : Array.Empty<SourceStream>();
         var chosen = plan.AudioTracks.Where(ordinal => ordinal >= 0 && ordinal < audio.Count).ToHashSet();
@@ -310,7 +323,7 @@ public static class ConversionArguments
     {
         if (SubtitleContainer(plan) is not { } container) return new List<SubtitleTrack>();
         var request = new StreamRequest(ExternalSubtitles: plan.ExternalSubtitles);
-        return StreamMapping.SubtitleTracks(info, request, container, 0, notes ?? new List<StreamNote>(),
+        return StreamMapping.SubtitleTracks(info, request, container, AddedAudio(plan) is null ? 0 : 1, notes ?? new List<StreamNote>(),
             AutoAudio(info)?.Language, plan.SubtitleTracks);
     }
 
@@ -324,7 +337,7 @@ public static class ConversionArguments
         var video = info.Streams.FirstOrDefault(stream => stream.Kind == StreamKind.Video && !stream.IsAttachedPicture);
         if (!plan.AudioOnly)
             a.AddRange(new[] { "-map", video is null ? "0:v:0" : "0:" + video.Index.ToString(CultureInfo.InvariantCulture) });
-        if (plan.AudioTracks is not null)
+        if (plan.AudioTracks is not null || plan.ExternalAudio is { Replace: true })
             foreach (var stream in SourceAudio(info, plan))
                 a.AddRange(new[] { "-map", "0:" + stream.Index.ToString(CultureInfo.InvariantCulture) });
         else if (plan.CarriesAudio && plan.AudioCodec is not null)
@@ -332,9 +345,48 @@ public static class ConversionArguments
             if (AutoAudio(info) is { } audio) a.AddRange(new[] { "-map", "0:" + audio.Index.ToString(CultureInfo.InvariantCulture) });
             else if (info.HasAudio) a.AddRange(new[] { "-map", "0:a:0?" });
         }
+        if (AddedAudio(plan) is not null) a.AddRange(new[] { "-map", "1:a:0" });
         foreach (var track in subtitles) a.AddRange(new[] { "-map", track.Map });
         return a;
     }
+
+    /// <summary>Ciktiya giren dis ses: ses tasiyan ve sesi dusurmeyen planda <see cref="ConversionPlan.ExternalAudio"/>.</summary>
+    private static ExternalAudio? AddedAudio(ConversionPlan plan)
+        => plan.CarriesAudio && plan.AudioCodec is not null ? plan.ExternalAudio : null;
+
+    /// <summary>
+    /// Dis ses dosyasinin uzantisindan cikan olasi kodekler; <c>null</c> bilinmeyen kodektir ve yalniz her seyi alan kap kopyalar.
+    /// Dosya yoklanmaz: kopya ancak her olasi kodek kaba uyarsa secilir, degilse iz yeniden kodlanir.
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, string?[]> ExternalAudioCodecs = new Dictionary<string, string?[]>
+    {
+        [".aac"] = new[] { "aac" },
+        [".ac3"] = new[] { "ac3" },
+        [".eac3"] = new[] { "eac3" },
+        [".flac"] = new[] { "flac" },
+        [".m4a"] = new[] { "aac", "alac" },
+        [".mp3"] = new[] { "mp3" },
+        [".ogg"] = new[] { "vorbis", "opus", "flac" },
+        [".opus"] = new[] { "opus" },
+        [".wav"] = new[] { "pcm_s16le", "pcm_s24le", "pcm_f32le", null },
+        [".wma"] = new[] { "wmav2" }
+    };
+
+    /// <summary>Kopya kipinde dis ses kopyalanabilir mi (<see cref="ExternalAudioCodecs"/>).</summary>
+    public static bool ExternalAudioCopies(string container, ExternalAudio audio)
+        => ExternalAudioCodecs.TryGetValue(Path.GetExtension(audio.Path).ToLowerInvariant(), out var codecs)
+            ? codecs.All(codec => AudioCopyCompatible(container, codec))
+            : AudioCopyCompatible(container, null);
+
+    /// <summary>Kopya kipinde kabin almadigi dis sesin kodlayicisi.</summary>
+    private static string FallbackAudioEncoder(string container) => container switch
+    {
+        "webm" or "mkv" => "libopus",
+        "mp3" or "avi" => "libmp3lame",
+        "wav" or "mxf" => "pcm_s16le",
+        "flac" => "flac",
+        _ => "aac"
+    };
 
     /// <summary>
     /// <c>-map</c> verilmeyince ffmpeg'in seçtiği ses izi: varsayılan işaretli iz, yoksa en çok kanallı,
@@ -370,8 +422,19 @@ public static class ConversionArguments
 
     private static void AddAudio(List<string> args, MediaInfo info, ConversionPlan plan)
     {
-        if (plan.AudioCodec is null || plan.AudioTracks is not null && SourceAudio(info, plan).Count == 0) args.Add("-an");
-        else if (plan.AudioCodec == "copy") args.AddRange(new[] { "-c:a", "copy" });
+        var external = AddedAudio(plan);
+        if (plan.AudioCodec is null || plan.AudioTracks is not null && SourceAudio(info, plan).Count == 0 && external is null) args.Add("-an");
+        else if (plan.AudioCodec == "copy")
+        {
+            args.AddRange(new[] { "-c:a", "copy" });
+            if (external is not null && !ExternalAudioCopies(plan.Container, external))
+            {
+                var stream = SourceAudio(info, plan).Count.ToString(CultureInfo.InvariantCulture);
+                var encoder = FallbackAudioEncoder(plan.Container);
+                args.AddRange(new[] { "-c:a:" + stream, encoder });
+                if (encoder is not "pcm_s16le" and not "flac") args.AddRange(new[] { "-b:a:" + stream, $"{plan.AudioBitrateK}k" });
+            }
+        }
         else args.AddRange(new[] { "-c:a", plan.AudioCodec, "-b:a", $"{plan.AudioBitrateK}k" });
         if (plan.Container == "mxf" && plan.AudioCodec is not null && !args.Contains("-an")) args.AddRange(MxfAudioArgs);
     }

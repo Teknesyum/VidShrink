@@ -279,11 +279,11 @@ public partial class MainWindow
     private void RefreshAudioFileList()
     {
         AudioFileList.Children.Clear();
-        if (_externalAudio is { } audio) AudioFileList.Children.Add(AudioFileRow(audio));
+        if (_externalAudio is { } audio) AudioFileList.Children.Add(AudioFileRow(audio, RemoveAudioFile));
         AudioFileList.IsVisible = _externalAudio is not null;
     }
 
-    private Grid AudioFileRow(ExternalAudio audio)
+    private Grid AudioFileRow(ExternalAudio audio, Action onRemove)
     {
         var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), ColumnSpacing = TokenOf("SpaceXs") };
         var name = new TextBlock
@@ -305,7 +305,7 @@ public partial class MainWindow
         if (this.FindResource("GhostButton") is Avalonia.Styling.ControlTheme ghost) remove.Theme = ghost;
         AutomationProperties.SetName(remove, Say("main.audio.external.remove"));
         ToolTip.SetTip(remove, Say("main.audio.external.remove"));
-        remove.Click += (_, _) => RemoveAudioFile();
+        remove.Click += (_, _) => onRemove();
         Grid.SetColumn(remove, 1);
         row.Children.Add(remove);
         return row;

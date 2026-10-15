@@ -43,6 +43,15 @@ public sealed class ConversionPlan
     /// </summary>
     public IReadOnlyList<int>? AudioTracks { get; init; }
 
+    /// <summary>
+    /// Ana girdiden sonraki ilk <c>-i</c> olarak baglanan ses dosyasi, <c>1:a:0</c> ile eslenir.
+    /// <see cref="ExternalAudio.Replace"/> kaynagin sesini birakir, degilse iz kaynagin seslerinin ardina eklenir.
+    /// </summary>
+    public ExternalAudio? ExternalAudio { get; init; }
+
+    /// <summary>Dis ses varken cikti kisa olan akista biter (<c>-shortest</c>). Dis ses yokken okunmaz.</summary>
+    public bool EndAtShortest { get; init; }
+
     /// <summary>Ek <c>-i</c> girdisi olarak baglanan .srt/.ass dosyalari.</summary>
     public IReadOnlyList<ExternalSubtitle> ExternalSubtitles { get; init; } = Array.Empty<ExternalSubtitle>();
     public bool AudioOnly => Container is "mp3" or "m4a" or "wav" or "flac";

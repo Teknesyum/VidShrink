@@ -174,6 +174,7 @@
   "main.convert.audio-tracks": "Ścieżki audio",
   "main.convert.audio-tracks.none": "Źródło nie ma ścieżek audio.",
   "main.convert.audio-tracks.not-carried": "Ten kontener nie przenosi dźwięku.",
+  "main.convert.audio-external.shortest": "Zakończ na krótszym",
   "main.audio.level.label": "Poziom dźwięku",
   "main.audio.loudnorm": "Normalizuj głośność (EBU R128)",
   "main.audio.gain": "Wzmocnienie",

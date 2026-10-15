@@ -174,6 +174,7 @@
   "main.convert.audio-tracks": "Rãnh âm thanh",
   "main.convert.audio-tracks.none": "Nguồn không có rãnh âm thanh nào.",
   "main.convert.audio-tracks.not-carried": "Vùng chứa này không mang âm thanh.",
+  "main.convert.audio-external.shortest": "Kết thúc theo cái ngắn hơn",
   "main.audio.level.label": "Mức âm thanh",
   "main.audio.loudnorm": "Chuẩn hóa âm lượng (EBU R128)",
   "main.audio.gain": "Độ lợi (Gain)",

@@ -174,6 +174,7 @@
   "main.convert.audio-tracks": "ஒலித் தடங்கள்",
   "main.convert.audio-tracks.none": "மூலத்தில் ஒலித் தடங்கள் இல்லை.",
   "main.convert.audio-tracks.not-carried": "இந்தக் கொள்கலன் ஒலியைக் கொண்டிருக்காது.",
+  "main.convert.audio-external.shortest": "குறுகியதில் முடிக்கவும்",
   "main.audio.level.label": "ஒலி நிலை",
   "main.audio.loudnorm": "ஒலி அளவை சமன்படுத்து (EBU R128)",
   "main.audio.gain": "கெயின்",

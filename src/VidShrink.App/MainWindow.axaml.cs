@@ -295,6 +295,8 @@ public partial class MainWindow : Window
             Watch(box, SelectingItemsControl.SelectedIndexProperty, OnConvertChanged);
         Watch(ChkConvertDropMetadata, ToggleButton.IsCheckedProperty, OnConvertChanged);
         Watch(ChkConvertSingleFrame, ToggleButton.IsCheckedProperty, OnConvertChanged);
+        Watch(ChkConvertAudioReplace, ToggleButton.IsCheckedProperty, OnConvertChanged);
+        Watch(ChkConvertAudioShortest, ToggleButton.IsCheckedProperty, OnConvertChanged);
         foreach (var field in new[] { TxtCustomResolution, TxtCustomFps, TxtAudioBitrate, TxtTrimStart, TxtTrimEnd })
             Watch(field, TextBox.TextProperty, OnConvertChanged);
 
@@ -4820,6 +4822,8 @@ public partial class MainWindow : Window
             DropMetadata = ChkConvertDropMetadata.IsChecked == true,
             SubtitleTracks = ConvertSubtitleChoice(),
             AudioTracks = ConvertAudioChoice(),
+            ExternalAudio = ConvertExternalAudio,
+            EndAtShortest = ChkConvertAudioShortest.IsChecked == true,
             ExternalSubtitles = _convertSubtitles.ToList(),
             SingleFrame = ChkConvertSingleFrame.IsChecked == true
         };

@@ -174,6 +174,7 @@
   "main.convert.audio-tracks": "Аудио записи",
   "main.convert.audio-tracks.none": "Извор нема аудио записа.",
   "main.convert.audio-tracks.not-carried": "Овај контејнер не преноси звук.",
+  "main.convert.audio-external.shortest": "Заврши на краћем",
   "main.audio.level.label": "Ниво звука",
   "main.audio.loudnorm": "Нормализуј јачину звука (EBU R128)",
   "main.audio.gain": "Појачање",

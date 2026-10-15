@@ -174,6 +174,7 @@
   "main.convert.audio-tracks": "Ääniraidat",
   "main.convert.audio-tracks.none": "Lähteessä ei ole ääniraitoja.",
   "main.convert.audio-tracks.not-carried": "Tämä säiliö ei sisällä ääntä.",
+  "main.convert.audio-external.shortest": "Lopeta lyhyempään",
   "main.audio.level.label": "Äänen taso",
   "main.audio.loudnorm": "Tasaa äänenvoimakkuus (EBU R128)",
   "main.audio.gain": "Vahvistus",

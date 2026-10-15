@@ -174,6 +174,7 @@
   "main.convert.audio-tracks": "অডিও ট্র্যাক",
   "main.convert.audio-tracks.none": "উৎসে কোনো অডিও ট্র্যাক নেই।",
   "main.convert.audio-tracks.not-carried": "এই কন্টেইনার অডিও বহন করে না।",
+  "main.convert.audio-external.shortest": "ছোটটিতে শেষ করুন",
   "main.audio.level.label": "অডিও লেভেল",
   "main.audio.loudnorm": "শব্দের মাত্রা সমান করুন (EBU R128)",
   "main.audio.gain": "গেইন",

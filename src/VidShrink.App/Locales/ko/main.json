@@ -174,6 +174,7 @@
   "main.convert.audio-tracks": "오디오 트랙",
   "main.convert.audio-tracks.none": "소스에 오디오 트랙이 없습니다.",
   "main.convert.audio-tracks.not-carried": "이 컨테이너는 오디오를 담지 않습니다.",
+  "main.convert.audio-external.shortest": "짧은 쪽에서 끝내기",
   "main.audio.level.label": "오디오 레벨",
   "main.audio.loudnorm": "음량 정규화 (EBU R128)",
   "main.audio.gain": "게인",

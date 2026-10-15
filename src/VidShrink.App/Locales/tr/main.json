@@ -174,6 +174,7 @@
   "main.convert.audio-tracks": "Ses izleri",
   "main.convert.audio-tracks.none": "Kaynakta ses izi yok.",
   "main.convert.audio-tracks.not-carried": "Bu kap ses taşımaz.",
+  "main.convert.audio-external.shortest": "Kısa olanda bitir",
   "main.audio.level.label": "Ses seviyesi",
   "main.audio.loudnorm": "Ses yüksekliğini eşitle (EBU R128)",
   "main.audio.gain": "Kazanç",

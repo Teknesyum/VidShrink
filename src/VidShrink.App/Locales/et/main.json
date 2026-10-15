@@ -174,6 +174,7 @@
   "main.convert.audio-tracks": "Helirajad",
   "main.convert.audio-tracks.none": "Allikal pole helirajasid.",
   "main.convert.audio-tracks.not-carried": "See konteiner ei kanna heli.",
+  "main.convert.audio-external.shortest": "Lõpeta lühema järgi",
   "main.audio.level.label": "Helitase",
   "main.audio.loudnorm": "Ühtlusta valjus (EBU R128)",
   "main.audio.gain": "Võimendus",

@@ -174,6 +174,7 @@
   "main.convert.audio-tracks": "Звуковые дорожки",
   "main.convert.audio-tracks.none": "В источнике нет звуковых дорожек.",
   "main.convert.audio-tracks.not-carried": "Этот контейнер не содержит звук.",
+  "main.convert.audio-external.shortest": "Закончить по более короткому",
   "main.audio.level.label": "Уровень звука",
   "main.audio.loudnorm": "Нормализовать громкость (EBU R128)",
   "main.audio.gain": "Усиление",

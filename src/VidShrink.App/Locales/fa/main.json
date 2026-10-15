@@ -174,6 +174,7 @@
   "main.convert.audio-tracks": "قطعه‌های صوتی",
   "main.convert.audio-tracks.none": "منبع هیچ قطعهٔ صوتی ندارد.",
   "main.convert.audio-tracks.not-carried": "این ظرف صدا حمل نمی‌کند.",
+  "main.convert.audio-external.shortest": "پایان با کوتاه‌تر",
   "main.audio.level.label": "سطح صدا",
   "main.audio.loudnorm": "یکسان‌سازی بلندی صدا (EBU R128)",
   "main.audio.gain": "افزایش (گین)",

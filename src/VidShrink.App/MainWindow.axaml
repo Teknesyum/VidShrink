@@ -1490,6 +1490,19 @@
                       <TextBlock Text="{loc:Text main.convert.audio-tracks}" Theme="{StaticResource Label}" Margin="0"/>
                       <TextBlock x:Name="TxtConvertAudioHint" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
                       <StackPanel x:Name="ConvertAudioTracks" Spacing="{StaticResource SpaceXs}"/>
+                      <TextBlock Text="{loc:Text main.audio.external.label}" Theme="{StaticResource Label}" Margin="0"/>
+                      <WrapPanel HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                        <Button x:Name="BtnConvertAudioFile" Theme="{StaticResource GhostButton}" Click="OnConvertAddAudioFile" VerticalAlignment="Bottom"
+                                MinHeight="{StaticResource FieldMinHeight}"
+                                Padding="{StaticResource ButtonPaddingSm}" Content="{loc:Text main.audio.external.add}"/>
+                        <CheckBox x:Name="ChkConvertAudioReplace" Theme="{StaticResource CheckStyle}" IsChecked="False" IsEnabled="False" VerticalAlignment="Bottom"
+                                  MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
+                                  Content="{loc:Text main.audio.external.replace}"/>
+                        <CheckBox x:Name="ChkConvertAudioShortest" Theme="{StaticResource CheckStyle}" IsChecked="False" IsEnabled="False" VerticalAlignment="Bottom"
+                                  MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
+                                  Content="{loc:Text main.convert.audio-external.shortest}"/>
+                      </WrapPanel>
+                      <StackPanel x:Name="ConvertAudioFileList" Spacing="{StaticResource SpaceXs}" IsVisible="False"/>
                     </StackPanel>
 
                   </Grid>

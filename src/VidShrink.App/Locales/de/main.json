@@ -174,6 +174,7 @@
   "main.convert.audio-tracks": "Audiospuren",
   "main.convert.audio-tracks.none": "Die Quelle hat keine Audiospuren.",
   "main.convert.audio-tracks.not-carried": "Dieser Container enthält keinen Ton.",
+  "main.convert.audio-external.shortest": "Beim kürzeren enden",
   "main.audio.level.label": "Lautstärkepegel",
   "main.audio.loudnorm": "Lautheit normalisieren (EBU R128)",
   "main.audio.gain": "Verstärkung",

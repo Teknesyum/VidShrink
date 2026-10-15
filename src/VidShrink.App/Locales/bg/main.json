@@ -174,6 +174,7 @@
   "main.convert.audio-tracks": "Аудиописти",
   "main.convert.audio-tracks.none": "Източникът няма аудиописти.",
   "main.convert.audio-tracks.not-carried": "Този контейнер не пренася звук.",
+  "main.convert.audio-external.shortest": "Край при по-краткия",
   "main.audio.level.label": "Ниво на звука",
   "main.audio.loudnorm": "Изравняване на силата на звука (EBU R128)",
   "main.audio.gain": "Усилване",
