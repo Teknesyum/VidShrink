@@ -252,7 +252,7 @@ internal sealed class SketchCanvas : Control
 
     private void Draw(DrawingContext context, SketchStroke stroke, IBrush ink, Pen pen)
     {
-        var points = stroke.Points.Select(p => new Point(p.X, p.Y)).ToArray();
+        var points = stroke.Vertices.Select(p => new Point(p.X, p.Y)).ToArray();
         switch (stroke.Tool)
         {
             case SketchTool.Pen when points.Length == 1:
@@ -270,12 +270,12 @@ internal sealed class SketchCanvas : Control
                 break;
             case SketchTool.Arrow when points.Length == 2:
                 context.DrawLine(pen, points[0], points[1]);
-                var (left, right) = ScreenSketch.ArrowHead(stroke.Points[0], stroke.Points[1], Token("RecorderSketchArrowHead"));
+                var (left, right) = ScreenSketch.ArrowHead(stroke.Vertices[0], stroke.Vertices[1], Token("RecorderSketchArrowHead"));
                 context.DrawLine(pen, points[1], new Point(left.X, left.Y));
                 context.DrawLine(pen, points[1], new Point(right.X, right.Y));
                 break;
             case SketchTool.Box when points.Length == 2:
-                var (corner, width, height) = ScreenSketch.Box(stroke.Points[0], stroke.Points[1]);
+                var (corner, width, height) = ScreenSketch.Box(stroke.Vertices[0], stroke.Vertices[1]);
                 context.DrawRectangle(null, pen, new Rect(corner.X, corner.Y, width, height));
                 break;
             case SketchTool.Number:

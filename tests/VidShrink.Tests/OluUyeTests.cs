@@ -76,7 +76,7 @@ internal static class MemberScan
     /// <summary>
     /// Tuketici konumlarin kapali listesi. Her kural bir C# dilbilgisi konumudur, bir
     /// anahtar kelime tahmini degil: uye ya bir orunt konumundadir (<c>case</c>, <c>is</c>,
-    /// desen birlestiricileri, <c>switch</c> kolunun solu), ya bir esitlik karsilastirmasinin
+    /// desen birlestiricileri, <c>switch</c> kolunun solu, ozellik deseninin degeri), ya bir esitlik karsilastirmasinin
     /// tarafidir, ya da bir tablo aramasinin anahtaridir.
     /// </summary>
     private static readonly (string Rule, Regex? Before, Regex? After)[] ConsumerRules =
@@ -87,6 +87,7 @@ internal static class MemberScan
         ("orunt-onek", new Regex(@"\b(is|not|or|and)\s+$", RegexOptions.Compiled), null),
         ("orunt-birlestirici", null, new Regex(@"^\s*(or|and)\b", RegexOptions.Compiled)),
         ("switch-kolu", null, new Regex(@"^\s*=>", RegexOptions.Compiled)),
+        ("ozellik-deseni", new Regex(@"\{\s*[A-Za-z_]\w*\s*:\s*$", RegexOptions.Compiled), null),
         ("arama-cagrisi",
             new Regex(@"\b(ContainsKey|ContainsValue|Contains|TryGetValue|HasFlag|IndexOf)\s*\(\s*$", RegexOptions.Compiled),
             null),

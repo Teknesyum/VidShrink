@@ -16,7 +16,7 @@
 
     <StackPanel x:Name="RowLevel" Orientation="Horizontal" Spacing="{StaticResource SpaceLg}">
       <StackPanel.Styles>
-        <Style Selector="Button#BtnHotkeys:pointerover">
+        <Style Selector="Button#BtnHotkeys:pointerover, Button#BtnHistory:pointerover, Button#BtnPrompter:pointerover">
           <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
         </Style>
       </StackPanel.Styles>
@@ -43,6 +43,13 @@
               Padding="{StaticResource HeaderButtonPadding}"
               Content="{loc:Text recorder.history.title}"
               auto:AutomationProperties.Name="{loc:Text recorder.history.title}"/>
+      <Button x:Name="BtnPrompter"
+              VerticalAlignment="Center"
+              Theme="{StaticResource GhostButton}"
+              Padding="{StaticResource HeaderButtonPadding}"
+              Content="{loc:Text recorder.prompter.title}"
+              ToolTip.Tip="{loc:Text recorder.prompter.open}"
+              auto:AutomationProperties.Name="{loc:Text recorder.prompter.open}"/>
     </StackPanel>
 
     <!--

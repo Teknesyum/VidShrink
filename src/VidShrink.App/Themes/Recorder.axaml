@@ -87,6 +87,12 @@
       RecorderSketchNumberSize <- RecorderPointerRingSmall (32). Numara dairesinin çapı, küçük imleç halkası kadar.
       RecorderSketchFont       <- FontSizeHero. Yazı aracının ve numaranın yazı boyu kayıtta okunacak büyüklükte.
 
+    Prompter.
+
+      RecorderPrompterWidth  <- TipMaxWidth (420). Kameranın yanına sığacak kadar dar; satır göz gezdirmeden okunur.
+      RecorderPrompterHeight <- PlanPanelMaxHeight (576). Geçmiş penceresiyle aynı boy.
+      RecorderPrompterFont   <- FontSizeHero. Okuma kipinde metin bir kol boyu uzaktan okunur.
+
     Sonuç panelindeki hızlı kırpma açılırı.
 
       RecorderQuickTrimWidth       <- TipMaxWidth (420). Açılır bir ipucu balonu kadar geniş;
@@ -153,6 +159,9 @@
   <StaticResource x:Key="RecorderSketchArrowHead" ResourceKey="SpaceXl"/>
   <StaticResource x:Key="RecorderSketchNumberSize" ResourceKey="RecorderPointerRingSmall"/>
   <StaticResource x:Key="RecorderSketchFont" ResourceKey="FontSizeHero"/>
+  <StaticResource x:Key="RecorderPrompterWidth" ResourceKey="TipMaxWidth"/>
+  <StaticResource x:Key="RecorderPrompterHeight" ResourceKey="PlanPanelMaxHeight"/>
+  <StaticResource x:Key="RecorderPrompterFont" ResourceKey="FontSizeHero"/>
   <StaticResource x:Key="RecorderQuickTrimWidth" ResourceKey="TipMaxWidth"/>
   <StaticResource x:Key="RecorderQuickTrimThumbHeight" ResourceKey="PlaybackBarButtonSize"/>
 

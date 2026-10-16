@@ -1,0 +1,56 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:auto="using:Avalonia.Automation"
+        xmlns:loc="using:VidShrink.App.Localization"
+        x:Class="VidShrink.App.Recorder.RecorderPrompter"
+        Title="{loc:Text recorder.prompter.title}"
+        FontSize="{StaticResource FontSizeMd}" FontFamily="{StaticResource FontSans}"
+        Width="{StaticResource RecorderPrompterWidth}" Height="{StaticResource RecorderPrompterHeight}"
+        WindowStartupLocation="CenterScreen"
+        ShowInTaskbar="False"
+        Topmost="True"
+        Background="{DynamicResource AppBg}"
+        auto:AutomationProperties.Name="{loc:Text recorder.prompter.title}">
+  <Grid RowDefinitions="Auto,*,Auto,Auto" RowSpacing="{StaticResource SpaceSm}" Margin="{StaticResource WorkspaceMargin}">
+    <Grid x:Name="WarningRow" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceXs}" IsVisible="False">
+      <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}"
+            Stretch="Uniform" VerticalAlignment="Top"
+            Data="{StaticResource IconWarning}" Fill="{StaticResource TextBody}"/>
+      <SarilanMetin Grid.Column="1" Theme="{StaticResource StatusWarning}" TextWrapping="Wrap"
+                    Text="{loc:Text recorder.prompter.not-excluded}"/>
+    </Grid>
+    <Grid Grid.Row="1" x:Name="EditPane" RowDefinitions="Auto,*" RowSpacing="{StaticResource SpaceXs}">
+      <SarilanMetin Theme="{StaticResource Label}" TextWrapping="Wrap"
+                    Text="{loc:Text recorder.prompter.placeholder}"/>
+      <TextBox Grid.Row="1" x:Name="Script"
+               AcceptsReturn="True" TextWrapping="Wrap"
+               auto:AutomationProperties.Name="{loc:Text recorder.prompter.placeholder}"/>
+    </Grid>
+    <ScrollViewer Grid.Row="1" x:Name="Stage" IsVisible="False"
+                  HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden"
+                  auto:AutomationProperties.Name="{loc:Text recorder.prompter.title}">
+      <SarilanMetin x:Name="Lines" TextWrapping="Wrap"
+                    FontSize="{StaticResource RecorderPrompterFont}" FontWeight="SemiBold"/>
+    </ScrollViewer>
+    <SarilanMetin Grid.Row="2" Theme="{StaticResource Hint}" TextWrapping="Wrap"
+                  Text="{loc:Text recorder.prompter.keys}"/>
+    <WrapPanel Grid.Row="3">
+      <Button x:Name="BtnPlay" Theme="{StaticResource PrimaryButton}" Margin="{StaticResource WrapItemMargin}"
+              Content="{loc:Text recorder.prompter.play}"
+              auto:AutomationProperties.Name="{loc:Text recorder.prompter.play}"/>
+      <Button x:Name="BtnSlower" Margin="{StaticResource WrapItemMargin}"
+              Content="{loc:Text recorder.prompter.slower}"
+              auto:AutomationProperties.Name="{loc:Text recorder.prompter.slower}"/>
+      <TextBlock x:Name="TxtSpeed" VerticalAlignment="Center" Margin="{StaticResource WrapItemMargin}"/>
+      <Button x:Name="BtnFaster" Margin="{StaticResource WrapItemMargin}"
+              Content="{loc:Text recorder.prompter.faster}"
+              auto:AutomationProperties.Name="{loc:Text recorder.prompter.faster}"/>
+      <Button x:Name="BtnRewind" Margin="{StaticResource WrapItemMargin}"
+              Content="{loc:Text recorder.prompter.rewind}"
+              auto:AutomationProperties.Name="{loc:Text recorder.prompter.rewind}"/>
+      <Button x:Name="BtnEdit" Margin="{StaticResource WrapItemMargin}"
+              Content="{loc:Text recorder.prompter.edit}"
+              auto:AutomationProperties.Name="{loc:Text recorder.prompter.edit}"/>
+    </WrapPanel>
+  </Grid>
+</Window>

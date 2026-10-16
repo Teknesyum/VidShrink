@@ -78,6 +78,11 @@ internal sealed class RecorderSettings
 
     internal bool ShowClicks { get; set; }
 
+    /// <summary>Prompter'ın metni; pencere kapanınca ve düzenleme bitince yazılır.</summary>
+    internal string PrompterText { get; set; } = string.Empty;
+
+    internal int PrompterStep { get; set; } = PrompterScroll.DefaultStep;
+
     internal bool ClickSound { get; set; }
 
     internal bool ShowKeys { get; set; }
@@ -305,6 +310,8 @@ internal sealed class RecorderSettings
             settings.PushToTalk = (bool?)root["pushToTalk"] ?? false;
             if (Enum.TryParse<RecorderFinishAction>((string?)root["finishAction"], true, out var finish) && Enum.IsDefined(finish)) settings.FinishAction = finish;
             settings.ShowClicks = (bool?)root["showClicks"] ?? false;
+            settings.PrompterText = (string?)root["prompterText"] ?? string.Empty;
+            settings.PrompterStep = PrompterScroll.ClampStep((int?)root["prompterStep"] ?? PrompterScroll.DefaultStep);
             settings.ClickSound = (bool?)root["clickSound"] ?? false;
             settings.ShowKeys = (bool?)root["showKeys"] ?? false;
             settings.KeysShortcutsOnly = (bool?)root["keysShortcutsOnly"] ?? true;
@@ -438,6 +445,8 @@ internal sealed class RecorderSettings
                 writer.WriteBoolean("pushToTalk", PushToTalk);
                 writer.WriteString("finishAction", FinishAction.ToString());
                 writer.WriteBoolean("showClicks", ShowClicks);
+                writer.WriteString("prompterText", PrompterText);
+                writer.WriteNumber("prompterStep", PrompterStep);
                 writer.WriteBoolean("clickSound", ClickSound);
                 writer.WriteBoolean("showKeys", ShowKeys);
                 writer.WriteBoolean("keysShortcutsOnly", KeysShortcutsOnly);

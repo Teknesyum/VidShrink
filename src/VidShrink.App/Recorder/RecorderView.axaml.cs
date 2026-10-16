@@ -157,6 +157,7 @@ internal partial class RecorderView : UserControl
         ResetShare();
         HideFinish();
         InitGecmis();
+        InitPrompter();
     }
 
     private void ShowError(string message)

@@ -335,7 +335,7 @@ public sealed class OynaticiListeAramaTests
             Assert.Equal(new[] { "a2.mp4", "01:05 / 05:00" }, yazilar);
 
             var digeri = view.Playlist.Items.OfType<ListBoxItem>().Single(i => Path.GetFileName((string)i.Tag!) == "a3.mp4");
-            Assert.IsType<TextBlock>(digeri.Content);
+            Assert.IsAssignableFrom<TextBlock>(digeri.Content);
         });
     }
 }

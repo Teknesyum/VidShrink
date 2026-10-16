@@ -47,9 +47,9 @@ public sealed class EkranaCizimTests
 
         Assert.Equal(new[] { SketchTool.Pen, SketchTool.Pen, SketchTool.Arrow, SketchTool.Number, SketchTool.Number, SketchTool.Text },
             cizim.Strokes.Select(s => s.Tool));
-        Assert.Equal(new[] { N(1, 1), N(2, 2), N(3, 1) }, cizim.Strokes[0].Points);
-        Assert.Single(cizim.Strokes[1].Points);
-        Assert.Equal(new[] { N(0, 0), N(9, 0) }, cizim.Strokes[2].Points);
+        Assert.Equal(new[] { N(1, 1), N(2, 2), N(3, 1) }, cizim.Strokes[0].Vertices);
+        Assert.Single(cizim.Strokes[1].Vertices);
+        Assert.Equal(new[] { N(0, 0), N(9, 0) }, cizim.Strokes[2].Vertices);
         Assert.Equal(new[] { 1, 2 }, cizim.Strokes.Where(s => s.Tool == SketchTool.Number).Select(s => s.Number));
         Assert.Equal("not", cizim.Strokes[^1].Text);
 

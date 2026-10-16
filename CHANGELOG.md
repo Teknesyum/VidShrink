@@ -16,6 +16,9 @@ ship as part of it.
 - Recorder: draw on screen while recording (Ctrl+F2, reassignable). Pen, arrow, box, numbered marker and text land in
   the recording; pressing the shortcut again keeps the drawing on screen and passes the mouse to the app underneath,
   Ctrl+Z undoes, Esc erases and closes. The drawing closes when the recording ends.
+- Recorder: a prompter window scrolls your script while you record. It is hidden from the recording (Windows 10 2004
+  and later; elsewhere it says it will show), starts scrolling when the recording starts and stops when it pauses;
+  seven speeds, Space, the arrow keys and Home; the script and speed are remembered.
 
 ### Fixed
 

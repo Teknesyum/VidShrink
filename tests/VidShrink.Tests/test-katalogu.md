@@ -414,9 +414,10 @@
   kaldırmak 18/18 kırmızı.
 - `EkranYokTests.cs` — Linux'ta X ekranı açılamayınca temiz çıkış (`Program.EkranKapisi`, `Program.PencereyiAc`): pencere alt sisteminin kurucusu yalnız Linux'ta sarılır ve attığı istisna `EkranAcilamadiException` olur (Linux dışı olumsuz kontrol, kurulabilen alt sistem olumlu kontrol), yalnız o yakalanır, stderr'e `main.startup.no-display` iletisi ve `(XOpenDisplay failed; DISPLAY=…)` satırı yazılıp 1 (`ExitCodes.Error`) dönülür, başka istisna yutulmaz; ileti 42 dilde. `[LinuxFact]` süreç kolları derlenmiş `VidShrink.App.dll`'i `DISPLAY=:57` ve DISPLAY'siz koşar (ana pencere, `--kucult`, tr sistem dili): çıkış 1, ileti var, "Unhandled exception" ve yığın yok; aynı kanalda dinleyen sahip varken ikinci süreç ekransız 0 ile teslim eder. Düzeltmeden önce süreç kolları 134 (SIGABRT). Kanal `VIDSHRINK_INSTANCE_CHANNEL`, ayar `.calisma/test-ciktilari/ekran-yok/`, test siler. Dört mutasyonun dördü kırmızı: kapıyı kaldırmak 5/11, Linux koşulunu kaldırmak 1/11, her istisnayı yakalamak 1/11, dili İngilizceye sabitlemek 1/11.
 - `GorselDenetimYapiTests.PlanTavaniKatliOzetiKesmez` — plan tavanı katlı özeti kesmez (`MainWindow.PlanTavani.cs`): etkin tavan `PlanPanelMaxHeight` ile özetin istediği boyun büyüğü, `DesiredSize`'tan. Linux'ta Tay yedeği (Noto Sans Thai satırı 16 px'te 24,2, Latin 20,8) 1136x720'de katlı özeti 486 px'e itiyor, görüş 483 kalıyordu (`PlanPaneliKatliykenHerDildeKaymaz(th)` kırmızı); düzeltmeden sonra panel 579, öteki 42 kolun panel/görüş/içerik sayıları bayt bayt aynı. Yazı tipinden bağımsız kol özeti `PlanFacts`'e 100 px alt payla iter (Windows'ta da koşar): katlıyken kaymaz, açıkken panel özet boyunda durur ve taşma `PlanScroll`'a düşer; paysız eş belirteçte durur. Mutasyonlar: kancayı kaldırmak 2/45 (th + itilmiş kol), gerekçe payını özetten düşmemek 3/3 (iki kol + `TheCeilingStopsALongPlan…`). İlk sürüm panelin `Bounds`'unu okuyordu ve kaydırıcının olayında ebeveynin eski boyunu görüp tavanı geri indiriyordu.
-- `SarilanMetinTests.cs` — `SarilanMetin` doğal genişliğinde yerleşince karakter düşürmüyor: fi 14/1.25, fi 16/1.5,
-  id 14/2.0 kollarında düz `TextBlock` son sözcüğü kaybediyor (negatif kontrol), `SarilanMetin` ölçüdeki karakter
-  sayısını taşıyor. `Pay = 0` mutasyonu üç kolu da kırıyor.
+- `SarilanMetinTests.cs` — `SarilanMetin` doğal genişliğin 1e-9 altında yerleşince karakter düşürmüyor. Kollar sabit
+  değil, dört metin × 10–24 boy her makinede taranır: hangi boyun kayan nokta artığı taşıdığı yazı tipine bağlı, sabit
+  üç kol CI'da kusuru üretmiyordu. Düz `TextBlock`'un düşürdüğü her bileşimde `SarilanMetin` tam taşır; hiçbiri
+  düşürmezse ölçü kör sayılır ve test düşer. `Pay = 0` mutasyonu kırıyor.
 - `TopluTeslimTests.cs` — düzenleyicinin toplu teslimi (`EditBatch`, `EditBatchWindow`): bozuk, eskimiş ve ters klip
   sınırını aşan proje sırayı durdurmuyor, çıktı adı komut satırı kuralı, iptal kalanı iptal sayıyor, aynı proje iki kez
   eklenmiyor, pencerede düşen satırın ipucu yerel neden. Hazırlık ve koşu sahte; düşüşte `break` mutasyonu iki testi kırıyor.
@@ -426,3 +427,7 @@
 - `EkranaCizimTests.cs` — ekrana çizim (`ScreenSketch`, `RecorderSketch`): iz modeli, geri alma ve numara sırası, kutu ve
   ok başı geometrisi, Ctrl+F2 varsayılanı ve yedi eylemli eski ayar, kayıtsız basış. Gerçek pencerede Windows isabet testi
   çizim kipinde pencereyi, geçiş kipinde alttakini bulur; kutu pencerenin kendi çiziminde görünür. Geçiş biçimi mutasyonu kırıyor.
+- `PrompterTests.cs` — prompter (`PrompterScroll`, `RecorderPrompter`): hız basamakları ve uçlar, sona varınca durma ve
+  sondan başa sarma, ayarda metin ve hız (geçersiz basamak varsayılana). Gerçek pencere `GetWindowDisplayAffinity` 0x11
+  okur (negatif kontrol 0, uyarı satırı görünür); akış saatle değil `Advance`'a verilen zamanla ölçülür, tuşlar ve
+  düzenleme kipi; kaydediciye bağ kenarda bir kez, elle durdurulan akış ezilmez. Kenar ve eşzamanlı ölçü mutasyonları kırıyor. Dosya bırakmaz.

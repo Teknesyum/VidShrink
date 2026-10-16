@@ -12,7 +12,7 @@ public enum SketchTool
 public readonly record struct SketchPoint(double X, double Y);
 
 /// <summary>Ekrana çizilmiş tek iz. Numara izinde <see cref="Number"/>, yazı izinde <see cref="Text"/> dolu.</summary>
-public sealed record SketchStroke(SketchTool Tool, IReadOnlyList<SketchPoint> Points, int Number = 0, string Text = "");
+public sealed record SketchStroke(SketchTool Tool, IReadOnlyList<SketchPoint> Vertices, int Number = 0, string Text = "");
 
 /// <summary>
 /// later.md #42, EKB-04: kayıt sürerken ekrana çizim. İzler eklendiği sırayla durur; geri alma son izi düşürür,
