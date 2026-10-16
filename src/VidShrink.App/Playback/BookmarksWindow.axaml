@@ -12,9 +12,9 @@
         auto:AutomationProperties.Name="{loc:Text player.bookmarks.title}">
   <Grid RowDefinitions="*,Auto,Auto,Auto" RowSpacing="{StaticResource SpaceSm}" Margin="{StaticResource WorkspaceMargin}">
     <ListBox x:Name="Rows" SelectionMode="Single" auto:AutomationProperties.Name="{loc:Text player.bookmarks.title}"/>
-    <TextBlock x:Name="TxtEmpty" Text="{loc:Text player.bookmarks.empty}" Theme="{StaticResource Hint}"
+    <SarilanMetin x:Name="TxtEmpty" Text="{loc:Text player.bookmarks.empty}" Theme="{StaticResource Hint}"
                HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="False"/>
-    <TextBlock Grid.Row="1" Text="{loc:Text player.bookmarks.name}" Theme="{StaticResource Hint}"/>
+    <SarilanMetin Grid.Row="1" Text="{loc:Text player.bookmarks.name}" Theme="{StaticResource Hint}"/>
     <TextBox Grid.Row="2" x:Name="NameBox" auto:AutomationProperties.Name="{loc:Text player.bookmarks.name}"/>
     <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" HorizontalAlignment="Right">
       <Button x:Name="BtnDelete" Content="{loc:Text player.bookmarks.delete}" Theme="{StaticResource GhostButton}" Click="OnDelete"/>

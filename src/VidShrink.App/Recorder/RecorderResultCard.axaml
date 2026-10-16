@@ -24,11 +24,11 @@
              Height="{StaticResource RecorderResultCardThumbHeight}"
              Stretch="Uniform"/>
       <StackPanel Spacing="{StaticResource SpaceXs}" VerticalAlignment="Center">
-        <TextBlock x:Name="TxtName"
+        <SarilanMetin x:Name="TxtName"
                    Theme="{StaticResource Body}"
                    MaxWidth="{StaticResource FieldWidthSm}"
                    TextTrimming="CharacterEllipsis"/>
-        <TextBlock Text="{loc:Text recorder.card.drag-hint}"
+        <SarilanMetin Text="{loc:Text recorder.card.drag-hint}"
                    Theme="{StaticResource Hint}"
                    MaxWidth="{StaticResource FieldWidthSm}"
                    TextWrapping="Wrap"/>

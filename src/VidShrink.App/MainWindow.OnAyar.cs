@@ -86,7 +86,7 @@ public partial class MainWindow
 
     private Button BuildUserChip(PresetProfile preset)
     {
-        var name = new TextBlock
+        var name = new SarilanMetin
         {
             Text = preset.Name ?? preset.Id,
             FontStyle = FontStyle.Italic,

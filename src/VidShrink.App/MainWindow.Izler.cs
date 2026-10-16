@@ -211,7 +211,7 @@ public partial class MainWindow
     private Grid SubtitleRow(ExternalSubtitle subtitle, Action onRemove)
     {
         var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), ColumnSpacing = TokenOf("SpaceXs") };
-        var name = new TextBlock
+        var name = new SarilanMetin
         {
             Text = subtitle.Language is { } language ? $"{Path.GetFileName(subtitle.Path)} · {language}" : Path.GetFileName(subtitle.Path),
             TextTrimming = TextTrimming.CharacterEllipsis,
@@ -293,7 +293,7 @@ public partial class MainWindow
     private Grid AudioFileRow(ExternalAudio audio, Action onRemove)
     {
         var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), ColumnSpacing = TokenOf("SpaceXs") };
-        var name = new TextBlock
+        var name = new SarilanMetin
         {
             Text = audio.Language is { } language ? $"{Path.GetFileName(audio.Path)} · {language}" : Path.GetFileName(audio.Path),
             TextTrimming = TextTrimming.CharacterEllipsis,

@@ -41,7 +41,7 @@ internal sealed class DefaultAppSuggestionBar : UserControl
     {
         _settingsPath = settingsPath;
 
-        _message = new TextBlock { TextWrapping = TextWrapping.Wrap, VerticalAlignment = VerticalAlignment.Center };
+        _message = new SarilanMetin { TextWrapping = TextWrapping.Wrap, VerticalAlignment = VerticalAlignment.Center };
         _message.Bind(TextBlock.TextProperty, Text(MessageKey));
         _message.Bind(TextBlock.ForegroundProperty, Token("TextBody"));
         _message.Bind(TextBlock.FontSizeProperty, Token("FontSizeSm"));

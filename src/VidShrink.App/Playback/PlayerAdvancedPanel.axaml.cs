@@ -99,7 +99,7 @@ internal partial class PlayerAdvancedPanel : UserControl
             var which = knob;
             Rows.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
 
-            var label = new TextBlock { Text = player.KnobLabel(which), Theme = Find("Body") as ControlTheme, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
+            var label = new SarilanMetin { Text = player.KnobLabel(which), Theme = Find("Body") as ControlTheme, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
             Grid.SetRow(label, index);
             Grid.SetColumn(label, 0);
 

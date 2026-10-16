@@ -15,6 +15,6 @@
   <Border Theme="{StaticResource Panel}"
           Padding="{StaticResource RecorderStripPadding}"
           IsHitTestVisible="False">
-    <TextBlock x:Name="TxtKeys" Theme="{StaticResource MonoValue}"/>
+    <SarilanMetin x:Name="TxtKeys" Theme="{StaticResource MonoValue}"/>
   </Border>
 </Window>

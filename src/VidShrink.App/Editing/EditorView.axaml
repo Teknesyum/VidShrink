@@ -50,7 +50,7 @@
           <Button x:Name="BtnAudioTrack" Theme="{StaticResource PlaybackBarButton}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.monitor.audio-track}" ToolTip.Tip="{loc:Text editor.monitor.audio-track}">
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceXs}">
               <Path x:Name="GlyphAudioTrack" Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" VerticalAlignment="Center" Data="{StaticResource IconVolume}" Fill="{Binding $parent[Button].Foreground}"/>
-              <TextBlock x:Name="TxtAudioTrack" VerticalAlignment="Center" Foreground="{Binding $parent[Button].Foreground}"/>
+              <SarilanMetin x:Name="TxtAudioTrack" VerticalAlignment="Center" Foreground="{Binding $parent[Button].Foreground}"/>
             </StackPanel>
           </Button>
           <ProgressBar x:Name="LevelMeter" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" Minimum="-60" Maximum="0" Value="-60" IsVisible="False" AutomationProperties.Name="{loc:Text editor.monitor.level}" ToolTip.Tip="{loc:Text editor.monitor.level}">
@@ -58,8 +58,8 @@
               <Transitions/>
             </ProgressBar.Transitions>
           </ProgressBar>
-          <TextBlock x:Name="TxtOnKeyframe" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.on-keyframe}" IsVisible="False"/>
-          <TextBlock x:Name="TxtDuration" Theme="{StaticResource MonoValue}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.duration}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+          <SarilanMetin x:Name="TxtOnKeyframe" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.on-keyframe}" IsVisible="False"/>
+          <SarilanMetin x:Name="TxtDuration" Theme="{StaticResource MonoValue}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.duration}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
         </StackPanel>
       </Grid>
       </Border>
@@ -100,65 +100,65 @@
                       <CheckBox x:Name="ChkExportSeparate" Theme="{StaticResource CheckStyle}" Content="{loc:Text editor.export.separate}"/>
                       <CheckBox x:Name="ChkExportDropMetadata" Theme="{StaticResource CheckStyle}" Content="{loc:Text main.advanced.drop-metadata.label}">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.drop-metadata.tip}"/>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.drop-metadata.tip}"/>
                         </ToolTip.Tip>
                       </CheckBox>
                       <CheckBox x:Name="ChkExportChapters" Theme="{StaticResource CheckStyle}" Content="{loc:Text editor.export.chapters}" ToolTip.Tip="{loc:Text editor.export.chapters.tip}"/>
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                        <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.part-name}"/>
+                        <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.part-name}"/>
                         <TextBox x:Name="TxtPartName" Width="{StaticResource FieldWidth}" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.export.part-name}" ToolTip.Tip="{loc:Text editor.export.part-name.hint}"/>
                       </StackPanel>
-                      <TextBlock x:Name="TxtPartNameError" Theme="{StaticResource StatusError}" TextWrapping="Wrap" MaxWidth="{StaticResource FieldWidth}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                      <SarilanMetin x:Name="TxtPartNameError" Theme="{StaticResource StatusError}" TextWrapping="Wrap" MaxWidth="{StaticResource FieldWidth}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                       <Grid x:Name="ExportSettingsGrid" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}" RowSpacing="{StaticResource SpaceSm}">
-                        <TextBlock Grid.Row="0" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.preset}"/>
+                        <SarilanMetin Grid.Row="0" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.preset}"/>
                         <ComboBox x:Name="CmbExportPreset" Grid.Row="0" Grid.Column="1" MinWidth="{StaticResource EditorExportModeWidth}" AutomationProperties.Name="{loc:Text editor.export.preset}" SelectedIndex="0">
                           <ComboBoxItem Content="{loc:Text editor.export.preset.custom}" Tag=""/>
                           <ComboBoxItem Content="{loc:Text editor.export.preset.1080p}" Tag="1080p"/>
                           <ComboBoxItem Content="{loc:Text editor.export.preset.720p}" Tag="720p"/>
                           <ComboBoxItem Content="{loc:Text editor.export.preset.vertical}" Tag="vertical"/>
                         </ComboBox>
-                        <TextBlock Grid.Row="1" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.resolution}"/>
+                        <SarilanMetin Grid.Row="1" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.resolution}"/>
                         <ComboBox x:Name="CmbExportResolution" Grid.Row="1" Grid.Column="1" MinWidth="{StaticResource EditorExportModeWidth}" AutomationProperties.Name="{loc:Text editor.export.resolution}" SelectedIndex="0">
                           <ComboBoxItem Content="{loc:Text editor.export.source}" Tag="0x0"/>
                           <ComboBoxItem Content="1920 × 1080" Tag="1920x1080"/>
                           <ComboBoxItem Content="1280 × 720" Tag="1280x720"/>
                           <ComboBoxItem Content="1080 × 1920" Tag="1080x1920"/>
                         </ComboBox>
-                        <TextBlock Grid.Row="2" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.fps}"/>
+                        <SarilanMetin Grid.Row="2" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.fps}"/>
                         <ComboBox x:Name="CmbExportFps" Grid.Row="2" Grid.Column="1" MinWidth="{StaticResource EditorExportModeWidth}" AutomationProperties.Name="{loc:Text editor.export.fps}" SelectedIndex="0">
                           <ComboBoxItem Content="{loc:Text editor.export.source}" Tag="0"/>
                         </ComboBox>
-                        <TextBlock Grid.Row="3" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.codec}"/>
+                        <SarilanMetin Grid.Row="3" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.codec}"/>
                         <ComboBox x:Name="CmbExportCodec" Grid.Row="3" Grid.Column="1" MinWidth="{StaticResource EditorExportModeWidth}" AutomationProperties.Name="{loc:Text editor.export.codec}"/>
-                        <TextBlock Grid.Row="4" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.quality}"/>
+                        <SarilanMetin Grid.Row="4" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.quality}"/>
                         <ComboBox x:Name="CmbExportQuality" Grid.Row="4" Grid.Column="1" MinWidth="{StaticResource EditorExportModeWidth}" AutomationProperties.Name="{loc:Text editor.export.quality}" SelectedIndex="0">
                           <ComboBoxItem Content="{loc:Text editor.export.quality.high}"/>
                           <ComboBoxItem Content="{loc:Text editor.export.quality.balanced}"/>
                           <ComboBoxItem Content="{loc:Text editor.export.quality.small}"/>
                         </ComboBox>
-                        <TextBlock Grid.Row="5" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.audio-bitrate}"/>
+                        <SarilanMetin Grid.Row="5" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.audio-bitrate}"/>
                         <ComboBox x:Name="CmbExportAudioBitrate" Grid.Row="5" Grid.Column="1" MinWidth="{StaticResource EditorExportModeWidth}" AutomationProperties.Name="{loc:Text editor.export.audio-bitrate}"/>
                         <CheckBox x:Name="ChkExportAudioOnly" Grid.Row="6" Grid.ColumnSpan="2" Theme="{StaticResource CheckStyle}" Content="{loc:Text editor.export.audio-only}" ToolTip.Tip="{loc:Text editor.export.audio-only.tip}"/>
-                        <TextBlock Grid.Row="7" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.audio-track}"/>
+                        <SarilanMetin Grid.Row="7" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.export.audio-track}"/>
                         <ComboBox x:Name="CmbExportAudioTrack" Grid.Row="7" Grid.Column="1" MinWidth="{StaticResource EditorExportModeWidth}" AutomationProperties.Name="{loc:Text editor.export.audio-track}"/>
                       </Grid>
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                         <TextBox x:Name="TxtExportPresetName" Width="{StaticResource FieldWidth}" VerticalAlignment="Center" PlaceholderText="{loc:Text editor.export.preset.name}" AutomationProperties.Name="{loc:Text editor.export.preset.name}"/>
                         <Button x:Name="BtnExportPresetSave" Theme="{StaticResource GhostButton}" VerticalAlignment="Center" Content="{loc:Text main.preset.save}"/>
                       </StackPanel>
-                      <TextBlock x:Name="TxtExportPresetError" Theme="{StaticResource StatusError}" TextWrapping="Wrap" MaxWidth="{StaticResource FieldWidth}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                      <SarilanMetin x:Name="TxtExportPresetError" Theme="{StaticResource StatusError}" TextWrapping="Wrap" MaxWidth="{StaticResource FieldWidth}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                       <Grid x:Name="RemuxGrid" ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}" RowSpacing="{StaticResource SpaceSm}">
-                        <TextBlock Grid.Row="0" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.file-title}"/>
+                        <SarilanMetin Grid.Row="0" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.file-title}"/>
                         <TextBox x:Name="TxtRemuxFileTitle" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.remux.file-title}"/>
-                        <TextBlock Grid.Row="1" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.track}"/>
+                        <SarilanMetin Grid.Row="1" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.track}"/>
                         <ComboBox x:Name="CmbRemuxTrack" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" MinWidth="{StaticResource EditorExportModeWidth}" AutomationProperties.Name="{loc:Text editor.remux.track}"/>
-                        <TextBlock Grid.Row="2" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.language}"/>
+                        <SarilanMetin Grid.Row="2" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.language}"/>
                         <TextBox x:Name="TxtRemuxLanguage" Grid.Row="2" Grid.Column="1" Width="{StaticResource FieldWidthSm}" MaxLength="3" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.remux.language}"/>
-                        <TextBlock Grid.Row="2" Grid.Column="2" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.track-title}"/>
+                        <SarilanMetin Grid.Row="2" Grid.Column="2" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.track-title}"/>
                         <TextBox x:Name="TxtRemuxTrackTitle" Grid.Row="2" Grid.Column="3" Width="{StaticResource FieldWidthSm}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.remux.track-title}"/>
-                        <TextBlock Grid.Row="3" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.offset}"/>
+                        <SarilanMetin Grid.Row="3" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.offset}"/>
                         <TextBox x:Name="TxtRemuxOffset" Grid.Row="3" Grid.Column="1" Width="{StaticResource FieldWidthSm}" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.remux.offset}"/>
-                        <TextBlock Grid.Row="3" Grid.Column="2" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.rotation}"/>
+                        <SarilanMetin Grid.Row="3" Grid.Column="2" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.remux.rotation}"/>
                         <ComboBox x:Name="CmbRemuxRotation" Grid.Row="3" Grid.Column="3" Width="{StaticResource FieldWidthSm}" AutomationProperties.Name="{loc:Text editor.remux.rotation}" SelectedIndex="0">
                           <ComboBoxItem Content="{loc:Text editor.remux.rotation.keep}"/>
                           <ComboBoxItem Content="0°"/>
@@ -172,23 +172,23 @@
                         </StackPanel>
                         <Button x:Name="BtnRemux" Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="2" Theme="{StaticResource GhostButton}" HorizontalAlignment="Right" IsEnabled="False" Content="{loc:Text editor.remux.run}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text editor.remux.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text editor.remux.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                         <StackPanel Grid.Row="5" Grid.ColumnSpan="4" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                           <Button x:Name="BtnRemuxAdd" Theme="{StaticResource GhostButton}" IsEnabled="False" Content="{loc:Text editor.remux.add}">
                             <ToolTip.Tip>
-                              <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text editor.remux.add.tip}"/>
+                              <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text editor.remux.add.tip}"/>
                             </ToolTip.Tip>
                           </Button>
                           <Button x:Name="BtnRemuxExtract" Theme="{StaticResource GhostButton}" IsEnabled="False" Content="{loc:Text editor.remux.extract}">
                             <ToolTip.Tip>
-                              <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text editor.remux.extract.tip}"/>
+                              <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text editor.remux.extract.tip}"/>
                             </ToolTip.Tip>
                           </Button>
                           <Button x:Name="BtnRemuxCover" Theme="{StaticResource GhostButton}" IsEnabled="False" Content="{loc:Text editor.remux.cover}">
                             <ToolTip.Tip>
-                              <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text editor.remux.cover.tip}"/>
+                              <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text editor.remux.cover.tip}"/>
                             </ToolTip.Tip>
                           </Button>
                         </StackPanel>
@@ -201,55 +201,55 @@
           </WrapPanel>
           <WrapPanel x:Name="TextPanel" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.text.panel}">
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock x:Name="LblTextContent" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.content}"/>
+              <SarilanMetin x:Name="LblTextContent" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.content}"/>
               <TextBox x:Name="TxtTextContent" Width="{StaticResource FieldWidth}" AcceptsReturn="True" TextWrapping="Wrap" AutomationProperties.Name="{loc:Text editor.text.content}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock x:Name="LblTextSize" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.size}"/>
+              <SarilanMetin x:Name="LblTextSize" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.size}"/>
               <TextBox x:Name="TxtTextSize" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.text.size}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock x:Name="LblTextColor" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.color}"/>
+              <SarilanMetin x:Name="LblTextColor" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.color}"/>
               <TextBox x:Name="TxtTextColor" Width="{StaticResource NumberBoxWidth}" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.text.color}"/>
               <Border x:Name="TextSwatch" Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" VerticalAlignment="Center" CornerRadius="{StaticResource RadiusChip}" BorderThickness="{StaticResource BorderThin}" BorderBrush="{StaticResource HeaderRestBorder}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock x:Name="LblTextFont" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.font}"/>
+              <SarilanMetin x:Name="LblTextFont" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.font}"/>
               <ComboBox x:Name="CmbTextFont" Width="{StaticResource FieldWidthSm}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.text.font}"/>
               <ToggleButton x:Name="BtnTextBold" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.text.bold}" AutomationProperties.Name="{loc:Text editor.text.bold}"/>
               <ToggleButton x:Name="BtnTextItalic" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.text.italic}" AutomationProperties.Name="{loc:Text editor.text.italic}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock x:Name="LblTextFadeIn" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.fade-in}"/>
+              <SarilanMetin x:Name="LblTextFadeIn" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.fade-in}"/>
               <TextBox x:Name="TxtTextFadeIn" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.fade-in}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock x:Name="LblTextFadeOut" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.fade-out}"/>
+              <SarilanMetin x:Name="LblTextFadeOut" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.fade-out}"/>
               <TextBox x:Name="TxtTextFadeOut" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.fade-out}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock x:Name="LblTextOutline" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.outline}"/>
+              <SarilanMetin x:Name="LblTextOutline" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.outline}"/>
               <TextBox x:Name="TxtTextOutline" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" PlaceholderText="{loc:Text editor.text.auto}" AutomationProperties.Name="{loc:Text editor.text.outline}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock x:Name="LblTextShadow" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.shadow}"/>
+              <SarilanMetin x:Name="LblTextShadow" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.shadow}"/>
               <TextBox x:Name="TxtTextShadow" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.text.shadow}"/>
               <ToggleButton x:Name="BtnTextBox" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.text.box}" AutomationProperties.Name="{loc:Text editor.text.box}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock x:Name="LblTextX" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.x}"/>
+              <SarilanMetin x:Name="LblTextX" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.x}"/>
               <TextBox x:Name="TxtTextX" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.text.x}"/>
-              <TextBlock x:Name="LblTextY" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.y}"/>
+              <SarilanMetin x:Name="LblTextY" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.y}"/>
               <TextBox x:Name="TxtTextY" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.text.y}"/>
               <ToggleButton x:Name="BtnTextKeyframe" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.text.keyframe}" ToolTip.Tip="{loc:Text editor.text.keyframe.tip}" AutomationProperties.Name="{loc:Text editor.text.keyframe}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock x:Name="LblTextMotionIn" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.motion-in}"/>
+              <SarilanMetin x:Name="LblTextMotionIn" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.motion-in}"/>
               <ComboBox x:Name="CmbTextMotionIn" MinWidth="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" ToolTip.Tip="{loc:Text editor.text.motion.tip}" AutomationProperties.Name="{loc:Text editor.text.motion-in}"/>
               <TextBox x:Name="TxtTextMotionIn" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" ToolTip.Tip="{loc:Text editor.text.motion.duration}" AutomationProperties.Name="{loc:Text editor.text.motion.duration}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock x:Name="LblTextMotionOut" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.motion-out}"/>
+              <SarilanMetin x:Name="LblTextMotionOut" Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.motion-out}"/>
               <ComboBox x:Name="CmbTextMotionOut" MinWidth="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" ToolTip.Tip="{loc:Text editor.text.motion.tip}" AutomationProperties.Name="{loc:Text editor.text.motion-out}"/>
               <TextBox x:Name="TxtTextMotionOut" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" ToolTip.Tip="{loc:Text editor.text.motion.duration}" AutomationProperties.Name="{loc:Text editor.text.motion.duration}"/>
             </StackPanel>
@@ -261,14 +261,14 @@
               <ToggleButton x:Name="BtnClipFlipV" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.clip.flip-v}" AutomationProperties.Name="{loc:Text editor.clip.flip-v}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.crop}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.crop}"/>
               <ComboBox x:Name="CmbClipCrop" MinWidth="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.crop}"/>
               <ToggleButton x:Name="BtnClipFit" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.clip.fit}" AutomationProperties.Name="{loc:Text editor.clip.fit}"/>
-              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.pad}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.pad}"/>
               <ComboBox x:Name="CmbClipPad" MinWidth="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.pad}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.volume}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.volume}"/>
               <TextBox x:Name="TxtClipVolume" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.volume}"/>
               <ToggleButton x:Name="BtnClipMute" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.clip.mute}" AutomationProperties.Name="{loc:Text editor.clip.mute}"/>
             </StackPanel>
@@ -279,43 +279,43 @@
               <ToggleButton x:Name="BtnClipLimiter" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.clip.limiter}" AutomationProperties.Name="{loc:Text editor.clip.limiter}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.eq-bass}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.eq-bass}"/>
               <TextBox x:Name="TxtClipBass" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.eq-bass}"/>
-              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.eq-mid}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.eq-mid}"/>
               <TextBox x:Name="TxtClipMid" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.eq-mid}"/>
-              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.eq-treble}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.eq-treble}"/>
               <TextBox x:Name="TxtClipTreble" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.eq-treble}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.fade-in}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.fade-in}"/>
               <TextBox x:Name="TxtClipFadeIn" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.fade-in}"/>
-              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.fade-out}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.fade-out}"/>
               <TextBox x:Name="TxtClipFadeOut" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.fade-out}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.transition}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.transition}"/>
               <ComboBox x:Name="CmbClipTransition" MinWidth="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.transition}"/>
-              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.transition.duration}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.transition.duration}"/>
               <TextBox x:Name="TxtClipTransition" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.transition.duration}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.label}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.label}"/>
               <TextBox x:Name="TxtClipLabel" Width="{StaticResource FieldWidthSm}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.label}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.look}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.look}"/>
               <ComboBox x:Name="CmbClipLook" MinWidth="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.look}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.brightness}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.brightness}"/>
               <TextBox x:Name="TxtClipBrightness" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.brightness}"/>
-              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.contrast}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.contrast}"/>
               <TextBox x:Name="TxtClipContrast" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.contrast}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.saturation}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.saturation}"/>
               <TextBox x:Name="TxtClipSaturation" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.saturation}"/>
-              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.temperature}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.temperature}"/>
               <TextBox x:Name="TxtClipTemperature" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.temperature}"/>
             </StackPanel>
             <Button x:Name="BtnClipReset" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.reset}" AutomationProperties.Name="{loc:Text editor.clip.reset}"/>
@@ -323,7 +323,7 @@
           <WrapPanel x:Name="MediaPanel" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.media.open}">
             <ListBox x:Name="LstMedia" Width="{StaticResource FieldWidth}" MaxHeight="{StaticResource DropDownMaxHeight}" SelectionMode="Single" AutomationProperties.Name="{loc:Text editor.media.open}" ToolTip.Tip="{loc:Text editor.media.tip}"/>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Top">
-              <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.media.mode}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.media.mode}"/>
               <ComboBox x:Name="CmbPlaceMode" MinWidth="{StaticResource FieldWidthSm}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.media.mode}">
                 <ComboBoxItem Content="{loc:Text editor.media.insert}"/>
                 <ComboBoxItem Content="{loc:Text editor.media.overwrite}"/>
@@ -337,23 +337,23 @@
                 <CheckBox x:Name="ChkSilenceBlack" Theme="{StaticResource CheckStyle}" Content="{loc:Text editor.silence.black}" VerticalAlignment="Center"/>
               </StackPanel>
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.silence.threshold}"/>
+                <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.silence.threshold}"/>
                 <TextBox x:Name="TxtSilenceThreshold" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.silence.threshold}"/>
               </StackPanel>
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.silence.min}"/>
+                <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.silence.min}"/>
                 <TextBox x:Name="TxtSilenceMin" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.silence.min}"/>
               </StackPanel>
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.silence.padding-start}"/>
+                <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.silence.padding-start}"/>
                 <TextBox x:Name="TxtSilencePaddingStart" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.silence.padding-start}"/>
               </StackPanel>
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.silence.padding-end}"/>
+                <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.silence.padding-end}"/>
                 <TextBox x:Name="TxtSilencePaddingEnd" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.silence.padding-end}"/>
               </StackPanel>
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.silence.track}"/>
+                <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.silence.track}"/>
                 <ComboBox x:Name="CmbSilenceTrack" MinWidth="{StaticResource FieldWidthSm}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.silence.track}" IsEnabled="{Binding #ChkSilenceAudio.IsChecked}"/>
               </StackPanel>
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
@@ -379,11 +379,11 @@
                 </Button.Styles>
               </Button>
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.scene.threshold}"/>
+                <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.scene.threshold}"/>
                 <TextBox x:Name="TxtSceneThreshold" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.scene.threshold}"/>
               </StackPanel>
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.split.auto}"/>
+                <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.split.auto}"/>
                 <ComboBox x:Name="CmbAutoSplit" MinWidth="{StaticResource FieldWidthSm}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.split.auto}">
                   <ComboBoxItem Content="{loc:Text editor.split.count}"/>
                   <ComboBoxItem Content="{loc:Text editor.split.duration}"/>
@@ -393,17 +393,17 @@
                 <Button x:Name="BtnAutoSplit" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.split.apply}" AutomationProperties.Name="{loc:Text editor.split.apply}" IsEnabled="False"/>
               </StackPanel>
               <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                <TextBlock Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.marker.name}"/>
+                <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.marker.name}"/>
                 <TextBox x:Name="TxtMarkerName" Width="{StaticResource FieldWidthSm}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.marker.name}"/>
               </StackPanel>
             </WrapPanel>
             <ProgressBar x:Name="SilenceProgress" Maximum="1" IsVisible="False"/>
-            <TextBlock x:Name="TxtSilenceStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+            <SarilanMetin x:Name="TxtSilenceStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
           </StackPanel>
           <StackPanel x:Name="ExportBar" Spacing="{StaticResource SpaceSm}" IsVisible="False">
             <ProgressBar x:Name="ExportProgress" Maximum="1" IsVisible="False"/>
-            <TextBlock x:Name="TxtExportNote" Theme="{StaticResource StatusWarning}" TextWrapping="Wrap" IsVisible="False"/>
-            <TextBlock x:Name="TxtExportStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+            <SarilanMetin x:Name="TxtExportNote" Theme="{StaticResource StatusWarning}" TextWrapping="Wrap" IsVisible="False"/>
+            <SarilanMetin x:Name="TxtExportStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
             <WrapPanel Orientation="Horizontal" ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
               <Button x:Name="BtnExportCancel" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.cancel}" IsVisible="False"/>
               <Button x:Name="BtnExportReveal" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.show-in-folder}" IsVisible="False"/>
@@ -415,7 +415,7 @@
               <TextBox Grid.Column="0" x:Name="TxtShareLink" IsReadOnly="True" FontFamily="{StaticResource FontMono}" VerticalAlignment="Center"/>
               <Button Grid.Column="1" x:Name="BtnShareCopy" Theme="{StaticResource GhostButton}" VerticalAlignment="Center" Content="{loc:Text main.action.copy}"/>
             </Grid>
-            <TextBlock x:Name="TxtShareStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+            <SarilanMetin x:Name="TxtShareStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
           </StackPanel>
           <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
             <StackPanel x:Name="ToolPalette" Grid.Column="0" Orientation="Vertical" Spacing="{StaticResource SpaceXs}" VerticalAlignment="Top" AutomationProperties.Name="{loc:Text editor.tools}">

@@ -136,8 +136,8 @@ public static class Tablo
         var degerTema = Tema("Body");
         foreach (var (etiket, deger) in Ciftler(metin))
         {
-            izgara.Children.Add(new TextBlock { Text = LanguageCatalog.Display(etiket), Theme = etiketTema });
-            izgara.Children.Add(new TextBlock { Text = deger, Theme = degerTema, TextWrapping = Avalonia.Media.TextWrapping.Wrap });
+            izgara.Children.Add(new SarilanMetin { Text = LanguageCatalog.Display(etiket), Theme = etiketTema });
+            izgara.Children.Add(new SarilanMetin { Text = deger, Theme = degerTema, TextWrapping = Avalonia.Media.TextWrapping.Wrap });
         }
     }
 

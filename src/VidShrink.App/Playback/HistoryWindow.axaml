@@ -11,10 +11,10 @@
         Background="{DynamicResource AppBg}"
         auto:AutomationProperties.Name="{loc:Text player.history.title}">
   <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="{StaticResource SpaceSm}" Margin="{StaticResource WorkspaceMargin}">
-    <TextBlock Text="{loc:Text player.history.search}" Theme="{StaticResource Hint}"/>
+    <SarilanMetin Text="{loc:Text player.history.search}" Theme="{StaticResource Hint}"/>
     <TextBox Grid.Row="1" x:Name="SearchBox" auto:AutomationProperties.Name="{loc:Text player.history.search}"/>
     <ListBox Grid.Row="2" x:Name="Rows" SelectionMode="Single" auto:AutomationProperties.Name="{loc:Text player.history.title}"/>
-    <TextBlock Grid.Row="2" x:Name="TxtEmpty" Text="{loc:Text player.history.empty}" Theme="{StaticResource Hint}"
+    <SarilanMetin Grid.Row="2" x:Name="TxtEmpty" Text="{loc:Text player.history.empty}" Theme="{StaticResource Hint}"
                HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="False"/>
     <Button Grid.Row="3" x:Name="BtnOpen" Content="{loc:Text player.history.open}" Theme="{StaticResource PrimaryButton}"
             HorizontalAlignment="Right" Click="OnOpen"/>

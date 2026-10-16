@@ -36,7 +36,7 @@
     <Border x:Name="Placeholder"
             Theme="{StaticResource PlaybackPlaceholder}"
             IsVisible="False">
-      <TextBlock x:Name="PlaceholderText"
+      <SarilanMetin x:Name="PlaceholderText"
                  Theme="{StaticResource Hint}"
                  HorizontalAlignment="Center"
                  VerticalAlignment="Center"/>
@@ -66,14 +66,14 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
                 Margin="{StaticResource PlaybackBadgeMargin}">
-          <TextBlock x:Name="LeftBadgeText" Theme="{StaticResource PlaybackBadgeText}"/>
+          <SarilanMetin x:Name="LeftBadgeText" Theme="{StaticResource PlaybackBadgeText}"/>
         </Border>
         <Border x:Name="RightBadge"
                 Theme="{StaticResource PlaybackBadge}"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
                 Margin="{StaticResource PlaybackBadgeMargin}">
-          <TextBlock x:Name="RightBadgeText" Theme="{StaticResource PlaybackBadgeText}"/>
+          <SarilanMetin x:Name="RightBadgeText" Theme="{StaticResource PlaybackBadgeText}"/>
         </Border>
       </Grid>
 
@@ -95,7 +95,7 @@
                 HorizontalAlignment="Right"
                 VerticalAlignment="Stretch"
                 IsVisible="False">
-          <TextBlock x:Name="RightCurtainText"
+          <SarilanMetin x:Name="RightCurtainText"
                      Theme="{StaticResource Hint}"
                      TextWrapping="Wrap"
                      TextAlignment="Center"
@@ -110,10 +110,10 @@
         <StackPanel x:Name="EmptyState"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center">
-          <TextBlock x:Name="EmptyTitle"
+          <SarilanMetin x:Name="EmptyTitle"
                      Theme="{StaticResource Label}"
                      HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
-          <TextBlock x:Name="EmptyHint"
+          <SarilanMetin x:Name="EmptyHint"
                      Theme="{StaticResource Hint}"
                      HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
         </StackPanel>
@@ -165,7 +165,7 @@
                   HorizontalAlignment="Right"
                   IsHitTestVisible="False"
                   IsVisible="False">
-            <TextBlock x:Name="ApproxBadgeText"
+            <SarilanMetin x:Name="ApproxBadgeText"
                        Theme="{StaticResource PlaybackBadgeText}"
                        IsHitTestVisible="False"
                        TextTrimming="CharacterEllipsis"/>
@@ -191,7 +191,7 @@
             <Button x:Name="BtnZoomOut" Content="-" Theme="{StaticResource PlaybackZoomButton}" auto:AutomationProperties.Name="{loc:Text playback.zoom.out}"/>
             <Button x:Name="BtnZoomIn" Content="+" Theme="{StaticResource PlaybackZoomButton}" auto:AutomationProperties.Name="{loc:Text playback.zoom.in}"/>
             <Border x:Name="ZoomBadge" Theme="{StaticResource PlaybackBadge}" VerticalAlignment="Center">
-              <TextBlock x:Name="ZoomText" Theme="{StaticResource PlaybackBadgeText}"/>
+              <SarilanMetin x:Name="ZoomText" Theme="{StaticResource PlaybackBadgeText}"/>
             </Border>
           </StackPanel>
 

@@ -7,6 +7,11 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Fixed
+
+- Wrapped text no longer loses its last word when it is laid out at exactly the width it measured
+  (Avalonia rounding at 125/150/200% scaling); every text block in the app uses the corrected control.
+
 ## [1.2.22] - 2026-10-16
 
 ### Added

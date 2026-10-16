@@ -99,12 +99,12 @@
                   Padding="{StaticResource ButtonPaddingSm}">
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
               <WrapPanel x:Name="AppliedNoticeText" VerticalAlignment="Center" ItemSpacing="{StaticResource SpaceMd}">
-                <TextBlock x:Name="TxtAppliedLead"
+                <SarilanMetin x:Name="TxtAppliedLead"
                            Text="{loc:Text main.update.applied}"
                            Theme="{StaticResource Body}"
                            TextWrapping="Wrap"
                            VerticalAlignment="Center"/>
-                <TextBlock x:Name="TxtAppliedVersion"
+                <SarilanMetin x:Name="TxtAppliedVersion"
                            Theme="{StaticResource MonoValue}"
                            Foreground="{StaticResource NeonBlue}"
                            VerticalAlignment="Center"/>
@@ -137,7 +137,7 @@
               <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}"
                     Stretch="Uniform" VerticalAlignment="Center"
                     Data="{StaticResource IconWarning}" Fill="{StaticResource TextBody}"/>
-              <TextBlock x:Name="TxtSettingsRecovery" Grid.Column="1"
+              <SarilanMetin x:Name="TxtSettingsRecovery" Grid.Column="1"
                          Theme="{StaticResource StatusWarning}"
                          TextWrapping="Wrap"
                          VerticalAlignment="Center"/>
@@ -170,12 +170,12 @@
                        Stretch="Uniform"
                        VerticalAlignment="Center"/>
                 <WrapPanel x:Name="UpdateNoticeText" Grid.Column="1" VerticalAlignment="Center" ItemSpacing="{StaticResource SpaceMd}">
-                  <TextBlock x:Name="TxtNoticeLead"
+                  <SarilanMetin x:Name="TxtNoticeLead"
                              Text="{loc:Text main.update.available}"
                              Theme="{StaticResource Body}"
                              TextWrapping="Wrap"
                              VerticalAlignment="Center"/>
-                  <TextBlock x:Name="TxtNoticeVersion"
+                  <SarilanMetin x:Name="TxtNoticeVersion"
                              Theme="{StaticResource MonoValue}"
                              Foreground="{StaticResource NeonBlue}"
                              VerticalAlignment="Center"/>
@@ -234,7 +234,7 @@
                           CornerRadius="{StaticResource RadiusChip}"
                           Background="{StaticResource AccentGradient}"/>
                 </Border>
-                <TextBlock x:Name="TxtUpdatePercent"
+                <SarilanMetin x:Name="TxtUpdatePercent"
                            Grid.Column="1"
                            VerticalAlignment="Center"
                            Theme="{StaticResource MonoValue}"/>
@@ -260,7 +260,7 @@
 
                 <Border x:Name="SourcePanel" Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
-                    <TextBlock Text="{loc:Text main.source.title}" Theme="{StaticResource H2}"/>
+                    <SarilanMetin Text="{loc:Text main.source.title}" Theme="{StaticResource H2}"/>
 
                     <Panel x:Name="DropZone" MinHeight="{StaticResource DropZoneMinHeight}">
                       <Rectangle x:Name="DropOutline"
@@ -301,8 +301,8 @@
                             </Transitions>
                           </Path.Transitions>
                         </Path>
-                        <TextBlock x:Name="TxtDropTitle" Theme="{StaticResource DropTitle}"/>
-                        <TextBlock x:Name="TxtDropHint" Theme="{StaticResource DropHint}"/>
+                        <SarilanMetin x:Name="TxtDropTitle" Theme="{StaticResource DropTitle}"/>
+                        <SarilanMetin x:Name="TxtDropHint" Theme="{StaticResource DropHint}"/>
                         <Button x:Name="BtnBrowseEmpty" Content="{loc:Text main.action.browse}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Center" Click="OnBrowse"/>
                       </StackPanel>
                     </Panel>
@@ -312,48 +312,48 @@
                         <Button x:Name="BtnMediaDetails" Content="{loc:Text mediainfo.open}" Theme="{StaticResource GhostButton}" Click="OnMediaDetails"/>
                         <Button Content="{loc:Text main.action.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowse"/>
                       </WrapPanel>
-                      <TextBlock x:Name="TxtFileName" Theme="{StaticResource Body}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip.Tip="{Binding $self.Text}"/>
+                      <SarilanMetin x:Name="TxtFileName" Theme="{StaticResource Body}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTip.Tip="{Binding $self.Text}"/>
                     </DockPanel>
 
-                    <TextBlock x:Name="TxtSourceStatus" Classes="reveal" Theme="{StaticResource StatusError}" IsVisible="False"/>
+                    <SarilanMetin x:Name="TxtSourceStatus" Classes="reveal" Theme="{StaticResource StatusError}" IsVisible="False"/>
 
                     <Grid x:Name="TitleRow" IsVisible="False" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                      <TextBlock Text="{loc:Text main.title.label}" Theme="{StaticResource Label}" VerticalAlignment="Center"/>
+                      <SarilanMetin Text="{loc:Text main.title.label}" Theme="{StaticResource Label}" VerticalAlignment="Center"/>
                       <ComboBox Grid.Column="1" x:Name="CmbTitle" HorizontalAlignment="Left" VerticalAlignment="Center" SelectionChanged="OnTitleChanged"/>
                     </Grid>
 
                     <izi:SutunIzgara x:Name="InfoGrid" MaxColumns="4" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}" IsVisible="False">
                       <StackPanel>
-                        <TextBlock Text="{loc:Text main.info.duration}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
-                        <TextBlock x:Name="TxtDuration" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+                        <SarilanMetin Text="{loc:Text main.info.duration}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+                        <SarilanMetin x:Name="TxtDuration" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="{loc:Text main.info.size}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
-                        <TextBlock x:Name="TxtSize" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+                        <SarilanMetin Text="{loc:Text main.info.size}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+                        <SarilanMetin x:Name="TxtSize" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="{loc:Text main.info.resolution}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
-                        <TextBlock x:Name="TxtResolution" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+                        <SarilanMetin Text="{loc:Text main.info.resolution}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+                        <SarilanMetin x:Name="TxtResolution" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="{loc:Text main.info.fps}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
-                        <TextBlock x:Name="TxtFps" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+                        <SarilanMetin Text="{loc:Text main.info.fps}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+                        <SarilanMetin x:Name="TxtFps" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="{loc:Text main.info.video-codec}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
-                        <TextBlock x:Name="TxtVideoCodec" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+                        <SarilanMetin Text="{loc:Text main.info.video-codec}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+                        <SarilanMetin x:Name="TxtVideoCodec" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="{loc:Text main.info.audio}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
-                        <TextBlock x:Name="TxtAudio" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+                        <SarilanMetin Text="{loc:Text main.info.audio}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+                        <SarilanMetin x:Name="TxtAudio" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="{loc:Text main.info.bitrate}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
-                        <TextBlock x:Name="TxtBitrate" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+                        <SarilanMetin Text="{loc:Text main.info.bitrate}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+                        <SarilanMetin x:Name="TxtBitrate" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                       </StackPanel>
                       <StackPanel>
-                        <TextBlock Text="{loc:Text main.info.hdr}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
-                        <TextBlock x:Name="TxtHdr" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+                        <SarilanMetin Text="{loc:Text main.info.hdr}" Theme="{StaticResource Label}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+                        <SarilanMetin x:Name="TxtHdr" Theme="{StaticResource MonoValue}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                       </StackPanel>
                     </izi:SutunIzgara>
                   </StackPanel>
@@ -362,7 +362,7 @@
                 <Border x:Name="TargetPanel" Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
                     <StackPanel Orientation="Horizontal">
-                      <TextBlock Text="{loc:Text main.target.title}" Theme="{StaticResource H2}"/>
+                      <SarilanMetin Text="{loc:Text main.target.title}" Theme="{StaticResource H2}"/>
                     </StackPanel>
                     <!--
                       T61: hedef ve kalite aynı sütun ölçüsünü paylaşır (SharedSizeGroup);
@@ -378,7 +378,7 @@
                         </izi:KaydiriciSatiri.ColumnDefinitions>
                         <Slider x:Name="SliderTarget" auto:AutomationProperties.Name="{loc:Text main.target.title}" Minimum="1" Maximum="500" Value="16" VerticalAlignment="Center"/>
                         <TextBox x:Name="TxtTarget" Text="16" Width="{StaticResource NumberBoxWidth}" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
-                        <TextBlock Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                        <SarilanMetin Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                       </izi:KaydiriciSatiri>
                     <!--
                       T46/K1: yonga yalnız sayıyı gösterir. Açıklamanın tek yeri balondur ve
@@ -386,28 +386,28 @@
                       bilgi kalkmadı.
                     -->
                     <StackPanel Spacing="{StaticResource SpaceMd}">
-                    <TextBlock x:Name="TxtTargetCrfLockedNotice"
+                    <SarilanMetin x:Name="TxtTargetCrfLockedNotice"
                                Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"
                                Text="{loc:Text main.target.crf-locked}"/>
                     <izi:YongaSeridi x:Name="ChipStrip">
                       <Button x:Name="ChipArchive" Content="{loc:Text main.intent.archive}" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPresetArchive">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.archive.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.archive.tip}"/>
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
                       <Button x:Name="ChipHalf" Content="{loc:Text main.chip.half}" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPresetHalf">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.half.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.half.tip}"/>
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
                       <Button x:Name="Chip8" Content="8" Tag="8" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.8.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.8.tip}"/>
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
@@ -415,8 +415,8 @@
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
                             <StackPanel Spacing="{StaticResource SpaceSm}">
-                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.chip.whatsapp.label}"/>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.whatsapp.tip}"/>
+                              <SarilanMetin Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.chip.whatsapp.label}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.whatsapp.tip}"/>
                             </StackPanel>
                           </StackPanel>
                         </ToolTip.Tip>
@@ -424,14 +424,14 @@
                       <Button x:Name="Chip25" Content="25" Tag="25" izi:YongaSeridi.SatirBasi="True" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.25.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.25.tip}"/>
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
                       <Button x:Name="Chip100" Content="100" Tag="100" Theme="{StaticResource ChipButton}" Margin="{StaticResource WrapItemMargin}" Click="OnPreset">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.100.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.100.tip}"/>
                           </StackPanel>
                         </ToolTip.Tip>
                       </Button>
@@ -439,8 +439,8 @@
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
                             <StackPanel Spacing="{StaticResource SpaceSm}">
-                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.chip.134.label}"/>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.134.tip}"/>
+                              <SarilanMetin Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.chip.134.label}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.134.tip}"/>
                             </StackPanel>
                           </StackPanel>
                         </ToolTip.Tip>
@@ -449,8 +449,8 @@
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
                             <StackPanel Spacing="{StaticResource SpaceSm}">
-                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.chip.180.label}"/>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.180.tip}"/>
+                              <SarilanMetin Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.chip.180.label}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.chip.180.tip}"/>
                             </StackPanel>
                           </StackPanel>
                         </ToolTip.Tip>
@@ -469,15 +469,15 @@
                               AutomationProperties.Name="{loc:Text main.preset.add.name}">
                         <ToolTip.Tip>
                           <StackPanel Spacing="{StaticResource SpaceSm}">
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.preset.add.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.preset.add.tip}"/>
                           </StackPanel>
                         </ToolTip.Tip>
                         <Button.Flyout>
                           <Flyout>
                             <StackPanel Spacing="{StaticResource SpaceSm}" MinWidth="220">
-                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.preset.name.label}"/>
+                              <SarilanMetin Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.preset.name.label}"/>
                               <TextBox x:Name="TxtPresetName" MaxLength="60"/>
-                              <TextBlock x:Name="TxtPresetNotice" Theme="{StaticResource Hint}"
+                              <SarilanMetin x:Name="TxtPresetNotice" Theme="{StaticResource Hint}"
                                          TextWrapping="Wrap" IsVisible="False"/>
                               <Button x:Name="BtnPresetSave" Content="{loc:Text main.preset.save}" Click="OnPresetSave"/>
                               <Border Theme="{StaticResource PanelRule}"/>
@@ -492,20 +492,20 @@
                         </Button.Flyout>
                       </Button>
                     </izi:YongaSeridi>
-                    <TextBlock x:Name="TxtChipDerivation" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                    <SarilanMetin x:Name="TxtChipDerivation" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     <!--
                       Silme onay penceresi istemiyor: yonga kalkıyor, bu satır beliriyor ve
                       geri alma silinen ön ayarı geri yazıyor.
                     -->
                     <StackPanel x:Name="PresetUndoBar" Classes="reveal-panel" Orientation="Horizontal" IsVisible="False"
                                 Spacing="{StaticResource SpaceSm}">
-                      <TextBlock x:Name="TxtPresetUndo" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                      <SarilanMetin x:Name="TxtPresetUndo" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                       <Button x:Name="BtnPresetUndo" Content="{loc:Text main.preset.undo}"
                               Theme="{StaticResource ChipButton}" Click="OnPresetUndo"/>
                     </StackPanel>
                     </StackPanel>
 
-                      <TextBlock Text="{loc:Text main.quality.title}" Theme="{StaticResource H2}"/>
+                      <SarilanMetin Text="{loc:Text main.quality.title}" Theme="{StaticResource H2}"/>
                       <izi:KaydiriciSatiri x:Name="QualitySliderRow" EnDarKaydirici="{StaticResource SliderMinWidth}"
                                            ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}">
                         <izi:KaydiriciSatiri.ColumnDefinitions>
@@ -515,9 +515,9 @@
                         </izi:KaydiriciSatiri.ColumnDefinitions>
                         <Slider x:Name="SliderQualityTarget" auto:AutomationProperties.Name="{loc:Text main.quality.title}" Minimum="1" Maximum="100" Value="60" VerticalAlignment="Center"/>
                         <TextBox x:Name="TxtQualityTarget" Text="60" Width="{StaticResource NumberBoxWidth}" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
-                        <TextBlock Text="{loc:Text main.unit.score-suffix}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                        <SarilanMetin Text="{loc:Text main.unit.score-suffix}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                       </izi:KaydiriciSatiri>
-                      <TextBlock x:Name="TxtQualityTargetNotice" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                      <SarilanMetin x:Name="TxtQualityTargetNotice" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     </StackPanel>
                   </StackPanel>
                 </Border>
@@ -567,10 +567,10 @@
                       MinHeight="{StaticResource PlanPanelMinHeight}"
                       MaxHeight="{StaticResource PlanPanelMaxHeight}">
                 <Grid RowDefinitions="Auto,*" RowSpacing="{StaticResource SpaceMd}">
-                  <TextBlock Grid.Row="0" Text="{loc:Text main.plan.title}" Theme="{StaticResource H2}"/>
+                  <SarilanMetin Grid.Row="0" Text="{loc:Text main.plan.title}" Theme="{StaticResource H2}"/>
                   <ScrollViewer Grid.Row="1" x:Name="PlanScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
                     <StackPanel x:Name="PlanBody" Spacing="{StaticResource SpaceMd}">
-                      <TextBlock x:Name="TxtPlanEmpty" Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text main.plan.empty}"/>
+                      <SarilanMetin x:Name="TxtPlanEmpty" Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text main.plan.empty}"/>
                       <izi:CiftIzgara x:Name="PlanFacts" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}"/>
                       <Border x:Name="PlanRule" Theme="{StaticResource PanelRule}" IsVisible="False"/>
                       <!--
@@ -583,7 +583,7 @@
                             ColumnDefinitions="*,Auto"
                             ColumnSpacing="{StaticResource SpaceMd}"
                             IsVisible="False">
-                        <TextBlock Grid.Column="0"
+                        <SarilanMetin Grid.Column="0"
                                    x:Name="TxtPlanReasonsHead"
                                    TextWrapping="Wrap"
                                    Theme="{StaticResource H3}"
@@ -609,79 +609,79 @@
 
                 <Border x:Name="OutputPanel" Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
-                    <TextBlock Text="{loc:Text main.output.title}" Theme="{StaticResource H2}"/>
+                    <SarilanMetin Text="{loc:Text main.output.title}" Theme="{StaticResource H2}"/>
                     <ProgressBar x:Name="Progress" Maximum="1"/>
                     <StackPanel Spacing="{StaticResource SpaceMd}">
                     <izi:SutunIzgara x:Name="OutputFacts" MaxColumns="2" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceMd}">
 
                       <StackPanel Spacing="{StaticResource SpaceXs}">
-                        <Grid MinHeight="{StaticResource TargetMinSize}"><TextBlock Text="{loc:Text main.output.stage}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/></Grid>
-                        <TextBlock x:Name="TxtStage" Text="{loc:Text main.output.idle}" Theme="{StaticResource OutFactValue}" TextWrapping="Wrap">
-                          <TextBlock.Transitions>
+                        <Grid MinHeight="{StaticResource TargetMinSize}"><SarilanMetin Text="{loc:Text main.output.stage}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/></Grid>
+                        <SarilanMetin x:Name="TxtStage" Text="{loc:Text main.output.idle}" Theme="{StaticResource OutFactValue}" TextWrapping="Wrap">
+                          <SarilanMetin.Transitions>
                             <Transitions>
                               <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
                             </Transitions>
-                          </TextBlock.Transitions>
-                        </TextBlock>
+                          </SarilanMetin.Transitions>
+                        </SarilanMetin>
                       </StackPanel>
 
                       <StackPanel Spacing="{StaticResource SpaceXs}">
-                        <Grid MinHeight="{StaticResource TargetMinSize}"><TextBlock Text="{loc:Text main.output.current-size}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/></Grid>
-                        <TextBlock x:Name="TxtOutSize" Text="-" Theme="{StaticResource OutFactValue}"/>
+                        <Grid MinHeight="{StaticResource TargetMinSize}"><SarilanMetin Text="{loc:Text main.output.current-size}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/></Grid>
+                        <SarilanMetin x:Name="TxtOutSize" Text="-" Theme="{StaticResource OutFactValue}"/>
                       </StackPanel>
 
                       <StackPanel Spacing="{StaticResource SpaceXs}">
-                        <Grid MinHeight="{StaticResource TargetMinSize}"><TextBlock Text="{loc:Text main.output.remaining}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/></Grid>
-                        <TextBlock x:Name="TxtRemaining" Text="-" Theme="{StaticResource OutFactValue}"/>
+                        <Grid MinHeight="{StaticResource TargetMinSize}"><SarilanMetin Text="{loc:Text main.output.remaining}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/></Grid>
+                        <SarilanMetin x:Name="TxtRemaining" Text="-" Theme="{StaticResource OutFactValue}"/>
                       </StackPanel>
 
                       <StackPanel Spacing="{StaticResource SpaceXs}">
                         <Grid ColumnDefinitions="*,Auto">
-                          <TextBlock Grid.Column="0" x:Name="LblDuration" Text="{loc:Text main.output.estimated-time}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                          <SarilanMetin Grid.Column="0" x:Name="LblDuration" Text="{loc:Text main.output.estimated-time}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/>
                           <Button Grid.Column="1" Theme="{StaticResource InfoButton}" VerticalAlignment="Center" auto:AutomationProperties.Name="{loc:Text main.output.estimated-time}">
                             <ToolTip.Tip>
-                              <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.output.estimated-time.tip}"/>
+                              <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.output.estimated-time.tip}"/>
                             </ToolTip.Tip>
                           </Button>
                         </Grid>
-                        <TextBlock x:Name="TxtDurationValue" Text="-" Theme="{StaticResource OutFactValue}">
-                          <TextBlock.Transitions>
+                        <SarilanMetin x:Name="TxtDurationValue" Text="-" Theme="{StaticResource OutFactValue}">
+                          <SarilanMetin.Transitions>
                             <Transitions>
                               <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
                             </Transitions>
-                          </TextBlock.Transitions>
-                        </TextBlock>
+                          </SarilanMetin.Transitions>
+                        </SarilanMetin>
                       </StackPanel>
                     </izi:SutunIzgara>
-                    <TextBlock x:Name="TxtDurationRange" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                    <SarilanMetin x:Name="TxtDurationRange" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
                       <StackPanel Spacing="{StaticResource SpaceXs}">
                         <Grid ColumnDefinitions="*,Auto">
-                          <TextBlock Grid.Column="0" x:Name="LblEstimate" Text="{loc:Text main.output.estimated-output}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                          <SarilanMetin Grid.Column="0" x:Name="LblEstimate" Text="{loc:Text main.output.estimated-output}" Theme="{StaticResource OutFactLabel}" TextWrapping="Wrap" VerticalAlignment="Center"/>
                           <Button Grid.Column="1" Theme="{StaticResource InfoButton}" VerticalAlignment="Center" auto:AutomationProperties.Name="{loc:Text main.output.estimated-output}">
                             <ToolTip.Tip>
-                              <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.output.estimated-output.tip}"/>
+                              <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.output.estimated-output.tip}"/>
                             </ToolTip.Tip>
                           </Button>
                         </Grid>
-                        <TextBlock x:Name="TxtEstimateValue" Text="-" Theme="{StaticResource OutFactValue}">
-                          <TextBlock.Transitions>
+                        <SarilanMetin x:Name="TxtEstimateValue" Text="-" Theme="{StaticResource OutFactValue}">
+                          <SarilanMetin.Transitions>
                             <Transitions>
                               <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
                             </Transitions>
-                          </TextBlock.Transitions>
-                        </TextBlock>
-                        <TextBlock x:Name="TxtEstimateRange" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                          </SarilanMetin.Transitions>
+                        </SarilanMetin>
+                        <SarilanMetin x:Name="TxtEstimateRange" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                       </StackPanel>
                     </StackPanel>
-                    <TextBlock x:Name="TxtEstimateNote" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                    <SarilanMetin x:Name="TxtEstimateNote" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceXs}" IsVisible="{Binding #TxtResult.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
                       <Path x:Name="ResultWarningGlyph"
                             IsVisible="False"
                             Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}"
                             Stretch="Uniform" VerticalAlignment="Top"
                             Data="{StaticResource IconWarning}" Fill="{StaticResource TextBody}"/>
-                      <TextBlock x:Name="TxtResult" Grid.ColumnSpan="2" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
+                      <SarilanMetin x:Name="TxtResult" Grid.ColumnSpan="2" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
                     </Grid>
                     <Border x:Name="RetryAskPanel"
                             IsVisible="False"
@@ -696,8 +696,8 @@
                         </Style>
                       </Border.Styles>
                       <StackPanel Spacing="{StaticResource SpaceSm}">
-                        <TextBlock Text="{loc:Text main.retry.title}" Theme="{StaticResource H3}" TextWrapping="Wrap"/>
-                        <TextBlock x:Name="TxtRetryOutcome" Theme="{StaticResource PlanFactValue}"/>
+                        <SarilanMetin Text="{loc:Text main.retry.title}" Theme="{StaticResource H3}" TextWrapping="Wrap"/>
+                        <SarilanMetin x:Name="TxtRetryOutcome" Theme="{StaticResource PlanFactValue}"/>
                         <WrapPanel>
                           <Button x:Name="BtnRetryAgain" Content="{loc:Text main.retry.again}" Theme="{StaticResource PrimaryButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryAgain"/>
                           <Button x:Name="BtnRetryTrim" auto:AutomationProperties.Name="{loc:Text main.retry.trim.name}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnRetryTrim"/>
@@ -710,10 +710,10 @@
                             <RadioButton x:Name="RbTrimStart" GroupName="OvershootTrim" Content="{loc:Text main.retry.trim.start}"/>
                             <RadioButton x:Name="RbTrimBoth" GroupName="OvershootTrim" Content="{loc:Text main.retry.trim.both}"/>
                           </WrapPanel>
-                          <TextBlock x:Name="TxtTrimRange" Theme="{StaticResource PlanFactValue}" TextWrapping="Wrap"/>
+                          <SarilanMetin x:Name="TxtTrimRange" Theme="{StaticResource PlanFactValue}" TextWrapping="Wrap"/>
                           <Button x:Name="BtnTrimConfirm" Content="{loc:Text main.retry.trim.confirm}" Theme="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Click="OnTrimConfirm"/>
                         </StackPanel>
-                        <TextBlock x:Name="TxtRetryMeaning" Theme="{StaticResource PlanReasonText}"/>
+                        <SarilanMetin x:Name="TxtRetryMeaning" Theme="{StaticResource PlanReasonText}"/>
                       </StackPanel>
                     </Border>
                     <StackPanel Spacing="{StaticResource SpaceSm}">
@@ -752,13 +752,13 @@
                                              ModuleSize="{StaticResource ShareQrModuleSize}"
                                              auto:AutomationProperties.Name="{loc:Text main.share.qr}"
                                              auto:AutomationProperties.HelpText="{loc:Text main.share.qr-hint}"/>
-                          <TextBlock Grid.Row="1"
+                          <SarilanMetin Grid.Row="1"
                                      Theme="{StaticResource Hint}"
                                      Text="{loc:Text main.share.qr-hint}"
                                      TextWrapping="Wrap"/>
                         </Grid>
                       </Grid>
-                      <TextBlock x:Name="TxtShareStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                      <SarilanMetin x:Name="TxtShareStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                     </StackPanel>
                   </StackPanel>
                 </Border>
@@ -785,8 +785,8 @@
                 <Border x:Name="OutcomePanel" Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
-                      <TextBlock Grid.Column="0" Text="{loc:Text main.section.outcome}" Theme="{StaticResource H2}" Margin="0" VerticalAlignment="Center"/>
-                      <TextBlock Grid.Column="1" x:Name="TxtOutcomeSummary" Theme="{StaticResource MonoValue}" VerticalAlignment="Center"/>
+                      <SarilanMetin Grid.Column="0" Text="{loc:Text main.section.outcome}" Theme="{StaticResource H2}" Margin="0" VerticalAlignment="Center"/>
+                      <SarilanMetin Grid.Column="1" x:Name="TxtOutcomeSummary" Theme="{StaticResource MonoValue}" VerticalAlignment="Center"/>
                     </Grid>
 
                     <StackPanel x:Name="SecQuality">
@@ -799,8 +799,8 @@
                               auto:AutomationProperties.Name="{loc:Text main.section.quality}">
                         <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
                           <Path x:Name="GlyphQuality" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Column="1" Text="{loc:Text main.section.quality}" Theme="{StaticResource Label}" TextWrapping="Wrap" Margin="0" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TxtQualitySummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                          <SarilanMetin Grid.Column="1" Text="{loc:Text main.section.quality}" Theme="{StaticResource Label}" TextWrapping="Wrap" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Grid.Row="1" Grid.Column="1" x:Name="TxtQualitySummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
                       </Button>
                       <StackPanel x:Name="QualitySectionBody" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
@@ -809,10 +809,10 @@
                         <Grid x:Name="CodecChoiceRow" RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
                           <ToolTip.Tip>
                             <StackPanel Spacing="{StaticResource SpaceSm}">
-                              <TextBlock x:Name="TxtCodecTip" Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.codec.tip}"/>
+                              <SarilanMetin x:Name="TxtCodecTip" Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.codec.tip}"/>
                             </StackPanel>
                           </ToolTip.Tip>
-                          <TextBlock Text="{loc:Text main.codec.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Text="{loc:Text main.codec.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                             <RadioButton x:Name="RbCodecAuto" GroupName="ShrinkCodec" IsChecked="True" Content="{loc:Text main.codec.automatic}"/>
                             <RadioButton x:Name="RbCodecCompatible" GroupName="ShrinkCodec" Content="{loc:Text main.codec.compatible}"/>
@@ -820,7 +820,7 @@
                           </WrapPanel>
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
-                          <TextBlock Text="{loc:Text main.fill.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Text="{loc:Text main.fill.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                             <RadioButton x:Name="RbFillTarget" GroupName="ShrinkFill" IsChecked="True" Content="{loc:Text main.fill.target}"/>
                             <RadioButton x:Name="RbFillCeiling" GroupName="ShrinkFill" Content="{loc:Text main.fill.ceiling}"/>
@@ -828,12 +828,12 @@
                         </Grid>
                         <CheckBox x:Name="ChkFastGpu" Theme="{StaticResource CheckStyle}" IsChecked="False" IsEnabled="False" HorizontalAlignment="Left" Content="{loc:Text main.fast-gpu}">
                           <ToolTip.Tip>
-                            <TextBlock x:Name="TipFastGpu" Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.fast-gpu.tip}"/>
+                            <SarilanMetin x:Name="TipFastGpu" Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.fast-gpu.tip}"/>
                           </ToolTip.Tip>
                         </CheckBox>
                         <StackPanel x:Name="HdrPolicyPanel" Classes="disclose" IsVisible="False">
                           <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
-                            <TextBlock Text="{loc:Text main.hdr.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                            <SarilanMetin Text="{loc:Text main.hdr.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                             <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                               <RadioButton x:Name="RbHdrPreserve" GroupName="ShrinkHdr" IsChecked="True" Content="{loc:Text main.hdr.preserve}"/>
                               <RadioButton x:Name="RbHdrSdr" GroupName="ShrinkHdr" Content="{loc:Text main.hdr.sdr}"/>
@@ -853,41 +853,41 @@
                               auto:AutomationProperties.Name="{loc:Text main.section.audio}">
                         <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
                           <Path x:Name="GlyphAudio" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Column="1" Text="{loc:Text main.section.audio}" Theme="{StaticResource Label}" TextWrapping="Wrap" Margin="0" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TxtAudioSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                          <SarilanMetin Grid.Column="1" Text="{loc:Text main.section.audio}" Theme="{StaticResource Label}" TextWrapping="Wrap" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Grid.Row="1" Grid.Column="1" x:Name="TxtAudioSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
                       </Button>
                       <StackPanel x:Name="AudioBody" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
-                          <TextBlock Text="{loc:Text main.advanced.audio-kbps.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Text="{loc:Text main.advanced.audio-kbps.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvAudioKbps" SelectedIndex="0" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="TxtAdvAudioKbpsNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                            <SarilanMetin x:Name="TxtAdvAudioKbpsNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
-                          <TextBlock Text="{loc:Text main.advanced.audio-channels.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Text="{loc:Text main.advanced.audio-channels.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvAudioChannels" SelectedIndex="0" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="TxtAdvAudioChannelsNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                            <SarilanMetin x:Name="TxtAdvAudioChannelsNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
-                          <TextBlock Text="{loc:Text main.advanced.audio-codec.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Text="{loc:Text main.advanced.audio-codec.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvAudioCodec" SelectedIndex="0" VerticalAlignment="Center"
                                       AutomationProperties.Name="{loc:Text main.advanced.audio-codec.label}"/>
-                            <TextBlock x:Name="TxtAdvAudioCodecNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                            <SarilanMetin x:Name="TxtAdvAudioCodecNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
-                          <TextBlock Text="{loc:Text main.audio.level.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Text="{loc:Text main.audio.level.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                             <CheckBox x:Name="ChkAudioLoudnorm" Theme="{StaticResource CheckStyle}" IsChecked="False" VerticalAlignment="Bottom"
                                       MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
                                       Content="{loc:Text main.audio.loudnorm}"/>
                             <StackPanel Spacing="{StaticResource SpaceXs}" VerticalAlignment="Bottom">
-                              <TextBlock Text="{loc:Text main.audio.gain}" Theme="{StaticResource Hint}"/>
+                              <SarilanMetin Text="{loc:Text main.audio.gain}" Theme="{StaticResource Hint}"/>
                               <ComboBox x:Name="CmbAudioGain"
                                         auto:AutomationProperties.Name="{loc:Text main.audio.gain}"/>
                             </StackPanel>
@@ -899,10 +899,10 @@
                                     Padding="{StaticResource ButtonPaddingSm}" Content="{loc:Text main.audio.loudness.measure}"
                                     auto:AutomationProperties.Name="{loc:Text main.audio.loudness.measure}"/>
                           </WrapPanel>
-                          <TextBlock x:Name="TxtLoudness" Grid.Row="2" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+                          <SarilanMetin x:Name="TxtLoudness" Grid.Row="2" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
-                          <TextBlock Text="{loc:Text main.audio.external.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Text="{loc:Text main.audio.external.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                             <Button x:Name="BtnAddAudioFile" Theme="{StaticResource GhostButton}" Click="OnAddAudioFile" VerticalAlignment="Bottom"
                                     MinHeight="{StaticResource FieldMinHeight}"
@@ -916,22 +916,22 @@
                         <CheckBox x:Name="ChkAdvKeepTracks" Theme="{StaticResource CheckStyle}" IsChecked="False" Content="{loc:Text main.advanced.keep-tracks.label}"/>
                         <CheckBox x:Name="ChkAdvDropMetadata" Theme="{StaticResource CheckStyle}" IsChecked="False" HorizontalAlignment="Left" Content="{loc:Text main.advanced.drop-metadata.label}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.advanced.drop-metadata.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.advanced.drop-metadata.tip}"/>
                           </ToolTip.Tip>
                         </CheckBox>
                         <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
-                          <TextBlock Text="{loc:Text main.subtitles.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Text="{loc:Text main.subtitles.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                             <Button x:Name="BtnAddSubtitle" Theme="{StaticResource GhostButton}" Click="OnAddSubtitle" VerticalAlignment="Bottom"
                                     MinHeight="{StaticResource FieldMinHeight}"
                                     Padding="{StaticResource ButtonPaddingSm}" Content="{loc:Text main.subtitles.add}"/>
                             <StackPanel Spacing="{StaticResource SpaceXs}" VerticalAlignment="Bottom">
-                              <TextBlock Text="{loc:Text main.subtitles.burn}" Theme="{StaticResource Hint}"/>
+                              <SarilanMetin Text="{loc:Text main.subtitles.burn}" Theme="{StaticResource Hint}"/>
                               <ComboBox x:Name="CmbBurnSubtitle"
                                         auto:AutomationProperties.Name="{loc:Text main.subtitles.burn}">
                                 <ComboBox.ItemTemplate>
                                   <DataTemplate x:DataType="x:String">
-                                    <TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding}"/>
+                                    <SarilanMetin Text="{Binding}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding}"/>
                                   </DataTemplate>
                                 </ComboBox.ItemTemplate>
                               </ComboBox>
@@ -951,12 +951,12 @@
                             <WrapPanel x:Name="BurnStylePanel" IsVisible="False" HorizontalAlignment="Left"
                                        ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                               <StackPanel Spacing="{StaticResource SpaceXs}" VerticalAlignment="Bottom">
-                                <TextBlock Text="{loc:Text main.subtitles.style.font}" Theme="{StaticResource Hint}"/>
+                                <SarilanMetin Text="{loc:Text main.subtitles.style.font}" Theme="{StaticResource Hint}"/>
                                 <ComboBox x:Name="CmbBurnFont"
                                           auto:AutomationProperties.Name="{loc:Text main.subtitles.style.font}"/>
                               </StackPanel>
                               <StackPanel Spacing="{StaticResource SpaceXs}" VerticalAlignment="Bottom">
-                                <TextBlock Text="{loc:Text main.subtitles.style.size}" Theme="{StaticResource Hint}"/>
+                                <SarilanMetin Text="{loc:Text main.subtitles.style.size}" Theme="{StaticResource Hint}"/>
                                 <ComboBox x:Name="CmbBurnSize"
                                           auto:AutomationProperties.Name="{loc:Text main.subtitles.style.size}"/>
                               </StackPanel>
@@ -964,7 +964,7 @@
                                         MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
                                         Content="{loc:Text main.subtitles.style.box}"/>
                             </WrapPanel>
-                            <TextBlock x:Name="TxtSubtitleScan" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"
+                            <SarilanMetin x:Name="TxtSubtitleScan" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"
                                        auto:AutomationProperties.LiveSetting="Polite"/>
                             <StackPanel x:Name="SubtitleList" Spacing="{StaticResource SpaceXs}" IsVisible="False"/>
                           </StackPanel>
@@ -982,8 +982,8 @@
                               auto:AutomationProperties.Name="{loc:Text main.section.frame}">
                         <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
                           <Path x:Name="GlyphFrame" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Column="1" Text="{loc:Text main.section.frame}" Theme="{StaticResource Label}" TextWrapping="Wrap" Margin="0" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TxtFrameSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                          <SarilanMetin Grid.Column="1" Text="{loc:Text main.section.frame}" Theme="{StaticResource Label}" TextWrapping="Wrap" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Grid.Row="1" Grid.Column="1" x:Name="TxtFrameSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
                       </Button>
                       <StackPanel x:Name="FrameBody" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}" Margin="{StaticResource RowMargin}">
@@ -993,7 +993,7 @@
                         </WrapPanel>
                         <!-- Kullanıcı 09-04: dinamik çözünürlük varsayılan; kutu kalkınca kullanıcı sabit boyu seçer. -->
                         <Grid x:Name="FixedResolutionRow" RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}" IsVisible="False">
-                          <TextBlock Text="{loc:Text main.fixed-resolution.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Text="{loc:Text main.fixed-resolution.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                             <RadioButton x:Name="RbFixedSource" GroupName="ShrinkFixedResolution" IsChecked="True" Content="{loc:Text main.fixed-resolution.source}"/>
                             <RadioButton x:Name="RbFixed1080" GroupName="ShrinkFixedResolution"/>
@@ -1002,17 +1002,17 @@
                           </WrapPanel>
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
-                          <TextBlock Text="{loc:Text main.advanced.min-resolution.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Text="{loc:Text main.advanced.min-resolution.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvMinResolution" SelectedIndex="0" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="TxtAdvMinResolutionNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                            <SarilanMetin x:Name="TxtAdvMinResolutionNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
-                          <TextBlock Text="{loc:Text main.advanced.min-fps.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Text="{loc:Text main.advanced.min-fps.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvMinFps" SelectedIndex="0" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="TxtAdvMinFpsNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                            <SarilanMetin x:Name="TxtAdvMinFpsNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
                       </StackPanel>
@@ -1028,70 +1028,70 @@
                               auto:AutomationProperties.Name="{loc:Text main.advanced.title}">
                         <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
                           <Path x:Name="GlyphAdvanced" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Column="1" Text="{loc:Text main.advanced.title}" Theme="{StaticResource Label}" TextWrapping="Wrap" Margin="0" VerticalAlignment="Center"/>
-                          <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TxtAdvancedSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                          <SarilanMetin Grid.Column="1" Text="{loc:Text main.advanced.title}" Theme="{StaticResource Label}" TextWrapping="Wrap" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Grid.Row="1" Grid.Column="1" x:Name="TxtAdvancedSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                         </Grid>
                       </Button>
                       <StackPanel x:Name="AdvancedBody" Classes="disclose" Spacing="{StaticResource SpaceMd}" IsVisible="False" Margin="{StaticResource RowMargin}">
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
-                          <TextBlock Text="{loc:Text main.advanced.mode.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Text="{loc:Text main.advanced.mode.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                             <RadioButton x:Name="RbAdvModeAuto" GroupName="AdvMode" IsChecked="True" Content="{loc:Text main.plan.automatic}"/>
                             <RadioButton x:Name="RbAdvModeCrf" GroupName="AdvMode" Content="{loc:Text main.advanced.mode.crf}"/>
                             <RadioButton x:Name="RbAdvModeTwoPass" GroupName="AdvMode" Content="{loc:Text main.advanced.mode.two-pass}"/>
-                            <TextBlock x:Name="TxtAdvModeNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                            <SarilanMetin x:Name="TxtAdvModeNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
-                          <TextBlock Text="{loc:Text main.advanced.crf.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Text="{loc:Text main.advanced.crf.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvCrf" SelectedIndex="0" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="TxtAdvCrfNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                            <SarilanMetin x:Name="TxtAdvCrfNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
-                          <TextBlock Text="{loc:Text main.advanced.preset.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Text="{loc:Text main.advanced.preset.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvPreset" SelectedIndex="0" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="TxtAdvPresetNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                            <SarilanMetin x:Name="TxtAdvPresetNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
-                          <TextBlock Text="{loc:Text main.advanced.tune.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Text="{loc:Text main.advanced.tune.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvTune" SelectedIndex="0" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="TxtAdvTuneNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                            <SarilanMetin x:Name="TxtAdvTuneNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
-                          <TextBlock Text="{loc:Text main.advanced.modulus.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Text="{loc:Text main.advanced.modulus.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvModulus" SelectedIndex="0" VerticalAlignment="Center"/>
-                            <TextBlock Text="{loc:Text main.advanced.modulus.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                            <SarilanMetin Text="{loc:Text main.advanced.modulus.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
-                          <TextBlock Text="{loc:Text main.advanced.encoder-path.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Text="{loc:Text main.advanced.encoder-path.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                             <RadioButton x:Name="RbAdvPathAuto" GroupName="AdvEncoderPath" IsChecked="True" Content="{loc:Text main.plan.automatic}"/>
                             <RadioButton x:Name="RbAdvPathSoftware" GroupName="AdvEncoderPath" Content="{loc:Text main.advanced.encoder-path.software}"/>
                             <RadioButton x:Name="RbAdvPathHardware" GroupName="AdvEncoderPath" Content="{loc:Text main.advanced.encoder-path.hardware}"/>
-                            <TextBlock x:Name="TxtAdvEncoderPathNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                            <SarilanMetin x:Name="TxtAdvEncoderPathNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
-                          <TextBlock Text="{loc:Text main.advanced.codec-lock.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Text="{loc:Text main.advanced.codec-lock.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                             <ComboBox x:Name="CmbAdvCodecLock" SelectedIndex="0" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="TxtAdvCodecLockNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                            <SarilanMetin x:Name="TxtAdvCodecLockNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
-                          <TextBlock Text="{loc:Text main.advanced.filters.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                          <SarilanMetin Text="{loc:Text main.advanced.filters.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <StackPanel Grid.Row="1" Spacing="{StaticResource SpaceSm}">
                             <WrapPanel x:Name="FilterPanel" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
                               <StackPanel Spacing="{StaticResource SpaceXs}">
-                                <TextBlock Text="{loc:Text main.advanced.filters.deinterlace}" Theme="{StaticResource Hint}"/>
+                                <SarilanMetin Text="{loc:Text main.advanced.filters.deinterlace}" Theme="{StaticResource Hint}"/>
                                 <WrapPanel x:Name="FltDeinterlaceGroup" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceXs}">
                                   <RadioButton x:Name="RbFltDeintAuto" GroupName="FltDeinterlace" IsChecked="True"/>
                                   <RadioButton x:Name="RbFltDeintOff" GroupName="FltDeinterlace"/>
@@ -1099,7 +1099,7 @@
                                 </WrapPanel>
                               </StackPanel>
                               <StackPanel Spacing="{StaticResource SpaceXs}">
-                                <TextBlock Text="{loc:Text main.advanced.filters.denoise}" Theme="{StaticResource Hint}"/>
+                                <SarilanMetin Text="{loc:Text main.advanced.filters.denoise}" Theme="{StaticResource Hint}"/>
                                 <WrapPanel x:Name="FltDenoiseGroup" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceXs}">
                                   <RadioButton x:Name="RbFltDenoiseOff" GroupName="FltDenoise" IsChecked="True"/>
                                   <RadioButton x:Name="RbFltDenoiseNlm" GroupName="FltDenoise"/>
@@ -1107,7 +1107,7 @@
                                 </WrapPanel>
                               </StackPanel>
                               <StackPanel Spacing="{StaticResource SpaceXs}">
-                                <TextBlock Text="{loc:Text main.advanced.filters.strength}" Theme="{StaticResource Hint}"/>
+                                <SarilanMetin Text="{loc:Text main.advanced.filters.strength}" Theme="{StaticResource Hint}"/>
                                 <WrapPanel x:Name="FltStrengthGroup" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceXs}">
                                   <RadioButton x:Name="RbFltStrLight" GroupName="FltStrength"/>
                                   <RadioButton x:Name="RbFltStrMedium" GroupName="FltStrength" IsChecked="True"/>
@@ -1115,15 +1115,15 @@
                                 </WrapPanel>
                               </StackPanel>
                               <StackPanel Spacing="{StaticResource SpaceXs}">
-                                <TextBlock Text="{loc:Text main.advanced.filters.sharpen}" Theme="{StaticResource Hint}"/>
+                                <SarilanMetin Text="{loc:Text main.advanced.filters.sharpen}" Theme="{StaticResource Hint}"/>
                                 <ComboBox x:Name="CmbFltSharpen" SelectedIndex="0" auto:AutomationProperties.Name="{loc:Text main.advanced.filters.sharpen}"/>
                               </StackPanel>
                               <StackPanel Spacing="{StaticResource SpaceXs}">
-                                <TextBlock Text="{loc:Text main.advanced.filters.rotate}" Theme="{StaticResource Hint}"/>
+                                <SarilanMetin Text="{loc:Text main.advanced.filters.rotate}" Theme="{StaticResource Hint}"/>
                                 <ComboBox x:Name="CmbFltRotate" SelectedIndex="0" auto:AutomationProperties.Name="{loc:Text main.advanced.filters.rotate}"/>
                               </StackPanel>
                               <StackPanel Spacing="{StaticResource SpaceXs}">
-                                <TextBlock Text="{loc:Text main.advanced.filters.color}" Theme="{StaticResource Hint}"/>
+                                <SarilanMetin Text="{loc:Text main.advanced.filters.color}" Theme="{StaticResource Hint}"/>
                                 <WrapPanel x:Name="FltColorGroup" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceXs}">
                                   <RadioButton x:Name="RbFltColorKeep" GroupName="FltColor" IsChecked="True"/>
                                   <RadioButton x:Name="RbFltColor709" GroupName="FltColor"/>
@@ -1139,20 +1139,20 @@
                               <CheckBox x:Name="ChkFltAutoCrop" Theme="{StaticResource CheckStyle}" Content="{loc:Text main.advanced.filters.autocrop}"/>
                               <CheckBox x:Name="ChkFltManualCrop" Theme="{StaticResource CheckStyle}" Content="{loc:Text main.advanced.filters.manualcrop}">
                                 <ToolTip.Tip>
-                                  <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.advanced.filters.manualcrop.tip}"/>
+                                  <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.advanced.filters.manualcrop.tip}"/>
                                 </ToolTip.Tip>
                               </CheckBox>
                             </izi:SutunIzgara>
                             <StackPanel Spacing="{StaticResource SpaceXs}">
-                              <TextBlock Text="{loc:Text main.advanced.filters.spec}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                              <SarilanMetin Text="{loc:Text main.advanced.filters.spec}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                               <TextBox x:Name="TxtAdvFilters" VerticalAlignment="Center"
                                        auto:AutomationProperties.Name="{loc:Text main.advanced.filters.label}"/>
-                              <TextBlock x:Name="TxtAdvFiltersNow" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                              <SarilanMetin x:Name="TxtAdvFiltersNow" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                             </StackPanel>
-                            <TextBlock Text="{loc:Text main.advanced.filters.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                            <SarilanMetin Text="{loc:Text main.advanced.filters.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                           </StackPanel>
                         </Grid>
-                        <TextBlock x:Name="TxtAdvancedError" Classes="reveal" Theme="{StaticResource Hint}" Foreground="{StaticResource EmberBlaze}" TextWrapping="Wrap" IsVisible="False"/>
+                        <SarilanMetin x:Name="TxtAdvancedError" Classes="reveal" Theme="{StaticResource Hint}" Foreground="{StaticResource EmberBlaze}" TextWrapping="Wrap" IsVisible="False"/>
                       </StackPanel>
                     </StackPanel>
                   </StackPanel>
@@ -1169,12 +1169,12 @@
 
               <Border Grid.Column="0" Theme="{StaticResource Panel}" VerticalAlignment="Top">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
-                  <TextBlock Text="{loc:Text main.convert.title}" Theme="{StaticResource H2}"/>
-                  <TextBlock x:Name="TxtConvertSource" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
+                  <SarilanMetin Text="{loc:Text main.convert.title}" Theme="{StaticResource H2}"/>
+                  <SarilanMetin x:Name="TxtConvertSource" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
                   <Button x:Name="BtnBrowseConvert" Content="{loc:Text main.convert.browse}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" Click="OnBrowseConvert"/>
                   <Button x:Name="BtnBrowseSequence" Content="{loc:Text main.convert.sequence.browse}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" Click="OnBrowseSequence"/>
                   <StackPanel Spacing="{StaticResource SpaceXs}">
-                    <TextBlock Text="{loc:Text main.convert.preset.label}" Theme="{StaticResource Label}"/>
+                    <SarilanMetin Text="{loc:Text main.convert.preset.label}" Theme="{StaticResource Label}"/>
                     <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
                       <ComboBox x:Name="CmbConvertPreset" HorizontalAlignment="Stretch"
                                 PlaceholderText="{loc:Text main.convert.preset.placeholder}"
@@ -1183,20 +1183,20 @@
                       <Button x:Name="BtnConvertRepairPreset" Grid.Column="1" Content="{loc:Text main.convert.repair.preset}" Theme="{StaticResource ChipButton}"
                               Click="OnConvertRepairPreset">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.repair.preset.tip}"/>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.repair.preset.tip}"/>
                         </ToolTip.Tip>
                       </Button>
                       <Button x:Name="BtnConvertPresetAdd" Grid.Column="2" Content="+" Theme="{StaticResource ChipButton}" Classes="eylem"
                               AutomationProperties.Name="{loc:Text main.preset.add.name}">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.preset.add.tip}"/>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.preset.add.tip}"/>
                         </ToolTip.Tip>
                         <Button.Flyout>
                           <Flyout>
                             <StackPanel Spacing="{StaticResource SpaceSm}" MinWidth="220">
-                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.preset.name.label}"/>
+                              <SarilanMetin Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.preset.name.label}"/>
                               <TextBox x:Name="TxtConvertPresetName" MaxLength="60"/>
-                              <TextBlock x:Name="TxtConvertPresetNotice" Theme="{StaticResource Hint}"
+                              <SarilanMetin x:Name="TxtConvertPresetNotice" Theme="{StaticResource Hint}"
                                          TextWrapping="Wrap" IsVisible="False"/>
                               <Button x:Name="BtnConvertPresetSave" Content="{loc:Text main.preset.save}" Click="OnConvertPresetSave"/>
                               <Border Theme="{StaticResource PanelRule}"/>
@@ -1226,10 +1226,10 @@
                         <RowDefinition Height="Auto"/>
                       </Grid.RowDefinitions>
                       <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                        <TextBlock Text="{loc:Text main.convert.container}" Theme="{StaticResource Label}"/>
+                        <SarilanMetin Text="{loc:Text main.convert.container}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.container}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.container.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.container.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
@@ -1263,10 +1263,10 @@
                         <RowDefinition Height="Auto"/>
                       </Grid.RowDefinitions>
                       <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                        <TextBlock Text="{loc:Text main.convert.video-codec}" Theme="{StaticResource Label}"/>
+                        <SarilanMetin Text="{loc:Text main.convert.video-codec}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.video-codec}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.video-codec.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.video-codec.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
@@ -1306,10 +1306,10 @@
                         <RowDefinition Height="Auto"/>
                       </Grid.RowDefinitions>
                       <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                        <TextBlock Text="{loc:Text main.convert.quality-mode}" Theme="{StaticResource Label}"/>
+                        <SarilanMetin Text="{loc:Text main.convert.quality-mode}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.quality-mode}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.quality-mode.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.quality-mode.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
@@ -1325,10 +1325,10 @@
                         <RowDefinition Height="Auto"/>
                       </Grid.RowDefinitions>
                       <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                        <TextBlock Text="{loc:Text main.convert.crf-label}" Theme="{StaticResource Label}"/>
+                        <SarilanMetin Text="{loc:Text main.convert.crf-label}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.crf-label}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.crf-label.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.crf-label.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
@@ -1345,10 +1345,10 @@
                         <RowDefinition Height="Auto"/>
                       </Grid.RowDefinitions>
                       <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                        <TextBlock Text="{loc:Text main.convert.resolution}" Theme="{StaticResource Label}"/>
+                        <SarilanMetin Text="{loc:Text main.convert.resolution}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.resolution}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.resolution.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.resolution.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
@@ -1369,10 +1369,10 @@
                         <RowDefinition Height="Auto"/>
                       </Grid.RowDefinitions>
                       <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                        <TextBlock Text="{loc:Text main.convert.custom-resolution}" Theme="{StaticResource Label}"/>
+                        <SarilanMetin Text="{loc:Text main.convert.custom-resolution}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.custom-resolution}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.custom-resolution.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.custom-resolution.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
@@ -1385,10 +1385,10 @@
                         <RowDefinition Height="Auto"/>
                       </Grid.RowDefinitions>
                       <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                        <TextBlock Text="{loc:Text main.convert.frame-rate}" Theme="{StaticResource Label}"/>
+                        <SarilanMetin Text="{loc:Text main.convert.frame-rate}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.frame-rate}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.frame-rate.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.frame-rate.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
@@ -1407,10 +1407,10 @@
                         <RowDefinition Height="Auto"/>
                       </Grid.RowDefinitions>
                       <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                        <TextBlock Text="{loc:Text main.convert.custom-fps}" Theme="{StaticResource Label}"/>
+                        <SarilanMetin Text="{loc:Text main.convert.custom-fps}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.custom-fps}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.custom-fps.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.custom-fps.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
@@ -1423,10 +1423,10 @@
                         <RowDefinition Height="Auto"/>
                       </Grid.RowDefinitions>
                       <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                        <TextBlock Text="{loc:Text main.convert.audio}" Theme="{StaticResource Label}"/>
+                        <SarilanMetin Text="{loc:Text main.convert.audio}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.audio}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.audio.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.audio.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
@@ -1449,10 +1449,10 @@
                         <RowDefinition Height="Auto"/>
                       </Grid.RowDefinitions>
                       <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                        <TextBlock Text="{loc:Text main.convert.audio-bitrate}" Theme="{StaticResource Label}"/>
+                        <SarilanMetin Text="{loc:Text main.convert.audio-bitrate}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.audio-bitrate}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.audio-bitrate.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.audio-bitrate.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
@@ -1465,10 +1465,10 @@
                         <RowDefinition Height="Auto"/>
                       </Grid.RowDefinitions>
                       <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                        <TextBlock Text="{loc:Text main.convert.trim-start}" Theme="{StaticResource Label}"/>
+                        <SarilanMetin Text="{loc:Text main.convert.trim-start}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.trim-start}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.trim-start.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.trim-start.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
@@ -1481,10 +1481,10 @@
                         <RowDefinition Height="Auto"/>
                       </Grid.RowDefinitions>
                       <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                        <TextBlock Text="{loc:Text main.convert.trim-end}" Theme="{StaticResource Label}"/>
+                        <SarilanMetin Text="{loc:Text main.convert.trim-end}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text main.convert.trim-end}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.trim-end.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.trim-end.tip}"/>
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
@@ -1494,36 +1494,36 @@
                     <WrapPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                       <CheckBox x:Name="ChkConvertDropMetadata" Theme="{StaticResource CheckStyle}" IsChecked="False" VerticalAlignment="Center" Content="{loc:Text main.advanced.drop-metadata.label}">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.drop-metadata.tip}"/>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.drop-metadata.tip}"/>
                         </ToolTip.Tip>
                       </CheckBox>
                       <CheckBox x:Name="ChkConvertRepair" Theme="{StaticResource CheckStyle}" IsChecked="False" VerticalAlignment="Center" Content="{loc:Text main.convert.repair}">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.repair.tip}"/>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.repair.tip}"/>
                         </ToolTip.Tip>
                       </CheckBox>
                       <Button x:Name="BtnConvertTags" Content="{loc:Text main.convert.tags}" Theme="{StaticResource ChipButton}" VerticalAlignment="Center">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.tags.tip}"/>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.tags.tip}"/>
                         </ToolTip.Tip>
                         <Button.Flyout>
                           <Flyout>
                             <StackPanel Spacing="{StaticResource SpaceSm}" MinWidth="{StaticResource FieldWidth}">
-                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.convert.tags.title}"/>
+                              <SarilanMetin Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.convert.tags.title}"/>
                               <TextBox x:Name="TxtConvertTagTitle" auto:AutomationProperties.Name="{loc:Text main.convert.tags.title}"/>
-                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.convert.tags.artist}"/>
+                              <SarilanMetin Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.convert.tags.artist}"/>
                               <TextBox x:Name="TxtConvertTagArtist" auto:AutomationProperties.Name="{loc:Text main.convert.tags.artist}"/>
-                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.convert.tags.year}"/>
+                              <SarilanMetin Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.convert.tags.year}"/>
                               <TextBox x:Name="TxtConvertTagYear" MaxLength="10" auto:AutomationProperties.Name="{loc:Text main.convert.tags.year}"/>
-                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.convert.tags.comment}"/>
+                              <SarilanMetin Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.convert.tags.comment}"/>
                               <TextBox x:Name="TxtConvertTagComment" auto:AutomationProperties.Name="{loc:Text main.convert.tags.comment}"/>
-                              <TextBlock Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.convert.tags.cover}"/>
-                              <TextBlock x:Name="TxtConvertCoverName" Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text main.convert.tags.cover.none}"/>
+                              <SarilanMetin Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.convert.tags.cover}"/>
+                              <SarilanMetin x:Name="TxtConvertCoverName" Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text main.convert.tags.cover.none}"/>
                               <WrapPanel>
                                 <Button x:Name="BtnConvertCoverPick" Content="{loc:Text main.convert.tags.cover.pick}" Theme="{StaticResource GhostButton}"
                                         Margin="{StaticResource WrapItemMargin}" Click="OnConvertCoverPick">
                                   <ToolTip.Tip>
-                                    <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.tags.cover.tip}"/>
+                                    <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.tags.cover.tip}"/>
                                   </ToolTip.Tip>
                                 </Button>
                                 <Button x:Name="BtnConvertCoverClear" Content="{loc:Text main.convert.tags.cover.clear}" Theme="{StaticResource GhostButton}"
@@ -1537,16 +1537,16 @@
 
                     <CheckBox x:Name="ChkConvertSingleFrame" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Theme="{StaticResource CheckStyle}" IsChecked="False" IsVisible="False" HorizontalAlignment="Left" Content="{loc:Text main.convert.single-frame}">
                       <ToolTip.Tip>
-                        <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.single-frame.tip}"/>
+                        <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.single-frame.tip}"/>
                       </ToolTip.Tip>
                     </CheckBox>
 
                     <WrapPanel x:Name="ConvertGifPanel" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" IsVisible="False" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.gif-loop.tip}"/>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.gif-loop.tip}"/>
                         </ToolTip.Tip>
-                        <TextBlock Text="{loc:Text main.convert.gif-loop}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <SarilanMetin Text="{loc:Text main.convert.gif-loop}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                         <ComboBox x:Name="CmbConvertGifLoop" SelectedIndex="0"
                                   auto:AutomationProperties.Name="{loc:Text main.convert.gif-loop}">
                           <ComboBoxItem Content="{loc:Text main.convert.gif-loop.infinite}" Tag=""/>
@@ -1560,9 +1560,9 @@
                       </StackPanel>
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.gif-colors.tip}"/>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.gif-colors.tip}"/>
                         </ToolTip.Tip>
-                        <TextBlock Text="{loc:Text main.convert.gif-colors}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <SarilanMetin Text="{loc:Text main.convert.gif-colors}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                         <ComboBox x:Name="CmbConvertGifColors" SelectedIndex="0"
                                   auto:AutomationProperties.Name="{loc:Text main.convert.gif-colors}">
                           <ComboBoxItem Content="256" Tag=""/>
@@ -1574,9 +1574,9 @@
                       </StackPanel>
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.gif-dither.tip}"/>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.gif-dither.tip}"/>
                         </ToolTip.Tip>
-                        <TextBlock Text="{loc:Text main.convert.gif-dither}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <SarilanMetin Text="{loc:Text main.convert.gif-dither}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                         <ComboBox x:Name="CmbConvertGifDither" SelectedIndex="0"
                                   auto:AutomationProperties.Name="{loc:Text main.convert.gif-dither}">
                           <ComboBoxItem Content="Sierra-2-4A" Tag=""/>
@@ -1600,12 +1600,12 @@
                             auto:AutomationProperties.Name="{loc:Text main.advanced.filters.label}">
                       <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
                         <Path x:Name="ConvertFiltersGlyph" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="1" Text="{loc:Text main.advanced.filters.label}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                        <SarilanMetin Grid.Column="1" Text="{loc:Text main.advanced.filters.label}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
                       </Grid>
                     </Button>
                     <WrapPanel x:Name="ConvertFilterBody" Classes="disclose" IsVisible="False" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
-                        <TextBlock Text="{loc:Text main.advanced.filters.deinterlace}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <SarilanMetin Text="{loc:Text main.advanced.filters.deinterlace}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                         <ComboBox x:Name="CmbConvertDeinterlace" SelectedIndex="0"
                                   auto:AutomationProperties.Name="{loc:Text main.advanced.filters.deinterlace}">
                           <ComboBoxItem Content="{loc:Text main.advanced.filters.off}" Tag="off"/>
@@ -1614,7 +1614,7 @@
                         </ComboBox>
                       </StackPanel>
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
-                        <TextBlock Text="{loc:Text main.advanced.filters.denoise}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <SarilanMetin Text="{loc:Text main.advanced.filters.denoise}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                         <ComboBox x:Name="CmbConvertDenoise" SelectedIndex="0"
                                   auto:AutomationProperties.Name="{loc:Text main.advanced.filters.denoise}">
                           <ComboBoxItem Content="{loc:Text main.advanced.filters.off}" Tag="off"/>
@@ -1624,7 +1624,7 @@
                         </ComboBox>
                       </StackPanel>
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
-                        <TextBlock Text="{loc:Text main.advanced.filters.rotate}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <SarilanMetin Text="{loc:Text main.advanced.filters.rotate}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                         <ComboBox x:Name="CmbConvertRotate" SelectedIndex="0"
                                   auto:AutomationProperties.Name="{loc:Text main.advanced.filters.rotate}">
                           <ComboBoxItem Content="{loc:Text main.advanced.filters.off}" Tag="none"/>
@@ -1636,7 +1636,7 @@
                         </ComboBox>
                       </StackPanel>
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
-                        <TextBlock Text="{loc:Text main.convert.scaler}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <SarilanMetin Text="{loc:Text main.convert.scaler}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                         <ComboBox x:Name="CmbConvertScaler" SelectedIndex="0"
                                   auto:AutomationProperties.Name="{loc:Text main.convert.scaler}">
                           <ComboBoxItem Content="Lanczos" Tag="lanczos"/>
@@ -1647,7 +1647,7 @@
                         </ComboBox>
                       </StackPanel>
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
-                        <TextBlock Text="{loc:Text main.convert.fps-mode}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <SarilanMetin Text="{loc:Text main.convert.fps-mode}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                         <ComboBox x:Name="CmbConvertFpsMode" SelectedIndex="0"
                                   auto:AutomationProperties.Name="{loc:Text main.convert.fps-mode}">
                           <ComboBoxItem Content="{loc:Text main.plan.automatic}" Tag="auto"/>
@@ -1659,7 +1659,7 @@
                                 MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
                                 Content="{loc:Text main.convert.interpolate}">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.interpolate.tip}"/>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.interpolate.tip}"/>
                         </ToolTip.Tip>
                       </CheckBox>
                       <CheckBox x:Name="ChkConvertAutoCrop" Theme="{StaticResource CheckStyle}" IsChecked="False" VerticalAlignment="Center"
@@ -1669,11 +1669,11 @@
                                 MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
                                 Content="{loc:Text main.convert.letterbox}"/>
                       <StackPanel Spacing="{StaticResource SpaceXs}">
-                        <TextBlock Text="{loc:Text main.convert.extra-args}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                        <SarilanMetin Text="{loc:Text main.convert.extra-args}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                         <TextBox x:Name="TxtConvertExtraArgs" MinWidth="{StaticResource SliderMinWidth}" MaxWidth="{StaticResource FieldWidth}" FlowDirection="LeftToRight"
                                  auto:AutomationProperties.Name="{loc:Text main.convert.extra-args}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.extra-args.tip}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.extra-args.tip}"/>
                           </ToolTip.Tip>
                         </TextBox>
                       </StackPanel>
@@ -1685,10 +1685,10 @@
               <StackPanel Grid.Column="1" Spacing="{StaticResource SpaceLg}">
                 <Border x:Name="ConvertAudioPanel" Theme="{StaticResource Panel}" IsVisible="False">
                   <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <TextBlock Text="{loc:Text main.convert.audio-tracks}" Theme="{StaticResource H2}"/>
-                    <TextBlock x:Name="TxtConvertAudioHint" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+                    <SarilanMetin Text="{loc:Text main.convert.audio-tracks}" Theme="{StaticResource H2}"/>
+                    <SarilanMetin x:Name="TxtConvertAudioHint" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
                     <StackPanel x:Name="ConvertAudioTracks" Spacing="{StaticResource SpaceXs}"/>
-                    <TextBlock Text="{loc:Text main.audio.external.label}" Theme="{StaticResource Label}" Margin="0"/>
+                    <SarilanMetin Text="{loc:Text main.audio.external.label}" Theme="{StaticResource Label}" Margin="0"/>
                     <WrapPanel HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                       <Button x:Name="BtnConvertAudioFile" Theme="{StaticResource GhostButton}" Click="OnConvertAddAudioFile" VerticalAlignment="Bottom"
                               MinHeight="{StaticResource FieldMinHeight}"
@@ -1703,7 +1703,7 @@
                     <StackPanel x:Name="ConvertAudioFileList" Spacing="{StaticResource SpaceXs}" IsVisible="False"/>
                     <WrapPanel x:Name="ConvertAudioProcessPanel" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
-                        <TextBlock Text="{loc:Text main.convert.audio-channels}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <SarilanMetin Text="{loc:Text main.convert.audio-channels}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                         <ComboBox x:Name="CmbConvertChannels" SelectedIndex="0" MinWidth="{StaticResource FieldWidthSm}"
                                   auto:AutomationProperties.Name="{loc:Text main.convert.audio-channels}">
                           <ComboBoxItem Content="{loc:Text main.convert.source-option}"/>
@@ -1712,7 +1712,7 @@
                         </ComboBox>
                       </StackPanel>
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
-                        <TextBlock Text="{loc:Text main.convert.audio-sample-rate}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <SarilanMetin Text="{loc:Text main.convert.audio-sample-rate}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                         <ComboBox x:Name="CmbConvertSampleRate" SelectedIndex="0" MinWidth="{StaticResource FieldWidthSm}"
                                   auto:AutomationProperties.Name="{loc:Text main.convert.audio-sample-rate}">
                           <ComboBoxItem Content="{loc:Text main.convert.source-option}"/>
@@ -1728,20 +1728,20 @@
                 </Border>
                 <Border x:Name="ConvertSubtitlePanel" Theme="{StaticResource Panel}" IsVisible="False">
                   <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <TextBlock Text="{loc:Text main.convert.subtitles}" Theme="{StaticResource H2}"/>
-                    <TextBlock x:Name="TxtConvertSubtitleHint" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+                    <SarilanMetin Text="{loc:Text main.convert.subtitles}" Theme="{StaticResource H2}"/>
+                    <SarilanMetin x:Name="TxtConvertSubtitleHint" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
                     <StackPanel x:Name="ConvertSubtitleTracks" Spacing="{StaticResource SpaceXs}"/>
                     <Button x:Name="BtnConvertAddSubtitle" Theme="{StaticResource GhostButton}" Click="OnConvertAddSubtitle" HorizontalAlignment="Left"
                             MinHeight="{StaticResource FieldMinHeight}"
                             Padding="{StaticResource ButtonPaddingSm}" Content="{loc:Text main.subtitles.add}"/>
                     <StackPanel x:Name="ConvertSubtitleList" Spacing="{StaticResource SpaceXs}" IsVisible="False"/>
                     <StackPanel Spacing="{StaticResource SpaceXs}" HorizontalAlignment="Left">
-                      <TextBlock Text="{loc:Text main.subtitles.burn}" Theme="{StaticResource Hint}"/>
+                      <SarilanMetin Text="{loc:Text main.subtitles.burn}" Theme="{StaticResource Hint}"/>
                       <ComboBox x:Name="CmbConvertBurn"
                                 auto:AutomationProperties.Name="{loc:Text main.subtitles.burn}">
                         <ComboBox.ItemTemplate>
                           <DataTemplate x:DataType="x:String">
-                            <TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding}"/>
+                            <SarilanMetin Text="{Binding}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding}"/>
                           </DataTemplate>
                         </ComboBox.ItemTemplate>
                       </ComboBox>
@@ -1749,17 +1749,17 @@
                     <WrapPanel x:Name="ConvertBurnStylePanel" IsVisible="False" HorizontalAlignment="Left"
                                ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                       <StackPanel Spacing="{StaticResource SpaceXs}" VerticalAlignment="Bottom">
-                        <TextBlock Text="{loc:Text main.subtitles.style.font}" Theme="{StaticResource Hint}"/>
+                        <SarilanMetin Text="{loc:Text main.subtitles.style.font}" Theme="{StaticResource Hint}"/>
                         <ComboBox x:Name="CmbConvertBurnFont"
                                   auto:AutomationProperties.Name="{loc:Text main.subtitles.style.font}"/>
                       </StackPanel>
                       <StackPanel Spacing="{StaticResource SpaceXs}" VerticalAlignment="Bottom">
-                        <TextBlock Text="{loc:Text main.subtitles.style.size}" Theme="{StaticResource Hint}"/>
+                        <SarilanMetin Text="{loc:Text main.subtitles.style.size}" Theme="{StaticResource Hint}"/>
                         <ComboBox x:Name="CmbConvertBurnSize"
                                   auto:AutomationProperties.Name="{loc:Text main.subtitles.style.size}"/>
                       </StackPanel>
                       <StackPanel Spacing="{StaticResource SpaceXs}" VerticalAlignment="Bottom">
-                        <TextBlock Text="{loc:Text main.subtitles.style.color}" Theme="{StaticResource Hint}"/>
+                        <SarilanMetin Text="{loc:Text main.subtitles.style.color}" Theme="{StaticResource Hint}"/>
                         <ComboBox x:Name="CmbConvertBurnColor"
                                   auto:AutomationProperties.Name="{loc:Text main.subtitles.style.color}"/>
                       </StackPanel>
@@ -1767,29 +1767,29 @@
                                 MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
                                 Content="{loc:Text main.subtitles.style.box}"/>
                     </WrapPanel>
-                    <TextBlock x:Name="TxtConvertSubtitleResult" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"
+                    <SarilanMetin x:Name="TxtConvertSubtitleResult" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"
                                auto:AutomationProperties.LiveSetting="Polite"/>
                   </StackPanel>
                 </Border>
                 <Border Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
-                    <TextBlock Text="{loc:Text main.convert.command}" Theme="{StaticResource H2}"/>
+                    <SarilanMetin Text="{loc:Text main.convert.command}" Theme="{StaticResource H2}"/>
                     <TextBox x:Name="TxtConvertCommand" FlowDirection="LeftToRight" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinLines="2"/>
-                    <TextBlock x:Name="TxtConvertValidation" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                    <SarilanMetin x:Name="TxtConvertValidation" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                   </StackPanel>
                 </Border>
                 <Border Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
-                    <TextBlock Text="{loc:Text main.convert.progress}" Theme="{StaticResource H2}"/>
+                    <SarilanMetin Text="{loc:Text main.convert.progress}" Theme="{StaticResource H2}"/>
                     <ProgressBar x:Name="ConvertProgress" Maximum="1"/>
-                    <TextBlock x:Name="TxtConvertStage" Text="{loc:Text main.output.idle}" Theme="{StaticResource MonoValue}">
-                      <TextBlock.Transitions>
+                    <SarilanMetin x:Name="TxtConvertStage" Text="{loc:Text main.output.idle}" Theme="{StaticResource MonoValue}">
+                      <SarilanMetin.Transitions>
                         <Transitions>
                           <DoubleTransition Property="Opacity" Duration="{StaticResource MotionFast}" Easing="CubicEaseOut"/>
                         </Transitions>
-                      </TextBlock.Transitions>
-                    </TextBlock>
-                    <TextBlock x:Name="TxtConvertResult" Theme="{StaticResource Body}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                      </SarilanMetin.Transitions>
+                    </SarilanMetin>
+                    <SarilanMetin x:Name="TxtConvertResult" Theme="{StaticResource Body}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                     <Button x:Name="BtnConvertReveal" Classes="reveal" Content="{loc:Text main.action.show-in-folder}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" IsVisible="False" Click="OnReveal"/>
                   </StackPanel>
                 </Border>
@@ -1826,7 +1826,7 @@
               <Border x:Name="CommandPanel" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-                    <TextBlock Grid.Column="0" Text="{loc:Text main.command.title}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                    <SarilanMetin Grid.Column="0" Text="{loc:Text main.command.title}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
                     <Button Grid.Column="1"
                             x:Name="BtnHideAdvanced"
                             Theme="{StaticResource GhostButton}"
@@ -1841,8 +1841,8 @@
               <Border x:Name="AiPanel" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}">
-                    <TextBlock Grid.Column="0" Text="{loc:Text main.ai.title}" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Row="1"
+                    <SarilanMetin Grid.Column="0" Text="{loc:Text main.ai.title}" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
+                    <SarilanMetin Grid.Row="1"
                                Grid.ColumnSpan="2"
                                x:Name="TxtAiHint"
                                Text="{loc:Text main.ai.tip}"
@@ -1850,9 +1850,9 @@
                                TextWrapping="Wrap"
                                VerticalAlignment="Center">
                       <ToolTip.Tip>
-                        <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.ai.tip}"/>
+                        <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.ai.tip}"/>
                       </ToolTip.Tip>
-                    </TextBlock>
+                    </SarilanMetin>
                     <Button Grid.Column="1"
                             x:Name="BtnAiDetails"
                             Theme="{StaticResource GhostButton}"
@@ -1863,14 +1863,14 @@
                             </Button>
                   </Grid>
                   <StackPanel x:Name="AiDetails" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}">
-                    <TextBlock Text="{loc:Text main.ai.tip}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                    <SarilanMetin Text="{loc:Text main.ai.tip}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     <WrapPanel>
                       <Button Content="{loc:Text main.ai.copy-prompt}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnCopyPrompt"/>
                       <Button Content="{loc:Text main.ai.apply-json}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnApplyJson"/>
                       <Button x:Name="BtnRevert" Content="{loc:Text main.ai.revert}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnRevertAuto"/>
                     </WrapPanel>
                     <TextBox x:Name="TxtAiJson" AcceptsReturn="True" TextWrapping="Wrap" MinLines="4" MaxLines="4"/>
-                    <TextBlock x:Name="TxtAiStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                    <SarilanMetin x:Name="TxtAiStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                   </StackPanel>
                 </StackPanel>
               </Border>
@@ -1878,7 +1878,7 @@
               <Border x:Name="PerformancePanel" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-                    <TextBlock Grid.Column="0" Text="{loc:Text performance.title}" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
+                    <SarilanMetin Grid.Column="0" Text="{loc:Text performance.title}" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
                     <Button Grid.Column="1"
                             x:Name="BtnPerformanceExpand"
                             Theme="{StaticResource GhostButton}"
@@ -1896,7 +1896,7 @@
                               Margin="{StaticResource WrapItemMargin}"
                               Click="OnRunPerformanceCheck"/>
                     </WrapPanel>
-                    <TextBlock x:Name="TxtPerformanceStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                    <SarilanMetin x:Name="TxtPerformanceStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                     <StackPanel x:Name="PerformanceFacts" Spacing="{StaticResource SpaceMd}"/>
                     <StackPanel x:Name="PerformanceLines" Spacing="{StaticResource SpaceMd}"/>
                   </StackPanel>
@@ -1923,7 +1923,7 @@
 
               <Border x:Name="GeneralSettingsPanel" izi:KartDuvari.Sutun="0" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
-                  <TextBlock Text="{loc:Text settings-tab.general.title}" Theme="{StaticResource H2}"/>
+                  <SarilanMetin Text="{loc:Text settings-tab.general.title}" Theme="{StaticResource H2}"/>
 
                   <!--
                     Kullanıcı 09-07: ayarlar derli toplu olsun, iki seçenekli açılır liste olmasın.
@@ -1932,82 +1932,82 @@
                   <Grid x:Name="LanguageThemeRow" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}">
                     <StackPanel Grid.Column="0" Spacing="{StaticResource SpaceSm}">
                       <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
-                        <TextBlock Text="{loc:Text settings-tab.language.label}" Theme="{StaticResource Label}"/>
+                        <SarilanMetin Text="{loc:Text settings-tab.language.label}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.language.label}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.language.hint}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.language.hint}"/>
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
                       <ComboBox x:Name="CmbLanguage" HorizontalAlignment="Stretch">
                         <ComboBox.ItemTemplate>
                           <DataTemplate x:DataType="x:String">
-                            <TextBlock Text="{Binding}" TextWrapping="Wrap"/>
+                            <SarilanMetin Text="{Binding}" TextWrapping="Wrap"/>
                           </DataTemplate>
                         </ComboBox.ItemTemplate>
                       </ComboBox>
                       <CheckBox x:Name="ChkReduceMotion" Theme="{StaticResource CheckStyle}" HorizontalAlignment="Left" Content="{loc:Text settings-tab.reduce-motion.label}">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.reduce-motion.hint}"/>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.reduce-motion.hint}"/>
                         </ToolTip.Tip>
                       </CheckBox>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Spacing="{StaticResource SpaceSm}">
                       <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
-                        <TextBlock Text="{loc:Text settings-tab.theme.label}" Theme="{StaticResource Label}"/>
+                        <SarilanMetin Text="{loc:Text settings-tab.theme.label}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.theme.label}">
                           <ToolTip.Tip>
-                            <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.theme.hint}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.theme.hint}"/>
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
                       <ComboBox x:Name="CmbTheme" HorizontalAlignment="Stretch"/>
                       <Grid x:Name="SystemThemePairRow" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}" RowSpacing="{StaticResource SpaceSm}" IsVisible="False">
-                        <TextBlock Text="{loc:Text settings-tab.theme.light}" Theme="{StaticResource Label}" VerticalAlignment="Center"/>
+                        <SarilanMetin Text="{loc:Text settings-tab.theme.light}" Theme="{StaticResource Label}" VerticalAlignment="Center"/>
                         <ComboBox Grid.Column="1" x:Name="CmbThemeLight" HorizontalAlignment="Stretch"/>
-                        <TextBlock Grid.Row="1" Text="{loc:Text settings-tab.theme.dark}" Theme="{StaticResource Label}" VerticalAlignment="Center"/>
+                        <SarilanMetin Grid.Row="1" Text="{loc:Text settings-tab.theme.dark}" Theme="{StaticResource Label}" VerticalAlignment="Center"/>
                         <ComboBox Grid.Row="1" Grid.Column="1" x:Name="CmbThemeDark" HorizontalAlignment="Stretch"/>
                       </Grid>
                       <CheckBox x:Name="ChkFollowSystemTheme" Theme="{StaticResource CheckStyle}" HorizontalAlignment="Left" Content="{loc:Text settings-tab.follow-system-theme.label}">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.follow-system-theme.hint}"/>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.follow-system-theme.hint}"/>
                         </ToolTip.Tip>
                       </CheckBox>
                     </StackPanel>
                   </Grid>
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <TextBlock Text="{loc:Text settings-tab.default-target.label}" Theme="{StaticResource Label}"/>
+                    <SarilanMetin Text="{loc:Text settings-tab.default-target.label}" Theme="{StaticResource Label}"/>
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                       <TextBox x:Name="TxtDefaultTargetMb" Width="{StaticResource FieldWidthSm}" TextAlignment="Center"/>
-                      <TextBlock Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                      <SarilanMetin Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                     </StackPanel>
-                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.default-target.hint}"/>
+                    <SarilanMetin Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.default-target.hint}"/>
                   </StackPanel>
 
                   <CheckBox x:Name="ChkAdvancedDefaultOpen" Theme="{StaticResource CheckStyle}" HorizontalAlignment="Left" Content="{loc:Text settings-tab.advanced-default-open.label}">
                     <ToolTip.Tip>
-                      <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.advanced-default-open.hint}"/>
+                      <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.advanced-default-open.hint}"/>
                     </ToolTip.Tip>
                   </CheckBox>
 
                   <CheckBox x:Name="ChkFollowRecording" Theme="{StaticResource CheckStyle}" HorizontalAlignment="Left" Content="{loc:Text settings-tab.follow-recording.label}">
                     <ToolTip.Tip>
-                      <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.follow-recording.hint}"/>
+                      <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.follow-recording.hint}"/>
                     </ToolTip.Tip>
                   </CheckBox>
 
                   <CheckBox x:Name="ChkNotifyWhenDone" Theme="{StaticResource CheckStyle}" IsChecked="True" HorizontalAlignment="Left" Content="{loc:Text settings-tab.notify-done.label}">
                     <ToolTip.Tip>
-                      <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.notify-done.hint}"/>
+                      <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.notify-done.hint}"/>
                     </ToolTip.Tip>
                   </CheckBox>
 
                   <CheckBox x:Name="ChkFinishSound" Theme="{StaticResource CheckStyle}" HorizontalAlignment="Left" Content="{loc:Text settings-tab.finish-sound.label}">
                     <ToolTip.Tip>
                       <StackPanel Spacing="{StaticResource SpaceSm}">
-                        <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.finish-sound.hint}"/>
-                        <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.finish-sound-file.hint}"/>
+                        <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.finish-sound.hint}"/>
+                        <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.finish-sound-file.hint}"/>
                       </StackPanel>
                     </ToolTip.Tip>
                     <CheckBox.ContextFlyout>
@@ -2020,22 +2020,22 @@
 
                   <CheckBox x:Name="ChkPreventSleep" Theme="{StaticResource CheckStyle}" IsChecked="True" HorizontalAlignment="Left" Content="{loc:Text settings-tab.prevent-sleep.label}">
                     <ToolTip.Tip>
-                      <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.prevent-sleep.hint}"/>
+                      <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.prevent-sleep.hint}"/>
                     </ToolTip.Tip>
                   </CheckBox>
 
                   <CheckBox x:Name="ChkKeepDates" Theme="{StaticResource CheckStyle}" HorizontalAlignment="Left" Content="{loc:Text settings-tab.keep-dates.label}">
                     <ToolTip.Tip>
-                      <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.keep-dates.hint}"/>
+                      <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.keep-dates.hint}"/>
                     </ToolTip.Tip>
                   </CheckBox>
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
                     <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
-                      <TextBlock Text="{loc:Text settings-tab.ffmpeg-path.label}" Theme="{StaticResource Label}"/>
+                      <SarilanMetin Text="{loc:Text settings-tab.ffmpeg-path.label}" Theme="{StaticResource Label}"/>
                       <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.ffmpeg-path.label}">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.ffmpeg-path.hint}"/>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.ffmpeg-path.hint}"/>
                         </ToolTip.Tip>
                       </Button>
                     </Grid>
@@ -2047,15 +2047,15 @@
                       <TextBox x:Name="TxtFfmpegPath"/>
                       <Button Grid.Column="1" x:Name="BtnBrowseFfmpegPath" Content="{loc:Text settings-tab.ffmpeg-path.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowseFfmpegPath"/>
                     </Grid>
-                    <TextBlock x:Name="TxtFfmpegPathError" Classes="reveal" Theme="{StaticResource Hint}" Foreground="{StaticResource EmberBlaze}" TextWrapping="Wrap" IsVisible="False"/>
+                    <SarilanMetin x:Name="TxtFfmpegPathError" Classes="reveal" Theme="{StaticResource Hint}" Foreground="{StaticResource EmberBlaze}" TextWrapping="Wrap" IsVisible="False"/>
                   </StackPanel>
                 </StackPanel>
               </Border>
 
               <Border x:Name="DiagnosticLogPanel" izi:KartDuvari.Sutun="1" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceSm}">
-                  <TextBlock Text="{loc:Text settings.log.title}" Theme="{StaticResource H2}"/>
-                  <TextBlock Text="{loc:Text settings.log.hint}" Theme="{StaticResource Caption}" TextWrapping="Wrap"/>
+                  <SarilanMetin Text="{loc:Text settings.log.title}" Theme="{StaticResource H2}"/>
+                  <SarilanMetin Text="{loc:Text settings.log.hint}" Theme="{StaticResource Caption}" TextWrapping="Wrap"/>
                   <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
                     <Button x:Name="BtnOpenLog"
                             Content="{loc:Text settings.log.open}"
@@ -2071,10 +2071,10 @@
 
               <Border x:Name="OutputSettingsPanel" izi:KartDuvari.Sutun="1" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
-                  <TextBlock Text="{loc:Text main.output.title}" Theme="{StaticResource H2}"/>
+                  <SarilanMetin Text="{loc:Text main.output.title}" Theme="{StaticResource H2}"/>
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <TextBlock Text="{loc:Text settings-tab.output-folder.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                    <SarilanMetin Text="{loc:Text settings-tab.output-folder.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                     <WrapPanel HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                       <RadioButton x:Name="RbOutputBesideSource" GroupName="OutputFolderMode" IsChecked="True" Content="{loc:Text settings-tab.output-folder.beside-source}"/>
                       <RadioButton x:Name="RbOutputFixed" GroupName="OutputFolderMode" Content="{loc:Text settings-tab.output-folder.fixed}"/>
@@ -2083,15 +2083,15 @@
                       <TextBox x:Name="TxtOutputFolder" IsReadOnly="True"/>
                       <Button Grid.Column="1" x:Name="BtnBrowseOutputFolder" Content="{loc:Text settings-tab.output-folder.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowseOutputFolder"/>
                     </Grid>
-                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.output-folder.hint}"/>
+                    <SarilanMetin Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.output-folder.hint}"/>
                   </StackPanel>
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
                     <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
-                      <TextBlock Text="{loc:Text settings-tab.output-name.label}" Theme="{StaticResource Label}"/>
+                      <SarilanMetin Text="{loc:Text settings-tab.output-name.label}" Theme="{StaticResource Label}"/>
                       <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.output-name.label}">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.output-name.hint}"/>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.output-name.hint}"/>
                         </ToolTip.Tip>
                       </Button>
                     </Grid>
@@ -2099,33 +2099,33 @@
                       <TextBox x:Name="TxtOutputName" FlowDirection="LeftToRight"/>
                       <Button Grid.Column="1" x:Name="BtnResetOutputName" Content="{loc:Text settings-tab.output-name.reset}" Theme="{StaticResource GhostButton}" Click="OnResetOutputName"/>
                     </Grid>
-                    <TextBlock x:Name="LblOutputNamePreview" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                    <SarilanMetin x:Name="LblOutputNamePreview" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                   </StackPanel>
 
                   <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}">
                     <Grid Grid.Row="0" ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Center">
-                      <TextBlock Text="{loc:Text settings-tab.parallel-jobs.label}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                      <SarilanMetin Text="{loc:Text settings-tab.parallel-jobs.label}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
                       <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.parallel-jobs.label}">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.parallel-jobs.hint}"/>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.parallel-jobs.hint}"/>
                         </ToolTip.Tip>
                       </Button>
                     </Grid>
                     <ComboBox Grid.Row="0" Grid.Column="1" x:Name="CmbParallelJobs" HorizontalAlignment="Stretch" VerticalAlignment="Center" MinWidth="{StaticResource FieldWidthSm}"/>
                     <Grid Grid.Row="1" ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Center">
-                      <TextBlock Text="{loc:Text settings-tab.encode-priority.label}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                      <SarilanMetin Text="{loc:Text settings-tab.encode-priority.label}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
                       <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.encode-priority.label}">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.encode-priority.hint}"/>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.encode-priority.hint}"/>
                         </ToolTip.Tip>
                       </Button>
                     </Grid>
                     <ComboBox Grid.Row="1" Grid.Column="1" x:Name="CmbEncodePriority" HorizontalAlignment="Stretch" VerticalAlignment="Center" MinWidth="{StaticResource FieldWidthSm}"/>
                     <Grid Grid.Row="2" x:Name="EncoderThreadsRow" ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Center">
-                      <TextBlock Text="{loc:Text settings-tab.encoder-threads.label}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+                      <SarilanMetin Text="{loc:Text settings-tab.encoder-threads.label}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
                       <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.encoder-threads.label}">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.encoder-threads.hint}"/>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.encoder-threads.hint}"/>
                         </ToolTip.Tip>
                       </Button>
                     </Grid>
@@ -2136,30 +2136,30 @@
 
               <Border x:Name="ShellMenuPanel" izi:KartDuvari.Sutun="2" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
-                  <TextBlock Text="{loc:Text settings-tab.shell-menu.title}" Theme="{StaticResource H2}"/>
+                  <SarilanMetin Text="{loc:Text settings-tab.shell-menu.title}" Theme="{StaticResource H2}"/>
                   <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.shell-menu.label}"/>
+                    <SarilanMetin Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.shell-menu.label}"/>
                     <CheckBox x:Name="ChkShellMenuOpen" Theme="{StaticResource CheckStyle}" Content="{loc:Text shell.menu.open}"/>
                     <CheckBox x:Name="ChkShellMenuShrink" Theme="{StaticResource CheckStyle}" Content="{loc:Text shell.menu.shrink}"/>
-                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.shell-menu.hint}"/>
-                    <TextBlock x:Name="TxtShellMenuStatus" Classes="reveal" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+                    <SarilanMetin Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.shell-menu.hint}"/>
+                    <SarilanMetin x:Name="TxtShellMenuStatus" Classes="reveal" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
                   </StackPanel>
                   <StackPanel Spacing="{StaticResource SpaceSm}">
                     <Button x:Name="BtnMakeDefaultApp" Content="{loc:Text settings-tab.default-app.button}" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" Click="OnMakeDefaultApp"/>
-                    <TextBlock Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.default-app.hint}"/>
+                    <SarilanMetin Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.default-app.hint}"/>
                   </StackPanel>
                 </StackPanel>
               </Border>
 
               <Border x:Name="SubtitleSettingsPanel" izi:KartDuvari.Sutun="3" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
-                  <TextBlock Text="{loc:Text main.subtitles.label}" Theme="{StaticResource H2}"/>
+                  <SarilanMetin Text="{loc:Text main.subtitles.label}" Theme="{StaticResource H2}"/>
                   <StackPanel Spacing="{StaticResource SpaceSm}">
                     <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
-                      <TextBlock Text="{loc:Text settings-tab.opensubtitles.label}" Theme="{StaticResource Label}"/>
+                      <SarilanMetin Text="{loc:Text settings-tab.opensubtitles.label}" Theme="{StaticResource Label}"/>
                       <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.opensubtitles.label}">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.opensubtitles.hint}"/>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.opensubtitles.hint}"/>
                         </ToolTip.Tip>
                       </Button>
                     </Grid>
@@ -2171,21 +2171,21 @@
 
                   <StackPanel Spacing="{StaticResource SpaceSm}">
                     <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
-                      <TextBlock Text="{loc:Text settings-tab.opensubtitles.account}" Theme="{StaticResource Label}"/>
+                      <SarilanMetin Text="{loc:Text settings-tab.opensubtitles.account}" Theme="{StaticResource Label}"/>
                       <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.opensubtitles.account}">
                         <ToolTip.Tip>
-                          <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.opensubtitles.accounthint}"/>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.opensubtitles.accounthint}"/>
                         </ToolTip.Tip>
                       </Button>
                     </Grid>
                     <Grid ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceSm}">
                       <StackPanel Spacing="{StaticResource SpaceXs}">
-                        <TextBlock Text="{loc:Text settings-tab.opensubtitles.user}" Theme="{StaticResource Label}" Margin="0"/>
+                        <SarilanMetin Text="{loc:Text settings-tab.opensubtitles.user}" Theme="{StaticResource Label}" Margin="0"/>
                         <TextBox x:Name="TxtOpenSubtitlesUser"
                                  auto:AutomationProperties.Name="{loc:Text settings-tab.opensubtitles.user}"/>
                       </StackPanel>
                       <StackPanel Grid.Column="1" Spacing="{StaticResource SpaceXs}">
-                        <TextBlock Text="{loc:Text settings-tab.opensubtitles.password}" Theme="{StaticResource Label}" Margin="0"/>
+                        <SarilanMetin Text="{loc:Text settings-tab.opensubtitles.password}" Theme="{StaticResource Label}" Margin="0"/>
                         <TextBox x:Name="TxtOpenSubtitlesPassword" PasswordChar="*"
                                  auto:AutomationProperties.Name="{loc:Text settings-tab.opensubtitles.password}"/>
                       </StackPanel>
@@ -2194,18 +2194,18 @@
                       <Button x:Name="BtnOpenSubtitlesSignIn" Content="{loc:Text settings-tab.opensubtitles.signin}" Theme="{StaticResource GhostButton}" Click="OnOpenSubtitlesSignIn"/>
                       <Button x:Name="BtnOpenSubtitlesSignOut" Content="{loc:Text settings-tab.opensubtitles.signout}" Theme="{StaticResource GhostButton}" Click="OnOpenSubtitlesSignOut"/>
                     </WrapPanel>
-                    <TextBlock x:Name="LblOpenSubtitlesStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.opensubtitles.signedout}"/>
+                    <SarilanMetin x:Name="LblOpenSubtitlesStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.opensubtitles.signedout}"/>
                   </StackPanel>
                 </StackPanel>
               </Border>
 
               <Border x:Name="UpdatePanel" izi:KartDuvari.Sutun="0" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
-                  <TextBlock Text="{loc:Text settings.update.title}" Theme="{StaticResource H2}"/>
+                  <SarilanMetin Text="{loc:Text settings.update.title}" Theme="{StaticResource H2}"/>
                   <StackPanel x:Name="AutoUpdateRow" Orientation="Horizontal">
                     <CheckBox x:Name="ChkAutoUpdate" Theme="{StaticResource CheckStyle}" Content="{loc:Text settings.update.auto}"/>
                   </StackPanel>
-                  <TextBlock x:Name="TxtAutoUpdateEffect"
+                  <SarilanMetin x:Name="TxtAutoUpdateEffect"
                              Theme="{StaticResource Hint}"
                              TextWrapping="Wrap"
                              Text="{loc:Text settings.update.auto-effect}"/>
@@ -2226,7 +2226,7 @@
                           auto:AutomationProperties.Name="{loc:Text main.about.title}">
                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
                       <Path x:Name="AboutGlyph" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
-                      <TextBlock Grid.Column="1" Text="{loc:Text main.about.title}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                      <SarilanMetin Grid.Column="1" Text="{loc:Text main.about.title}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
                     </Grid>
                   </Button>
                   <StackPanel x:Name="AboutBody" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}">
@@ -2235,30 +2235,30 @@
                       <Button x:Name="BtnLicenses" Theme="{StaticResource LinkButton}" Content="{loc:Text main.about.licenses}" Click="OnOpenLicenses"/>
                       <Button x:Name="BtnPrivacy" Theme="{StaticResource LinkButton}" Content="{loc:Text main.about.privacy}" Click="OnOpenPrivacy"/>
                     </WrapPanel>
-                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.intro}"/>
-                    <TextBlock Text="{loc:Text main.about.engine.title}" Theme="{StaticResource H3}"/>
-                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.engine.body}"/>
-                    <TextBlock Text="{loc:Text main.about.measured.title}" Theme="{StaticResource H3}"/>
+                    <SarilanMetin Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.intro}"/>
+                    <SarilanMetin Text="{loc:Text main.about.engine.title}" Theme="{StaticResource H3}"/>
+                    <SarilanMetin Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.engine.body}"/>
+                    <SarilanMetin Text="{loc:Text main.about.measured.title}" Theme="{StaticResource H3}"/>
                     <izi:CiftIzgara x:Name="AboutMeasured" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}" loc:Tablo.Text="{loc:Text main.about.measured.table}"/>
-                    <TextBlock Text="{loc:Text main.about.loss.title}" Theme="{StaticResource H3}"/>
-                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.loss.body}"/>
-                    <TextBlock Text="{loc:Text main.about.scenario.title}" Theme="{StaticResource H3}"/>
-                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.scenario.body}"/>
-                    <TextBlock Text="{loc:Text main.about.ai.title}" Theme="{StaticResource H3}"/>
-                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.ai.body}"/>
-                    <TextBlock Text="{loc:Text main.about.codecs.title}" Theme="{StaticResource H3}"/>
-                    <TextBlock Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.codecs.body}"/>
+                    <SarilanMetin Text="{loc:Text main.about.loss.title}" Theme="{StaticResource H3}"/>
+                    <SarilanMetin Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.loss.body}"/>
+                    <SarilanMetin Text="{loc:Text main.about.scenario.title}" Theme="{StaticResource H3}"/>
+                    <SarilanMetin Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.scenario.body}"/>
+                    <SarilanMetin Text="{loc:Text main.about.ai.title}" Theme="{StaticResource H3}"/>
+                    <SarilanMetin Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.ai.body}"/>
+                    <SarilanMetin Text="{loc:Text main.about.codecs.title}" Theme="{StaticResource H3}"/>
+                    <SarilanMetin Theme="{StaticResource BulletText}" loc:Bullets.Text="{loc:Text main.about.codecs.body}"/>
                   </StackPanel>
                   <StackPanel x:Name="AboutStatus" Spacing="{StaticResource SpaceSm}">
                     <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}">
-                      <TextBlock Text="{loc:Text main.about.status.title}" Theme="{StaticResource H3}" TextWrapping="Wrap"/>
-                      <TextBlock Grid.Row="1" x:Name="TxtLastCheck" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                      <SarilanMetin Text="{loc:Text main.about.status.title}" Theme="{StaticResource H3}" TextWrapping="Wrap"/>
+                      <SarilanMetin Grid.Row="1" x:Name="TxtLastCheck" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                       <Button Grid.Column="1" Grid.RowSpan="2" x:Name="BtnCheckNow" Theme="{StaticResource LinkButton}" Content="{loc:Text main.about.check.now}" Click="OnCheckNow" VerticalAlignment="Bottom"/>
                     </Grid>
-                    <TextBlock x:Name="TxtSystemStatus" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"
+                    <SarilanMetin x:Name="TxtSystemStatus" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"
                                Cursor="Hand" PointerPressed="OnSystemStatusTapped"/>
-                    <TextBlock Text="{loc:Text main.about.platforms.title}" Theme="{StaticResource H3}"/>
-                    <TextBlock x:Name="TxtPlatforms" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"/>
+                    <SarilanMetin Text="{loc:Text main.about.platforms.title}" Theme="{StaticResource H3}"/>
+                    <SarilanMetin x:Name="TxtPlatforms" Theme="{StaticResource MonoValue}" FontWeight="Normal" TextWrapping="Wrap"/>
                   </StackPanel>
                 </StackPanel>
               </Border>
@@ -2266,10 +2266,10 @@
               <Border x:Name="SharePanel" izi:KartDuvari.Sutun="2" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{loc:Text settings.share.title}" Theme="{StaticResource H2}"/>
+                    <SarilanMetin Text="{loc:Text settings.share.title}" Theme="{StaticResource H2}"/>
                     <Button Theme="{StaticResource InfoButton}" auto:AutomationProperties.Name="{loc:Text settings.share.title}">
                       <ToolTip.Tip>
-                        <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings.share.tip}"/>
+                        <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings.share.tip}"/>
                       </ToolTip.Tip>
                     </Button>
                   </StackPanel>
@@ -2280,16 +2280,16 @@
                         RowDefinitions="Auto,Auto,Auto,Auto"
                         ColumnSpacing="{StaticResource SpaceMd}"
                         RowSpacing="{StaticResource SpaceSm}">
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{loc:Text settings.share.ceiling}" Theme="{StaticResource PlanFactLabel}"/>
-                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="TxtShareCeiling" Theme="{StaticResource PlanFactValue}"/>
+                    <SarilanMetin Grid.Row="0" Grid.Column="0" Text="{loc:Text settings.share.ceiling}" Theme="{StaticResource PlanFactLabel}"/>
+                    <SarilanMetin Grid.Row="0" Grid.Column="1" x:Name="TxtShareCeiling" Theme="{StaticResource PlanFactValue}"/>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{loc:Text settings.share.lifetime}" Theme="{StaticResource PlanFactLabel}" VerticalAlignment="Center"/>
+                    <SarilanMetin Grid.Row="1" Grid.Column="0" Text="{loc:Text settings.share.lifetime}" Theme="{StaticResource PlanFactLabel}" VerticalAlignment="Center"/>
                     <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpaceSm}">
                       <ComboBox x:Name="CmbShareRetention" HorizontalAlignment="Left"/>
-                      <TextBlock x:Name="TxtShareRetentionFixed" Theme="{StaticResource PlanFactValue}" IsVisible="False"/>
+                      <SarilanMetin x:Name="TxtShareRetentionFixed" Theme="{StaticResource PlanFactValue}" IsVisible="False"/>
                     </StackPanel>
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="{loc:Text settings.share.deletion}" Theme="{StaticResource PlanFactLabel}" VerticalAlignment="Center"/>
+                    <SarilanMetin Grid.Row="2" Grid.Column="0" Text="{loc:Text settings.share.deletion}" Theme="{StaticResource PlanFactLabel}" VerticalAlignment="Center"/>
                     <Button x:Name="BtnShareDelete" Grid.Row="2" Grid.Column="1"
                             Content="{loc:Text settings.share.delete}"
                             Theme="{StaticResource GhostButton}"
@@ -2302,7 +2302,7 @@
                         </Style>
                       </Button.Styles>
                     </Button>
-                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="TxtShareDeleteNote" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                    <SarilanMetin Grid.Row="3" Grid.Column="1" x:Name="TxtShareDeleteNote" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                   </Grid>
                 </StackPanel>
               </Border>
@@ -2323,10 +2323,10 @@
                             Theme="{StaticResource GhostButton}"
                             Click="OnResetSettings"/>
                   </WrapPanel>
-                  <TextBlock x:Name="TxtSettingsBackup" Theme="{StaticResource Body}" TextWrapping="Wrap"
+                  <SarilanMetin x:Name="TxtSettingsBackup" Theme="{StaticResource Body}" TextWrapping="Wrap"
                              IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                   <StackPanel x:Name="ResetSettingsConfirm" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceSm}">
-                    <TextBlock x:Name="TxtResetSettingsConfirm" Text="{loc:Text settings.reset-confirm}" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
+                    <SarilanMetin x:Name="TxtResetSettingsConfirm" Text="{loc:Text settings.reset-confirm}" Theme="{StaticResource Body}" TextWrapping="Wrap"/>
                     <WrapPanel ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
                       <Button x:Name="BtnConfirmResetSettings" Content="{loc:Text settings.reset-confirm-button}" Theme="{StaticResource GhostButton}" Click="OnConfirmResetSettings"/>
                       <Button x:Name="BtnCancelResetSettings" Content="{loc:Text settings.reset-cancel}" Theme="{StaticResource GhostButton}" Click="OnCancelResetSettings"/>
@@ -2353,9 +2353,9 @@
             <Grid x:Name="TitleBarContent" Margin="{StaticResource TitleBarContentMargin}" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceXl}">
               <StackPanel Grid.Column="0" x:Name="TitleBrand" IsHitTestVisible="False" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
                 <Image x:Name="AppLogo" Width="24" Height="24" Stretch="Uniform" IsVisible="False"/>
-                <TextBlock x:Name="TxtAppName" Theme="{StaticResource AppTitle}" VerticalAlignment="Center">
+                <SarilanMetin x:Name="TxtAppName" Theme="{StaticResource AppTitle}" VerticalAlignment="Center">
                   <Run Text="Vid"/><Run Text="Shrink" Foreground="{StaticResource PinkText}"/>
-                </TextBlock>
+                </SarilanMetin>
               </StackPanel>
               <StackPanel Grid.Column="2" x:Name="TitleBarRight" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Stretch">
                 <Button x:Name="BtnUpdateBadge" Theme="{StaticResource TitleBarLinkButton}" IsVisible="False"
@@ -2364,7 +2364,7 @@
                   <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                     <Ellipse x:Name="UpdateBadgeDot" Width="{StaticResource BadgeDotSize}" Height="{StaticResource BadgeDotSize}"
                              VerticalAlignment="Center" Fill="{StaticResource TextDisabled}"/>
-                    <TextBlock x:Name="TxtUpdateBadge" VerticalAlignment="Center"/>
+                    <SarilanMetin x:Name="TxtUpdateBadge" VerticalAlignment="Center"/>
                   </StackPanel>
                 </Button>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="{StaticResource WindowButtonMargin}">
@@ -2374,11 +2374,11 @@
                   <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
                     <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" VerticalAlignment="Center"
                           Data="{StaticResource IconCoffee}" Fill="{Binding $parent[Button].Foreground}"/>
-                    <TextBlock x:Name="TxtSponsor" Text="{loc:Etiket sig.support}" VerticalAlignment="Center"/>
+                    <SarilanMetin x:Name="TxtSponsor" Text="{loc:Etiket sig.support}" VerticalAlignment="Center"/>
                   </StackPanel>
                 </Button>
                 <Button x:Name="BtnGitHub" Theme="{StaticResource TitleBarLinkButton}" auto:AutomationProperties.Name="{loc:Etiket sig.brand}" ToolTip.Tip="{loc:Etiket sig.brandTitle}" Click="OnOpenGitHub">
-                  <TextBlock x:Name="TxtGitHub" Text="{loc:Etiket sig.brand}" VerticalAlignment="Center"/>
+                  <SarilanMetin x:Name="TxtGitHub" Text="{loc:Etiket sig.brand}" VerticalAlignment="Center"/>
                 </Button>
                 <!--
                   Üç düğme Windows'taki gibi bitişik dikdörtgen: aralarında boşluk yok, başlık

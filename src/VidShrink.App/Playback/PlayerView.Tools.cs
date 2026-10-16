@@ -639,7 +639,7 @@ internal partial class PlayerView
                 Margin = new Thickness(pad),
                 Children =
                 {
-                    new TextBlock { Text = Strings.Get("player.tools.url-hint") },
+                    new SarilanMetin { Text = Strings.Get("player.tools.url-hint") },
                     box,
                     buttons
                 }

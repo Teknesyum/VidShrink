@@ -25,14 +25,14 @@
           Padding="{StaticResource PanelPadding}">
     <StackPanel Spacing="{StaticResource SpaceMd}">
 
-      <TextBlock x:Name="TxtHeadline"
+      <SarilanMetin x:Name="TxtHeadline"
                  FontSize="{StaticResource FontSizeMd}"
                  TextWrapping="Wrap"
                  MaxLines="2"
                  TextTrimming="CharacterEllipsis"
                  ToolTip.Tip="{Binding $self.Text}"/>
 
-      <TextBlock x:Name="TxtTarget"
+      <SarilanMetin x:Name="TxtTarget"
                  FontSize="{StaticResource FontSizeSm}"
                  TextWrapping="Wrap"
                  Foreground="{StaticResource TextBody}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
@@ -42,46 +42,46 @@
                    Height="{StaticResource ProgressBarHeight}"/>
 
       <Grid ColumnDefinitions="Auto,*,Auto,Auto" x:Name="RowFacts">
-        <TextBlock Grid.Column="0"
+        <SarilanMetin Grid.Column="0"
                    Text="{loc:Text main.output.stage}"
                    FontSize="{StaticResource FontSizeSm}"
                    Foreground="{StaticResource TextBody}"
                    Margin="{StaticResource ChipMargin}"/>
-        <TextBlock Grid.Column="1" x:Name="TxtStage"
+        <SarilanMetin Grid.Column="1" x:Name="TxtStage"
                    FontSize="{StaticResource FontSizeSm}"
                    TextTrimming="CharacterEllipsis"
                    ToolTip.Tip="{Binding $self.Text}"/>
-        <TextBlock Grid.Column="2"
+        <SarilanMetin Grid.Column="2"
                    Text="{loc:Text main.output.remaining}"
                    FontSize="{StaticResource FontSizeSm}"
                    Foreground="{StaticResource TextBody}"
                    Margin="{StaticResource ChipMargin}"/>
-        <TextBlock Grid.Column="3" x:Name="TxtRemaining"
+        <SarilanMetin Grid.Column="3" x:Name="TxtRemaining"
                    FontSize="{StaticResource FontSizeSm}"/>
       </Grid>
 
-      <TextBlock x:Name="TxtNotice"
+      <SarilanMetin x:Name="TxtNotice"
                  FontSize="{StaticResource FontSizeSm}"
                  Foreground="{StaticResource EmberBlaze}"
                  TextWrapping="Wrap"
                  MaxWidth="{StaticResource TipMaxWidth}"
                  IsVisible="False"/>
 
-      <TextBlock x:Name="TxtMessage"
+      <SarilanMetin x:Name="TxtMessage"
                  FontSize="{StaticResource FontSizeSm}"
                  TextWrapping="Wrap"
                  MaxWidth="{StaticResource TipMaxWidth}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
       <StackPanel x:Name="OvershootPanel" Spacing="{StaticResource SpaceSm}" IsVisible="False">
-        <TextBlock Text="{loc:Text main.retry.title}"
+        <SarilanMetin Text="{loc:Text main.retry.title}"
                    FontSize="{StaticResource FontSizeMd}"
                    FontWeight="SemiBold"
                    TextWrapping="Wrap"/>
-        <TextBlock x:Name="TxtOvershoot"
+        <SarilanMetin x:Name="TxtOvershoot"
                    FontSize="{StaticResource FontSizeSm}"
                    TextWrapping="Wrap"
                    MaxWidth="{StaticResource TipMaxWidth}"/>
-        <TextBlock x:Name="TxtOvershootMeaning"
+        <SarilanMetin x:Name="TxtOvershootMeaning"
                    FontSize="{StaticResource FontSizeSm}"
                    Foreground="{StaticResource TextBody}"
                    TextWrapping="Wrap"
@@ -104,7 +104,7 @@
       </ScrollViewer>
 
       <StackPanel x:Name="PendingPanel" Spacing="{StaticResource SpaceXs}" IsVisible="False">
-        <TextBlock x:Name="TxtPending"
+        <SarilanMetin x:Name="TxtPending"
                    FontSize="{StaticResource FontSizeSm}"
                    Foreground="{StaticResource TextBody}"/>
         <ScrollViewer MaxHeight="{StaticResource DropDownMaxHeight}"
@@ -115,11 +115,11 @@
 
       <Border x:Name="EditPanel" Theme="{StaticResource Panel}" IsVisible="False">
         <StackPanel Spacing="{StaticResource SpaceXs}">
-          <TextBlock x:Name="TxtEditTitle"
+          <SarilanMetin x:Name="TxtEditTitle"
                      FontSize="{StaticResource FontSizeSm}"
                      FontWeight="SemiBold"
                      TextTrimming="CharacterEllipsis"/>
-          <TextBlock Text="{loc:Text main.shrink-job.edit.target}"
+          <SarilanMetin Text="{loc:Text main.shrink-job.edit.target}"
                      FontSize="{StaticResource FontSizeSm}"
                      Foreground="{StaticResource TextBody}"
                      TextWrapping="Wrap"/>
@@ -141,7 +141,7 @@
       </Border>
 
       <StackPanel x:Name="FailedPanel" Spacing="{StaticResource SpaceXs}" IsVisible="False">
-        <TextBlock x:Name="TxtFailed"
+        <SarilanMetin x:Name="TxtFailed"
                    FontSize="{StaticResource FontSizeSm}"
                    Foreground="{StaticResource TextBody}"/>
         <ScrollViewer MaxHeight="{StaticResource DropDownMaxHeight}"
@@ -155,7 +155,7 @@
                 Content="{loc:Text main.shrink-job.pause}"
                 Padding="{StaticResource ButtonPaddingSm}"/>
         <StackPanel Spacing="{StaticResource SpaceXs}">
-          <TextBlock Text="{loc:Text main.shrink-job.when-done}"
+          <SarilanMetin Text="{loc:Text main.shrink-job.when-done}"
                      FontSize="{StaticResource FontSizeSm}"
                      Foreground="{StaticResource TextBody}"
                      TextWrapping="Wrap"/>
@@ -165,7 +165,7 @@
                     HorizontalAlignment="Stretch"/>
         </StackPanel>
         <StackPanel Spacing="{StaticResource SpaceXs}">
-          <TextBlock Text="{loc:Text main.shrink-job.start}"
+          <SarilanMetin Text="{loc:Text main.shrink-job.start}"
                      FontSize="{StaticResource FontSizeSm}"
                      Foreground="{StaticResource TextBody}"
                      TextWrapping="Wrap"/>
@@ -179,7 +179,7 @@
           <Button Theme="{StaticResource GhostButton}" x:Name="BtnSchedule"
                   Content="{loc:Text main.shrink-job.schedule}"
                   Padding="{StaticResource ButtonPaddingSm}"/>
-          <TextBlock x:Name="TxtScheduleError"
+          <SarilanMetin x:Name="TxtScheduleError"
                      Theme="{StaticResource StatusError}"
                      FontSize="{StaticResource FontSizeSm}"
                      TextWrapping="Wrap"
@@ -197,7 +197,7 @@
                     Padding="{StaticResource ButtonPaddingSm}"
                     VerticalAlignment="Center"/>
           </WrapPanel>
-          <TextBlock x:Name="TxtWatchFolder"
+          <SarilanMetin x:Name="TxtWatchFolder"
                      FontSize="{StaticResource FontSizeSm}"
                      Foreground="{StaticResource TextBody}"
                      TextTrimming="CharacterEllipsis"/>
@@ -208,7 +208,7 @@
             <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}"
                   Stretch="Uniform" VerticalAlignment="Top"
                   Data="{StaticResource IconWarning}" Fill="{StaticResource TextBody}"/>
-            <TextBlock Grid.Column="1" x:Name="TxtWatchWarning"
+            <SarilanMetin Grid.Column="1" x:Name="TxtWatchWarning"
                        Theme="{StaticResource StatusWarning}"
                        FontSize="{StaticResource FontSizeSm}"
                        Text="{loc:Text main.shrink-job.watch.lost}"/>
@@ -216,7 +216,7 @@
         </StackPanel>
       </StackPanel>
 
-      <TextBlock x:Name="TxtPaused"
+      <SarilanMetin x:Name="TxtPaused"
                  Text="{loc:Text main.shrink-job.paused}"
                  FontSize="{StaticResource FontSizeSm}"
                  FontWeight="SemiBold"
@@ -227,7 +227,7 @@
             ColumnDefinitions="*,Auto"
             ColumnSpacing="{StaticResource SpaceMd}"
             IsVisible="False">
-        <TextBlock Grid.Column="0"
+        <SarilanMetin Grid.Column="0"
                    x:Name="TxtCountdown"
                    FontSize="{StaticResource FontSizeSm}"
                    FontWeight="SemiBold"
@@ -295,7 +295,7 @@
                              ModuleSize="{StaticResource ShareQrModuleSize}"
                              auto:AutomationProperties.Name="{loc:Text main.share.qr}"
                              auto:AutomationProperties.HelpText="{loc:Text main.share.qr-hint}"/>
-          <TextBlock Grid.Row="1"
+          <SarilanMetin Grid.Row="1"
                      Text="{loc:Text main.share.qr-hint}"
                      FontSize="{StaticResource FontSizeSm}"
                      Foreground="{StaticResource TextBody}"
@@ -303,7 +303,7 @@
         </Grid>
       </Grid>
 
-      <TextBlock x:Name="TxtShareStatus"
+      <SarilanMetin x:Name="TxtShareStatus"
                  FontSize="{StaticResource FontSizeSm}"
                  Foreground="{StaticResource TextBody}"
                  TextWrapping="Wrap"

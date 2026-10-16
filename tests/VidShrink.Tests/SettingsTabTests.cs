@@ -310,8 +310,8 @@ public sealed class BrandSpellingTests
     {
         var xaml = File.ReadAllText(TipSources.WindowXamlPath);
 
-        Assert.Contains("""<TextBlock x:Name="TxtSponsor" Text="{loc:Etiket sig.support}" """.TrimEnd(), xaml, StringComparison.Ordinal);
-        Assert.Contains("""<TextBlock x:Name="TxtGitHub" Text="{loc:Etiket sig.brand}" """.TrimEnd(), xaml, StringComparison.Ordinal);
+        Assert.Contains("""<SarilanMetin x:Name="TxtSponsor" Text="{loc:Etiket sig.support}" """.TrimEnd(), xaml, StringComparison.Ordinal);
+        Assert.Contains("""<SarilanMetin x:Name="TxtGitHub" Text="{loc:Etiket sig.brand}" """.TrimEnd(), xaml, StringComparison.Ordinal);
         Assert.Contains("""auto:AutomationProperties.Name="{loc:Etiket sig.support}" ToolTip.Tip="{loc:Etiket sig.supportTitle}" """.TrimEnd(), xaml, StringComparison.Ordinal);
         Assert.Contains("""auto:AutomationProperties.Name="{loc:Etiket sig.brand}" ToolTip.Tip="{loc:Etiket sig.brandTitle}" """.TrimEnd(), xaml, StringComparison.Ordinal);
         Assert.DoesNotContain("Buy me a coffee", xaml, StringComparison.OrdinalIgnoreCase);

@@ -22,7 +22,7 @@ internal sealed class EditorClip : Border
 
     public EditorClip()
     {
-        _label = new TextBlock { VerticalAlignment = VerticalAlignment.Center };
+        _label = new SarilanMetin { VerticalAlignment = VerticalAlignment.Center };
         _reverse = new Path { Stretch = Stretch.Uniform, VerticalAlignment = VerticalAlignment.Center, IsVisible = false };
         _reverse.Bind(Shape.FillProperty, _label.GetObservable(TextBlock.ForegroundProperty));
         var row = new StackPanel { Orientation = Orientation.Horizontal, Children = { _reverse, _label } };

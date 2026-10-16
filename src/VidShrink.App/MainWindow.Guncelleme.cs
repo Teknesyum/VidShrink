@@ -407,7 +407,7 @@ public partial class MainWindow
         var enter = Scalar("SpaceSm", 0);
         var motion = this.TryFindResource("MotionBase", out var duration) && duration is TimeSpan span ? span : TimeSpan.Zero;
 
-        var line = new TextBlock
+        var line = new SarilanMetin
         {
             Text = history[^1],
             Theme = Look("MonoValue"),

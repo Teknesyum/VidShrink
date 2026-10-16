@@ -23,7 +23,7 @@
           Padding="{StaticResource PanelPadding}">
     <StackPanel Spacing="{StaticResource SpaceMd}">
 
-      <TextBlock x:Name="TxtHeadline"
+      <SarilanMetin x:Name="TxtHeadline"
                  FontSize="{StaticResource FontSizeMd}"
                  TextWrapping="Wrap"/>
 
@@ -32,12 +32,12 @@
                    Height="{StaticResource ProgressBarHeight}"/>
 
       <Grid ColumnDefinitions="Auto,*">
-        <TextBlock Grid.Column="0"
+        <SarilanMetin Grid.Column="0"
                    Text="{loc:Text main.output.stage}"
                    FontSize="{StaticResource FontSizeSm}"
                    Foreground="{StaticResource TextBody}"
                    Margin="{StaticResource ChipMargin}"/>
-        <TextBlock Grid.Column="1" x:Name="TxtStage"
+        <SarilanMetin Grid.Column="1" x:Name="TxtStage"
                    FontSize="{StaticResource FontSizeSm}"
                    TextTrimming="CharacterEllipsis"
                    ToolTip.Tip="{Binding $self.Text}"/>
@@ -48,7 +48,7 @@
         <StackPanel x:Name="ItemList" Spacing="{StaticResource SpaceXs}"/>
       </ScrollViewer>
 
-      <TextBlock x:Name="TxtSummary"
+      <SarilanMetin x:Name="TxtSummary"
                  FontSize="{StaticResource FontSizeSm}"
                  FontWeight="SemiBold"
                  TextWrapping="Wrap"

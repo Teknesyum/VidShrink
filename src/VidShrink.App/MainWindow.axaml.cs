@@ -3940,7 +3940,7 @@ public partial class MainWindow : Window
         // Video yüklü değilken skor hesaplanamaz. Sıfır ya da uydurma bir sayı yerine alan
         // boş kalır ve yonganın ne işe yaradığı yukarıdaki maddelerde durmaya devam eder.
         if (hint.Score is not { } score || hint.TargetMb is not { } target)
-            return new TextBlock
+            return new SarilanMetin
             {
                 Text = Say("main.quality.tip.empty"),
                 Theme = Look("Hint"),
@@ -3977,11 +3977,11 @@ public partial class MainWindow : Window
         var row = grid.RowDefinitions.Count;
         grid.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
 
-        var key = new TextBlock { Text = LanguageCatalog.Display(label), Theme = Look("PlanFactLabel") };
+        var key = new SarilanMetin { Text = LanguageCatalog.Display(label), Theme = Look("PlanFactLabel") };
         Grid.SetRow(key, row);
         Grid.SetColumn(key, 0);
 
-        var read = new TextBlock { Text = LanguageCatalog.Display(value), Theme = Look("PlanFactValue") };
+        var read = new SarilanMetin { Text = LanguageCatalog.Display(value), Theme = Look("PlanFactValue") };
         Grid.SetRow(read, row);
         Grid.SetColumn(read, 1);
 
@@ -4000,8 +4000,8 @@ public partial class MainWindow : Window
 
     private void AddPlanFact(string label, string value)
     {
-        var key = new TextBlock { Text = LanguageCatalog.Display(label), Theme = Look("PlanFactLabel") };
-        var read = new TextBlock { Text = value, Theme = Look("PlanFactValue") };
+        var key = new SarilanMetin { Text = LanguageCatalog.Display(label), Theme = Look("PlanFactLabel") };
+        var read = new SarilanMetin { Text = value, Theme = Look("PlanFactValue") };
 
         PlanFacts.Children.Add(key);
         PlanFacts.Children.Add(read);
@@ -4010,9 +4010,9 @@ public partial class MainWindow : Window
     private void AddPlanReason(string text)
     {
         var row = new Grid { ColumnDefinitions = new ColumnDefinitions("Auto,*") };
-        row.Children.Add(new TextBlock { Text = "•", Theme = Look("PlanBullet") });
+        row.Children.Add(new SarilanMetin { Text = "•", Theme = Look("PlanBullet") });
 
-        var body = new TextBlock { Text = LanguageCatalog.Display(text), Theme = Look("PlanReasonText") };
+        var body = new SarilanMetin { Text = LanguageCatalog.Display(text), Theme = Look("PlanReasonText") };
         Grid.SetColumn(body, 1);
         row.Children.Add(body);
 
@@ -4464,7 +4464,7 @@ public partial class MainWindow : Window
         PerformanceFacts.Children.Clear();
         foreach (var fact in PerformanceReportText.Facts(result))
         {
-            var row = new TextBlock
+            var row = new SarilanMetin
             {
                 Theme = Look("MonoValue"),
                 FontWeight = FontWeight.Normal,
@@ -4486,7 +4486,7 @@ public partial class MainWindow : Window
 
         PerformanceLines.Children.Clear();
         foreach (var line in PerformanceReportText.Describe(result))
-            PerformanceLines.Children.Add(new TextBlock
+            PerformanceLines.Children.Add(new SarilanMetin
             {
                 Text = LanguageCatalog.Display(line),
                 Theme = Look("Hint"),

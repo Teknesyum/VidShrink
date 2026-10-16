@@ -62,7 +62,7 @@ public sealed class KabukStandardiTests
     [Fact]
     public void PariltiYaziyaKonmaz()
     {
-        var yaziOgeleri = new[] { "TextBlock", "SelectableTextBlock", "TextBox", "Label", "AccessText" };
+        var yaziOgeleri = new[] { "TextBlock", "SarilanMetin", "SelectableTextBlock", "TextBox", "Label", "AccessText" };
         var cocukDesen = new Regex($@"<({string.Join('|', yaziOgeleri)})\.Effect\b");
         var etiketDesen = new Regex($@"<({string.Join('|', yaziOgeleri)})\b[^>]*>", RegexOptions.Singleline);
         var kacaklar = new List<string>();

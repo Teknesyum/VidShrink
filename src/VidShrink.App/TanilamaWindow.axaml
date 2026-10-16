@@ -11,15 +11,15 @@
         Background="{DynamicResource AppBg}"
         auto:AutomationProperties.Name="{loc:Text settings.diag.title}">
   <Grid RowDefinitions="Auto,Auto,*,Auto,Auto" RowSpacing="{StaticResource SpaceSm}" Margin="{StaticResource WorkspaceMargin}">
-    <TextBlock Text="{loc:Text settings.diag.system}" Theme="{StaticResource H3}"/>
+    <SarilanMetin Text="{loc:Text settings.diag.system}" Theme="{StaticResource H3}"/>
     <SelectableTextBlock Grid.Row="1" x:Name="TxtSystem" FontFamily="{StaticResource FontMono}" TextWrapping="Wrap"
                          auto:AutomationProperties.Name="{loc:Text settings.diag.system}"/>
     <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
       <SelectableTextBlock x:Name="TxtLog" FontFamily="{StaticResource FontMono}" auto:AutomationProperties.Name="{loc:Text settings.log.title}"/>
     </ScrollViewer>
-    <TextBlock Grid.Row="3" Text="{loc:Text settings.diag.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+    <SarilanMetin Grid.Row="3" Text="{loc:Text settings.diag.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
     <Grid Grid.Row="4" ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
-      <TextBlock x:Name="TxtStatus" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+      <SarilanMetin x:Name="TxtStatus" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
       <WrapPanel Grid.Column="1" ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
         <Button x:Name="BtnReveal" Theme="{StaticResource GhostButton}" Content="{loc:Text settings.diag.reveal}"/>
         <Button x:Name="BtnCopy" Theme="{StaticResource GhostButton}" Content="{loc:Text settings.diag.copy}"/>

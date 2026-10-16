@@ -503,7 +503,7 @@ internal partial class PlayerView
         if (files.Count == 0) recent.Items.Add(new MenuItem { Header = Strings.Get("player.list.recent-empty"), IsEnabled = false });
         foreach (var path in files)
         {
-            var entry = new MenuItem { Header = new TextBlock { Text = Path.GetFileName(path) }, Tag = path };
+            var entry = new MenuItem { Header = new SarilanMetin { Text = Path.GetFileName(path) }, Tag = path };
             ToolTip.SetTip(entry, path);
             entry.Click += OnRecentRow;
             recent.Items.Add(entry);
@@ -528,7 +528,7 @@ internal partial class PlayerView
         if (items.Count == 0) menu.Items.Add(new MenuItem { Header = Strings.Get("player.favorites.empty"), IsEnabled = false });
         foreach (var item in items)
         {
-            var row = new MenuItem { Header = new TextBlock { Text = FavoriteName(item) }, Tag = item };
+            var row = new MenuItem { Header = new SarilanMetin { Text = FavoriteName(item) }, Tag = item };
             ToolTip.SetTip(row, item);
             row.Click += (_, _) => OpenFavorite(item);
             menu.Items.Add(row);

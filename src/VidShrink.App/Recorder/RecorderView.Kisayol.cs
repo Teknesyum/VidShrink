@@ -245,7 +245,7 @@ internal partial class RecorderView
             var binding = RecorderHotkeys.Of(_hotkeys, action);
             var label = HotkeyLabel(action);
 
-            var name = new TextBlock { Text = label, Theme = HotkeyTheme("Body"), TextWrapping = TextWrapping.Wrap, VerticalAlignment = VerticalAlignment.Center };
+            var name = new SarilanMetin { Text = label, Theme = HotkeyTheme("Body"), TextWrapping = TextWrapping.Wrap, VerticalAlignment = VerticalAlignment.Center };
             var slot = new ShortcutSlot(ShortcutMap.Player, action.ToString(), PlayerInput.OnKey(fallback.Key, fallback.Modifiers), PlayerInput.OnKey(binding.Key, binding.Modifiers), label);
             var box = new ShortcutKeyButton(slot, HotkeyTheme("ShortcutKeyButton"), HotkeyTheme("MonoValue")) { VerticalAlignment = VerticalAlignment.Center };
             box.Captured += (_, input) =>
@@ -262,7 +262,7 @@ internal partial class RecorderView
             var message = _hotkeyError is { } failed && failed.Action == action
                 ? failed.Text()
                 : HotkeyConflicts.Any(b => b.Action == action) ? Say("recorder.hotkeys.rejected", RecorderHotkeys.Gesture(binding)) : string.Empty;
-            var error = new TextBlock { Text = message, Theme = HotkeyTheme("StatusError"), TextWrapping = TextWrapping.Wrap, IsVisible = message.Length > 0 };
+            var error = new SarilanMetin { Text = message, Theme = HotkeyTheme("StatusError"), TextWrapping = TextWrapping.Wrap, IsVisible = message.Length > 0 };
 
             var row = new Grid
             {

@@ -595,7 +595,7 @@ public partial class ShrinkJobWindow : Window
         {
             var index = i;
             var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto"), ColumnSpacing = Token("SpaceXs") };
-            var name = new TextBlock
+            var name = new SarilanMetin
             {
                 Text = Path.GetFileName(_dusenler[i].Path),
                 FontSize = Token("FontSizeSm"),
@@ -614,7 +614,7 @@ public partial class ShrinkJobWindow : Window
     private Grid PendingRow(IReadOnlyList<ShrinkRequest> pending, int index)
     {
         var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto,Auto,Auto,Auto"), ColumnSpacing = Token("SpaceXs") };
-        var name = new TextBlock
+        var name = new SarilanMetin
         {
             Text = Path.GetFileName(pending[index].Path),
             FontSize = Token("FontSizeSm"),
@@ -690,7 +690,7 @@ public partial class ShrinkJobWindow : Window
             ColumnSpacing = Token("SpaceXs"),
             RowSpacing = Token("SpaceXs")
         };
-        var name = new TextBlock
+        var name = new SarilanMetin
         {
             Text = Path.GetFileName(job.Request.Path),
             FontSize = Token("FontSizeSm"),
@@ -701,7 +701,7 @@ public partial class ShrinkJobWindow : Window
         };
         ToolTip.SetTip(name, job.Request.Path);
         row.Children.Add(name);
-        job.Kalan = new TextBlock { Text = job.Remaining, FontSize = Token("FontSizeSm"), VerticalAlignment = VerticalAlignment.Center };
+        job.Kalan = new SarilanMetin { Text = job.Remaining, FontSize = Token("FontSizeSm"), VerticalAlignment = VerticalAlignment.Center };
         Grid.SetColumn(job.Kalan, 1);
         row.Children.Add(job.Kalan);
         AddRowButton(row, 2, "IconClose", "main.action.cancel", true, () => CancelJob(job.Request));

@@ -148,7 +148,7 @@ internal partial class PlayerView
 
     private Control PlaylistContent(string file, string name)
     {
-        var title = new TextBlock
+        var title = new SarilanMetin
         {
             Text = name,
             TextTrimming = TextTrimming.CharacterEllipsis,
@@ -156,7 +156,7 @@ internal partial class PlayerView
         };
         if (_history.Progress(file) is not { } progress || PlaylistRow.Progress(progress.Position, progress.Duration) is not { } text) return title;
 
-        var time = new TextBlock { Text = text, TextWrapping = TextWrapping.NoWrap, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
+        var time = new SarilanMetin { Text = text, TextWrapping = TextWrapping.NoWrap, VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center };
         if (this.TryFindResource("FontSizeSm", out var size) && size is double small) time.FontSize = small;
         var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
         if (this.TryFindResource("SpaceSm", out var gap) && gap is double space) row.ColumnSpacing = space;

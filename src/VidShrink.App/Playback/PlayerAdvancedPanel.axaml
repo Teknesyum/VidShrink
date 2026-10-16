@@ -17,12 +17,12 @@
               auto:AutomationProperties.Name="{loc:Text player.advanced.title}">
         <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
           <Path x:Name="Glyph" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
-          <TextBlock Grid.Column="1" Text="{loc:Text player.advanced.title}" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
-          <TextBlock Grid.Column="2" x:Name="TxtSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
+          <SarilanMetin Grid.Column="1" Text="{loc:Text player.advanced.title}" Theme="{StaticResource H2}" VerticalAlignment="Center"/>
+          <SarilanMetin Grid.Column="2" x:Name="TxtSummary" Theme="{StaticResource Hint}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
         </Grid>
       </Button>
       <StackPanel x:Name="Body" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}">
-        <TextBlock Text="{loc:Text player.advanced.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+        <SarilanMetin Text="{loc:Text player.advanced.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
         <Grid x:Name="Rows"
               ColumnDefinitions="Auto,Auto,Auto,Auto"
               ColumnSpacing="{StaticResource SpaceMd}"

@@ -62,8 +62,8 @@ internal sealed partial class HistoryWindow : Window
         Rows.Items.Clear();
         foreach (var row in _rows(SearchBox.Text))
         {
-            var name = new TextBlock { Text = Path.GetFileName(row.Path), TextTrimming = Avalonia.Media.TextTrimming.CharacterEllipsis };
-            var detail = new TextBlock
+            var name = new SarilanMetin { Text = Path.GetFileName(row.Path), TextTrimming = Avalonia.Media.TextTrimming.CharacterEllipsis };
+            var detail = new SarilanMetin
             {
                 Text = row.Seen.ToLocalTime().ToString("g", Strings.Culture) + " · " + Path.GetDirectoryName(row.Path),
                 TextTrimming = Avalonia.Media.TextTrimming.CharacterEllipsis,

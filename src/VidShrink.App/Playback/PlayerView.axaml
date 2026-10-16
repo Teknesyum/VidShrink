@@ -69,12 +69,12 @@
                 BorderThickness="{StaticResource EndCueThickness}"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"/>
-        <TextBlock x:Name="TxtEmpty"
+        <SarilanMetin x:Name="TxtEmpty"
                    Text="{loc:Text main.player.empty}"
                    Theme="{StaticResource MonoValue}"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"/>
-        <TextBlock x:Name="TxtEngine"
+        <SarilanMetin x:Name="TxtEngine"
                    Theme="{StaticResource StatusError}"
                    IsVisible="False"
                    Margin="{StaticResource PlaybackBadgeMargin}"
@@ -96,8 +96,8 @@
             </Transitions>
           </Border.Transitions>
           <StackPanel Spacing="{StaticResource PlaybackBadgeGap}">
-            <TextBlock x:Name="TxtAudioTitle" Theme="{StaticResource DropTitle}"/>
-            <TextBlock x:Name="TxtAudioArtist"
+            <SarilanMetin x:Name="TxtAudioTitle" Theme="{StaticResource DropTitle}"/>
+            <SarilanMetin x:Name="TxtAudioArtist"
                        Theme="{StaticResource PlaybackBadgeText}"
                        TextAlignment="Center"
                        TextWrapping="Wrap"/>
@@ -134,12 +134,12 @@
                 <Path x:Name="GlyphOsdSpeedTip" Stretch="Uniform" IsVisible="False"
                       Data="{StaticResource IconSpeedFastTip}" Fill="{StaticResource EmberFlameGlyph}"/>
               </Grid>
-              <TextBlock x:Name="TxtOsd" Theme="{StaticResource PlaybackTimeText}" VerticalAlignment="Center"/>
+              <SarilanMetin x:Name="TxtOsd" Theme="{StaticResource PlaybackTimeText}" VerticalAlignment="Center"/>
             </StackPanel>
           </Border>
           <Border x:Name="InfoPanel" Theme="{StaticResource PlaybackBadge}" IsVisible="False">
             <StackPanel Spacing="{StaticResource SpaceXs}">
-              <TextBlock x:Name="TxtInfo" Theme="{StaticResource PlaybackTimeText}"/>
+              <SarilanMetin x:Name="TxtInfo" Theme="{StaticResource PlaybackTimeText}"/>
               <Button x:Name="BtnInfoDetails" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left"
                       Content="{loc:Text mediainfo.open}" auto:AutomationProperties.Name="{loc:Text mediainfo.open}"
                       Click="OnInfoDetails"/>
@@ -149,9 +149,9 @@
                   Theme="{StaticResource PlaybackBadge}"
                   IsVisible="{Binding #InfoPanel.IsVisible}">
             <StackPanel Spacing="{StaticResource SpaceXs}">
-              <TextBlock x:Name="TxtView" Theme="{StaticResource MonoValue}" TextWrapping="Wrap" IsVisible="False"/>
-              <TextBlock x:Name="TxtState" Theme="{StaticResource MonoValue}" TextWrapping="Wrap"/>
-              <TextBlock x:Name="TxtControls" Theme="{StaticResource MonoValue}" TextWrapping="Wrap"/>
+              <SarilanMetin x:Name="TxtView" Theme="{StaticResource MonoValue}" TextWrapping="Wrap" IsVisible="False"/>
+              <SarilanMetin x:Name="TxtState" Theme="{StaticResource MonoValue}" TextWrapping="Wrap"/>
+              <SarilanMetin x:Name="TxtControls" Theme="{StaticResource MonoValue}" TextWrapping="Wrap"/>
             </StackPanel>
           </Border>
         </StackPanel>
@@ -162,7 +162,7 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Top"
                 IsVisible="{Binding #TxtStall.IsVisible}">
-          <TextBlock x:Name="TxtStall"
+          <SarilanMetin x:Name="TxtStall"
                      Theme="{StaticResource MonoValue}"
                      TextWrapping="Wrap"
                      IsVisible="False"
@@ -188,7 +188,7 @@
                 VerticalAlignment="Center"
                 IsVisible="False">
           <StackPanel Spacing="{StaticResource PlaybackBadgeGap}">
-            <TextBlock Text="{loc:Text player.resume.ask}"
+            <SarilanMetin Text="{loc:Text player.resume.ask}"
                        Theme="{StaticResource PlaybackBadgeText}"
                        TextAlignment="Center"
                        TextWrapping="Wrap"/>
@@ -202,7 +202,7 @@
         </Border>
 
         <Border x:Name="MediaTitle" Theme="{StaticResource PlaybackMediaTitle}" Classes="reveal">
-          <TextBlock x:Name="TxtMediaTitle" Theme="{StaticResource PlaybackMediaTitleText}"/>
+          <SarilanMetin x:Name="TxtMediaTitle" Theme="{StaticResource PlaybackMediaTitleText}"/>
         </Border>
 
         <Canvas x:Name="ThumbLayer" IsHitTestVisible="False">
@@ -212,7 +212,7 @@
                    Height="{StaticResource PlaybackThumbnailHeight}"
                    Stretch="Fill"/>
             <Border Theme="{StaticResource PlaybackThumbTime}" HorizontalAlignment="Center">
-              <TextBlock x:Name="ThumbTime" Theme="{StaticResource PlaybackTimeText}"/>
+              <SarilanMetin x:Name="ThumbTime" Theme="{StaticResource PlaybackTimeText}"/>
             </Border>
           </StackPanel>
         </Canvas>
@@ -264,7 +264,7 @@
                   <ColumnDefinition Width="*" MaxWidth="{StaticResource PlaybackSliderWidth}"/>
                   <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock x:Name="TxtSeritTime"
+                <SarilanMetin x:Name="TxtSeritTime"
                            Theme="{StaticResource PlaybackTimeText}"
                            Background="Transparent"
                            VerticalAlignment="Center"/>
@@ -282,7 +282,7 @@
                         IsSnapToTickEnabled="True"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.volume}"/>
                 <Border Grid.Column="3" x:Name="ChipSeritVolume" Theme="{StaticResource PlaybackValueChip}">
-                  <TextBlock x:Name="TxtSeritVolume" Theme="{StaticResource PlaybackValueTextBright}"/>
+                  <SarilanMetin x:Name="TxtSeritVolume" Theme="{StaticResource PlaybackValueTextBright}"/>
                 </Border>
               </Grid>
 
@@ -295,7 +295,7 @@
                   <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceXs}">
                     <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
                           Data="{StaticResource IconRewind}" Fill="{Binding $parent[Button].Foreground}"/>
-                    <TextBlock x:Name="TxtSeritBack" Theme="{StaticResource PlaybackValueText}"
+                    <SarilanMetin x:Name="TxtSeritBack" Theme="{StaticResource PlaybackValueText}"
                                Foreground="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
                   </StackPanel>
                 </Button>
@@ -308,7 +308,7 @@
                 <Button x:Name="BtnSeritForward" Theme="{StaticResource PlaybackBarButton}"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.seek}">
                   <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceXs}">
-                    <TextBlock x:Name="TxtSeritForward" Theme="{StaticResource PlaybackValueText}"
+                    <SarilanMetin x:Name="TxtSeritForward" Theme="{StaticResource PlaybackValueText}"
                                Foreground="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
                     <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform"
                           Data="{StaticResource IconFastForward}" Fill="{Binding $parent[Button].Foreground}"/>
@@ -343,7 +343,7 @@
                         IsSnapToTickEnabled="True"
                         auto:AutomationProperties.Name="{loc:Text main.player.menu.faster}"/>
                 <Border Grid.Column="3" x:Name="ChipSeritSpeed" Theme="{StaticResource PlaybackValueChip}">
-                  <TextBlock x:Name="TxtSeritSpeed" Theme="{StaticResource PlaybackValueTextBright}"/>
+                  <SarilanMetin x:Name="TxtSeritSpeed" Theme="{StaticResource PlaybackValueTextBright}"/>
                 </Border>
                 <Button Grid.Column="4" x:Name="BtnSeritEdit" Theme="{StaticResource PlaybackBarButton}" IsVisible="False"
                         auto:AutomationProperties.Name="{loc:Text player.menu.edit}">

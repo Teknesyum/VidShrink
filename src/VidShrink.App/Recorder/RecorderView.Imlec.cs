@@ -98,7 +98,7 @@ internal partial class RecorderView
         var panel = new StackPanel { Orientation = Orientation.Horizontal };
         if (this.TryFindResource("SpaceSm", out var gap) && gap is double spacing) panel.Spacing = spacing;
         panel.Children.Add(swatch);
-        panel.Children.Add(new TextBlock { Text = Say("recorder.pointer.color", number), VerticalAlignment = VerticalAlignment.Center });
+        panel.Children.Add(new SarilanMetin { Text = Say("recorder.pointer.color", number), VerticalAlignment = VerticalAlignment.Center });
         return panel;
     }
 

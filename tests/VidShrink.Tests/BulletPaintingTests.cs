@@ -111,7 +111,7 @@ public sealed class BulletPaintingTests
         var document = XDocument.Load(TipSources.WindowXamlPath);
 
         var stray = document
-            .Descendants(Ui + "TextBlock")
+            .Descendants().Where(block => block.Name == Ui + "TextBlock" || block.Name == Ui + "SarilanMetin")
             .Where(block => (block.Attribute("Text")?.Value ?? string.Empty)
                 .Split('\n')
                 .Any(line => line.StartsWith("• ", StringComparison.Ordinal)))

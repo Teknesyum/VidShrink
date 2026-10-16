@@ -81,7 +81,7 @@ internal sealed partial class BookmarksWindow : Window
         Rows.Items.Clear();
         foreach (var mark in _rows())
         {
-            var item = new ListBoxItem { Tag = mark, Content = new TextBlock { Text = Describe(mark), TextTrimming = Avalonia.Media.TextTrimming.CharacterEllipsis } };
+            var item = new ListBoxItem { Tag = mark, Content = new SarilanMetin { Text = Describe(mark), TextTrimming = Avalonia.Media.TextTrimming.CharacterEllipsis } };
             Rows.Items.Add(item);
             if (keep is { } at && Math.Abs(mark.Seconds - at) < PlaybackHistory.BookmarkMergeSeconds) Rows.SelectedItem = item;
         }

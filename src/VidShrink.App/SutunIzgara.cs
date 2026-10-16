@@ -121,7 +121,7 @@ public sealed class SutunIzgara : Panel
                 var sozcuk = 0.0;
                 foreach (var parca in metin.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    var olcu = new TextBlock
+                    var olcu = new SarilanMetin
                     {
                         Text = parca,
                         FontFamily = yazi.FontFamily,

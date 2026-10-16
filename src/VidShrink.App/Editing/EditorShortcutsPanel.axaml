@@ -11,13 +11,13 @@
               auto:AutomationProperties.Name="{loc:Text editor.shortcuts.title}">
         <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
           <Path x:Name="Glyph" Classes="chevron open" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
-          <TextBlock Grid.Column="1" Text="{loc:Text editor.shortcuts.title}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+          <SarilanMetin Grid.Column="1" Text="{loc:Text editor.shortcuts.title}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
         </Grid>
       </Button>
       <StackPanel x:Name="Body" Classes="disclose" Spacing="{StaticResource SpaceMd}">
-        <TextBlock Text="{loc:Text editor.shortcuts.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+        <SarilanMetin Text="{loc:Text editor.shortcuts.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
         <Button x:Name="BtnReset" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" Content="{loc:Text shortcuts.reset}" Click="OnReset"/>
-        <TextBlock x:Name="TxtNotice" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+        <SarilanMetin x:Name="TxtNotice" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
         <Grid x:Name="Rows"
               ColumnDefinitions="Auto,*"
               ColumnSpacing="{StaticResource SpaceMd}"

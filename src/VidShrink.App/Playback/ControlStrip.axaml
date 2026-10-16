@@ -70,7 +70,7 @@
                 HorizontalAlignment="Left"/>
       </Grid>
 
-      <TextBlock x:Name="TimeText"
+      <SarilanMetin x:Name="TimeText"
                  Grid.Column="3"
                  Theme="{StaticResource PlaybackTimeText}"
                  Margin="{StaticResource PlaybackStripGap}"
@@ -82,7 +82,7 @@
               Theme="{StaticResource PlaybackEncodeChip}"
               VerticalAlignment="Center"
               IsVisible="False">
-        <TextBlock x:Name="EncodeText" Theme="{StaticResource PlaybackEncodeText}"/>
+        <SarilanMetin x:Name="EncodeText" Theme="{StaticResource PlaybackEncodeText}"/>
       </Border>
 
     </Grid>

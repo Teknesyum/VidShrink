@@ -83,7 +83,7 @@
                  Fill="{StaticResource NeonEmber}"
                  Opacity="0"
                  VerticalAlignment="Center"/>
-        <TextBlock x:Name="TxtElapsed"
+        <SarilanMetin x:Name="TxtElapsed"
                    Theme="{StaticResource MonoValue}"
                    MinWidth="{StaticResource RecorderMiniReadoutWidth}"
                    Cursor="SizeAll"
@@ -91,7 +91,7 @@
                    PointerPressed="OnDrag"
                    ToolTip.Tip="{loc:Text recorder.mini.drag-hint}"/>
         <!-- Bölüm işaretinin bildirimi; işaret konana kadar yer tutmaz. -->
-        <TextBlock x:Name="TxtChapter"
+        <SarilanMetin x:Name="TxtChapter"
                    Theme="{StaticResource Hint}"
                    IsVisible="False"
                    VerticalAlignment="Center"/>

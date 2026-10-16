@@ -172,7 +172,7 @@ public partial class ConvertQueueWindow : Window
     private Grid Row(ConversionQueueItem item)
     {
         var row = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto,Auto"), ColumnSpacing = Token("SpaceXs") };
-        var name = new TextBlock
+        var name = new SarilanMetin
         {
             Text = Path.GetFileName(item.Path),
             FontSize = Token("FontSizeSm"),
@@ -205,7 +205,7 @@ public partial class ConvertQueueWindow : Window
         Grid.SetColumn(choice, 1);
         row.Children.Add(choice);
 
-        var state = new TextBlock
+        var state = new SarilanMetin
         {
             Text = StateText(item.State),
             FontSize = Token("FontSizeSm"),

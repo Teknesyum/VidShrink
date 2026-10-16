@@ -63,7 +63,7 @@
                  IsVisible="False"
                  VerticalAlignment="Center"/>
 
-        <TextBlock Grid.Column="1"
+        <SarilanMetin Grid.Column="1"
                    x:Name="TxtState"
                    Theme="{StaticResource MonoValue}"
                    VerticalAlignment="Center"/>
@@ -80,18 +80,18 @@
               ToolTip.Tip="{loc:Text recorder.strip.size-hint}">
 
           <StackPanel>
-            <TextBlock Text="{loc:Text recorder.strip.elapsed}" Theme="{StaticResource PlanFactLabel}" MinWidth="0" TextWrapping="Wrap"/>
-            <TextBlock x:Name="TxtElapsed" Theme="{StaticResource PlanFactValue}"/>
+            <SarilanMetin Text="{loc:Text recorder.strip.elapsed}" Theme="{StaticResource PlanFactLabel}" MinWidth="0" TextWrapping="Wrap"/>
+            <SarilanMetin x:Name="TxtElapsed" Theme="{StaticResource PlanFactValue}"/>
           </StackPanel>
 
           <StackPanel>
-            <TextBlock Text="{loc:Text recorder.strip.frames}" Theme="{StaticResource PlanFactLabel}" MinWidth="0" TextWrapping="Wrap"/>
-            <TextBlock x:Name="TxtFrames" Theme="{StaticResource PlanFactValue}"/>
+            <SarilanMetin Text="{loc:Text recorder.strip.frames}" Theme="{StaticResource PlanFactLabel}" MinWidth="0" TextWrapping="Wrap"/>
+            <SarilanMetin x:Name="TxtFrames" Theme="{StaticResource PlanFactValue}"/>
           </StackPanel>
 
           <StackPanel>
-            <TextBlock Text="{loc:Text recorder.strip.dropped}" Theme="{StaticResource PlanFactLabel}" MinWidth="0" TextWrapping="Wrap"/>
-            <TextBlock x:Name="TxtDropped" Theme="{StaticResource PlanFactValue}"/>
+            <SarilanMetin Text="{loc:Text recorder.strip.dropped}" Theme="{StaticResource PlanFactLabel}" MinWidth="0" TextWrapping="Wrap"/>
+            <SarilanMetin x:Name="TxtDropped" Theme="{StaticResource PlanFactValue}"/>
           </StackPanel>
         </izi:SutunIzgara>
 
@@ -175,7 +175,7 @@
                   VerticalAlignment="Center"
                   Data="{StaticResource IconRestore}"
                   Fill="{StaticResource NeonBlue}"/>
-            <TextBlock Text="{loc:Text recorder.mini.offer}" VerticalAlignment="Center"/>
+            <SarilanMetin Text="{loc:Text recorder.mini.offer}" VerticalAlignment="Center"/>
           </StackPanel>
         </Button>
       </Grid>
@@ -192,7 +192,7 @@
          gizlenmiyor, kendi satırıyla bildiriliyor. -->
     <Border x:Name="ResultPanel" Classes="reveal-panel" Theme="{StaticResource Panel}" IsVisible="False">
       <StackPanel Spacing="{StaticResource SpaceMd}">
-        <TextBlock x:Name="TxtResult" Theme="{StaticResource StatusSuccess}" TextWrapping="Wrap"/>
+        <SarilanMetin x:Name="TxtResult" Theme="{StaticResource StatusSuccess}" TextWrapping="Wrap"/>
         <TextBox x:Name="TxtResultPath"
                  IsReadOnly="True"
                  FontFamily="{StaticResource FontMono}"
@@ -202,7 +202,7 @@
                 Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}"
                 Stretch="Uniform" VerticalAlignment="Top"
                 Data="{StaticResource IconWarning}" Fill="{StaticResource TextBody}"/>
-          <TextBlock x:Name="TxtWarning" Grid.Column="1"
+          <SarilanMetin x:Name="TxtWarning" Grid.Column="1"
                      Theme="{StaticResource StatusWarning}"
                      TextWrapping="Wrap"/>
         </Grid>
@@ -253,19 +253,19 @@
                   Content="{loc:Text recorder.output.quick-trim}"
                   auto:AutomationProperties.Name="{loc:Text recorder.output.quick-trim}">
             <ToolTip.Tip>
-              <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text recorder.output.quick-trim.tip}"/>
+              <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text recorder.output.quick-trim.tip}"/>
             </ToolTip.Tip>
             <Button.Flyout>
               <Flyout>
                 <StackPanel Spacing="{StaticResource SpaceSm}" Width="{StaticResource RecorderQuickTrimWidth}">
                   <UniformGrid x:Name="QuickTrimStrip" Rows="1" Height="{StaticResource RecorderQuickTrimThumbHeight}"/>
-                  <TextBlock Text="{loc:Text recorder.output.quick-trim-start}" Theme="{StaticResource Label}"/>
+                  <SarilanMetin Text="{loc:Text recorder.output.quick-trim-start}" Theme="{StaticResource Label}"/>
                   <Slider x:Name="SldTrimStart" Minimum="0" Maximum="1" IsSnapToTickEnabled="True"
                           auto:AutomationProperties.Name="{loc:Text recorder.output.quick-trim-start}"/>
-                  <TextBlock Text="{loc:Text recorder.output.quick-trim-end}" Theme="{StaticResource Label}"/>
+                  <SarilanMetin Text="{loc:Text recorder.output.quick-trim-end}" Theme="{StaticResource Label}"/>
                   <Slider x:Name="SldTrimEnd" Minimum="0" Maximum="1" Value="1"
                           auto:AutomationProperties.Name="{loc:Text recorder.output.quick-trim-end}"/>
-                  <TextBlock x:Name="TxtTrimRange" TextWrapping="Wrap"/>
+                  <SarilanMetin x:Name="TxtTrimRange" TextWrapping="Wrap"/>
                   <Button x:Name="BtnTrimCut"
                           Theme="{StaticResource PrimaryButton}"
                           IsEnabled="False"
@@ -326,28 +326,28 @@
                                ModuleSize="{StaticResource ShareQrModuleSize}"
                                auto:AutomationProperties.Name="{loc:Text main.share.qr}"
                                auto:AutomationProperties.HelpText="{loc:Text main.share.qr-hint}"/>
-            <TextBlock Grid.Row="1"
+            <SarilanMetin Grid.Row="1"
                        Theme="{StaticResource Hint}"
                        Text="{loc:Text main.share.qr-hint}"
                        TextWrapping="Wrap"/>
           </Grid>
         </Grid>
 
-        <TextBlock x:Name="TxtRecShareStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+        <SarilanMetin x:Name="TxtRecShareStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
 
-        <TextBlock x:Name="TxtFinishStatus"
+        <SarilanMetin x:Name="TxtFinishStatus"
                    Theme="{StaticResource StatusSuccess}"
                    TextWrapping="Wrap"
                    IsVisible="False"/>
       </StackPanel>
     </Border>
 
-    <TextBlock x:Name="TxtError" Classes="reveal"
+    <SarilanMetin x:Name="TxtError" Classes="reveal"
                Theme="{StaticResource StatusError}"
                TextWrapping="Wrap"
                IsVisible="False"/>
 
-    <TextBlock x:Name="TxtNotice" Classes="reveal"
+    <SarilanMetin x:Name="TxtNotice" Classes="reveal"
                Theme="{StaticResource StatusSuccess}"
                TextWrapping="Wrap"
                IsVisible="False"/>
@@ -356,7 +356,7 @@
       <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}"
             Stretch="Uniform" VerticalAlignment="Top"
             Data="{StaticResource IconWarning}" Fill="{StaticResource TextBody}"/>
-      <TextBlock x:Name="TxtDisk" Grid.Column="1"
+      <SarilanMetin x:Name="TxtDisk" Grid.Column="1"
                  Theme="{StaticResource StatusWarning}"
                  TextWrapping="Wrap"/>
     </Grid>
@@ -366,7 +366,7 @@
         <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}"
               Stretch="Uniform" VerticalAlignment="Center"
               Data="{StaticResource IconWarning}" Fill="{StaticResource TextBody}"/>
-        <TextBlock x:Name="TxtRecover" Grid.Column="1"
+        <SarilanMetin x:Name="TxtRecover" Grid.Column="1"
                    Theme="{StaticResource StatusWarning}"
                    VerticalAlignment="Center"
                    TextWrapping="Wrap"/>
@@ -378,7 +378,7 @@
       </Grid>
     </Border>
 
-    <TextBlock x:Name="TxtWizardSummary"
+    <SarilanMetin x:Name="TxtWizardSummary"
                Theme="{StaticResource Hint}"
                TextWrapping="Wrap"
                IsVisible="False"/>
@@ -389,8 +389,8 @@
             IsVisible="False"
             auto:AutomationProperties.Name="{loc:Text recorder.wizard.open}">
       <StackPanel Spacing="{StaticResource SpaceMd}">
-        <TextBlock x:Name="TxtWizardStep" Theme="{StaticResource Hint}"/>
-        <TextBlock x:Name="TxtWizardQuestion" Theme="{StaticResource H2}" TextWrapping="Wrap"/>
+        <SarilanMetin x:Name="TxtWizardStep" Theme="{StaticResource Hint}"/>
+        <SarilanMetin x:Name="TxtWizardQuestion" Theme="{StaticResource H2}" TextWrapping="Wrap"/>
 
         <WrapPanel x:Name="RowWizardOptions"
                    ItemSpacing="{StaticResource SpaceMd}"
@@ -404,7 +404,7 @@
                   Tag="0"
                   Click="OnWizardOption"
                   auto:AutomationProperties.Name="{Binding #TxtWizardOpt0.Text}">
-            <TextBlock x:Name="TxtWizardOpt0" TextWrapping="Wrap" TextAlignment="Center"/>
+            <SarilanMetin x:Name="TxtWizardOpt0" TextWrapping="Wrap" TextAlignment="Center"/>
           </Button>
           <Button x:Name="BtnWizardOpt1"
                   Theme="{StaticResource GhostButton}"
@@ -415,7 +415,7 @@
                   Tag="1"
                   Click="OnWizardOption"
                   auto:AutomationProperties.Name="{Binding #TxtWizardOpt1.Text}">
-            <TextBlock x:Name="TxtWizardOpt1" TextWrapping="Wrap" TextAlignment="Center"/>
+            <SarilanMetin x:Name="TxtWizardOpt1" TextWrapping="Wrap" TextAlignment="Center"/>
           </Button>
           <Button x:Name="BtnWizardOpt2"
                   Theme="{StaticResource GhostButton}"
@@ -426,7 +426,7 @@
                   Tag="2"
                   Click="OnWizardOption"
                   auto:AutomationProperties.Name="{Binding #TxtWizardOpt2.Text}">
-            <TextBlock x:Name="TxtWizardOpt2" TextWrapping="Wrap" TextAlignment="Center"/>
+            <SarilanMetin x:Name="TxtWizardOpt2" TextWrapping="Wrap" TextAlignment="Center"/>
           </Button>
           <Button x:Name="BtnWizardOpt3"
                   Theme="{StaticResource GhostButton}"
@@ -437,7 +437,7 @@
                   Tag="3"
                   Click="OnWizardOption"
                   auto:AutomationProperties.Name="{Binding #TxtWizardOpt3.Text}">
-            <TextBlock x:Name="TxtWizardOpt3" TextWrapping="Wrap" TextAlignment="Center"/>
+            <SarilanMetin x:Name="TxtWizardOpt3" TextWrapping="Wrap" TextAlignment="Center"/>
           </Button>
         </WrapPanel>
 
@@ -465,20 +465,20 @@
       <StackPanel x:Name="CardsLeft" Spacing="{StaticResource SpaceMd}">
         <Border x:Name="PanelTarget" Theme="{StaticResource Panel}">
           <StackPanel Spacing="{StaticResource SpaceMd}">
-            <TextBlock Text="{loc:Text recorder.target.title}" Theme="{StaticResource H2}"/>
+            <SarilanMetin Text="{loc:Text recorder.target.title}" Theme="{StaticResource H2}"/>
 
             <izi:SutunIzgara MaxColumns="2" Uniform="True"
                              ColumnSpacing="{StaticResource SpaceMd}"
                              RowSpacing="{StaticResource SpaceMd}">
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.target.what}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.target.what}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbTarget"
                           HorizontalAlignment="Stretch"
                           auto:AutomationProperties.Name="{loc:Text recorder.target.what}"/>
               </StackPanel>
 
               <StackPanel x:Name="RowScreen" IsVisible="False">
-                <TextBlock Text="{loc:Text recorder.target.screen-pick}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.target.screen-pick}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbScreen"
                           HorizontalAlignment="Stretch"
                           auto:AutomationProperties.Name="{loc:Text recorder.target.screen-pick}"/>
@@ -487,7 +487,7 @@
 
             <StackPanel x:Name="RowWindow" IsVisible="False" Spacing="{StaticResource SpaceMd}">
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.target.window-pick}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.target.window-pick}" Theme="{StaticResource Label}"/>
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
                   <ComboBox x:Name="CmbWindow"
                             HorizontalAlignment="Stretch"
@@ -500,7 +500,7 @@
                 </Grid>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.target.window-title}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.target.window-title}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtWindowTitle"
                          ToolTip.Tip="{loc:Text recorder.target.window-title-hint}"
                          auto:AutomationProperties.Name="{loc:Text recorder.target.window-title}"/>
@@ -517,13 +517,13 @@
                                ColumnSpacing="{StaticResource SpaceMd}"
                                RowSpacing="{StaticResource SpaceMd}">
                 <StackPanel>
-                  <TextBlock Text="{loc:Text recorder.target.aspect}" Theme="{StaticResource Label}"/>
+                  <SarilanMetin Text="{loc:Text recorder.target.aspect}" Theme="{StaticResource Label}"/>
                   <ComboBox x:Name="CmbAspect"
                             HorizontalAlignment="Stretch"
                             auto:AutomationProperties.Name="{loc:Text recorder.target.aspect}"/>
                 </StackPanel>
                 <StackPanel>
-                  <TextBlock Text="{loc:Text recorder.target.size}" Theme="{StaticResource Label}"/>
+                  <SarilanMetin Text="{loc:Text recorder.target.size}" Theme="{StaticResource Label}"/>
                   <ComboBox x:Name="CmbRegionSize"
                             HorizontalAlignment="Stretch"
                             auto:AutomationProperties.Name="{loc:Text recorder.target.size}"/>
@@ -538,30 +538,30 @@
                              ColumnSpacing="{StaticResource SpaceSm}"
                              RowSpacing="{StaticResource SpaceSm}">
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.target.region-x}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.target.region-x}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtRegionX" auto:AutomationProperties.Name="{loc:Text recorder.target.region-x}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.target.region-y}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.target.region-y}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtRegionY" auto:AutomationProperties.Name="{loc:Text recorder.target.region-y}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.target.region-width}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.target.region-width}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtRegionWidth" auto:AutomationProperties.Name="{loc:Text recorder.target.region-width}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.target.region-height}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.target.region-height}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtRegionHeight" auto:AutomationProperties.Name="{loc:Text recorder.target.region-height}"/>
               </StackPanel>
             </izi:SutunIzgara>
 
-            <TextBlock Text="{loc:Text recorder.target.region-hint}"
+            <SarilanMetin Text="{loc:Text recorder.target.region-hint}"
                        Theme="{StaticResource Hint}"
                        TextWrapping="Wrap"
                        IsVisible="{Binding #RowRegion.IsVisible}"/>
 
             <WrapPanel ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
-              <TextBlock Text="{loc:Text recorder.mask.title}" Theme="{StaticResource Label}" VerticalAlignment="Center"/>
+              <SarilanMetin Text="{loc:Text recorder.mask.title}" Theme="{StaticResource Label}" VerticalAlignment="Center"/>
               <Button x:Name="BtnDrawMask"
                       Theme="{StaticResource GhostButton}"
                       Content="{loc:Text recorder.mask.draw}"
@@ -571,7 +571,7 @@
                       Theme="{StaticResource GhostButton}"
                       Content="{loc:Text recorder.mask.clear}"
                       auto:AutomationProperties.Name="{loc:Text recorder.mask.clear}"/>
-              <TextBlock x:Name="TxtMaskCount"
+              <SarilanMetin x:Name="TxtMaskCount"
                          Theme="{StaticResource Hint}"
                          VerticalAlignment="Center"/>
             </WrapPanel>
@@ -581,30 +581,30 @@
                              RowSpacing="{StaticResource SpaceMd}">
               <StackPanel>
                 <Grid ColumnDefinitions="Auto,Auto" HorizontalAlignment="Left">
-                  <TextBlock Text="{loc:Text recorder.countdown.title}" Theme="{StaticResource Label}"/>
+                  <SarilanMetin Text="{loc:Text recorder.countdown.title}" Theme="{StaticResource Label}"/>
                   <Button x:Name="BtnSchedule" Grid.Column="1" Theme="{StaticResource GhostButton}"
                           Width="{StaticResource InfoBadgeSize}" Height="{StaticResource InfoBadgeSize}"
                           MinHeight="0" Padding="0" Margin="{StaticResource InfoBadgeLabelMargin}"
                           CornerRadius="{StaticResource RadiusChip}" VerticalAlignment="Center"
                           auto:AutomationProperties.Name="{loc:Text recorder.schedule.open}">
                     <ToolTip.Tip>
-                      <TextBlock Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text recorder.schedule.hint}"/>
+                      <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text recorder.schedule.hint}"/>
                     </ToolTip.Tip>
                     <Path Width="{StaticResource InfoBadgeGlyphSize}" Height="{StaticResource InfoBadgeGlyphSize}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
                     <Button.Flyout>
                       <Flyout>
                         <StackPanel Spacing="{StaticResource SpaceSm}" Width="{StaticResource FieldWidth}">
-                          <TextBlock Text="{loc:Text recorder.schedule.open}" Theme="{StaticResource Label}"/>
-                          <TextBlock Text="{loc:Text recorder.schedule.repeat}" Theme="{StaticResource Hint}"/>
+                          <SarilanMetin Text="{loc:Text recorder.schedule.open}" Theme="{StaticResource Label}"/>
+                          <SarilanMetin Text="{loc:Text recorder.schedule.repeat}" Theme="{StaticResource Hint}"/>
                           <ComboBox x:Name="CmbScheduleRepeat" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.schedule.repeat}"/>
-                          <TextBlock Text="{loc:Text recorder.schedule.time}" Theme="{StaticResource Hint}"/>
+                          <SarilanMetin Text="{loc:Text recorder.schedule.time}" Theme="{StaticResource Hint}"/>
                           <TextBox x:Name="TxtScheduleTime" FontFamily="{StaticResource FontMono}" auto:AutomationProperties.Name="{loc:Text recorder.schedule.time}"/>
                           <StackPanel x:Name="PanelScheduleDay" Spacing="{StaticResource SpaceSm}" IsVisible="False">
-                            <TextBlock Text="{loc:Text recorder.schedule.day}" Theme="{StaticResource Hint}"/>
+                            <SarilanMetin Text="{loc:Text recorder.schedule.day}" Theme="{StaticResource Hint}"/>
                             <ComboBox x:Name="CmbScheduleDay" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.schedule.day}"/>
                           </StackPanel>
-                          <TextBlock x:Name="TxtScheduleError" Theme="{StaticResource StatusError}" TextWrapping="Wrap" IsVisible="False"/>
-                          <TextBlock x:Name="TxtScheduleNext" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+                          <SarilanMetin x:Name="TxtScheduleError" Theme="{StaticResource StatusError}" TextWrapping="Wrap" IsVisible="False"/>
+                          <SarilanMetin x:Name="TxtScheduleNext" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
                         </StackPanel>
                       </Flyout>
                     </Button.Flyout>
@@ -616,7 +616,7 @@
                           auto:AutomationProperties.Name="{loc:Text recorder.countdown.title}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.finish.title}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.finish.title}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbFinishAction"
                           HorizontalAlignment="Stretch"
                           ToolTip.Tip="{loc:Text recorder.finish.hint}"
@@ -639,7 +639,7 @@
       <StackPanel x:Name="CardsMiddle" Spacing="{StaticResource SpaceMd}">
         <Border x:Name="PanelOptions" Theme="{StaticResource Panel}">
           <StackPanel Spacing="{StaticResource SpaceMd}">
-            <TextBlock Text="{loc:Text recorder.option.title}" Theme="{StaticResource H2}"/>
+            <SarilanMetin Text="{loc:Text recorder.option.title}" Theme="{StaticResource H2}"/>
 
             <izi:SutunIzgara x:Name="RecorderEncodingChoice" MaxColumns="2"
                              ColumnSpacing="{StaticResource SpaceLg}" RowSpacing="{StaticResource SpaceSm}">
@@ -656,7 +656,7 @@
             </izi:SutunIzgara>
 
             <StackPanel x:Name="PanelAutoResult" Spacing="{StaticResource SpaceSm}">
-              <TextBlock x:Name="TxtAutoSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+              <SarilanMetin x:Name="TxtAutoSummary" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
               <Button x:Name="BtnAutoMeasure"
                       HorizontalAlignment="Left"
                       Theme="{StaticResource GhostButton}"
@@ -671,23 +671,23 @@
                              ColumnSpacing="{StaticResource SpaceMd}"
                              RowSpacing="{StaticResource SpaceMd}">
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.option.fps}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.option.fps}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtFps" auto:AutomationProperties.Name="{loc:Text recorder.option.fps}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.option.quality}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.option.quality}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtQuality"
                          ToolTip.Tip="{loc:Text recorder.option.quality-hint}"
                          auto:AutomationProperties.Name="{loc:Text recorder.option.quality}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.option.codec}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.option.codec}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbCodec"
                           HorizontalAlignment="Stretch"
                           auto:AutomationProperties.Name="{loc:Text recorder.option.codec}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.option.preset}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.option.preset}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbPreset"
                           HorizontalAlignment="Stretch"
                           auto:AutomationProperties.Name="{loc:Text recorder.option.preset}"/>
@@ -698,14 +698,14 @@
                              ColumnSpacing="{StaticResource SpaceMd}"
                              RowSpacing="{StaticResource SpaceMd}">
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.budget.seconds}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.budget.seconds}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtTargetSeconds"
                          PlaceholderText="{loc:Text recorder.budget.optional}"
                          ToolTip.Tip="{loc:Text recorder.budget.hint}"
                          auto:AutomationProperties.Name="{loc:Text recorder.budget.seconds}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.budget.megabytes}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.budget.megabytes}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtTargetMegabytes"
                          PlaceholderText="{loc:Text recorder.budget.optional}"
                          ToolTip.Tip="{loc:Text recorder.budget.hint}"
@@ -713,7 +713,7 @@
               </StackPanel>
             </izi:SutunIzgara>
 
-            <TextBlock x:Name="TxtBudgetNote" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+            <SarilanMetin x:Name="TxtBudgetNote" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
 
             <izi:SutunIzgara MaxColumns="2" Uniform="True"
                              ColumnSpacing="{StaticResource SpaceMd}"
@@ -753,42 +753,42 @@
                         auto:AutomationProperties.Name="{loc:Text recorder.option.live-preview}"/>
             </izi:SutunIzgara>
 
-            <TextBlock Text="{loc:Text recorder.pointer.title}"
+            <SarilanMetin Text="{loc:Text recorder.pointer.title}"
                        Theme="{StaticResource Label}"
                        IsVisible="{Binding #PointerChoices.IsVisible}"/>
             <izi:SutunIzgara x:Name="PointerChoices" MaxColumns="2" Uniform="True"
                              ColumnSpacing="{StaticResource SpaceMd}"
                              RowSpacing="{StaticResource SpaceSm}">
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.pointer.size}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.pointer.size}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbPointerSize"
                           HorizontalAlignment="Stretch"
                           auto:AutomationProperties.Name="{loc:Text recorder.pointer.size}"/>
               </StackPanel>
 
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.pointer.highlight-color}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.pointer.highlight-color}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbHighlightColor"
                           HorizontalAlignment="Stretch"
                           auto:AutomationProperties.Name="{loc:Text recorder.pointer.highlight-color}"/>
               </StackPanel>
 
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.pointer.left-color}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.pointer.left-color}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbLeftClickColor"
                           HorizontalAlignment="Stretch"
                           auto:AutomationProperties.Name="{loc:Text recorder.pointer.left-color}"/>
               </StackPanel>
 
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.pointer.right-color}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.pointer.right-color}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbRightClickColor"
                           HorizontalAlignment="Stretch"
                           auto:AutomationProperties.Name="{loc:Text recorder.pointer.right-color}"/>
               </StackPanel>
             </izi:SutunIzgara>
 
-            <TextBlock Text="{loc:Text recorder.keys.title}"
+            <SarilanMetin Text="{loc:Text recorder.keys.title}"
                        Theme="{StaticResource Label}"
                        IsVisible="{Binding #KeyChoices.IsVisible}"/>
             <izi:SutunIzgara x:Name="KeyChoices" MaxColumns="2" Uniform="True"
@@ -801,21 +801,21 @@
                         auto:AutomationProperties.Name="{loc:Text recorder.keys.shortcuts-only}"/>
 
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.keys.place}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.keys.place}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbKeyCaptionPlace"
                           HorizontalAlignment="Stretch"
                           auto:AutomationProperties.Name="{loc:Text recorder.keys.place}"/>
               </StackPanel>
 
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.keys.size}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.keys.size}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbKeyCaptionSize"
                           HorizontalAlignment="Stretch"
                           auto:AutomationProperties.Name="{loc:Text recorder.keys.size}"/>
               </StackPanel>
 
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.keys.hold}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.keys.hold}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbKeyCaptionHold"
                           HorizontalAlignment="Stretch"
                           auto:AutomationProperties.Name="{loc:Text recorder.keys.hold}"/>
@@ -823,7 +823,7 @@
             </izi:SutunIzgara>
 
             <StackPanel>
-              <TextBlock Text="{loc:Text recorder.output.title}" Theme="{StaticResource Label}"/>
+              <SarilanMetin Text="{loc:Text recorder.output.title}" Theme="{StaticResource Label}"/>
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
                 <TextBox Grid.Column="0"
                          x:Name="TxtOutputFolder"
@@ -845,7 +845,7 @@
         <Border x:Name="PanelAudio" Theme="{StaticResource Panel}">
           <StackPanel Spacing="{StaticResource SpaceMd}">
             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
-              <TextBlock Text="{loc:Text recorder.audio.title}" Theme="{StaticResource H2}"/>
+              <SarilanMetin Text="{loc:Text recorder.audio.title}" Theme="{StaticResource H2}"/>
               <CheckBox x:Name="ChkPushToTalk" Grid.Column="1"
                         Theme="{StaticResource CheckStyle}"
                         VerticalAlignment="Center"
@@ -858,7 +858,7 @@
                              RowSpacing="{StaticResource SpaceMd}">
               <StackPanel>
                 <Grid ColumnDefinitions="Auto,*">
-                  <TextBlock Text="{loc:Text recorder.audio.microphone}" Theme="{StaticResource Label}"/>
+                  <SarilanMetin Text="{loc:Text recorder.audio.microphone}" Theme="{StaticResource Label}"/>
                   <ProgressBar x:Name="BarMicrophoneLevel" Grid.Column="1"
                                IsVisible="False"
                                Minimum="0" Maximum="1"
@@ -875,7 +875,7 @@
 
               <StackPanel>
                 <Grid ColumnDefinitions="Auto,*">
-                  <TextBlock Text="{loc:Text recorder.audio.system}" Theme="{StaticResource Label}"/>
+                  <SarilanMetin Text="{loc:Text recorder.audio.system}" Theme="{StaticResource Label}"/>
                   <ProgressBar x:Name="BarSystemAudioLevel" Grid.Column="1"
                                IsVisible="False"
                                Minimum="0" Maximum="1"
@@ -903,21 +903,21 @@
       <StackPanel x:Name="CardsRight" Spacing="{StaticResource SpaceMd}">
         <Border x:Name="PanelAdvanced" Theme="{StaticResource Panel}">
           <StackPanel Spacing="{StaticResource SpaceMd}">
-            <TextBlock Text="{loc:Text recorder.advanced.title}" Theme="{StaticResource H2}"/>
+            <SarilanMetin Text="{loc:Text recorder.advanced.title}" Theme="{StaticResource H2}"/>
 
             <izi:SutunIzgara MaxColumns="3" Uniform="True"
                              ColumnSpacing="{StaticResource SpaceMd}"
                              RowSpacing="{StaticResource SpaceMd}">
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.container}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.container}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbContainer" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.container}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.audio-layout}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.audio-layout}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbAudioLayout" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.audio-layout}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.audio-codec}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.audio-codec}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbAudioCodec" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.audio-codec}"/>
               </StackPanel>
             </izi:SutunIzgara>
@@ -926,19 +926,19 @@
                              ColumnSpacing="{StaticResource SpaceMd}"
                              RowSpacing="{StaticResource SpaceMd}">
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.max-duration}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.max-duration}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtMaxDuration" PlaceholderText="{loc:Text recorder.budget.optional}" ToolTip.Tip="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.max-duration}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.split-seconds}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.split-seconds}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtSplitSeconds" PlaceholderText="{loc:Text recorder.budget.optional}" ToolTip.Tip="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.split-seconds}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.split-megabytes}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.split-megabytes}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtSplitMegabytes" PlaceholderText="{loc:Text recorder.budget.optional}" ToolTip.Tip="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.split-megabytes}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.audio-gain}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.audio-gain}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtAudioGain" PlaceholderText="{loc:Text recorder.budget.optional}" ToolTip.Tip="{loc:Text recorder.advanced.optional}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.audio-gain}"/>
               </StackPanel>
             </izi:SutunIzgara>
@@ -968,10 +968,10 @@
 
         <Border x:Name="PanelReplay" Theme="{StaticResource Panel}">
           <StackPanel Spacing="{StaticResource SpaceMd}">
-            <TextBlock Text="{loc:Text recorder.replay.label}" Theme="{StaticResource H2}"/>
+            <SarilanMetin Text="{loc:Text recorder.replay.label}" Theme="{StaticResource H2}"/>
 
             <StackPanel>
-              <TextBlock Text="{loc:Text recorder.replay.seconds}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
+              <SarilanMetin Text="{loc:Text recorder.replay.seconds}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
               <ComboBox x:Name="CmbReplaySeconds"
                         HorizontalAlignment="Stretch"
                         auto:AutomationProperties.Name="{loc:Text recorder.replay.seconds}"/>
@@ -1001,13 +1001,13 @@
       <StackPanel x:Name="CardsExtra" Spacing="{StaticResource SpaceMd}">
         <Border x:Name="PanelWebcam" Theme="{StaticResource Panel}">
           <StackPanel Spacing="{StaticResource SpaceMd}">
-            <TextBlock Text="{loc:Text recorder.webcam.title}" Theme="{StaticResource H2}"/>
+            <SarilanMetin Text="{loc:Text recorder.webcam.title}" Theme="{StaticResource H2}"/>
 
             <izi:SutunIzgara MaxColumns="2" Uniform="True"
                              ColumnSpacing="{StaticResource SpaceMd}"
                              RowSpacing="{StaticResource SpaceMd}">
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.webcam.device}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.webcam.device}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbWebcam"
                           ToolTip.Tip="{loc:Text recorder.webcam.hint}"
                           HorizontalAlignment="Stretch"
@@ -1015,14 +1015,14 @@
               </StackPanel>
 
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.webcam.shape}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.webcam.shape}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbWebcamShape"
                           HorizontalAlignment="Stretch"
                           auto:AutomationProperties.Name="{loc:Text recorder.webcam.shape}"/>
               </StackPanel>
 
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.webcam.background.label}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.webcam.background.label}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbWebcamBackground"
                           ToolTip.Tip="{loc:Text recorder.webcam.background.hint}"
                           HorizontalAlignment="Stretch"
@@ -1040,62 +1040,62 @@
 
         <Border x:Name="PanelEncoding" Theme="{StaticResource Panel}" IsVisible="{Binding #PanelAdvancedEncoding.IsVisible}">
           <StackPanel Spacing="{StaticResource SpaceMd}">
-            <TextBlock Text="{loc:Text recorder.advanced.encoder-title}" Theme="{StaticResource H2}"/>
+            <SarilanMetin Text="{loc:Text recorder.advanced.encoder-title}" Theme="{StaticResource H2}"/>
             <izi:SutunIzgara x:Name="PanelAdvancedEncoding"
                              MaxColumns="3"
                              Uniform="True"
                              ColumnSpacing="{StaticResource SpaceMd}"
                              RowSpacing="{StaticResource SpaceMd}">
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.scale-width}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.scale-width}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtScaleWidth" ToolTip.Tip="{loc:Text recorder.advanced.scale-hint}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.scale-width}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.scale-height}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.scale-height}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtScaleHeight" ToolTip.Tip="{loc:Text recorder.advanced.scale-hint}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.scale-height}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.keyframe}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.keyframe}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtKeyframe" auto:AutomationProperties.Name="{loc:Text recorder.advanced.keyframe}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.pixel-format}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.pixel-format}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbPixelFormat" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.pixel-format}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.profile}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.profile}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbProfile" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.profile}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.tune}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.tune}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbTune" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.tune}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.color-space}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.color-space}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbColorSpace" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.color-space}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.color-range}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.color-range}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbColorRange" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.color-range}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.rate}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.rate}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbRateControl" HorizontalAlignment="Stretch" auto:AutomationProperties.Name="{loc:Text recorder.advanced.rate}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.frame-rate-mode}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.frame-rate-mode}" Theme="{StaticResource Label}"/>
                 <ComboBox x:Name="CmbFrameRateMode" HorizontalAlignment="Stretch" ToolTip.Tip="{loc:Text recorder.advanced.frame-rate-mode-hint}" auto:AutomationProperties.Name="{loc:Text recorder.advanced.frame-rate-mode}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.bitrate}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.bitrate}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtBitrate" auto:AutomationProperties.Name="{loc:Text recorder.advanced.bitrate}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.max-bitrate}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.max-bitrate}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtMaxBitrate" auto:AutomationProperties.Name="{loc:Text recorder.advanced.max-bitrate}"/>
               </StackPanel>
               <StackPanel>
-                <TextBlock Text="{loc:Text recorder.advanced.buffer}" Theme="{StaticResource Label}"/>
+                <SarilanMetin Text="{loc:Text recorder.advanced.buffer}" Theme="{StaticResource Label}"/>
                 <TextBox x:Name="TxtBuffer" auto:AutomationProperties.Name="{loc:Text recorder.advanced.buffer}"/>
               </StackPanel>
             </izi:SutunIzgara>

@@ -94,7 +94,7 @@ internal sealed class ShortcutTable
             Grid.SetRow(gesture, index);
             Grid.SetColumn(gesture, 0);
 
-            var label = new TextBlock
+            var label = new SarilanMetin
             {
                 Text = VidShrink.Core.Bicim.Satir.Bagla(slot.Label),
                 Theme = _find("Body"),
