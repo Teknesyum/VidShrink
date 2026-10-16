@@ -169,6 +169,7 @@
   "recorder.hotkeys.unsupported": "Denne tasten kan ikke være en global hurtigtast. Bruk en funksjonstast, eller en bokstav eller et tall sammen med Ctrl eller Alt.",
   "recorder.hotkeys.chapter": "Merk et kapittel",
   "recorder.hotkeys.draw": "Tegn på skjermen",
+  "recorder.hotkeys.unassigned": "(ingen tast tilordnet)",
   "recorder.sketch.tools": "Tegner på skjermen under opptak. P penn, A pil, B boks, N nummer, T tekst; Ctrl+Z angrer, Delete tømmer, Esc sletter og lukker. Trykk snarveien igjen for å beholde tegningen på skjermen og gi musen videre til appen under.",
   "recorder.prompter.title": "Teleprompter",
   "recorder.prompter.open": "Teleprompter: ruller manuset ditt ved siden av kameraet mens du tar opp",

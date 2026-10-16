@@ -169,6 +169,7 @@
   "recorder.hotkeys.unsupported": "Ova tipka ne može biti globalna prečica. Upotrijebite funkcijsku tipku ili slovo odnosno znamenku uz Ctrl ili Alt.",
   "recorder.hotkeys.chapter": "Označi poglavlje",
   "recorder.hotkeys.draw": "Crtaj po zaslonu",
+  "recorder.hotkeys.unassigned": "(tipka nije dodijeljena)",
   "recorder.sketch.tools": "Crta po zaslonu tijekom snimanja. P olovka, A strelica, B okvir, N broj, T tekst; Ctrl+Z poništava, Delete briše sve, Esc briše i zatvara. Ponovno pritisnite prečac da crtež ostane na zaslonu, a miš prijeđe na aplikaciju ispod.",
   "recorder.prompter.title": "Teleprompter",
   "recorder.prompter.open": "Teleprompter: pomiče vaš tekst uz kameru dok snimate",

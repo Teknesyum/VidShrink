@@ -169,6 +169,7 @@
   "recorder.hotkeys.unsupported": "Tämä näppäin ei voi olla globaali pikanäppäin. Käytä toimintonäppäintä tai kirjainta tai numeroa yhdessä Ctrl- tai Alt-näppäimen kanssa.",
   "recorder.hotkeys.chapter": "Merkitse luku",
   "recorder.hotkeys.draw": "Piirrä näytölle",
+  "recorder.hotkeys.unassigned": "(ei näppäintä määritetty)",
   "recorder.sketch.tools": "Piirtää näytölle tallennuksen aikana. P kynä, A nuoli, B laatikko, N numero, T teksti; Ctrl+Z kumoaa, Delete tyhjentää, Esc poistaa ja sulkee. Paina pikanäppäintä uudelleen, jotta piirros jää näytölle ja hiiri siirtyy alla olevalle sovellukselle.",
   "recorder.prompter.title": "Teleprompteri",
   "recorder.prompter.open": "Teleprompteri: vierittää käsikirjoitustasi kameran vieressä tallennuksen aikana",

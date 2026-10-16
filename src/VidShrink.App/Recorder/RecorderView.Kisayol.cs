@@ -44,7 +44,11 @@ internal partial class RecorderView
     /// <summary>Geçerli atamalar; ayardan okunur, bozuk ya da eski ayarda varsayılan tablodur.</summary>
     internal IReadOnlyList<HotkeyBinding> Hotkeys => _hotkeys;
 
-    internal string HotkeyName(HotkeyAction action) => RecorderHotkeys.Gesture(RecorderHotkeys.Of(_hotkeys, action));
+    /// <summary>İpuçlarına giren tuş adı; atanmamış eylemde boş kalmasın diye "tuş atanmadı" metni.</summary>
+    internal string HotkeyName(HotkeyAction action)
+        => RecorderHotkeys.Of(_hotkeys, action) is var binding && RecorderHotkeys.IsAssigned(binding)
+            ? RecorderHotkeys.Gesture(binding)
+            : Say("recorder.hotkeys.unassigned");
 
     internal ShortcutKeyButton HotkeyBox(HotkeyAction action) => _hotkeyBoxes[action];
 

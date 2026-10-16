@@ -169,6 +169,7 @@
   "recorder.hotkeys.unsupported": "ปุ่มนี้ใช้เป็นปุ่มลัดส่วนกลางไม่ได้ ให้ใช้ปุ่มฟังก์ชัน หรือตัวอักษรหรือตัวเลขร่วมกับ Ctrl หรือ Alt",
   "recorder.hotkeys.chapter": "ทำเครื่องหมายตอน",
   "recorder.hotkeys.draw": "วาดบนหน้าจอ",
+  "recorder.hotkeys.unassigned": "(ยังไม่ได้กำหนดปุ่ม)",
   "recorder.sketch.tools": "วาดบนหน้าจอขณะบันทึก P ปากกา, A ลูกศร, B กรอบ, N หมายเลข, T ข้อความ; Ctrl+Z ย้อนกลับ, Delete ล้างทั้งหมด, Esc ลบและปิด กดปุ่มลัดอีกครั้งเพื่อคงภาพวาดไว้บนหน้าจอและส่งเมาส์ให้แอปด้านล่าง",
   "recorder.prompter.title": "พรอมเตอร์",
   "recorder.prompter.open": "พรอมเตอร์: เลื่อนสคริปต์ของคุณข้างกล้องขณะบันทึก",

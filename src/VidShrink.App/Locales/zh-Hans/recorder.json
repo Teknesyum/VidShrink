@@ -169,6 +169,7 @@
   "recorder.hotkeys.unsupported": "此按键不能用作全局快捷键。请使用功能键，或与 Ctrl 或 Alt 组合的字母或数字。",
   "recorder.hotkeys.chapter": "标记章节",
   "recorder.hotkeys.draw": "在屏幕上绘制",
+  "recorder.hotkeys.unassigned": "（未分配按键）",
   "recorder.sketch.tools": "录制时在屏幕上绘制。P 画笔，A 箭头，B 方框，N 编号，T 文字；Ctrl+Z 撤销，Delete 清除，Esc 擦除并关闭。再次按下快捷键可将绘图保留在屏幕上，并把鼠标交给下方的应用。",
   "recorder.prompter.title": "提词器",
   "recorder.prompter.open": "提词器：录制时在摄像头旁滚动显示你的讲稿",

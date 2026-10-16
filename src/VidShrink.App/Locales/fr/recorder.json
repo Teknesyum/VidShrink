@@ -169,6 +169,7 @@
   "recorder.hotkeys.unsupported": "Cette touche ne peut pas servir de raccourci global. Utilisez une touche de fonction, ou une lettre ou un chiffre avec Ctrl ou Alt.",
   "recorder.hotkeys.chapter": "Marquer un chapitre",
   "recorder.hotkeys.draw": "Dessiner à l'écran",
+  "recorder.hotkeys.unassigned": "(aucune touche attribuée)",
   "recorder.sketch.tools": "Dessine à l'écran pendant l'enregistrement. P stylo, A flèche, B cadre, N numéro, T texte ; Ctrl+Z annule, Delete efface tout, Esc efface et ferme. Appuyez de nouveau sur le raccourci pour garder le dessin à l'écran et passer la souris à l'application en dessous.",
   "recorder.prompter.title": "Prompteur",
   "recorder.prompter.open": "Prompteur : fait défiler votre texte à côté de la caméra pendant l'enregistrement",

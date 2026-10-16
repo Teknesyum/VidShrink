@@ -29,6 +29,8 @@ ship as part of it.
   (Avalonia rounding at 125/150/200% scaling); every text block in the app uses the corrected control.
 - Recorder: the click, click sound, keys and magnifier boxes followed two gates after the Linux merge; one gate now
   decides, so they hide where they do not work and show where they do.
+- Recorder: a shortcut with no key assigned no longer leaves a blank in hints such as Push to Talk; they say
+  "(no key assigned)".
 
 ## [1.2.22] - 2026-10-16
 

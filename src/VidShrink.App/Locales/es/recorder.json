@@ -169,6 +169,7 @@
   "recorder.hotkeys.unsupported": "Esta tecla no puede ser un atajo global. Use una tecla de función, o una letra o un dígito con Ctrl o Alt.",
   "recorder.hotkeys.chapter": "Marcar un capítulo",
   "recorder.hotkeys.draw": "Dibujar en pantalla",
+  "recorder.hotkeys.unassigned": "(sin tecla asignada)",
   "recorder.sketch.tools": "Dibuja en la pantalla durante la grabación. P lápiz, A flecha, B recuadro, N número, T texto; Ctrl+Z deshace, Delete borra todo, Esc borra y cierra. Pulsa el atajo otra vez para dejar el dibujo en pantalla y pasar el ratón a la aplicación de debajo.",
   "recorder.prompter.title": "Teleprompter",
   "recorder.prompter.open": "Teleprompter: desplaza tu guion junto a la cámara mientras grabas",

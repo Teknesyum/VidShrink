@@ -169,6 +169,7 @@
   "recorder.hotkeys.unsupported": "Deze toets kan geen globale sneltoets zijn. Gebruik een functietoets, of een letter of cijfer met Ctrl of Alt.",
   "recorder.hotkeys.chapter": "Hoofdstuk markeren",
   "recorder.hotkeys.draw": "Op het scherm tekenen",
+  "recorder.hotkeys.unassigned": "(geen toets toegewezen)",
   "recorder.sketch.tools": "Tekent op het scherm tijdens het opnemen. P pen, A pijl, B kader, N nummer, T tekst; Ctrl+Z maakt ongedaan, Delete wist alles, Esc wist en sluit. Druk de sneltoets nogmaals in om de tekening op het scherm te houden en de muis door te geven aan de app eronder.",
   "recorder.prompter.title": "Teleprompter",
   "recorder.prompter.open": "Teleprompter: laat je script naast de camera scrollen terwijl je opneemt",

@@ -24,7 +24,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 - Hızlı kırpma 16 Ekim 2026'da main'de (`RecorderQuickTrim`, sonuç panelinde "Hızlı kırp").
 - Kayıt geçmişi 16 Ekim 2026'da main'de: kaydedicide "Son Kayıtlar" (`RecordingHistoryWindow`, `RecentRecordings`); küçük resim, süre, boyut, tarih; aç, klasörde göster, paylaş, çöpe taşı. Sahte klasörle ölçüldü (`KayitGecmisiTests`).
-- Yan bulgu: bas-konuş kısayolu atanmamışken ipucunda tuş adı boş kalıyor; yer saptanmadı.
+- Yan bulgu kapandı (16 Ekim 2026): atanmamış kısayolun adı ipuçlarında boş kalıyordu; `HotkeyName` artık "(tuş atanmadı)" yazıyor (`KaydediciBasKonusTests.AtanmamisTusIpucundaBosKalmaz`).
 
 ## 42. Ekrana Çizim Ve Prompter
 

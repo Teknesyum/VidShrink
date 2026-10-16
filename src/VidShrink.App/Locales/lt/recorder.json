@@ -169,6 +169,7 @@
   "recorder.hotkeys.unsupported": "Šis klavišas negali būti visuotinis trumpinys. Naudokite funkcinį klavišą arba raidę ar skaitmenį kartu su Ctrl arba Alt.",
   "recorder.hotkeys.chapter": "Pažymėti skyrių",
   "recorder.hotkeys.draw": "Piešti ekrane",
+  "recorder.hotkeys.unassigned": "(klavišas nepriskirtas)",
   "recorder.sketch.tools": "Įrašant piešia ekrane. P rašiklis, A rodyklė, B langelis, N numeris, T tekstas; Ctrl+Z atšaukia, Delete išvalo, Esc ištrina ir uždaro. Dar kartą paspauskite spartųjį klavišą, kad piešinys liktų ekrane, o pelė atitektų žemiau esančiai programai.",
   "recorder.prompter.title": "Teleprompteris",
   "recorder.prompter.open": "Teleprompteris: įrašant slenka jūsų tekstą šalia kameros",

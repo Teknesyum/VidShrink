@@ -288,6 +288,24 @@ public sealed class KaydediciBasKonusTests
     }
 
     [Fact]
+    public void AtanmamisTusIpucundaBosKalmaz()
+    {
+        using var ayar = new OzelAyar();
+        File.WriteAllText(ayar.Yol, "{\"hotkeys\":\"0:F1,0:F2,0:F3,0:F4,2:F5,0:F6\",\"pushToTalk\":true}");
+        var olcu = AppHost.Run(() =>
+        {
+            var view = new RecorderView(ayar.Yol);
+            return (Ad: view.HotkeyName(HotkeyAction.PushToTalk), Ipucu: ToolTip.GetTip(Bul<CheckBox>(view, "ChkPushToTalk"))?.ToString(),
+                Atanmis: view.HotkeyName(HotkeyAction.Stop));
+        });
+
+        var metin = VidShrink.App.LanguageCatalog.Display(Strings.Get("recorder.hotkeys.unassigned"));
+        Assert.Equal(metin, olcu.Ad);
+        Assert.Contains(metin, olcu.Ipucu);
+        Assert.Equal("F2", olcu.Atanmis);
+    }
+
+    [Fact]
     public void YalnizKayitIstegiKomutHedefiTasirTamponTasimaz()
     {
         var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>

@@ -169,6 +169,7 @@
   "recorder.hotkeys.unsupported": "Tento kláves nemôže byť globálnou skratkou. Použite funkčný kláves, alebo písmeno či číslicu s Ctrl alebo Alt.",
   "recorder.hotkeys.chapter": "Označiť kapitolu",
   "recorder.hotkeys.draw": "Kresliť na obrazovku",
+  "recorder.hotkeys.unassigned": "(kláves nepriradený)",
   "recorder.sketch.tools": "Kreslí na obrazovku počas nahrávania. P pero, A šípka, B rámček, N číslo, T text; Ctrl+Z vracia späť, Delete maže, Esc zmaže a zavrie. Ďalším stlačením skratky necháte kresbu na obrazovke a myš odovzdáte aplikácii pod ňou.",
   "recorder.prompter.title": "Teleprompter",
   "recorder.prompter.open": "Teleprompter: posúva váš text vedľa kamery počas nahrávania",
