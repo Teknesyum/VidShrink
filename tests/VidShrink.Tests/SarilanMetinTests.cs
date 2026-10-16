@@ -14,13 +14,16 @@ namespace VidShrink.Tests;
 /// taramada 848.670 bileşimin 179'u).
 /// <para>Hangi boyun artık taşıdığı yazı tipine bağlı: bu makinede kusurlu çıkan üç kol CI'nın yazı tipinde
 /// kusursuzdu, ölçü kör kaldı. Bu yüzden kollar sabit değil, her makinede taranır: metinler <see cref="Boylar"/>
-/// boyunca doğal genişlikten <see cref="Artik"/> kadar dar kurulur, düz <see cref="TextBlock"/>'un karakter
+/// boyunca doğal genişlikten <see cref="Artiklar"/> kadar dar kurulur, düz <see cref="TextBlock"/>'un karakter
 /// düşürdüğü her bileşimde <see cref="SarilanMetin"/> düşürmemeli. Olumsuz kontrol: hiçbir bileşim kusuru
 /// üretmezse ölçü kördür ve test düşer.</para>
+/// <para>1e-9 kolu gerçek artığı taklit eder ama CI'nın yazı tipinde 60 bileşimin hiçbirinde kusur doğurmadı
+/// (379a5ec koşumu). 0,25 kolu yuvarlamanın kırpabileceği en büyük açığın yarısı: düz metin her yazı tipinde
+/// sarar, düzeltmenin 0,5 piksellik eşiği içinde kalır.</para>
 /// </summary>
 public sealed class SarilanMetinTests
 {
-    private const double Artik = 1e-9;
+    private static readonly double[] Artiklar = { 1e-9, 0.25 };
 
     private static readonly string[] Metinler =
     {
@@ -38,23 +41,23 @@ public sealed class SarilanMetinTests
         var kollar = AppHost.Run(() =>
         {
             Application.Current!.TryFindResource("FontSans", out var aile);
-            int Yerlestir(TextBlock t, string metin, double boy)
+            int Yerlestir(TextBlock t, string metin, double boy, double artik)
             {
                 t.Text = metin;
                 t.FontFamily = (FontFamily)aile!;
                 t.FontSize = boy;
                 t.TextWrapping = TextWrapping.Wrap;
                 t.Measure(Size.Infinity);
-                t.Arrange(new Rect(0, 0, t.TextLayout.WidthIncludingTrailingWhitespace - Artik, t.DesiredSize.Height));
+                t.Arrange(new Rect(0, 0, t.TextLayout.WidthIncludingTrailingWhitespace - artik, t.DesiredSize.Height));
                 return t.TextLayout.TextLines.Sum(l => l.Length);
             }
 
-            return Metinler.SelectMany(metin => Boylar.Select(boy => (metin, boy))).Select(k =>
+            return Metinler.SelectMany(metin => Boylar.SelectMany(boy => Artiklar.Select(artik => (metin, boy, artik)))).Select(k =>
             {
                 var olcu = new TextBlock { Text = k.metin, FontFamily = (FontFamily)aile!, FontSize = k.boy, TextWrapping = TextWrapping.Wrap };
                 olcu.Measure(Size.Infinity);
-                return (Ad: $"{k.metin[..8]}…@{k.boy}", Dogal: olcu.TextLayout.TextLines.Sum(l => l.Length),
-                    Duz: Yerlestir(new TextBlock(), k.metin, k.boy), Sarilan: Yerlestir(new SarilanMetin(), k.metin, k.boy));
+                return (Ad: $"{k.metin[..8]}…@{k.boy}-{k.artik}", Dogal: olcu.TextLayout.TextLines.Sum(l => l.Length),
+                    Duz: Yerlestir(new TextBlock(), k.metin, k.boy, k.artik), Sarilan: Yerlestir(new SarilanMetin(), k.metin, k.boy, k.artik));
             }).ToArray();
         });
 

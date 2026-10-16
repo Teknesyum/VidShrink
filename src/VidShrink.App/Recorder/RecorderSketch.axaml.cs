@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using VidShrink.App.Localization;
 using VidShrink.Core;
 
 namespace VidShrink.App.Recorder;
@@ -281,7 +282,7 @@ internal sealed class SketchCanvas : Control
             case SketchTool.Number:
                 var radius = Token("RecorderSketchNumberSize") / 2;
                 context.DrawEllipse(ink, null, points[0], radius, radius);
-                var number = Text(stroke.Number.ToString(CultureInfo.CurrentCulture), Token("FontSizeMd"), Brush("OnNeon"));
+                var number = Text(stroke.Number.ToString(Strings.Culture), Token("FontSizeMd"), Brush("OnNeon"));
                 context.DrawText(number, new Point(points[0].X - number.Width / 2, points[0].Y - number.Height / 2));
                 break;
             case SketchTool.Text:
@@ -291,7 +292,7 @@ internal sealed class SketchCanvas : Control
     }
 
     private FormattedText Text(string text, double size, IBrush brush)
-        => new(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight,
+        => new(text, Strings.Culture, FlowDirection.LeftToRight,
             new Typeface(this.TryFindResource("FontSans", out var font) && font is FontFamily family ? family : FontFamily.Default, FontStyle.Normal, FontWeight.SemiBold),
             size, brush);
 

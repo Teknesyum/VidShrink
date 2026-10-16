@@ -37,13 +37,16 @@ public sealed class KaydediciAyarGidisDonusTests
         ["Preset"] = "slow",
         ["ColorRange"] = "jpeg",
         ["AudioCodec"] = "libopus",
-        ["Hotkeys"] = "2:F1,2:F2,2:F3,2:F4,2:F5,2:F6,2:F7",
+        ["Hotkeys"] = "2:F1,2:F2,2:F3,2:F4,2:F5,2:F6,2:F7,2:F8",
+        ["PrompterStep"] = 5,
+        ["PrompterLook"] = new PrompterLook(Mirror: true, Line: false, Size: 0),
         ["ScheduleAt"] = new DateTime(2026, 10, 12, 14, 30, 0)
     };
 
     private static readonly Dictionary<string, int> CokAnahtarli = new()
     {
-        ["KeyCaption"] = 3
+        ["KeyCaption"] = 3,
+        ["PrompterLook"] = 3
     };
 
     internal static IReadOnlyList<PropertyInfo> Ozellikler() => typeof(RecorderSettings)
