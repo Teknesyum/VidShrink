@@ -1,0 +1,23 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:auto="using:Avalonia.Automation"
+        xmlns:loc="using:VidShrink.App.Localization"
+        xmlns:rec="using:VidShrink.App.Recorder"
+        x:Class="VidShrink.App.Recorder.RecorderSketch"
+        Title="VidShrink" FontSize="{StaticResource FontSizeMd}" FontFamily="{StaticResource FontSans}"
+        WindowDecorations="None"
+        CanResize="False" CanMaximize="False"
+        ShowInTaskbar="False"
+        ShowActivated="False"
+        Topmost="True"
+        Background="Transparent"
+        TransparencyLevelHint="Transparent"
+        auto:AutomationProperties.Name="{loc:Text recorder.hotkeys.draw}">
+  <Canvas x:Name="Surface" Background="Transparent">
+    <rec:SketchCanvas x:Name="Ink" IsHitTestVisible="False"/>
+    <TextBox x:Name="Entry" IsVisible="False" AcceptsReturn="False"
+             FontSize="{StaticResource RecorderSketchFont}"
+             Foreground="{DynamicResource NeonEmber}"
+             auto:AutomationProperties.Name="{loc:Text recorder.hotkeys.draw}"/>
+  </Canvas>
+</Window>

@@ -367,6 +367,7 @@ internal partial class RecorderView
         SyncRegionEditor();
         SyncPreview(running);
         SyncInput(_session is not null);
+        SyncSketch(_session is not null);
         SyncTray();
         RefreshMini();
     }

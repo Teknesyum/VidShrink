@@ -168,6 +168,8 @@
   "recorder.hotkeys.rejected": "Nie udało się zarejestrować {0}; używa go inna aplikacja lub system.",
   "recorder.hotkeys.unsupported": "Ten klawisz nie może być skrótem globalnym. Użyj klawisza funkcyjnego albo litery lub cyfry z Ctrl lub Alt.",
   "recorder.hotkeys.chapter": "Oznacz rozdział",
+  "recorder.hotkeys.draw": "Rysuj na ekranie",
+  "recorder.sketch.tools": "Rysuje na ekranie podczas nagrywania. P pióro, A strzałka, B ramka, N numer, T tekst; Ctrl+Z cofa, Delete czyści, Esc usuwa i zamyka. Naciśnij skrót ponownie, aby zostawić rysunek na ekranie i przekazać mysz aplikacji pod spodem.",
   "recorder.chapter.marked": "Rozdział {0} oznaczony",
   "recorder.chapter.title": "Rozdział {0}",
   "recorder.chapter.unsupported": "Ten format nie obsługuje rozdziałów; znaczniki rozdziałów nie zostały zapisane.",

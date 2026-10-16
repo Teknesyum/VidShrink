@@ -168,6 +168,8 @@
   "recorder.hotkeys.rejected": "{0} could not be registered; another application or the system holds it.",
   "recorder.hotkeys.unsupported": "This key cannot be a global shortcut. Use a function key, or a letter or digit with Ctrl or Alt.",
   "recorder.hotkeys.chapter": "Mark a chapter",
+  "recorder.hotkeys.draw": "Draw on screen",
+  "recorder.sketch.tools": "Draws on the screen while recording. P pen, A arrow, B box, N number, T text; Ctrl+Z undoes, Delete clears, Esc erases and closes. Press the shortcut again to keep the drawing on screen and pass the mouse to the app underneath.",
   "recorder.chapter.marked": "Chapter {0} marked",
   "recorder.chapter.title": "Chapter {0}",
   "recorder.chapter.unsupported": "This format does not carry chapters; the chapter marks were not written.",

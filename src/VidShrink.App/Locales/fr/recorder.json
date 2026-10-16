@@ -168,6 +168,8 @@
   "recorder.hotkeys.rejected": "{0} n’a pas pu être enregistré ; une autre application ou le système l’utilise.",
   "recorder.hotkeys.unsupported": "Cette touche ne peut pas servir de raccourci global. Utilisez une touche de fonction, ou une lettre ou un chiffre avec Ctrl ou Alt.",
   "recorder.hotkeys.chapter": "Marquer un chapitre",
+  "recorder.hotkeys.draw": "Dessiner à l'écran",
+  "recorder.sketch.tools": "Dessine à l'écran pendant l'enregistrement. P stylo, A flèche, B cadre, N numéro, T texte ; Ctrl+Z annule, Delete efface tout, Esc efface et ferme. Appuyez de nouveau sur le raccourci pour garder le dessin à l'écran et passer la souris à l'application en dessous.",
   "recorder.chapter.marked": "Chapitre {0} marqué",
   "recorder.chapter.title": "Chapitre {0}",
   "recorder.chapter.unsupported": "Ce format ne prend pas en charge les chapitres ; les marques de chapitre n’ont pas été écrites.",

@@ -168,6 +168,8 @@
   "recorder.hotkeys.rejected": "Näppäintä {0} ei voitu rekisteröidä; toinen sovellus tai järjestelmä käyttää sitä.",
   "recorder.hotkeys.unsupported": "Tämä näppäin ei voi olla globaali pikanäppäin. Käytä toimintonäppäintä tai kirjainta tai numeroa yhdessä Ctrl- tai Alt-näppäimen kanssa.",
   "recorder.hotkeys.chapter": "Merkitse luku",
+  "recorder.hotkeys.draw": "Piirrä näytölle",
+  "recorder.sketch.tools": "Piirtää näytölle tallennuksen aikana. P kynä, A nuoli, B laatikko, N numero, T teksti; Ctrl+Z kumoaa, Delete tyhjentää, Esc poistaa ja sulkee. Paina pikanäppäintä uudelleen, jotta piirros jää näytölle ja hiiri siirtyy alla olevalle sovellukselle.",
   "recorder.chapter.marked": "Luku {0} merkitty",
   "recorder.chapter.title": "Luku {0}",
   "recorder.chapter.unsupported": "Tämä muoto ei tue lukuja; lukumerkkejä ei kirjoitettu.",

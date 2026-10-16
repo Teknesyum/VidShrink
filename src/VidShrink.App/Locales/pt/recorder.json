@@ -168,6 +168,8 @@
   "recorder.hotkeys.rejected": "Não foi possível registrar {0}; outro aplicativo ou o sistema está usando.",
   "recorder.hotkeys.unsupported": "Esta tecla não pode ser um atalho global. Use uma tecla de função, ou uma letra ou um dígito com Ctrl ou Alt.",
   "recorder.hotkeys.chapter": "Marcar um capítulo",
+  "recorder.hotkeys.draw": "Desenhar no ecrã",
+  "recorder.sketch.tools": "Desenha no ecrã durante a gravação. P caneta, A seta, B caixa, N número, T texto; Ctrl+Z desfaz, Delete limpa tudo, Esc apaga e fecha. Prima o atalho novamente para manter o desenho no ecrã e passar o rato à aplicação por baixo.",
   "recorder.chapter.marked": "Capítulo {0} marcado",
   "recorder.chapter.title": "Capítulo {0}",
   "recorder.chapter.unsupported": "Este formato não suporta capítulos; as marcas de capítulo não foram gravadas.",

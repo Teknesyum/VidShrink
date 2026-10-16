@@ -168,6 +168,8 @@
   "recorder.hotkeys.rejected": "{0} nije bilo moguće registrirati; koristi je druga aplikacija ili sustav.",
   "recorder.hotkeys.unsupported": "Ova tipka ne može biti globalna prečica. Upotrijebite funkcijsku tipku ili slovo odnosno znamenku uz Ctrl ili Alt.",
   "recorder.hotkeys.chapter": "Označi poglavlje",
+  "recorder.hotkeys.draw": "Crtaj po zaslonu",
+  "recorder.sketch.tools": "Crta po zaslonu tijekom snimanja. P olovka, A strelica, B okvir, N broj, T tekst; Ctrl+Z poništava, Delete briše sve, Esc briše i zatvara. Ponovno pritisnite prečac da crtež ostane na zaslonu, a miš prijeđe na aplikaciju ispod.",
   "recorder.chapter.marked": "Poglavlje {0} označeno",
   "recorder.chapter.title": "Poglavlje {0}",
   "recorder.chapter.unsupported": "Ovaj format ne podržava poglavlja; oznake poglavlja nisu zapisane.",

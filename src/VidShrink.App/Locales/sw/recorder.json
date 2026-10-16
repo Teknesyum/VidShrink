@@ -168,6 +168,8 @@
   "recorder.hotkeys.rejected": "{0} haikuweza kusajiliwa; programu nyingine au mfumo unaitumia.",
   "recorder.hotkeys.unsupported": "Kitufe hiki hakiwezi kuwa njia ya mkato ya jumla. Tumia kitufe cha kazi, au herufi au tarakimu pamoja na Ctrl au Alt.",
   "recorder.hotkeys.chapter": "Weka alama ya sura",
+  "recorder.hotkeys.draw": "Chora kwenye skrini",
+  "recorder.sketch.tools": "Huchora kwenye skrini wakati wa kurekodi. P kalamu, A mshale, B kisanduku, N nambari, T maandishi; Ctrl+Z hutendua, Delete husafisha, Esc hufuta na kufunga. Bonyeza njia ya mkato tena ili kuacha mchoro kwenye skrini na kupitisha kipanya kwa programu iliyo chini.",
   "recorder.chapter.marked": "Sura {0} imewekwa alama",
   "recorder.chapter.title": "Sura {0}",
   "recorder.chapter.unsupported": "Umbizo hili halibebi sura; alama za sura hazikuandikwa.",

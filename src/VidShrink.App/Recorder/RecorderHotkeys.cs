@@ -19,7 +19,8 @@ internal enum HotkeyAction
     Discard,
     ReplaySave,
     Chapter,
-    PushToTalk
+    PushToTalk,
+    Draw
 }
 
 internal sealed record HotkeyBinding(HotkeyAction Action, Key Key, uint VirtualKey, KeyModifiers Modifiers = KeyModifiers.None);
@@ -65,7 +66,8 @@ internal static class RecorderHotkeys
         new(HotkeyAction.Discard, Key.F10, 0x79),
         new(HotkeyAction.ReplaySave, Key.F11, 0x7A),
         new(HotkeyAction.Chapter, Key.F6, 0x75),
-        new(HotkeyAction.PushToTalk, Key.F5, 0x74, KeyModifiers.Control)
+        new(HotkeyAction.PushToTalk, Key.F5, 0x74, KeyModifiers.Control),
+        new(HotkeyAction.Draw, Key.F2, 0x71, KeyModifiers.Control)
     ];
 
     /// <summary>Bölüm işareti eklenmeden önceki ayarın taşıdığı eylem sayısı.</summary>

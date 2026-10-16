@@ -168,6 +168,8 @@
   "recorder.hotkeys.rejected": "تعذّر تسجيل {0}؛ يستخدمه تطبيق آخر أو النظام.",
   "recorder.hotkeys.unsupported": "لا يمكن أن يكون هذا المفتاح اختصارًا عامًا. استخدم مفتاح وظيفة، أو حرفًا أو رقمًا مع Ctrl أو Alt.",
   "recorder.hotkeys.chapter": "وضع علامة فصل",
+  "recorder.hotkeys.draw": "الرسم على الشاشة",
+  "recorder.sketch.tools": "يرسم على الشاشة أثناء التسجيل. P قلم، A سهم، B مربع، N رقم، T نص؛ Ctrl+Z يتراجع، Delete يمسح، Esc يمحو ويغلق. اضغط الاختصار مرة أخرى لإبقاء الرسم على الشاشة وتمرير الماوس إلى التطبيق الذي تحته.",
   "recorder.chapter.marked": "تم وضع علامة الفصل {0}",
   "recorder.chapter.title": "الفصل {0}",
   "recorder.chapter.unsupported": "هذا التنسيق لا يدعم الفصول؛ لم تُكتب علامات الفصول.",

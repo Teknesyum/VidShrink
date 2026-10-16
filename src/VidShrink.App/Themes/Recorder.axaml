@@ -79,6 +79,14 @@
                                  kartının küçük resmi ve yanında ad ile ayrıntı.
       RecorderHistoryHeight   <- PlanPanelMaxHeight (576). Oynatıcının geçmiş penceresiyle aynı boy.
 
+    Ekrana çizim.
+
+      RecorderSketchStroke     <- RecorderClickRingThickness (4). Kalem, ok ve kutu, tıklama halkasıyla
+                                  aynı kalınlıkta; kayıtta ikisi aynı dilden okunur.
+      RecorderSketchArrowHead  <- SpaceXl (24). Ok başı kanadının boyu.
+      RecorderSketchNumberSize <- RecorderPointerRingSmall (32). Numara dairesinin çapı, küçük imleç halkası kadar.
+      RecorderSketchFont       <- FontSizeHero. Yazı aracının ve numaranın yazı boyu kayıtta okunacak büyüklükte.
+
     Sonuç panelindeki hızlı kırpma açılırı.
 
       RecorderQuickTrimWidth       <- TipMaxWidth (420). Açılır bir ipucu balonu kadar geniş;
@@ -141,6 +149,10 @@
   <sys:TimeSpan x:Key="RecorderResultCardHold">00:00:06</sys:TimeSpan>
   <StaticResource x:Key="RecorderHistoryWidth" ResourceKey="TipMaxWidth"/>
   <StaticResource x:Key="RecorderHistoryHeight" ResourceKey="PlanPanelMaxHeight"/>
+  <StaticResource x:Key="RecorderSketchStroke" ResourceKey="RecorderClickRingThickness"/>
+  <StaticResource x:Key="RecorderSketchArrowHead" ResourceKey="SpaceXl"/>
+  <StaticResource x:Key="RecorderSketchNumberSize" ResourceKey="RecorderPointerRingSmall"/>
+  <StaticResource x:Key="RecorderSketchFont" ResourceKey="FontSizeHero"/>
   <StaticResource x:Key="RecorderQuickTrimWidth" ResourceKey="TipMaxWidth"/>
   <StaticResource x:Key="RecorderQuickTrimThumbHeight" ResourceKey="PlaybackBarButtonSize"/>
 

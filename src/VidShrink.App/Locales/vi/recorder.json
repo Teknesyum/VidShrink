@@ -168,6 +168,8 @@
   "recorder.hotkeys.rejected": "Không thể đăng ký {0}; ứng dụng khác hoặc hệ thống đang dùng phím này.",
   "recorder.hotkeys.unsupported": "Phím này không thể làm phím tắt toàn cục. Hãy dùng phím chức năng, hoặc một chữ cái hay chữ số cùng với Ctrl hoặc Alt.",
   "recorder.hotkeys.chapter": "Đánh dấu chương",
+  "recorder.hotkeys.draw": "Vẽ trên màn hình",
+  "recorder.sketch.tools": "Vẽ trên màn hình khi đang ghi. P bút, A mũi tên, B khung, N số, T văn bản; Ctrl+Z hoàn tác, Delete xóa hết, Esc xóa và đóng. Nhấn lại phím tắt để giữ hình vẽ trên màn hình và chuyển chuột cho ứng dụng bên dưới.",
   "recorder.chapter.marked": "Đã đánh dấu chương {0}",
   "recorder.chapter.title": "Chương {0}",
   "recorder.chapter.unsupported": "Định dạng này không hỗ trợ chương; các dấu chương không được ghi.",

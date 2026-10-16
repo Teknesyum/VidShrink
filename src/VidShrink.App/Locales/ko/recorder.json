@@ -168,6 +168,8 @@
   "recorder.hotkeys.rejected": "{0}을(를) 등록할 수 없습니다. 다른 애플리케이션이나 시스템이 사용 중입니다.",
   "recorder.hotkeys.unsupported": "이 키는 전역 단축키로 쓸 수 없습니다. 기능 키를 쓰거나 Ctrl 또는 Alt와 함께 문자나 숫자를 사용하세요.",
   "recorder.hotkeys.chapter": "챕터 표시",
+  "recorder.hotkeys.draw": "화면에 그리기",
+  "recorder.sketch.tools": "녹화 중 화면에 그립니다. P 펜, A 화살표, B 상자, N 번호, T 텍스트; Ctrl+Z는 실행 취소, Delete는 모두 지우기, Esc는 지우고 닫기입니다. 단축키를 다시 누르면 그림을 화면에 남기고 마우스를 아래 앱으로 넘깁니다.",
   "recorder.chapter.marked": "챕터 {0} 표시됨",
   "recorder.chapter.title": "챕터 {0}",
   "recorder.chapter.unsupported": "이 형식은 챕터를 지원하지 않습니다. 챕터 표시가 기록되지 않았습니다.",

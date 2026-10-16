@@ -218,6 +218,7 @@ internal partial class RecorderView
         HotkeyAction.Discard => Say("recorder.hotkeys.discard"),
         HotkeyAction.Chapter => Say("recorder.hotkeys.chapter"),
         HotkeyAction.PushToTalk => Say("recorder.audio.push-to-talk"),
+        HotkeyAction.Draw => Say("recorder.hotkeys.draw"),
         _ => Say("recorder.hotkeys.replay-save")
     };
 
@@ -248,6 +249,7 @@ internal partial class RecorderView
             var name = new SarilanMetin { Text = label, Theme = HotkeyTheme("Body"), TextWrapping = TextWrapping.Wrap, VerticalAlignment = VerticalAlignment.Center };
             var slot = new ShortcutSlot(ShortcutMap.Player, action.ToString(), PlayerInput.OnKey(fallback.Key, fallback.Modifiers), PlayerInput.OnKey(binding.Key, binding.Modifiers), label);
             var box = new ShortcutKeyButton(slot, HotkeyTheme("ShortcutKeyButton"), HotkeyTheme("MonoValue")) { VerticalAlignment = VerticalAlignment.Center };
+            if (action == HotkeyAction.Draw) ToolTip.SetTip(name, Core.Bicim.Satir.Bagla(Say("recorder.sketch.tools")));
             box.Captured += (_, input) =>
             {
                 if (input.Kind == PlayerInputKind.Key) AssignHotkey(action, input.Key, input.Modifiers);
@@ -298,6 +300,7 @@ internal partial class RecorderView
         HotkeyAction.ReplaySave => ReplayRunning,
         HotkeyAction.Chapter => CanMarkChapter,
         HotkeyAction.PushToTalk => false,
+        HotkeyAction.Draw => HasSession,
         _ => action is not (HotkeyAction.Stop or HotkeyAction.Discard) || HasSession || CountingDown
     };
 
@@ -313,6 +316,7 @@ internal partial class RecorderView
             case HotkeyAction.Discard: await DiscardAsync(); break;
             case HotkeyAction.ReplaySave: await SaveReplayAsync(); break;
             case HotkeyAction.Chapter: MarkChapter(); break;
+            case HotkeyAction.Draw: ToggleSketch(); break;
         }
 
         return true;

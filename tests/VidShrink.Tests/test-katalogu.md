@@ -423,3 +423,6 @@
 - `KayitGecmisiTests.cs` — kaydedicinin son kayıtları (`RecentRecordings`, `RecordingHistoryWindow`): yalnız `kayit_*`
   kayıtları en yenisi başta, süre ve küçük resim sonradan, çöpe taşınan düşer, taşınamayan kalır, klasörden kalkmış kayıt
   oynatıcıya verilmez, kaydedici düğmesi ayardaki klasörü okur. Önek ve varlık denetimi mutasyonu üç testi kırıyor.
+- `EkranaCizimTests.cs` — ekrana çizim (`ScreenSketch`, `RecorderSketch`): iz modeli, geri alma ve numara sırası, kutu ve
+  ok başı geometrisi, Ctrl+F2 varsayılanı ve yedi eylemli eski ayar, kayıtsız basış. Gerçek pencerede Windows isabet testi
+  çizim kipinde pencereyi, geçiş kipinde alttakini bulur; kutu pencerenin kendi çiziminde görünür. Geçiş biçimi mutasyonu kırıyor.

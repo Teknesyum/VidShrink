@@ -168,6 +168,8 @@
   "recorder.hotkeys.rejected": "Impossibile registrare {0}; è in uso da un'altra applicazione o dal sistema.",
   "recorder.hotkeys.unsupported": "Questo tasto non può essere una scorciatoia globale. Usa un tasto funzione, oppure una lettera o una cifra con Ctrl o Alt.",
   "recorder.hotkeys.chapter": "Segna un capitolo",
+  "recorder.hotkeys.draw": "Disegna sullo schermo",
+  "recorder.sketch.tools": "Disegna sullo schermo durante la registrazione. P penna, A freccia, B riquadro, N numero, T testo; Ctrl+Z annulla, Delete cancella tutto, Esc cancella e chiude. Premi di nuovo la scorciatoia per lasciare il disegno sullo schermo e passare il mouse all'app sottostante.",
   "recorder.chapter.marked": "Capitolo {0} segnato",
   "recorder.chapter.title": "Capitolo {0}",
   "recorder.chapter.unsupported": "Questo formato non supporta i capitoli; i segni di capitolo non sono stati scritti.",

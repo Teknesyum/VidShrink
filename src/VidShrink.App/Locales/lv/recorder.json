@@ -168,6 +168,8 @@
   "recorder.hotkeys.rejected": "{0} neizdevās reģistrēt; to izmanto cita lietotne vai sistēma.",
   "recorder.hotkeys.unsupported": "Šis taustiņš nevar būt globāla saīsne. Izmantojiet funkciju taustiņu vai burtu vai ciparu kopā ar Ctrl vai Alt.",
   "recorder.hotkeys.chapter": "Atzīmēt nodaļu",
+  "recorder.hotkeys.draw": "Zīmēt uz ekrāna",
+  "recorder.sketch.tools": "Ierakstīšanas laikā zīmē uz ekrāna. P pildspalva, A bultiņa, B rāmis, N numurs, T teksts; Ctrl+Z atsauc, Delete notīra, Esc izdzēš un aizver. Vēlreiz nospiediet saīsni, lai zīmējums paliktu uz ekrāna un pele pāriet zemāk esošajai lietotnei.",
   "recorder.chapter.marked": "{0}. nodaļa atzīmēta",
   "recorder.chapter.title": "{0}. nodaļa",
   "recorder.chapter.unsupported": "Šis formāts neatbalsta nodaļas; nodaļu atzīmes netika ierakstītas.",

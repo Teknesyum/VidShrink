@@ -168,6 +168,8 @@
   "recorder.hotkeys.rejected": "{0} kunne ikke registreres; et annet program eller systemet bruker tasten.",
   "recorder.hotkeys.unsupported": "Denne tasten kan ikke være en global hurtigtast. Bruk en funksjonstast, eller en bokstav eller et tall sammen med Ctrl eller Alt.",
   "recorder.hotkeys.chapter": "Merk et kapittel",
+  "recorder.hotkeys.draw": "Tegn på skjermen",
+  "recorder.sketch.tools": "Tegner på skjermen under opptak. P penn, A pil, B boks, N nummer, T tekst; Ctrl+Z angrer, Delete tømmer, Esc sletter og lukker. Trykk snarveien igjen for å beholde tegningen på skjermen og gi musen videre til appen under.",
   "recorder.chapter.marked": "Kapittel {0} merket",
   "recorder.chapter.title": "Kapittel {0}",
   "recorder.chapter.unsupported": "Dette formatet støtter ikke kapitler; kapittelmerkene ble ikke skrevet.",

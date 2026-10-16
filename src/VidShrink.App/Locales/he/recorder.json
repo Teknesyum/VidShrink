@@ -168,6 +168,8 @@
   "recorder.hotkeys.rejected": "לא ניתן היה לרשום את {0}; אפליקציה אחרת או המערכת משתמשת בו.",
   "recorder.hotkeys.unsupported": "מקש זה אינו יכול לשמש קיצור דרך גלובלי. השתמש במקש פונקציה, או באות או ספרה יחד עם Ctrl או Alt.",
   "recorder.hotkeys.chapter": "סמן פרק",
+  "recorder.hotkeys.draw": "ציור על המסך",
+  "recorder.sketch.tools": "מצייר על המסך בזמן ההקלטה. P עט, A חץ, B תיבה, N מספר, T טקסט; Ctrl+Z מבטל, Delete מנקה, Esc מוחק וסוגר. לחצו שוב על הקיצור כדי להשאיר את הציור על המסך ולהעביר את העכבר ליישום שמתחת.",
   "recorder.chapter.marked": "פרק {0} סומן",
   "recorder.chapter.title": "פרק {0}",
   "recorder.chapter.unsupported": "תבנית זו אינה תומכת בפרקים; סימוני הפרקים לא נכתבו.",

@@ -13,6 +13,9 @@ ship as part of it.
   cannot be read, whose source changed or that fails does not stop the rest, and its row says why.
 - Recorder: "Recent Recordings" lists the recordings in the recording folder with thumbnail, duration, size and date;
   a recording opens in the player, shows in its folder, is shared or moves to the trash (never deleted outright).
+- Recorder: draw on screen while recording (Ctrl+F2, reassignable). Pen, arrow, box, numbered marker and text land in
+  the recording; pressing the shortcut again keeps the drawing on screen and passes the mouse to the app underneath,
+  Ctrl+Z undoes, Esc erases and closes. The drawing closes when the recording ends.
 
 ### Fixed
 
