@@ -61,7 +61,7 @@ public partial class MainWindow
     {
         var time = new TextBox
         {
-            Text = start.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture),
+            Text = Saat.Ekran(start, TimeSpan.FromHours(1)),
             Width = (double)this.FindResource("NumberBoxWidth")!
         };
         Avalonia.Automation.AutomationProperties.SetName(time, Say("main.convert.chapters.time"));
