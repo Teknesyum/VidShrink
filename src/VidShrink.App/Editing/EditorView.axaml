@@ -452,6 +452,7 @@
                   <MenuItem x:Name="MnuAddSource" Header="{loc:Text editor.source.add}"/>
                   <MenuItem x:Name="MnuProjectSave" Header="{loc:Text editor.project.save}"/>
                   <MenuItem x:Name="MnuProjectOpen" Header="{loc:Text editor.project.open}"/>
+                  <MenuItem x:Name="MnuBatchExport" Header="{loc:Text editor.batch.open}"/>
                   <MenuItem x:Name="MnuCutListExport" Header="{loc:Text editor.cutlist.export}"/>
                   <MenuItem x:Name="MnuCutListImport" Header="{loc:Text editor.cutlist.import}"/>
                   <MenuItem x:Name="MnuSubtitleImport" Header="{loc:Text editor.subtitle.import}"/>

@@ -15,6 +15,7 @@ namespace VidShrink.App.Yazi;
 /// yuvarlaması ölçünün kayan nokta artığını siliyor (588,0000000000003 → 588), ölçek 1'de tam
 /// sayı genişlikte satır kırıcı kendi toplamıyla sınırı aşabiliyor. Kutu bir satırlık
 /// yüksekliğe göre kurulduğu için alt satıra düşen sözcük yerleşimden düşüyor, görünmez oluyordu.
+/// <para>Avalonia kaydı: https://github.com/AvaloniaUI/Avalonia/issues/22493 (12.1.4 de kusurlu).</para>
 /// <para>Düzeltme yalnız yerleşimde: metin ölçtüğü genişlikte yerleşir ve taşıdığı karakter azalırsa iç yerleşim
 /// <see cref="Pay"/> kadar geniş kurulur. İstenen boyut değişmez; düzen pimleri kıpırdamaz,
 /// ortalanmış metin yalnız kusurlu durumda yarım piksel kayar.</para>

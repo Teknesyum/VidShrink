@@ -7,6 +7,11 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Added
+
+- Editor: "Batch Export…" in the timeline menu exports several saved projects one after another; a project that
+  cannot be read, whose source changed or that fails does not stop the rest, and its row says why.
+
 ### Fixed
 
 - Wrapped text no longer loses its last word when it is laid out at exactly the width it measured

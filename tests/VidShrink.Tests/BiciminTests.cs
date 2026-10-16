@@ -1348,9 +1348,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3789, toplam);
-        Assert.Equal(364, dilBasina["en"]);
-        Assert.Equal(123, dilBasina["tr"]);
+        Assert.Equal(3808, toplam);
+        Assert.Equal(367, dilBasina["en"]);
+        Assert.Equal(124, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1625,6 +1625,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-16, later 41 ve 57 birlesmesinden sonra: hizli kirpma metinleri toplam 3781 + 2 = 3783, gezilen 80453 + 387 = 80840; elle kirpma anahtarlari gezilen 80840 + 86 = 80926; en 364, tr 123 degismedi.</para>
     /// <para>2026-10-16, later 44 birlesmesinden sonra: etiket ve onar metinleri toplam 3783 + 2 = 3785, gezilen 80926 + 774 = 81700; en 364, tr 123 degismedi.</para>
     /// <para>2026-10-16, Linux turu birlesmesinden sonra: Wayland metni toplam 3785 + 4 = 3789, gezilen 81700 + 86 = 81786; en 364, tr 123 degismedi.</para>
+    /// <para>2026-10-16, toplu teslim (later 40): sekiz yeni anahtar (<c>editor.batch.*</c>) 42 dilde, dusen yok; olculen toplam 3789 + 19 = 3808, en 364 + 3 = 367, tr 123 + 1 = 124, gezilen 81786 + 344 = 82130.</para>
     /// <para>2026-10-16, later 44 (etiket ve Onar): on sekiz yeni anahtar; olculen toplam 3781 + 2 = 3783 (lt main.convert.tags.cover.none, ro main.convert.tags.year), en 364, tr 123, gezilen 80453 + 774 = 81227.</para>
     /// <para>2026-10-15, uzun iste oncelik ve bitis sesi (later 76): dort yeni anahtar (<c>settings-tab.encode-priority.above-normal</c>, <c>settings-tab.finish-sound-file.choose</c>, <c>.hint</c>, <c>.reset</c>) 42 dilde, dusen yok; olculen gezilen 78604 + 172 = 78776.</para>
     /// <para>2026-10-15, bas konus (later 68): iki yeni anahtar (<c>recorder.audio.push-to-talk</c>, <c>.hint</c>), dusen yok; olculen 78604 + 43 x 2 = 78690. <c>kayip</c> 0.</para>
@@ -1661,7 +1662,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(81786, gezilen);
+        Assert.Equal(82130, gezilen);
         Assert.Empty(kayip);
     }
 

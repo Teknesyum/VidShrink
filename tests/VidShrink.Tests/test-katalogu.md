@@ -417,3 +417,6 @@
 - `SarilanMetinTests.cs` — `SarilanMetin` doğal genişliğinde yerleşince karakter düşürmüyor: fi 14/1.25, fi 16/1.5,
   id 14/2.0 kollarında düz `TextBlock` son sözcüğü kaybediyor (negatif kontrol), `SarilanMetin` ölçüdeki karakter
   sayısını taşıyor. `Pay = 0` mutasyonu üç kolu da kırıyor.
+- `TopluTeslimTests.cs` — düzenleyicinin toplu teslimi (`EditBatch`, `EditBatchWindow`): bozuk, eskimiş ve ters klip
+  sınırını aşan proje sırayı durdurmuyor, çıktı adı komut satırı kuralı, iptal kalanı iptal sayıyor, aynı proje iki kez
+  eklenmiyor, pencerede düşen satırın ipucu yerel neden. Hazırlık ve koşu sahte; düşüşte `break` mutasyonu iki testi kırıyor.

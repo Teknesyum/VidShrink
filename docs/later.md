@@ -15,7 +15,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 13 Ekim 2026 · "bulduklarını later a eklersin" · DZA-P9 · Düzenleyici · iş orta · öncelik 1 · karar gerekmez
 
 - İlk adım 16 Ekim 2026'da main'de: `vidshrink teslim <proje>` pencere açmadan proje dosyasını teslim ediyor (`src/VidShrink.Cli/CliEdit.cs`, `EditProject.ToJob`).
-- Kalan (DZA-09 Toplu teslim): düzenleyiciye proje ve dosya sırası gelir; sıra Küçült'ün iş pompasıyla (`src/VidShrink.Core/JobPump.cs`) art arda koşar, bir işin düşmesi ötekileri durdurmaz. Doğrulama: sahte teslimle sıra testi.
+- Toplu teslim (DZA-09) 16 Ekim 2026'da main'de: düzenleyici sağ tık menüsünde "Toplu Teslim…" (`EditBatch`, `EditBatchWindow`); projeler komut satırı yoluyla sırayla teslim edilir, düşen proje ötekini durdurmaz.
 - Ölçülmeyen: komut satırı tesliminde hızlı ve akıllı kip, çok kaynaklı ve müzikli proje uçtan uca gerçek ffmpeg ile.
 
 ## 41. Kayıt Geçmişi

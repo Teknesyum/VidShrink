@@ -43,6 +43,7 @@ internal partial class EditorView
         CmbExportMode.SelectionChanged += (_, _) => MarkEdited();
         MnuProjectSave.Click += (_, _) => _ = SaveProjectClickedAsync();
         MnuProjectOpen.Click += (_, _) => _ = OpenProjectClickedAsync();
+        MnuBatchExport.Click += (_, _) => _ = BatchExportClickedAsync();
         MnuCutListExport.Click += (_, _) => _ = ExportCutListClickedAsync();
         MnuCutListImport.Click += (_, _) => _ = ImportCutListClickedAsync();
         TimelineMenu.Opening += (_, _) =>
@@ -241,6 +242,22 @@ internal partial class EditorView
             FileTypeFilter = new[] { ProjectFileType() }
         }).ConfigureAwait(true);
         if (files.Count > 0 && files[0].TryGetLocalPath() is { } path) await OpenProjectAsync(path).ConfigureAwait(true);
+    }
+
+    /// <summary>DZA-09: seçilen proje dosyalarını toplu teslim penceresinde açar; testler açıcıyı değiştirir.</summary>
+    internal Action<IReadOnlyList<string>>? BatchExportOpener { get; set; }
+
+    private async Task BatchExportClickedAsync()
+    {
+        if (TopLevel.GetTopLevel(this)?.StorageProvider is not { } storage) return;
+        var files = await storage.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = Strings.Get("editor.batch.add"),
+            AllowMultiple = true,
+            FileTypeFilter = new[] { ProjectFileType() }
+        }).ConfigureAwait(true);
+        var paths = files.Select(file => file.TryGetLocalPath()).OfType<string>().ToArray();
+        if (paths.Length > 0) (BatchExportOpener ?? (chosen => new EditBatchWindow(chosen).Show()))(paths);
     }
 
     private static FilePickerFileType ProjectFileType()
