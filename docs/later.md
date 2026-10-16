@@ -34,7 +34,8 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.App/Recorder/, src/VidShrink.App/Recorder/CaptureAffinity.cs, src/VidShrink.App/Recorder/RecorderView.Kisayol.cs, src/VidShrink.App/Recorder/RecorderSettings.cs, src/VidShrink.App/Locales/
 - Adım 1 (çizim) 16 Ekim 2026'da main'de: `ScreenSketch`, `RecorderSketch`, kısayol Ctrl+F2 (`EkranaCizimTests`).
 - Adım 2 (prompter) 16 Ekim 2026'da main'de: kaydedicide "Prompter" (`RecorderPrompter`, `PrompterScroll`); kayıttan çıkarılır, çıkarılamazsa pencerede uyarı; kayıt başlayınca akar, duraklayınca durur; yedi hız basamağı, metin ve hız ayarda (`PrompterTests`).
-- Açık kalan: prompter ayna (yansıtılmış metin) ve yazı boyu seçimi yok, okuma çizgisi yok. Çizimde: araç paleti yok (araçlar tuşla), renk tek (palet NeonEmber), çoklu ekranda yalnız kayıt bölgesi kaplanır.
+- Prompter görünümü 16 Ekim 2026'da main'de: ayna, ortada okuma çizgisi, üç basamaklı yazı boyu (belirteçlerden), ayarda (`PrompterLook`, `PrompterTests.AynaCizgiVeYaziBoyuUygulanirAyaraYazilir`).
+- Açık kalan: çizimde araç paleti yok (araçlar tuşla), renk tek (palet NeonEmber), çoklu ekranda yalnız kayıt bölgesi kaplanır.
 - Plan: Çizim için ekranı kaplayan saydam bir pencere açılır; kısayolla çizim kipine girilir, kalem, ok, kutu, numara ve yazı çizilir, pencere kayda girer. Prompter (konuşma metnini akıtan pencere) ayrı penceredir ve `CaptureAffinity.Exclude` ile kayıttan çıkarılır; Windows 10 2004 öncesinde pencere kayıttan çıkmadığı için orada uyarı gösterilir (CaptureAffinity.cs:16-20). İki adımda teslim edilebilir: önce çizim, sonra prompter. Çizim araçları başsız pencere testiyle, kayıttan çıkarma bayrağı pencere başına ölçülür.
 
 ## 44. Bölüm Düzenleyici

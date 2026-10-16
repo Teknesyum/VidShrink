@@ -172,6 +172,66 @@ public sealed class PrompterTests
     }
 
     [Fact]
+    public void GorunumBasamaklariUclardaDurur()
+    {
+        var gorunum = new PrompterLook();
+        Assert.Equal((false, true, PrompterLook.DefaultSize, false), (gorunum.Mirror, gorunum.Line, gorunum.Size, gorunum.CanGrow));
+        Assert.Same(gorunum, gorunum.Larger());
+        var kucuk = gorunum.Smaller().Smaller();
+        Assert.Equal((0, false), (kucuk.Size, kucuk.CanShrink));
+        Assert.Same(kucuk, kucuk.Smaller());
+        Assert.Equal(PrompterLook.DefaultSize, PrompterLook.ClampSize(PrompterLook.SizeCount));
+        Assert.Equal(PrompterLook.DefaultSize, PrompterLook.ClampSize(-1));
+    }
+
+    [Fact]
+    public void AynaCizgiVeYaziBoyuUygulanirAyaraYazilir()
+    {
+        using var ayar = new KaydediciAyarTests.OzelAyar();
+        var kayit = RecorderSettings.Load(ayar.Yol);
+        Assert.Equal(new PrompterLook(), kayit.PrompterLook);
+        kayit.PrompterText = UzunMetin;
+        kayit.Save(ayar.Yol);
+
+        var olcu = AppHost.Run(() =>
+        {
+            var view = new RecorderView(ayar.Yol);
+            var pencere = view.ShowPrompter();
+            try
+            {
+                pencere.Read();
+                Dispatcher.UIThread.RunJobs();
+                var buyuk = (pencere.Lines.FontSize, pencere.ReadingLine.IsVisible, pencere.Lines.RenderTransform is null, pencere.BtnLargerText.IsEnabled);
+                pencere.Measure();
+                var buyukUzunluk = pencere.Scroll.Extent;
+
+                pencere.SetLook(pencere.Look.Smaller().Smaller());
+                pencere.ChkMirror.IsChecked = true;
+                pencere.ChkLine.IsChecked = false;
+                Dispatcher.UIThread.RunJobs();
+                pencere.UpdateLayout();
+                pencere.Measure();
+                var ayna = pencere.Lines.RenderTransform is Avalonia.Media.ScaleTransform { ScaleX: -1, ScaleY: 1 };
+                var kucuk = (pencere.Lines.FontSize, pencere.ReadingLine.IsVisible, ayna, pencere.BtnSmallerText.IsEnabled, pencere.Scroll.Extent < buyukUzunluk);
+                return (buyuk, kucuk, Kucuk: (double)pencere.FindResource("FontSizeLg")!, Buyuk: (double)pencere.FindResource("FontSizeHero")!);
+            }
+            finally { pencere.Close(); }
+        });
+
+        Assert.Equal((olcu.Buyuk, true, true, false), olcu.buyuk);
+        Assert.Equal((olcu.Kucuk, false, true, false, true), olcu.kucuk);
+        Assert.Equal(new PrompterLook(Mirror: true, Line: false, Size: 0), RecorderSettings.Load(ayar.Yol).PrompterLook);
+
+        var acilis = AppHost.Run(() =>
+        {
+            var pencere = new RecorderView(ayar.Yol).ShowPrompter();
+            try { return (pencere.ChkMirror.IsChecked, pencere.ChkLine.IsChecked, pencere.Lines.FontSize); }
+            finally { pencere.Close(); }
+        });
+        Assert.Equal((true, false, olcu.Kucuk), acilis);
+    }
+
+    [Fact]
     public void BosMetinAkmaz()
     {
         var olcu = AppHost.Run(() =>

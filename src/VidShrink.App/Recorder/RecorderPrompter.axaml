@@ -26,12 +26,16 @@
                AcceptsReturn="True" TextWrapping="Wrap"
                auto:AutomationProperties.Name="{loc:Text recorder.prompter.placeholder}"/>
     </Grid>
-    <ScrollViewer Grid.Row="1" x:Name="Stage" IsVisible="False"
-                  HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden"
-                  auto:AutomationProperties.Name="{loc:Text recorder.prompter.title}">
-      <SarilanMetin x:Name="Lines" TextWrapping="Wrap"
-                    FontSize="{StaticResource RecorderPrompterFont}" FontWeight="SemiBold"/>
-    </ScrollViewer>
+    <Grid Grid.Row="1" x:Name="StageFrame" IsVisible="False">
+      <ScrollViewer x:Name="Stage"
+                    HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden"
+                    auto:AutomationProperties.Name="{loc:Text recorder.prompter.title}">
+        <SarilanMetin x:Name="Lines" TextWrapping="Wrap"
+                      FontSize="{StaticResource RecorderPrompterFont}" FontWeight="SemiBold"/>
+      </ScrollViewer>
+      <Border x:Name="ReadingLine" Height="{StaticResource RecorderPrompterLine}" VerticalAlignment="Center"
+              Background="{DynamicResource NeonBlue}" IsHitTestVisible="False"/>
+    </Grid>
     <SarilanMetin Grid.Row="2" Theme="{StaticResource Hint}" TextWrapping="Wrap"
                   Text="{loc:Text recorder.prompter.keys}"/>
     <WrapPanel Grid.Row="3">
@@ -51,6 +55,18 @@
       <Button x:Name="BtnEdit" Margin="{StaticResource WrapItemMargin}"
               Content="{loc:Text recorder.prompter.edit}"
               auto:AutomationProperties.Name="{loc:Text recorder.prompter.edit}"/>
+      <Button x:Name="BtnSmallerText" Margin="{StaticResource WrapItemMargin}"
+              Content="{loc:Text recorder.prompter.smaller-text}"
+              auto:AutomationProperties.Name="{loc:Text recorder.prompter.smaller-text}"/>
+      <Button x:Name="BtnLargerText" Margin="{StaticResource WrapItemMargin}"
+              Content="{loc:Text recorder.prompter.larger-text}"
+              auto:AutomationProperties.Name="{loc:Text recorder.prompter.larger-text}"/>
+      <CheckBox x:Name="ChkMirror" Margin="{StaticResource WrapItemMargin}" VerticalAlignment="Center"
+                Content="{loc:Text recorder.prompter.mirror}"
+                auto:AutomationProperties.Name="{loc:Text recorder.prompter.mirror}"/>
+      <CheckBox x:Name="ChkLine" Margin="{StaticResource WrapItemMargin}" VerticalAlignment="Center"
+                Content="{loc:Text recorder.prompter.line}"
+                auto:AutomationProperties.Name="{loc:Text recorder.prompter.line}"/>
     </WrapPanel>
   </Grid>
 </Window>

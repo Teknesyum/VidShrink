@@ -435,4 +435,6 @@
 - `PrompterTests.cs` — prompter (`PrompterScroll`, `RecorderPrompter`): hız basamakları ve uçlar, sona varınca durma ve
   sondan başa sarma, ayarda metin ve hız (geçersiz basamak varsayılana). Gerçek pencere `GetWindowDisplayAffinity` 0x11
   okur (negatif kontrol 0, uyarı satırı görünür); akış saatle değil `Advance`'a verilen zamanla ölçülür, tuşlar ve
-  düzenleme kipi; kaydediciye bağ kenarda bir kez, elle durdurulan akış ezilmez. Kenar ve eşzamanlı ölçü mutasyonları kırıyor. Dosya bırakmaz.
+  düzenleme kipi; kaydediciye bağ kenarda bir kez, elle durdurulan akış ezilmez. Görünüm (`PrompterLook`): ayna
+  `ScaleTransform(-1,1)`, okuma çizgisi, yazı boyu belirteçten ve küçülünce kayma boyu kısalır; ayara yazılıp yeniden
+  açılışta geri gelir. Kenar, eşzamanlı ölçü ve ayna mutasyonları kırıyor. Dosya bırakmaz.

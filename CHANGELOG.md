@@ -19,6 +19,8 @@ ship as part of it.
 - Recorder: a prompter window scrolls your script while you record. It is hidden from the recording (Windows 10 2004
   and later; elsewhere it says it will show), starts scrolling when the recording starts and stops when it pauses;
   seven speeds, Space, the arrow keys and Home; the script and speed are remembered.
+  It can mirror the text for a glass reflector, show a reading line across the middle and switch between three
+  text sizes; these are remembered too.
 - Convert: "Chapters…" edits the output's chapter list. It fills with the source's chapters; add, rename or remove
   them, or remove them all for an output without chapters. Left untouched, the source's chapters are carried as before.
   In a trimmed output the chapters shift with the trim. MP4, MKV and MOV.

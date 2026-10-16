@@ -23,7 +23,12 @@ internal partial class RecorderView
             return open;
         }
 
-        var window = new RecorderPrompter(_settings.PrompterText, _settings.PrompterStep);
+        var window = new RecorderPrompter(_settings.PrompterText, _settings.PrompterStep, _settings.PrompterLook);
+        window.LookChanged += look =>
+        {
+            _settings.PrompterLook = look;
+            _settings.Save(_settingsPath);
+        };
         window.Saved += (text, step) =>
         {
             if (_settings.PrompterText == text && _settings.PrompterStep == step) return;

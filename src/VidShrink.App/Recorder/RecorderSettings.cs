@@ -83,6 +83,9 @@ internal sealed class RecorderSettings
 
     internal int PrompterStep { get; set; } = PrompterScroll.DefaultStep;
 
+    /// <summary>Prompter'ın okuma kipindeki ayna, okuma çizgisi ve yazı boyu.</summary>
+    internal PrompterLook PrompterLook { get; set; } = new();
+
     internal bool ClickSound { get; set; }
 
     internal bool ShowKeys { get; set; }
@@ -312,6 +315,8 @@ internal sealed class RecorderSettings
             settings.ShowClicks = (bool?)root["showClicks"] ?? false;
             settings.PrompterText = (string?)root["prompterText"] ?? string.Empty;
             settings.PrompterStep = PrompterScroll.ClampStep((int?)root["prompterStep"] ?? PrompterScroll.DefaultStep);
+            settings.PrompterLook = new PrompterLook((bool?)root["prompterMirror"] ?? false, (bool?)root["prompterLine"] ?? true,
+                PrompterLook.ClampSize((int?)root["prompterSize"] ?? PrompterLook.DefaultSize));
             settings.ClickSound = (bool?)root["clickSound"] ?? false;
             settings.ShowKeys = (bool?)root["showKeys"] ?? false;
             settings.KeysShortcutsOnly = (bool?)root["keysShortcutsOnly"] ?? true;
@@ -447,6 +452,9 @@ internal sealed class RecorderSettings
                 writer.WriteBoolean("showClicks", ShowClicks);
                 writer.WriteString("prompterText", PrompterText);
                 writer.WriteNumber("prompterStep", PrompterStep);
+                writer.WriteBoolean("prompterMirror", PrompterLook.Mirror);
+                writer.WriteBoolean("prompterLine", PrompterLook.Line);
+                writer.WriteNumber("prompterSize", PrompterLook.Size);
                 writer.WriteBoolean("clickSound", ClickSound);
                 writer.WriteBoolean("showKeys", ShowKeys);
                 writer.WriteBoolean("keysShortcutsOnly", KeysShortcutsOnly);

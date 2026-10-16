@@ -14,19 +14,30 @@ namespace VidShrink.App.Recorder;
 /// çıkarılır; çıkarılamadıysa (Windows 10 2004 öncesi, Windows dışı) pencerenin üstünde kayda gireceği yazılır.
 /// İki kipi var: düzenleme kipinde metin yazılır, okuma kipinde büyük yazıyla akar. Boşluk akıtır ya da durdurur,
 /// yukarı ve aşağı ok hızı değiştirir, Home başa döner; kayıt başlayınca kaydedici <see cref="Start"/>'ı çağırır.
+/// Okuma kipinin görünümü (<see cref="PrompterLook"/>): ayna, ortadaki okuma çizgisi ve üç basamaklı yazı boyu.
 /// </summary>
 internal sealed partial class RecorderPrompter : Window
 {
     private readonly DispatcherTimer _timer;
     private readonly Stopwatch _clock = new();
 
+    private static readonly string[] SizeKeys = { "RecorderPrompterFontSm", "RecorderPrompterFontMd", "RecorderPrompterFont" };
+
     public RecorderPrompter() : this(string.Empty, PrompterScroll.DefaultStep)
     {
     }
 
-    internal RecorderPrompter(string text, int step)
+    internal RecorderPrompter(string text, int step, PrompterLook? look = null)
     {
         InitializeComponent();
+        Look = look ?? new PrompterLook();
+        ChkMirror.IsChecked = Look.Mirror;
+        ChkLine.IsChecked = Look.Line;
+        ApplyLook();
+        ChkMirror.IsCheckedChanged += (_, _) => SetLook(Look with { Mirror = ChkMirror.IsChecked == true });
+        ChkLine.IsCheckedChanged += (_, _) => SetLook(Look with { Line = ChkLine.IsChecked == true });
+        BtnSmallerText.Click += (_, _) => SetLook(Look.Smaller());
+        BtnLargerText.Click += (_, _) => SetLook(Look.Larger());
         Script.Text = text;
         Scroll.SetStep(step);
         _timer = new DispatcherTimer(TimeSpan.FromMilliseconds(16), DispatcherPriority.Render, (_, _) => Advance(_clock.Elapsed));
@@ -63,7 +74,32 @@ internal sealed partial class RecorderPrompter : Window
 
     internal string Text => Script.Text ?? string.Empty;
 
-    internal bool Reading => Stage.IsVisible;
+    internal bool Reading => StageFrame.IsVisible;
+
+    internal PrompterLook Look { get; private set; }
+
+    /// <summary>Görünüm değişti; kaydedici ayara yazar.</summary>
+    internal event Action<PrompterLook>? LookChanged;
+
+    internal void SetLook(PrompterLook look)
+    {
+        if (look == Look) return;
+        Look = look with { Size = PrompterLook.ClampSize(look.Size) };
+        ChkMirror.IsChecked = Look.Mirror;
+        ChkLine.IsChecked = Look.Line;
+        ApplyLook();
+        LookChanged?.Invoke(Look);
+    }
+
+    private void ApplyLook()
+    {
+        Lines.FontSize = (double)this.FindResource(SizeKeys[PrompterLook.ClampSize(Look.Size)])!;
+        Lines.RenderTransform = Look.Mirror ? new Avalonia.Media.ScaleTransform(-1, 1) : null;
+        ReadingLine.IsVisible = Look.Line;
+        BtnSmallerText.IsEnabled = Look.CanShrink;
+        BtnLargerText.IsEnabled = Look.CanGrow;
+        if (Reading) Dispatcher.UIThread.Post(Measure);
+    }
 
     internal bool Ticking => _timer.IsEnabled;
 
@@ -93,7 +129,7 @@ internal sealed partial class RecorderPrompter : Window
         if (Reading) return;
         Lines.Text = Text;
         EditPane.IsVisible = false;
-        Stage.IsVisible = true;
+        StageFrame.IsVisible = true;
         Saved?.Invoke(Text, Scroll.Step);
         UpdateLayout();
         Measure();
@@ -103,7 +139,7 @@ internal sealed partial class RecorderPrompter : Window
     internal void Edit()
     {
         Scroll.Pause();
-        Stage.IsVisible = false;
+        StageFrame.IsVisible = false;
         EditPane.IsVisible = true;
         Script.Focus();
         Refresh();
