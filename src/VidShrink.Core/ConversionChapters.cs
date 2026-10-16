@@ -46,10 +46,26 @@ public static class ConversionChapters
         return chapters;
     }
 
+    /// <summary>
+    /// Kaynağın başlangıç zamanı bu kadardan büyükse liste el değmemiş olsa da ffmetadata'dan yazılır: ffmpeg
+    /// kendi taşırken bölümleri kaynağın başlangıcı kadar geri çekiyor, 10 sn'lik kaynakta altı bölümün altısı da düştü.
+    /// </summary>
+    public const double ShiftedStartSeconds = 0.001;
+
+    /// <summary>Bölümler ffmpeg'e bırakılmaz, uygulamanın yazdığı dosyadan eşlenir.</summary>
+    public static bool Writes(MediaInfo info, ConversionPlan plan)
+        => Carries(plan.Container) && Entries(info, plan) is not null;
+
+    private static IReadOnlyList<ChapterEntry>? Entries(MediaInfo info, ConversionPlan plan)
+        => plan.Chapters
+           ?? (Math.Abs(info.StartSeconds) > ShiftedStartSeconds && info.Chapters.Count > 0
+               ? info.Chapters.Select(c => new ChapterEntry(TimeSpan.FromSeconds(c.StartSeconds), c.Title ?? "")).ToArray()
+               : null);
+
     /// <summary>Plana göre ffmetadata metni; bölüm yazılmayacaksa <c>null</c>.</summary>
     public static string? Metadata(MediaInfo info, ConversionPlan plan)
     {
-        if (plan.Chapters is not { } entries || !Carries(plan.Container)) return null;
+        if (!Carries(plan.Container) || Entries(info, plan) is not { } entries) return null;
         var chapters = ForOutput(entries, TimeSpan.FromSeconds(info.DurationSeconds), plan.Start, plan.End);
         return chapters.Count == 0 ? null : RecorderChapters.Metadata(chapters);
     }

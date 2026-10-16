@@ -44,7 +44,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 - Etiketler ve "Onar" hazır ayarı 16 Ekim 2026'da main'de (`MainWindow.DonusturEtiket.cs`).
 - Bölüm listesi (ARC-15, DON-30) 16 Ekim 2026'da main'de: Dönüştür'de "Bölümler…" açılırı (`MainWindow.DonusturBolum.cs`), hesap `Core/ConversionChapters.cs`, ffmetadata metni kaydedicinin `RecorderChapters.Metadata`'sından. ffprobe ile okunarak doğrulandı (`BolumDuzenleyiciTests`).
-- Açık kalanlar: etiketler ve bölümler ayara yazılmıyor, komut satırı yüzü yok, Onar gerçek bozuk dosyada ölçülmedi; bölüm başlangıcı kaynağın `start_time`'ı sıfır değilse ona göre kaydırılmıyor.
+- Açık kalanlar: etiketler ve bölümler ayara yazılmıyor, komut satırı yüzü yok, Onar gerçek bozuk dosyada ölçülmedi. Kapandı: başlangıcı kaymış kaynakta (`start_time` ≠ 0) ffmpeg bölümlerin hepsini düşürüyordu; el değmemiş liste artık ffmetadata'dan yazılıyor (`BolumDuzenleyiciTests.BaslangiciKaymisKaynaginBolumleriDusmez`).
 
 ## 50. Mac Ortam Denetimi Bağlantısı
 

@@ -169,7 +169,7 @@ public static class ConversionArguments
             coverMap = coverInput.ToString(CultureInfo.InvariantCulture) + ":v:0";
         }
         string? chapterMap = null;
-        if (plan.Chapters is not null && ConversionChapters.Carries(plan.Container))
+        if (ConversionChapters.Writes(info, plan))
         {
             if (ConversionChapters.Metadata(info, plan) is null) chapterMap = "-1";
             else

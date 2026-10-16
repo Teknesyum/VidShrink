@@ -63,6 +63,12 @@ public sealed record MediaInfo
     public IReadOnlyList<ChapterMark> Chapters { get; init; } = Array.Empty<ChapterMark>();
 
     /// <summary>
+    /// ffprobe'un kap <c>start_time</c>'i (saniye). Sifir degilse ffmpeg kaynagin bolumlerini kendisi tasirken
+    /// bu kadar geri ceker ve sifirin altina dusenleri atar; <see cref="ConversionChapters.Metadata"/> bunu onler.
+    /// </summary>
+    public double StartSeconds { get; init; }
+
+    /// <summary>
     /// Kaynaktaki basliklar, dosyadaki sirayla. Duz dosyada tek ogeli; cok programli bir
     /// yayinda her program bir baslik. Bos kalmaz — yoklama en az bir baslik doldurur,
     /// boylece "baslik var mi" sorusu <see cref="HasMultipleTitles"/> ile tek yerde sorulur.

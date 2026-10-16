@@ -128,6 +128,45 @@ public sealed class BolumDuzenleyiciTests
     }
 
     /// <summary>
+    /// Kaynağın başlangıcı 10 sn'de: ffmpeg bölümleri kendisi taşırken o kadar geri çekip hepsini düşürüyordu.
+    /// El değmemiş liste artık ffmetadata'dan yazılır; başlangıcı sıfır olan kaynakta komut eskisi gibi bölüme dokunmaz.
+    /// </summary>
+    [FfmpegFact]
+    public async Task BaslangiciKaymisKaynaginBolumleriDusmez()
+    {
+        var adlar = new[] { "bolum-kayik-kaynak.mkv", "bolum-kayik-bolum.txt", "bolum-kayik-cikti.mp4" };
+        Kapat(adlar);
+        try
+        {
+            var kaynak = Yol(adlar[0]);
+            var bolum = Yol(adlar[1]);
+            await File.WriteAllTextAsync(bolum, RecorderChapters.Metadata(new[]
+            {
+                new RecorderChapter(TimeSpan.Zero, TimeSpan.FromSeconds(3), "Bir"),
+                new RecorderChapter(TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(6), "Iki"),
+            }));
+            await AkisGirdisi.RunOrThrowAsync(ToolLocator.Ffmpeg, new[]
+            {
+                "-hide_banner", "-y", "-threads", "2",
+                "-f", "lavfi", "-i", "testsrc=size=160x120:rate=12:duration=6",
+                "-i", bolum, "-map", "0:v", "-map_chapters", "1", "-output_ts_offset", "10",
+                "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p", kaynak
+            });
+            var info = await FfprobeClient.ProbeAsync(kaynak);
+            Assert.Equal(10, info.StartSeconds, 1);
+            var plan = new ConversionPlan { Container = "mp4", VideoCodec = "libx264", Crf = 35, ExtraArgs = new[] { "-threads", "2" } };
+            Assert.Contains("ffmetadata", ConversionArguments.Build(info, plan, "c.mp4"));
+            Assert.DoesNotContain("-map_chapters", ConversionArguments.Build(info with { StartSeconds = 0 }, plan, "c.mp4"));
+
+            var cikti = Yol(adlar[2]);
+            await new EncodeRunner().ConvertAsync(info, plan, cikti, null);
+            Assert.Equal(new[] { (0d, "Bir"), (3d, "Iki") }, await BolumlerAsync(cikti));
+            Assert.False(File.Exists(ConversionChapters.MetadataPath(cikti)));
+        }
+        finally { Kapat(adlar); }
+    }
+
+    /// <summary>
     /// Pencere kolu: kaynağın iki bölümü satırlara dolar ve dokunulmadıkça komut <c>-map_chapters</c> taşımaz.
     /// Ad değişince komut ffmetadata girdisini alır, okunamayan zaman doğrulama hatası olur, satırların hepsi
     /// silinince <c>-map_chapters -1</c> yazılır. GIF'te açılır gizlenir ve komut bölüme dokunmaz; yeni kaynak

@@ -114,6 +114,7 @@ public static class FfprobeClient
             AudioChannels = audio is null ? 0 : GetInt(audio.Value, "channels") ?? 2,
             Streams = inventory,
             Chapters = chapters,
+            StartSeconds = ParseDouble(format, "start_time") ?? 0,
             Titles = titles
         };
     }
@@ -149,6 +150,7 @@ public static class FfprobeClient
             IsAudioOnly = true,
             Streams = inventory,
             Chapters = chapters,
+            StartSeconds = ParseDouble(format, "start_time") ?? 0,
             Titles = Basliklar(root, duration, (0, 0), inventory.Count, chapters.Count)
         };
     }

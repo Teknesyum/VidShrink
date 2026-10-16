@@ -27,6 +27,7 @@ ship as part of it.
 
 ### Fixed
 
+- Convert no longer loses every chapter of a source whose timeline does not start at zero; ffmpeg pulled them back by the start time and dropped them, so the app now writes them itself.
 - Wrapped text no longer loses its last word when it is laid out at exactly the width it measured
   (Avalonia rounding at 125/150/200% scaling); every text block in the app uses the corrected control.
 - Recorder: the click, click sound, keys and magnifier boxes followed two gates after the Linux merge; one gate now
