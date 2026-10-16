@@ -17,12 +17,13 @@ internal partial class RecorderView
     /// kancasına ve GDI ekran kopyasına dayanıyor; başka sistemde yerlerine sessiz boş
     /// uygulamalar geçiyor. Linux'ta dört kutu işaretlenebiliyor ama kayıtta hiçbir şey
     /// yapmıyordu; artık yalnız çalıştıkları yerde gösterilir.
+    /// <para>Boşken karar yakalama platformundan gelir (<see cref="HooksAvailable"/>); testler ikisini de zorlayabilir.</para>
     /// </summary>
-    internal static bool InputEffectsAvailable { get; set; } = OperatingSystem.IsWindows();
+    internal static bool? InputEffectsAvailable { get; set; }
 
     private void HideUnavailableInputOptions()
     {
-        if (InputEffectsAvailable) return;
+        if (InputEffectsAvailable ?? OperatingSystem.IsWindows()) return;
         ChkShowClicks.IsVisible = ChkClickSound.IsVisible = ChkShowKeys.IsVisible = ChkMagnifier.IsVisible = false;
     }
 
@@ -47,10 +48,10 @@ internal partial class RecorderView
     internal bool InputActive { get; private set; }
 
     /// <summary>Tıklama, tıklama sesi, tuş ve büyüteç Windows kancasıyla çalışıyor; öteki platformda kutular gizli, kayıtlı ayar işe geçmez.</summary>
-    private bool HooksAvailable => CapturePlatform == RecorderPlatform.Windows;
+    private bool HooksAvailable => InputEffectsAvailable ?? CapturePlatform == RecorderPlatform.Windows;
 
     /// <summary>macOS'ta tıklamayı kancasız ffmpeg işaretliyor (<c>-capture_mouse_clicks</c>); kutu yalnız orada da açık.</summary>
-    private bool ClicksAvailable => HooksAvailable || CapturePlatform == RecorderPlatform.MacOs;
+    private bool ClicksAvailable => HooksAvailable || (InputEffectsAvailable is null && CapturePlatform == RecorderPlatform.MacOs);
 
     private bool ClicksInCapture => CapturePlatform == RecorderPlatform.MacOs && ChkShowClicks.IsChecked == true;
 
