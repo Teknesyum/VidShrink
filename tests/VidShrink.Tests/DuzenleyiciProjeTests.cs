@@ -300,6 +300,7 @@ public sealed class DuzenleyiciProjeTests
                 KnownInfo = yol => new MediaInfo { FilePath = yol, FileSizeBytes = 16, DurationSeconds = 600, Width = 320, Height = 240, Fps = 30, VideoCodec = "h264", TotalBitrateBps = 1 },
                 Projects = depo,
                 AutosaveDelay = TimeSpan.FromMilliseconds(40),
+                PeakReader = (_, _) => Task.FromResult(AudioPeaks.Empty),
             };
             View.Player.EngineFactory = () => new KlipMotoru();
             View.OverlayRoot = Path.Combine(klasor, "katman");

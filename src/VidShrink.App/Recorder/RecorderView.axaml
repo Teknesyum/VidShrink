@@ -361,20 +361,22 @@
                  TextWrapping="Wrap"/>
     </Grid>
 
-    <Grid x:Name="RecoverRow" Classes="reveal" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceXs}" IsVisible="False">
-      <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}"
-            Stretch="Uniform" VerticalAlignment="Center"
-            Data="{StaticResource IconWarning}" Fill="{StaticResource TextBody}"/>
-      <TextBlock x:Name="TxtRecover" Grid.Column="1"
-                 Theme="{StaticResource StatusWarning}"
-                 VerticalAlignment="Center"
-                 TextWrapping="Wrap"/>
-      <Button x:Name="BtnRecover" Grid.Column="2"
-              Theme="{StaticResource GhostButton}"
-              Content="{loc:Text recorder.recover.action}"
-              auto:AutomationProperties.Name="{loc:Text recorder.recover.action}"
-              Click="OnRecover"/>
-    </Grid>
+    <Border x:Name="RecoverPanel" Classes="reveal-panel" Theme="{StaticResource Panel}" IsVisible="False">
+      <Grid x:Name="RecoverRow" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="{StaticResource SpaceXs}">
+        <Path Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}"
+              Stretch="Uniform" VerticalAlignment="Center"
+              Data="{StaticResource IconWarning}" Fill="{StaticResource TextBody}"/>
+        <TextBlock x:Name="TxtRecover" Grid.Column="1"
+                   Theme="{StaticResource StatusWarning}"
+                   VerticalAlignment="Center"
+                   TextWrapping="Wrap"/>
+        <Button x:Name="BtnRecover" Grid.Column="2"
+                Theme="{StaticResource GhostButton}"
+                Content="{loc:Text recorder.recover.action}"
+                auto:AutomationProperties.Name="{loc:Text recorder.recover.action}"
+                Click="OnRecover"/>
+      </Grid>
+    </Border>
 
     <TextBlock x:Name="TxtWizardSummary"
                Theme="{StaticResource Hint}"

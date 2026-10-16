@@ -111,9 +111,9 @@ internal partial class RecorderView
 
     private IReadOnlyList<string> _orphans = Array.Empty<string>();
 
-    internal bool RecoverVisible => RecoverRow.IsVisible;
+    internal bool RecoverVisible => RecoverPanel.IsVisible;
 
-    internal string RecoverText => RecoverRow.IsVisible ? TxtRecover.Text ?? string.Empty : string.Empty;
+    internal string RecoverText => RecoverPanel.IsVisible ? TxtRecover.Text ?? string.Empty : string.Empty;
 
     /// <summary>EKA-20: cikti klasorunde teslim edilmemis yakalama arar, varsa kurtarmayi onerir.</summary>
     internal void ScanOrphans(string folder)
@@ -131,7 +131,7 @@ internal partial class RecorderView
         TxtRecover.Text = found.Count == 0
             ? string.Empty
             : Say("recorder.recover.found", string.Join(", ", found.Select(Path.GetFileName)));
-        RecoverRow.IsVisible = found.Count > 0;
+        RecoverPanel.IsVisible = found.Count > 0;
     }
 
     /// <summary>
