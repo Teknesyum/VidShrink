@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.23] - 2026-10-16
+
 ### Added
 
 - Editor: "Batch Export…" in the timeline menu exports several saved projects one after another; a project that
