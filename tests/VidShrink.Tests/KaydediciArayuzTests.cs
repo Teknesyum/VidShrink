@@ -716,10 +716,8 @@ public sealed class KaydediciArayuzTests
         var (orta, kose) = AppHost.Run<(uint, uint)>(() =>
         {
             var renk = Avalonia.Media.Color.FromRgb(0xF0, 0x71, 0x78);
-            var simge = RecorderTray.Render(renk);
-            using var akis = new MemoryStream();
-            simge.Save(akis);
-            akis.Position = 0;
+            Assert.NotNull(RecorderTray.Render(renk));
+            using var akis = new MemoryStream(RecorderTray.RenderPng(renk));
             using var resim = Avalonia.Media.Imaging.WriteableBitmap.Decode(akis);
             using var kilit = resim.Lock();
             uint Oku(int x, int y) => (uint)System.Runtime.InteropServices.Marshal.ReadInt32(kilit.Address + y * kilit.RowBytes + x * 4);

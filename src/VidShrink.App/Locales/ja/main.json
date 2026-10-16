@@ -58,6 +58,7 @@
   "main.action.cancel.disabled-tip": "まだ実行中のジョブはありません",
   "main.action.shrink": "圧縮",
   "main.action.shrink.disabled-tip": "先に動画ファイルを読み込んでください",
+  "main.action.busy-tip": "ジョブを実行中です。終わるまで待つか、キャンセルしてください",
   "main.action.convert": "変換",
   "main.action.convert.disabled-tip": "先に動画ファイルを読み込んでください",
   "main.action.show-in-folder": "フォルダーで表示",
@@ -883,5 +884,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "除外: 対応していないコーデックです",
   "main.preset.handbrake.dropped.structural": "スキップ: HandBrake のリスト構造",
   "main.share.qr": "共有リンクの QR コード",
-  "main.share.qr-hint": "スマートフォンでスキャンするとリンクが開きます。"
+  "main.share.qr-hint": "スマートフォンでスキャンするとリンクが開きます。",
+  "main.startup.no-display": "VidShrink はグラフィカルディスプレイを開けませんでした。デスクトップセッションから起動してください。Wayland では Xwayland が必要です。"
 }

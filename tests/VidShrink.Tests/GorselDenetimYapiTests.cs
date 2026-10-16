@@ -354,6 +354,54 @@ public sealed class GorselDenetimYapiTests
         Assert.True(icerik <= gorus + 0.5, $"Katlı plan {icerik:0.#} px istiyor, görüş alanı {gorus:0.#} px; son satır kırpılıyor.");
     }
 
+    /// <summary>
+    /// Linux turu: plan tavanı özeti kesmez, yazı tipinden bağımsız. Linux'ta Tay yedeğinin satırı
+    /// (Noto Sans Thai 24,2 px, Loma 25,4; Latin 20,8) katlı özeti <c>PlanPanelMaxHeight</c>'ın üstüne
+    /// itiyor, özet kayıyordu (486/483, Loma'da 497/482). Burada özet <c>PlanFacts</c>'in alt payıyla
+    /// her yazı tipinde aynı yere itilir: katlıyken kaymaz ve panel tavanı aşar; gerekçeler açılınca
+    /// panel özetin boyunda durur, taşma yine <c>PlanScroll</c>'a düşer (tavan listeye bağlamaya devam
+    /// eder). Payısız eş belirtecin tavanında durur (olumsuz kontrol).
+    /// </summary>
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void PlanTavaniKatliOzetiKesmez(bool itilmis)
+    {
+        const double pay = 100;
+        var tavan = AppHost.Run(() =>
+        {
+            Assert.True(Application.Current!.TryFindResource("PlanPanelMaxHeight", out var deger));
+            return (double)deger!;
+        });
+        (double panel, double gorus, double icerik) Oku(MainWindow w)
+        {
+            var kaydirici = Ad<ScrollViewer>(w, "PlanScroll");
+            return (Ad<Border>(w, "PlanPanel").Bounds.Height, kaydirici.Viewport.Height, kaydirici.Extent.Height);
+        }
+        var (katli, acik) = Pencere(Dar, w =>
+        {
+            var k = Oku(w);
+            w.ExpandPlanReasons();
+            Yerlestir(w, Dar);
+            return (k, Oku(w));
+        }, sekme: 2, dil: "en", hazirla: w => { if (itilmis) w.FindControl<Control>("PlanFacts")!.Margin = new Thickness(0, 0, 0, pay); });
+
+        _output.WriteLine($"tavan {tavan:0.#}; katlı: panel {katli.panel:0.#}, görüş {katli.gorus:0.#}, içerik {katli.icerik:0.#}; "
+                          + $"açık: panel {acik.panel:0.#}, görüş {acik.gorus:0.#}, içerik {acik.icerik:0.#}");
+        Assert.True(katli.icerik <= katli.gorus + 0.5, $"Katlı özet {katli.icerik:0.#} px istiyor, görüş alanı {katli.gorus:0.#} px.");
+        Assert.True(acik.icerik > acik.gorus + 0.5, $"Açık gerekçeler ({acik.icerik:0.#}) görüş alanına ({acik.gorus:0.#}) sığdı; tavan bağlamıyor, ölçü kör.");
+        if (itilmis)
+        {
+            Assert.True(katli.panel > tavan + 0.5, $"İtilmiş özette panel {katli.panel:0.#}; tavanı ({tavan:0.#}) aşması bekleniyordu.");
+            Assert.Equal(katli.panel, acik.panel, 1);
+        }
+        else
+        {
+            Assert.True(katli.panel < tavan, $"Payısız özette panel {katli.panel:0.#}; içerik kadar, tavanın ({tavan:0.#}) altında bekleniyordu.");
+            Assert.Equal(tavan, acik.panel, 1);
+        }
+    }
+
     [Theory]
     [InlineData("ar", false)]
     [InlineData("fa", false)]
@@ -857,6 +905,37 @@ public sealed class GorselDenetimYapiTests
 
         Assert.True(pasif, "pasif düğmede ShowOnDisabled kapalı.");
         Assert.True(etkin, "pasif Dönüştür düğmesinin ipucu yok.");
+    }
+
+    /// <summary>
+    /// Linux turu: iş sürerken pasif Küçült/Dönüştür düğmesi "Önce bir video dosyası yükleyin"
+    /// diyordu, oysa video yüklüydü. Kodlama sürerken ipucu işin sürdüğünü söyler, iş bitince
+    /// eski ipucu geri gelir (olumsuz kontrol).
+    /// </summary>
+    [Fact]
+    public void KodlamaSurerkenPasifDugmeIsiSoyler()
+    {
+        var (kosarken, bitince) = Pencere(Dar, w =>
+        {
+            var baslat = w.FindControl<Button>("BtnStart")!;
+            var donustur = w.FindControl<Button>("BtnConvert")!;
+            // Gercek iste _cts dolu: plan yenilemesi (zamanlayici) dugmeyi yeniden acmaz.
+            w.BeginEncodingForTest();
+            w.ShowEncodeProgressForTest(new VidShrink.Ffmpeg.EncodeProgress(0.4, TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(4), 1.0, "pass 1/2 (attempt 1)"));
+            Yerlestir(w, Dar);
+            var k = (ToolTip.GetTip(baslat) as string, ToolTip.GetTip(donustur) as string, baslat.IsEnabled);
+            w.EndEncodingForTest();
+            w.EndEncodeForTest();
+            baslat.IsEnabled = donustur.IsEnabled = false;
+            return (k, (ToolTip.GetTip(baslat) as string, ToolTip.GetTip(donustur) as string));
+        }, sekme: 2, dil: "tr");
+
+        var mesgul = "Bir iş zaten sürüyor; bitmesini bekleyin ya da iptal edin";
+        Assert.False(kosarken.IsEnabled);
+        Assert.Equal(mesgul, kosarken.Item1);
+        Assert.Equal(mesgul, kosarken.Item2);
+        Assert.Equal("Önce bir video dosyası yükleyin", bitince.Item1);
+        Assert.Equal("Önce bir video dosyası yükleyin", bitince.Item2);
     }
 
     /// <summary>

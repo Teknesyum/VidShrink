@@ -58,6 +58,7 @@
   "main.action.cancel.disabled-tip": "لا توجد مهمة قيد التشغيل بعد",
   "main.action.shrink": "تقليص",
   "main.action.shrink.disabled-tip": "حمّل ملف فيديو أولاً",
+  "main.action.busy-tip": "تعمل مهمة الآن؛ انتظر حتى تنتهي أو ألغها",
   "main.action.convert": "تحويل",
   "main.action.convert.disabled-tip": "حمّل ملف فيديو أولاً",
   "main.action.show-in-folder": "إظهار في المجلد",
@@ -883,5 +884,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "أُسقط: الترميز غير مدعوم",
   "main.preset.handbrake.dropped.structural": "تُخطي: بنية قائمة HandBrake",
   "main.share.qr": "رمز QR لرابط المشاركة",
-  "main.share.qr-hint": "امسح الرمز بهاتفك لفتح الرابط."
+  "main.share.qr-hint": "امسح الرمز بهاتفك لفتح الرابط.",
+  "main.startup.no-display": "تعذّر على VidShrink فتح شاشة رسومية. شغّله من جلسة سطح مكتب؛ في Wayland يجب أن يكون Xwayland متاحًا."
 }

@@ -545,7 +545,7 @@ public sealed class KaydediciKameraTests
         Kapat("buyutec-yer.txt");
     }
 
-    [Fact]
+    [WindowsFact("büyüteç ekranı GDI ile kopyalar; başka sistemde seçenek gizli")]
     public void GercekBuyutecPenceresiImleciIzlerVeEkraniKopyalar()
     {
         var olcu = AppHost.Run(() =>

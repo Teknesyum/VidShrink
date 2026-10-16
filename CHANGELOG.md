@@ -235,11 +235,70 @@ not publish; everything listed under 1.2.17 ships with this release.
 
 ### Fixed
 
+- Linux, Thai: the collapsed plan summary on the Shrink tab no longer scrolls. The Thai fallback
+  font's taller lines pushed the summary 3 px past the plan panel's ceiling; the ceiling now
+  never sits below the summary and still stops the expanded reasons list.
 - Three buttons that start disabled now say why when hovered: "Cut ranges" and "Split at scene
   changes" in the editor's silence panel, and "Find foreign-language subtitle" in the Shrink tab.
   The recorder wizard's four answer buttons, its "same as last time" button and the region
   editor's hide button carry their accessible name from the markup, not only after the first
   refresh.
+- Linux: opening several files at once (or several "Shrink with VidShrink" requests) lost all
+  but one of them. The hand-off pipe is a Unix socket there, and it was closed between requests,
+  so senders waiting in its backlog were reset and opened their own window or dropped the file.
+  The next listener now exists before the current one closes; the same fix applies on Windows.
+- Linux recorder: whole-screen and region recording used a fixed `:0.0` display instead of the
+  session's `DISPLAY` (GNOME on Xorg runs on `:1`), and picking a monitor was ignored, so
+  "Screen 2" recorded the whole desktop. Both now behave like window capture and like Windows.
+- "Show in folder" in the recorder and the editor crashed the app on Linux systems without
+  `xdg-open`; the error is now shown in the status line, and the recorder's "open folder when
+  done" no longer stops the rest of the delivery.
+- The editor's timecode box cut off its last digit with Linux's wider monospace font; it now
+  grows to fit.
+- While a job runs, the disabled Shrink and Convert buttons said "Load a video file first"; they
+  now say a job is already running.
+- Linux: screenshot names kept `:`, `?` and other characters that exFAT, NTFS and Windows shares
+  reject; they are replaced with `_` on every system, as the output-name pattern already required.
+- Linux: the player's stall recovery could not reopen the file with the system libmpv 0.37
+  (Ubuntu 24.04, Debian 12); `loadfile` gained an index argument in mpv 0.38 and the older
+  library rejected the call. The older form is tried when the newer one is refused.
+- Linux: Thai text fell back to a taller system font and was cut off in the recorder's buttons;
+  Noto Sans Thai is preferred when installed.
+- Linux and macOS: the recorder's click rings, click sound, key display and cursor magnifier only
+  work on Windows, but their boxes were shown and silently did nothing; they are now hidden there.
+- Linux: the recording frame covered the whole recorded area with a black window on desktops
+  without a compositor, so the recorded monitor went dark and the video turned black after the
+  first seconds. The frame is now cut down to its edge strip with the X Shape extension and lets
+  clicks through; when the strip would fall inside the recording it is not shown.
+- Linux: drawing a region showed a black screen on desktops without a compositor. The desktop is
+  now frozen into the picker's background while you draw.
+- Linux: with no `~/Videos` or `~/Pictures` folder, recordings and stream screenshots went to the
+  folder the app was started from (often `/`). They now go to `~/Videos/VidShrink` and
+  `~/Pictures/VidShrink`.
+- Linux: VidShrink could crash when several files were opened at once on a system without a
+  sound server. libmpv fell back to SDL audio, whose start-up is not safe when the player and the
+  compare panel open together. SDL is no longer in the audio output list; with no sound server
+  playback continues silently.
+- The shrink queue window said "file 1 of 1" while more requests from "Shrink with VidShrink"
+  were already waiting below it; the total now follows the queue.
+- Linux: in the shortcut tables (Settings → Player keys / Editor keys) long key names such as
+  Ukrainian "<Клацання середньою кнопкою>" squeezed the description column until words broke in
+  the middle ("повноекранног|о", Greek "Αντικατοπτρισμ|ός"). The key column is capped at 200 px; a
+  key name that does not fit wraps only at its spaces, and a key without spaces is never split.
+- Linux: in a Wayland session screen and region recording produced an all-black video (x11grab
+  only sees Xwayland's empty root), and the window-capture message even suggested choosing
+  screen or region. Every capture target is now refused on Wayland with a message that says why
+  and points to an X11 (Xorg) session.
+- Linux: the app's icon was only copied into the macOS release, so `install-vidshrink.sh` never
+  wrote an `Icon=` line and menus showed a generic icon. The Linux release now carries
+  `VidShrink.png` next to the executable.
+- The player did not start at all with a libmpv built without Lua ("option ytdl=no failed: option
+  not found"). An option that only switches off a feature the build does not have is now skipped;
+  every other option still fails loudly.
+- Linux: starting VidShrink without a usable X display (no `DISPLAY`, an ssh shell, Wayland without
+  Xwayland) crashed with a .NET stack trace and exit code 134. It now prints a short, localized
+  message saying a desktop session is needed and exits with code 1; a second launch still hands its
+  file to a running window without needing a display.
 
 ## [1.2.15] - 2026-10-10
 

@@ -143,3 +143,25 @@ public sealed class QuietMachineFactAttribute : FactAttribute
                    "Bos taban yok, yuk iddiasi kurulmadi.";
     }
 }
+
+/// <summary>
+/// Yalnız Windows'ta anlamı olan ölçü: Windows yolu (<c>C:\…</c>) ayrıştırması, kayıt defteri
+/// planı, Win32 pencere tutamağı, <c>FileShare.None</c> kilidi. Linux ve macOS'ta bu davranış
+/// ürünün yolunda hiç koşmuyor; orada kırmızı değil atlanmış sayılır, sebebi yazılı.
+/// </summary>
+public sealed class WindowsFactAttribute : FactAttribute
+{
+    public WindowsFactAttribute(string neden = "Windows'a özgü davranış.")
+    {
+        if (!OperatingSystem.IsWindows()) Skip = $"yalnız Windows: {neden}";
+    }
+}
+
+/// <summary><see cref="WindowsFactAttribute"/>'un veri satırlı eşi.</summary>
+public sealed class WindowsTheoryAttribute : TheoryAttribute
+{
+    public WindowsTheoryAttribute(string neden = "Windows'a özgü davranış.")
+    {
+        if (!OperatingSystem.IsWindows()) Skip = $"yalnız Windows: {neden}";
+    }
+}

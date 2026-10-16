@@ -58,6 +58,7 @@
   "main.action.cancel.disabled-tip": "Yhtään tehtävää ei ole vielä käynnissä",
   "main.action.shrink": "Pakkaa",
   "main.action.shrink.disabled-tip": "Lataa ensin videotiedosto",
+  "main.action.busy-tip": "Työ on jo käynnissä; odota sen valmistumista tai peruuta se",
   "main.action.convert": "Muunna",
   "main.action.convert.disabled-tip": "Lataa ensin videotiedosto",
   "main.action.show-in-folder": "Näytä kansiossa",
@@ -883,5 +884,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Pudotettu: koodekkia ei tueta",
   "main.preset.handbrake.dropped.structural": "Ohitettu: HandBraken luettelorakenne",
   "main.share.qr": "Jakolinkin QR-koodi",
-  "main.share.qr-hint": "Avaa linkki skannaamalla koodi puhelimella."
+  "main.share.qr-hint": "Avaa linkki skannaamalla koodi puhelimella.",
+  "main.startup.no-display": "VidShrink ei voinut avata graafista näyttöä. Käynnistä se työpöytäistunnosta; Waylandissa Xwaylandin on oltava käytettävissä."
 }

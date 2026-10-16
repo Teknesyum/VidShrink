@@ -31,6 +31,54 @@ public sealed class KuyrukDuzenlemeTests
 
     private static string[] Adlar(ShrinkJobWindow window) => window.Pending.Select(r => r.Path).ToArray();
 
+    /// <summary>
+    /// Kabuktan gelen istekler ilk dosya kodlanırken sıraya düşer; "dosya N / toplam" satırı
+    /// toplamı o anki kabul sayısından okur. Önceden toplam iş başlarken dondurulup canlı
+    /// koşumda "1 / 1" yazarken altında "Bekleyen: 2" duruyordu (Linux, üç eş zamanlı
+    /// <c>--kucult 8</c>). İstekler gerçek kuyruk borusundan gelir; çıkarma toplamı geri indirir.
+    /// </summary>
+    [Fact]
+    public void KosarkenGelenIstekToplamiGunceller()
+    {
+        var kanal = $"sayac-{Guid.NewGuid():N}";
+        var (once, sonra, cikarinca, kabul) = AppHost.Run(() =>
+        {
+            using var sahip = new ShrinkRequestQueue(kanal);
+            Assert.True(sahip.IsOwner);
+            var ilk = new ShrinkRequest(8, "a.mp4");
+            var window = new ShrinkJobWindow(new ShellShrinkStartup(new[] { ilk }, null, null), sahip) { Actions = new SahteEylem() };
+            try
+            {
+                window.SetPaused(true);
+                window.Begin();
+                window.ShowActiveForTest(ilk, 8);
+                var basta = window.TargetLineForTest;
+
+                using var ikinci = new ShrinkRequestQueue(kanal);
+                var gonderim = System.Threading.Tasks.Task.Run(() =>
+                    ikinci.Submit(new ShrinkRequest(8, "b.mp4")) && ikinci.Submit(new ShrinkRequest(8, "c.mp4")));
+                var son = DateTime.UtcNow.AddSeconds(15);
+                while (window.AcceptedCount < 3 && DateTime.UtcNow < son)
+                {
+                    Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+                    System.Threading.Thread.Sleep(20);
+                }
+                Assert.True(gonderim.Result, "ikinci sürecin istekleri kabul edilmedi");
+                var gelince = window.TargetLineForTest;
+                window.RemovePending(window.Pending.Count - 1);
+                return (basta, gelince, window.TargetLineForTest, window.AcceptedCount);
+            }
+            finally { window.Close(); }
+        });
+
+        Assert.Equal(2, kabul);
+        Assert.Contains("1", once);
+        Assert.DoesNotContain("3", once);
+        Assert.Contains("3", sonra);
+        Assert.Contains("2", cikarinca);
+        Assert.DoesNotContain("3", cikarinca);
+    }
+
     /// <summary>Duraklatılmış sıra başlamaz; taşıma sınırda bir şey yapmaz, çıkarma sayıyı düşürür.</summary>
     [Fact]
     public void BekleyenlerTasinirVeCikarilir()

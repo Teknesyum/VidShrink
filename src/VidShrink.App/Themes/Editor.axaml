@@ -68,8 +68,10 @@
       EditorToolButtonSize       <- PlaybackBarButtonSize (32). Araç paletinin kare
                                     düğmesi; oynatıcı şeridinin düğmesiyle aynı hedef.
       EditorTransportGap         <- SpaceSm (8). Monitör satırındaki düğmelerin arası.
-      EditorTimecodeWidth        <- FieldWidthSm (120). Mono zaman kodu kutusu;
-                                    "00:00:00:00" ve kutu dolgusu sığar.
+      EditorTimecodeWidth        <- FieldWidthSm (120). Mono zaman kodu kutusunun en az
+                                    genişliği; Consolas'ta "00:00:00:00" ve dolgu sığar.
+                                    Linux'un DejaVu Sans Mono'su daha geniş, kutu yazıya
+                                    göre büyür (sabit Width son rakamı kesiyordu).
       EditorExportModeWidth      <- FieldWidth (280). Dışa aktarma kipi kutusu; en uzun
                                     Türkçe seçenek ("Tam Yeniden Kodlama") ok sütunuyla sığar.
       EditorPreviewMinHeight     <- DropZoneMinHeight (144). Önizlemenin en az yüksekliği;

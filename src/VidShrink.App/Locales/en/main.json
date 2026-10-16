@@ -58,6 +58,7 @@
   "main.action.cancel.disabled-tip": "No job is running yet",
   "main.action.shrink": "Shrink",
   "main.action.shrink.disabled-tip": "Load a video file first",
+  "main.action.busy-tip": "A job is already running; wait for it to finish or cancel it",
   "main.action.convert": "Convert",
   "main.action.convert.disabled-tip": "Load a video file first",
   "main.action.show-in-folder": "Show in Folder",
@@ -883,5 +884,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Dropped: codec not supported",
   "main.preset.handbrake.dropped.structural": "Skipped: HandBrake list structure",
   "main.share.qr": "QR code for the share link",
-  "main.share.qr-hint": "Scan with your phone to open the link."
+  "main.share.qr-hint": "Scan with your phone to open the link.",
+  "main.startup.no-display": "VidShrink could not open a graphical display. Start it from a desktop session; on Wayland, Xwayland must be available."
 }

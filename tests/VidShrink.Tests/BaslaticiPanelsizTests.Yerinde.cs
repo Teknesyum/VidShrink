@@ -106,7 +106,7 @@ public sealed partial class BaslaticiPanelsizTests
         Assert.Equal("9.9.9", UpdateCheck.ReadVersionMarker(kurulum.App));
     }
 
-    [Fact]
+    [WindowsFact("FileShare kilidi yer değiştirmeyi yalnız Windows'ta engeller; yerinde güncelleme Windows'a özgü")]
     public void KilitliDosyadaYerDegistirmeGeriAlinir()
     {
         using var klasor = new YerindeKlasoru();

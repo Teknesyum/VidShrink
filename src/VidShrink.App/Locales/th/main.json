@@ -58,6 +58,7 @@
   "main.action.cancel.disabled-tip": "ยังไม่มีงานที่กำลังทำงานอยู่",
   "main.action.shrink": "ย่อ",
   "main.action.shrink.disabled-tip": "โหลดไฟล์วิดีโอก่อน",
+  "main.action.busy-tip": "มีงานกำลังทำอยู่ รอให้เสร็จหรือยกเลิกงานนั้น",
   "main.action.convert": "แปลง",
   "main.action.convert.disabled-tip": "โหลดไฟล์วิดีโอก่อน",
   "main.action.show-in-folder": "แสดงในโฟลเดอร์",
@@ -883,5 +884,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "ตัดออก: ไม่รองรับโคเดก",
   "main.preset.handbrake.dropped.structural": "ข้าม: โครงสร้างรายการของ HandBrake",
   "main.share.qr": "คิวอาร์โค้ดของลิงก์แชร์",
-  "main.share.qr-hint": "สแกนด้วยโทรศัพท์เพื่อเปิดลิงก์"
+  "main.share.qr-hint": "สแกนด้วยโทรศัพท์เพื่อเปิดลิงก์",
+  "main.startup.no-display": "VidShrink ไม่สามารถเปิดจอแสดงผลกราฟิกได้ ให้เริ่มจากเซสชันเดสก์ท็อป บน Wayland ต้องมี Xwayland"
 }

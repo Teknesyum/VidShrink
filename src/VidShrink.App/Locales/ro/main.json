@@ -58,6 +58,7 @@
   "main.action.cancel.disabled-tip": "Încă nu rulează nicio sarcină",
   "main.action.shrink": "Micșorează",
   "main.action.shrink.disabled-tip": "Încărcați mai întâi un fișier video",
+  "main.action.busy-tip": "O sarcină rulează deja; așteptați să se termine sau anulați-o",
   "main.action.convert": "Convertește",
   "main.action.convert.disabled-tip": "Încărcați mai întâi un fișier video",
   "main.action.show-in-folder": "Arată în dosar",
@@ -883,5 +884,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Omis: codec neacceptat",
   "main.preset.handbrake.dropped.structural": "Sărit: structura listei HandBrake",
   "main.share.qr": "Cod QR pentru linkul de partajare",
-  "main.share.qr-hint": "Scanați cu telefonul pentru a deschide linkul."
+  "main.share.qr-hint": "Scanați cu telefonul pentru a deschide linkul.",
+  "main.startup.no-display": "VidShrink nu a putut deschide un afișaj grafic. Porniți-l dintr-o sesiune de desktop; în Wayland trebuie să fie disponibil Xwayland."
 }

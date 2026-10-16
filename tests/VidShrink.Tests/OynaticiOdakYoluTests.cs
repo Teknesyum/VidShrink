@@ -238,7 +238,7 @@ public sealed class OynaticiOdakYoluTests
         return sonuc;
     }
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void DondurmeTusuMenudeGorunurVeHamKlavyeyleKareyiDondurur()
     {
         var (kayit, hata) = AppHost.Run(() =>

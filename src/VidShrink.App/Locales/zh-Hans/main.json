@@ -58,6 +58,7 @@
   "main.action.cancel.disabled-tip": "目前没有正在运行的任务",
   "main.action.shrink": "压缩",
   "main.action.shrink.disabled-tip": "请先加载视频文件",
+  "main.action.busy-tip": "已有任务在运行；请等待完成或将其取消",
   "main.action.convert": "转换",
   "main.action.convert.disabled-tip": "请先加载视频文件",
   "main.action.show-in-folder": "在文件夹中显示",
@@ -883,5 +884,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "已舍弃：不支持该编解码器",
   "main.preset.handbrake.dropped.structural": "已跳过：HandBrake 列表结构",
   "main.share.qr": "分享链接的二维码",
-  "main.share.qr-hint": "用手机扫描即可打开链接。"
+  "main.share.qr-hint": "用手机扫描即可打开链接。",
+  "main.startup.no-display": "VidShrink 无法打开图形显示。请从桌面会话中启动；在 Wayland 下需要 Xwayland。"
 }

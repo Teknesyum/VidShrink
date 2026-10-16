@@ -370,12 +370,22 @@ public sealed class AltyaziYakmaKodlamaYolTests(ITestOutputHelper cikti)
         Assert.True(uzun.Length > 260, uzun.Length.ToString());
 
         var duz = await KareAsync(Yak(uzun));
+        Assert.True(duz.Kod == 0, duz.Hata);
+        Assert.True(duz.Kare.SequenceEqual(referans), "uzun yol karesi referanstan farkli");
+
+        // \\?\ uzun yol on eki yalniz Windows'ta var; Linux ve macOS'ta kullanicinin yolu
+        // boyle gelmez, ffmpeg de onu duz bir klasor adi sayar. Duz uzun yol yukarida olculdu.
+        if (!OperatingSystem.IsWindows())
+        {
+            Directory.Delete(kok, recursive: true);
+            Topla("referans-utf8.srt");
+            return;
+        }
+
         var onEkli = await KareAsync(Yak("\\\\?\\" + uzun));
         var kisaOnEkli = await KareAsync(Yak("\\\\?\\" + Path.Combine(Klasor, "referans-utf8.srt")));
 
         cikti.WriteLine($"uzun yol {uzun.Length} karakter: cikis {duz.Kod}; \\\\?\\ on ekli: {onEkli.Kod}; kisa \\\\?\\: {kisaOnEkli.Kod}");
-        Assert.True(duz.Kod == 0, duz.Hata);
-        Assert.True(duz.Kare.SequenceEqual(referans), "uzun yol karesi referanstan farkli");
         Assert.True(onEkli.Kod == 0, onEkli.Hata);
         Assert.True(onEkli.Kare.SequenceEqual(referans), "on ekli uzun yol karesi referanstan farkli");
         Assert.True(kisaOnEkli.Kod == 0, kisaOnEkli.Hata);

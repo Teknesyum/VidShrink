@@ -338,7 +338,7 @@ public sealed class OynaticiListeTests
         }
     }
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void CalanDosyaGorunureKaydirilirVeListeTavandaKalir()
     {
         var adlar = Enumerable.Range(1, 40).Select(i => $"klip{i:00}.mp4").ToArray();
@@ -368,7 +368,7 @@ public sealed class OynaticiListeTests
         }
     }
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void ListeyeTiklamakMenuyuKapatmazDosyaTiklamakAcar()
     {
         var klasor = Klasor("a1.mp4", "a2.mp4", "a3.mp4");
@@ -406,7 +406,7 @@ public sealed class OynaticiListeTests
         }
     }
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void MenuKapaninListeDeKapanir()
     {
         var klasor = Klasor("a1.mp4", "a2.mp4");

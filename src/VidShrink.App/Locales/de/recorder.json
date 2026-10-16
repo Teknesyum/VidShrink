@@ -66,7 +66,7 @@
   "recorder.output.failed": "ffmpeg wurde mit Code {0} beendet.",
   "recorder.error.no-ffmpeg": "{0} konnte nicht gefunden werden.",
   "recorder.error.invalid": "Diese Einstellungen erlauben keine Aufnahme: {0}",
-  "recorder.error.window-wayland": "Fensteraufnahme wird in einer Wayland-Sitzung nicht unterstützt; wähle Bildschirm oder Bereich oder melde dich in einer X11-Sitzung an.",
+  "recorder.error.window-wayland": "Aufnahmen werden in einer Wayland-Sitzung nicht unterstützt: Das Video wäre schwarz. Melde dich zum Aufnehmen in einer X11-Sitzung (Xorg) an.",
   "recorder.error.window-missing": "Das Fenster „{0}“ wurde nicht gefunden; aktualisiere die Liste und wähle es erneut.",
   "recorder.error.number": "{0} muss eine Zahl sein.",
   "recorder.error.start": "Die Aufnahme konnte nicht gestartet werden: {0}",

@@ -465,6 +465,72 @@ public sealed class YerlesimDenetimiTests
     }
 
     /// <summary>
+    /// Sağdan sola, üç noktayla biten düğme yazısı (ar "حفظ باسم…", düzenleyicinin Farklı Kaydet'i)
+    /// kendi yönüyle ölçülür: doğal genişliğindeki düğme kusur sayılmaz ve çizilen yerleşim metnin
+    /// dokuz karakterinin hepsini tek satırda taşır. Olumlu kontrol: aynı düğme 60 px'e daraltılıp
+    /// yüksekliği tek satırda tutulunca yazı gerçekten sarılır, çizilen yerleşim kutuya sığmayan
+    /// satırları bırakır (görünen karakter dokuzdan az) ve denetçi onu kesik sayar. Satır sayısı
+    /// ölçü değil: <see cref="TextBlock"/> yerleşimi yüksekliğe kırptığı için kesilen yazı da tek
+    /// satır görünür. İki etiket de "Olumlu" ile başlar, çünkü <see cref="Ad"/> etiketi yalnız o
+    /// önekle kusur satırına yazar.
+    /// </summary>
+    [Fact]
+    public void SagdanSolaUcNoktaliDugmeYalnizSarilincaKesik()
+    {
+        const string metin = "حفظ باسم…";
+        var (denetim, satirlar) = AppHost.Run(() =>
+        {
+            Button Dugme(string etiket) => new()
+            {
+                Theme = (ControlTheme)Application.Current!.FindResource("GhostButton")!,
+                Content = metin,
+                Tag = etiket,
+                HorizontalAlignment = HorizontalAlignment.Left,
+            };
+            TextBlock Yazi(Button dugme) => dugme.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Text == metin);
+
+            var dogal = Dugme("OlumluDogal");
+            var dar = Dugme("OlumluDar");
+            var kap = new Window
+            {
+                SizeToContent = SizeToContent.WidthAndHeight,
+                FlowDirection = FlowDirection.RightToLeft,
+                Content = new StackPanel { Spacing = 8, Children = { dogal, dar } },
+            };
+            kap.Classes.Add("reduced-motion");
+            var d = new Denetim { Dil = "ar" };
+            try
+            {
+                kap.Measure(Size.Infinity);
+                dar.Width = 60;
+                dar.Height = dogal.DesiredSize.Height;
+                KuyruguTara(kap, "sagdan-sola", d, double.PositiveInfinity);
+
+                foreach (var dugme in new[] { dogal, dar }) Yazi(dugme).Tag = dugme.Tag;
+                d.Kusurlar.Clear();
+                d.Gorulen.Clear();
+                Metinler(kap, "sagdan-sola", d);
+                static int Gorunen(TextBlock yazi) => yazi.TextLayout.TextLines
+                    .Sum(satir => satir.TextRuns.OfType<Avalonia.Media.TextFormatting.ShapedTextRun>().Sum(parca => parca.Length));
+                return (d, (Dogal: Gorunen(Yazi(dogal)), Dar: Gorunen(Yazi(dar))));
+            }
+            finally
+            {
+                kap.Content = null;
+            }
+        });
+
+        var dokum = string.Join(Environment.NewLine, denetim.Kusurlar);
+        _output.WriteLine($"görünen karakter: doğal {satirlar.Dogal}, dar {satirlar.Dar} / {metin.Length}");
+        _output.WriteLine(dokum);
+
+        Assert.Equal(metin.Length, satirlar.Dogal);
+        Assert.True(satirlar.Dar < metin.Length, $"dar düğmede yazı kesilmedi, olumlu kontrol kurulamadı ({satirlar.Dar} karakter)");
+        Assert.DoesNotContain(denetim.Kusurlar, k => k.Yer.Contains("OlumluDogal", StringComparison.Ordinal));
+        Assert.Contains(denetim.Kusurlar, k => k.Tur == "kesik" && k.Yer.Contains("OlumluDar", StringComparison.Ordinal));
+    }
+
+    /// <summary>
     /// Başlık denetiminin olumlu kontrolü: küçük harfle yazılmış içerik sözcüğü yakalanır,
     /// bağlaç ve birim yakalanmaz.
     /// </summary>
@@ -947,12 +1013,22 @@ public sealed class YerlesimDenetimiTests
         return tek.Length > 60 ? tek[..60] + "…" : tek;
     }
 
+    /// <summary>
+    /// Ölçü yerleşimi metnin kendi akış yönüyle kurulur, çizilen yerleşim (<see cref="TextBlock.TextLayout"/>)
+    /// gibi. Yönsüz kurulunca sağdan sola metnin sonundaki "…" (U+2026, yönü çevresinden alan nötr
+    /// karakter) paragrafın soldan sağa düzeyine düşüp ayrı bir parça oluyor ve birincil yazı tipiyle
+    /// (Atkinson, 12,5 px) şekilleniyordu; çizilen yerleşimde Arapça parçayla birlikte yedek yazı tipinden
+    /// (Linux'ta DejaVu Sans Mono, 9,6 px) gelir. Fark 2,9 px: ar "حفظ باسم…" yönsüz 84,9 px'te 83 px'lik
+    /// kutuya sığmayıp iki satıra (41,6 px) sarılıyordu, çizilen tek satır 82,1 px. Yalnız Linux'ta
+    /// görünüyordu; Windows CI'da yedek yazı tipi başka ve fark eşiği aşmıyor (Windows'ta ölçülmedi).
+    /// </summary>
     private static double GerekenGenislik(TextBlock blok, string metin) =>
         new Avalonia.Media.TextFormatting.TextLayout(
             metin,
             new Typeface(blok.FontFamily, blok.FontStyle, blok.FontWeight, blok.FontStretch),
             blok.FontSize,
             Brushes.Black,
+            flowDirection: blok.FlowDirection,
             lineHeight: blok.LineHeight,
             letterSpacing: blok.LetterSpacing).WidthIncludingTrailingWhitespace;
 
@@ -974,6 +1050,7 @@ public sealed class YerlesimDenetimiTests
             Brushes.Black,
             textWrapping: blok.TextWrapping,
             maxWidth: blok.TextWrapping == TextWrapping.NoWrap ? double.PositiveInfinity : genislik,
+            flowDirection: blok.FlowDirection,
             lineHeight: blok.LineHeight,
             letterSpacing: blok.LetterSpacing);
         var satirlar = yerlesim.TextLines;

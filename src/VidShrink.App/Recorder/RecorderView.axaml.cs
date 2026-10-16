@@ -56,6 +56,7 @@ internal partial class RecorderView : UserControl
     {
         _settingsPath = settingsPath;
         InitializeComponent();
+        HideUnavailableInputOptions();
         _settings = RecorderSettings.Load(_settingsPath);
         InitHedef();
         InitSecici();
@@ -277,7 +278,7 @@ internal partial class RecorderView : UserControl
 
     private void OnReveal(object? sender, RoutedEventArgs e)
     {
-        if (Delivered() is { } path) VidShrink.App.Platform.Reveal(path);
+        if (Delivered() is { } path) RevealSafely(path);
     }
 
     /// <summary>

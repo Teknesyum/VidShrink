@@ -240,7 +240,7 @@ public sealed class OynaticiDalga3GirdiTests
         });
     }
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void GoruntuKlasoruHamSagTikMenusundenSecilirVeCtrlEOraYazar()
     {
         var hedef = "secici-hedef";
@@ -261,7 +261,7 @@ public sealed class OynaticiDalga3GirdiTests
     /// Taramalı görüntüyü düzelt satırına iner ve anahtarı çevirir; değer libmpv'den
     /// okunur. Aynı alt menüde sekmeye götüren satır bulunmaz.
     /// </summary>
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void P3HamSagTikVeOklarlaMenudenAyarDegisirMotordanOkunur()
     {
         var clip = MotorKlipleri.Kucuk;
@@ -320,7 +320,7 @@ public sealed class OynaticiDalga3GirdiTests
     /// menüyü açar, oklar Ayarlar › Kısayollar'a iner, Yavaşlat satırına ham fare tıklaması
     /// gider; hız libmpv'nin speed özelliğinden okunur, tablonun 0,05 adımıyla 1'den 0,95'e düşer.
     /// </summary>
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void P3KisayollarSatirinaHamTikEylemiOynaticidaUygular()
     {
         var clip = MotorKlipleri.Kucuk;
@@ -405,7 +405,7 @@ public sealed class OynaticiDalga3GirdiTests
         Kapat("p3-kisayol-ham-tik.txt");
     }
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void GoruntuKlasoruSecimIptalindeAyarDegismez()
     {
         var sonuc = KlasorSec(false);

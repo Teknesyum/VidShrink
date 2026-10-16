@@ -324,6 +324,13 @@
   <x:Double x:Key="PlanPanelMinHeight">320</x:Double>
   <x:Double x:Key="PlanPanelMaxHeight">576</x:Double>
   <StaticResource x:Key="PlaylistWidth" ResourceKey="FieldWidth"/>
+  <!--
+    ShortcutKeyMaxWidth <- SliderMinWidth (200). Kısayol tablosunda tuş sütununun tavanı; daha uzun
+    tuş adı ("<Клацання середньою кнопкою>") boşlukta sarılır. Tavan yokken tuş sütunu açıklamayı
+    ~120 px'e sıkıştırıyor, uzun sözcük satır ortasında bölünüyordu (Linux, DejaVu Sans). 280'lik
+    tavan 1920 genişlikteki Ayarlar kartında el "Αντικατοπτρισμός"u yine bölüyordu.
+  -->
+  <StaticResource x:Key="ShortcutKeyMaxWidth" ResourceKey="SliderMinWidth"/>
   <StaticResource x:Key="PlaylistMaxHeight" ResourceKey="PlanPanelMaxHeight"/>
   <StaticResource x:Key="HistoryWindowWidth" ResourceKey="FieldWidth"/>
   <StaticResource x:Key="HistoryWindowHeight" ResourceKey="PlanPanelMaxHeight"/>

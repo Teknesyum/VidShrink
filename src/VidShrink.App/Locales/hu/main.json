@@ -58,6 +58,7 @@
   "main.action.cancel.disabled-tip": "Még nem fut feladat",
   "main.action.shrink": "Tömörítés",
   "main.action.shrink.disabled-tip": "Először töltsön be egy videofájlt",
+  "main.action.busy-tip": "Már fut egy feladat; várja meg, amíg befejeződik, vagy szakítsa meg",
   "main.action.convert": "Konvertálás",
   "main.action.convert.disabled-tip": "Először töltsön be egy videofájlt",
   "main.action.show-in-folder": "Megjelenítés mappában",
@@ -883,5 +884,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Elhagyva: a kodek nem támogatott",
   "main.preset.handbrake.dropped.structural": "Kihagyva: HandBrake listaszerkezet",
   "main.share.qr": "A megosztási hivatkozás QR-kódja",
-  "main.share.qr-hint": "Olvassa be a telefonjával a hivatkozás megnyitásához."
+  "main.share.qr-hint": "Olvassa be a telefonjával a hivatkozás megnyitásához.",
+  "main.startup.no-display": "A VidShrink nem tudott grafikus kijelzőt megnyitni. Indítsa asztali munkamenetből; Waylanden az Xwaylandnek elérhetőnek kell lennie."
 }

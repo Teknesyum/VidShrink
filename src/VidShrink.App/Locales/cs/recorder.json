@@ -66,7 +66,7 @@
   "recorder.output.failed": "ffmpeg skončil s kódem {0}.",
   "recorder.error.no-ffmpeg": "{0} nebylo nalezeno.",
   "recorder.error.invalid": "Tato nastavení neumožňují nahrávání: {0}",
-  "recorder.error.window-wayland": "Záznam okna není v relaci Wayland podporován; zvolte obrazovku nebo oblast, nebo se přihlaste do relace X11.",
+  "recorder.error.window-wayland": "Nahrávání není v relaci Wayland podporováno: video by bylo černé. Pro nahrávání se přihlaste do relace X11 (Xorg).",
   "recorder.error.window-missing": "Okno „{0}“ nebylo nalezeno; obnovte seznam a vyberte ho znovu.",
   "recorder.error.number": "{0} musí být číslo.",
   "recorder.error.start": "Nahrávání se nepodařilo spustit: {0}",

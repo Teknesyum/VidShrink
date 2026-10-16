@@ -59,7 +59,7 @@ public sealed class OynaticiTikTasimaTests
         Dispatcher.UIThread.RunJobs();
     }
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void BasipBirakmakOynatmayiBirKezCevirir()
     {
         var sonuc = AppHost.Run(() =>
@@ -98,7 +98,7 @@ public sealed class OynaticiTikTasimaTests
         Assert.Equal(sonuc.ikinci.IsPlaying, !sonuc.ikinci.IsPaused);
     }
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void EsikAltiOynamaTiklamaEsikUstuPencereTasir()
     {
         var sonuc = AppHost.Run(() =>
@@ -142,7 +142,7 @@ public sealed class OynaticiTikTasimaTests
         Assert.InRange(sonuc.ustu.dx, (int)Math.Floor(5 * sonuc.ustu.olcek) - 1, (int)Math.Ceiling(5 * sonuc.ustu.olcek) + 1);
     }
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void SeritDugmesineBasisPencereyiTasimazOynatmayiIkiKezCevirmez()
     {
         var sonuc = AppHost.Run(() =>
@@ -273,7 +273,7 @@ public sealed class OynaticiTikTasimaTests
         Assert.NotEqual(0, sonuc.bos);
     }
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void DurakliykenSuruklemedenSonraFareGidinceSeritKapanir()
     {
         var sonuc = AppHost.Run(() =>

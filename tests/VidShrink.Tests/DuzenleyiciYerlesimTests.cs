@@ -70,6 +70,27 @@ public sealed class DuzenleyiciYerlesimTests
         }
     });
 
+    /// <summary>
+    /// Linux turu: kutu sabit 120 px genişlikteydi; Consolas'ı olmayan Linux DejaVu Sans Mono'ya
+    /// düşüyor ve "00:00:03:00"ın son rakamı kesiliyordu. Kutu artık en az bu genişlikte, yazıya
+    /// göre büyür: kaydırıcının kapsamı görünür alanı geçmez.
+    /// </summary>
+    [Fact]
+    public void ZamanKoduKutusuYaziyiKesmez()
+    {
+        Kos(o =>
+        {
+            var kutu = o.Duzenleyici.TxtTimecode;
+            kutu.Text = "00:59:59:24";
+            o.Pencere.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            var kaydirici = Avalonia.VisualTree.VisualExtensions.GetVisualDescendants(kutu).OfType<ScrollViewer>().First();
+            Assert.True(kaydirici.Extent.Width <= kaydirici.Viewport.Width + 0.5,
+                $"zaman kodu kesik: kapsam {kaydirici.Extent.Width:0.#} px, görünür {kaydirici.Viewport.Width:0.#} px");
+            Assert.True(kutu.Bounds.Width >= (double)kutu.FindResource("EditorTimecodeWidth")! - 0.5);
+        });
+    }
+
     [Fact]
     public void ZamanKoduEnterIleOKareyeGider()
     {

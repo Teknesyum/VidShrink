@@ -332,6 +332,45 @@ public sealed class OynaticiKurulumTests
         foreach (var dir in LibMpvLocator.MacLibraryDirectories)
             Assert.Contains(dir, kurulum, StringComparison.Ordinal);
     }
+
+    /// <summary>
+    /// Lua'sız libmpv'de <c>ytdl</c> seçeneği yok; yalnız o seçeneğin "bulunamadı" dönüşü yutulur.
+    /// Önceden motor hiç açılmıyordu (kaynaktan Lua'sız derlenen 0.40, "option ytdl=no failed:
+    /// option not found"). Başka seçenekte ya da başka hatada motor yine reddedilir (olumsuz kontrol).
+    /// </summary>
+    [Fact]
+    public void DerlemedeOlmayanSecenekMotoruDusurmez()
+    {
+        Assert.True(MpvEngine.Absent("ytdl", -5));
+        Assert.False(MpvEngine.Absent("ytdl", -7));
+        Assert.False(MpvEngine.Absent("vo", -5));
+        Assert.False(MpvEngine.Absent("hwdec", -5));
+        Assert.All(MpvEngine.OptionalOptions, ad => Assert.Contains(MpvEngine.OptionsFor(new PlaybackOptions()), o => o.Name == ad));
+    }
+
+    /// <summary>
+    /// Linux'ta ses çıkışı SDL'e inmez: ses sunucusu olmayan oturumda oynatıcı ile karşılaştırma
+    /// motorları aynı anda açılınca SDL'in ses açılışı süreci düşürüyordu (gdb: libmpv `core` →
+    /// libSDL2 → 0x0; iki eş zamanlı iletimde 3/5). Sıra yalnız Linux'ta yazılır, ses sunucusu
+    /// olan oturumda varsayılanla aynı sürücü (pulse) seçilir.
+    /// </summary>
+    [Fact]
+    public void LinuxSesCikisiSdleInmez()
+    {
+        var secenekler = MpvEngine.OptionsFor(new PlaybackOptions());
+        var ao = secenekler.Where(o => o.Name == "ao").Select(o => o.Value).ToArray();
+        if (!OperatingSystem.IsLinux())
+        {
+            Assert.Empty(ao);
+            return;
+        }
+
+        var surucu = Assert.Single(ao).Split(',');
+        Assert.DoesNotContain("sdl", surucu);
+        Assert.DoesNotContain("", surucu);
+        Assert.Equal("pulse", surucu[0]);
+        Assert.Contains(("audio-fallback-to-null", "yes"), secenekler);
+    }
 }
 
 public sealed class OynaticiGorunumuFabrikaTests

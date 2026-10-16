@@ -58,6 +58,7 @@
   "main.action.cancel.disabled-tip": "Все още няма изпълняваща се задача",
   "main.action.shrink": "Свий",
   "main.action.shrink.disabled-tip": "Първо заредете видео файл",
+  "main.action.busy-tip": "Вече се изпълнява задача; изчакайте я да завърши или я отменете",
   "main.action.convert": "Конвертирай",
   "main.action.convert.disabled-tip": "Първо заредете видео файл",
   "main.action.show-in-folder": "Покажи в папката",
@@ -883,5 +884,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Пропуснато: кодекът не се поддържа",
   "main.preset.handbrake.dropped.structural": "Прескочено: структура на списъка на HandBrake",
   "main.share.qr": "QR код на връзката за споделяне",
-  "main.share.qr-hint": "Сканирайте с телефона си, за да отворите връзката."
+  "main.share.qr-hint": "Сканирайте с телефона си, за да отворите връзката.",
+  "main.startup.no-display": "VidShrink не успя да отвори графичен дисплей. Стартирайте го от сесия на работния плот; под Wayland е необходим Xwayland."
 }

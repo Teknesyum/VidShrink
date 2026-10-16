@@ -78,6 +78,13 @@
     <None Include="Assets\VidShrink.png" CopyToPublishDirectory="PreserveNewest" Link="VidShrink.png" />
   </ItemGroup>
 
+  <!-- Linux kurucusu (install-vidshrink.sh) masaüstü kaydının Icon= satırını çalıştırılabilirin
+       yanındaki VidShrink.png'den yazıyor; görsel yalnız macOS yayınına kopyalandığı için Linux'ta
+       satır hiç yazılmıyor, menü ve "Birlikte aç" listesi genel simge gösteriyordu. -->
+  <ItemGroup Condition="$(RuntimeIdentifier.StartsWith('linux'))">
+    <None Include="Assets\VidShrink.png" CopyToPublishDirectory="PreserveNewest" Link="VidShrink.png" />
+  </ItemGroup>
+
   <Target Name="RenameMacHost" AfterTargets="Publish"
           Condition="$(RuntimeIdentifier.StartsWith('osx')) And '$(AssemblyName)' != '$(MacHostName)'">
     <Move SourceFiles="$(PublishDir)$(AssemblyName)" DestinationFiles="$(PublishDir)$(MacHostName)" />

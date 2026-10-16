@@ -167,6 +167,39 @@ public sealed class KaydediciPencereTests
         return view;
     }
 
+    /// <summary>
+    /// Wayland oturumunda ekran ve bölge de reddedilir: x11grab Xwayland'in köksüz ekranını
+    /// tümden siyah okuyor (weston + Xwayland, xclock dahil). Eskiden yalnız pencere reddedilip
+    /// ileti "ekran ya da bölge seç" diyordu. Aynı görünüm X11 oturumunda istek kurar (olumlu kontrol).
+    /// </summary>
+    [Theory]
+    [InlineData(RecorderTargetKind.Screen)]
+    [InlineData(RecorderTargetKind.Region)]
+    public void WaylandOturumundaEkranVeBolgeDeReddedilir(RecorderTargetKind hedef)
+    {
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            RecorderView Kur(params (string, string)[] ortam)
+            {
+                var view = Pencereli(ayarYolu, RecorderPlatform.Linux, _ => null, ortam);
+                view.FindControl<ComboBox>("CmbTarget")!.SelectedIndex = (int)hedef;
+                Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+                return view;
+            }
+
+            var wayland = Kur(("XDG_SESSION_TYPE", "wayland"), ("DISPLAY", ":0"), ("WAYLAND_DISPLAY", "wayland-0"));
+            var x11 = Kur(("XDG_SESSION_TYPE", "x11"), ("DISPLAY", ":0"));
+            return (wayland: wayland.BuildRequest(applyAuto: false), waylandHata: wayland.ErrorText,
+                x11: x11.BuildRequest(applyAuto: false), x11Hata: x11.ErrorText);
+        }));
+
+        Assert.Null(olcu.wayland);
+        Assert.Equal(Metin("recorder.error.window-wayland"), olcu.waylandHata);
+        Assert.NotNull(olcu.x11);
+        Assert.Equal(string.Empty, olcu.x11Hata);
+        Assert.Equal(":0", olcu.x11!.Display);
+    }
+
     [Fact]
     public void SeciciLinuxtaKimlikVeEkranMacteKirpmaYazarWaylandiReddeder()
     {
@@ -268,5 +301,243 @@ public sealed class KaydediciPencereTests
 
         Kapat("x11-liste.txt");
         KayitKanit.Kapat("x11-pencere.mkv", "x11-pencere.ffprobe.txt", "x11-olmayan.mkv");
+    }
+
+    /// <summary>
+    /// Linux turu, iki kaydedici hatası: (1) oturumun <c>DISPLAY</c>'i yalnız pencere koluna
+    /// yazılıyordu, ekran ve bölge sabit <c>:0.0</c>'a gidiyordu (GNOME'un Xorg oturumu :1'de);
+    /// (2) ekran seçimi x11grab'da yok sayılıyor, "Ekran 2" bütün masaüstünü kaydediyordu.
+    /// Şimdi ekran seçimi gdigrab'daki gibi o monitörün dikdörtgenine iner ve adres DISPLAY'den gelir.
+    /// Olumsuz kontroller: DISPLAY yokken varsayılan <c>:0.0</c>, tek monitörde ekranın tamamı.
+    /// </summary>
+    [Fact]
+    public void LinuxEkranVeBolgeKaydiOturumunEkraniniVeSecilenMonitoruKullanir()
+    {
+        IReadOnlyList<ScreenBounds> IkiEkran() => new[] { new ScreenBounds(0, 0, 0, 1024, 768), new ScreenBounds(1, 1024, 0, 1920, 1080) };
+        IReadOnlyList<ScreenBounds> TekEkran() => new[] { new ScreenBounds(0, 0, 0, 1920, 1080) };
+
+        var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            RecorderView Kur(Func<IReadOnlyList<ScreenBounds>> ekranlar, params (string, string)[] ortam)
+            {
+                var view = new RecorderView(ayarYolu)
+                {
+                    SkipAutoMeasure = true,
+                    CapturePlatform = RecorderPlatform.Linux,
+                    ScreenSource = ekranlar,
+                    ReadEnvironment = ad => ortam.FirstOrDefault(d => d.Item1 == ad).Item2,
+                    DrawRegion = _ => Task.FromResult<Avalonia.PixelRect?>(new Avalonia.PixelRect(100, 50, 640, 360))
+                };
+                Elle(view);
+                view.RefreshScreens();
+                return view;
+            }
+
+            string Girdi(RecorderView view)
+            {
+                var istek = view.BuildRequest(applyAuto: false)!;
+                var args = RecorderArguments.Build(istek with { Container = RecorderContainer.Mkv }, "/tmp/l.mkv");
+                var i = args.ToList().IndexOf("-i");
+                var boyut = args.ToList().IndexOf("-video_size");
+                return (boyut >= 0 ? args[boyut + 1] + " " : "") + args[i + 1];
+            }
+
+            var ekran = Kur(IkiEkran, ("DISPLAY", ":1"));
+            ekran.FindControl<ComboBox>("CmbTarget")!.SelectedIndex = (int)RecorderTargetKind.Screen;
+            ekran.FindControl<ComboBox>("CmbScreen")!.SelectedIndex = 1;
+            var ikinci = Girdi(ekran);
+            ekran.FindControl<ComboBox>("CmbScreen")!.SelectedIndex = 0;
+            var birinci = Girdi(ekran);
+
+            var tek = Kur(TekEkran, ("DISPLAY", ":1"));
+            tek.FindControl<ComboBox>("CmbTarget")!.SelectedIndex = (int)RecorderTargetKind.Screen;
+            var tamami = Girdi(tek);
+
+            var bolge = Kur(TekEkran, ("DISPLAY", ":1"));
+            bolge.DrawRegionAsync().GetAwaiter().GetResult();
+            var bolgeGirdi = Girdi(bolge);
+
+            var ortamsiz = Kur(TekEkran);
+            ortamsiz.FindControl<ComboBox>("CmbTarget")!.SelectedIndex = (int)RecorderTargetKind.Screen;
+            var varsayilan = Girdi(ortamsiz);
+
+            return (ikinci, birinci, tamami, bolgeGirdi, varsayilan);
+        }));
+
+        Assert.Equal("1920x1080 :1+1024,0", olcu.ikinci);
+        Assert.Equal("1024x768 :1+0,0", olcu.birinci);
+        Assert.Equal(":1", olcu.tamami);
+        Assert.Equal("640x360 :1+100,50", olcu.bolgeGirdi);
+        Assert.Equal(RecorderArguments.DefaultDisplay, olcu.varsayilan);
+    }
+
+    /// <summary>
+    /// Linux turu: tıklama halkası, tıklama sesi, tuş gösterimi ve büyüteç yalnız Win32'de
+    /// çalışıyor; başka sistemde kutular işaretlenebiliyor ama kayıtta hiçbir şey olmuyordu.
+    /// Desteklenmeyen yerde dört kutu sayfada ve mini şeridin seçeneklerinde gizli; imleç
+    /// ve klasör kutusu kalır. Olumlu kontrol: destek açıkken dördü de görünür.
+    /// </summary>
+    [Fact]
+    public void GirdiEtkileriDesteklenmeyenSistemdeGizlenir()
+    {
+        var onceki = RecorderView.InputEffectsAvailable;
+        try
+        {
+            (bool[] sayfa, bool[] mini, bool imlec) Olc(bool destek) => AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+            {
+                RecorderView.InputEffectsAvailable = destek;
+                var view = new RecorderView(ayarYolu) { SkipAutoMeasure = true };
+                var mini = new RecorderMini();
+                string[] adlar = { "ChkShowClicks", "ChkClickSound", "ChkShowKeys", "ChkMagnifier" };
+                return (adlar.Select(a => view.FindControl<CheckBox>(a)!.IsVisible).ToArray(),
+                        adlar.Select(a => mini.FindControl<CheckBox>(a)!.IsVisible).ToArray(),
+                        view.FindControl<CheckBox>("ChkCursor")!.IsVisible && mini.FindControl<CheckBox>("ChkOpenFolder")!.IsVisible);
+            }));
+
+            var yok = Olc(false);
+            var var_ = Olc(true);
+
+            Assert.All(yok.sayfa, g => Assert.False(g));
+            Assert.All(yok.mini, g => Assert.False(g));
+            Assert.True(yok.imlec);
+            Assert.All(var_.sayfa, g => Assert.True(g));
+            Assert.All(var_.mini, g => Assert.True(g));
+        }
+        finally
+        {
+            RecorderView.InputEffectsAvailable = onceki;
+        }
+    }
+
+    /// <summary>
+    /// Linux turu 2, canlı X11: kayıt çerçevesi X Shape ile dört şeride iner ve girdiyi geçirir.
+    /// Önceden pencere bölgenin tamamını kaplıyordu; birleştiricisiz masaüstünde kaydedilen
+    /// monitör siyah kalıyor, video da ilk saniyelerden sonra siyah çıkıyordu (elle ölçüldü:
+    /// ortalama parlaklık 90'dan 1,6'ya). Olumsuz kontrol: biçim verilmeyen pencere tek dikdörtgen.
+    /// </summary>
+    [X11KayitFact]
+    public void CerceveX11deKenarSeridineInerVeTiklamayiGecirir()
+    {
+        var ekran = X11.XOpenDisplay(IntPtr.Zero);
+        Assert.NotEqual(IntPtr.Zero, ekran);
+        try
+        {
+            var kok = X11.XDefaultRootWindow(ekran);
+            var bicimli = X11.XCreateSimpleWindow(ekran, kok, 0, 0, 644, 484, 0, 0, 0);
+            var bicimsiz = X11.XCreateSimpleWindow(ekran, kok, 0, 0, 644, 484, 0, 0, 0);
+            X11.XSync(ekran, false);
+
+            Assert.True(RecorderFrame.ShapeX11(bicimli, RecorderFrame.Ring(new Avalonia.PixelSize(644, 484), 2)));
+            X11.XSync(ekran, false);
+
+            Assert.Equal(4, X11.Dikdortgenler(ekran, bicimli, 0));
+            Assert.Equal(0, X11.Dikdortgenler(ekran, bicimli, 2));
+            Assert.Equal(1, X11.Dikdortgenler(ekran, bicimsiz, 0));
+            Assert.Equal(1, X11.Dikdortgenler(ekran, bicimsiz, 2));
+
+            X11.XDestroyWindow(ekran, bicimli);
+            X11.XDestroyWindow(ekran, bicimsiz);
+        }
+        finally
+        {
+            X11.XCloseDisplay(ekran);
+        }
+    }
+
+    /// <summary>
+    /// Bölge çizerken masaüstü dondurulur: seçici birleştiricisiz X11'de saydam değil siyah
+    /// çiziliyordu. Canlı kol gerçek ekranın karesini alır (ekran boyunda), sahte kare zemine
+    /// fırça olarak gider; kare yoksa zemin saydam kalır (olumsuz kontrol).
+    /// </summary>
+    [X11KayitFact]
+    public void BolgeSeciciMasaustununDondurulmusKaresiniGosterir()
+    {
+        var olcu = AppHost.Run(() =>
+        {
+            var kare = RecorderRegionPicker.FreezeX11Async(System.Threading.CancellationToken.None).GetAwaiter().GetResult();
+            var boyut = kare?.PixelSize;
+            var dolu = new RecorderRegionPicker { Frozen = kare };
+            dolu.ApplyFrozen();
+            var bos = new RecorderRegionPicker();
+            bos.ApplyFrozen();
+            var zemin = dolu.FindControl<Canvas>("Surface")!.Background;
+            var bosZemin = bos.FindControl<Canvas>("Surface")!.Background;
+            kare?.Dispose();
+            return (boyut, dolu: zemin is Avalonia.Media.ImageBrush, bos: bosZemin is Avalonia.Media.ImageBrush);
+        });
+
+        Assert.NotNull(olcu.boyut);
+        Assert.True(olcu.boyut!.Value.Width > 0 && olcu.boyut.Value.Height > 0);
+        Assert.True(olcu.dolu);
+        Assert.False(olcu.bos);
+    }
+
+    /// <summary>Çerçeve Windows'ta her zaman; X11'de yalnız biçim verildiyse ve şerit bölgenin dışındaysa (içteki şerit kayda girer).</summary>
+    [Fact]
+    public void CerceveYalnizKaydaGirmeyecekVeBicimliyseGosterilir()
+    {
+        Assert.True(RecorderFrameHost.Showable(windows: true, inside: true, shaped: false));
+        Assert.True(RecorderFrameHost.Showable(windows: false, inside: false, shaped: true));
+        Assert.False(RecorderFrameHost.Showable(windows: false, inside: true, shaped: true));
+        Assert.False(RecorderFrameHost.Showable(windows: false, inside: false, shaped: false));
+    }
+
+    /// <summary>
+    /// Video klasörü yoksa (.NET Linux'ta <c>~/Videos</c> yoksa MyVideos için boş dönüyor) kayıt
+    /// çalışma klasörüne değil <c>~/Videos/VidShrink</c>'e gider; masaüstünden açılınca çalışma
+    /// klasörü <c>/</c> olabiliyor. Sistem klasörü varsa o kullanılır (olumlu kontrol).
+    /// </summary>
+    [Fact]
+    public void VideoKlasoruYoksaEvKlasorununAltinaDuser()
+    {
+        var onceki = KullaniciKlasoru.Bul;
+        try
+        {
+            KullaniciKlasoru.Bul = k => k == Environment.SpecialFolder.UserProfile ? "/home/ali" : "";
+            Assert.Equal(Path.Combine("/home/ali", "Videos", "VidShrink"), new RecorderSettings().ResolveFolder());
+            Assert.Equal(Path.Combine("/home/ali", "Pictures", "VidShrink"), KullaniciKlasoru.Resim());
+
+            KullaniciKlasoru.Bul = k => k == Environment.SpecialFolder.MyVideos ? "/home/ali/Filmler" : "/home/ali";
+            Assert.Equal(Path.Combine("/home/ali/Filmler", "VidShrink"), new RecorderSettings().ResolveFolder());
+            Assert.Equal("/elle", new RecorderSettings { OutputFolder = "/elle" }.ResolveFolder());
+        }
+        finally
+        {
+            KullaniciKlasoru.Bul = onceki;
+        }
+    }
+
+    private static class X11
+    {
+        [System.Runtime.InteropServices.DllImport("libX11.so.6")]
+        internal static extern IntPtr XOpenDisplay(IntPtr name);
+
+        [System.Runtime.InteropServices.DllImport("libX11.so.6")]
+        internal static extern int XCloseDisplay(IntPtr display);
+
+        [System.Runtime.InteropServices.DllImport("libX11.so.6")]
+        internal static extern IntPtr XDefaultRootWindow(IntPtr display);
+
+        [System.Runtime.InteropServices.DllImport("libX11.so.6")]
+        internal static extern IntPtr XCreateSimpleWindow(IntPtr display, IntPtr parent, int x, int y, uint width, uint height, uint border, ulong borderColor, ulong background);
+
+        [System.Runtime.InteropServices.DllImport("libX11.so.6")]
+        internal static extern int XDestroyWindow(IntPtr display, IntPtr window);
+
+        [System.Runtime.InteropServices.DllImport("libX11.so.6")]
+        internal static extern int XSync(IntPtr display, bool discard);
+
+        [System.Runtime.InteropServices.DllImport("libX11.so.6")]
+        private static extern int XFree(IntPtr data);
+
+        [System.Runtime.InteropServices.DllImport("libXext.so.6")]
+        private static extern IntPtr XShapeGetRectangles(IntPtr display, IntPtr window, int kind, out int count, out int ordering);
+
+        internal static int Dikdortgenler(IntPtr display, IntPtr window, int kind)
+        {
+            var veri = XShapeGetRectangles(display, window, kind, out var sayi, out _);
+            if (veri != IntPtr.Zero) XFree(veri);
+            return sayi;
+        }
     }
 }

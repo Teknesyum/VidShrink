@@ -58,6 +58,7 @@
   "main.action.cancel.disabled-tip": "Nijedan zadatak još nije u toku",
   "main.action.shrink": "Smanji",
   "main.action.shrink.disabled-tip": "Prvo učitajte video fajl",
+  "main.action.busy-tip": "Posao je već u toku; sačekajte da se završi ili ga otkažite",
   "main.action.convert": "Konvertuj",
   "main.action.convert.disabled-tip": "Prvo učitajte video fajl",
   "main.action.show-in-folder": "Prikaži u fascikli",
@@ -883,5 +884,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Izostavljeno: kodek nije podržan",
   "main.preset.handbrake.dropped.structural": "Preskočeno: struktura liste HandBrake-a",
   "main.share.qr": "QR kod linka za deljenje",
-  "main.share.qr-hint": "Skenirajte telefonom da biste otvorili link."
+  "main.share.qr-hint": "Skenirajte telefonom da biste otvorili link.",
+  "main.startup.no-display": "VidShrink nije mogao da otvori grafički ekran. Pokrenite ga iz sesije radne površine; na Waylandu mora biti dostupan Xwayland."
 }

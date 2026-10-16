@@ -58,6 +58,7 @@
   "main.action.cancel.disabled-tip": "אין עדיין עבודה פעילה",
   "main.action.shrink": "כווץ",
   "main.action.shrink.disabled-tip": "טענו קודם קובץ וידאו",
+  "main.action.busy-tip": "משימה כבר פועלת; המתינו לסיומה או בטלו אותה",
   "main.action.convert": "המר",
   "main.action.convert.disabled-tip": "טענו קודם קובץ וידאו",
   "main.action.show-in-folder": "הצג בתיקייה",
@@ -883,5 +884,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "הושמט: הקודק אינו נתמך",
   "main.preset.handbrake.dropped.structural": "דולג: מבנה הרשימה של HandBrake",
   "main.share.qr": "קוד QR של קישור השיתוף",
-  "main.share.qr-hint": "סרקו בטלפון כדי לפתוח את הקישור."
+  "main.share.qr-hint": "סרקו בטלפון כדי לפתוח את הקישור.",
+  "main.startup.no-display": "VidShrink לא הצליח לפתוח תצוגה גרפית. הפעילו אותו מתוך הפעלת שולחן עבודה; ב-Wayland נדרש Xwayland."
 }

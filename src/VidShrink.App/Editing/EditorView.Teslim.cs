@@ -136,7 +136,7 @@ internal partial class EditorView
         BtnShareCancel.Click += (_, _) => _shareSession?.Cancel();
         BtnShareCopy.Click += (_, _) => _ = CopyShareLinkAsync();
         BtnExportCancel.Click += (_, _) => _exportCts?.Cancel();
-        BtnExportReveal.Click += (_, _) => { if (_exported is { } path) RevealFolder(path); };
+        BtnExportReveal.Click += (_, _) => { if (_exported is { } path) RevealSafely(path); };
         BtnExportPlay.Click += (_, _) => { if (_exported is { } path && OpenInPlayer is { } open) _ = open(path); };
         CmbExportMode.SelectionChanged += (_, _) => _pendingPlan = null;
         ChkExportSeparate.IsCheckedChanged += (_, _) => _pendingPlan = null;
@@ -398,6 +398,19 @@ internal partial class EditorView
         BtnExportPlay.IsVisible = false;
         CmbExportMode.IsEnabled = !running;
         EnableExport(!running);
+    }
+
+    /// <summary>Klasör açılamazsa (Linux'ta <c>xdg-open</c> yoksa) çökmek yerine durum satırına yazar.</summary>
+    internal void RevealSafely(string path)
+    {
+        try
+        {
+            RevealFolder(path);
+        }
+        catch (Exception ex) when (ex is IOException or System.ComponentModel.Win32Exception or InvalidOperationException)
+        {
+            SetStatus("StatusError", $"{Strings.Get("main.error.folder")}: {ex.Message}");
+        }
     }
 
     private void SetStatus(string theme, string text)

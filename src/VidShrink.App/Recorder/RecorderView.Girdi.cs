@@ -12,6 +12,20 @@ internal partial class RecorderView
     private KeyTracker _keys = new();
     private (bool WantsClicks, bool ShowKeys, PointerStyle Style, bool ShortcutsOnly, KeyCaptionStyle Caption) _inputMode;
 
+    /// <summary>
+    /// Tıklama halkası, tıklama sesi, tuş gösterimi ve imleç büyüteci düşük seviye Win32
+    /// kancasına ve GDI ekran kopyasına dayanıyor; başka sistemde yerlerine sessiz boş
+    /// uygulamalar geçiyor. Linux'ta dört kutu işaretlenebiliyor ama kayıtta hiçbir şey
+    /// yapmıyordu; artık yalnız çalıştıkları yerde gösterilir.
+    /// </summary>
+    internal static bool InputEffectsAvailable { get; set; } = OperatingSystem.IsWindows();
+
+    private void HideUnavailableInputOptions()
+    {
+        if (InputEffectsAvailable) return;
+        ChkShowClicks.IsVisible = ChkClickSound.IsVisible = ChkShowKeys.IsVisible = ChkMagnifier.IsVisible = false;
+    }
+
     private static bool RealDesktop
         => OperatingSystem.IsWindows()
            && Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime;

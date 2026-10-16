@@ -58,6 +58,7 @@
   "main.action.cancel.disabled-tip": "Der kører endnu ingen opgave",
   "main.action.shrink": "Krymp",
   "main.action.shrink.disabled-tip": "Indlæs en videofil først",
+  "main.action.busy-tip": "Et job kører allerede; vent til det er færdigt, eller annuller det",
   "main.action.convert": "Konverter",
   "main.action.convert.disabled-tip": "Indlæs en videofil først",
   "main.action.show-in-folder": "Vis i mappe",
@@ -883,5 +884,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Udeladt: codec understøttes ikke",
   "main.preset.handbrake.dropped.structural": "Sprunget over: HandBrakes listestruktur",
   "main.share.qr": "QR-kode til delingslinket",
-  "main.share.qr-hint": "Scan med din telefon for at åbne linket."
+  "main.share.qr-hint": "Scan med din telefon for at åbne linket.",
+  "main.startup.no-display": "VidShrink kunne ikke åbne en grafisk skærm. Start programmet fra en skrivebordssession; under Wayland skal Xwayland være tilgængelig."
 }

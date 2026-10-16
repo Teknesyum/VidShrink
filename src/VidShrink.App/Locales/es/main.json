@@ -58,6 +58,7 @@
   "main.action.cancel.disabled-tip": "Todavía no hay ningún trabajo en curso",
   "main.action.shrink": "Reducir",
   "main.action.shrink.disabled-tip": "Cargue primero un archivo de vídeo",
+  "main.action.busy-tip": "Ya hay un trabajo en curso; espere a que termine o cancélelo",
   "main.action.convert": "Convertir",
   "main.action.convert.disabled-tip": "Cargue primero un archivo de vídeo",
   "main.action.show-in-folder": "Ver en carpeta",
@@ -883,5 +884,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Descartado: códec no compatible",
   "main.preset.handbrake.dropped.structural": "Omitido: estructura de lista de HandBrake",
   "main.share.qr": "Código QR del enlace compartido",
-  "main.share.qr-hint": "Escanéalo con el teléfono para abrir el enlace."
+  "main.share.qr-hint": "Escanéalo con el teléfono para abrir el enlace.",
+  "main.startup.no-display": "VidShrink no pudo abrir una pantalla gráfica. Inícielo desde una sesión de escritorio; en Wayland debe estar disponible Xwayland."
 }

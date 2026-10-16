@@ -58,6 +58,7 @@
   "main.action.cancel.disabled-tip": "Pagaidām nenotiek neviens uzdevums",
   "main.action.shrink": "Saspiest",
   "main.action.shrink.disabled-tip": "Vispirms ielādējiet video failu",
+  "main.action.busy-tip": "Darbs jau notiek; pagaidiet, līdz tas beidzas, vai atceliet to",
   "main.action.convert": "Pārveidot",
   "main.action.convert.disabled-tip": "Vispirms ielādējiet video failu",
   "main.action.show-in-folder": "Rādīt mapē",
@@ -883,5 +884,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Izlaists: kodeks netiek atbalstīts",
   "main.preset.handbrake.dropped.structural": "Izlaists: HandBrake saraksta struktūra",
   "main.share.qr": "Kopīgošanas saites QR kods",
-  "main.share.qr-hint": "Noskenējiet ar tālruni, lai atvērtu saiti."
+  "main.share.qr-hint": "Noskenējiet ar tālruni, lai atvērtu saiti.",
+  "main.startup.no-display": "VidShrink nevarēja atvērt grafisko displeju. Palaidiet to no darbvirsmas sesijas; Wayland vidē jābūt pieejamam Xwayland."
 }

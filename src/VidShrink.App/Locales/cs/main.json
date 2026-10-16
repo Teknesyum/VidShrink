@@ -58,6 +58,7 @@
   "main.action.cancel.disabled-tip": "Zatím neběží žádná úloha",
   "main.action.shrink": "Zmenšit",
   "main.action.shrink.disabled-tip": "Nejprve načtěte video soubor",
+  "main.action.busy-tip": "Už běží úloha; počkejte na její dokončení nebo ji zrušte",
   "main.action.convert": "Převést",
   "main.action.convert.disabled-tip": "Nejprve načtěte video soubor",
   "main.action.show-in-folder": "Zobrazit ve složce",
@@ -883,5 +884,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Vynecháno: kodek není podporován",
   "main.preset.handbrake.dropped.structural": "Přeskočeno: struktura seznamu HandBrake",
   "main.share.qr": "QR kód odkazu ke sdílení",
-  "main.share.qr-hint": "Naskenujte telefonem a otevřete odkaz."
+  "main.share.qr-hint": "Naskenujte telefonem a otevřete odkaz.",
+  "main.startup.no-display": "VidShrink nemohl otevřít grafický displej. Spusťte jej z relace pracovní plochy; ve Waylandu musí být k dispozici Xwayland."
 }

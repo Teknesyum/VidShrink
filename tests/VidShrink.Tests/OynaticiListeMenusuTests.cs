@@ -135,7 +135,7 @@ public sealed class OynaticiListeMenusuTests
         }
     }
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void AcikMenudeSagTikKapatirYenidenAcmaz()
     {
         Kosum(new[] { "a1.mp4", "a2.mp4" }, "a1.mp4", (view, window, _) =>
@@ -157,7 +157,7 @@ public sealed class OynaticiListeMenusuTests
         });
     }
 
-    [Theory]
+    [WindowsTheory("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     [InlineData("menu")]
     [InlineData("liste")]
     public void AcikMenununUstundeSagTikIkinciMenuAcmaz(string yer)
@@ -183,7 +183,7 @@ public sealed class OynaticiListeMenusuTests
         });
     }
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void OgeMenusununOgeleriDogru()
     {
         Kosum(new[] { "a1.mp4", "a2.mp4", "a3.mp4" }, "a1.mp4", (view, window, _) =>
@@ -219,7 +219,7 @@ public sealed class OynaticiListeMenusuTests
         });
     }
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void BundanSonraOynatCalaninHemenArkasinaKoyar()
     {
         Kosum(new[] { "a1.mp4", "a2.mp4", "a3.mp4", "a4.mp4" }, "a2.mp4", (view, window, _) =>
@@ -239,7 +239,7 @@ public sealed class OynaticiListeMenusuTests
         });
     }
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void SirayaAlSonaKoyar()
     {
         Kosum(new[] { "a1.mp4", "a2.mp4", "a3.mp4", "a4.mp4" }, "a2.mp4", (view, window, _) =>
@@ -253,7 +253,7 @@ public sealed class OynaticiListeMenusuTests
         });
     }
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void ListedenKaldirCikarir()
     {
         Kosum(new[] { "a1.mp4", "a2.mp4", "a3.mp4" }, "a1.mp4", (view, window, klasor) =>
@@ -267,7 +267,7 @@ public sealed class OynaticiListeMenusuTests
         });
     }
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void OynatKonumVeYolKapidanGecer()
     {
         Kosum(new[] { "a1.mp4", "a2.mp4", "a3.mp4" }, "a1.mp4", (view, window, klasor) =>
@@ -306,7 +306,7 @@ public sealed class OynaticiListeMenusuTests
         });
     }
 
-    [Fact]
+    [WindowsFact("ham girdi ve açılır pencere düzeneği Win32 arka ucuna bağlı; Linux'ta AppHost başsız, davranış X11'de elle doğrulandı")]
     public void AcikOgeMenusundeListeyeTiklamakDosyaAcmaz()
     {
         Kosum(new[] { "a1.mp4", "a2.mp4", "a3.mp4" }, "a1.mp4", (view, window, klasor) =>

@@ -26,7 +26,11 @@ internal partial class RecorderFrame : Window
     public RecorderFrame()
     {
         InitializeComponent();
-        Opened += (_, _) => MakeClickThrough();
+        Opened += (_, _) =>
+        {
+            MakeClickThrough();
+            ApplyX11Shape();
+        };
     }
 
     internal static long ClickThroughStyle(long exStyle)
@@ -80,11 +84,13 @@ internal partial class RecorderFrame : Window
         var scaling = (Screens.ScreenFromPoint(new PixelPoint(region.X, region.Y)) ?? Screens.Primary)?.Scaling ?? 1;
         _edge = EdgePixels(Thickness, scaling);
         var placed = Placement(region, _edge, Screens.All.Select(s => s.Bounds));
+        Inside = placed == region;
         _size = placed.Size;
         Position = placed.Position;
         Width = placed.Width / scaling;
         Height = placed.Height / scaling;
         ApplyShape();
+        ApplyX11Shape();
     }
 
     private void ApplyShape()
@@ -179,8 +185,22 @@ internal sealed class RecorderFrameHost : IRecorderFrameHost
     {
         _frame ??= new RecorderFrame();
         _frame.Place(region);
+        if (!Showable(OperatingSystem.IsWindows(), _frame.Inside, _frame.Shaped))
+        {
+            Hide();
+            return;
+        }
+
         if (!_frame.IsVisible) _frame.Show();
     }
+
+    /// <summary>
+    /// Windows'ta çerçeve her zaman gösterilir: biçim bölgeyle kesilir ve affinity ile kayda
+    /// girmez. X11'de kayıttan dışlama yok; bölgenin içine düşen şerit videoya girerdi, biçim
+    /// verilemeyen pencere ise bölgeyi siyah bir dikdörtgenle örterdi. İkisinde de çerçeve yok.
+    /// </summary>
+    internal static bool Showable(bool windows, bool inside, bool shaped)
+        => windows || (!inside && shaped);
 
     public void Hide()
     {

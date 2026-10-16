@@ -45,7 +45,8 @@ internal static class AppHost
             {
                 if (Application.Current is null)
                 {
-                    var builder = AppBuilder.Configure<VidShrink.App.App>().UseSkia().UseHarfBuzz();
+                    // Uygulamanin Linux yazi tipi yedegi testte de kurulur; yoksa yerlesim denetimi baska yazi tipini olcer.
+                    var builder = VidShrink.App.YaziTipiYedegi.Uygula(AppBuilder.Configure<VidShrink.App.App>().UseSkia().UseHarfBuzz());
                     builder = Backend == "Win32"
                         ? builder.UseWin32()
                         : builder.UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false });

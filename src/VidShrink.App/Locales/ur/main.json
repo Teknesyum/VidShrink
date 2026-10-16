@@ -58,6 +58,7 @@
   "main.action.cancel.disabled-tip": "ابھی تک کوئی کام نہیں چل رہا",
   "main.action.shrink": "سکیڑیں",
   "main.action.shrink.disabled-tip": "پہلے ایک ویڈیو فائل لوڈ کریں",
+  "main.action.busy-tip": "ایک کام پہلے سے چل رہا ہے؛ اس کے ختم ہونے کا انتظار کریں یا اسے منسوخ کریں",
   "main.action.convert": "تبدیل کریں",
   "main.action.convert.disabled-tip": "پہلے ایک ویڈیو فائل لوڈ کریں",
   "main.action.show-in-folder": "فولڈر میں دکھائیں",
@@ -883,5 +884,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "چھوڑ دیا گیا: کوڈیک معاون نہیں",
   "main.preset.handbrake.dropped.structural": "نظرانداز: HandBrake فہرست کی ساخت",
   "main.share.qr": "شیئر لنک کا QR کوڈ",
-  "main.share.qr-hint": "لنک کھولنے کے لیے فون سے اسکین کریں۔"
+  "main.share.qr-hint": "لنک کھولنے کے لیے فون سے اسکین کریں۔",
+  "main.startup.no-display": "VidShrink کوئی گرافیکل ڈسپلے نہیں کھول سکا۔ اسے ڈیسک ٹاپ سیشن سے چلائیں؛ Wayland پر Xwayland دستیاب ہونا ضروری ہے۔"
 }

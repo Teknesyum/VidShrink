@@ -58,6 +58,7 @@
   "main.action.cancel.disabled-tip": "अभी कोई काम नहीं चल रहा",
   "main.action.shrink": "सिकोड़ें",
   "main.action.shrink.disabled-tip": "पहले एक वीडियो फ़ाइल लोड करें",
+  "main.action.busy-tip": "एक काम पहले से चल रहा है; उसके पूरा होने की प्रतीक्षा करें या उसे रद्द करें",
   "main.action.convert": "बदलें",
   "main.action.convert.disabled-tip": "पहले एक वीडियो फ़ाइल लोड करें",
   "main.action.show-in-folder": "फ़ोल्डर में दिखाएँ",
@@ -883,5 +884,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "छोड़ा गया: कोडेक समर्थित नहीं",
   "main.preset.handbrake.dropped.structural": "छोड़ा गया: HandBrake सूची संरचना",
   "main.share.qr": "शेयर लिंक का QR कोड",
-  "main.share.qr-hint": "लिंक खोलने के लिए फ़ोन से स्कैन करें।"
+  "main.share.qr-hint": "लिंक खोलने के लिए फ़ोन से स्कैन करें।",
+  "main.startup.no-display": "VidShrink कोई ग्राफ़िकल डिस्प्ले नहीं खोल सका। इसे डेस्कटॉप सत्र से चलाएँ; Wayland पर Xwayland उपलब्ध होना चाहिए।"
 }

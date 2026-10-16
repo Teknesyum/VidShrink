@@ -58,6 +58,7 @@
   "main.action.cancel.disabled-tip": "Aucune tâche n'est en cours pour le moment",
   "main.action.shrink": "Réduire",
   "main.action.shrink.disabled-tip": "Chargez d'abord un fichier vidéo",
+  "main.action.busy-tip": "Une tâche est déjà en cours ; attendez qu’elle se termine ou annulez-la",
   "main.action.convert": "Convertir",
   "main.action.convert.disabled-tip": "Chargez d'abord un fichier vidéo",
   "main.action.show-in-folder": "Afficher dans le dossier",
@@ -883,5 +884,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Ignoré : codec non pris en charge",
   "main.preset.handbrake.dropped.structural": "Passé : structure de liste HandBrake",
   "main.share.qr": "Code QR du lien de partage",
-  "main.share.qr-hint": "Scannez-le avec votre téléphone pour ouvrir le lien."
+  "main.share.qr-hint": "Scannez-le avec votre téléphone pour ouvrir le lien.",
+  "main.startup.no-display": "VidShrink n'a pas pu ouvrir d'affichage graphique. Lancez-le depuis une session de bureau ; sous Wayland, Xwayland doit être disponible."
 }

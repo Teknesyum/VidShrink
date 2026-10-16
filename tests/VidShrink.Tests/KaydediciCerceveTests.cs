@@ -87,7 +87,7 @@ public sealed class KaydediciCerceveTests
         Assert.Equal(new[] { "Hesap Makinesi", "Kapali" }, olcu.sorulan);
     }
 
-    [Fact]
+    [WindowsFact("kayıt çerçevesi Win32 FindWindow/GetClientRect okur")]
     public void GercekPencereninIstemciAlaniOkunur()
     {
         var olcu = AppHost.Run(() =>

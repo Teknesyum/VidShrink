@@ -83,7 +83,7 @@ public sealed class KaydediciSeciciTests
             var vazgecildi = vazgecen.DrawRegionAsync().GetAwaiter().GetResult();
             var vazgecKutu = Bul<TextBox>(vazgecen, "TxtRegionWidth").Text;
 
-            var sonra = new RecorderView(ayarYolu) { SkipAutoMeasure = true };
+            var sonra = new RecorderView(ayarYolu) { SkipAutoMeasure = true, CapturePlatform = RecorderPlatform.Windows };
             var hazir = sonra.PrepareRecording()!.Value;
             var args = RecorderArguments.Build(hazir.Request, hazir.Path);
             return (cizildi, istenenOran, kutular, dosya, vazgecildi, vazgecKutu, aspect: Bul<ComboBox>(sonra, "CmbAspect").SelectedIndex,
@@ -287,7 +287,7 @@ public sealed class KaydediciSeciciTests
             var kutu = Bul<TextBox>(once, "TxtWindowTitle").Text;
             var dosyada = Dosyada(ayarYolu, "windowTitle");
 
-            var sonra = new RecorderView(ayarYolu) { SkipAutoMeasure = true, ListWindows = () => new[] { "Hesap Makinesi" } };
+            var sonra = new RecorderView(ayarYolu) { SkipAutoMeasure = true, CapturePlatform = RecorderPlatform.Windows, ListWindows = () => new[] { "Hesap Makinesi" } };
             sonra.RefreshWindowList();
             var hazir = sonra.PrepareRecording()!.Value;
             var args = RecorderArguments.Build(hazir.Request, hazir.Path);
@@ -339,7 +339,7 @@ public sealed class KaydediciSeciciTests
 
         var olcu = AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
         {
-            var degismeyen = new RecorderView(ayarYolu) { SkipAutoMeasure = true, ScreenSource = Ekranlar };
+            var degismeyen = new RecorderView(ayarYolu) { SkipAutoMeasure = true, CapturePlatform = RecorderPlatform.Windows, ScreenSource = Ekranlar };
             Elle(degismeyen);
             degismeyen.RefreshScreens();
             var ilkHazir = degismeyen.PrepareRecording()!.Value;
@@ -352,7 +352,7 @@ public sealed class KaydediciSeciciTests
             kutu.SelectedIndex = 1;
             var dosyada = Dosyada(ayarYolu, "screenIndex");
 
-            var sonra = new RecorderView(ayarYolu) { SkipAutoMeasure = true, ScreenSource = Ekranlar };
+            var sonra = new RecorderView(ayarYolu) { SkipAutoMeasure = true, CapturePlatform = RecorderPlatform.Windows, ScreenSource = Ekranlar };
             sonra.RefreshScreens();
             var hazir = sonra.PrepareRecording()!.Value;
             var args = RecorderArguments.Build(hazir.Request, hazir.Path);

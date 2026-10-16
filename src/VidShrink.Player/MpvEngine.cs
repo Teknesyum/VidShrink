@@ -88,7 +88,10 @@ public sealed partial class MpvEngine : IPlaybackEngine
         try
         {
             foreach (var (name, value) in OptionsFor(_options))
-                Check(mpv_set_option_string(_mpv, name, value), $"option {name}={value}");
+            {
+                var rc = mpv_set_option_string(_mpv, name, value);
+                if (!Absent(name, rc)) Check(rc, $"option {name}={value}");
+            }
 
             Check(mpv_initialize(_mpv), "mpv_initialize");
             Check(mpv_request_log_messages(_mpv, "info"), "mpv_request_log_messages");
@@ -136,11 +139,21 @@ public sealed partial class MpvEngine : IPlaybackEngine
     public static IReadOnlyList<(string Name, string Value)> OptionsFor(PlaybackOptions options)
     {
         var list = new List<(string Name, string Value)>(BaseOptions(options));
+        if (OperatingSystem.IsLinux()) list.Add(("ao", LinuxAudioOutputs));
         if (!options.Audio) list.Add(("aid", "no"));
         if (!options.Video) list.Add(("vid", "no"));
         if (options.Loop) list.Add(("loop-file", "inf"));
         return list;
     }
+
+    /// <summary>
+    /// Linux'ta ses cikisi sirasi SDL'siz. Ses sunucusu yokken (kok kullanici, masaustu oturumu
+    /// disi) libmpv'nin varsayilan sirasi SDL'e iner; SDL'in ses acilisi is parcacigi guvenli
+    /// degil ve oynatici ile karsilastirma motorlari ayni anda acilinca SDL icinde bos isaretciye
+    /// atlayip sureci dusuruyordu (iki dosya ayni anda iletilince 2 kosumdan 1'i). Listede
+    /// olmayan surucu atlanir, hicbiri acilmazsa <c>audio-fallback-to-null</c> sessiz surer.
+    /// </summary>
+    public const string LinuxAudioOutputs = "pulse,pipewire,alsa,jack";
 
     /// <summary>
     /// <c>hwdec</c> degeri. Cizim yazilimda (<c>vo=libmpv</c>, SW render) oldugu icin donanim
@@ -655,7 +668,11 @@ public sealed partial class MpvEngine : IPlaybackEngine
         var open = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         Volatile.Write(ref _open, open);
         var start = "start=" + Number(Math.Max(0, double.IsFinite(atSeconds) ? atSeconds : 0));
-        if (CommandRc(OpenTag, "loadfile", source, "replace", "-1", start) < 0)
+        // mpv 0.38 loadfile'a <index> argumanini ekledi; 0.37 (Ubuntu 24.04, Debian 12'nin
+        // sistem libmpv'si) ucuncu argumani secenek sayip "-1"i reddediyor ve takilma kurtarmasinin
+        // yeniden acmasi Linux'ta hic calismiyordu. Ret eszamanli doner; eski bicimle bir kez daha denenir.
+        if (CommandRc(OpenTag, "loadfile", source, "replace", "-1", start) < 0
+            && CommandRc(OpenTag, "loadfile", source, "replace", start) < 0)
         {
             Interlocked.CompareExchange(ref _open, null, open);
             return false;
@@ -1086,6 +1103,17 @@ public sealed partial class MpvEngine : IPlaybackEngine
         => line.Contains("/warn:", StringComparison.Ordinal)
            || line.Contains("/error:", StringComparison.Ordinal)
            || line.Contains("/fatal:", StringComparison.Ordinal);
+
+    private const int OptionNotFound = -5;
+
+    /// <summary>
+    /// Yalniz derlemede bulunmayan ozelligi kapatan secenekler. <c>ytdl</c> Lua betigi
+    /// (ytdl_hook) ile gelir; Lua'siz libmpv'de secenek yok ve "option not found" motoru hic
+    /// actirmiyordu (kaynaktan derlenen 0.40'ta olculdu). Secenek yoksa kapattigi ozellik de yok.
+    /// </summary>
+    internal static readonly IReadOnlySet<string> OptionalOptions = new HashSet<string>(StringComparer.Ordinal) { "ytdl" };
+
+    internal static bool Absent(string name, int rc) => rc == OptionNotFound && OptionalOptions.Contains(name);
 
     private static void Check(int rc, string what)
     {

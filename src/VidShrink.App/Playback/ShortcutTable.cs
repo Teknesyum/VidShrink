@@ -84,7 +84,11 @@ internal sealed class ShortcutTable
             }
             else
             {
-                gesture = new TextBlock { Text = ShortcutKeyButton.Display(slot.Current), Theme = _find("MonoValue") };
+                gesture = new KeyText
+                {
+                    Text = ShortcutKeyButton.Display(slot.Current),
+                    Theme = _find("MonoValue")
+                };
             }
 
             Grid.SetRow(gesture, index);

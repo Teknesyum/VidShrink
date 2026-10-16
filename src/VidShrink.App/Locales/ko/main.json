@@ -58,6 +58,7 @@
   "main.action.cancel.disabled-tip": "아직 실행 중인 작업이 없습니다",
   "main.action.shrink": "축소",
   "main.action.shrink.disabled-tip": "먼저 동영상 파일을 불러오세요",
+  "main.action.busy-tip": "작업이 이미 실행 중입니다. 끝날 때까지 기다리거나 취소하세요",
   "main.action.convert": "변환",
   "main.action.convert.disabled-tip": "먼저 동영상 파일을 불러오세요",
   "main.action.show-in-folder": "폴더에서 보기",
@@ -883,5 +884,6 @@
   "main.preset.handbrake.dropped.unsupported-codec": "제외: 지원하지 않는 코덱",
   "main.preset.handbrake.dropped.structural": "건너뜀: HandBrake 목록 구조",
   "main.share.qr": "공유 링크 QR 코드",
-  "main.share.qr-hint": "휴대폰으로 스캔하면 링크가 열립니다."
+  "main.share.qr-hint": "휴대폰으로 스캔하면 링크가 열립니다.",
+  "main.startup.no-display": "VidShrink가 그래픽 디스플레이를 열 수 없습니다. 데스크톱 세션에서 실행하세요. Wayland에서는 Xwayland가 필요합니다."
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -46,7 +47,9 @@ internal partial class RecorderRegionPicker : Window
 
     internal static async Task<PixelRect?> PickAsync(double? ratio)
     {
-        var picker = new RecorderRegionPicker(ratio);
+        var frozen = await Freeze(CancellationToken.None);
+        var picker = new RecorderRegionPicker(ratio) { Frozen = frozen };
+        picker.Closed += (_, _) => frozen?.Dispose();
         picker.Show();
         picker.Activate();
         return await picker.Result;
@@ -55,6 +58,7 @@ internal partial class RecorderRegionPicker : Window
     private void Cover()
     {
         _desktop = Cover(this);
+        ApplyFrozen();
         Scrim.Width = Width;
         Scrim.Height = Height;
     }
