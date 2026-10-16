@@ -1533,6 +1533,23 @@
                           </Flyout>
                         </Button.Flyout>
                       </Button>
+                      <Button x:Name="BtnConvertChapters" Content="{loc:Text main.convert.chapters}" Theme="{StaticResource ChipButton}" VerticalAlignment="Center"
+                              auto:AutomationProperties.Name="{loc:Text main.convert.chapters}">
+                        <ToolTip.Tip>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.chapters.tip}"/>
+                        </ToolTip.Tip>
+                        <Button.Flyout>
+                          <Flyout>
+                            <StackPanel Spacing="{StaticResource SpaceSm}" MinWidth="{StaticResource FieldWidth}" MaxWidth="{StaticResource TipMaxWidth}">
+                              <SarilanMetin Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text main.convert.chapters.hint}"/>
+                              <SarilanMetin x:Name="TxtConvertChaptersEmpty" Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text main.convert.chapters.empty}"/>
+                              <StackPanel x:Name="ConvertChapterList" Spacing="{StaticResource SpaceXs}"/>
+                              <Button x:Name="BtnConvertChapterAdd" Content="{loc:Text main.convert.chapters.add}" Theme="{StaticResource GhostButton}"
+                                      HorizontalAlignment="Left" Click="OnConvertChapterAdd"/>
+                            </StackPanel>
+                          </Flyout>
+                        </Button.Flyout>
+                      </Button>
                     </WrapPanel>
 
                     <CheckBox x:Name="ChkConvertSingleFrame" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Theme="{StaticResource CheckStyle}" IsChecked="False" IsVisible="False" HorizontalAlignment="Left" Content="{loc:Text main.convert.single-frame}">

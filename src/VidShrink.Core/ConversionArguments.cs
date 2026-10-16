@@ -168,6 +168,16 @@ public static class ConversionArguments
             a.AddRange(new[] { "-i", plan.CoverPath! });
             coverMap = coverInput.ToString(CultureInfo.InvariantCulture) + ":v:0";
         }
+        string? chapterMap = null;
+        if (plan.Chapters is not null && ConversionChapters.Carries(plan.Container))
+        {
+            if (ConversionChapters.Metadata(info, plan) is null) chapterMap = "-1";
+            else
+            {
+                chapterMap = a.Count(arg => arg == "-i").ToString(CultureInfo.InvariantCulture);
+                a.AddRange(new[] { "-f", "ffmetadata", "-i", ConversionChapters.MetadataPath(outputPath) });
+            }
+        }
         if (plan.End is { } end)
         {
             var trimSeconds = end.TotalSeconds - (plan.Start?.TotalSeconds ?? 0);
@@ -284,6 +294,7 @@ public static class ConversionArguments
             a.AddRange(new[] { "-attach", plan.CoverPath!, "-metadata:s:t:0", "mimetype=" + attached.Mime, "-metadata:s:t:0", "filename=cover." + attached.Extension });
         if (plan.Repair) a.AddRange(RepairOutputArgs);
         a.AddRange(MetadataArgs(info, plan, subtitles));
+        if (chapterMap is not null) a.AddRange(new[] { "-map_chapters", chapterMap });
         a.AddRange(TagArgs(plan));
         if (plan.EndAtShortest && AddedAudio(plan) is not null) a.Add("-shortest");
         a.AddRange(plan.ExtraArgs);

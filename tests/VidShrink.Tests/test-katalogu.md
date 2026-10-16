@@ -427,6 +427,11 @@
 - `EkranaCizimTests.cs` — ekrana çizim (`ScreenSketch`, `RecorderSketch`): iz modeli, geri alma ve numara sırası, kutu ve
   ok başı geometrisi, Ctrl+F2 varsayılanı ve yedi eylemli eski ayar, kayıtsız basış. Gerçek pencerede Windows isabet testi
   çizim kipinde pencereyi, geçiş kipinde alttakini bulur; kutu pencerenin kendi çiziminde görünür. Geçiş biçimi mutasyonu kırıyor.
+- `BolumDuzenleyiciTests.cs` — Dönüştür'ün bölüm listesi (`ConversionChapters`, `MainWindow.DonusturBolum.cs`): kırpmaya
+  göre kayma, kırpma başını içeren bölümün 0'a çekilmesi, sona sığmayanın ve 1 sn'den yakının atılması; argümanda üç hal
+  (`null` dokunmaz, boş `-map_chapters -1`, dolu ffmetadata girdisi `-t`'den önce), bölüm taşımayan kapta değişmeyen komut.
+  Canlı kol `ConvertAsync` ile kırpılmış çıktının bölümlerini ffprobe'dan okur, metin dosyası kalmaz. Pencere kolu satırları,
+  hatalı zamanı, hepsini silmeyi, GIF'te gizlenmeyi ve yeni kaynakta sıfırlanmayı ölçer. Kırpma atlama mutasyonu kırıyor.
 - `PrompterTests.cs` — prompter (`PrompterScroll`, `RecorderPrompter`): hız basamakları ve uçlar, sona varınca durma ve
   sondan başa sarma, ayarda metin ve hız (geçersiz basamak varsayılana). Gerçek pencere `GetWindowDisplayAffinity` 0x11
   okur (negatif kontrol 0, uyarı satırı görünür); akış saatle değil `Advance`'a verilen zamanla ölçülür, tuşlar ve

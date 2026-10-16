@@ -141,6 +141,12 @@ public sealed record ConversionPlan
     /// <summary>Resim dizisi çıktısında yalnız ilk kare tek dosyaya yazılır. Öteki kaplarda okunmaz.</summary>
     public bool SingleFrame { get; init; }
 
+    /// <summary>
+    /// Düzenlenen bölüm listesi (later.md #44): <c>null</c> kaynağın bölümleri olduğu gibi, boş liste bölümsüz.
+    /// Zamanı kaynağın başından sayılır; çıktıya <see cref="ConversionChapters.ForOutput"/> ile kayar.
+    /// </summary>
+    public IReadOnlyList<ChapterEntry>? Chapters { get; init; }
+
     /// <summary>Çıktı ses akışı taşıyor mu. GIF, hareketli görsel ve resim dizisi taşımaz; ses seçimi orada okunmaz.</summary>
     public bool CarriesAudio => !Gif && !AnimatedImage && !ImageSequenceOutput;
 

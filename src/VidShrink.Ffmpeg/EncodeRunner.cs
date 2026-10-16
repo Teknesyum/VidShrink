@@ -784,7 +784,16 @@ public sealed class EncodeRunner
                 return new ConversionResult(outputPath, Megabayt.Oku(bytes));
             }
             else
-                await RunCommandAsync(ConversionArguments.Build(info, plan, partialPath, availability: EncoderCapabilities.Instance), duration, progress, "converting", 0, 1, ct);
+            {
+                var chapters = ConversionChapters.Metadata(info, plan);
+                var chapterPath = ConversionChapters.MetadataPath(partialPath);
+                if (chapters is not null) await File.WriteAllTextAsync(chapterPath, chapters, ct);
+                try
+                {
+                    await RunCommandAsync(ConversionArguments.Build(info, plan, partialPath, availability: EncoderCapabilities.Instance), duration, progress, "converting", 0, 1, ct);
+                }
+                finally { if (chapters is not null) TryDelete(chapterPath); }
+            }
 
             File.Move(partialPath, outputPath, overwrite: true);
             return new ConversionResult(outputPath, Megabayt.Oku(new FileInfo(outputPath).Length));

@@ -42,8 +42,8 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 13 Ekim 2026 · "bulduklarını later a eklersin" · ARC-P5 = DON-P14 · Bizde Olmayan Araçlar · iş orta · öncelik 1 · karar gerekmez
 
 - Etiketler ve "Onar" hazır ayarı 16 Ekim 2026'da main'de (`MainWindow.DonusturEtiket.cs`).
-- Kalan (ARC-15, DON-30): kaydedicinin bölüm yazan yolu (`src/VidShrink.Core/RecorderChapters.cs`) ortak hâle getirilir; kaynağın bölümleri Dönüştür'de eklenip adlandırılıp silinebilen liste olur. Doğrulama: ffprobe ile bölüm okunur.
-- Açık kalanlar: etiketler ayara yazılmıyor, komut satırı yüzü yok, Onar gerçek bozuk dosyada ölçülmedi.
+- Bölüm listesi (ARC-15, DON-30) 16 Ekim 2026'da main'de: Dönüştür'de "Bölümler…" açılırı (`MainWindow.DonusturBolum.cs`), hesap `Core/ConversionChapters.cs`, ffmetadata metni kaydedicinin `RecorderChapters.Metadata`'sından. ffprobe ile okunarak doğrulandı (`BolumDuzenleyiciTests`).
+- Açık kalanlar: etiketler ve bölümler ayara yazılmıyor, komut satırı yüzü yok, Onar gerçek bozuk dosyada ölçülmedi; bölüm başlangıcı kaynağın `start_time`'ı sıfır değilse ona göre kaydırılmıyor.
 
 ## 50. Mac Ortam Denetimi Bağlantısı
 

@@ -3691,6 +3691,7 @@ public partial class MainWindow : Window
         RefreshQualityTargetAvailability();
         DeriveQualityFromTarget();
         KapSecenekleriniYokla();
+        ResetConvertChapters(info);
         RefreshConversion();
     }
 
@@ -4955,6 +4956,7 @@ public partial class MainWindow : Window
         CmbQualityMode.IsEnabled = SliderQuality.IsEnabled = TxtQuality.IsEnabled = kaliteOkunur;
         ChkConvertSingleFrame.IsVisible = plan.ImageSequenceOutput;
         ConvertGifPanel.IsVisible = plan.Gif;
+        BtnConvertChapters.IsVisible = ConversionChapters.Carries(plan.Container);
     }
 
     private void RefreshConversion()
@@ -4966,6 +4968,7 @@ public partial class MainWindow : Window
         if (plan.Start == TimeSpan.MinValue || plan.End == TimeSpan.MinValue)
             errors.Add(LanguageCatalog.Validation(LanguageCatalog.TrimFormatError));
         if (ExtraArgsError(CustomArguments.Parse(TxtConvertExtraArgs.Text)) is { } extraError) errors.Add(extraError);
+        if (ConvertChapterError() is { } chapterError) errors.Add(chapterError);
 
         var output = CommandOutputPath(plan, ConversionOutputPath(info, plan));
         RefreshConvertSubtitleState(plan);

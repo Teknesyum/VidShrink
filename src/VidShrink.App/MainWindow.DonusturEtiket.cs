@@ -33,7 +33,8 @@ public partial class MainWindow
         Year = TxtConvertTagYear.Text,
         Comment = TxtConvertTagComment.Text,
         CoverPath = _convertCoverPath,
-        Repair = ChkConvertRepair.IsChecked == true
+        Repair = ChkConvertRepair.IsChecked == true,
+        Chapters = ReadConvertChapters()
     };
 
     /// <summary>Kapağı seçer ya da (<c>null</c>) kaldırır; adı panelde gösterilir, komut tazelenir.</summary>
