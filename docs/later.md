@@ -23,7 +23,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P6 · Kaydedici · iş orta · öncelik 1 · karar gerekmez
 
 - Hızlı kırpma 16 Ekim 2026'da main'de (`RecorderQuickTrim`, sonuç panelinde "Hızlı kırp").
-- Kalan (EKB-25 Kayıt geçmişi): hızlı kırpmanın küçük resim üretimi son kayıtların listesinde kullanılır: ad, süre, boyut; aç, paylaş, sil. Liste sahte klasörle ölçülür.
+- Kayıt geçmişi 16 Ekim 2026'da main'de: kaydedicide "Son Kayıtlar" (`RecordingHistoryWindow`, `RecentRecordings`); küçük resim, süre, boyut, tarih; aç, klasörde göster, paylaş, çöpe taşı. Sahte klasörle ölçüldü (`KayitGecmisiTests`).
 - Yan bulgu: bas-konuş kısayolu atanmamışken ipucunda tuş adı boş kalıyor; yer saptanmadı.
 
 ## 42. Ekrana Çizim Ve Prompter

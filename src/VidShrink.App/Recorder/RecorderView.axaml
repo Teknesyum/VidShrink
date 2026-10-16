@@ -37,6 +37,12 @@
               IsVisible="{Binding #RadAdvanced.IsChecked}"
               Content="{loc:Text recorder.hotkeys.title}"
               auto:AutomationProperties.Name="{loc:Text recorder.hotkeys.title}"/>
+      <Button x:Name="BtnHistory"
+              VerticalAlignment="Center"
+              Theme="{StaticResource GhostButton}"
+              Padding="{StaticResource HeaderButtonPadding}"
+              Content="{loc:Text recorder.history.title}"
+              auto:AutomationProperties.Name="{loc:Text recorder.history.title}"/>
     </StackPanel>
 
     <!--

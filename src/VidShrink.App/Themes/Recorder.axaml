@@ -73,6 +73,12 @@
       RecorderResultCardHold  <- 6 sn. Kart bu süre sonunda kendiliğinden kapanır; imleç
                                  üstündeyken kapanmaz, imleç çıkınca süre baştan sayılır.
 
+    Son kayıtlar penceresi.
+
+      RecorderHistoryWidth    <- TipMaxWidth (420). Kuyruk pencereleriyle aynı en; satırda sonuç
+                                 kartının küçük resmi ve yanında ad ile ayrıntı.
+      RecorderHistoryHeight   <- PlanPanelMaxHeight (576). Oynatıcının geçmiş penceresiyle aynı boy.
+
     Sonuç panelindeki hızlı kırpma açılırı.
 
       RecorderQuickTrimWidth       <- TipMaxWidth (420). Açılır bir ipucu balonu kadar geniş;
@@ -133,6 +139,8 @@
   <StaticResource x:Key="RecorderResultCardThumbHeight" ResourceKey="PlaybackThumbnailHeight"/>
   <StaticResource x:Key="RecorderResultCardGap" ResourceKey="SpaceLg"/>
   <sys:TimeSpan x:Key="RecorderResultCardHold">00:00:06</sys:TimeSpan>
+  <StaticResource x:Key="RecorderHistoryWidth" ResourceKey="TipMaxWidth"/>
+  <StaticResource x:Key="RecorderHistoryHeight" ResourceKey="PlanPanelMaxHeight"/>
   <StaticResource x:Key="RecorderQuickTrimWidth" ResourceKey="TipMaxWidth"/>
   <StaticResource x:Key="RecorderQuickTrimThumbHeight" ResourceKey="PlaybackBarButtonSize"/>
 

@@ -156,6 +156,7 @@ internal partial class RecorderView : UserControl
         _lastRecording = null;
         ResetShare();
         HideFinish();
+        InitGecmis();
     }
 
     private void ShowError(string message)

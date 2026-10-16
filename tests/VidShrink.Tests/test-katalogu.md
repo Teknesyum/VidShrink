@@ -420,3 +420,6 @@
 - `TopluTeslimTests.cs` — düzenleyicinin toplu teslimi (`EditBatch`, `EditBatchWindow`): bozuk, eskimiş ve ters klip
   sınırını aşan proje sırayı durdurmuyor, çıktı adı komut satırı kuralı, iptal kalanı iptal sayıyor, aynı proje iki kez
   eklenmiyor, pencerede düşen satırın ipucu yerel neden. Hazırlık ve koşu sahte; düşüşte `break` mutasyonu iki testi kırıyor.
+- `KayitGecmisiTests.cs` — kaydedicinin son kayıtları (`RecentRecordings`, `RecordingHistoryWindow`): yalnız `kayit_*`
+  kayıtları en yenisi başta, süre ve küçük resim sonradan, çöpe taşınan düşer, taşınamayan kalır, klasörden kalkmış kayıt
+  oynatıcıya verilmez, kaydedici düğmesi ayardaki klasörü okur. Önek ve varlık denetimi mutasyonu üç testi kırıyor.

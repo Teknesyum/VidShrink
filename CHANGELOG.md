@@ -11,11 +11,15 @@ ship as part of it.
 
 - Editor: "Batch Export…" in the timeline menu exports several saved projects one after another; a project that
   cannot be read, whose source changed or that fails does not stop the rest, and its row says why.
+- Recorder: "Recent Recordings" lists the recordings in the recording folder with thumbnail, duration, size and date;
+  a recording opens in the player, shows in its folder, is shared or moves to the trash (never deleted outright).
 
 ### Fixed
 
 - Wrapped text no longer loses its last word when it is laid out at exactly the width it measured
   (Avalonia rounding at 125/150/200% scaling); every text block in the app uses the corrected control.
+- Recorder: the click, click sound, keys and magnifier boxes followed two gates after the Linux merge; one gate now
+  decides, so they hide where they do not work and show where they do.
 
 ## [1.2.22] - 2026-10-16
 

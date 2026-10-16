@@ -1,0 +1,35 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:auto="using:Avalonia.Automation"
+        xmlns:loc="using:VidShrink.App.Localization"
+        x:Class="VidShrink.App.Recorder.RecordingHistoryWindow"
+        Title="{loc:Text recorder.history.title}"
+        FontSize="{StaticResource FontSizeMd}" FontFamily="{StaticResource FontSans}"
+        Width="{StaticResource RecorderHistoryWidth}" Height="{StaticResource RecorderHistoryHeight}"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="{DynamicResource AppBg}"
+        auto:AutomationProperties.Name="{loc:Text recorder.history.title}">
+  <Grid RowDefinitions="*,Auto,Auto,Auto" RowSpacing="{StaticResource SpaceSm}" Margin="{StaticResource WorkspaceMargin}">
+    <ListBox x:Name="Rows" SelectionMode="Single" auto:AutomationProperties.Name="{loc:Text recorder.history.title}"/>
+    <SarilanMetin x:Name="TxtEmpty" Text="{loc:Text recorder.history.empty}" Theme="{StaticResource Hint}"
+               TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="False"/>
+    <ProgressBar Grid.Row="1" x:Name="ShareProgress" Minimum="0" Maximum="1"
+                 Height="{StaticResource ProgressBarHeight}" IsVisible="False"/>
+    <SarilanMetin Grid.Row="2" x:Name="TxtStatus" TextWrapping="Wrap" IsVisible="False"/>
+    <WrapPanel Grid.Row="3" HorizontalAlignment="Right">
+      <Button x:Name="BtnOpen" Theme="{StaticResource PrimaryButton}" Margin="{StaticResource WrapItemMargin}"
+              Content="{loc:Text recorder.output.to-player}"
+              auto:AutomationProperties.Name="{loc:Text recorder.output.to-player}"/>
+      <Button x:Name="BtnReveal" Margin="{StaticResource WrapItemMargin}"
+              Content="{loc:Text recorder.output.reveal}"
+              auto:AutomationProperties.Name="{loc:Text recorder.output.reveal}"/>
+      <Button x:Name="BtnShare" Margin="{StaticResource WrapItemMargin}"
+              Content="{loc:Text main.action.share}"
+              auto:AutomationProperties.Name="{loc:Text main.action.share}"/>
+      <Button x:Name="BtnTrash" Margin="{StaticResource WrapItemMargin}"
+              Content="{loc:Text recorder.history.trash}"
+              auto:AutomationProperties.Name="{loc:Text recorder.history.trash}"/>
+    </WrapPanel>
+  </Grid>
+</Window>
