@@ -475,7 +475,7 @@ public static class QualityMeter
         args.AddRange(new[] { "-i", path });
     }
 
-    private static string? ColorIncompatibility(VidShrink.Core.MediaInfo reference, VidShrink.Core.MediaInfo test)
+    internal static string? ColorIncompatibility(VidShrink.Core.MediaInfo reference, VidShrink.Core.MediaInfo test)
     {
         if (reference.IsHdr != test.IsHdr)
             return "Renk uzayı uyuşmuyor; HDR ve SDR/tonemap edilmiş görüntü karşılaştırılamaz.";
@@ -509,7 +509,7 @@ public static class QualityMeter
     private static string Describe(VidShrink.Core.MediaInfo info)
         => $"{info.ColorPrimaries ?? "etiketsiz"}/{info.ColorTransfer ?? "etiketsiz"}/{info.ColorSpace ?? "etiketsiz"}/{info.ColorRange ?? "etiketsiz"}";
 
-    private static string ColorFilter(VidShrink.Core.MediaInfo input, VidShrink.Core.MediaInfo reference, int width, int height)
+    internal static string ColorFilter(VidShrink.Core.MediaInfo input, VidShrink.Core.MediaInfo reference, int width, int height)
     {
         var hdr = reference.IsHdr;
         var inputPrimaries = input.ColorPrimaries ?? (hdr ? "bt2020" : "bt709");

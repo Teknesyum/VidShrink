@@ -35,6 +35,8 @@ public sealed class AppSettings
     /// <summary>Kap etiketlerini silme kutusu; eski dosyada anahtar yoktur ve kapalı okunur.</summary>
     public bool AdvDropMetadata { get; set; }
 
+    public bool AdvMeasureQuality { get; set; }
+
     /// <summary>Dönüştür sekmesindeki meta silme kutusu; eski dosyada anahtar yoktur ve kapalı okunur.</summary>
     public bool ConvertDropMetadata { get; set; }
 
@@ -185,6 +187,7 @@ public sealed class AppSettings
             ReadInt(root, "advCodecLock", value => settings.AdvCodecLock = value);
             ReadBool(root, "advKeepTracks", value => settings.AdvKeepTracks = value);
             ReadBool(root, "advDropMetadata", value => settings.AdvDropMetadata = value);
+            ReadBool(root, "advMeasureQuality", value => settings.AdvMeasureQuality = value);
             ReadBool(root, "convertDropMetadata", value => settings.ConvertDropMetadata = value);
             ReadString(root, "convertGifLoop", value => settings.ConvertGifLoop = value);
             ReadString(root, "convertGifColors", value => settings.ConvertGifColors = value);
@@ -287,6 +290,7 @@ public sealed class AppSettings
         root["advCodecLock"] = AdvCodecLock;
         root["advKeepTracks"] = AdvKeepTracks;
         root["advDropMetadata"] = AdvDropMetadata;
+        root["advMeasureQuality"] = AdvMeasureQuality;
         root["convertDropMetadata"] = ConvertDropMetadata;
         root["convertGifLoop"] = ConvertGifLoop;
         root["convertGifColors"] = ConvertGifColors;
