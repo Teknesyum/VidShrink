@@ -68,7 +68,7 @@ public static class MergeCompatibility
         if (timeline.HasText || timeline.HasEffects || timeline.HasTransitions || timeline.HasMusic || timeline.Clips.Any(EditExport.NeedsReencode))
             return MergeDecision.Edits;
         if (!settings.IsDefault) return MergeDecision.Settings;
-
+        if (audioTrack != EditAudioTrack.All && audioTrack != EditAudioTrack.First) return MergeDecision.AudioTrack;
         var used = EditExport.UsedSources(timeline);
         if (used.Any(s => !sources.ContainsKey(s))) throw new ArgumentException("Parcanin kaynagi okunmamis", nameof(sources));
         if (used.Any(s => sources[s].Keyframes.Count == 0)) return MergeDecision.NoKeyframes;
@@ -83,13 +83,13 @@ public static class MergeCompatibility
         if (!Same(a.VideoProfile, b.VideoProfile)) return MergeMismatch.VideoProfile;
         if (a.Width != b.Width || a.Height != b.Height) return MergeMismatch.Resolution;
         if ((long)a.ParNum * b.ParDen != (long)b.ParNum * a.ParDen) return MergeMismatch.PixelAspect;
-        if (b.PixelFormat is null || !Same(a.PixelFormat, b.PixelFormat)) return MergeMismatch.PixelFormat;
+        if (!Same(a.PixelFormat, b.PixelFormat)) return MergeMismatch.PixelFormat;
         if (Math.Abs(a.Fps - b.Fps) > FrameRateTolerance) return MergeMismatch.FrameRate;
-        if (b.VideoTimeBase is null || !Same(a.VideoTimeBase, b.VideoTimeBase)) return MergeMismatch.TimeBase;
+        if (!Same(a.VideoTimeBase, b.VideoTimeBase)) return MergeMismatch.TimeBase;
         if (a.HasAudio != b.HasAudio) return MergeMismatch.AudioPresence;
         if (!a.HasAudio) return Layout(a).SequenceEqual(Layout(b)) ? MergeMismatch.None : MergeMismatch.StreamLayout;
         if (!Same(a.AudioCodec, b.AudioCodec)) return MergeMismatch.AudioCodec;
-        if (SampleRate(b) <= 0 || SampleRate(a) != SampleRate(b)) return MergeMismatch.SampleRate;
+        if (SampleRate(a) != SampleRate(b)) return MergeMismatch.SampleRate;
         if (a.AudioChannels != b.AudioChannels) return MergeMismatch.Channels;
         return Layout(a).SequenceEqual(Layout(b)) ? MergeMismatch.None : MergeMismatch.StreamLayout;
     }
