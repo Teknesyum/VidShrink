@@ -40,6 +40,7 @@ public static class KayitTanisi
                 + (o.SdrWhiteNits is { } w ? string.Format(inv, " sdr-white={0:0.#}", w) : "")));
         var hedef = RecorderArguments.DdagrabTarget(istek);
         b.Append("target-output: ").AppendLine(hedef is { } h ? h.Output.Index.ToString(inv) : "-");
+        b.Append("window-clipped: ").AppendLine(Evet(RecorderArguments.WindowClipped(istek)));
         b.Append("hdr-capture: ").AppendLine(Evet(RecorderArguments.HdrCapture(istek)));
         var statik = RecorderArguments.HdrStatic(istek);
         b.Append("hdr-static: ").AppendLine(statik is null ? "-" : statik.MasterDisplay + " cll=" + statik.ContentLight);

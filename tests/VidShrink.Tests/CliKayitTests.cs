@@ -184,6 +184,22 @@ public sealed class CliKayitTests : IDisposable
         Assert.Equal(pencere.Container, komut.Container);
         Assert.Equal(pencere.ManualMode, komut.ManualMode);
         Assert.Equal(pencere.Target, komut.Target);
+        Assert.True(komut.HdrToSdr);
+        Assert.Equal(pencere.HdrToSdr, komut.HdrToSdr);
+    }
+
+    [Fact]
+    public void EskiDosyaninKapaliHdrdenSdryeAyariPencereGibiBirKezAcilir()
+    {
+        var eski = Path.Combine(_klasor, "eski.json");
+        File.WriteAllText(eski, "{\"hdrToSdr\": false}");
+        var bilincli = Path.Combine(_klasor, "bilincli.json");
+        File.WriteAllText(bilincli, "{\"hdrToSdr\": false, \"hdrToSdrDefaultOn\": true}");
+
+        Assert.True(CliRecordSettings.Load(eski).HdrToSdr);
+        Assert.Equal(RecorderSettings.Load(eski).HdrToSdr, CliRecordSettings.Load(eski).HdrToSdr);
+        Assert.False(CliRecordSettings.Load(bilincli).HdrToSdr);
+        Assert.Equal(RecorderSettings.Load(bilincli).HdrToSdr, CliRecordSettings.Load(bilincli).HdrToSdr);
     }
 
     [Fact]

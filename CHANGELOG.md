@@ -14,6 +14,15 @@ ship as part of it.
   so audio and picture stay in sync instead of jumping. Off by default; threshold (`silenceThresholdDb`, default
   -35 dB) and shortest silence (`silenceMinimumSeconds`, default 0.5 s) live in the player settings file.
 
+### Fixed
+
+- Recorder: on an HDR display a window that hangs off the screen or spans two monitors is captured from the monitor
+  that holds most of it, through the colour-correct HDR-to-SDR path, instead of falling back to GDI with washed-out
+  colours. Windows spanning only SDR monitors are still captured whole.
+- Recorder: GIF capture on an HDR display gets the same HDR-to-SDR conversion as video, so it matches the screen.
+- Command line: `record` turns HDR-to-SDR on by default like the app; an old settings file that stored it off
+  is switched on once, a setting saved off by the current app is respected.
+
 ## [1.2.24] - 2026-10-17
 
 ### Added

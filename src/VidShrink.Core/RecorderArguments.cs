@@ -1396,7 +1396,39 @@ public static class RecorderArguments
             return (output, new RecorderRegion(x, y, width, height));
         }
 
-        return null;
+        return request.Target == RecorderTargetKind.Window ? ClippedWindow(request.DdaOutputs, area) : null;
+    }
+
+    /// <summary>
+    /// Ekrana tam sigmayan pencerenin <c>ddagrab</c> alani: pencere tek cikisa degiyorsa disari
+    /// tasan kisim zaten gorunmuyor, kirpilir; birden cok cikisa degiyor ve biri HDR ise en buyuk
+    /// payin cikisina kirpilir, cunku <c>gdigrab</c> HDR masaustunu yanlis renkle okuyor. HDR
+    /// olmayan cok ekranli pencere <c>null</c> doner ve <c>gdigrab</c>'da butun kalir.
+    /// </summary>
+    private static (DdaOutput Output, RecorderRegion Local)? ClippedWindow(IReadOnlyList<DdaOutput> outputs, RecorderRegion area)
+    {
+        var touched = outputs
+            .Select(o => (Output: o, Left: Math.Max(area.X, o.X), Top: Math.Max(area.Y, o.Y),
+                Right: Math.Min(area.X + area.Width, o.X + o.Width), Bottom: Math.Min(area.Y + area.Height, o.Y + o.Height)))
+            .Where(t => t.Right > t.Left && t.Bottom > t.Top)
+            .ToList();
+        if (touched.Count == 0 || (touched.Count > 1 && !touched.Any(t => t.Output.Hdr))) return null;
+
+        var best = touched.OrderByDescending(t => (long)(t.Right - t.Left) * (t.Bottom - t.Top)).First();
+        var width = best.Right - best.Left;
+        var height = best.Bottom - best.Top;
+        width -= width % 2;
+        height -= height % 2;
+        if (width < 2 || height < 2) return null;
+        return (best.Output, new RecorderRegion(best.Left - best.Output.X, best.Top - best.Output.Y, width, height));
+    }
+
+    /// <summary>Pencere ekrana sigmadigi icin <c>ddagrab</c> alani pencereden kucuk; tani gunlugu soyler.</summary>
+    public static bool WindowClipped(RecorderRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        return request.Target == RecorderTargetKind.Window && request.WindowRegion is { } w && DdagrabTarget(request) is { } t
+               && (t.Local.Width < w.Width - w.Width % 2 || t.Local.Height < w.Height - w.Height % 2);
     }
 
     /// <summary>
@@ -1566,11 +1598,11 @@ public static class RecorderArguments
     /// GIF yakalamasi eski yolda kalir.
     /// </summary>
     public static bool HdrTonemapCapture(RecorderRequest request)
-        => HdrDisplay(request) && request.HdrToSdr && request.CanTonemap && !GifPath(request);
+        => HdrDisplay(request) && request.HdrToSdr && request.CanTonemap;
 
     /// <summary>SDR'ye cevirme istendi ama <c>zscale</c> yok: kayit eski 8 bit yolda, cagiran soyler.</summary>
     public static bool HdrTonemapMissing(RecorderRequest request)
-        => HdrDisplay(request) && request.HdrToSdr && !request.CanTonemap && !GifPath(request);
+        => HdrDisplay(request) && request.HdrToSdr && !request.CanTonemap;
 
     /// <summary>
     /// Kayit <c>gdigrab</c>'a dustu ve yakalanan ekran HDR: GDI kareyi HDR masaustunden

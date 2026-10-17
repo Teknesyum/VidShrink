@@ -55,7 +55,7 @@ public sealed record CliRecordSettings
     public string PixelFormat { get; init; } = RecorderArguments.DefaultPixelFormat;
     public string? ColorSpace { get; init; }
     public string? ColorRange { get; init; }
-    public bool HdrToSdr { get; init; }
+    public bool HdrToSdr { get; init; } = true;
     public double MaxDurationSeconds { get; init; }
     public double SplitSeconds { get; init; }
     public double SplitMegabytes { get; init; }
@@ -155,7 +155,7 @@ public sealed record CliRecordSettings
                 PixelFormat = (string?)root["pixelFormat"] is { Length: > 0 } pixel ? RecorderArguments.StoredPixelFormat(pixel) : settings.PixelFormat,
                 ColorSpace = (string?)root["colorSpace"],
                 ColorRange = (string?)root["colorRange"],
-                HdrToSdr = (bool?)root["hdrToSdr"] ?? false,
+                HdrToSdr = root["hdrToSdrDefaultOn"] is null || ((bool?)root["hdrToSdr"] ?? true),
                 MaxDurationSeconds = (double?)root["maxDurationSeconds"] ?? 0,
                 SplitSeconds = (double?)root["splitSeconds"] ?? 0,
                 SplitMegabytes = (double?)root["splitMegabytes"] ?? 0,

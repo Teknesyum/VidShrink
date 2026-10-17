@@ -129,14 +129,15 @@ public sealed class KaydediciHdrTests
     }
 
     [Fact]
-    public void GifYakalamasiTonEslemeVeSdrEtiketiAlmaz()
+    public void GifYakalamasiTonEslemeAlirSdrEtiketiAlmaz()
     {
-        var gif = RecorderArguments.CaptureRequest(Istek(HdrCikis) with { HdrToSdr = true, Container = RecorderContainer.Gif });
+        var gif = RecorderArguments.CaptureRequest(Istek(HdrCikis) with { HdrToSdr = true, CanTonemap = true, Container = RecorderContainer.Gif });
         var args = Kur(gif);
 
         Assert.True(gif.GifCapture);
-        Assert.False(RecorderArguments.HdrTonemapCapture(gif));
-        Assert.EndsWith(",hwdownload,format=bgra", Kaynak(args));
+        Assert.True(RecorderArguments.HdrTonemapCapture(gif));
+        Assert.Contains("output_fmt=10bit,hwdownload,format=x2bgr10,zscale=", Kaynak(args));
+        Assert.EndsWith(",format=gbrp,format=bgra", Kaynak(args));
         Assert.DoesNotContain("-color_trc", args);
         Assert.DoesNotContain("-vf", args);
     }
@@ -282,6 +283,63 @@ public sealed class KaydediciHdrTests
         Assert.False(RecorderArguments.HdrCapture(istek));
         Assert.True(RecorderArguments.HdrLost(istek));
         Assert.EndsWith(",hwdownload,format=bgra", Kaynak(Kur(istek)));
+    }
+
+    private static RecorderRequest Pencere(RecorderRegion pencere, params DdaOutput[] cikislar) => Istek(HdrCikis) with
+    {
+        Target = RecorderTargetKind.Window,
+        WindowTitle = "Oyun",
+        Region = null,
+        WindowRegion = pencere,
+        DdaOutputs = cikislar,
+        HdrToSdr = true,
+        CanTonemap = true
+    };
+
+    [Fact]
+    public void IkiEkranaTasanPencereHdrEkranaKirpilirVeTonEslenir()
+    {
+        var sag = new DdaOutput(1, 2560, 0, 1920, 1080);
+        var istek = Pencere(new RecorderRegion(1800, 100, 1000, 700), HdrCikis, sag);
+
+        var hedef = RecorderArguments.DdagrabTarget(istek);
+
+        Assert.Equal(0, hedef!.Value.Output.Index);
+        Assert.Equal(new RecorderRegion(1800, 100, 760, 700), hedef.Value.Local);
+        Assert.True(RecorderArguments.WindowClipped(istek));
+        Assert.Equal(DdagrabFallback.None, RecorderArguments.DdagrabBlocker(istek));
+        Assert.True(RecorderArguments.HdrTonemapCapture(istek));
+        Assert.Contains(":offset_x=1800:offset_y=100:video_size=760x700:output_fmt=10bit", Kaynak(Kur(istek with { Capture = RecorderCapture.Ddagrab })));
+    }
+
+    [Fact]
+    public void EkranDisinaTasanPencereGorunenKismaKirpilir()
+    {
+        var istek = Pencere(new RecorderRegion(-9, -9, 2578, 1458), SdrCikis);
+
+        Assert.Equal(new RecorderRegion(0, 0, 2560, 1440), RecorderArguments.DdagrabTarget(istek)!.Value.Local);
+        Assert.True(RecorderArguments.WindowClipped(istek));
+    }
+
+    [Fact]
+    public void HdrsizIkiEkranaTasanPencereKirpilmazGdigrabdaButunKalir()
+    {
+        var sag = new DdaOutput(1, 2560, 0, 1920, 1080);
+        var istek = Pencere(new RecorderRegion(1800, 100, 1000, 700), SdrCikis, sag);
+
+        Assert.Null(RecorderArguments.DdagrabTarget(istek));
+        Assert.False(RecorderArguments.WindowClipped(istek));
+        Assert.Equal(DdagrabFallback.OutsideOneOutput, RecorderArguments.DdagrabBlocker(istek));
+    }
+
+    [Fact]
+    public void IkiEkranaTasanBolgeKirpilmaz()
+    {
+        var sag = new DdaOutput(1, 2560, 0, 1920, 1080);
+        var istek = Istek(HdrCikis) with { Region = new RecorderRegion(1800, 100, 1000, 700), DdaOutputs = new[] { HdrCikis, sag } };
+
+        Assert.Null(RecorderArguments.DdagrabTarget(istek));
+        Assert.True(RecorderArguments.HdrOnGdigrab(istek with { Capture = RecorderCapture.Gdigrab }));
     }
 
     [Fact]
