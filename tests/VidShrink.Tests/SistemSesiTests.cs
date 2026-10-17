@@ -97,8 +97,15 @@ public sealed class SistemSesiTests
     {
         var liste = CaptureDevices.Unloaded();
         Assert.False(liste.Loaded);
-        if (OperatingSystem.IsWindows()) Assert.Contains(LoopbackAudio.Device, liste.Audio);
-        else Assert.DoesNotContain(LoopbackAudio.Device, liste.Audio);
+        if (OperatingSystem.IsWindows())
+        {
+            Assert.Equal([LoopbackAudio.Device], liste.Audio);
+            return;
+        }
+        Assert.DoesNotContain(LoopbackAudio.Device, liste.Audio);
+        Assert.Contains(liste.Audio, cihaz => cihaz.Role == AudioSourceRole.Microphone && cihaz.Reference == CaptureDevices.DefaultDevice);
+        if (OperatingSystem.IsLinux())
+            Assert.Contains(liste.Audio, cihaz => cihaz.Role == AudioSourceRole.SystemAudio && cihaz.Reference == CaptureDevices.PulseDefaultMonitor);
     }
 
     [Fact]

@@ -1598,22 +1598,37 @@ public static class MacUpdate
     /// karşılaştırılır, yayının kendi paketleme betiği koşar, üretilen paket ad-hoc imzalanır ve
     /// imzası doğrulanır. Adımlardan biri düşerse hazırlama dizini silinir ve kurulu pakete o
     /// ana kadar hiç dokunulmamıştır.
+    /// <para>Sessiz yol olduğu için her düşüş <see cref="UpdateHealth"/>'e sayılır; yeni sürüm
+    /// yoksa sayaç sıfırlanır. Sayılmayan düşüş kullanıcıyı haftalarca eski sürümde tutuyor.</para>
     /// </summary>
     public static async Task<bool> PrepareAsync(
         string bundle,
         string currentVersion,
         string? source,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        string? settingsPath = null)
     {
         var rid = UpdateCheck.Rid;
         try
         {
             var json = await ReadManifestAsync(rid, source, cancellationToken);
-            if (json is null) return false;
+            if (json is null)
+            {
+                UpdateHealth.RecordFailure(settingsPath, DateTimeOffset.UtcNow, "mac-manifest-okunamadi");
+                return false;
+            }
 
             var manifest = UpdateCheck.ParseManifest(json);
-            if (manifest.Files.Count == 0) return false;
-            if (!UpdateCheck.IsNewer(manifest.Version, currentVersion)) return false;
+            if (manifest.Files.Count == 0)
+            {
+                UpdateHealth.RecordFailure(settingsPath, DateTimeOffset.UtcNow, "mac-manifest-bos");
+                return false;
+            }
+            if (!UpdateCheck.IsNewer(manifest.Version, currentVersion))
+            {
+                UpdateHealth.RecordSuccess(settingsPath, DateTimeOffset.UtcNow);
+                return false;
+            }
 
             var payload = Path.Combine(StageRoot(bundle), PayloadFolderName);
             Directory.CreateDirectory(payload);
@@ -1640,9 +1655,10 @@ public static class MacUpdate
             Directory.Delete(payload, recursive: true);
             return true;
         }
-        catch (Exception)
+        catch (Exception exception)
         {
             Discard(bundle);
+            UpdateHealth.RecordFailure(settingsPath, DateTimeOffset.UtcNow, "mac-hazirlik " + exception.GetType().Name + ": " + exception.Message);
             return false;
         }
     }
@@ -1680,7 +1696,14 @@ public static class MacUpdate
         if (_prepared is null || !_prepared.IsCompletedSuccessfully || !_prepared.Result) return false;
 
         var bundle = BundleOf(Environment.ProcessPath);
-        return bundle is not null && Commit(bundle);
+        if (bundle is null) return false;
+        if (Commit(bundle))
+        {
+            UpdateHealth.RecordSuccess(null, DateTimeOffset.UtcNow);
+            return true;
+        }
+        UpdateHealth.RecordFailure(null, DateTimeOffset.UtcNow, "mac-takas-dustu");
+        return false;
     }
 
     /// <summary>

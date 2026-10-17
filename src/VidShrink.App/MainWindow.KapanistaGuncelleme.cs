@@ -77,12 +77,17 @@ public partial class MainWindow
 
     /// <summary>
     /// Açılışta otomatik güncelleme açıkken çağrılır: rozet gizli kalır, sahneleme açılış
-    /// bittikten sonra başlar. macOS'ta iş <see cref="MacUpdate"/>'in; burada yalnız rozet gizlenir.
+    /// bittikten sonra başlar. macOS'ta iş <see cref="MacUpdate"/>'in; burada rozet gizlenir, düşüş sayacı
+    /// takılmışsa (<see cref="UpdateHealth.Stuck"/>) elle denetim yedek kipte koşar.
     /// </summary>
     internal async Task OtomatikGuncellemeyiBaslatAsync()
     {
         BtnUpdateBadge.IsVisible = false;
-        if (SessizIndirici is null && !OperatingSystem.IsWindows()) return;
+        if (SessizIndirici is null && !OperatingSystem.IsWindows())
+        {
+            if (UpdateHealth.Load(SettingsPathOverride).Stuck) YedekDenetimeDon();
+            return;
+        }
 
         await (AcilisBittiBekle ?? AcilisiBekle)();
         if (!OtomatikAcik()) return;
