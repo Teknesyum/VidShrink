@@ -36,8 +36,9 @@ public enum RecorderTargetKind
     AudioOnly,
 
     /// <summary>
-    /// Web kamerasi ya da yakalama karti ekranin yerine ana goruntu: Windows'ta DirectShow aygiti
-    /// (<see cref="RecorderRequest.Device"/>), kamera katmaninin girdisiyle ayni kurucudan.
+    /// Web kamerasi ya da yakalama karti ekranin yerine ana goruntu (<see cref="RecorderRequest.Device"/>):
+    /// Windows'ta dshow, macOS'ta avfoundation, Linux'ta v4l2; kamera katmaniyla ayni kurucudan
+    /// (<see cref="RecorderArguments.CameraInput"/>).
     /// </summary>
     Device
 }
@@ -368,7 +369,10 @@ public sealed record RecorderRequest
 
     public RecorderWebcam? Webcam { get; init; }
 
-    /// <summary><see cref="RecorderTargetKind.Device"/> hedefinde ana goruntuyu veren DirectShow aygitinin adi.</summary>
+    /// <summary>
+    /// <see cref="RecorderTargetKind.Device"/> hedefinde ana goruntuyu veren aygit: Windows'ta ve macOS'ta
+    /// aygitin adi, Linux'ta aygit dosyasi (<c>/dev/...</c>).
+    /// </summary>
     public string? Device { get; init; }
 
     public string? PreviewPath { get; init; }
@@ -972,13 +976,37 @@ public static class RecorderArguments
     private static IEnumerable<string> DeviceErrors(RecorderRequest request)
     {
         if (request.Target != RecorderTargetKind.Device) yield break;
-        if (request.Platform != RecorderPlatform.Windows)
-            yield return "A camera or capture card as the main picture is only available on Windows.";
         if (string.IsNullOrWhiteSpace(request.Device))
             yield return "Device capture needs a camera or capture card name.";
+        else if (CameraNameError(request.Platform, request.Device) is { } nameError)
+            yield return nameError;
         else if (request.Webcam is { } cam && string.Equals(cam.Device, request.Device, StringComparison.OrdinalIgnoreCase))
             yield return "The webcam overlay cannot use the device that is already the main picture.";
     }
+
+    /// <summary>
+    /// Aygit adinin o sistemin girdisine yazilabilir olup olmadigi. dshow adi <c>video=</c>dan
+    /// sonra tirnaksiz alir; avfoundation <c>-i</c>yi ilk <c>:</c>dan video ve ses diye boluyor;
+    /// v4l2 ad degil aygit dosyasi aciyor.
+    /// </summary>
+    private static string? CameraNameError(RecorderPlatform platform, string device) => platform switch
+    {
+        RecorderPlatform.Windows when device.Contains('"', StringComparison.Ordinal)
+            => "A camera device name cannot contain a quotation mark.",
+        RecorderPlatform.MacOs when device.Contains(':', StringComparison.Ordinal)
+            => "An AVFoundation camera name cannot contain a colon; avfoundation splits its input at the first colon.",
+        RecorderPlatform.Linux when !device.StartsWith(V4l2DevicePrefix, StringComparison.Ordinal)
+            => $"A Video4Linux camera is opened by its device file, which starts with {V4l2DevicePrefix}.",
+        _ => null
+    };
+
+    public const string V4l2DevicePrefix = "/dev/";
+
+    /// <summary>
+    /// avfoundation kameralarda istenmeyen hizda girdiyi acmiyor ve varsayilani 29.97;
+    /// Mac kameralarinin cogu yalniz tam 30'u bildiriyor.
+    /// </summary>
+    public const int MacCameraFps = 30;
 
     /// <summary>
     /// DirectShow video girdisi: kamera katmani da ana goruntu de buradan kurulur. Kare hizi
@@ -986,6 +1014,19 @@ public static class RecorderArguments
     /// </summary>
     public static IReadOnlyList<string> DirectShowVideoInput(string device)
         => new[] { "-f", "dshow", "-rtbufsize", WebcamBufferSize, "-i", "video=" + device };
+
+    /// <summary>
+    /// Kamera ya da yakalama karti girdisi, sistemin aygit demuxer'iyla: Windows'ta dshow,
+    /// macOS'ta avfoundation (yalniz video, <c>:none</c>), Linux'ta v4l2 aygit dosyasi. Kamera
+    /// katmani da ana goruntu de buradan kurulur.
+    /// </summary>
+    public static IReadOnlyList<string> CameraInput(RecorderPlatform platform, string device) => platform switch
+    {
+        RecorderPlatform.Windows => DirectShowVideoInput(device),
+        RecorderPlatform.MacOs => new[] { "-f", "avfoundation", "-framerate", Number(MacCameraFps), "-i", device + ":none" },
+        RecorderPlatform.Linux => new[] { "-f", "v4l2", "-i", device },
+        _ => throw new InvalidOperationException($"Unknown recorder platform: {platform}.")
+    };
 
     private static List<string> AudioOnlyErrors(RecorderRequest request, string outputPath)
     {
@@ -1216,12 +1257,10 @@ public static class RecorderArguments
     private static IEnumerable<string> WebcamErrors(RecorderRequest request)
     {
         if (request.Webcam is not { } cam) yield break;
-        if (request.Platform != RecorderPlatform.Windows)
-            yield return "The webcam overlay reads the camera through DirectShow and is only available on Windows.";
         if (string.IsNullOrWhiteSpace(cam.Device))
             yield return "The webcam overlay needs a camera device.";
-        else if (cam.Device.Contains('"', StringComparison.Ordinal))
-            yield return "A camera device name cannot contain a quotation mark.";
+        else if (CameraNameError(request.Platform, cam.Device) is { } nameError)
+            yield return nameError;
         if (cam.Width < MinWebcamWidth || cam.Width > MaxWebcamWidth || cam.Width % 2 != 0)
             yield return $"The webcam width must be an even number between {MinWebcamWidth} and {MaxWebcamWidth} pixels.";
         if (!Enum.IsDefined(cam.Corner))
@@ -1895,7 +1934,7 @@ public static class RecorderArguments
 
         var webcam = WebcamGraph(request with { Audio = audio });
         if (request.Webcam is { } cam)
-            a.AddRange(DirectShowVideoInput(cam.Device));
+            a.AddRange(CameraInput(request.Platform, cam.Device));
 
         if (webcam is null && EncoderFilter(request) is { } filter) a.AddRange(new[] { "-vf", filter });
 
@@ -2210,6 +2249,7 @@ public static class RecorderArguments
 
     private static IReadOnlyList<string> Input(RecorderRequest request) => request.Platform switch
     {
+        _ when request.Target == RecorderTargetKind.Device => CameraInput(request.Platform, request.Device!),
         RecorderPlatform.Windows => WindowsInput(request),
         RecorderPlatform.MacOs => MacInput(request),
         RecorderPlatform.Linux => LinuxInput(request),
@@ -2218,7 +2258,6 @@ public static class RecorderArguments
 
     private static IReadOnlyList<string> WindowsInput(RecorderRequest request)
     {
-        if (request.Target == RecorderTargetKind.Device) return DirectShowVideoInput(request.Device!);
         if (request.Capture == RecorderCapture.Ddagrab) return DdagrabInput(request);
 
         var a = new List<string> { "-f", "gdigrab", "-framerate", Number(request.Fps), "-draw_mouse", Flag(request.ShowCursor) };

@@ -73,7 +73,7 @@ internal partial class RecorderView
 
     private void InitHedef()
     {
-        CmbTarget.ItemsSource = TargetLabels(CapturePlatform);
+        CmbTarget.ItemsSource = TargetLabels();
 
         var codecs = CodecsFor(CapturePlatform);
         CmbCodec.ItemsSource = codecs;
@@ -109,22 +109,19 @@ internal partial class RecorderView
 
     /// <summary>
     /// Kutuda sunulan hedefler; sıra <see cref="RecorderTargetKind"/> ile aynı. Kamera ya da
-    /// yakalama kartı yalnız Windows'ta ana kaynak olur: girdisi DirectShow.
+    /// yakalama kartı her sistemde ana kaynak olur: Windows'ta dshow, macOS'ta avfoundation,
+    /// Linux'ta v4l2 (<see cref="RecorderArguments.CameraInput"/>).
     /// </summary>
-    internal static IReadOnlyList<RecorderTargetKind> TargetKinds(RecorderPlatform platform)
+    internal static readonly IReadOnlyList<RecorderTargetKind> TargetKinds = new[]
     {
-        var kinds = new List<RecorderTargetKind>
-        {
-            RecorderTargetKind.Screen,
-            RecorderTargetKind.Window,
-            RecorderTargetKind.Region,
-            RecorderTargetKind.AudioOnly
-        };
-        if (platform == RecorderPlatform.Windows) kinds.Add(RecorderTargetKind.Device);
-        return kinds;
-    }
+        RecorderTargetKind.Screen,
+        RecorderTargetKind.Window,
+        RecorderTargetKind.Region,
+        RecorderTargetKind.AudioOnly,
+        RecorderTargetKind.Device
+    };
 
-    private static List<string> TargetLabels(RecorderPlatform platform) => TargetKinds(platform).Select(TargetLabel).ToList();
+    private static List<string> TargetLabels() => TargetKinds.Select(TargetLabel).ToList();
 
     /// <summary>
     /// Kutunun öğelerini o anki dilde yeniden üretir. Seçim indeksten korunuyor: liste sırası
@@ -133,7 +130,7 @@ internal partial class RecorderView
     private void RefreshTargetLabels()
     {
         var selected = CmbTarget.SelectedIndex >= 0 ? CmbTarget.SelectedIndex : (int)_settings.Target;
-        var labels = TargetLabels(CapturePlatform);
+        var labels = TargetLabels();
         CmbTarget.ItemsSource = labels;
         CmbTarget.SelectedIndex = selected < labels.Count ? selected : 0;
     }

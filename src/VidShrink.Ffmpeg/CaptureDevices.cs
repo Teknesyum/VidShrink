@@ -19,7 +19,8 @@ public sealed record CaptureDeviceList(
 /// <summary>
 /// Cihaz listesini ffmpeg'in kendisinden okur ve onbellekler. Windows'ta
 /// <c>-list_devices true -f dshow -i dummy</c>, macOS'ta <c>-f avfoundation
-/// -list_devices true -i ""</c>, Linux'ta <c>pactl list short sources</c>.
+/// -list_devices true -i ""</c>, Linux'ta ses icin <c>pactl list short sources</c>, kamera icin
+/// Video4Linux aygit dosyalari (<see cref="ListV4l2"/>; v4l2'nin ffmpeg'de listeleme komutu yok).
 ///
 /// Okuma <see cref="EncoderCapabilities"/> kalibinda: cikti <b>asenkron</b> baslar,
 /// <c>ReadToEnd()</c> akis kapanana kadar bloke oldugu icin ondan sonra gelen
@@ -116,13 +117,87 @@ public sealed class CaptureDevices
                 return WithLoopback(ParseDirectShow(RunCapture(ToolLocator.Ffmpeg, DirectShowArguments)));
             if (OperatingSystem.IsMacOS())
                 return ParseAvFoundation(RunCapture(ToolLocator.Ffmpeg, AvFoundationArguments));
-            return ParsePulse(RunCapture("pactl", PulseArguments, wantStandardOutput: true));
+            return LoadLinux();
         }
         catch
         {
             return Unloaded();
         }
     }
+
+    private static CaptureDeviceList LoadLinux()
+    {
+        var cameras = ListV4l2(V4l2ByIdFolder, V4l2SysFolder);
+        try
+        {
+            return ParsePulse(RunCapture("pactl", PulseArguments, wantStandardOutput: true)) with { Video = cameras };
+        }
+        catch
+        {
+            return Unloaded() with { Video = cameras };
+        }
+    }
+
+    internal const string V4l2ByIdFolder = "/dev/v4l/by-id";
+
+    internal const string V4l2SysFolder = "/sys/class/video4linux";
+
+    /// <summary>
+    /// Linux kameralari aygit dosyasiyla. Once <c>/dev/v4l/by-id</c>: ad kameranin kendisini
+    /// soyler ve takip cikarilinca numara degismez; yalniz <c>-video-index0</c> ile bitenler
+    /// alinir, UVC her kamera icin ikinci bir meta veri dugumu acar ve o goruntu vermez.
+    /// Klasor yoksa (yerlesik ya da sanal kamera) <c>/sys/class/video4linux/videoN</c>'den
+    /// <c>index</c>'i 0 olan dugumler <c>/dev/videoN</c> olarak yazilir.
+    /// </summary>
+    internal static IReadOnlyList<string> ListV4l2(string byIdFolder, string sysFolder)
+    {
+        try
+        {
+            if (Directory.Exists(byIdFolder))
+            {
+                var stable = Directory.GetFileSystemEntries(byIdFolder)
+                    .Select(Path.GetFileName)
+                    .OfType<string>()
+                    .Where(name => name.EndsWith(V4l2CaptureSuffix, StringComparison.Ordinal))
+                    .Order(StringComparer.Ordinal)
+                    .Select(name => V4l2ByIdFolder + "/" + name)
+                    .ToList();
+                if (stable.Count > 0) return stable;
+            }
+
+            if (!Directory.Exists(sysFolder)) return Array.Empty<string>();
+            return Directory.GetDirectories(sysFolder, "video*")
+                .Select(Path.GetFileName)
+                .OfType<string>()
+                .Select(name => (name, number: int.TryParse(name.AsSpan(V4l2NodePrefix.Length), out var n) ? n : -1))
+                .Where(node => node.number >= 0 && V4l2Index(Path.Combine(sysFolder, node.name)) == 0)
+                .OrderBy(node => node.number)
+                .Select(node => RecorderArguments.V4l2DevicePrefix + node.name)
+                .ToList();
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            return Array.Empty<string>();
+        }
+    }
+
+    internal const string V4l2CaptureSuffix = "-video-index0";
+
+    private const string V4l2NodePrefix = "video";
+
+    private static int V4l2Index(string node)
+    {
+        var file = Path.Combine(node, "index");
+        if (!File.Exists(file)) return 0;
+        return int.TryParse(File.ReadAllText(file).Trim(), out var index) ? index : -1;
+    }
+
+    /// <summary>
+    /// avfoundation video listesinde ekranlar da durur (<c>Capture screen N</c>); kamera listesi
+    /// onlari almaz, ekran kaydi onlari zaten adla aciyor.
+    /// </summary>
+    internal static bool IsAvFoundationScreen(string name)
+        => name.StartsWith("Capture screen ", StringComparison.Ordinal);
 
     /// <summary>
     /// Windows listesinin sonuna uygulamanin kendi yakaladigi sistem sesini ekler. dshow'un
@@ -246,7 +321,7 @@ public sealed class CaptureDevices
             var name = device.Groups[2].Value;
             if (section == "audio")
                 audio.Add(new AudioCaptureDevice(name, CaptureBackend.AvFoundation, ClassifyRole(name), device.Groups[1].Value));
-            else
+            else if (!IsAvFoundationScreen(name))
                 video.Add(name);
         }
 
