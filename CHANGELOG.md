@@ -7,6 +7,12 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Added
+
+- Player: the play queue and the playing file are kept between sessions. When the Player tab first opens, the last
+  queue comes back paused at the file and position it was left at; files no longer on disk are dropped. Nothing is
+  kept while "Keep History" is off.
+
 ### Fixed
 
 - Recorder: on Windows the "System Audio" source stays in the list when the device list cannot be read; before, a failed

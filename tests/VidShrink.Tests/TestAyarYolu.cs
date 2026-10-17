@@ -17,6 +17,7 @@ internal static class TestAyarYolu
         VidShrink.Ffmpeg.DdagrabProbe.Disabled = true;
         VidShrink.App.Editing.EditorView.StripDisabled = true;
         VidShrink.App.Playback.PlayerView.ListTitleDisabled = true;
+        VidShrink.App.Playback.PlayerView.QueueRestoreDisabled = true;
         VidShrink.App.SystemSleepBlocker.Disabled = true;
         VidShrink.Core.QueueJournal.Disabled = true;
         if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(VidShrink.Core.Setup.ShortcutIcons.DirectoryVariable)))
