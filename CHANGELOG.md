@@ -13,6 +13,8 @@ ship as part of it.
   audio chain; when it reports a silence the speed rises to 4x and drops back to the previous speed when sound returns,
   so audio and picture stay in sync instead of jumping. Off by default; threshold (`silenceThresholdDb`, default
   -35 dB) and shortest silence (`silenceMinimumSeconds`, default 0.5 s) live in the player settings file.
+- Tests: the list of human-reviewed languages is pinned to exactly English and Turkish, so adding a third language to
+  it without review fails the build.
 
 ### Fixed
 

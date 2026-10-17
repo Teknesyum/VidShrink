@@ -29,6 +29,13 @@ public sealed class CeviriTamlikIsaretiTests : IDisposable
     }
 
     [Fact]
+    public void GozdenGecenDilListesiTamOlarakIngilizceVeTurkce()
+    {
+        Assert.Equal(new[] { "en", "tr" }, Strings.ReviewedLanguages.OrderBy(l => l, StringComparer.Ordinal).ToArray());
+        Assert.Equal(Strings.Languages.Count - 2, Strings.Languages.Count(l => !Strings.IsReviewedLanguage(l)));
+    }
+
+    [Fact]
     public void GozdenGecmemisHerDilKendiDilindeIsaretlenir()
     {
         var unreviewed = Strings.Languages.Where(l => !Strings.IsReviewedLanguage(l)).ToList();
