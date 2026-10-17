@@ -19,8 +19,8 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Adım 1 (çizim) 16 Ekim 2026'da main'de: `ScreenSketch`, `RecorderSketch`, kısayol Ctrl+F2 (`EkranaCizimTests`).
 - Adım 2 (prompter) 16 Ekim 2026'da main'de: kaydedicide "Prompter" (`RecorderPrompter`, `PrompterScroll`); kayıttan çıkarılır, çıkarılamazsa pencerede uyarı; kayıt başlayınca akar, duraklayınca durur; yedi hız basamağı, metin ve hız ayarda (`PrompterTests`).
 - Prompter görünümü 16 Ekim 2026'da main'de: ayna, ortada okuma çizgisi, üç basamaklı yazı boyu (belirteçlerden), ayarda (`PrompterLook`, `PrompterTests.AynaCizgiVeYaziBoyuUygulanirAyaraYazilir`).
-- Açık kalan: çizimde araç paleti yok (araçlar tuşla), renk tek (palet NeonEmber), çoklu ekranda yalnız kayıt bölgesi kaplanır.
 - Plan: Çizim için ekranı kaplayan saydam bir pencere açılır; kısayolla çizim kipine girilir, kalem, ok, kutu, numara ve yazı çizilir, pencere kayda girer. Prompter (konuşma metnini akıtan pencere) ayrı penceredir ve `CaptureAffinity.Exclude` ile kayıttan çıkarılır; Windows 10 2004 öncesinde pencere kayıttan çıkmadığı için orada uyarı gösterilir (CaptureAffinity.cs:16-20). İki adımda teslim edilebilir: önce çizim, sonra prompter. Çizim araçları başsız pencere testiyle, kayıttan çıkarma bayrağı pencere başına ölçülür.
+- Durum (18 Ekim 2026, main): çizime araç paneli ve mürekkep rengi geldi (`yan/cizim-prompter`). Açık: çoklu ekranda yalnız kayıt bölgesi kaplanır, renk için kısayol yok, panelin görsel denetimi elle yapılacak.
 
 ## 44. Bölüm Düzenleyici
 
@@ -54,6 +54,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (EKA-P8): EKA-06 Aygıt kaynağı. [Tablo](piyasa/2026-10-13/kaydedici-yakalama-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Core/RecorderArguments.cs, src/VidShrink.Ffmpeg/CaptureDevices.cs, src/VidShrink.App/Recorder/RecorderView.Hedef.cs, src/VidShrink.App/Recorder/RecorderView.Kamera.cs
 - Plan: Hedef türlerine (`RecorderArguments.cs:24`) "aygıt" eklenir: web kamerası ya da yakalama kartı ekran girdisinin yerine ana görüntü olur. Windows'ta kamera girdisi zaten DirectShow ile kuruluyor (`RecorderArguments.cs:1203`); aynı kurucu ana girdi için yeniden kullanılır. Ölçü `tests/VidShrink.Tests/KaydediciHedefTests.cs` ve `KaydediciKameraTests.cs` yanına yazılır; gerçek deneme takılı bir kamerayla Windows'ta elle yapılır.
+- Durum (18 Ekim 2026, main): hedef türlerine "aygıt" girdi; kamera ya da yakalama kartı ana görüntü olur (`yan/kamera-ana-kaynak`). Açık: takılı gerçek kamerayla elle deneme, aygıtın çözünürlük seçimi, kayıt sırasında anlık kare.
 
 ## 70. Kamera Katmanı Windows Dışında
 
@@ -63,15 +64,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (EKB-P13): EKB-18 Kamera katmanı macOS ve Linux'ta. [Tablo](piyasa/2026-10-13/kaydedici-sunum-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Core/RecorderArguments.cs, src/VidShrink.Ffmpeg/CaptureDevices.cs, src/VidShrink.App/Recorder/RecorderView.Kamera.cs
 - Plan: Kamera girdisi macOS'ta `avfoundation`, Linux'ta `v4l2` ile kurulur (ffmpeg'in o sistemlerdeki aygıt girdileri) ve kamera paneli yalnız Windows koşulundan çıkar (`RecorderView.Kamera.cs:53`). Kardeş tablodaki EKB-18 ve onun paketi EKB-P13 aynı iştir; yalnız biri açılır. Argüman üretimi `tests/VidShrink.Tests/KaydediciKameraTests.cs` yanında her sistem için ölçülür; gerçek aygıt denemesi bu makinede yapılamaz, o sistemlerde elle yapılır.
-
-## 72. Sonuç Paneli Ve Paylaşım Kısayolları
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P3 · Kaydedici · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (EKB-P3): EKB-22 Sonuçta Kopyala düğmesi; EKB-23 Sonuçta GIF'e çevir; EKB-26 Dosya adı şablonu; EKB-27 Kaydedicide hedef ve süre seçimi; EKB-33 Bitiş eylemi zinciri. [Tablo](piyasa/2026-10-13/kaydedici-sunum-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Recorder/RecorderView.axaml, src/VidShrink.App/Recorder/RecorderView.axaml.cs, src/VidShrink.App/Recorder/RecorderView.Bitince.cs, src/VidShrink.App/Recorder/RecorderView.Paylas.cs, src/VidShrink.App/Recorder/RecorderSettings.cs, src/VidShrink.App/Share/ShareSession.cs, src/VidShrink.Core/AdlandirmaDeseni.cs, src/VidShrink.App/Locales/
-- Plan: Sonuç paneline Kopyala ve GIF düğmeleri eklenir; kopyalama bitiş eylemindeki yolu, GIF oynatıcıdaki palet süzgecini kullanır (ClipExport.cs:55-63). Paylaş satırına hedef ve süre kutusu ile Sil düğmesi gelir; Küçült sekmesindeki parçalar örnek alınır (MainWindow.axaml.cs:2593-2613, :2769-2785). Bitiş eylemlerine "küçült, yükle, bağlantıyı kopyala" eklenir ve kayıt adı Küçült'teki ad deseninden kurulur; desene pencere adı ve sıra numarası yer tutucusu eklenir. Yükleme sahte sağlayıcıyla, ağa çıkmadan ölçülür (`DuzenleKaydetPaylasTests` düzeni).
-- Durum (18 Ekim 2026, `yan/sonuc-paneli`): EKB-22 Kopyala, EKB-23 GIF'e çevir (640 px) ve EKB-26 ad deseni (`{damga}` `{tarih}` `{saat}` `{pencere}` `{sayac}`, CLI da okur) yapıldı. Açık: EKB-27 Paylaş satırında hedef, süre ve Sil; EKB-33 "küçült, yükle, bağlantıyı kopyala" zinciri. İkisi de sahte sağlayıcıyla ölçülecek.
 
 ## 78. Erişilebilirlik Denemesi
 
@@ -88,6 +80,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (DAG-P3): DAG-37 Windows 11 ilk menüsünde hızlı küçültme. [Tablo](piyasa/2026-10-13/dagitim-otomasyon-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.ShellExtension/VidShrink.ShellExtension.cpp, src/VidShrink.ShellExtension/AppxManifest.template.xml, src/VidShrink.Core/ShellIntegration.cs, src/VidShrink.Core/Setup/SetupRunner.cs, Install-VidShrink.ps1
 - Plan: Kabuk eklentisi (Windows 11'in ilk sağ tık menüsüne girdi koyan C++ bileşeni) bugün tek komut döndürüyor ve alt komut kolu boş. Açma girdisinin yanına "VidShrink ile Küçült" üst girdisi eklenir: `GetFlags` `ECF_HASSUBCOMMANDS` döndürür, `EnumSubCommands` altı hedefi `ShellIntegration.QuickShrinkMenu` sırasıyla sayar ve her biri başlatıcıyı `--kucult` ile çağırır. Etiketler var olan `ShellLabels` kayıt anahtarından okunur, böylece menü dili korunur. Doğrulama: listeyi üç kurucuyla karşılaştıran mevcut teste eklenti dizisi eklenir; Windows 11'de ilk menüde alt menünün görünmesi ve bir hedefin küçültmeyi başlatması elle bakılır.
+- Durum (18 Ekim 2026, main): eklenti "VidShrink ile Küçült" alt menüsünü altı hedefle sayıyor (`yan/win11-ilk-menu`). Açık: Windows 11'de elle deneme (paket kaydı, iki dosya, dil değişimi); kurucular `ShellLabels` yazmıyor, uygulama bir kez açılana dek yerleşik adlar görünür.
 
 ## 83. Akış Kalitesi Ve Kesintisiz Çalma
 
@@ -128,6 +121,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (ARC-P10): ARC-10 Slayt gösterisi yapıcı; ARC-20 Sesten video. [Tablo](piyasa/2026-10-13/eksik-araclar-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Core/Editing/, src/VidShrink.App/Editing/, src/VidShrink.Core/ConversionArguments.cs
 - Plan: İkisi de video olmayan malzemeden video üretir. Sesten video ARC-P3'ün üstüne gelir: ses kaynağında Dönüştür'e "görüntü" seçeneği eklenir, kapak resmi ya da dalga biçimi (showwaves süzgeci). Slayt gösterisi düzenleyicinin üç parçasına bağlıdır: resim klibi (DZB-04), müzik izi (DZB-01) ve çapraz geçiş (DZB-16); onlar bitince kalan iş fotoğrafları seçip süre vererek çizelgeye dizen kısa bir sihirbazdır ve iş orta'ya iner. Doğrulama: çıktının süresi ses süresine ya da fotoğraf sayısı çarpı süreye eşit.
+- Durum (18 Ekim 2026, main): sesten video bitti, Dönüştür'de ses kaynağına kapak ya da dalga biçimi (`yan/slayt-gosterisi`). Açık: slayt sihirbazı; resim klibine (later 87) bağlı.
 
 **Sahibin Kararını Bekleyenler**
 
