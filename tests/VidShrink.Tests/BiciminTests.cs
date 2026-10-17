@@ -1327,6 +1327,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-18, cizim arac paneli (later 42): dokuz yeni <c>recorder.sketch.*</c> anahtarindan yalniz <c>recorder.sketch.toolbar</c> 4 dilde kola giriyor (es, fr, pt, ro), KOL dokumunden ve SAYIM satirindan olculdu, en ve tr girmiyor: toplam 3948 + 4 = 3952, en 381, tr 127.</para>
     /// <para>2026-10-18, oynatici HDR ton esleme (later 96): yeni <c>player.advanced.tone-mapping</c> es ("Mapeo de tonos HDR") ve pt ("Mapeamento de tons HDR") dillerinde kola giriyor, en ve tr haric: 3888 + 2 = 3890, en 373, tr 126.</para>
     /// <para>2026-10-18, kamera ana kaynak (later 69): iki yeni anahtar (<c>recorder.target.device</c>, <c>.device-pick</c>); yalniz <c>recorder.target.device</c> 6 dilde kola giriyor (en, nl, pt, ro, sw, tr), KOL dokumunden ve SAYIM satirindan olculdu: toplam 3948 + 6 = 3954, en 381 + 1 = 382, tr 127 + 1 = 128.</para>
+    /// <para>2026-10-18, akis kalite secimi (later 83): iki yeni anahtar (<c>player.tracks.quality</c>, <c>.rate</c>); yalniz <c>player.tracks.quality</c> es ve pt dillerinde kola giriyor, KOL dokumunden ve SAYIM satirindan olculdu, en ve tr girmiyor: toplam 3970 + 2 = 3972, en 383, tr 129.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1352,7 +1353,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3985, toplam);
+        Assert.Equal(3987, toplam);
         Assert.Equal(383, dilBasina["en"]);
         Assert.Equal(129, dilBasina["tr"]);
     }
@@ -1657,6 +1658,8 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-18, 87 ve 88 birlikte: toplam 3970 + 7 + 1 = 3978, en 383, tr 129; gezilen 86645 + 215 + 430 = 87290.</para>
     /// <para>2026-10-18, hiz rampasi (later 89, DZB-48/50): uc yeni anahtar (<c>editor.speed-ramp-down</c>, <c>.speed-ramp-up</c>, <c>editor.smooth-slow</c>) 42 dilde, dusen yok; es 2, fr 1, pt 2, ro 2 kola giriyor (KOL dokumu): olculen toplam 3970 + 7 = 3977, en 383, tr 129 degismedi; gezilen 86645 + 3 x 43 = 86774.</para>
     /// <para>2026-10-18, ve 89: toplam 3978 + 7 = 3985, en 383, tr 129; gezilen 87290 + 129 = 87419.</para>
+    /// <para>2026-10-18, akis kalite secimi (later 83): iki yeni anahtar (<c>player.tracks.quality</c>, <c>.rate</c>) 42 dilde, dusen yok; olculen gezilen 86645 + 2 x 43 = 86731. <c>kayip</c> 0.</para>
+    /// <para>2026-10-18, ve 83: toplam 3985 + 2 = 3987, en 383, tr 129; gezilen 87419 + 86 = 87505.</para>
     /// <para>2026-10-16, later 44 (etiket ve Onar): on sekiz yeni anahtar; olculen toplam 3781 + 2 = 3783 (lt main.convert.tags.cover.none, ro main.convert.tags.year), en 364, tr 123, gezilen 80453 + 774 = 81227.</para>
     /// <para>2026-10-15, uzun iste oncelik ve bitis sesi (later 76): dort yeni anahtar (<c>settings-tab.encode-priority.above-normal</c>, <c>settings-tab.finish-sound-file.choose</c>, <c>.hint</c>, <c>.reset</c>) 42 dilde, dusen yok; olculen gezilen 78604 + 172 = 78776.</para>
     /// <para>2026-10-15, bas konus (later 68): iki yeni anahtar (<c>recorder.audio.push-to-talk</c>, <c>.hint</c>), dusen yok; olculen 78604 + 43 x 2 = 78690. <c>kayip</c> 0.</para>
@@ -1694,7 +1697,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(87419, gezilen);
+        Assert.Equal(87505, gezilen);
         Assert.Empty(kayip);
     }
 

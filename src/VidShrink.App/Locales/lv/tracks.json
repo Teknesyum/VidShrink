@@ -1,5 +1,7 @@
 {
   "player.tracks.audio": "Audio celiņš",
+  "player.tracks.quality": "Straumes kvalitāte",
+  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Nākamais audio celiņš",
   "player.tracks.delay": "Audio aizture {0} s",
   "player.tracks.delayreset": "Atiestatīt audio aizturi",

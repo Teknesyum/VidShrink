@@ -1,5 +1,7 @@
 {
   "player.tracks.audio": "অডিও ট্র্যাক",
+  "player.tracks.quality": "স্ট্রিমের মান",
+  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "পরবর্তী অডিও ট্র্যাক",
   "player.tracks.delay": "অডিও বিলম্ব {0} সে",
   "player.tracks.delayreset": "অডিও বিলম্ব রিসেট করুন",

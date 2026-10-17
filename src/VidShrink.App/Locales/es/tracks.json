@@ -1,5 +1,7 @@
 {
   "player.tracks.audio": "Pista de audio",
+  "player.tracks.quality": "Calidad de la transmisión",
+  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Siguiente pista de audio",
   "player.tracks.delay": "Retraso de audio {0} s",
   "player.tracks.delayreset": "Restablecer retraso de audio",

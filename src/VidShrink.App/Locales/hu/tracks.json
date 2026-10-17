@@ -1,5 +1,7 @@
 {
   "player.tracks.audio": "Hangsáv",
+  "player.tracks.quality": "Adatfolyam minősége",
+  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Következő hangsáv",
   "player.tracks.delay": "Hang késleltetése {0} mp",
   "player.tracks.delayreset": "Hangkésleltetés visszaállítása",

@@ -1,5 +1,7 @@
 {
   "player.tracks.audio": "آڈیو ٹریک",
+  "player.tracks.quality": "سٹریم کا معیار",
+  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "اگلا آڈیو ٹریک",
   "player.tracks.delay": "آڈیو تاخیر {0} س",
   "player.tracks.delayreset": "آڈیو تاخیر ری سیٹ کریں",

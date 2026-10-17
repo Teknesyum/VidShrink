@@ -1,5 +1,7 @@
 {
   "player.tracks.audio": "Audio track",
+  "player.tracks.quality": "Stream quality",
+  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Next audio track",
   "player.tracks.delay": "Audio delay {0} s",
   "player.tracks.delayreset": "Reset audio delay",

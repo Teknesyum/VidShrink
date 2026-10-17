@@ -1,5 +1,7 @@
 {
   "player.tracks.audio": "Piste audio",
+  "player.tracks.quality": "Qualité du flux",
+  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Piste audio suivante",
   "player.tracks.delay": "Décalage audio {0} s",
   "player.tracks.delayreset": "Réinitialiser le décalage audio",

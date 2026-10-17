@@ -12,6 +12,9 @@ namespace VidShrink.App.Playback;
 /// çalar; sonraki/önceki, sonda otomatik geçiş ve açılır liste klasör yerine kuyruğu izler.
 /// Kuyrukta olmayan bir dosya açılınca kuyruk düşer, oynatıcı klasör gezintisine döner.
 /// Liste mpv'ye verilmez: mpv'nin kendi listesi arayüzün yolunu ve kartını güncellemiyor.
+/// 2026-10-18 yeniden ölçüldü (later 83): <c>loadfile append</c> geçişinden sonra motor ikinci
+/// dosyadayken arayüz ilkinde kaldı; <c>ao=pcm</c> ile dört yolun hiçbirinde örnek kaybı yok, ses
+/// çalınmadan aygıt boşluğu ölçülemiyor. Karar korundu: <c>docs/olcumler/akis-kalitesi-kesintisiz.md</c>.
 /// Uzak adres liste uzantılı olsa da (HLS, radyo pls) kuyruk kurmadan olduğu gibi mpv'ye gider.
 /// </summary>
 internal partial class PlayerView

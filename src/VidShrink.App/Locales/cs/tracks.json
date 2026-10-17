@@ -1,5 +1,7 @@
 {
   "player.tracks.audio": "Zvuková stopa",
+  "player.tracks.quality": "Kvalita streamu",
+  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Další zvuková stopa",
   "player.tracks.delay": "Zpoždění zvuku {0} s",
   "player.tracks.delayreset": "Obnovit zpoždění zvuku",

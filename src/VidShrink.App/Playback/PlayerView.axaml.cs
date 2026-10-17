@@ -812,6 +812,7 @@ internal partial class PlayerView : UserControl
         TxtEmpty.IsVisible = false;
         ShowAudioCard(path, engine);
         ShowMediaTitle(path, engine);
+        LoadStreamVariants(path);
         StartWatchdog();
         StartRender();
         var mode = HistoryPath is null ? ResumeMode.Off : Settings.Resume;

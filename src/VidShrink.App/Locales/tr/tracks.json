@@ -1,5 +1,7 @@
 {
   "player.tracks.audio": "Ses parçası",
+  "player.tracks.quality": "Yayın kalitesi",
+  "player.tracks.quality.rate": "{0} kb/sn",
   "player.tracks.cycle": "Sonraki ses parçası",
   "player.tracks.delay": "Ses gecikmesi {0} sn",
   "player.tracks.delayreset": "Ses gecikmesini sıfırla",

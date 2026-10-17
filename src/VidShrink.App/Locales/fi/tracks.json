@@ -1,5 +1,7 @@
 {
   "player.tracks.audio": "Ääniraita",
+  "player.tracks.quality": "Suoratoiston laatu",
+  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Seuraava ääniraita",
   "player.tracks.delay": "Äänen viive {0} s",
   "player.tracks.delayreset": "Nollaa äänen viive",

@@ -1,5 +1,7 @@
 {
   "player.tracks.audio": "قطعه صوتی",
+  "player.tracks.quality": "کیفیت پخش",
+  "player.tracks.quality.rate": "{0} کیلوبیت/ث",
   "player.tracks.cycle": "قطعه صوتی بعدی",
   "player.tracks.delay": "تأخیر صدا {0} ث",
   "player.tracks.delayreset": "بازنشانی تأخیر صدا",

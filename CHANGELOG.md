@@ -25,6 +25,11 @@ ship as part of it.
   (each slice carries its own `setpts`/`atempo`, one undo step), and a "Smooth slow motion" check that makes slow clips
   build in-between frames with `minterpolate` instead of repeating frames. The preview plays the ramp slice by slice;
   interpolation is export-only and costly, so keep it to short clips. The flag is saved in the project file.
+- Player: Track menu gains Stream quality for HLS addresses with two or more variants. The variants are read from the
+  master playlist (libmpv lists only the selected variant's tracks), the choice is written to `hls-bitrate` and the stream
+  reopens at the same position without carrying the old track ids over. The decision not to hand the queue to mpv's own
+  playlist was re-measured and kept: no samples were lost on any path, and the UI would stay on the first file.
+  Measurement `docs/olcumler/akis-kalitesi-kesintisiz.md`.
 - Command line: `donustur` gains the Convert tab's tags, cover, Repair and chapters. `--etiket-baslik`,
   `--etiket-sanatci`, `--etiket-yil`, `--etiket-yorum` write the container tags, `--kapak` adds a PNG or JPEG cover,
   `--onar` is the Repair preset (corrupt packets dropped, timestamps rebuilt, MKV remux unless a container or codec
