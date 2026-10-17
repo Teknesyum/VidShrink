@@ -52,7 +52,6 @@ internal partial class RecorderView
 
     private void RefreshWebcamBoxes()
     {
-        PanelWebcam.IsVisible = OperatingSystem.IsWindows();
         _cameras = CameraSource();
 
         var wanted = CmbWebcam.SelectedIndex > 0 ? CmbWebcam.SelectedItem as string : _settings.WebcamName;
@@ -81,7 +80,8 @@ internal partial class RecorderView
     }
 
     /// <summary>
-    /// Ana kaynak olacak aygıtın kutusu: kamera katmanıyla aynı DirectShow listesi. Seçim addan
+    /// Ana kaynak olacak aygıtın kutusu: kamera katmanıyla aynı liste (Windows'ta dshow, macOS'ta
+    /// avfoundation kameraları, Linux'ta v4l2 aygıt dosyaları). Seçim addan
     /// korunur; hatırlanan aygıt takılı değilse kutu boş kalır ve motor adı eksik isteği reddeder,
     /// başka bir kamera sessizce yerine geçmez.
     /// </summary>

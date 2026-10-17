@@ -183,7 +183,7 @@ public sealed class SesGirisiTests
             $"avfoundation ses: {string.Join(" | ", mac.Audio.Select(a => $"{a.Name} [{a.Role}] -> {a.Reference}"))}\n" +
             $"pulse ses: {string.Join(" | ", linux.Audio.Select(a => $"{a.Name} [{a.Role}]"))}\n");
 
-        Assert.Equal(new[] { "FaceTime HD Camera", "Capture screen 0" }, mac.Video);
+        Assert.Equal(new[] { "FaceTime HD Camera" }, mac.Video);
         Assert.Equal(2, mac.Audio.Count);
         Assert.Equal("Built-in Microphone", mac.Audio[0].Name);
         Assert.Equal("0", mac.Audio[0].Reference);

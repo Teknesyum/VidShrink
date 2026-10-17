@@ -9,6 +9,11 @@ ship as part of it.
 
 ### Added
 
+- Recorder: the webcam overlay and the camera or capture card as the main picture now work on macOS and Linux.
+  macOS opens the camera through AVFoundation at 30 fps, Linux through Video4Linux by its device file; the webcam
+  panel and the "Camera or capture card" target are no longer Windows-only. Linux lists cameras from
+  `/dev/v4l/by-id` (falling back to `/sys/class/video4linux`), keeping only picture nodes; the macOS list no
+  longer offers `Capture screen N` entries as cameras.
 - Command line: `donustur` gains the Convert tab's tags, cover, Repair and chapters. `--etiket-baslik`,
   `--etiket-sanatci`, `--etiket-yil`, `--etiket-yorum` write the container tags, `--kapak` adds a PNG or JPEG cover,
   `--onar` is the Repair preset (corrupt packets dropped, timestamps rebuilt, MKV remux unless a container or codec

@@ -118,7 +118,8 @@ public sealed class KaydediciKameraTests
         string[] Hata(RecorderRequest r) => RecorderArguments.Validate(r, "a.mkv").ToArray();
 
         Assert.Empty(Hata(Istek() with { Webcam = new RecorderWebcam("Kam", 320) }));
-        Assert.Contains(Hata(Istek() with { Platform = RecorderPlatform.MacOs, Region = null, Target = RecorderTargetKind.Screen, Webcam = new RecorderWebcam("Kam", 320) }), h => h.Contains("DirectShow"));
+        Assert.Empty(Hata(Istek() with { Platform = RecorderPlatform.MacOs, Region = null, Target = RecorderTargetKind.Screen, Webcam = new RecorderWebcam("Kam", 320) }));
+        Assert.Single(Hata(Istek() with { Platform = RecorderPlatform.MacOs, Region = null, Target = RecorderTargetKind.Screen, Webcam = new RecorderWebcam("Kam:0", 320) }));
         Assert.Single(Hata(Istek() with { Webcam = new RecorderWebcam(" ", 320) }));
         Assert.Single(Hata(Istek() with { Webcam = new RecorderWebcam("Kam\" -y", 320) }));
         Assert.Single(Hata(Istek() with { Webcam = new RecorderWebcam("Kam", 241) }));

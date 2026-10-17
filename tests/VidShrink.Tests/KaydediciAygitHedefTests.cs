@@ -90,8 +90,8 @@ public sealed class KaydediciAygitHedefTests
     {
         Assert.Contains(Hata(Istek() with { Device = null }), h => h.Contains("capture card name", StringComparison.Ordinal));
         Assert.Contains(Hata(Istek() with { Device = " " }), h => h.Contains("capture card name", StringComparison.Ordinal));
-        Assert.Contains(Hata(Istek() with { Platform = RecorderPlatform.MacOs }), h => h.Contains("only available on Windows", StringComparison.Ordinal));
-        Assert.Contains(Hata(Istek() with { Platform = RecorderPlatform.Linux }), h => h.Contains("only available on Windows", StringComparison.Ordinal));
+        Assert.Empty(Hata(Istek() with { Platform = RecorderPlatform.MacOs }));
+        Assert.Contains(Hata(Istek() with { Platform = RecorderPlatform.Linux }), h => h.Contains("device file", StringComparison.Ordinal));
         Assert.Contains(Hata(Istek() with { Webcam = new RecorderWebcam("kart a", 240) }), h => h.Contains("already the main picture", StringComparison.Ordinal));
         Assert.Empty(Hata(Istek() with { Webcam = new RecorderWebcam("Kam B", 240) }));
         Assert.Contains(Hata(Istek() with { Capture = RecorderCapture.Ddagrab }), h => h.Contains("DirectShow", StringComparison.Ordinal));
@@ -132,12 +132,11 @@ public sealed class KaydediciAygitHedefTests
     }
 
     [Fact]
-    public void ArayuzAygitHedefiniYalnizWindowsdaSunar()
+    public void ArayuzAygitHedefiniHerSistemdeSunar()
     {
-        Assert.Equal(RecorderTargetKind.Device, RecorderView.TargetKinds(RecorderPlatform.Windows)[(int)RecorderTargetKind.Device]);
-        Assert.DoesNotContain(RecorderTargetKind.Device, RecorderView.TargetKinds(RecorderPlatform.MacOs));
-        Assert.DoesNotContain(RecorderTargetKind.Device, RecorderView.TargetKinds(RecorderPlatform.Linux));
-        Assert.All(RecorderView.TargetKinds(RecorderPlatform.Windows).Select((k, i) => (k, i)), x => Assert.Equal((int)x.k, x.i));
+        Assert.Equal(RecorderTargetKind.Device, RecorderView.TargetKinds[(int)RecorderTargetKind.Device]);
+        Assert.Equal(Enum.GetValues<RecorderTargetKind>(), RecorderView.TargetKinds);
+        Assert.All(RecorderView.TargetKinds.Select((k, i) => (k, i)), x => Assert.Equal((int)x.k, x.i));
     }
 
     private static string? Dosyada(string dosya, string anahtar)
