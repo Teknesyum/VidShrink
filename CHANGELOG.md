@@ -9,6 +9,9 @@ ship as part of it.
 
 ### Added
 
+- Output quality check (Advanced, off by default): after a finished shrink the result panel shows one score and what it
+  means. VMAF when ffmpeg has libvmaf, otherwise SSIM or PSNR; runs with two threads, samples long videos to about 600
+  frames and stops with the Cancel button.
 - Player: "Speed through silence" mode (J, Playback menu). A labelled `silencedetect` ring sits at the head of the
   audio chain; when it reports a silence the speed rises to 4x and drops back to the previous speed when sound returns,
   so audio and picture stay in sync instead of jumping. Off by default; threshold (`silenceThresholdDb`, default

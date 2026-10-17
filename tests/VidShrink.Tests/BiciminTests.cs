@@ -1322,6 +1322,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-15, saatli kayit (later 67): on iki yeni <c>recorder.schedule.*</c> anahtarindan 5 kol (hu <c>.off</c>; pt <c>.weekly</c>; tr <c>.once</c>, <c>.daily</c>, <c>.weekly</c>), KOL dokumunden ve SAYIM satirindan olculdu: toplam 3733 + 5 = 3738, en 361, tr 120 + 3 = 123.</para>
     /// <para>2026-10-16, hizli kirpma (later 41): dokuz yeni <c>recorder.output.quick-trim*</c> anahtarindan 2 kol (it <c>quick-trim-running</c>, ro <c>quick-trim-failed</c>), KOL dokumunden sayildi, en ve tr girmiyor: olculen 3781 + 2 = 3783, en 364, tr 123.</para>
     /// <para>2026-10-16, onizlemede elle kirpma (later 57): iki yeni anahtar (<c>main.advanced.filters.manualcrop</c>, <c>.tip</c>) kola girmiyor; en etiketi "Crop in preview" iken kola girip baslik denetiminde kusur sayildi, "Manual crop" yapildi. SAYIM satirindan olculdu: toplam 3781, en 364, tr 123.</para>
+    /// <para>2026-10-18, biten ciktinin kalite olcumu (later 122): dokuz yeni anahtardan (<c>main.advanced.quality-check.*</c>, <c>main.output.quality-check</c>, <c>main.run.quality*</c>) 6 kol (en, hu, pt, sw <c>main.advanced.quality-check.label</c>; fr, pt <c>main.output.quality-check</c>), KOL dokumunden ve SAYIM satirindan olculdu, tr girmiyor: toplam 3888 + 6 = 3894, en 373 + 1 = 374, tr 126.</para>
     /// <para>2026-10-12, Linux Wayland: <c>recorder.error.window-wayland</c> metni artik her kaydi reddediyor ve "Wayland" ile basliyor; bn, hi, th, ur kola giriyor (KOL dokumu). 3086 + 4 = 3090, en ve tr degismedi.</para>
     /// </summary>
     [Fact]
@@ -1348,8 +1349,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3888, toplam);
-        Assert.Equal(373, dilBasina["en"]);
+        Assert.Equal(3894, toplam);
+        Assert.Equal(374, dilBasina["en"]);
         Assert.Equal(126, dilBasina["tr"]);
     }
 
@@ -1634,6 +1635,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-16, atanmamis tus ve prompter gorunumu: bes yeni anahtar (<c>recorder.hotkeys.unassigned</c>, <c>recorder.prompter.smaller-text</c>/<c>larger-text</c>/<c>mirror</c>/<c>line</c>) 42 dilde, dusen yok; olculen toplam 3870 + 4 = 3874, en 372, tr 126 degismedi, gezilen 83463 + 215 = 83678.</para>
     /// <para>2026-10-17, tepsiye kucultme (later 120): alti yeni anahtar (<c>settings-tab.minimize-to-tray.*</c>, <c>main.tray.*</c>) 42 dilde, dusen yok; etiket 11 dilde kola girdi: olculen toplam 3874 + 11 = 3885, en 372 + 1 = 373, tr 126 degismedi, gezilen 83678 + 258 = 83936.</para>
     /// <para>2026-10-17, sessiz bolum hizlandirma: iki yeni anahtar (<c>player.menu.silenceskip</c>, <c>player.view.state-silenceskip</c>) 42 dilde, dusen yok; gezilen 84194 + 86 = 84280.</para>
+    /// <para>2026-10-18, biten ciktinin kalite olcumu (later 122): dokuz yeni anahtar, dusen yok; gezilen 84280 + 9 x 43 = 84667.</para>
     /// <para>2026-10-16, later 44 (etiket ve Onar): on sekiz yeni anahtar; olculen toplam 3781 + 2 = 3783 (lt main.convert.tags.cover.none, ro main.convert.tags.year), en 364, tr 123, gezilen 80453 + 774 = 81227.</para>
     /// <para>2026-10-15, uzun iste oncelik ve bitis sesi (later 76): dort yeni anahtar (<c>settings-tab.encode-priority.above-normal</c>, <c>settings-tab.finish-sound-file.choose</c>, <c>.hint</c>, <c>.reset</c>) 42 dilde, dusen yok; olculen gezilen 78604 + 172 = 78776.</para>
     /// <para>2026-10-15, bas konus (later 68): iki yeni anahtar (<c>recorder.audio.push-to-talk</c>, <c>.hint</c>), dusen yok; olculen 78604 + 43 x 2 = 78690. <c>kayip</c> 0.</para>
@@ -1670,7 +1672,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(84280, gezilen);
+        Assert.Equal(84667, gezilen);
         Assert.Empty(kayip);
     }
 

@@ -334,6 +334,7 @@ public partial class MainWindow : Window
         Player.Opened += OnPlayerOpened;
         Watch(ChkAdvKeepTracks, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkAdvDropMetadata, ToggleButton.IsCheckedProperty, SaveAppSettings);
+        Watch(ChkAdvMeasureQuality, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkConvertDropMetadata, ToggleButton.IsCheckedProperty, SaveAppSettings);
         foreach (var box in new[] { CmbConvertGifLoop, CmbConvertGifColors, CmbConvertGifDither })
             Watch(box, SelectingItemsControl.SelectedIndexProperty, SaveAppSettings);
@@ -1626,6 +1627,7 @@ public partial class MainWindow : Window
             AdvCodecLock = CmbAdvCodecLock.SelectedIndex,
             AdvKeepTracks = ChkAdvKeepTracks.IsChecked == true,
             AdvDropMetadata = ChkAdvDropMetadata.IsChecked == true,
+            AdvMeasureQuality = ChkAdvMeasureQuality.IsChecked == true,
             ConvertDropMetadata = ChkConvertDropMetadata.IsChecked == true,
             ConvertGifLoop = SelectedTag(CmbConvertGifLoop) ?? "",
             ConvertGifColors = SelectedTag(CmbConvertGifColors) ?? "",
@@ -1684,6 +1686,7 @@ public partial class MainWindow : Window
                 if (index >= 0 && index < box.ItemCount) box.SelectedIndex = index;
             ChkAdvKeepTracks.IsChecked = settings.AdvKeepTracks;
             ChkAdvDropMetadata.IsChecked = settings.AdvDropMetadata;
+            ChkAdvMeasureQuality.IsChecked = settings.AdvMeasureQuality;
             ChkConvertDropMetadata.IsChecked = settings.ConvertDropMetadata;
             SelectByTag(CmbConvertGifLoop, settings.ConvertGifLoop);
             SelectByTag(CmbConvertGifColors, settings.ConvertGifColors);
@@ -4609,6 +4612,7 @@ public partial class MainWindow : Window
             var progress = new Progress<EncodeProgress>(ShowEncodeProgress);
 
             var plan = ActivePlan;
+            var source = _info.FilePath;
             var result = await ShrinkEngine.EncodeAsync(_info, plan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync, _sceneMap?.Map, RunPause, ChkKeepDates.IsChecked == true);
             _lastOutput = result.OutputPath;
             RefreshPreviewSource();
@@ -4649,6 +4653,10 @@ public partial class MainWindow : Window
                 TxtOutSize.Text = "-";
                 TxtResult.Text = Say("main.run.ended");
             }
+
+            if (result.Success && ChkAdvMeasureQuality.IsChecked == true
+                && await KaliteSatiriAsync(source, result.OutputPath, cts.Token) is { Length: > 0 } kalite)
+                TxtResult.Text += " " + kalite;
 
             BtnReveal.IsVisible = result.Success;
             ResetShare(result.Success);
