@@ -7,6 +7,12 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Added
+
+- Settings: "Minimize to tray" (off by default). A minimized main window leaves the taskbar and waits in the system
+  tray; clicking the icon brings it back, and its tooltip shows the running job and queue progress. The close button
+  still quits.
+
 ### Fixed
 
 - Recorder: on Windows the "System Audio" source stays in the list when the device list cannot be read; before, a failed

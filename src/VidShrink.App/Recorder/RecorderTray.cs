@@ -79,41 +79,20 @@ internal static class RecorderTray
 internal sealed class RecorderTrayHost : IRecorderTrayHost
 {
     private readonly Dictionary<Color, WindowIcon> _icons = new();
-    private readonly Action _clicked;
-    private TrayIcon? _tray;
+    private readonly TrayIconHost _host;
 
-    internal RecorderTrayHost(Action clicked) => _clicked = clicked;
+    internal RecorderTrayHost(Action clicked) => _host = new TrayIconHost(clicked);
 
     public void Update(TrayPhase phase, Color color, string tip)
     {
-        if (Application.Current is not { ApplicationLifetime: Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime } app) return;
-
-        if (_tray is null)
-        {
-            _tray = new TrayIcon();
-            _tray.Clicked += (_, _) => _clicked();
-            var icons = TrayIcon.GetIcons(app) ?? new TrayIcons();
-            icons.Add(_tray);
-            TrayIcon.SetIcons(app, icons);
-        }
-
         if (!_icons.TryGetValue(color, out var icon))
         {
             icon = RecorderTray.Render(color);
             _icons[color] = icon;
         }
 
-        _tray.Icon = icon;
-        _tray.ToolTipText = tip;
-        _tray.IsVisible = true;
+        _host.Show(icon, tip);
     }
 
-    public void Remove()
-    {
-        if (_tray is null) return;
-        _tray.IsVisible = false;
-        if (Application.Current is { } app) TrayIcon.GetIcons(app)?.Remove(_tray);
-        _tray.Dispose();
-        _tray = null;
-    }
+    public void Remove() => _host.Remove();
 }

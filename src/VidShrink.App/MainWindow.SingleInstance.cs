@@ -64,6 +64,7 @@ public partial class MainWindow
 
         if (!request.Enqueue || Player.LoadedPath is null)
         {
+            TepsidenGeriGetir();
             if (WindowState == WindowState.Minimized) WindowState = _restoreState;
             Activate();
         }

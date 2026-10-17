@@ -79,6 +79,9 @@ public sealed class AppSettings
     /// <summary>SIK-P2: kodlama sürerken sistem uyumaz, ekran kapanabilir. Alanı olmayan eski dosya açık okunur.</summary>
     public bool PreventSleepWhileEncoding { get; set; } = true;
 
+    /// <summary>AYR-22: simge durumuna küçültülen ana pencere görev çubuğundan kalkıp tepsiye gider. Varsayılan kapalı.</summary>
+    public bool MinimizeToTray { get; set; }
+
     /// <summary>SIK-11: çıktı kaynağın oluşturma ve değiştirme tarihini alır. Varsayılan kapalı.</summary>
     public bool KeepSourceDates { get; set; }
 
@@ -203,6 +206,7 @@ public sealed class AppSettings
             ReadBool(root, "finishSound", value => settings.FinishSound = value);
             ReadString(root, "finishSoundFile", value => settings.FinishSoundFile = value);
             ReadBool(root, "preventSleepWhileEncoding", value => settings.PreventSleepWhileEncoding = value);
+            ReadBool(root, "minimizeToTray", value => settings.MinimizeToTray = value);
             ReadBool(root, "keepSourceDates", value => settings.KeepSourceDates = value);
             ReadInt(root, "parallelJobs", value => settings.ParallelJobs = Math.Max(VidShrink.Core.ParallelJobs.Default, value));
             ReadInt(root, "encodePriority", value => settings.EncodePriority = Enum.IsDefined(typeof(EncodePriority), value) ? (EncodePriority)value : EncodePriority.Normal);
@@ -305,6 +309,7 @@ public sealed class AppSettings
         root["finishSound"] = FinishSound;
         root["finishSoundFile"] = FinishSoundFile;
         root["preventSleepWhileEncoding"] = PreventSleepWhileEncoding;
+        root["minimizeToTray"] = MinimizeToTray;
         root["keepSourceDates"] = KeepSourceDates;
         root["parallelJobs"] = ParallelJobs;
         root["encodePriority"] = (int)EncodePriority;
