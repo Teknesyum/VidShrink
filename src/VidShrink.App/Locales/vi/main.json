@@ -902,5 +902,6 @@
   "main.preset.handbrake.dropped.structural": "Đã bỏ qua: cấu trúc danh sách HandBrake",
   "main.share.qr": "Mã QR của liên kết chia sẻ",
   "main.share.qr-hint": "Quét bằng điện thoại để mở liên kết.",
-  "main.startup.no-display": "VidShrink không thể mở màn hình đồ họa. Hãy khởi động từ một phiên máy tính để bàn; trên Wayland cần có Xwayland."
+  "main.startup.no-display": "VidShrink không thể mở màn hình đồ họa. Hãy khởi động từ một phiên máy tính để bàn; trên Wayland cần có Xwayland.",
+  "main.about.guide": "Hướng dẫn sử dụng"
 }

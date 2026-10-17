@@ -129,5 +129,14 @@
   "share.step.confirm": "confirmării",
   "share.step.probe": "verificării stării",
   "share.step.delete": "ștergerii",
-  "share.error.token-lost": "Nu avem jetonul de ștergere al acestui fișier, așa că legătura de pe {0} nu poate fi închisă mai devreme. Fișierul este șters când i se termină propria durată de viață."
+  "share.error.token-lost": "Nu avem jetonul de ștergere al acestui fișier, așa că legătura de pe {0} nu poate fi închisă mai devreme. Fișierul este șters când i se termină propria durată de viață.",
+  "settings.shell-shortcuts.title": "Comenzi rapide ale ferestrei",
+  "settings.shell-shortcuts.hint": "Funcționează în fiecare filă; o tastă folosită de player sau de editor are acolo prioritate.",
+  "shortcuts.shell.tab": "Deschide fila {0}",
+  "shortcuts.shell.open": "Deschide un fișier",
+  "shortcuts.shell.region-next": "Zona următoare (file, pagină, bară de titlu)",
+  "shortcuts.shell.region-prev": "Zona anterioară",
+  "shortcuts.shell.help": "Deschide ghidul de utilizare",
+  "settings.search.placeholder": "Caută în setări și comenzi rapide",
+  "settings.search.empty": "Nimic nu se potrivește cu „{0}”."
 }

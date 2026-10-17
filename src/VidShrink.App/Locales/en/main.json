@@ -902,5 +902,6 @@
   "main.preset.handbrake.dropped.structural": "Skipped: HandBrake list structure",
   "main.share.qr": "QR code for the share link",
   "main.share.qr-hint": "Scan with your phone to open the link.",
-  "main.startup.no-display": "VidShrink could not open a graphical display. Start it from a desktop session; on Wayland, Xwayland must be available."
+  "main.startup.no-display": "VidShrink could not open a graphical display. Start it from a desktop session; on Wayland, Xwayland must be available.",
+  "main.about.guide": "User Guide"
 }

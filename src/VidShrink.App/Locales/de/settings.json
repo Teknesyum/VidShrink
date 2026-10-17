@@ -127,5 +127,14 @@
   "share.step.confirm": "Bestätigen",
   "share.step.probe": "Prüfen des Status",
   "share.step.delete": "Löschen",
-  "share.error.token-lost": "Uns liegt kein Löschtoken für diese Datei vor, daher lässt sich der Link auf {0} nicht vorzeitig schließen. Die Datei wird gelöscht, wenn ihre eigene Lebensdauer abläuft."
+  "share.error.token-lost": "Uns liegt kein Löschtoken für diese Datei vor, daher lässt sich der Link auf {0} nicht vorzeitig schließen. Die Datei wird gelöscht, wenn ihre eigene Lebensdauer abläuft.",
+  "settings.shell-shortcuts.title": "Fensterkürzel",
+  "settings.shell-shortcuts.hint": "Gelten auf jedem Tab; eine Taste, die Player oder Editor belegt, hat dort Vorrang.",
+  "shortcuts.shell.tab": "Tab „{0}“ öffnen",
+  "shortcuts.shell.open": "Datei öffnen",
+  "shortcuts.shell.region-next": "Nächster Bereich (Tabs, Seite, Titelleiste)",
+  "shortcuts.shell.region-prev": "Vorheriger Bereich",
+  "shortcuts.shell.help": "Benutzerhandbuch öffnen",
+  "settings.search.placeholder": "Einstellungen und Kürzel durchsuchen",
+  "settings.search.empty": "Nichts passt zu „{0}“."
 }

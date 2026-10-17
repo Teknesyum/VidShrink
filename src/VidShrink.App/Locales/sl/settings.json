@@ -129,5 +129,14 @@
   "share.step.confirm": "potrjevanjem",
   "share.step.probe": "preverjanjem stanja",
   "share.step.delete": "brisanjem",
-  "share.error.token-lost": "Žetona za brisanje te datoteke nimamo, zato povezave na {0} ni mogoče zapreti predčasno. Datoteka se izbriše, ko poteče njena lastna življenjska doba."
+  "share.error.token-lost": "Žetona za brisanje te datoteke nimamo, zato povezave na {0} ni mogoče zapreti predčasno. Datoteka se izbriše, ko poteče njena lastna življenjska doba.",
+  "settings.shell-shortcuts.title": "Bližnjice okna",
+  "settings.shell-shortcuts.hint": "Delujejo na vsakem zavihku; tipka, ki jo uporablja predvajalnik ali urejevalnik, ima tam prednost.",
+  "shortcuts.shell.tab": "Odpri zavihek {0}",
+  "shortcuts.shell.open": "Odpri datoteko",
+  "shortcuts.shell.region-next": "Naslednje območje (zavihki, stran, naslovna vrstica)",
+  "shortcuts.shell.region-prev": "Prejšnje območje",
+  "shortcuts.shell.help": "Odpri navodila za uporabo",
+  "settings.search.placeholder": "Iskanje po nastavitvah in bližnjicah",
+  "settings.search.empty": "Nič se ne ujema z »{0}«."
 }

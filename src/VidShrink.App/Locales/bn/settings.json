@@ -127,5 +127,14 @@
   "share.step.confirm": "নিশ্চিতকরণ",
   "share.step.probe": "অবস্থা যাচাই",
   "share.step.delete": "মুছে ফেলা",
-  "share.error.token-lost": "এই ফাইলের মুছে ফেলার টোকেন আমাদের কাছে নেই, তাই {0}-এ লিঙ্কটি আগেভাগে বন্ধ করা যাবে না। ফাইলটির নিজস্ব মেয়াদ শেষ হলে সেটি মুছে যাবে।"
+  "share.error.token-lost": "এই ফাইলের মুছে ফেলার টোকেন আমাদের কাছে নেই, তাই {0}-এ লিঙ্কটি আগেভাগে বন্ধ করা যাবে না। ফাইলটির নিজস্ব মেয়াদ শেষ হলে সেটি মুছে যাবে।",
+  "settings.shell-shortcuts.title": "উইন্ডোর শর্টকাট",
+  "settings.shell-shortcuts.hint": "প্রতিটি ট্যাবে কাজ করে; প্লেয়ার বা এডিটর যে কী ব্যবহার করে, সেখানে সেটিই অগ্রাধিকার পায়।",
+  "shortcuts.shell.tab": "{0} ট্যাব খুলুন",
+  "shortcuts.shell.open": "ফাইল খুলুন",
+  "shortcuts.shell.region-next": "পরের অংশ (ট্যাব, পৃষ্ঠা, শিরোনাম বার)",
+  "shortcuts.shell.region-prev": "আগের অংশ",
+  "shortcuts.shell.help": "ব্যবহার নির্দেশিকা খুলুন",
+  "settings.search.placeholder": "সেটিংস ও শর্টকাটে খুঁজুন",
+  "settings.search.empty": "“{0}”-এর সঙ্গে কিছু মেলেনি।"
 }

@@ -127,5 +127,14 @@
   "share.step.confirm": "確認",
   "share.step.probe": "状態確認",
   "share.step.delete": "削除",
-  "share.error.token-lost": "このファイルの削除トークンが手元にないため、{0}ではリンクを早めに閉じることができません。ファイルは自身の保持期間が切れたときに削除されます。"
+  "share.error.token-lost": "このファイルの削除トークンが手元にないため、{0}ではリンクを早めに閉じることができません。ファイルは自身の保持期間が切れたときに削除されます。",
+  "settings.shell-shortcuts.title": "ウィンドウのショートカット",
+  "settings.shell-shortcuts.hint": "すべてのタブで使えます。プレーヤーやエディターが使うキーはそこで優先されます。",
+  "shortcuts.shell.tab": "{0}タブを開く",
+  "shortcuts.shell.open": "ファイルを開く",
+  "shortcuts.shell.region-next": "次の領域（タブ、ページ、タイトルバー）",
+  "shortcuts.shell.region-prev": "前の領域",
+  "shortcuts.shell.help": "使い方ガイドを開く",
+  "settings.search.placeholder": "設定とショートカットを検索",
+  "settings.search.empty": "「{0}」に一致するものはありません。"
 }

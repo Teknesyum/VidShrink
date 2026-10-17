@@ -9,6 +9,13 @@ ship as part of it.
 
 ### Added
 
+- Window shortcuts: a third editable set in Settings next to the player and editor tables. Ctrl+1..6 open the
+  Player, Editor, Shrink, Convert, Recorder and Settings tabs, Ctrl+O opens a file for the current tab, Ctrl+F6 and
+  Ctrl+Shift+F6 move focus between the tab strip, the page and the title bar (F6 stays the recorder's chapter key), and
+  F1 opens the user guide in the app language (the Recorder section on the Recorder tab). A key the player or editor
+  uses still wins inside its own tab. The About card gains a User Guide link.
+- Settings search: a filter box above the Settings cards hides the cards that do not match and narrows the shortcut
+  tables to matching rows, by action name or by key; clearing it restores the page as it was.
 - Player: "Speed through silence" mode (J, Playback menu). A labelled `silencedetect` ring sits at the head of the
   audio chain; when it reports a silence the speed rises to 4x and drops back to the previous speed when sound returns,
   so audio and picture stay in sync instead of jumping. Off by default; threshold (`silenceThresholdDb`, default

@@ -14,7 +14,8 @@ namespace VidShrink.App.Playback;
 internal enum ShortcutMap
 {
     Player,
-    Editor
+    Editor,
+    Shell
 }
 
 internal sealed record ShortcutSlot(ShortcutMap Map, string Id, PlayerInput Default, PlayerInput? Current, string Label)
@@ -33,6 +34,7 @@ internal static class ShortcutBindings
 
     private static readonly Dictionary<string, string> PlayerOverrides = new(StringComparer.Ordinal);
     private static readonly Dictionary<string, string> EditorOverrides = new(StringComparer.Ordinal);
+    private static readonly Dictionary<string, string> ShellOverrides = new(StringComparer.Ordinal);
     private static readonly object Gate = new();
     private static string? _file;
     private static bool _useDefault = true;
@@ -102,7 +104,12 @@ internal static class ShortcutBindings
     }
 
     internal static IReadOnlyList<ShortcutSlot> Slots(ShortcutMap map)
-        => map == ShortcutMap.Player ? Keymap.ShortcutSlots() : EditorKeymap.ShortcutSlots();
+        => map switch
+        {
+            ShortcutMap.Player => Keymap.ShortcutSlots(),
+            ShortcutMap.Shell => ShellKeymap.ShortcutSlots(),
+            _ => EditorKeymap.ShortcutSlots()
+        };
 
     internal static IReadOnlyList<ShortcutSlot> Assign(ShortcutMap map, string id, PlayerInput input)
     {
@@ -172,12 +179,18 @@ internal static class ShortcutBindings
     }
 
     private static Dictionary<string, string> Overrides(ShortcutMap map)
-        => map == ShortcutMap.Player ? PlayerOverrides : EditorOverrides;
+        => map switch
+        {
+            ShortcutMap.Player => PlayerOverrides,
+            ShortcutMap.Shell => ShellOverrides,
+            _ => EditorOverrides
+        };
 
     private static void Read()
     {
         PlayerOverrides.Clear();
         EditorOverrides.Clear();
+        ShellOverrides.Clear();
         _loaded = true;
         _version++;
         var file = Location;
@@ -188,11 +201,13 @@ internal static class ShortcutBindings
             if (JsonNode.Parse(File.ReadAllText(file)) is not JsonObject root) return;
             Fill(root["player"], PlayerOverrides);
             Fill(root["editor"], EditorOverrides);
+            Fill(root["shell"], ShellOverrides);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or FormatException)
         {
             PlayerOverrides.Clear();
             EditorOverrides.Clear();
+            ShellOverrides.Clear();
         }
     }
 
@@ -223,6 +238,7 @@ internal static class ShortcutBindings
                 writer.WriteStartObject();
                 Write(writer, "player", PlayerOverrides);
                 Write(writer, "editor", EditorOverrides);
+                Write(writer, "shell", ShellOverrides);
                 writer.WriteEndObject();
             }
 

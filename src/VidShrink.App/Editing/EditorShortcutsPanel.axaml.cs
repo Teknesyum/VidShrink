@@ -9,7 +9,7 @@ using VidShrink.App.Playback;
 
 namespace VidShrink.App.Editing;
 
-internal partial class EditorShortcutsPanel : UserControl
+internal partial class EditorShortcutsPanel : UserControl, IShortcutCard
 {
     private readonly ShortcutTable _table;
 
@@ -23,6 +23,10 @@ internal partial class EditorShortcutsPanel : UserControl
     internal IReadOnlyList<(string Gesture, string Label)> Shown => _table.Shown;
 
     internal ShortcutTable Table => _table;
+
+    ShortcutTable IShortcutCard.Table => _table;
+
+    string IShortcutCard.Heading => Strings.Get("editor.shortcuts.title") + " " + Strings.Get("editor.shortcuts.hint");
 
     /// <summary>
     /// Liste açık mı. Tek başına kurulan panel açık gelir; Ayarlar sayfası kapalı kurar ki

@@ -902,5 +902,6 @@
   "main.preset.handbrake.dropped.structural": "Прескочено: структура на списъка на HandBrake",
   "main.share.qr": "QR код на връзката за споделяне",
   "main.share.qr-hint": "Сканирайте с телефона си, за да отворите връзката.",
-  "main.startup.no-display": "VidShrink не успя да отвори графичен дисплей. Стартирайте го от сесия на работния плот; под Wayland е необходим Xwayland."
+  "main.startup.no-display": "VidShrink не успя да отвори графичен дисплей. Стартирайте го от сесия на работния плот; под Wayland е необходим Xwayland.",
+  "main.about.guide": "Ръководство за употреба"
 }

@@ -129,5 +129,14 @@
   "share.step.confirm": "la confirmation",
   "share.step.probe": "la vérification de l'état",
   "share.step.delete": "la suppression",
-  "share.error.token-lost": "Nous n'avons pas le jeton de suppression de ce fichier ; le lien ne peut donc pas être fermé à l'avance sur {0}. Le fichier est supprimé à la fin de sa propre durée de vie."
+  "share.error.token-lost": "Nous n'avons pas le jeton de suppression de ce fichier ; le lien ne peut donc pas être fermé à l'avance sur {0}. Le fichier est supprimé à la fin de sa propre durée de vie.",
+  "settings.shell-shortcuts.title": "Raccourcis de la fenêtre",
+  "settings.shell-shortcuts.hint": "Valables dans chaque onglet ; une touche utilisée par le lecteur ou l’éditeur y reste prioritaire.",
+  "shortcuts.shell.tab": "Ouvrir l’onglet {0}",
+  "shortcuts.shell.open": "Ouvrir un fichier",
+  "shortcuts.shell.region-next": "Zone suivante (onglets, page, barre de titre)",
+  "shortcuts.shell.region-prev": "Zone précédente",
+  "shortcuts.shell.help": "Ouvrir le guide d’utilisation",
+  "settings.search.placeholder": "Rechercher dans les réglages et les raccourcis",
+  "settings.search.empty": "Rien ne correspond à « {0} »."
 }

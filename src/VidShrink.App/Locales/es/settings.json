@@ -127,5 +127,14 @@
   "share.step.confirm": "la confirmación",
   "share.step.probe": "la comprobación de estado",
   "share.step.delete": "el borrado",
-  "share.error.token-lost": "No tenemos el testigo de borrado de este archivo, así que el enlace no se puede cerrar antes de tiempo en {0}. El archivo se borra cuando se agota su propia vida útil."
+  "share.error.token-lost": "No tenemos el testigo de borrado de este archivo, así que el enlace no se puede cerrar antes de tiempo en {0}. El archivo se borra cuando se agota su propia vida útil.",
+  "settings.shell-shortcuts.title": "Atajos de la ventana",
+  "settings.shell-shortcuts.hint": "Funcionan en todas las pestañas; una tecla que usa el reproductor o el editor tiene prioridad allí.",
+  "shortcuts.shell.tab": "Abrir la pestaña {0}",
+  "shortcuts.shell.open": "Abrir un archivo",
+  "shortcuts.shell.region-next": "Siguiente zona (pestañas, página, barra de título)",
+  "shortcuts.shell.region-prev": "Zona anterior",
+  "shortcuts.shell.help": "Abrir la guía de uso",
+  "settings.search.placeholder": "Buscar en ajustes y atajos",
+  "settings.search.empty": "Nada coincide con «{0}»."
 }

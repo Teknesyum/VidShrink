@@ -127,5 +127,14 @@
   "share.step.confirm": "确认",
   "share.step.probe": "状态检查",
   "share.step.delete": "删除",
-  "share.error.token-lost": "我们没有此文件的删除令牌，因此无法提前关闭 {0} 上的链接。文件会在自身有效期结束时被删除。"
+  "share.error.token-lost": "我们没有此文件的删除令牌，因此无法提前关闭 {0} 上的链接。文件会在自身有效期结束时被删除。",
+  "settings.shell-shortcuts.title": "窗口快捷键",
+  "settings.shell-shortcuts.hint": "在每个标签页都有效；播放器或编辑器使用的按键在那里优先。",
+  "shortcuts.shell.tab": "打开“{0}”标签页",
+  "shortcuts.shell.open": "打开文件",
+  "shortcuts.shell.region-next": "下一个区域（标签页、页面、标题栏）",
+  "shortcuts.shell.region-prev": "上一个区域",
+  "shortcuts.shell.help": "打开使用指南",
+  "settings.search.placeholder": "搜索设置和快捷键",
+  "settings.search.empty": "没有与“{0}”匹配的内容。"
 }

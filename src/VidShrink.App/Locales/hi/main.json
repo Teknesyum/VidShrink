@@ -902,5 +902,6 @@
   "main.preset.handbrake.dropped.structural": "छोड़ा गया: HandBrake सूची संरचना",
   "main.share.qr": "शेयर लिंक का QR कोड",
   "main.share.qr-hint": "लिंक खोलने के लिए फ़ोन से स्कैन करें।",
-  "main.startup.no-display": "VidShrink कोई ग्राफ़िकल डिस्प्ले नहीं खोल सका। इसे डेस्कटॉप सत्र से चलाएँ; Wayland पर Xwayland उपलब्ध होना चाहिए।"
+  "main.startup.no-display": "VidShrink कोई ग्राफ़िकल डिस्प्ले नहीं खोल सका। इसे डेस्कटॉप सत्र से चलाएँ; Wayland पर Xwayland उपलब्ध होना चाहिए।",
+  "main.about.guide": "उपयोग गाइड"
 }

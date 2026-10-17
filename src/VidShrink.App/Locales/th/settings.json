@@ -127,5 +127,14 @@
   "share.step.confirm": "การยืนยัน",
   "share.step.probe": "การตรวจสอบสถานะ",
   "share.step.delete": "การลบ",
-  "share.error.token-lost": "เราไม่มีโทเคนสำหรับลบของไฟล์นี้ จึงปิดลิงก์บน {0} ก่อนกำหนดไม่ได้ ไฟล์จะถูกลบเมื่อครบอายุของตัวเอง"
+  "share.error.token-lost": "เราไม่มีโทเคนสำหรับลบของไฟล์นี้ จึงปิดลิงก์บน {0} ก่อนกำหนดไม่ได้ ไฟล์จะถูกลบเมื่อครบอายุของตัวเอง",
+  "settings.shell-shortcuts.title": "ปุ่มลัดของหน้าต่าง",
+  "settings.shell-shortcuts.hint": "ใช้ได้ทุกแท็บ ปุ่มที่เครื่องเล่นหรือตัวแก้ไขใช้จะมีลำดับก่อนในแท็บนั้น",
+  "shortcuts.shell.tab": "เปิดแท็บ {0}",
+  "shortcuts.shell.open": "เปิดไฟล์",
+  "shortcuts.shell.region-next": "พื้นที่ถัดไป (แท็บ หน้า แถบชื่อเรื่อง)",
+  "shortcuts.shell.region-prev": "พื้นที่ก่อนหน้า",
+  "shortcuts.shell.help": "เปิดคู่มือการใช้งาน",
+  "settings.search.placeholder": "ค้นหาในการตั้งค่าและปุ่มลัด",
+  "settings.search.empty": "ไม่พบรายการที่ตรงกับ “{0}”"
 }

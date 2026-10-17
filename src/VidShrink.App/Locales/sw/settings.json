@@ -127,5 +127,14 @@
   "share.step.confirm": "uthibitishaji",
   "share.step.probe": "ukaguzi wa hali",
   "share.step.delete": "ufutaji",
-  "share.error.token-lost": "Hatuna tokeni ya kufuta ya faili hili, kwa hivyo kiungo hakiwezi kufungwa mapema kwenye {0}. Faili hufutwa muda wake wenyewe unapoisha."
+  "share.error.token-lost": "Hatuna tokeni ya kufuta ya faili hili, kwa hivyo kiungo hakiwezi kufungwa mapema kwenye {0}. Faili hufutwa muda wake wenyewe unapoisha.",
+  "settings.shell-shortcuts.title": "Njia za mkato za dirisha",
+  "settings.shell-shortcuts.hint": "Zinafanya kazi kwenye kila kichupo; kitufe kinachotumiwa na kicheza au kihariri kinapewa kipaumbele hapo.",
+  "shortcuts.shell.tab": "Fungua kichupo cha {0}",
+  "shortcuts.shell.open": "Fungua faili",
+  "shortcuts.shell.region-next": "Eneo linalofuata (vichupo, ukurasa, upau wa kichwa)",
+  "shortcuts.shell.region-prev": "Eneo lililotangulia",
+  "shortcuts.shell.help": "Fungua mwongozo wa matumizi",
+  "settings.search.placeholder": "Tafuta katika mipangilio na njia za mkato",
+  "settings.search.empty": "Hakuna kinacholingana na “{0}”."
 }

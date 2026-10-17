@@ -127,5 +127,14 @@
   "share.step.confirm": "confirmation",
   "share.step.probe": "the status check",
   "share.step.delete": "deletion",
-  "share.error.token-lost": "We do not have this file's delete token, so the link cannot be closed early on {0}. The file is deleted when its own lifetime runs out."
+  "share.error.token-lost": "We do not have this file's delete token, so the link cannot be closed early on {0}. The file is deleted when its own lifetime runs out.",
+  "settings.shell-shortcuts.title": "Window shortcuts",
+  "settings.shell-shortcuts.hint": "Work on every tab; a key the player or editor uses takes priority there.",
+  "shortcuts.shell.tab": "Open the {0} tab",
+  "shortcuts.shell.open": "Open a file",
+  "shortcuts.shell.region-next": "Next region (tabs, page, title bar)",
+  "shortcuts.shell.region-prev": "Previous region",
+  "shortcuts.shell.help": "Open the user guide",
+  "settings.search.placeholder": "Search settings and shortcuts",
+  "settings.search.empty": "Nothing matches “{0}”."
 }

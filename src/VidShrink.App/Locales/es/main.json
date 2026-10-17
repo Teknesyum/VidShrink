@@ -902,5 +902,6 @@
   "main.preset.handbrake.dropped.structural": "Omitido: estructura de lista de HandBrake",
   "main.share.qr": "Código QR del enlace compartido",
   "main.share.qr-hint": "Escanéalo con el teléfono para abrir el enlace.",
-  "main.startup.no-display": "VidShrink no pudo abrir una pantalla gráfica. Inícielo desde una sesión de escritorio; en Wayland debe estar disponible Xwayland."
+  "main.startup.no-display": "VidShrink no pudo abrir una pantalla gráfica. Inícielo desde una sesión de escritorio; en Wayland debe estar disponible Xwayland.",
+  "main.about.guide": "Guía de uso"
 }

@@ -127,5 +127,14 @@
   "share.step.confirm": "patvirtinimą",
   "share.step.probe": "būsenos patikrą",
   "share.step.delete": "trynimą",
-  "share.error.token-lost": "Šio failo trynimo prieigos rakto neturime, todėl {0} nuorodos anksčiau uždaryti negalima. Failas ištrinamas, kai baigiasi jo paties galiojimo laikas."
+  "share.error.token-lost": "Šio failo trynimo prieigos rakto neturime, todėl {0} nuorodos anksčiau uždaryti negalima. Failas ištrinamas, kai baigiasi jo paties galiojimo laikas.",
+  "settings.shell-shortcuts.title": "Lango spartieji klavišai",
+  "settings.shell-shortcuts.hint": "Veikia kiekviename skirtuke; ten pirmenybę turi klavišas, kurį naudoja grotuvas ar redaktorius.",
+  "shortcuts.shell.tab": "Atverti skirtuką „{0}“",
+  "shortcuts.shell.open": "Atverti failą",
+  "shortcuts.shell.region-next": "Kita sritis (skirtukai, puslapis, pavadinimo juosta)",
+  "shortcuts.shell.region-prev": "Ankstesnė sritis",
+  "shortcuts.shell.help": "Atverti naudojimo vadovą",
+  "settings.search.placeholder": "Ieškoti nustatymuose ir sparčiuosiuose klavišuose",
+  "settings.search.empty": "Niekas neatitinka „{0}“."
 }

@@ -127,5 +127,14 @@
   "share.step.confirm": "quá trình xác nhận",
   "share.step.probe": "quá trình kiểm tra trạng thái",
   "share.step.delete": "quá trình xóa",
-  "share.error.token-lost": "Chúng tôi không có mã xóa của tệp này nên không thể đóng sớm liên kết trên {0}. Tệp bị xóa khi hết hạn của chính nó."
+  "share.error.token-lost": "Chúng tôi không có mã xóa của tệp này nên không thể đóng sớm liên kết trên {0}. Tệp bị xóa khi hết hạn của chính nó.",
+  "settings.shell-shortcuts.title": "Phím tắt cửa sổ",
+  "settings.shell-shortcuts.hint": "Dùng được ở mọi thẻ; phím mà trình phát hoặc trình chỉnh sửa dùng sẽ được ưu tiên ở đó.",
+  "shortcuts.shell.tab": "Mở thẻ {0}",
+  "shortcuts.shell.open": "Mở tệp",
+  "shortcuts.shell.region-next": "Vùng tiếp theo (thẻ, trang, thanh tiêu đề)",
+  "shortcuts.shell.region-prev": "Vùng trước",
+  "shortcuts.shell.help": "Mở hướng dẫn sử dụng",
+  "settings.search.placeholder": "Tìm trong cài đặt và phím tắt",
+  "settings.search.empty": "Không có kết quả cho “{0}”."
 }

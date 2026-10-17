@@ -902,5 +902,6 @@
   "main.preset.handbrake.dropped.structural": "Preskočeno: struktura liste HandBrake-a",
   "main.share.qr": "QR kod linka za deljenje",
   "main.share.qr-hint": "Skenirajte telefonom da biste otvorili link.",
-  "main.startup.no-display": "VidShrink nije mogao da otvori grafički ekran. Pokrenite ga iz sesije radne površine; na Waylandu mora biti dostupan Xwayland."
+  "main.startup.no-display": "VidShrink nije mogao da otvori grafički ekran. Pokrenite ga iz sesije radne površine; na Waylandu mora biti dostupan Xwayland.",
+  "main.about.guide": "Упутство за употребу"
 }

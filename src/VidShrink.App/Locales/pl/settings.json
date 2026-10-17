@@ -129,5 +129,14 @@
   "share.step.confirm": "potwierdzania",
   "share.step.probe": "sprawdzania stanu",
   "share.step.delete": "usuwania",
-  "share.error.token-lost": "Nie mamy tokenu usuwania tego pliku, więc linku w {0} nie można zamknąć wcześniej. Plik zostanie usunięty, gdy upłynie jego własny czas życia."
+  "share.error.token-lost": "Nie mamy tokenu usuwania tego pliku, więc linku w {0} nie można zamknąć wcześniej. Plik zostanie usunięty, gdy upłynie jego własny czas życia.",
+  "settings.shell-shortcuts.title": "Skróty okna",
+  "settings.shell-shortcuts.hint": "Działają na każdej karcie; klawisz używany przez odtwarzacz lub edytor ma tam pierwszeństwo.",
+  "shortcuts.shell.tab": "Otwórz kartę {0}",
+  "shortcuts.shell.open": "Otwórz plik",
+  "shortcuts.shell.region-next": "Następny obszar (karty, strona, pasek tytułu)",
+  "shortcuts.shell.region-prev": "Poprzedni obszar",
+  "shortcuts.shell.help": "Otwórz instrukcję obsługi",
+  "settings.search.placeholder": "Szukaj w ustawieniach i skrótach",
+  "settings.search.empty": "Nic nie pasuje do „{0}”."
 }

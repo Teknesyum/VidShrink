@@ -127,5 +127,14 @@
   "share.step.confirm": "konfirmasi",
   "share.step.probe": "pemeriksaan status",
   "share.step.delete": "penghapusan",
-  "share.error.token-lost": "Token hapus berkas ini tidak ada pada kami, jadi tautan di {0} tidak dapat ditutup lebih awal. Berkas dihapus ketika masa hidupnya habis."
+  "share.error.token-lost": "Token hapus berkas ini tidak ada pada kami, jadi tautan di {0} tidak dapat ditutup lebih awal. Berkas dihapus ketika masa hidupnya habis.",
+  "settings.shell-shortcuts.title": "Pintasan jendela",
+  "settings.shell-shortcuts.hint": "Berlaku di setiap tab; tombol yang dipakai pemutar atau editor didahulukan di sana.",
+  "shortcuts.shell.tab": "Buka tab {0}",
+  "shortcuts.shell.open": "Buka file",
+  "shortcuts.shell.region-next": "Area berikutnya (tab, halaman, bilah judul)",
+  "shortcuts.shell.region-prev": "Area sebelumnya",
+  "shortcuts.shell.help": "Buka panduan penggunaan",
+  "settings.search.placeholder": "Cari di pengaturan dan pintasan",
+  "settings.search.empty": "Tidak ada yang cocok dengan “{0}”."
 }

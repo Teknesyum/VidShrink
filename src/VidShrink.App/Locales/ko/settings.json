@@ -127,5 +127,14 @@
   "share.step.confirm": "확인",
   "share.step.probe": "상태 점검",
   "share.step.delete": "삭제",
-  "share.error.token-lost": "이 파일의 삭제 토큰이 우리에게 없어서 {0}에서는 링크를 미리 닫을 수 없습니다. 파일은 자체 수명이 다하면 삭제됩니다."
+  "share.error.token-lost": "이 파일의 삭제 토큰이 우리에게 없어서 {0}에서는 링크를 미리 닫을 수 없습니다. 파일은 자체 수명이 다하면 삭제됩니다.",
+  "settings.shell-shortcuts.title": "창 단축키",
+  "settings.shell-shortcuts.hint": "모든 탭에서 작동합니다. 플레이어나 편집기가 쓰는 키는 그곳에서 우선합니다.",
+  "shortcuts.shell.tab": "{0} 탭 열기",
+  "shortcuts.shell.open": "파일 열기",
+  "shortcuts.shell.region-next": "다음 영역(탭, 페이지, 제목 표시줄)",
+  "shortcuts.shell.region-prev": "이전 영역",
+  "shortcuts.shell.help": "사용 설명서 열기",
+  "settings.search.placeholder": "설정과 단축키 검색",
+  "settings.search.empty": "“{0}”과(와) 일치하는 항목이 없습니다."
 }

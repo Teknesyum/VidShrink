@@ -129,5 +129,14 @@
   "share.step.confirm": "تأیید",
   "share.step.probe": "بررسی وضعیت",
   "share.step.delete": "حذف",
-  "share.error.token-lost": "توکن حذف این فایل را در اختیار نداریم، بنابراین پیوند روی {0} را نمی‌توان زودتر بست. فایل با پایان عمر خودش حذف می‌شود."
+  "share.error.token-lost": "توکن حذف این فایل را در اختیار نداریم، بنابراین پیوند روی {0} را نمی‌توان زودتر بست. فایل با پایان عمر خودش حذف می‌شود.",
+  "settings.shell-shortcuts.title": "میان‌برهای پنجره",
+  "settings.shell-shortcuts.hint": "در همهٔ زبانه‌ها کار می‌کنند؛ کلیدی که پخش‌کننده یا ویرایشگر به کار می‌برد، آنجا اولویت دارد.",
+  "shortcuts.shell.tab": "باز کردن زبانهٔ {0}",
+  "shortcuts.shell.open": "باز کردن پرونده",
+  "shortcuts.shell.region-next": "ناحیهٔ بعدی (زبانه‌ها، صفحه، نوار عنوان)",
+  "shortcuts.shell.region-prev": "ناحیهٔ قبلی",
+  "shortcuts.shell.help": "باز کردن راهنمای استفاده",
+  "settings.search.placeholder": "جست‌وجو در تنظیمات و میان‌برها",
+  "settings.search.empty": "چیزی با «{0}» جور نیست."
 }

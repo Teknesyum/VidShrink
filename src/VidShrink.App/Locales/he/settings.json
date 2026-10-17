@@ -129,5 +129,14 @@
   "share.step.confirm": "האישור",
   "share.step.probe": "בדיקת המצב",
   "share.step.delete": "המחיקה",
-  "share.error.token-lost": "אסימון המחיקה של הקובץ הזה אינו ברשותנו, ולכן לא ניתן לסגור את הקישור מוקדם ב-{0}. הקובץ נמחק כאשר תוקפו שלו פג."
+  "share.error.token-lost": "אסימון המחיקה של הקובץ הזה אינו ברשותנו, ולכן לא ניתן לסגור את הקישור מוקדם ב-{0}. הקובץ נמחק כאשר תוקפו שלו פג.",
+  "settings.shell-shortcuts.title": "קיצורי מקשים של החלון",
+  "settings.shell-shortcuts.hint": "פועלים בכל כרטיסייה; מקש שהנגן או העורך משתמשים בו מקבל שם עדיפות.",
+  "shortcuts.shell.tab": "פתיחת הכרטיסייה {0}",
+  "shortcuts.shell.open": "פתיחת קובץ",
+  "shortcuts.shell.region-next": "האזור הבא (כרטיסיות, דף, שורת כותרת)",
+  "shortcuts.shell.region-prev": "האזור הקודם",
+  "shortcuts.shell.help": "פתיחת מדריך השימוש",
+  "settings.search.placeholder": "חיפוש בהגדרות ובקיצורי המקשים",
+  "settings.search.empty": "אין התאמה ל־„{0}”."
 }

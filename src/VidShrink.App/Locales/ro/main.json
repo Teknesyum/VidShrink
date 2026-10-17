@@ -902,5 +902,6 @@
   "main.preset.handbrake.dropped.structural": "Sărit: structura listei HandBrake",
   "main.share.qr": "Cod QR pentru linkul de partajare",
   "main.share.qr-hint": "Scanați cu telefonul pentru a deschide linkul.",
-  "main.startup.no-display": "VidShrink nu a putut deschide un afișaj grafic. Porniți-l dintr-o sesiune de desktop; în Wayland trebuie să fie disponibil Xwayland."
+  "main.startup.no-display": "VidShrink nu a putut deschide un afișaj grafic. Porniți-l dintr-o sesiune de desktop; în Wayland trebuie să fie disponibil Xwayland.",
+  "main.about.guide": "Ghid de utilizare"
 }

@@ -127,5 +127,14 @@
   "share.step.confirm": "التأكيد",
   "share.step.probe": "فحص الحالة",
   "share.step.delete": "الحذف",
-  "share.error.token-lost": "ليس لدينا رمز حذف هذا الملف، لذا لا يمكن إغلاق الرابط مبكرًا على {0}. يُحذف الملف عند انتهاء مدته."
+  "share.error.token-lost": "ليس لدينا رمز حذف هذا الملف، لذا لا يمكن إغلاق الرابط مبكرًا على {0}. يُحذف الملف عند انتهاء مدته.",
+  "settings.shell-shortcuts.title": "اختصارات النافذة",
+  "settings.shell-shortcuts.hint": "تعمل في كل علامة تبويب؛ والمفتاح الذي يستخدمه المشغّل أو المحرّر تكون له الأولوية هناك.",
+  "shortcuts.shell.tab": "فتح علامة التبويب {0}",
+  "shortcuts.shell.open": "فتح ملف",
+  "shortcuts.shell.region-next": "المنطقة التالية (علامات التبويب، الصفحة، شريط العنوان)",
+  "shortcuts.shell.region-prev": "المنطقة السابقة",
+  "shortcuts.shell.help": "فتح دليل الاستخدام",
+  "settings.search.placeholder": "البحث في الإعدادات والاختصارات",
+  "settings.search.empty": "لا شيء يطابق «{0}»."
 }

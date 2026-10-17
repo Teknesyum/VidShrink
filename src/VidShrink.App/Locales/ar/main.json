@@ -902,5 +902,6 @@
   "main.preset.handbrake.dropped.structural": "تُخطي: بنية قائمة HandBrake",
   "main.share.qr": "رمز QR لرابط المشاركة",
   "main.share.qr-hint": "امسح الرمز بهاتفك لفتح الرابط.",
-  "main.startup.no-display": "تعذّر على VidShrink فتح شاشة رسومية. شغّله من جلسة سطح مكتب؛ في Wayland يجب أن يكون Xwayland متاحًا."
+  "main.startup.no-display": "تعذّر على VidShrink فتح شاشة رسومية. شغّله من جلسة سطح مكتب؛ في Wayland يجب أن يكون Xwayland متاحًا.",
+  "main.about.guide": "دليل الاستخدام"
 }

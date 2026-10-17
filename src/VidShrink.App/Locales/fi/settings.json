@@ -129,5 +129,14 @@
   "share.step.confirm": "vahvistuksen",
   "share.step.probe": "tilan tarkistuksen",
   "share.step.delete": "poiston",
-  "share.error.token-lost": "Meillä ei ole tämän tiedoston poistotunnusta, joten linkkiä ei voi sulkea etuajassa palvelussa {0}. Tiedosto poistetaan, kun sen oma elinaika päättyy."
+  "share.error.token-lost": "Meillä ei ole tämän tiedoston poistotunnusta, joten linkkiä ei voi sulkea etuajassa palvelussa {0}. Tiedosto poistetaan, kun sen oma elinaika päättyy.",
+  "settings.shell-shortcuts.title": "Ikkunan pikanäppäimet",
+  "settings.shell-shortcuts.hint": "Toimivat joka välilehdellä; soittimen tai editorin käyttämä näppäin on siellä etusijalla.",
+  "shortcuts.shell.tab": "Avaa välilehti {0}",
+  "shortcuts.shell.open": "Avaa tiedosto",
+  "shortcuts.shell.region-next": "Seuraava alue (välilehdet, sivu, otsikkopalkki)",
+  "shortcuts.shell.region-prev": "Edellinen alue",
+  "shortcuts.shell.help": "Avaa käyttöopas",
+  "settings.search.placeholder": "Hae asetuksista ja pikanäppäimistä",
+  "settings.search.empty": "Mikään ei vastaa hakua ”{0}”."
 }

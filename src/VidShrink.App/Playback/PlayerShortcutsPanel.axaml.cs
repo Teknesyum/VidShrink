@@ -8,7 +8,7 @@ using VidShrink.App.Localization;
 
 namespace VidShrink.App.Playback;
 
-internal partial class PlayerShortcutsPanel : UserControl
+internal partial class PlayerShortcutsPanel : UserControl, IShortcutCard
 {
     private readonly ShortcutTable _table;
 
@@ -22,6 +22,10 @@ internal partial class PlayerShortcutsPanel : UserControl
     internal IReadOnlyList<(string Gesture, string Label)> Shown => _table.Shown;
 
     internal ShortcutTable Table => _table;
+
+    ShortcutTable IShortcutCard.Table => _table;
+
+    string IShortcutCard.Heading => Strings.Get("settings.player-shortcuts.title") + " " + Strings.Get("settings.player-shortcuts.hint");
 
     /// <summary>
     /// Liste açık mı. Tek başına kurulan panel açık gelir; Ayarlar sayfası kapalı kurar ki

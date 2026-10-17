@@ -902,5 +902,6 @@
   "main.preset.handbrake.dropped.structural": "ข้าม: โครงสร้างรายการของ HandBrake",
   "main.share.qr": "คิวอาร์โค้ดของลิงก์แชร์",
   "main.share.qr-hint": "สแกนด้วยโทรศัพท์เพื่อเปิดลิงก์",
-  "main.startup.no-display": "VidShrink ไม่สามารถเปิดจอแสดงผลกราฟิกได้ ให้เริ่มจากเซสชันเดสก์ท็อป บน Wayland ต้องมี Xwayland"
+  "main.startup.no-display": "VidShrink ไม่สามารถเปิดจอแสดงผลกราฟิกได้ ให้เริ่มจากเซสชันเดสก์ท็อป บน Wayland ต้องมี Xwayland",
+  "main.about.guide": "คู่มือการใช้งาน"
 }
