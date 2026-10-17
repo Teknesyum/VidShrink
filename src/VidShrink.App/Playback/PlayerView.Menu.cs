@@ -22,6 +22,7 @@ internal partial class PlayerView
         flyout.Items.Add(new Separator());
         flyout.Items.Add(AudioMenu());
         flyout.Items.Add(SubtitleMenu());
+        if (StreamQualityMenu() is { } quality) flyout.Items.Add(quality);
         flyout.Items.Add(ActionMenu("player.menu.view", Keymap.ViewMenu));
         flyout.Items.Add(ActionMenu("player.menu.playback", Keymap.PlaybackMenu));
         flyout.Items.Add(ActionMenu("player.menu.loop", Keymap.LoopMenu));

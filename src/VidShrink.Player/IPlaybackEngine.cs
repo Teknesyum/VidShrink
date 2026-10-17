@@ -277,6 +277,15 @@ public interface IPlaybackEngine : IDisposable
 
     Task<bool> ReopenAsync(double atSeconds, bool playing, CancellationToken ct = default) => Task.FromResult(false);
 
+    /// <summary>Uyarlamali yayinda calan katmanin bant genisligi (izin <c>hls-bitrate</c>'i); katman yoksa 0.</summary>
+    long StreamBitrate => 0;
+
+    /// <summary>
+    /// Katmani bant genisligiyle secer (<c>hls-bitrate</c>; 0 en yuksek) ve yayini ayni konumdan yeniden acar.
+    /// Iz kimlikleri katmana bagli oldugu icin eski ses ve altyazi kimligi geri yazilmaz.
+    /// </summary>
+    Task<bool> SetStreamBitrateAsync(long bitrate, CancellationToken ct = default) => Task.FromResult(false);
+
     /// <summary>Motorun gordugu ses cikis aygitlari; ilk satir otomatik secimdir.</summary>
     IReadOnlyList<AudioDevice> AudioDevices => Array.Empty<AudioDevice>();
 

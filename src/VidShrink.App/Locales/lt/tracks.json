@@ -1,5 +1,7 @@
 {
   "player.tracks.audio": "Garso takelis",
+  "player.tracks.quality": "Srauto kokybė",
+  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Kitas garso takelis",
   "player.tracks.delay": "Garso vėlinimas {0} s",
   "player.tracks.delayreset": "Atstatyti garso vėlinimą",

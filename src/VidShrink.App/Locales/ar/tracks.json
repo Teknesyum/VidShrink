@@ -1,5 +1,7 @@
 {
   "player.tracks.audio": "مسار صوتي",
+  "player.tracks.quality": "جودة البث",
+  "player.tracks.quality.rate": "{0} ك.ب/ث",
   "player.tracks.cycle": "المسار الصوتي التالي",
   "player.tracks.delay": "تأخير الصوت {0} ث",
   "player.tracks.delayreset": "إعادة ضبط تأخير الصوت",

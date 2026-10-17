@@ -77,6 +77,9 @@ internal partial class PlayerView
     }
 
     internal static async Task<string?> ReadListTitleAsync(string path, CancellationToken token)
+        => await ReadListHeadAsync(path, token) is { } head ? PlaylistFile.PlsTitle(head) : null;
+
+    private static async Task<byte[]?> ReadListHeadAsync(string path, CancellationToken token)
     {
         using var response = await ListTitleClient.GetAsync(path, HttpCompletionOption.ResponseHeadersRead, token);
         if (!response.IsSuccessStatusCode) return null;
@@ -84,7 +87,7 @@ internal partial class PlayerView
         var buffer = new byte[ListTitleMaxBytes];
         var read = 0;
         while (read < buffer.Length && await stream.ReadAsync(buffer.AsMemory(read), token) is var count and > 0) read += count;
-        return PlaylistFile.PlsTitle(buffer[..read]);
+        return buffer[..read];
     }
 
     internal static string? StreamTitle(string path, IPlaybackEngine? engine)

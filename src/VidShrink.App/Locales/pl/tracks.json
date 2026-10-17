@@ -1,5 +1,7 @@
 {
   "player.tracks.audio": "Ścieżka audio",
+  "player.tracks.quality": "Jakość strumienia",
+  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Następna ścieżka audio",
   "player.tracks.delay": "Opóźnienie audio {0} s",
   "player.tracks.delayreset": "Zresetuj opóźnienie audio",

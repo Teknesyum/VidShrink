@@ -1,5 +1,7 @@
 {
   "player.tracks.audio": "Audio traka",
+  "player.tracks.quality": "Kvalitet strima",
+  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Sledeća audio traka",
   "player.tracks.delay": "Audio kašnjenje {0} s",
   "player.tracks.delayreset": "Resetuj audio kašnjenje",

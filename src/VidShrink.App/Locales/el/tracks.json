@@ -1,5 +1,7 @@
 {
   "player.tracks.audio": "Κομμάτι ήχου",
+  "player.tracks.quality": "Ποιότητα ροής",
+  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Επόμενο κομμάτι ήχου",
   "player.tracks.delay": "Καθυστέρηση ήχου {0} δ",
   "player.tracks.delayreset": "Επαναφορά καθυστέρησης ήχου",

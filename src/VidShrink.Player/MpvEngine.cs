@@ -658,7 +658,20 @@ public sealed partial class MpvEngine : IPlaybackEngine
         return CommandSync("ao-reload") >= 0;
     }
 
-    public async Task<bool> ReopenAsync(double atSeconds, bool playing, CancellationToken ct = default)
+    public Task<bool> ReopenAsync(double atSeconds, bool playing, CancellationToken ct = default)
+        => ReopenCoreAsync(atSeconds, playing, true, ct);
+
+    public long StreamBitrate => TrackId("current-tracks/video/hls-bitrate") is > 0 and var video ? video : TrackId("current-tracks/audio/hls-bitrate");
+
+    public static string StreamBitrateValue(long bitrate) => bitrate > 0 ? bitrate.ToString(CultureInfo.InvariantCulture) : "max";
+
+    public async Task<bool> SetStreamBitrateAsync(long bitrate, CancellationToken ct = default)
+    {
+        if (!_isOpen || !TrySet("hls-bitrate", StreamBitrateValue(bitrate))) return false;
+        return await ReopenCoreAsync(PositionSeconds, !IsPaused, false, ct).ConfigureAwait(false);
+    }
+
+    private async Task<bool> ReopenCoreAsync(double atSeconds, bool playing, bool restoreTracks, CancellationToken ct)
     {
         if (Volatile.Read(ref _disposed) != 0 || Volatile.Read(ref _source) is not { } source) return false;
 
@@ -689,6 +702,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
         }
 
         foreach (var file in external) CommandSync("sub-add", file, "auto");
+        if (!restoreTracks) return true;
         if (audio > 0 && AudioTrack != audio) SetAudioTrack(audio);
         if (SubtitleTrack != subtitle) SetSubtitleTrack(subtitle);
         if (SecondarySubtitleTrack != secondary) SetSecondarySubtitleTrack(secondary);

@@ -1,5 +1,7 @@
 {
   "player.tracks.audio": "Faixa de áudio",
+  "player.tracks.quality": "Qualidade da transmissão",
+  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Próxima faixa de áudio",
   "player.tracks.delay": "Atraso de áudio {0} s",
   "player.tracks.delayreset": "Redefinir atraso de áudio",

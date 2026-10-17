@@ -1,5 +1,7 @@
 {
   "player.tracks.audio": "Track âm thanh",
+  "player.tracks.quality": "Chất lượng luồng",
+  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Track âm thanh kế tiếp",
   "player.tracks.delay": "Độ trễ âm thanh {0} giây",
   "player.tracks.delayreset": "Đặt lại độ trễ âm thanh",

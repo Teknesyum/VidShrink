@@ -1,5 +1,7 @@
 {
   "player.tracks.audio": "רצועת שמע",
+  "player.tracks.quality": "איכות השידור",
+  "player.tracks.quality.rate": "{0} קב/ש",
   "player.tracks.cycle": "רצועת השמע הבאה",
   "player.tracks.delay": "השהיית שמע {0} שנ'",
   "player.tracks.delayreset": "איפוס השהיית שמע",
