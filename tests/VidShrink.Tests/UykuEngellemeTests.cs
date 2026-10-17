@@ -276,6 +276,125 @@ public sealed class UykuEngellemeTests
         finally { Directory.Delete(klasor, true); }
     }
 
+    private static void Bekle(Func<bool> bitti)
+    {
+        var saat = System.Diagnostics.Stopwatch.StartNew();
+        while (!bitti() && saat.Elapsed.TotalSeconds < 30)
+        {
+            using var dilim = new CancellationTokenSource(TimeSpan.FromMilliseconds(5));
+            Dispatcher.UIThread.MainLoop(dilim.Token);
+        }
+    }
+
+    private static (string[] Olaylar, int[] Tutan) DonusturKuyrugu(bool? ayar)
+    {
+        var defter = new Defter();
+        var nobet = new SleepGuard(new SahteEngel(defter));
+        var tutan = new List<int>();
+        AppHost.Run(() =>
+        {
+            var pencere = new ConvertQueueWindow(new[] { "a.mp4", "b.mp4" }, new ConversionPreset(), Array.Empty<ConversionPreset>(), HdrPolicy.Preserve, null)
+            {
+                Uyku = nobet,
+                UykuyuEngelle = ayar,
+                Kosturucu = (yol, _, _, _) =>
+                {
+                    tutan.Add(nobet.Holders);
+                    return yol == "b.mp4" ? Task.FromException<string>(new IOException("bozuk")) : Task.FromResult(yol + ".out");
+                }
+            };
+            try
+            {
+                var is_ = pencere.StartAsync();
+                Bekle(() => is_.IsCompleted);
+                is_.GetAwaiter().GetResult();
+            }
+            finally { pencere.Close(); }
+        });
+        return (defter.Olaylar.ToArray(), tutan.ToArray());
+    }
+
+    private static (string[] Olaylar, int[] Tutan) TopluTeslim(bool? ayar)
+    {
+        var defter = new Defter();
+        var nobet = new SleepGuard(new SahteEngel(defter));
+        var tutan = new List<int>();
+        AppHost.Run(() =>
+        {
+            var pencere = new EditBatchWindow(new[] { "a" + VidShrink.Core.Editing.EditProject.Extension, "b" + VidShrink.Core.Editing.EditProject.Extension })
+            {
+                Uyku = nobet,
+                UykuyuEngelle = ayar,
+                Kosturucu = (yol, _, _) =>
+                {
+                    tutan.Add(nobet.Holders);
+                    return yol.StartsWith('b') ? Task.FromException<string>(new IOException("bozuk")) : Task.FromResult(yol + ".mp4");
+                }
+            };
+            try
+            {
+                var is_ = pencere.StartAsync();
+                Bekle(() => is_.IsCompleted);
+                is_.GetAwaiter().GetResult();
+            }
+            finally { pencere.Close(); }
+        });
+        return (defter.Olaylar.ToArray(), tutan.ToArray());
+    }
+
+    /// <summary>
+    /// Dönüştürme kuyruğu ve toplu düzenleme teslimi de kodlar: istek her işte tutulur, hatalı iş
+    /// dahil kuyruk bitince bir kez bırakılır.
+    /// </summary>
+    [Fact]
+    public void KuyrukPencereleriKosarkenTutarBitinceBirakir()
+    {
+        var donustur = DonusturKuyrugu(true);
+        Assert.Equal(new[] { 1, 1 }, donustur.Tutan);
+        Assert.Equal(new[] { "block", "allow" }, donustur.Olaylar);
+
+        var toplu = TopluTeslim(true);
+        Assert.Equal(new[] { 1, 1 }, toplu.Tutan);
+        Assert.Equal(new[] { "block", "allow" }, toplu.Olaylar);
+    }
+
+    /// <summary>Kutu kapalıyken kuyruk pencereleri isteği hiç almaz.</summary>
+    [Fact]
+    public void KuyrukPencereleriAyarKapaliysaTutmaz()
+    {
+        var donustur = DonusturKuyrugu(false);
+        Assert.Equal(new[] { 0, 0 }, donustur.Tutan);
+        Assert.Empty(donustur.Olaylar);
+
+        var toplu = TopluTeslim(false);
+        Assert.Equal(new[] { 0, 0 }, toplu.Tutan);
+        Assert.Empty(toplu.Olaylar);
+    }
+
+    /// <summary>Ana pencere dışındaki yollar kutuyu ayar dosyasından okur; dosya yoksa açık sayılır.</summary>
+    [Fact]
+    public void KuyruklarIcinAyarDosyadanOkunur()
+    {
+        var klasor = Path.Combine(TestPaths.OutputRoot, "uyku-engelleme", "kuyruk-ayar");
+        if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
+        Directory.CreateDirectory(klasor);
+        var eski = Environment.GetEnvironmentVariable(TestAyarYolu.Degisken);
+        try
+        {
+            var kapali = Path.Combine(klasor, "kapali.json");
+            new AppSettings { PreventSleepWhileEncoding = false }.Save(kapali);
+            Environment.SetEnvironmentVariable(TestAyarYolu.Degisken, kapali);
+            Assert.False(SleepGuard.PreventSleepSetting());
+            Environment.SetEnvironmentVariable(TestAyarYolu.Degisken, Path.Combine(klasor, "yok.json"));
+            Assert.True(SleepGuard.PreventSleepSetting());
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(TestAyarYolu.Degisken, eski);
+            Directory.Delete(klasor, true);
+        }
+    }
+
     /// <summary>Test sürecinde gerçek katman kapalıdır: varsayılan nöbetin altında kapalı bayrak durur.</summary>
     [Fact]
     public void TestSurecindeGercekKatmanKapali()

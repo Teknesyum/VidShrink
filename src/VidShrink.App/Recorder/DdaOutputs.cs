@@ -54,7 +54,7 @@ internal static class DdaOutputs
                         {
                             var display = HdrDisplay(output);
                             found.Add(new DdaOutput((int)index, desc.Left, desc.Top, width, height, display is not null, display,
-                                display is null ? null : SdrWhiteLevel.Read(desc.DeviceName)));
+                                display is null ? null : SdrWhiteLevel.Read(desc.GdiName)));
                         }
                     }
                     finally { Marshal.ReleaseComObject(output); }
@@ -97,7 +97,7 @@ internal static class DdaOutputs
     private struct OutputDesc
     {
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-        public string DeviceName;
+        public string GdiName;
         public int Left;
         public int Top;
         public int Right;
@@ -147,7 +147,7 @@ internal static class DdaOutputs
     private struct OutputDesc1
     {
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-        public string DeviceName;
+        public string GdiName;
         public int Left;
         public int Top;
         public int Right;

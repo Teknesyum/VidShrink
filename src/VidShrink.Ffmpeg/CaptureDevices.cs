@@ -133,14 +133,32 @@ public sealed class CaptureDevices
         => list with { Audio = list.Audio.Append(LoopbackAudio.Device).ToList() };
 
     /// <summary>
-    /// Cihaz listesi okunamadiginda donen bos liste. Windows'ta sistem sesi ffmpeg'in listesine
-    /// bagli olmadigi icin burada da durur; yoksa liste dustugunde secenek de kayboluyor.
+    /// Cihaz listesi okunamadiginda donen liste. Liste okunamayinca kaydedici yalniz "Sessiz"
+    /// gosteriyordu; burada her platformun ada bagli olmayan varsayilan girdileri durur:
+    /// Windows'ta uygulamanin kendi sistem sesi, macOS'ta avfoundation'in <c>default</c>'u,
+    /// Linux'ta pulse'un <c>default</c> kaynagi ve varsayilan cikisin geri-dongusu.
     /// </summary>
     internal static CaptureDeviceList Unloaded() => new(
-        OperatingSystem.IsWindows() ? [LoopbackAudio.Device] : Array.Empty<AudioCaptureDevice>(),
+        FallbackAudio(),
         Array.Empty<string>(),
         Backend,
         Loaded: false);
+
+    internal const string DefaultDevice = "default";
+
+    internal const string PulseDefaultMonitor = "@DEFAULT_MONITOR@";
+
+    private static AudioCaptureDevice[] FallbackAudio() => Backend switch
+    {
+        CaptureBackend.DirectShow => [LoopbackAudio.Device],
+        CaptureBackend.AvFoundation =>
+            [new AudioCaptureDevice(DefaultDevice, CaptureBackend.AvFoundation, AudioSourceRole.Microphone, DefaultDevice)],
+        _ =>
+        [
+            new AudioCaptureDevice(DefaultDevice, CaptureBackend.PulseAudio, AudioSourceRole.Microphone, DefaultDevice),
+            new AudioCaptureDevice(PulseDefaultMonitor, CaptureBackend.PulseAudio, AudioSourceRole.SystemAudio, PulseDefaultMonitor)
+        ]
+    };
 
     /// <summary>
     /// dshow listesinin iki bicimi ayni yerden ayristirilir. ffmpeg 7 oncesi bolum basligi

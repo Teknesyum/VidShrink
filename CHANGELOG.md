@@ -11,6 +11,12 @@ ship as part of it.
 
 - Recorder: `VidShrink.exe --recorder-selftest` shows a colour card for one second, captures it through the recording's
   HDR-to-SDR path and the 8-bit path, and writes the per-patch colour difference to `recorder-last.log`.
+- Player: the play queue and the playing file are kept between sessions. When the Player tab first opens, the last
+  queue comes back paused at the file and position it was left at; files no longer on disk are dropped. Nothing is
+  kept while "Keep History" is off.
+- Settings: "Minimize to Tray" (off by default). A minimized main window leaves the taskbar and waits in the system
+  tray; clicking the icon brings it back, and its tooltip shows the running job and queue progress. The close button
+  still quits.
 
 ### Fixed
 
@@ -25,6 +31,17 @@ ship as part of it.
   is clipped to the limited range, and keeping HDR with H.264 switches to an HEVC encoder when one works.
 - Recorder: an HDR display that falls back to GDI capture is now named in the notice, since that capture washes out
   colours.
+- Recorder: on macOS and Linux an unreadable device list still offers the default microphone; on Linux also the
+  default output monitor as system audio.
+- Update: on macOS a failed background preparation now counts toward update health; after the third failure the
+  update badge comes back instead of staying silent.
+- "Keep the computer awake while encoding" now also covers the Convert queue, the editor's export and its Batch
+  Export; before, only the Shrink tab and its queue held the request, so the machine could sleep mid-conversion.
+
+### Changed
+
+- Update: automatic update is on by default on macOS too. A saved "off" written before this release counts as the
+  old default and turns on once; an "off" saved from now on is kept.
 
 ## [1.2.23] - 2026-10-16
 

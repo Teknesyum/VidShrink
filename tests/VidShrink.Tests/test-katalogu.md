@@ -439,3 +439,11 @@
   düzenleme kipi; kaydediciye bağ kenarda bir kez, elle durdurulan akış ezilmez. Görünüm (`PrompterLook`): ayna
   `ScaleTransform(-1,1)`, okuma çizgisi, yazı boyu belirteçten ve küçülünce kayma boyu kısalır; ayara yazılıp yeniden
   açılışta geri gelir. Kenar, eşzamanlı ölçü ve ayna mutasyonları kırıyor. Dosya bırakmaz.
+- `OynaticiKuyrukSaklamaTests.cs` — oynatıcı kuyruğunun saklanması (`PlayerQueue`, `PlayerView.KuyrukSaklama.cs`): yaz,
+  diskte olmayanı at, çalan yoksa ilk kalan, bozuk dosya kuyruksuz; kapanışta yazılan kuyruk yeni oynatıcıda düzenlenmiş
+  sırasıyla, duraklatılmış ve bir kez gelir; geçmiş kapalıyken dosya silinir; pencere oynatıcı sekmesine geçince getirir.
+  Duraklatma ve sekme bağı mutasyonları kırıyor. Dosyaları `TestPaths.OutputRoot` altında, kendisi siler.
+- `TepsiyeKucultmeTests.cs` — AYR-22: "Tepsiye küçült" açıkken simge durumuna küçültme pencereyi gizler, sahte tepsi
+  simgesi görünür; tıklama küçültmeden önceki hale döndürür ve simgeyi kaldırır. Kapalıyken küçültme bugünkü gibi.
+  İpucu iş ve kuyruk yüzdesini sırayla yazar; ayar gidip döner, eski dosya kapalı okunur. Tepsiye gönderme çağrısını
+  kaldırmak 1/9 kırmızı. Gerçek tepsi simgesi açılmaz; dosyalar `TestPaths.OutputRoot/tepsiye-kucultme` altında, test siler.

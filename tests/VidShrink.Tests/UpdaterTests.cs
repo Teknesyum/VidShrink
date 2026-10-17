@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO.Compression;
 using System.Net;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using VidShrink.Core;
 using Xunit.Abstractions;
@@ -269,9 +270,9 @@ public sealed class UpdaterTests : IDisposable
     {
         var file = Path.Combine(_root, "settings.json");
 
-        Assert.Equal(OperatingSystem.IsWindows(), UpdateSettings.Load(file).AutoUpdate);
-        Assert.Equal(OperatingSystem.IsWindows(), UpdateCheck.AutoUpdateEnabled(UpdateSettings.Load(file)));
-        Assert.Equal(OperatingSystem.IsWindows(), new UpdateSettings().AutoUpdate);
+        Assert.Equal(UpdateSettings.DefaultOn, UpdateSettings.Load(file).AutoUpdate);
+        Assert.Equal(UpdateSettings.DefaultOn && UpdateCheck.CanSelfUpdate, UpdateCheck.AutoUpdateEnabled(UpdateSettings.Load(file)));
+        Assert.Equal(UpdateSettings.DefaultOn, new UpdateSettings().AutoUpdate);
 
         new UpdateSettings { AutoUpdate = true }.Save(file);
         Assert.True(UpdateSettings.Load(file).AutoUpdate);
@@ -292,7 +293,7 @@ public sealed class UpdaterTests : IDisposable
         kept.Save(file);
         Assert.True(UpdateSettings.Load(file).AutoUpdate);
 
-        File.WriteAllText(file, "{\"autoUpdate\": false, \"autoUpdateDefaultOn\": true, \"language\": \"tr\", \"targetMb\": 25}");
+        File.WriteAllText(file, "{\"autoUpdate\": false, \"autoUpdateDefaultOn\": true, \"autoUpdateDefaultOnMac\": true, \"language\": \"tr\", \"targetMb\": 25}");
         var off = UpdateSettings.Load(file);
         Assert.False(off.AutoUpdate);
         off.TargetMb = 30;
@@ -301,7 +302,7 @@ public sealed class UpdaterTests : IDisposable
         Assert.Contains("\"autoUpdate\": false", File.ReadAllText(file), StringComparison.Ordinal);
 
         File.WriteAllText(file, "{\"language\": \"tr\", \"targetMb\": 25}");
-        Assert.Equal(OperatingSystem.IsWindows(), UpdateSettings.Load(file).AutoUpdate);
+        Assert.Equal(UpdateSettings.DefaultOn, UpdateSettings.Load(file).AutoUpdate);
     }
 
     /// <summary>
@@ -316,17 +317,41 @@ public sealed class UpdaterTests : IDisposable
 
         File.WriteAllText(file, "{\"autoUpdate\": false, \"language\": \"tr\", \"targetMb\": 25}");
         var migrated = UpdateSettings.Load(file);
-        Assert.Equal(OperatingSystem.IsWindows(), migrated.AutoUpdate);
+        Assert.Equal(UpdateSettings.DefaultOn, migrated.AutoUpdate);
         Assert.Equal("tr", migrated.Language);
         Assert.Equal(25, migrated.TargetMb);
 
         migrated.AutoUpdate = false;
         migrated.Save(file);
         Assert.Contains("\"autoUpdateDefaultOn\": true", File.ReadAllText(file), StringComparison.Ordinal);
+        Assert.Contains("\"autoUpdateDefaultOnMac\": true", File.ReadAllText(file), StringComparison.Ordinal);
         Assert.False(UpdateSettings.Load(file).AutoUpdate);
 
         UpdateSettings.Load(file).Save(file);
         Assert.False(UpdateSettings.Load(file).AutoUpdate);
+    }
+
+    /// <summary>
+    /// macOS'ta varsayılan sonradan açıldı: Windows işaretiyle yazılmış ama macOS işareti olmayan
+    /// <c>false</c> macOS'ta varsayılandır ve bir kez açılır, Windows'ta seçimdir ve kalır. Platform
+    /// parametre olduğu için iki kol her makinede ölçülür.
+    /// </summary>
+    [Fact]
+    public void MacOnceSadeceWindowsIsaretliKapaliyiAcar()
+    {
+        using var yalnizWindows = JsonDocument.Parse("{\"autoUpdate\": false, \"autoUpdateDefaultOn\": true}");
+        Assert.True(UpdateSettings.MigratesOff(yalnizWindows.RootElement, windows: false, mac: true));
+        Assert.False(UpdateSettings.MigratesOff(yalnizWindows.RootElement, windows: true, mac: false));
+        Assert.False(UpdateSettings.MigratesOff(yalnizWindows.RootElement, windows: false, mac: false));
+
+        using var ikisi = JsonDocument.Parse("{\"autoUpdate\": false, \"autoUpdateDefaultOn\": true, \"autoUpdateDefaultOnMac\": true}");
+        Assert.False(UpdateSettings.MigratesOff(ikisi.RootElement, windows: false, mac: true));
+        Assert.False(UpdateSettings.MigratesOff(ikisi.RootElement, windows: true, mac: false));
+
+        using var isaretsiz = JsonDocument.Parse("{\"autoUpdate\": false}");
+        Assert.True(UpdateSettings.MigratesOff(isaretsiz.RootElement, windows: true, mac: false));
+        Assert.True(UpdateSettings.MigratesOff(isaretsiz.RootElement, windows: false, mac: true));
+        Assert.False(UpdateSettings.MigratesOff(isaretsiz.RootElement, windows: false, mac: false));
     }
 
     [Fact]

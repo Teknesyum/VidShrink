@@ -201,7 +201,7 @@ public partial class App : Application
 
     private bool _kuyrukGeriGeldi;
 
-    private static WindowIcon? LoadAppIcon()
+    internal static WindowIcon? LoadAppIcon()
     {
         try
         {

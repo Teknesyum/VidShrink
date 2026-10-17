@@ -228,6 +228,24 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+  # Platforma ozel yollar: macOS'un kendini guncellemesi, Linux ve macOS'un ses cihazi yedegi,
+  # guncelleme sagligi. Bu kollar Windows'ta erken donuyor; yalniz burada gercekten kosuyorlar.
+  # Bu is eklenmeden once Windows disindaki her kol CI'da hic olculmeden yayina cikiyordu.
+  platform:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Platform testleri
+        run: dotnet test tests/VidShrink.Tests/VidShrink.Tests.csproj -c Release --filter "FullyQualifiedName~MacUpdateTests|FullyQualifiedName~UpdateCheckTests|FullyQualifiedName~GuncellemeSagligiTests|FullyQualifiedName~SistemSesiTests|FullyQualifiedName~SesGirisiTests|FullyQualifiedName~UpdaterTests.MacOnce|FullyQualifiedName~UpdaterTests.OldUnmarked|FullyQualifiedName~UpdaterTests.AnExisting" --logger "console;verbosity=normal"
+
   # Kaydedicinin Linux pencere kolu: Xvfb uzerinde gercek bir X penceresi (xlogo) acilir,
   # pencere listesi hem xwininfo'dan hem libX11 _NET_CLIENT_LIST'ten okunur ve x11grab
   # -window_id ile 2 sn kaydedilen dosya ffprobe'ta okunur. Pencere yoneticisi olmadigi

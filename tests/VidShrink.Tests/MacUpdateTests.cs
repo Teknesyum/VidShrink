@@ -190,14 +190,54 @@ public sealed class MacUpdateTests
             Bundle(Path.Combine(sandbox, "old"), "0.2.5", installed);
 
             var source = Release(Path.Combine(sandbox, "release"), "0.2.6");
-            Assert.True(await MacUpdate.PrepareAsync(installed, "0.2.5", source, CancellationToken.None));
+            Assert.True(await MacUpdate.PrepareAsync(installed, "0.2.5", source, CancellationToken.None, Path.Combine(sandbox, "settings.json")));
 
             var staged = MacUpdate.StagedBundle(installed);
             Assert.True(MacUpdate.SignatureValid(staged));
             Assert.Equal("0.2.6", Marker(staged));
             Assert.Equal("0.2.5", Marker(installed));
 
-            Assert.False(await MacUpdate.PrepareAsync(installed, "0.2.6", source, CancellationToken.None));
+            Assert.False(await MacUpdate.PrepareAsync(installed, "0.2.6", source, CancellationToken.None, Path.Combine(sandbox, "settings.json")));
+        }
+        finally
+        {
+            Directory.Delete(sandbox, true);
+        }
+    }
+
+    /// <summary>
+    /// Hazırlık sessiz yol: düşüş sayılmazsa kullanıcı eski sürümde kalır ve kimse bilmez.
+    /// Manifest yoksa ve arşiv inmezse sayaç artar, yeni sürüm yoksa sıfırlanır. Paket üretimine
+    /// varmadan düştüğü için her platformda koşar.
+    /// </summary>
+    [Fact]
+    public async Task HazirlikDususuSagligaSayilirGuncelSurumSayaciSifirlar()
+    {
+        var sandbox = Sandbox();
+        try
+        {
+            var ayar = Path.Combine(sandbox, "settings.json");
+            var installed = Path.Combine(sandbox, "Applications", "VidShrink.app");
+            var bos = Path.Combine(sandbox, "bos");
+            Directory.CreateDirectory(bos);
+
+            Assert.False(await MacUpdate.PrepareAsync(installed, "0.2.5", bos, CancellationToken.None, ayar));
+            var saglik = UpdateHealth.Load(ayar);
+            Assert.Equal(1, saglik.Failures);
+            Assert.Equal("mac-manifest-okunamadi", saglik.LastError);
+
+            var source = Release(Path.Combine(sandbox, "release"), "0.2.6");
+            File.Delete(Path.Combine(source, UpdateCheck.ArchiveAssetName(UpdateCheck.Rid)));
+            Assert.False(await MacUpdate.PrepareAsync(installed, "0.2.5", source, CancellationToken.None, ayar));
+            saglik = UpdateHealth.Load(ayar);
+            Assert.Equal(2, saglik.Failures);
+            Assert.StartsWith("mac-hazirlik ", saglik.LastError);
+            Assert.False(Directory.Exists(MacUpdate.StageRoot(installed)));
+
+            Assert.False(await MacUpdate.PrepareAsync(installed, "0.2.6", source, CancellationToken.None, ayar));
+            saglik = UpdateHealth.Load(ayar);
+            Assert.Equal(0, saglik.Failures);
+            Assert.NotNull(saglik.LastSuccess);
         }
         finally
         {

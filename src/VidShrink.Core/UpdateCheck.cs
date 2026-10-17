@@ -429,13 +429,29 @@ public sealed class UpdateSettings
     public static readonly string FileName = "settings.json";
 
     /// <summary>
-    /// Windows'ta varsayılan açık: uygulama açılış bittikten sonra yeni sürümü arka planda
-    /// indirir ve kapanırken kurar. macOS ve Linux'ta varsayılan kapalı kalır; orada rozet
-    /// haber verir. Dosyada yazılı değer, <c>false</c> dahil, korunur; yalnız
-    /// <see cref="AutoUpdateDefaultMarker"/> taşımayan eski dosyanın <c>false</c>'u Windows'ta
-    /// bir kez açılır, çünkü eski kayıt varsayılanı da seçimi de aynı alana yazıyordu.
+    /// Windows'ta ve macOS'ta varsayılan açık (<see cref="DefaultOn"/>): Windows açılış bittikten
+    /// sonra yeni sürümü arka planda indirir ve kapanırken kurar, macOS paketi yanında hazırlayıp
+    /// çıkışta takas eder. Linux'ta kapalı kalır; orada rozet haber verir. Dosyada yazılı değer,
+    /// <c>false</c> dahil, korunur; yalnız platformun işaretini (<see cref="AutoUpdateDefaultMarker"/>,
+    /// <see cref="AutoUpdateDefaultMacMarker"/>) taşımayan eski dosyanın <c>false</c>'u bir kez
+    /// açılır, çünkü eski kayıt varsayılanı da seçimi de aynı alana yazıyordu.
     /// </summary>
-    public bool AutoUpdate { get; set; } = OperatingSystem.IsWindows();
+    public bool AutoUpdate { get; set; } = DefaultOn;
+
+    /// <summary>Otomatik güncellemenin varsayılan açık olduğu platformlar.</summary>
+    public static bool DefaultOn => OperatingSystem.IsWindows() || OperatingSystem.IsMacOS();
+
+    /// <summary>
+    /// macOS'ta varsayılan açıldıktan sonra yazılmış dosyanın işareti. Ondan önce macOS kaydı
+    /// varsayılan <c>false</c>'u <see cref="AutoUpdateDefaultMarker"/> ile birlikte yazıyordu; o
+    /// işaret macOS'ta seçim sayılmaz.
+    /// </summary>
+    public const string AutoUpdateDefaultMacMarker = "autoUpdateDefaultOnMac";
+
+    /// <summary>Kayıtlı <c>false</c> bu platformda göçle bir kez açılır mı.</summary>
+    internal static bool MigratesOff(JsonElement root, bool windows, bool mac)
+        => (windows && !root.TryGetProperty(AutoUpdateDefaultMarker, out _))
+            || (mac && !root.TryGetProperty(AutoUpdateDefaultMacMarker, out _));
 
     /// <summary>
     /// Otomatik güncellemenin varsayılan açık olduğu sürümden sonra yazılmış dosyanın işareti.
@@ -514,8 +530,8 @@ public sealed class UpdateSettings
                 (value.ValueKind == JsonValueKind.True || value.ValueKind == JsonValueKind.False))
             {
                 settings.AutoUpdate = value.GetBoolean();
-                if (!settings.AutoUpdate && OperatingSystem.IsWindows() &&
-                    !document.RootElement.TryGetProperty(AutoUpdateDefaultMarker, out _))
+                if (!settings.AutoUpdate &&
+                    MigratesOff(document.RootElement, OperatingSystem.IsWindows(), OperatingSystem.IsMacOS()))
                 {
                     settings.AutoUpdate = true;
                 }
@@ -594,6 +610,7 @@ public sealed class UpdateSettings
         var root = ReadRoot(file);
         root["autoUpdate"] = AutoUpdate;
         root[AutoUpdateDefaultMarker] = true;
+        root[AutoUpdateDefaultMacMarker] = true;
         SetOrRemove(root, "fastGpu", FastGpu is { } fastGpu ? JsonValue.Create(fastGpu) : null);
         SetOrRemove(root, "language", string.IsNullOrWhiteSpace(Language) ? null : JsonValue.Create(Language));
         root["targetMb"] = TargetMb;
@@ -1598,22 +1615,37 @@ public static class MacUpdate
     /// karşılaştırılır, yayının kendi paketleme betiği koşar, üretilen paket ad-hoc imzalanır ve
     /// imzası doğrulanır. Adımlardan biri düşerse hazırlama dizini silinir ve kurulu pakete o
     /// ana kadar hiç dokunulmamıştır.
+    /// <para>Sessiz yol olduğu için her düşüş <see cref="UpdateHealth"/>'e sayılır; yeni sürüm
+    /// yoksa sayaç sıfırlanır. Sayılmayan düşüş kullanıcıyı haftalarca eski sürümde tutuyor.</para>
     /// </summary>
     public static async Task<bool> PrepareAsync(
         string bundle,
         string currentVersion,
         string? source,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        string? settingsPath = null)
     {
         var rid = UpdateCheck.Rid;
         try
         {
             var json = await ReadManifestAsync(rid, source, cancellationToken);
-            if (json is null) return false;
+            if (json is null)
+            {
+                UpdateHealth.RecordFailure(settingsPath, DateTimeOffset.UtcNow, "mac-manifest-okunamadi");
+                return false;
+            }
 
             var manifest = UpdateCheck.ParseManifest(json);
-            if (manifest.Files.Count == 0) return false;
-            if (!UpdateCheck.IsNewer(manifest.Version, currentVersion)) return false;
+            if (manifest.Files.Count == 0)
+            {
+                UpdateHealth.RecordFailure(settingsPath, DateTimeOffset.UtcNow, "mac-manifest-bos");
+                return false;
+            }
+            if (!UpdateCheck.IsNewer(manifest.Version, currentVersion))
+            {
+                UpdateHealth.RecordSuccess(settingsPath, DateTimeOffset.UtcNow);
+                return false;
+            }
 
             var payload = Path.Combine(StageRoot(bundle), PayloadFolderName);
             Directory.CreateDirectory(payload);
@@ -1640,9 +1672,10 @@ public static class MacUpdate
             Directory.Delete(payload, recursive: true);
             return true;
         }
-        catch (Exception)
+        catch (Exception exception)
         {
             Discard(bundle);
+            UpdateHealth.RecordFailure(settingsPath, DateTimeOffset.UtcNow, "mac-hazirlik " + exception.GetType().Name + ": " + exception.Message);
             return false;
         }
     }
@@ -1680,7 +1713,14 @@ public static class MacUpdate
         if (_prepared is null || !_prepared.IsCompletedSuccessfully || !_prepared.Result) return false;
 
         var bundle = BundleOf(Environment.ProcessPath);
-        return bundle is not null && Commit(bundle);
+        if (bundle is null) return false;
+        if (Commit(bundle))
+        {
+            UpdateHealth.RecordSuccess(null, DateTimeOffset.UtcNow);
+            return true;
+        }
+        UpdateHealth.RecordFailure(null, DateTimeOffset.UtcNow, "mac-takas-dustu");
+        return false;
     }
 
     /// <summary>

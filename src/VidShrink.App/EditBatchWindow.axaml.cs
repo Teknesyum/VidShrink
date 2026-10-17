@@ -76,6 +76,12 @@ public partial class EditBatchWindow : Window
 
     internal IQueueEndActions Actions { get; set; } = SystemQueueEndActions.Instance;
 
+    /// <summary>SIK-P2: kuyruk koşarken tutulan uyku isteği; testler sahte katmanlı nöbet verir.</summary>
+    internal SleepGuard Uyku { get; set; } = SleepGuard.Shared;
+
+    /// <summary>Boşsa Ayarlar'daki kutu iş başlarken okunur.</summary>
+    internal bool? UykuyuEngelle { get; set; }
+
     internal string StateTextFor(int index) => _rows[Batch.Items[index]].Text ?? "";
 
     internal string? ErrorTextFor(int index) => ToolTip.GetTip(_rows[Batch.Items[index]]) as string;
@@ -127,6 +133,7 @@ public partial class EditBatchWindow : Window
         var total = Math.Max(1, Batch.Items.Count);
         var index = 0;
         var runner = Kosturucu ?? RunOneAsync;
+        using var uyku = Uyku.HoldIf(UykuyuEngelle ?? SleepGuard.PreventSleepSetting());
         try
         {
             var summary = await Batch.RunAsync(async (item, ct) =>

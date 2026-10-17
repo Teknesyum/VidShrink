@@ -817,9 +817,10 @@ internal partial class PlayerView : UserControl
         _seek.GoTo(ask ? 0 : resume);
         if (resume > 0 && !ask) _trace.Add("resume -> " + Saat.Tani.Konum(resume));
         if (ask) AskResume(resume);
-        else if (!_playing) TogglePlay(false);
+        else if (!_playing && !_openPaused) TogglePlay(false);
         AfterOpen(path, engine);
         RefreshState();
+        SaveQueue();
         Opened?.Invoke(path);
     }
 
@@ -834,6 +835,7 @@ internal partial class PlayerView : UserControl
 
     private void SaveHistory(bool finished)
     {
+        SaveQueue();
         if (_path is not { } path || HistoryPath?.Invoke() is not { } file || !Settings.KeepHistory) return;
         _history.Remember(path, _pendingResume ?? CurrentPosition(), finished, _seek.Duration, CurrentTracks());
         _history.Save(file);

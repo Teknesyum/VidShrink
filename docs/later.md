@@ -18,14 +18,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Toplu teslim (DZA-09) 16 Ekim 2026'da main'de: düzenleyici sağ tık menüsünde "Toplu Teslim…" (`EditBatch`, `EditBatchWindow`); projeler komut satırı yoluyla sırayla teslim edilir, düşen proje ötekini durdurmaz.
 - Ölçülmeyen: komut satırı tesliminde hızlı ve akıllı kip, çok kaynaklı ve müzikli proje uçtan uca gerçek ffmpeg ile.
 
-## 41. Kayıt Geçmişi
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P6 · Kaydedici · iş orta · öncelik 1 · karar gerekmez
-
-- Hızlı kırpma 16 Ekim 2026'da main'de (`RecorderQuickTrim`, sonuç panelinde "Hızlı kırp").
-- Kayıt geçmişi 16 Ekim 2026'da main'de: kaydedicide "Son Kayıtlar" (`RecordingHistoryWindow`, `RecentRecordings`); küçük resim, süre, boyut, tarih; aç, klasörde göster, paylaş, çöpe taşı. Sahte klasörle ölçüldü (`KayitGecmisiTests`).
-- Yan bulgu kapandı (16 Ekim 2026): atanmamış kısayolun adı ipuçlarında boş kalıyordu; `HotkeyName` artık "(tuş atanmadı)" yazıyor (`KaydediciBasKonusTests.AtanmamisTusIpucundaBosKalmaz`).
-
 ## 42. Ekrana Çizim Ve Prompter
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P7 · Kaydedici · iş büyük · öncelik 1 · karar gerekmez
@@ -153,33 +145,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 **Sahibin Kararını Bekleyenler**
 
-## 91. Kodlama Sürerken Uykuyu Engelleme
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · SIK-P2 · Küçült · iş küçük · öncelik 1 · karar sahibin
-
-- Satırlar (SIK-P2): SIK-06 Kodlama sürerken uykuyu engelleme. [Tablo](piyasa/2026-10-13/kucult-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/ (yeni uyku engelleme yardımcısı), src/VidShrink.App/ShrinkJobWindow.axaml.cs, src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.App/QueueEndActions.cs, src/VidShrink.App/AppSettings.cs, src/VidShrink.App/Locales/
-- Sahibin kararı: Kodlama sürerken bilgisayarın uykuya geçmesi varsayılan olarak mı engellensin, yoksa kapalı gelen bir ayar mı olsun?
-- Plan: İlk iş başlarken sistemden uyumama isteği alınır, son iş bitince ya da iptalde geri verilir: Windows'ta `SetThreadExecutionState` çağrısı, macOS'ta `caffeinate` süreci, Linux'ta `systemd-inhibit`. Ekranın kararmasına dokunulmaz, yalnız uyku engellenir; "bitince uyut" eylemi seçiliyse istek önce bırakılır, sonra makine uyutulur. Doğrulama: isteğin alınıp bırakıldığını sayan sahte sağlayıcılı test ve Windows'ta `powercfg /requests` çıktısına elle bakış.
-
-## 92. Tuş Gösterimi Süzgeci
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P1 · Kaydedici · iş küçük · öncelik 1 · karar sahibin
-
-- Satırlar (EKB-P1): EKB-11 Tuş gösterimi süzgeci ve ayarı. [Tablo](piyasa/2026-10-13/kaydedici-sunum-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Recorder/RecorderInput.cs, src/VidShrink.App/Recorder/RecorderInputOverlay.cs, src/VidShrink.App/Recorder/RecorderSettings.cs, src/VidShrink.App/Recorder/RecorderView.axaml, src/VidShrink.App/Locales/
-- Sahibin kararı: "Yalnız kısayolları göster" süzgeci varsayılan açık mı gelsin, yoksa bugünkü gibi her tuş mu gösterilsin.
-- Plan: `Feed` içine süzgeç eklenir: açıkken yalnız Ctrl, Alt ya da Win ile basılan tuşlar ve işlev tuşları yazıya döner, düz harf ve rakam dönmez (RecorderInput.cs:87-98). Ayarlara "yalnız kısayollar" kutusu ile yazının konumu, boyutu ve süresi eklenir. `KaydediciGirdiTests` içinde süzgeç açıkken düz harfin boş, Ctrl+C'nin metin döndürdüğü ölçülür.
-
-## 93. Pencere Konumunu Hatırlama
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · AYR-P1 · Ayarlar Ve Kabuk · iş küçük · öncelik 1 · karar sahibin
-
-- Satırlar (AYR-P1): AYR-03 Pencere Konumunu Ve Boyutunu Hatırlama. [Tablo](piyasa/2026-10-13/ayarlar-kabuk-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/MainWindow.axaml.cs
-- Sahibin kararı: Uygulama her açılışta ekranı kaplamış açılmak yerine son konumunda, boyutunda ve durumunda mı açılsın?
-- Plan: Pencerenin konumu, boyutu, ekranı ve kaplama durumu kapanışta, bugün yalnız panel yüksekliğini tutan yerleşim dosyasına yazılır ve açılışta oradan okunur. Kayıtlı konum bağlı ekranların hiçbirine düşmüyorsa bugünkü açılışa dönülür. Doğrulama: pencere açmadan koşan arayüz testiyle kaydet ve geri yükle turu, bir de sökülmüş ikinci ekran durumu.
-
 ## 94. Açılış Varsayılanları
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · OYA-P5 · Oynatıcı · iş orta · öncelik 1 · karar sahibin
@@ -242,24 +207,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.Core/Editing/EditExport.cs, src/VidShrink.Core/Editing/SmartCutCodec.cs, src/VidShrink.App/Editing/EditorView.Teslim.cs, src/VidShrink.App/Locales/
 - Sahibin kararı: çok kaynakta Hızlı ve Akıllı kip, kaynaklar uyumluysa yeniden kodlamak yerine kopyalasın mı (K7 her zaman yeniden kodlamayı seçmişti)
 - Plan: Çok kaynak bugün kipe bakmadan yeniden kodlama yoluna gidiyor (EditExport.cs:252). Kaynaklar arası uyum denetimi eklenir: kodek, profil, çözünürlük, piksel biçimi, kare hızı, ses kodeği ve örnekleme hızı. Hepsi tutuyorsa parçalar ffmpeg'in concat girişiyle (dosyaları yeniden kodlamadan uç uca okuyan liste) kopyalanır; tutmuyorsa bugünkü yol ve notu kalır. Doğrulama: uyum denetimi birim testleri, örnek çıktıda kare sayısı ve süre.
-
-## 101. Tüm İzleri Varsayılan Taşıma
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DZA-P7 · Düzenleyici · iş orta · öncelik 1 · karar sahibin
-
-- Satırlar (DZA-P7): DZA-02 Tüm izleri taşıma. [Tablo](piyasa/2026-10-13/duzenleyici-kesim-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/Editing/EditExport.cs, src/VidShrink.App/Editing/EditorView.Teslim.cs
-- Sahibin kararı: teslim varsayılanı "ilk görüntü ve ilk ses" yerine "bütün izler" olsun mu
-- Plan: DZA-P5'in paneli üstüne gelir: varsayılan seçim bütün ses, altyazı ve veri izleri olur. Altyazı ve ek ses izleri üç kipte de kesim aralığına göre kırpılır; Akıllı kipte her ses izi kendi parça dosyasıyla taşınır. Doğrulama: çok sesli ve altyazılı örnekte ffprobe ile iz sayısı ve süre eşitliği.
-
-## 102. Çapraz Geçiş Teslimi
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DZB-P6 · Düzenleyici · iş orta · öncelik 1 · karar sahibin
-
-- Satırlar (DZB-P6): DZB-16 Çapraz geçiş teslimi; DZB-18 Geçiş çeşitleri. [Tablo](piyasa/2026-10-13/duzenleyici-kurgu-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/Editing/EditTimeline.cs, src/VidShrink.Core/Editing/EditExport.cs, src/VidShrink.Core/Editing/EditProject.cs, src/VidShrink.App/Editing/EditorTimeline.cs, src/VidShrink.App/Editing/EditorView.Klip.cs, src/VidShrink.App/Locales/, tests/VidShrink.Tests/
-- Sahibin kararı: Düzenleyicinin yazılı kapsamı "geçişsiz"den çıkıp iki klip arasında çapraz geçişi kapsasın mı?
-- Plan: İki klibin sınırına geçiş süresi ve türü yazılır; Tam kipte görüntü ffmpeg `xfade`, ses `acrossfade` süzgeciyle birleştirilir. Tür listesi `xfade`'in hazır desenlerinden gelir (erime, silme, kaydırma, iris), ek içerik gerekmez. Geçişli kurgu Hızlı ve Akıllı kipte teslim edilemez; bugün efektlerde olduğu gibi Tam kipe düşer. Bu pakette canlı önizleme yok (DZB-P8); doğrulama argüman testi ve toplam sürenin geçiş süresi kadar kısaldığının ölçümü.
 
 ## 103. Müzik İzi
 
@@ -396,15 +343,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Sahibin kararı: Ana pencere için kapalı gelen bir "tepsiye küçült" seçeneği eklensin mi; eklenecekse kapatma düğmesi de tepsiye mi gitsin?
 - Plan: Kaydedicinin tepsi simgesi kodu ana pencerenin de kullanabileceği ortak bir parçaya çıkarılır. Seçenek açıkken küçültülen pencere görev çubuğundan kalkar, tepsi simgesine tıklanınca geri gelir; kuyruk ilerlemesi simgenin ipucunda yazar. Doğrulama: pencere durumu geçişlerinin testi; tepsi simgesi Windows'ta bir kez elle görülür.
 
-## 121. Kuyruğun Saklanması Ve Geri Yüklenmesi
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · SIK-P9 · Küçült · iş orta · öncelik 2 · karar sahibin
-
-- Satırlar (SIK-P9): SIK-05 Kuyruğun saklanması. [Tablo](piyasa/2026-10-13/kucult-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/JobPump.cs, src/VidShrink.Core/ (yeni kuyruk deposu), src/VidShrink.App/ShrinkJobWindow.axaml.cs, src/VidShrink.App/Locales/
-- Sahibin kararı: Açılışta yarım kalan kuyruk kendiliğinden mi geri gelsin, yoksa kullanıcıya mı sorulsun?
-- Plan: Bekleyen ve koşan işler her değişiklikte kullanıcı veri klasöründeki bir JSON dosyasına yazılır; önce geçici dosyaya yazılıp sonra yer değiştirilir ki yarım yazılmış dosya kuyruğu bozmasın. Açılışta dosya okunur, kaynağı artık olmayan işler elenir, koşarken kesilen iş baştan sıraya girer. Doğrulama: yaz, süreci kes, yeniden oku testi ve bozuk dosyada uygulamanın boş kuyrukla açıldığını ölçen test.
-
 ## 122. Biten Çıktının Kalite Ölçümü
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · SIK-P10 · Küçült · iş orta · öncelik 2 · karar sahibin
@@ -422,15 +360,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.Core/PlanParser.cs, src/VidShrink.Core/FfmpegArguments.cs, src/VidShrink.Core/PlanCalculator.cs, src/VidShrink.App/MainWindow.axaml (kodek seçimi), src/VidShrink.App/Locales/
 - Sahibin kararı: libvvenc içeren bir ffmpeg derlemesi dağıtılsın mı ve oynatma desteği bu kadar darken VVC kodek listesine girsin mi?
 - Plan: Önce dağıtılan ffmpeg'de libvvenc (VVC kodlayan açık kaynak kitaplık) var mı diye yoklanır; yoksa iş derleme kararında bekler. Varsa kodek izin listesine eklenir (`src/VidShrink.Core/PlanParser.cs:13`), hız ön ayarları ve boyut verimi ölçülerek yazılır, kodek seçiminde çoğu aygıtta oynamadığı uyarısıyla gösterilir. Doğrulama: argüman testi ve ölçüm aracıyla hedef boyut bandının tuttuğunun ölçülmesi. Dönüştür sekmesindeki DON-33 ile aynı iştir.
-
-## 125. Kayan Sonuç Kartı
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P14 · Kaydedici · iş orta · öncelik 2 · karar sahibin
-
-- Satırlar (EKB-P14): EKB-24 Kayan sonuç kartı. [Tablo](piyasa/2026-10-13/kaydedici-sunum-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Recorder/, src/VidShrink.App/Recorder/RecorderView.axaml.cs, src/VidShrink.App/Recorder/RecorderSettings.cs, src/VidShrink.App/Locales/
-- Sahibin kararı: Kayıt bitince ekran köşesinde kendiliğinden yeni bir pencere açılsın mı ve bu varsayılan açık mı gelsin.
-- Plan: Kayıt bitince köşede küçük resimli, birkaç saniye sonra kaybolan bir kart açılır; dosya karttan başka uygulamaya sürüklenir (Avalonia'nın sürükle-bırak yolu, dosya verisiyle). Kart `CaptureAffinity` ile sonraki kayıttan çıkarılır. Kartın açılıp kapanması ve sürüklenen verinin dosya yolunu taşıdığı başsız pencere testiyle ölçülür.
 
 ## 126. Kayıtta Bildirim Ve Simge Gizleme
 
@@ -557,15 +486,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.Core/HdrResolver.cs, src/VidShrink.Core/FfmpegArguments.cs, tools/VidShrink.Bench/, docs/olcumler/
 - Sahibin kararı: Dolby Vision kapsamı donanım kodlayıcılarına genişlesin mi, gerekirse ffmpeg dışında ayrı bir araçla?
 - Plan: Önce ölçülür: ekran kartı kodlayıcılarıyla yapılan kodlamada ffmpeg Dolby Vision üst verisini çıktıya yazıyor mu; sonuç `docs/olcumler/` altına girer. Yazıyorsa `src/VidShrink.Core/HdrResolver.cs:46` satırındaki kodlayıcı koşulu genişletilir; yazmıyorsa iş ayrı araç zinciri kararına döner ve paket orada durur. Doğrulama: çıktının Dolby Vision kaydını ffprobe ile okuyan test.
-
-## 143. HDR Yakalama
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · EKA-P15 · Kaydedici · iş büyük · öncelik 2 · karar sahibin
-
-- Satırlar (EKA-P15): EKA-08 HDR yakalama. [Tablo](piyasa/2026-10-13/kaydedici-yakalama-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/RecorderArguments.cs, src/VidShrink.App/Recorder/DdaOutputs.cs, src/VidShrink.App/Recorder/RecorderView.Gelismis.cs, docs/olcumler/
-- Sahibin kararı: HDR ekranda varsayılan HDR dosya mı olsun, yoksa SDR'ye çevrilmiş kayıt mı.
-- Plan: İlk adım ölçümdür: HDR ekranda bugünkü kaydın nasıl göründüğü `docs/olcumler/` altında yok. Sonra hızlı yolda `ddagrab` süzgecinden 10 bit çıkış istenir (bugün kare hep 8 bit `bgra`ya iniyor, `RecorderArguments.cs:1118`), 10 bit kodlama ve HDR renk etiketleri yazılır. HDR olmayan ekranda davranış değişmez. Ölçü: argüman testi (`tests/VidShrink.Tests/KaydediciDdagrabTests.cs` yanında) ve HDR ekranda alınan dosyanın `ffprobe` çıktısı.
 
 ## 144. Oyun Yakalama
 
