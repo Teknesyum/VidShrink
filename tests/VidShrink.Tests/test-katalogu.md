@@ -113,6 +113,10 @@
   paylaşım), yolun metin kutusundan değil alandan okunması, ana pencerenin iki kapısının sekmeyi değiştirip yükleyiciyi
   çağırması, paylaşımın `ShareFlow`/`Core/Share` üstünden gitmesi, hedef tablosunun yayın paketine girmesi ve iki yeni
   anahtarın 42 dilde bulunması. Kaynak metin okur, pencere açmaz.
+- `CeviriTamlikIsaretiTests.cs` — AYR-25, dil seçicideki makine çevirisi işareti: gözden geçmiş dil listesi
+  (`Strings.ReviewedLanguages`) tam olarak {en, tr}, bu iki dil işaretsiz görünür; öteki her dil
+  `main.language.unreviewed` anahtarını kendi kataloğunda taşır ve etiketi o dilin işaretiyle biçimlenir; Ayarlar'daki
+  dil seçicisi aynı işaretli adları gösterir (pencere açar).
 - `KayitTeslimBitinceTests.cs` — kaydedicinin "Kayıt bitince" seçimi (Hiçbir şey / dosyayı panoya / küçült ve panoya / yükle ve bağlantıyı kopyala): her seçim yalnız kendi sahtesini çağırır (`IRecordingClipboard`, `ShrinkForFinish`, sahte `IShareProvider`), yarım/başarısız/GIF'siz/taşınamayan kayıtta hiçbiri (aynı düzenekte olumlu kontrol), hata `StatusError` satırında, seçim `finishAction` olarak yazılır, varsayılan Hiçbir şey, 14 anahtar 42 dilde. Gerçek pano ve ağ yok. Dört mutasyonun dördü kırmızı (1/11, 5/11, 2/11, 3/11). Kanıt `.calisma/kayit-bitince/`, test siler.
 - `KaydediciSonucKartiTests.cs` — kayıt bitince köşede açılan sonuç kartı (`RecorderResultCard`): varsayılan açık, tam teslimde açılır, küçük resim sahte `IThumbnailSource`'tan (ffmpeg koşmaz), kendiliğinden kapanır; yarım kayıtta açılmaz; sürükleme verisinin dosya öğesi teslim edilen yolu taşır; "Bir daha gösterme" kartı kapatır, `showResultCard: false` yazar, sonraki teslimde kart yok; ayar kutusu geri açar. Altı mutasyonun altısı kırmızı. `CaptureAffinity` başsızda ölçülmez.
 - `KayitSonucVurguTests.cs` — sonuç paneli: "Küçült'e gönder" ilk ve birincil, klasör/paylaş ikincil; düğme zemin pikseli paletin birincil fırçasıyla oranlanır (negatif kontrol aynı fırça). Paylaş ham tıkla sahte sağlayıcıdan bir mp4'ü geçirip bağlantıyı gösterir (`CreateShareFlow`); mp4 teslimi son kayıt olur ve izleyiciye gider, "MP4 olarak kaydet" yalnız mkv'de. Kanıt `.calisma/kayit-sonuc-vurgu/`.
