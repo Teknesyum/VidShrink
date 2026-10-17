@@ -919,5 +919,14 @@
   "main.share.qr": "Κωδικός QR του συνδέσμου κοινοποίησης",
   "main.share.qr-hint": "Σαρώστε με το τηλέφωνό σας για να ανοίξετε τον σύνδεσμο.",
   "main.startup.no-display": "Το VidShrink δεν μπόρεσε να ανοίξει γραφική οθόνη. Εκκινήστε το από μια συνεδρία επιφάνειας εργασίας· στο Wayland απαιτείται το Xwayland.",
-  "main.about.guide": "Οδηγός χρήσης"
+  "main.about.guide": "Οδηγός χρήσης",
+  "main.convert.encoder.label": "Κωδικοποιητής και χρώμα",
+  "main.convert.encoder.profile": "Προφίλ",
+  "main.convert.encoder.level": "Επίπεδο",
+  "main.convert.encoder.two-pass": "Κωδικοποίηση δύο περασμάτων",
+  "main.convert.encoder.two-pass.tip": "• Το πρώτο πέρασμα αναλύει το βίντεο, το δεύτερο το κωδικοποιεί.\n• Ο ρυθμός bit κατανέμεται πιο ομοιόμορφα· η κωδικοποίηση διαρκεί περίπου διπλάσιο χρόνο.\n• Μόνο σε λειτουργία ρυθμού bit.",
+  "main.convert.color.range": "Εύρος χρωμάτων",
+  "main.convert.color.range.limited": "Περιορισμένο (TV)",
+  "main.convert.color.range.full": "Πλήρες (PC)",
+  "main.validation.encoder-setting": "Ο κωδικοποιητής {0} δεν υποστηρίζει τη ρύθμιση {1}."
 }

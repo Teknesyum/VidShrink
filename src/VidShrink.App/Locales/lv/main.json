@@ -919,5 +919,14 @@
   "main.share.qr": "Kopīgošanas saites QR kods",
   "main.share.qr-hint": "Noskenējiet ar tālruni, lai atvērtu saiti.",
   "main.startup.no-display": "VidShrink nevarēja atvērt grafisko displeju. Palaidiet to no darbvirsmas sesijas; Wayland vidē jābūt pieejamam Xwayland.",
-  "main.about.guide": "Lietošanas pamācība"
+  "main.about.guide": "Lietošanas pamācība",
+  "main.convert.encoder.label": "Kodētājs un krāsa",
+  "main.convert.encoder.profile": "Profils",
+  "main.convert.encoder.level": "Līmenis",
+  "main.convert.encoder.two-pass": "Divu gājienu kodēšana",
+  "main.convert.encoder.two-pass.tip": "• Pirmais gājiens analizē video, otrais to kodē.\n• Bitu pārraides ātrums sadalās vienmērīgāk; kodēšana ilgst aptuveni divreiz ilgāk.\n• Tikai bitu ātruma režīmā.",
+  "main.convert.color.range": "Krāsu diapazons",
+  "main.convert.color.range.limited": "Ierobežots (TV)",
+  "main.convert.color.range.full": "Pilns (PC)",
+  "main.validation.encoder-setting": "Kodētājs {0} neatbalsta iestatījumu {1}."
 }

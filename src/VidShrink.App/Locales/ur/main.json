@@ -919,5 +919,14 @@
   "main.share.qr": "شیئر لنک کا QR کوڈ",
   "main.share.qr-hint": "لنک کھولنے کے لیے فون سے اسکین کریں۔",
   "main.startup.no-display": "VidShrink کوئی گرافیکل ڈسپلے نہیں کھول سکا۔ اسے ڈیسک ٹاپ سیشن سے چلائیں؛ Wayland پر Xwayland دستیاب ہونا ضروری ہے۔",
-  "main.about.guide": "استعمال کی رہنمائی"
+  "main.about.guide": "استعمال کی رہنمائی",
+  "main.convert.encoder.label": "انکوڈر اور رنگ",
+  "main.convert.encoder.profile": "پروفائل",
+  "main.convert.encoder.level": "لیول",
+  "main.convert.encoder.two-pass": "دو مرحلوں والی انکوڈنگ",
+  "main.convert.encoder.two-pass.tip": "• پہلا مرحلہ ویڈیو کا تجزیہ کرتا ہے، دوسرا اسے انکوڈ کرتا ہے۔\n• بٹ ریٹ زیادہ یکساں تقسیم ہوتا ہے؛ انکوڈنگ میں تقریباً دگنا وقت لگتا ہے۔\n• صرف بٹ ریٹ موڈ میں۔",
+  "main.convert.color.range": "رنگ کی حد",
+  "main.convert.color.range.limited": "محدود (TV)",
+  "main.convert.color.range.full": "مکمل (PC)",
+  "main.validation.encoder-setting": "انکوڈر {0} میں {1} ترتیب کی سہولت نہیں۔"
 }

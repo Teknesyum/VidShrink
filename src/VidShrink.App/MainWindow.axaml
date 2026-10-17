@@ -1629,15 +1629,26 @@
 
                   </Grid>
                   <StackPanel x:Name="ConvertFilterPanel" Spacing="{StaticResource SpaceSm}">
-                    <Button x:Name="BtnConvertFiltersToggle"
-                            Click="OnConvertFiltersToggle"
-                            Theme="{StaticResource PanelHeaderToggle}"
-                            auto:AutomationProperties.Name="{loc:Text main.advanced.filters.label}">
-                      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
-                        <Path x:Name="ConvertFiltersGlyph" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
-                        <SarilanMetin Grid.Column="1" Text="{loc:Text main.advanced.filters.label}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                      </Grid>
-                    </Button>
+                    <WrapPanel ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                      <Button x:Name="BtnConvertFiltersToggle"
+                              Click="OnConvertFiltersToggle"
+                              Theme="{StaticResource PanelHeaderToggle}"
+                              auto:AutomationProperties.Name="{loc:Text main.advanced.filters.label}">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
+                          <Path x:Name="ConvertFiltersGlyph" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
+                          <SarilanMetin Grid.Column="1" Text="{loc:Text main.advanced.filters.label}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                        </Grid>
+                      </Button>
+                      <Button x:Name="BtnConvertEncoderToggle"
+                              Click="OnConvertEncoderToggle"
+                              Theme="{StaticResource PanelHeaderToggle}"
+                              auto:AutomationProperties.Name="{loc:Text main.convert.encoder.label}">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
+                          <Path x:Name="ConvertEncoderGlyph" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
+                          <SarilanMetin Grid.Column="1" Text="{loc:Text main.convert.encoder.label}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                        </Grid>
+                      </Button>
+                    </WrapPanel>
                     <WrapPanel x:Name="ConvertFilterBody" Classes="disclose" IsVisible="False" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
                         <SarilanMetin Text="{loc:Text main.advanced.filters.deinterlace}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
@@ -1711,6 +1722,55 @@
                             <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.extra-args.tip}"/>
                           </ToolTip.Tip>
                         </TextBox>
+                      </StackPanel>
+                    </WrapPanel>
+                    <WrapPanel x:Name="ConvertEncoderBody" Classes="disclose" IsVisible="False" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                      <StackPanel x:Name="ConvertPresetRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+                        <SarilanMetin Text="{loc:Text main.advanced.preset.label}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="CmbConvertSpeed" auto:AutomationProperties.Name="{loc:Text main.advanced.preset.label}"/>
+                      </StackPanel>
+                      <StackPanel x:Name="ConvertTuneRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+                        <SarilanMetin Text="{loc:Text main.advanced.tune.label}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="CmbConvertTune" auto:AutomationProperties.Name="{loc:Text main.advanced.tune.label}"/>
+                      </StackPanel>
+                      <StackPanel x:Name="ConvertProfileRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+                        <SarilanMetin Text="{loc:Text main.convert.encoder.profile}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="CmbConvertCodecProfile" auto:AutomationProperties.Name="{loc:Text main.convert.encoder.profile}"/>
+                      </StackPanel>
+                      <StackPanel x:Name="ConvertLevelRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+                        <SarilanMetin Text="{loc:Text main.convert.encoder.level}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="CmbConvertLevel" auto:AutomationProperties.Name="{loc:Text main.convert.encoder.level}"/>
+                      </StackPanel>
+                      <CheckBox x:Name="ChkConvertTwoPass" Theme="{StaticResource CheckStyle}" IsChecked="False" VerticalAlignment="Center"
+                                MinHeight="{StaticResource FieldMinHeight}" VerticalContentAlignment="Center"
+                                Content="{loc:Text main.convert.encoder.two-pass}">
+                        <ToolTip.Tip>
+                          <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.encoder.two-pass.tip}"/>
+                        </ToolTip.Tip>
+                      </CheckBox>
+                      <StackPanel x:Name="ConvertHdrRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center" IsVisible="False">
+                        <SarilanMetin Text="{loc:Text main.hdr.label}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <RadioButton x:Name="RbConvertHdrPreserve" GroupName="ConvertHdr" IsChecked="True" Content="{loc:Text main.hdr.preserve}"/>
+                        <RadioButton x:Name="RbConvertHdrSdr" GroupName="ConvertHdr" Content="{loc:Text main.hdr.sdr}"/>
+                      </StackPanel>
+                      <StackPanel x:Name="ConvertColorRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+                        <SarilanMetin Text="{loc:Text main.advanced.filters.color}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="CmbConvertColorSpace" SelectedIndex="0"
+                                  auto:AutomationProperties.Name="{loc:Text main.advanced.filters.color}">
+                          <ComboBoxItem Content="{loc:Text main.advanced.filters.color.keep}" Tag="keep"/>
+                          <ComboBoxItem Content="BT.601" Tag="bt601"/>
+                          <ComboBoxItem Content="BT.709" Tag="bt709"/>
+                          <ComboBoxItem Content="BT.2020" Tag="bt2020"/>
+                        </ComboBox>
+                      </StackPanel>
+                      <StackPanel x:Name="ConvertRangeRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+                        <SarilanMetin Text="{loc:Text main.convert.color.range}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="CmbConvertColorRange" SelectedIndex="0"
+                                  auto:AutomationProperties.Name="{loc:Text main.convert.color.range}">
+                          <ComboBoxItem Content="{loc:Text main.advanced.filters.color.keep}" Tag="keep"/>
+                          <ComboBoxItem Content="{loc:Text main.convert.color.range.limited}" Tag="limited"/>
+                          <ComboBoxItem Content="{loc:Text main.convert.color.range.full}" Tag="full"/>
+                        </ComboBox>
                       </StackPanel>
                     </WrapPanel>
                   </StackPanel>

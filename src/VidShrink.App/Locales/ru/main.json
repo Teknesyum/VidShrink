@@ -919,5 +919,14 @@
   "main.share.qr": "QR-код ссылки для общего доступа",
   "main.share.qr-hint": "Отсканируйте телефоном, чтобы открыть ссылку.",
   "main.startup.no-display": "VidShrink не удалось открыть графический дисплей. Запустите его из сеанса рабочего стола; в Wayland необходим Xwayland.",
-  "main.about.guide": "Руководство пользователя"
+  "main.about.guide": "Руководство пользователя",
+  "main.convert.encoder.label": "Кодировщик и цвет",
+  "main.convert.encoder.profile": "Профиль",
+  "main.convert.encoder.level": "Уровень",
+  "main.convert.encoder.two-pass": "Двухпроходное кодирование",
+  "main.convert.encoder.two-pass.tip": "• Первый проход анализирует видео, второй кодирует его.\n• Битрейт распределяется равномернее; кодирование занимает примерно вдвое больше времени.\n• Только в режиме битрейта.",
+  "main.convert.color.range": "Цветовой диапазон",
+  "main.convert.color.range.limited": "Ограниченный (TV)",
+  "main.convert.color.range.full": "Полный (PC)",
+  "main.validation.encoder-setting": "Кодировщик {0} не поддерживает настройку {1}."
 }

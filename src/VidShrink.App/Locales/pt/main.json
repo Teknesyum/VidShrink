@@ -919,5 +919,14 @@
   "main.share.qr": "Código QR do link de partilha",
   "main.share.qr-hint": "Digitalize com o telemóvel para abrir o link.",
   "main.startup.no-display": "O VidShrink não conseguiu abrir uma tela gráfica. Inicie-o a partir de uma sessão da área de trabalho; no Wayland, o Xwayland precisa estar disponível.",
-  "main.about.guide": "Guia de uso"
+  "main.about.guide": "Guia de uso",
+  "main.convert.encoder.label": "Codificador e cor",
+  "main.convert.encoder.profile": "Perfil",
+  "main.convert.encoder.level": "Nível",
+  "main.convert.encoder.two-pass": "Codificação em duas passagens",
+  "main.convert.encoder.two-pass.tip": "• A primeira passagem analisa o vídeo e a segunda o codifica.\n• A taxa de bits é distribuída de forma mais uniforme; a codificação leva cerca do dobro do tempo.\n• Apenas no modo de taxa de bits.",
+  "main.convert.color.range": "Intervalo de cor",
+  "main.convert.color.range.limited": "Limitado (TV)",
+  "main.convert.color.range.full": "Completo (PC)",
+  "main.validation.encoder-setting": "O codificador {0} não suporta a configuração {1}."
 }

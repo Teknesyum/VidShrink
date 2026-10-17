@@ -919,5 +919,14 @@
   "main.share.qr": "קוד QR של קישור השיתוף",
   "main.share.qr-hint": "סרקו בטלפון כדי לפתוח את הקישור.",
   "main.startup.no-display": "VidShrink לא הצליח לפתוח תצוגה גרפית. הפעילו אותו מתוך הפעלת שולחן עבודה; ב-Wayland נדרש Xwayland.",
-  "main.about.guide": "מדריך שימוש"
+  "main.about.guide": "מדריך שימוש",
+  "main.convert.encoder.label": "מקודד וצבע",
+  "main.convert.encoder.profile": "פרופיל",
+  "main.convert.encoder.level": "רמה",
+  "main.convert.encoder.two-pass": "קידוד בשני מעברים",
+  "main.convert.encoder.two-pass.tip": "• המעבר הראשון מנתח את הווידאו, השני מקודד אותו.\n• קצב הסיביות מתפזר באופן אחיד יותר; הקידוד נמשך בערך פי שניים.\n• רק במצב קצב סיביות.",
+  "main.convert.color.range": "טווח צבעים",
+  "main.convert.color.range.limited": "מוגבל (TV)",
+  "main.convert.color.range.full": "מלא (PC)",
+  "main.validation.encoder-setting": "המקודד {0} אינו תומך בהגדרה {1}."
 }

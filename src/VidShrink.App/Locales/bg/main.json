@@ -919,5 +919,14 @@
   "main.share.qr": "QR код на връзката за споделяне",
   "main.share.qr-hint": "Сканирайте с телефона си, за да отворите връзката.",
   "main.startup.no-display": "VidShrink не успя да отвори графичен дисплей. Стартирайте го от сесия на работния плот; под Wayland е необходим Xwayland.",
-  "main.about.guide": "Ръководство за употреба"
+  "main.about.guide": "Ръководство за употреба",
+  "main.convert.encoder.label": "Кодер и цвят",
+  "main.convert.encoder.profile": "Профил",
+  "main.convert.encoder.level": "Ниво",
+  "main.convert.encoder.two-pass": "Двупасово кодиране",
+  "main.convert.encoder.two-pass.tip": "• Първото преминаване анализира видеото, второто го кодира.\n• Битрейтът се разпределя по-равномерно; кодирането трае около два пъти по-дълго.\n• Само в режим на битрейт.",
+  "main.convert.color.range": "Цветови диапазон",
+  "main.convert.color.range.limited": "Ограничен (TV)",
+  "main.convert.color.range.full": "Пълен (PC)",
+  "main.validation.encoder-setting": "Кодерът {0} не поддържа настройката {1}."
 }

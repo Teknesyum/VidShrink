@@ -42,6 +42,24 @@ public sealed record ConversionPlan
     public TimeSpan? End { get; init; }
     public HdrPolicy HdrPolicy { get; init; } = HdrPolicy.Preserve;
 
+    /// <summary>DON-15: kodlayıcı hız ön ayarı; <c>null</c> kodeğin varsayılanı (<see cref="FfmpegArguments.DefaultPreset"/>).</summary>
+    public string? EncoderPreset { get; init; }
+
+    /// <summary>DON-15: <c>-tune</c>; yalnız <see cref="ConversionArguments.TuneOptions"/> listesindeki kodeklerde.</summary>
+    public string? Tune { get; init; }
+
+    /// <summary>DON-15: H.264 profili (<c>-profile:v</c>); ara kodeğin <see cref="VideoProfile"/>'ından ayrı.</summary>
+    public string? CodecProfile { get; init; }
+
+    /// <summary>DON-15: H.264 seviyesi (<c>-level:v</c>).</summary>
+    public string? Level { get; init; }
+
+    /// <summary>DON-15: bit hızı kipinde iki geçiş; CRF kipinde ve desteklemeyen kodekte okunmaz.</summary>
+    public bool TwoPass { get; init; }
+
+    /// <summary>DON-26: çıktı renk aralığı; matris <see cref="VideoFilterOptions.ColorMatrix"/>'ten okunur.</summary>
+    public ColorRangeTarget ColorRange { get; init; } = ColorRangeTarget.Keep;
+
     /// <summary>Kap ve akış etiketleri silinir, iz dili açıkça geri yazılır. GIF'te okunmaz.</summary>
     public bool DropMetadata { get; init; }
 

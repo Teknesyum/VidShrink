@@ -919,5 +919,14 @@
   "main.share.qr": "Msimbo wa QR wa kiungo cha kushiriki",
   "main.share.qr-hint": "Changanua kwa simu yako ili kufungua kiungo.",
   "main.startup.no-display": "VidShrink haikuweza kufungua skrini ya michoro. Ianzishe kutoka kwenye kipindi cha eneo-kazi; kwenye Wayland, Xwayland lazima ipatikane.",
-  "main.about.guide": "Mwongozo wa matumizi"
+  "main.about.guide": "Mwongozo wa matumizi",
+  "main.convert.encoder.label": "Kisimbaji na rangi",
+  "main.convert.encoder.profile": "Wasifu",
+  "main.convert.encoder.level": "Kiwango",
+  "main.convert.encoder.two-pass": "Usimbaji wa mizunguko miwili",
+  "main.convert.encoder.two-pass.tip": "• Mzunguko wa kwanza huchambua video, wa pili huisimba.\n• Kasi biti husambazwa kwa usawa zaidi; usimbaji huchukua takriban mara mbili ya muda.\n• Katika hali ya kasi biti pekee.",
+  "main.convert.color.range": "Masafa ya rangi",
+  "main.convert.color.range.limited": "Yenye kikomo (TV)",
+  "main.convert.color.range.full": "Kamili (PC)",
+  "main.validation.encoder-setting": "Kisimbaji {0} hakitumii mpangilio {1}."
 }

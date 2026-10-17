@@ -310,6 +310,7 @@ public partial class MainWindow : Window
         foreach (var field in new[] { TxtCustomResolution, TxtCustomFps, TxtAudioBitrate, TxtTrimStart, TxtTrimEnd, TxtConvertExtraArgs })
             Watch(field, TextBox.TextProperty, OnConvertChanged);
         InitializeConvertFilterUi();
+        InitializeConvertEncoderUi();
         InitializeManualCropUi();
 
         Watch(ChkAutoUpdate, ToggleButton.IsCheckedProperty, OnAutoUpdateChanged);
@@ -4856,7 +4857,7 @@ public partial class MainWindow : Window
         var audio = SelectedTag(CmbConvertAudio);
         if (new ConversionPlan { Container = container }.AudioOnly) audio = ConversionPresetPlan.AudioCodecForAudioContainer(container);
 
-        return WithConvertTags(new ConversionPlan
+        return DonusturKodlayiciPlani(WithConvertTags(new ConversionPlan
         {
             Container = container,
             VideoCodec = codec,
@@ -4874,7 +4875,6 @@ public partial class MainWindow : Window
             AudioSampleRate = ConvertAudioNumber(CmbConvertSampleRate),
             Start = ParseTime(TxtTrimStart.Text),
             End = ParseTime(TxtTrimEnd.Text),
-            HdrPolicy = HdrPolicyIndex == 1 ? HdrPolicy.TonemapToSdr : HdrPolicy.Preserve,
             DropMetadata = ChkConvertDropMetadata.IsChecked == true,
             SubtitleTracks = ConvertSubtitleChoice(),
             AudioTracks = ConvertAudioChoice(),
@@ -4897,7 +4897,7 @@ public partial class MainWindow : Window
             GifDither = container == "gif" && SelectedTag(CmbConvertGifDither) is { Length: > 0 } dither ? dither : null,
             ExtraArgs = CustomArguments.Parse(TxtConvertExtraArgs.Text).Arguments,
             AudioVisual = SesGoruntusu()
-        });
+        }));
     }
 
     private static string? ExtraArgsError(CustomArgumentResult extra) => extra.Problem switch
@@ -4977,12 +4977,14 @@ public partial class MainWindow : Window
         ConvertGifPanel.IsVisible = plan.Gif;
         ConvertAudioVisualPanel.IsVisible = SesKaynagiAcik;
         BtnConvertChapters.IsVisible = ConversionChapters.Carries(plan.Container);
+        DonusturKodlayiciAlanlari();
     }
 
     private void RefreshConversion()
     {
         if (ConvertInfo is not { } info) return;
         DonusturKirpmaYoklamasi();
+        DonusturKodlayiciAlanlari();
         var plan = ReadConversionPlan();
         var errors = ConversionArguments.Validate(info, plan).Select(message => LanguageCatalog.Validation(message)).ToList();
         if (plan.Start == TimeSpan.MinValue || plan.End == TimeSpan.MinValue)
@@ -5001,7 +5003,7 @@ public partial class MainWindow : Window
         try
         {
             TxtConvertCommand.Text = errors.Count == 0
-                ? FfmpegArguments.ToCommandLine(ConversionArguments.Build(info, plan, output, plan.Gif ? "palette.png" : null))
+                ? DonusturKomutu(info, plan, output)
                 : "";
         }
         catch (Exception ex)

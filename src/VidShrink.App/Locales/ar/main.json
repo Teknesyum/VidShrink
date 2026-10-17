@@ -919,5 +919,14 @@
   "main.share.qr": "رمز QR لرابط المشاركة",
   "main.share.qr-hint": "امسح الرمز بهاتفك لفتح الرابط.",
   "main.startup.no-display": "تعذّر على VidShrink فتح شاشة رسومية. شغّله من جلسة سطح مكتب؛ في Wayland يجب أن يكون Xwayland متاحًا.",
-  "main.about.guide": "دليل الاستخدام"
+  "main.about.guide": "دليل الاستخدام",
+  "main.convert.encoder.label": "المرمِّز والألوان",
+  "main.convert.encoder.profile": "الملف التعريفي",
+  "main.convert.encoder.level": "المستوى",
+  "main.convert.encoder.two-pass": "ترميز بمرورين",
+  "main.convert.encoder.two-pass.tip": "• يحلّل المرور الأول الفيديو، ويرمّزه المرور الثاني.\n• يتوزّع معدّل البت بشكل أكثر توازنًا؛ ويستغرق الترميز نحو ضعف الوقت.\n• في وضع معدّل البت فقط.",
+  "main.convert.color.range": "نطاق الألوان",
+  "main.convert.color.range.limited": "محدود (TV)",
+  "main.convert.color.range.full": "كامل (PC)",
+  "main.validation.encoder-setting": "المرمِّز {0} لا يدعم الإعداد {1}."
 }

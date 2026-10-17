@@ -919,5 +919,14 @@
   "main.share.qr": "Kod QR linku udostępniania",
   "main.share.qr-hint": "Zeskanuj telefonem, aby otworzyć link.",
   "main.startup.no-display": "VidShrink nie mógł otworzyć ekranu graficznego. Uruchom go z sesji pulpitu; w Waylandzie musi być dostępny Xwayland.",
-  "main.about.guide": "Instrukcja obsługi"
+  "main.about.guide": "Instrukcja obsługi",
+  "main.convert.encoder.label": "Koder i kolor",
+  "main.convert.encoder.profile": "Profil",
+  "main.convert.encoder.level": "Poziom",
+  "main.convert.encoder.two-pass": "Kodowanie dwuprzebiegowe",
+  "main.convert.encoder.two-pass.tip": "• Pierwszy przebieg analizuje wideo, drugi je koduje.\n• Przepływność rozkłada się równomierniej; kodowanie trwa mniej więcej dwa razy dłużej.\n• Tylko w trybie przepływności.",
+  "main.convert.color.range": "Zakres kolorów",
+  "main.convert.color.range.limited": "Ograniczony (TV)",
+  "main.convert.color.range.full": "Pełny (PC)",
+  "main.validation.encoder-setting": "Koder {0} nie obsługuje ustawienia {1}."
 }

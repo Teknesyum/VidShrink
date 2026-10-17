@@ -919,5 +919,14 @@
   "main.share.qr": "शेयर लिंक का QR कोड",
   "main.share.qr-hint": "लिंक खोलने के लिए फ़ोन से स्कैन करें।",
   "main.startup.no-display": "VidShrink कोई ग्राफ़िकल डिस्प्ले नहीं खोल सका। इसे डेस्कटॉप सत्र से चलाएँ; Wayland पर Xwayland उपलब्ध होना चाहिए।",
-  "main.about.guide": "उपयोग गाइड"
+  "main.about.guide": "उपयोग गाइड",
+  "main.convert.encoder.label": "एन्कोडर और रंग",
+  "main.convert.encoder.profile": "प्रोफ़ाइल",
+  "main.convert.encoder.level": "लेवल",
+  "main.convert.encoder.two-pass": "दो-पास एन्कोडिंग",
+  "main.convert.encoder.two-pass.tip": "• पहला पास वीडियो का विश्लेषण करता है, दूसरा उसे एन्कोड करता है।\n• बिटरेट अधिक समान रूप से बँटता है; एन्कोडिंग में लगभग दोगुना समय लगता है।\n• केवल बिटरेट मोड में।",
+  "main.convert.color.range": "रंग सीमा",
+  "main.convert.color.range.limited": "सीमित (TV)",
+  "main.convert.color.range.full": "पूर्ण (PC)",
+  "main.validation.encoder-setting": "एन्कोडर {0} {1} सेटिंग का समर्थन नहीं करता।"
 }

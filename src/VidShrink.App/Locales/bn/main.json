@@ -919,5 +919,14 @@
   "main.share.qr": "শেয়ার লিংকের QR কোড",
   "main.share.qr-hint": "লিংকটি খুলতে ফোন দিয়ে স্ক্যান করুন।",
   "main.startup.no-display": "VidShrink কোনো গ্রাফিক্যাল ডিসপ্লে খুলতে পারেনি। এটি একটি ডেস্কটপ সেশন থেকে চালু করুন; Wayland-এ Xwayland থাকা আবশ্যক।",
-  "main.about.guide": "ব্যবহার নির্দেশিকা"
+  "main.about.guide": "ব্যবহার নির্দেশিকা",
+  "main.convert.encoder.label": "এনকোডার ও রঙ",
+  "main.convert.encoder.profile": "প্রোফাইল",
+  "main.convert.encoder.level": "লেভেল",
+  "main.convert.encoder.two-pass": "দুই-পাস এনকোডিং",
+  "main.convert.encoder.two-pass.tip": "• প্রথম পাস ভিডিও বিশ্লেষণ করে, দ্বিতীয়টি এনকোড করে।\n• বিটরেট আরও সমানভাবে ছড়ায়; এনকোডিংয়ে প্রায় দ্বিগুণ সময় লাগে।\n• কেবল বিটরেট মোডে।",
+  "main.convert.color.range": "রঙের পরিসর",
+  "main.convert.color.range.limited": "সীমিত (TV)",
+  "main.convert.color.range.full": "পূর্ণ (PC)",
+  "main.validation.encoder-setting": "এনকোডার {0} {1} সেটিং সমর্থন করে না।"
 }

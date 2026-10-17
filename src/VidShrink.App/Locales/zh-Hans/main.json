@@ -919,5 +919,14 @@
   "main.share.qr": "分享链接的二维码",
   "main.share.qr-hint": "用手机扫描即可打开链接。",
   "main.startup.no-display": "VidShrink 无法打开图形显示。请从桌面会话中启动；在 Wayland 下需要 Xwayland。",
-  "main.about.guide": "使用指南"
+  "main.about.guide": "使用指南",
+  "main.convert.encoder.label": "编码器与颜色",
+  "main.convert.encoder.profile": "配置文件",
+  "main.convert.encoder.level": "级别",
+  "main.convert.encoder.two-pass": "两遍编码",
+  "main.convert.encoder.two-pass.tip": "• 第一遍分析视频，第二遍进行编码。\n• 码率分配更均匀；编码时间约为两倍。\n• 仅限码率模式。",
+  "main.convert.color.range": "色彩范围",
+  "main.convert.color.range.limited": "有限 (TV)",
+  "main.convert.color.range.full": "完整 (PC)",
+  "main.validation.encoder-setting": "编码器 {0} 不支持 {1} 设置。"
 }

@@ -919,5 +919,14 @@
   "main.share.qr": "QR-code van de deellink",
   "main.share.qr-hint": "Scan met je telefoon om de link te openen.",
   "main.startup.no-display": "VidShrink kon geen grafisch beeldscherm openen. Start het vanuit een bureaubladsessie; onder Wayland moet Xwayland beschikbaar zijn.",
-  "main.about.guide": "Gebruikershandleiding"
+  "main.about.guide": "Gebruikershandleiding",
+  "main.convert.encoder.label": "Encoder en kleur",
+  "main.convert.encoder.profile": "Profiel",
+  "main.convert.encoder.level": "Niveau",
+  "main.convert.encoder.two-pass": "Coderen in twee passes",
+  "main.convert.encoder.two-pass.tip": "• De eerste pass analyseert de video, de tweede codeert hem.\n• De bitrate wordt gelijkmatiger verdeeld; coderen duurt ongeveer twee keer zo lang.\n• Alleen in bitratemodus.",
+  "main.convert.color.range": "Kleurbereik",
+  "main.convert.color.range.limited": "Beperkt (TV)",
+  "main.convert.color.range.full": "Volledig (PC)",
+  "main.validation.encoder-setting": "De encoder {0} ondersteunt de instelling {1} niet."
 }

@@ -919,5 +919,14 @@
   "main.share.qr": "Code QR du lien de partage",
   "main.share.qr-hint": "Scannez-le avec votre téléphone pour ouvrir le lien.",
   "main.startup.no-display": "VidShrink n'a pas pu ouvrir d'affichage graphique. Lancez-le depuis une session de bureau ; sous Wayland, Xwayland doit être disponible.",
-  "main.about.guide": "Guide d’utilisation"
+  "main.about.guide": "Guide d’utilisation",
+  "main.convert.encoder.label": "Encodeur et couleur",
+  "main.convert.encoder.profile": "Profil",
+  "main.convert.encoder.level": "Niveau",
+  "main.convert.encoder.two-pass": "Encodage en deux passes",
+  "main.convert.encoder.two-pass.tip": "• La première passe analyse la vidéo, la seconde l'encode.\n• Le débit est réparti plus régulièrement ; l'encodage prend environ deux fois plus de temps.\n• Uniquement en mode débit.",
+  "main.convert.color.range": "Plage de couleurs",
+  "main.convert.color.range.limited": "Limitée (TV)",
+  "main.convert.color.range.full": "Complète (PC)",
+  "main.validation.encoder-setting": "L'encodeur {0} ne prend pas en charge le réglage {1}."
 }
