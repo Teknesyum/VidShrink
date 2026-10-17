@@ -202,6 +202,134 @@ public sealed class EkranaCizimTests
         Assert.Equal(0, sonuc.Iz);
     }
 
+    /// <summary>
+    /// Her iz çizildiği andaki mürekkebi taşır; mürekkep ya da araç değişince <see cref="ScreenSketch.Selected"/> bir kez
+    /// düşer, aynı değer yeniden yazılınca düşmez. Sürmekte olan iz mürekkebini basışta alır, ortada değişen mürekkep onu
+    /// boyamaz.
+    /// </summary>
+    [Fact]
+    public void MurekkepIzBasinaTutulurVeSecimHaberVerir()
+    {
+        var cizim = new ScreenSketch();
+        var haber = 0;
+        cizim.Selected += () => haber++;
+        cizim.Press(N(0, 0));
+        cizim.Move(N(5, 5));
+        cizim.Ink = SketchInk.Blue;
+        cizim.Release();
+        cizim.Tool = SketchTool.Box;
+        cizim.Tool = SketchTool.Box;
+        cizim.Press(N(0, 0));
+        cizim.Move(N(9, 9));
+        var suren = cizim.Active!.Ink;
+        cizim.Release();
+        cizim.Ink = SketchInk.Pink;
+        cizim.Ink = SketchInk.Pink;
+        cizim.Tool = SketchTool.Number;
+        cizim.Press(N(3, 3));
+        cizim.Ink = SketchInk.Green;
+        cizim.AddText(N(4, 4), "a");
+
+        Assert.Equal(new[] { SketchInk.Ember, SketchInk.Blue, SketchInk.Pink, SketchInk.Green }, cizim.Strokes.Select(s => s.Ink));
+        Assert.Equal(SketchInk.Blue, suren);
+        Assert.Equal(5, haber);
+    }
+
+    /// <summary>
+    /// Araç paneli ayrı bir penceredir ve kayıttan çıkarma pencere başına ölçülür: Windows'un kendi
+    /// <c>GetWindowDisplayAffinity</c>'si panelde <c>WDA_EXCLUDEFROMCAPTURE</c>, çizimde sıfır okur (çizim kayda girer).
+    /// Panel kayıt bölgesinin üstünde, dışında durur. Panelden seçilen araç ve mürekkep çizime geçer, tuşla seçilen araç
+    /// panelde işaretlenir; mavi mürekkeple çizilen kutunun kenarı paletin <c>NeonBlue</c>'su ile boyanır. Kipten çıkınca
+    /// panel gizlenir, yeniden girince görünür; paneldeki kapat düğmesi izleri siler, çizimi de paneli de kapatır.
+    /// </summary>
+    [Fact]
+    public void AracPaneliKayittanCikarSecerVeMurekkeptenBoyar()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        var alan = new PixelRect(220, 320, 400, 300);
+        var sonuc = AppHost.Run(() =>
+        {
+            var katman = new RecorderSketchHost();
+            katman.Toggle(alan);
+            var pencere = katman.Window!;
+            Bekle(300);
+            var panel = pencere.Tools!;
+            var cizimTutamak = pencere.TryGetPlatformHandle()!.Handle;
+            var panelTutamak = panel.TryGetPlatformHandle()!.Handle;
+            GetWindowDisplayAffinity(cizimTutamak, out var cizimBayrak);
+            GetWindowDisplayAffinity(panelTutamak, out var panelBayrak);
+            var yer = new PixelRect(panel.Position, PixelSize.FromSize(panel.Bounds.Size, panel.RenderScaling));
+            var acik = (Panel: panel.IsVisible, Kalem: panel.ButtonOf(SketchTool.Pen).IsChecked, Kor: panel.ButtonOf(SketchInk.Ember).IsChecked);
+
+            panel.ButtonOf(SketchTool.Box).RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Avalonia.Controls.Button.ClickEvent));
+            panel.ButtonOf(SketchInk.Blue).RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Avalonia.Controls.Button.ClickEvent));
+            var secim = (pencere.Sketch.Tool, pencere.Sketch.Ink,
+                Isaretli: panel.ToolButtons.Where(b => b.IsChecked == true).Count() + panel.InkButtons.Where(b => b.IsChecked == true).Count(),
+                Kutu: panel.ButtonOf(SketchTool.Box).IsChecked, Mavi: panel.ButtonOf(SketchInk.Blue).IsChecked);
+            pencere.Down(N(60, 60));
+            pencere.Drag(N(120, 110));
+            pencere.Up();
+            var renk = Renk(pencere.Ink, (int)Math.Ceiling(pencere.Width), (int)Math.Ceiling(pencere.Height), 60, 85);
+            var mavi = Avalonia.Controls.ResourceNodeExtensions.TryFindResource(pencere.Ink, "NeonBlue", out var firca) && firca is Avalonia.Media.ISolidColorBrush duz ? duz.Color : default;
+            pencere.Press(Key.A, KeyModifiers.None);
+            var tusla = (Ok: panel.ButtonOf(SketchTool.Arrow).IsChecked, Kutu: panel.ButtonOf(SketchTool.Box).IsChecked);
+            panel.UndoButton.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Avalonia.Controls.Button.ClickEvent));
+            var geriAlinca = pencere.Sketch.Strokes.Count;
+            pencere.Down(N(10, 10));
+            pencere.Drag(N(30, 30));
+            pencere.Up();
+
+            katman.Toggle(alan);
+            Bekle(150);
+            var gecis = panel.IsVisible;
+            katman.Toggle(alan);
+            Bekle(150);
+            var yine = (Panel: panel.IsVisible, Ayni: ReferenceEquals(panel, pencere.Tools));
+            var izKapanmadan = pencere.Sketch.Strokes.Count;
+            panel.CloseButton.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Avalonia.Controls.Button.ClickEvent));
+            Bekle(150);
+            return (cizimBayrak, panelBayrak, yer, acik, secim, renk, mavi, tusla, geriAlinca, gecis, yine, izKapanmadan,
+                Katman: katman.Visible, PanelSonra: panel.IsVisible, Iz: pencere.Sketch.Strokes.Count);
+        });
+
+        Assert.Equal(0u, sonuc.cizimBayrak);
+        if (CaptureAffinity.Supported) Assert.Equal(CaptureAffinity.ExcludeFromCapture, sonuc.panelBayrak);
+        Assert.True(sonuc.yer.Bottom <= alan.Y, $"panel bölgenin içinde: {sonuc.yer}");
+        Assert.True(sonuc.yer.Width > 0 && sonuc.yer.Height > 0);
+        Assert.Equal((true, (bool?)true, (bool?)true), sonuc.acik);
+        Assert.Equal(SketchTool.Box, sonuc.secim.Tool);
+        Assert.Equal(SketchInk.Blue, sonuc.secim.Ink);
+        Assert.Equal(2, sonuc.secim.Isaretli);
+        Assert.True(sonuc.secim.Kutu);
+        Assert.True(sonuc.secim.Mavi);
+        Assert.Equal((sonuc.mavi.R, sonuc.mavi.G, sonuc.mavi.B, (byte)255), sonuc.renk);
+        Assert.Equal(((bool?)true, (bool?)false), sonuc.tusla);
+        Assert.Equal(0, sonuc.geriAlinca);
+        Assert.False(sonuc.gecis);
+        Assert.True(sonuc.yine.Panel);
+        Assert.True(sonuc.yine.Ayni);
+        Assert.Equal(1, sonuc.izKapanmadan);
+        Assert.False(sonuc.Katman);
+        Assert.False(sonuc.PanelSonra);
+        Assert.Equal(0, sonuc.Iz);
+    }
+
+    private static (byte R, byte G, byte B, byte A) Renk(Avalonia.Visual cizim, int w, int h, int x, int y)
+    {
+        using var hedef = new RenderTargetBitmap(new PixelSize(w, h), new Vector(96, 96));
+        hedef.Render(cizim);
+        var piksel = new byte[w * h * 4];
+        var tutamak = GCHandle.Alloc(piksel, GCHandleType.Pinned);
+        try { hedef.CopyPixels(new PixelRect(0, 0, w, h), tutamak.AddrOfPinnedObject(), piksel.Length, w * 4); }
+        finally { tutamak.Free(); }
+
+        var i = (y * w + x) * 4;
+        return (piksel[i + 2], piksel[i + 1], piksel[i], piksel[i + 3]);
+    }
+
+    [DllImport("user32.dll")]
+    private static extern bool GetWindowDisplayAffinity(IntPtr hwnd, out uint affinity);
+
     private static (int Kenar, int Ic) Ciz(Avalonia.Visual cizim, int w, int h)
     {
         using var hedef = new RenderTargetBitmap(new PixelSize(w, h), new Vector(96, 96));

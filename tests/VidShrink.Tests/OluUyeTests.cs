@@ -576,6 +576,8 @@ public sealed class OluUyeTests
     /// tuketiliyor, sifir uretim tuketicisi degil. Pimden dusuruldu, uye dusurulmedi.
     /// Kumeyi bir satir kuculten DZA-85 kap ici iz isleri: <c>Remux.TracksOf</c> <c>stream.Kind != StreamKind.Data</c>
     /// diye soruyor, <c>StreamKind.Data</c> adiyla okunuyor ve pimden dustu (olcunun kendi ciktisindan).
+    /// Kumeyi bir satir buyuten cizim murekkebi (later 42, 18 Ekim 2026): <c>SketchInk.Ember</c>
+    /// <c>SketchCanvas.BrushKey</c>'in '_' kolu, uc kardesi adiyla okunuyor.
     /// </para>
     /// </summary>
     private static readonly PinnedFinding[] Pinned =
@@ -614,6 +616,8 @@ public sealed class OluUyeTests
             "K8 borcu 5 olculdu: ayrim enum uzerinden degil ShareDiagnosis.Key uzerinden kullaniciya ulasiyor (11 uyeye karsi 22 anahtar, hepsi 42 dilde pimli). Enum'un tasidigi karar yeniden deneme: ShareRetry.IsRetryable RateLimited/NetworkFailure/ServiceError'i adiyla soruyor, bu uye o sorunun olumsuz kolu. Jeton yanlissa ya da icerik engellendiyse tekrar gondermek ayni yaniti alir. PaylasimTekrarDenemeTests.KalanUyelerHicbirAdimdaYenidenDenenmiyor kolu pimliyor; kumeyi genisletmek kirmizi veriyor (docs/olcumler/k8-paylasim-tekrar-2026-09-19.md)."),
         new("ShareFailure.QuotaExceeded", "varsayilan-kol", Legitimate,
             "K8 borcu 5 olculdu: ayrim enum uzerinden degil ShareDiagnosis.Key uzerinden kullaniciya ulasiyor (11 uyeye karsi 22 anahtar, hepsi 42 dilde pimli). Enum'un tasidigi karar yeniden deneme: ShareRetry.IsRetryable RateLimited/NetworkFailure/ServiceError'i adiyla soruyor, bu uye o sorunun olumsuz kolu. Kota doldu; bekleme suresi sunucudan gelmiyor, yeniden deneme onerilmiyor. PaylasimTekrarDenemeTests.KalanUyelerHicbirAdimdaYenidenDenenmiyor kolu pimliyor; kumeyi genisletmek kirmizi veriyor (docs/olcumler/k8-paylasim-tekrar-2026-09-19.md)."),
+        new("SketchInk.Ember", "varsayilan-kol", Legitimate,
+            "Cizim murekkebinin varsayilani ve paletin kayit rengi. SketchCanvas.BrushKey uc kardesi adiyla soruyor (NeonBlue, NeonPink, NeonSuccess), Ember '_' kolu ve NeonEmber'a cikiyor; arac panelinin ilk renk dugmesi onu uretiyor (later 42, 18 Ekim 2026)."),
         new("SpeedMode.Quality", "varsayilan-kol", Legitimate,
             "Iki degerli kipin olumsuz kolu ve varsayilani. On okuma yerinin hepsi 'speed == SpeedMode.Fast' kalibinda soruyor (dokuzu ==, CalibrationProbe.cs:148 !=); Quality o kosulun else'i."),
         new("StreamNote.LosslessAudioNotPassedThrough", "varsayilan-kol", Legitimate,

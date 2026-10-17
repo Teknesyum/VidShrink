@@ -9,6 +9,9 @@ ship as part of it.
 
 ### Added
 
+- Recorder: drawing on screen now has a tool bar: pen, arrow, box, number and text, four ink colors from the palette,
+  undo, clear and close. The bar sits outside the recording area and is hidden from the recording (Windows 10 2004
+  and later); the drawing itself still lands in the recording, each stroke in the color it was drawn with.
 - Recorder: the wizard's "Game" answer now picks the screen for you. When a recording or the replay buffer
   starts, the screen target follows the foreground window (or the window right under VidShrink when VidShrink itself
   is in front), falling back to the primary screen; an HDR screen still goes through the HDR-to-SDR path. Picking a
