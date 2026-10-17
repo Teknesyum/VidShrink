@@ -64,6 +64,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (EKB-P13): EKB-18 Kamera katmanı macOS ve Linux'ta. [Tablo](piyasa/2026-10-13/kaydedici-sunum-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Core/RecorderArguments.cs, src/VidShrink.Ffmpeg/CaptureDevices.cs, src/VidShrink.App/Recorder/RecorderView.Kamera.cs
 - Plan: Kamera girdisi macOS'ta `avfoundation`, Linux'ta `v4l2` ile kurulur (ffmpeg'in o sistemlerdeki aygıt girdileri) ve kamera paneli yalnız Windows koşulundan çıkar (`RecorderView.Kamera.cs:53`). Kardeş tablodaki EKB-18 ve onun paketi EKB-P13 aynı iştir; yalnız biri açılır. Argüman üretimi `tests/VidShrink.Tests/KaydediciKameraTests.cs` yanında her sistem için ölçülür; gerçek aygıt denemesi bu makinede yapılamaz, o sistemlerde elle yapılır.
+- Durum (18 Ekim 2026, main): kamera katmanı ve aygıt hedefi macOS (`avfoundation`, 30 fps) ve Linux'ta (`v4l2`, liste `/dev/v4l/by-id`'den) aynı kurucudan kuruluyor (`KaydediciKameraSistemTests`). Açık: o makinelerde elle deneme; katmanın sürükleme düzenleyicisi yalnız Windows'ta.
 
 ## 78. Erişilebilirlik Denemesi
 
@@ -98,6 +99,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (DZB-P10): DZB-04 Resim klibi; DZB-05 Düz renk klibi; DZB-03 Klip dönüşümü; DZB-56 Proje oranı ve tuval; DZB-49 Kare dondurma. [Tablo](piyasa/2026-10-13/duzenleyici-kurgu-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.App/Editing/EditorView.Kaynak.cs, src/VidShrink.App/Editing/EditorView.Klip.cs, src/VidShrink.Core/Editing/EditTimeline.cs, src/VidShrink.Core/Editing/ClipEffects.cs, src/VidShrink.Core/Editing/ClipFilters.cs, src/VidShrink.Core/Editing/EditLook.cs, src/VidShrink.Core/Editing/EditExport.cs, src/VidShrink.Core/Editing/EditProject.cs, tests/VidShrink.Tests/
 - Plan: Resim ve düz renk, eklenirken kısa bir ara videoya çevrilir ve bildik kaynak gibi çizelgeye girer; önizleme yolu değişmez. Kare dondurma aynı yoldan gelir: oynatma başındaki kare resme çıkarılıp klip yapılır. Klibe serbest ölçek, konum ve açı, projeye de çıktı çerçevesi (9:16, 1:1, 16:9) eklenir; ikisi de ClipFilters'ın geometri zincirinden (ClipFilters.cs:38) geçer. Paket ikiye bölünebilir: resim, renk ve dondurma (DZB-04, DZB-05, DZB-49) ile dönüşüm ve tuval (DZB-03, DZB-56); doğrulama argüman testleri ve kare karşılaştırması.
+- Durum (18 Ekim 2026, main): resim klibi, düz renk (siyah, beyaz) ve kare dondurma ara videoyla çizelgeye giriyor (`StillClip`, `DuzenleyiciResimKlibiTests`). Açık: dönüşüm ve tuval (DZB-03, DZB-56), renk seçici, sabit klip süreleri, boş çizelgede tek resim, `ara-klipler/` budanmıyor.
 
 ## 88. İleri Renk Ve Bulanıklık
 
