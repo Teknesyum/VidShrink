@@ -72,6 +72,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (AYR-P7): AYR-16 Ekran Okuyucu Denemesi; AYR-17 Klavyeyle Tam Kullanım Denemesi. [Tablo](piyasa/2026-10-13/ayarlar-kabuk-dogrulanmis.md)
 - Dokunacağı yer: docs/olcumler/, src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/Themes/Controls.axaml
 - Plan: Her sekmede bir ana iş baştan sona önce yalnız klavyeyle, sonra ekran okuyucuyla (Windows'ta Anlatıcı ve NVDA) yapılır; sekme sırası, klavye tuzağı ve adı okunmayan denetimler tek tek yazılır. Bulgular `docs/olcumler` altına kayıt olarak girer; adı eksik denetim ve bozuk sekme sırası gibi küçük kusurlar aynı turda düzeltilir, büyükleri deftere yazılır. macOS'ta VoiceOver denemesi o makinede ayrıca yapılır.
+- Durum (18 Ekim 2026, main): klavye ve UI Automation ağacıyla denendi, Tab tuzağı düzeldi, 45 adsız denetime ad verildi (`docs/olcumler/erisilebilirlik-denemesi.md`). Açık: Anlatıcı ve NVDA ile dinleyerek deneme, macOS VoiceOver, Shift+Tab yönü, alan başına çift Tab durağı, hedef çiplerinde birim ve paylaşım bağlantısı kutularının adı (yeni anahtar ister).
 
 ## 81. Windows 11 İlk Menüde Küçültme
 
