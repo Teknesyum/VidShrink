@@ -334,14 +334,14 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Sahibin kararı: Uygulama kayıt sırasında sistemin bildirim ayarına ve masaüstü simgelerine dokunsun mu.
 - Plan: Kayıt başlarken bildirimler susturulur ve masaüstü simgeleri gizlenir, bitince eski durum geri yüklenir; eski durum diske yazılır ki çökmeden sonra açılışta geri alınsın. Windows'ta bildirim susturmanın belgeli yolu doğrulanmadı; bulunamazsa EKB-20 yapılmaz, yalnız simge gizleme teslim edilir. EKB-20 kardeş tablodaki EKA-27 ile aynı iştir. Geri yükleme sahte sistem katmanıyla, çökme senaryosu dahil ölçülür.
 
-## 127. Çeviri Katkısı Ve Tamlık İşareti
+## 127. Çeviri Sitesi Bağlantısı
 
-13 Ekim 2026 · "bulduklarını later a eklersin" · AYR-P10 · Ayarlar Ve Kabuk · iş orta · öncelik 2 · karar sahibin
+13 Ekim 2026 · "bulduklarını later a eklersin" · AYR-P10 · Ayarlar Ve Kabuk · iş küçük · öncelik 2 · karar sahibin
 
-- Satırlar (AYR-P10): AYR-04 Çeviri Katkı Platformu; AYR-25 Bakımsız Çeviriyi İşaretleme. [Tablo](piyasa/2026-10-13/ayarlar-kabuk-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Localization/Strings.cs, src/VidShrink.App/Locales/, README.md, .github/workflows/
-- Sahibin kararı: 42 dil sözü nasıl sunulsun: gözden geçmemiş diller listede işaretlensin mi ve bir çeviri sitesinde proje hesabı açılsın mı?
-- Plan: Önce küçük adım olan AYR-25: insan gözünden geçmiş diller bir listede tutulur, öteki diller dil seçicide işaretlenir. Sonra AYR-04: sahibin seçtiği çeviri sitesi (Weblate, Crowdin ya da Transifex) depodaki `Locales` klasörüne bağlanır ve README'deki katkı yolu oraya çevrilir. Doğrulama: işaretli dil listesinin testi ve siteden gelen ilk deneme çevirisinin dizgi tamlığı testinden geçmesi.
+- Satırlar (AYR-P10): AYR-04 Çeviri Katkı Platformu. AYR-25 (gözden geçmemiş dil işareti) bitti: `Strings.ReviewedLanguages`, `CeviriTamlikIsaretiTests`. [Tablo](piyasa/2026-10-13/ayarlar-kabuk-dogrulanmis.md)
+- Dokunacağı yer: README.md, .weblate, .github/workflows/
+- Sahibin kararı: bir çeviri sitesinde (Weblate, Crowdin ya da Transifex) proje hesabı açılsın mı; hesabı sahip açar.
+- Plan: Seçilen site depodaki `Locales` klasörüne bağlanır, README'deki katkı yolu oraya çevrilir. Doğrulama: siteden gelen ilk deneme çevirisinin dizgi tamlığı testinden geçmesi.
 
 ## 131. macOS İzin Akışı
 
