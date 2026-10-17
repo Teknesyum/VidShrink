@@ -452,6 +452,11 @@
                   <MenuItem x:Name="MnuMusic" Header="{loc:Text editor.music}"/>
                   <Separator/>
                   <MenuItem x:Name="MnuAddSource" Header="{loc:Text editor.source.add}"/>
+                  <MenuItem x:Name="MnuColorClip" Header="{loc:Text editor.still.color}">
+                    <MenuItem x:Name="MnuColorBlack" Header="{loc:Text editor.still.black}"/>
+                    <MenuItem x:Name="MnuColorWhite" Header="{loc:Text editor.still.white}"/>
+                  </MenuItem>
+                  <MenuItem x:Name="MnuFreeze" Header="{loc:Text editor.still.freeze}"/>
                   <MenuItem x:Name="MnuProjectSave" Header="{loc:Text editor.project.save}"/>
                   <MenuItem x:Name="MnuProjectOpen" Header="{loc:Text editor.project.open}"/>
                   <MenuItem x:Name="MnuBatchExport" Header="{loc:Text editor.batch.open}"/>

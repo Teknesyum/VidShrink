@@ -60,6 +60,20 @@ public sealed class EditTimeline
         return source;
     }
 
+    /// <summary>
+    /// Yeni bir kaynagi kaydeder ve tamamini <paramref name="at"/> anina araya ekler; sonraki parcalar iter.
+    /// Tek adimda geri alinir. Konan parcanin sirasi doner.
+    /// </summary>
+    public int InsertSource(long duration, long at)
+    {
+        if (duration <= 0)
+            throw new ArgumentOutOfRangeException(nameof(duration), duration, "Kaynak suresi pozitif olmalidir");
+        if (at < 0 || at > Duration)
+            throw new ArgumentOutOfRangeException(nameof(at), at, "An cizelgenin disinda");
+        _extraSources.Add(duration);
+        return PlaceSource(_extraSources.Count, at, overwrite: false);
+    }
+
     public long Duration => Clips.Sum(c => c.TimelineLength);
 
     public bool CanUndo => _undo.Count > 0;
