@@ -23,6 +23,8 @@ public static class ShellRegistration
 
     public const string CommandClsid = "7B8B4A16-E3F5-4C4A-A8D2-26B2F895BE58";
 
+    public const string ShrinkCommandClsid = "565576F4-81A6-4FE2-B3E2-02E8072B334A";
+
     public const string ProgId = "Teknesyum.VidShrink.Video";
 
     public const string AssociationName = "VidShrink";
@@ -147,8 +149,21 @@ public static class ShellRegistration
     public static string RenderPackageManifest(string template)
     {
         var verbs = ShellIntegration.MediaExtensions.Select(extension =>
-            $"            <desktop5:ItemType Type=\".{extension}\"><desktop5:Verb Id=\"VidShrink{extension}\" Clsid=\"{CommandClsid}\" /></desktop5:ItemType>");
+            $"            <desktop5:ItemType Type=\".{extension}\"><desktop5:Verb Id=\"VidShrink{extension}\" Clsid=\"{CommandClsid}\" /><desktop5:Verb Id=\"{ShrinkMenuKey}{extension}\" Clsid=\"{ShrinkCommandClsid}\" /></desktop5:ItemType>");
         return template.Replace("__ITEM_TYPES__", string.Join(Environment.NewLine, verbs));
+    }
+
+    /// <summary>
+    /// Paket bildirimini kabuk klasörüne yazar ve paketi verilen kayıt yoluyla yeniden kurar.
+    /// Kayıt yolu <see cref="IShellPackage"/> arkasındadır; testler sahte paketle ölçer.
+    /// </summary>
+    public static bool RegisterPackage(string shellFolder, string externalLocation, IShellPackage package)
+    {
+        var template = Path.Combine(shellFolder, "AppxManifest.template.xml");
+        var manifest = Path.Combine(shellFolder, "AppxManifest.xml");
+        File.WriteAllBytes(manifest, Utf8NoBom(RenderPackageManifest(File.ReadAllText(template))));
+        if (package.Registered()) package.Remove();
+        return package.Register(manifest, externalLocation);
     }
 
     [SupportedOSPlatform("windows")]

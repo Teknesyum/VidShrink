@@ -323,10 +323,7 @@ public static class SetupRunner
         }
         if (!options.DefaultRegistry || host.ShellPackage is not { } package) return false;
 
-        var manifest = Path.Combine(shell, "AppxManifest.xml");
-        File.WriteAllBytes(manifest, ShellRegistration.Utf8NoBom(ShellRegistration.RenderPackageManifest(File.ReadAllText(template))));
-        if (package.Registered()) package.Remove();
-        if (package.Register(manifest, root)) return true;
+        if (ShellRegistration.RegisterPackage(shell, root, package)) return true;
 
         host.Log(SetupText.Get("setup.shell.package-failed"));
         return false;

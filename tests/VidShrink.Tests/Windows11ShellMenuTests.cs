@@ -216,6 +216,10 @@ public sealed class Windows11ShellMenuTests
             else if (installer[i] == '}' && --depth == 0) { end = i + 1; break; }
         }
         Assert.True(end > start);
+        var manifestStart = installer.IndexOf("function Get-Windows11ShellManifest", StringComparison.Ordinal);
+        Assert.True(manifestStart >= 0);
+        var manifestEnd = installer.IndexOf("\n}\n", manifestStart, StringComparison.Ordinal) + 3;
+        Assert.True(manifestEnd > manifestStart);
 
         var work = Path.Combine(TipSources.Root, ".calisma", "appx-reddi", Guid.NewGuid().ToString("N"));
         var shell = Path.Combine(work, "shell");
@@ -229,6 +233,9 @@ public sealed class Windows11ShellMenuTests
             "$ErrorActionPreference = 'Stop'",
             "$shellMenuExtensions = @('mp4')",
             "$shellCommandClsid = '00000000-0000-0000-0000-000000000000'",
+            "$shellShrinkCommandClsid = '00000000-0000-0000-0000-000000000001'",
+            "$shellShrinkMenuKeyName = 'VidShrinkKucult'",
+            installer[manifestStart..manifestEnd],
             "function Write-Host { param([Parameter(Position = 0)]$Object, [string]$ForegroundColor) }",
             "function Test-Windows11 { $true }",
             "function Test-DefaultRegistryRoot([string]$Root) { $true }",

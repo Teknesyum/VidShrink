@@ -144,6 +144,7 @@ internal static class ShellMenu
         RemoveShrink();
         WriteLabel("shrink", label);
         var entryLabels = EntryLabels();
+        WriteEntryLabels(entryLabels);
 
         var written = 0;
         foreach (var extension in Extensions)
@@ -199,6 +200,7 @@ internal static class ShellMenu
         }
 
         var entryLabels = menu == ShrinkMenuKey ? EntryLabels() : null;
+        if (entryLabels is not null) written += WriteEntryLabels(entryLabels, onlyChanged: true);
         foreach (var extension in ExtensionsFor(menu))
         {
             using var verb = Registry.CurrentUser.OpenSubKey(root + Branch(extension) + "\\" + menu, writable: true);
@@ -206,6 +208,27 @@ internal static class ShellMenu
             if (entryLabels is not null) written += RelabelEntries(verb, entryLabels);
             if (verb.GetValue("MUIVerb") as string == label) continue;
             verb.SetValue("MUIVerb", label, RegistryValueKind.String);
+            written++;
+        }
+
+        return written;
+    }
+
+    /// <summary>
+    /// Alt menü girdilerinin etiketini Windows 11 kabuk eklentisine bırakır: eklenti
+    /// <c>ShellLabels</c> altında <see cref="QuickShrinkTarget.ShellLabelName"/> değerini okur.
+    /// </summary>
+    [SupportedOSPlatform("windows")]
+    private static int WriteEntryLabels(IReadOnlyList<string> entryLabels, bool onlyChanged = false)
+    {
+        if (Root is not { } root) return 0;
+        using var key = Registry.CurrentUser.CreateSubKey(root + LabelKey);
+        var written = 0;
+        for (var i = 0; i < ShellIntegration.QuickShrinkMenu.Count; i++)
+        {
+            var name = ShellIntegration.QuickShrinkMenu[i].ShellLabelName;
+            if (onlyChanged && key.GetValue(name) as string == entryLabels[i]) continue;
+            key.SetValue(name, entryLabels[i], RegistryValueKind.String);
             written++;
         }
 
