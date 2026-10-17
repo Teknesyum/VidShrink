@@ -809,6 +809,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
                     break;
                 case MPV_EVENT_VIDEO_RECONFIG:
                     ReadVideoSize();
+                    ApplyToneMapping();
                     break;
                 case MPV_EVENT_SEEK:
                     OnSeek();

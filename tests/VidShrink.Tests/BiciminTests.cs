@@ -1323,6 +1323,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-16, hizli kirpma (later 41): dokuz yeni <c>recorder.output.quick-trim*</c> anahtarindan 2 kol (it <c>quick-trim-running</c>, ro <c>quick-trim-failed</c>), KOL dokumunden sayildi, en ve tr girmiyor: olculen 3781 + 2 = 3783, en 364, tr 123.</para>
     /// <para>2026-10-16, onizlemede elle kirpma (later 57): iki yeni anahtar (<c>main.advanced.filters.manualcrop</c>, <c>.tip</c>) kola girmiyor; en etiketi "Crop in preview" iken kola girip baslik denetiminde kusur sayildi, "Manual crop" yapildi. SAYIM satirindan olculdu: toplam 3781, en 364, tr 123.</para>
     /// <para>2026-10-12, Linux Wayland: <c>recorder.error.window-wayland</c> metni artik her kaydi reddediyor ve "Wayland" ile basliyor; bn, hi, th, ur kola giriyor (KOL dokumu). 3086 + 4 = 3090, en ve tr degismedi.</para>
+    /// <para>2026-10-18, oynatici HDR ton esleme (later 96): yeni <c>player.advanced.tone-mapping</c> es ("Mapeo de tonos HDR") ve pt ("Mapeamento de tons HDR") dillerinde kola giriyor, en ve tr haric: 3888 + 2 = 3890, en 373, tr 126.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1348,7 +1349,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3888, toplam);
+        Assert.Equal(3890, toplam);
         Assert.Equal(373, dilBasina["en"]);
         Assert.Equal(126, dilBasina["tr"]);
     }
@@ -1643,6 +1644,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-16, onizlemede elle kirpma (later 57): iki yeni anahtar (<c>main.advanced.filters.manualcrop</c>, <c>.tip</c>), dusen yok; olculen gezilen 80453 + 43 x 2 = 80539. <c>kayip</c> 0.</para>
     /// <para>2026-10-12, Linux turu: is surerken pasif Kucult/Donustur ipucu <c>main.action.busy-tip</c>, dusen yok. 1362 + 1 = 1363, 43 x 1363 = 58609. <c>kayip</c> 0.</para>
     /// <para>2026-10-12, Linux'ta ekran acilamayinca temiz cikis: tek yeni anahtar (<c>main.startup.no-display</c>, <c>Program.EkranYokIletisi</c>), dusen yok: 1363 + 1 = 1364, 43 x 1364 = 58652. <c>kayip</c> 0.</para>
+    /// <para>2026-10-18, oynatici HDR ton esleme (later 96): tek yeni anahtar (<c>player.advanced.tone-mapping</c>), dusen yok: 84280 + 43 = 84323. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1670,7 +1672,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(84280, gezilen);
+        Assert.Equal(84323, gezilen);
         Assert.Empty(kayip);
     }
 

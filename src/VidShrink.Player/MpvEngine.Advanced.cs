@@ -23,6 +23,52 @@ public sealed partial class MpvEngine
     private const string MeterFilter = "lavfi=[astats=metadata=1:reset=1:measure_perchannel=none:measure_overall=Peak_level]";
     private volatile bool _metering;
 
+    private const string ToneLabel = "vstone";
+    private const string ToneFilter = "gpu";
+    private readonly object _toneGate = new();
+    private volatile bool _toneMapping = true;
+    private bool _toneAttached;
+
+    public bool ToneMapping => _toneMapping;
+
+    internal bool ToneRefused { get; private set; }
+
+    public bool ToneMappingActive
+        => (GetProperty("vf") ?? "").Contains("@" + ToneLabel + ":", StringComparison.Ordinal)
+           && !IsHdrTransfer(GetProperty("video-out-params/gamma"));
+
+    public void SetToneMapping(bool on)
+    {
+        _toneMapping = on;
+        ApplyToneMapping();
+    }
+
+    internal static bool IsHdrTransfer(string? transfer)
+        => transfer?.Trim().ToLowerInvariant() is "pq" or "hlg";
+
+    internal static bool NeedsToneMapping(bool wanted, string? transfer) => wanted && IsHdrTransfer(transfer);
+
+    internal static readonly IReadOnlyList<(string Name, string Value)> ToneTarget = new[]
+    {
+        ("target-prim", "bt.709"),
+        ("target-trc", "bt.1886")
+    };
+
+    private void ApplyToneMapping()
+    {
+        lock (_toneGate)
+        {
+            var wanted = NeedsToneMapping(_toneMapping, GetProperty("video-params/gamma"));
+            if (wanted == _toneAttached) return;
+            _toneAttached = wanted;
+            CommandSync("vf", "remove", "@" + ToneLabel);
+            ToneRefused = false;
+            if (!wanted) return;
+            foreach (var (name, value) in ToneTarget) TrySet(name, value);
+            ToneRefused = CommandSync("vf", "pre", "@" + ToneLabel + ":" + ToneFilter) < 0;
+        }
+    }
+
     private const double HueSpan = 1.8;
     private const double SharpSpan = 0.015;
 

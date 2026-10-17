@@ -14,6 +14,7 @@
   "player.advanced.less": "Minska",
   "player.advanced.deinterlace": "Avfläta",
   "player.advanced.hardware": "Hårdvaruavkodning",
+  "player.advanced.tone-mapping": "HDR-tonmappning",
   "player.advanced.picture-reset": "Återställ bild",
   "player.advanced.sound": "Ljud",
   "player.advanced.equalizer-flat": "Platt",

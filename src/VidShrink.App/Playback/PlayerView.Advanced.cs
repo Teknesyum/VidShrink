@@ -156,6 +156,24 @@ internal partial class PlayerView
         if (HardwareDecodingOn) engine.SetHardwareDecoding(Settings.Hardware);
     }
 
+    internal bool ToneMappingOn => Settings.ToneMapping;
+
+    internal void ToggleToneMapping() => UseToneMapping(!ToneMappingOn);
+
+    private void UseToneMapping(bool on)
+    {
+        Settings.ToneMapping = on;
+        SaveSettings();
+        _engine?.SetToneMapping(on);
+        _trace.Add("tonemap -> " + (on ? "on" : "off"));
+        AdvancedChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void ApplyToneMapping(IPlaybackEngine engine)
+    {
+        if (!ToneMappingOn) engine.SetToneMapping(false);
+    }
+
     internal void ResetPicture()
     {
         EnsureAdvanced();
@@ -305,6 +323,7 @@ internal partial class PlayerView
         }
 
         if (HardwareDecodingOn) UseHardwareDecoding(HardwareDecoding.Off);
+        if (!ToneMappingOn) UseToneMapping(true);
         if (!AudioOutput.IsPlain) UseAudioOutput(AudioOutput.Plain);
         Settle("advanced" + ResetTrace);
     }

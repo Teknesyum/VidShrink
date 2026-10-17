@@ -14,6 +14,7 @@
   "player.advanced.less": "Vähenda",
   "player.advanced.deinterlace": "Ülerealaotuse eemaldamine",
   "player.advanced.hardware": "Riistvaraline dekodeerimine",
+  "player.advanced.tone-mapping": "HDR-i toonivastendus",
   "player.advanced.picture-reset": "Lähtesta pilt",
   "player.advanced.sound": "Heli",
   "player.advanced.equalizer-flat": "Tasane",

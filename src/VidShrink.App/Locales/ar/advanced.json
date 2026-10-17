@@ -14,6 +14,7 @@
   "player.advanced.less": "إنقاص",
   "player.advanced.deinterlace": "إزالة التشابك",
   "player.advanced.hardware": "فك الترميز بالعتاد",
+  "player.advanced.tone-mapping": "تعيين درجات HDR",
   "player.advanced.picture-reset": "إعادة تعيين الصورة",
   "player.advanced.sound": "الصوت",
   "player.advanced.equalizer-flat": "مسطح",

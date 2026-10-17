@@ -246,6 +246,12 @@ public interface IPlaybackEngine : IDisposable
     /// <summary>Donanim cozmeyi calan dosyada da degistirir; motor desteklemiyorsa yok sayilir.</summary>
     void SetHardwareDecoding(HardwareDecoding mode) { }
 
+    bool ToneMapping => false;
+
+    bool ToneMappingActive => false;
+
+    void SetToneMapping(bool on) { }
+
     Task<bool> SaveScreenshotAsync(string path, CancellationToken ct = default) => Task.FromResult(false);
 
     /// <summary>Kareyi altyaziyla (<paramref name="withSubtitles"/>) ya da yalniz goruntuyle kaydeder.</summary>

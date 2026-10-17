@@ -14,6 +14,7 @@
   "player.advanced.less": "Mažinti",
   "player.advanced.deinterlace": "Perėjimo panaikinimas",
   "player.advanced.hardware": "Aparatinis dekodavimas",
+  "player.advanced.tone-mapping": "HDR tonų atvaizdavimas",
   "player.advanced.picture-reset": "Atstatyti vaizdą",
   "player.advanced.sound": "Garsas",
   "player.advanced.equalizer-flat": "Lygus",

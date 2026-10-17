@@ -21,5 +21,5 @@ Oynatıcı sekmesinin ve karşılaştırma panelinin motoru. `IPlaybackEngine` m
   Arayüze yalnız varsayılan gövdeli üyeler eklenir.
 - Bölümler: `ChapterTimes` ve aynı sırada `ChapterTitles` (`chapter-list/N/title`, adsız bölüm boş metin), `StepChapter`.
 - Gelişmiş (`MpvEngine.Advanced.cs`): renk, ton, keskinlik, kırpma, ekolayzer ve normalleştirme etiketli `vf`/`af`
-  halkaları (`@vscolor`…); `deinterlace` anahtar kapalıyken `auto` (geçmeli kare kendiliğinden düzelir), açıkken `yes`; altyazı biçimi (`sub-ass-override=force` yalnız geçersiz kılma açıkken; kapalıyken ASS kendi biçemini korur, `sub-filter-sdh`, `sub-bold`, `sub-italic`) ve `volume-max` özellikten. Geri okumada mpv'nin `%uzunluk%` kaçışı ayıklanır.
+  halkaları (`@vscolor`…); HDR ton eşleme `vf @vstone:gpu` (varsayılan açık, yalnız `video-params/gamma` pq/hlg iken VIDEO_RECONFIG'te takılır, reddedilirse `ToneRefused`; `docs/olcumler/oynatici-hdr-ton-esleme.md`); `deinterlace` anahtar kapalıyken `auto` (geçmeli kare kendiliğinden düzelir), açıkken `yes`; altyazı biçimi (`sub-ass-override=force` yalnız geçersiz kılma açıkken; kapalıyken ASS kendi biçemini korur, `sub-filter-sdh`, `sub-bold`, `sub-italic`) ve `volume-max` özellikten. Geri okumada mpv'nin `%uzunluk%` kaçışı ayıklanır.
 Testler `OynaticiMotorTests.cs`, `OynaticiKarsilastirmaTests.cs`, `OynaticiParcaTests.cs`, `OynaticiGorunumTests.cs`.
