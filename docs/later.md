@@ -458,7 +458,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (EKA-P16): EKA-05 Oyun yakalama. [Tablo](piyasa/2026-10-13/kaydedici-yakalama-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Core/RecorderArguments.cs, src/VidShrink.Core/RecorderWizard.cs, src/VidShrink.App/Recorder/RecorderView.Sihirbaz.cs, docs/olcumler/
 - Sahibin kararı: Oyun sürecine kanca atan ayrı bir yakalama yolu yapılsın mı, yoksa ekran kaydı yolu ölçülüp yeterli mi sayılsın.
-- Plan: İlk adım ölçümdür: tam ekran bir oyunun bugünkü hızlı yolla kaydı hiç ölçülmedi. Kayıt düzgünse iş küçülür: sihirbazdaki "Oyun" seçimi (`RecorderWizard.cs:5`) oyunun bulunduğu ekranı kendiliğinden hedef alır ve satır kapanır. Kayıt bozuksa kanca yolu (oyunun içine girip çizdiği kareyi oradan alan yöntem) sahibin kararına çıkar; hile koruması olan oyunlarda risk taşır. Ölçüm `tools/VidShrink.Bench` ile alınır ve `docs/olcumler/` altına yazılır.
+- Plan: Sihirbazın "Oyun" cevabı oyunun ekranını kendiliğinden seçiyor (`RecorderWizard.GameScreen`, 18 Ekim 2026). Kalan: tam ekran bir oyunun bugünkü hızlı yolla kaydı `tools/VidShrink.Bench` ile ölçülür, `docs/olcumler/` altına yazılır; kayıt bozuksa kanca yolu (oyunun içine girip çizdiği kareyi alan yöntem) sahibin kararına çıkar, hile koruması olan oyunlarda risk taşır.
 
 ## 146. Girdi Efektleri Mac Ve Linux
 
