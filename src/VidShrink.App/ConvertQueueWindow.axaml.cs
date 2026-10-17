@@ -84,6 +84,12 @@ public partial class ConvertQueueWindow : Window
 
     internal IQueueEndActions Actions { get; set; } = SystemQueueEndActions.Instance;
 
+    /// <summary>SIK-P2: kuyruk koşarken tutulan uyku isteği; testler sahte katmanlı nöbet verir.</summary>
+    internal SleepGuard Uyku { get; set; } = SleepGuard.Shared;
+
+    /// <summary>Boşsa Ayarlar'daki kutu iş başlarken okunur.</summary>
+    internal bool? UykuyuEngelle { get; set; }
+
     internal ComboBox ChoiceFor(int index) => _rows[Queue.Items[index]].Choice;
 
     internal string StateTextFor(int index) => _rows[Queue.Items[index]].State.Text ?? "";
@@ -126,6 +132,7 @@ public partial class ConvertQueueWindow : Window
         var total = Math.Max(1, Queue.Items.Count);
         var index = 0;
         var runner = Kosturucu ?? RunOneAsync;
+        using var uyku = Uyku.HoldIf(UykuyuEngelle ?? SleepGuard.PreventSleepSetting());
         try
         {
             var summary = await Queue.RunAsync(async (item, preset, ct) =>

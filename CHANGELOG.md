@@ -11,6 +11,8 @@ ship as part of it.
 
 - Recorder: on Windows the "System Audio" source stays in the list when the device list cannot be read; before, a failed
   device query left both microphone and system audio at "Silent".
+- "Keep the computer awake while encoding" now also covers the Convert queue, the editor's export and its Batch
+  Export; before, only the Shrink tab and its queue held the request, so the machine could sleep mid-conversion.
 
 ## [1.2.23] - 2026-10-16
 

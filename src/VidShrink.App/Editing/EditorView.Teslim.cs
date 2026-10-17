@@ -272,8 +272,15 @@ internal partial class EditorView
         return await RunExportAsync(plans, key).ConfigureAwait(true);
     }
 
+    /// <summary>SIK-P2: teslim sürerken tutulan uyku isteği; testler sahte katmanlı nöbet verir.</summary>
+    internal SleepGuard Uyku { get; set; } = SleepGuard.Shared;
+
+    /// <summary>Boşsa Ayarlar'daki kutu teslim başlarken okunur.</summary>
+    internal bool? UykuyuEngelle { get; set; }
+
     private async Task<bool> RunExportAsync(IReadOnlyList<ExportPlan> plans, string? key)
     {
+        using var uyku = Uyku.HoldIf(UykuyuEngelle ?? SleepGuard.PreventSleepSetting());
         using var cts = new CancellationTokenSource();
         _exportCts = cts;
         ShowExportBar(running: true);
