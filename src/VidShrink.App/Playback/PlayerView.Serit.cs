@@ -324,6 +324,7 @@ internal partial class PlayerView
         TxtSeritBack.Text = "−" + Keymap.Steps.Small.ToString(Strings.Culture);
         TxtSeritForward.Text = "+" + Keymap.Steps.Small.ToString(Strings.Culture);
         SeritLabel(BtnSeritMute, Strings.Get(Keymap.Mute.LabelKey), Keymap.FirstKeyRow(Keymap.Mute));
+        AutomationProperties.SetName(SliderSeritVolume, Strings.Get("main.player.menu.volume", "").Trim());
         SeritLabel(BtnSeritFullScreen, Strings.Get(Keymap.Fullscreen.LabelKey), Keymap.FirstKeyRow(Keymap.Fullscreen));
         var hizliKip = SpeedFast;
         SeritLabel(BtnSeritSpeedAb, Strings.Get("main.player.speedab.tip", SpeedText(hizliKip ? _speed : OtherModeSpeed), SpeedText(hizliKip ? OtherModeSpeed : _speed)), Keymap.FirstKeyRow(Keymap.SpeedAb));

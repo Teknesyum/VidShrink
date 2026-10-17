@@ -279,8 +279,7 @@
                         Minimum="0"
                         Maximum="100"
                         TickFrequency="{StaticResource PlaybackVolumeTick}"
-                        IsSnapToTickEnabled="True"
-                        auto:AutomationProperties.Name="{loc:Text main.player.menu.volume}"/>
+                        IsSnapToTickEnabled="True"/>
                 <Border Grid.Column="3" x:Name="ChipSeritVolume" Theme="{StaticResource PlaybackValueChip}">
                   <SarilanMetin x:Name="TxtSeritVolume" Theme="{StaticResource PlaybackValueTextBright}"/>
                 </Border>

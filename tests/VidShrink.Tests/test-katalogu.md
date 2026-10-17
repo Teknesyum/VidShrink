@@ -468,3 +468,4 @@
   gizler, kısayol kartını açıp satırı süzer, temizleyince kartları ve açıklığı geri verir; tablo tuş metnine göre de
   süzülür. Kısayol dosyası `.calisma/kabuk-kisayol/` altında (`ShortcutBindings.UseFile`). 16 python mutasyonunun 16'sı
   kırmızı.
+- `ErisilebilirlikDenemesiTests.cs` — Later 78 (AYR-16/17): yedi kolda (Oynatıcı, Düzenleyici, Küçült boş ve dolu, Dönüştür, Kaydedici, Ayarlar) gerçek Tab tuşuyla sekme sırası yürür; takılma yok, sıra sekme düğmesine döner, en az durak sayısı tutar (ölçülen 16/17/28/33/40/25/63), her durak görünür ve otomasyon adı boş değil, `{0}` taşımaz. `AnaPenceredeAdsizGirdiAlaniKalmaz` `MainWindow.axaml`'daki adsız TextBox/ComboBox/Slider'ı tarar, yalnız `TxtShareLink` izinli. Pencere ayarı `TestPaths.OutputRoot/erisilebilirlik/`. Kayıt `docs/olcumler/erisilebilirlik-denemesi.md`.

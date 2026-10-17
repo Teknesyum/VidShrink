@@ -219,6 +219,7 @@ public partial class MainWindow : Window
         TitleBar.PointerPressed += OnTitleBarPointerPressed;
         TrackBackgroundDrag();
         TrackShellShortcuts();
+        SekmeSeridiOdagi();
         TrackWindowMode();
         TepsiyiIzle();
         TitleBrand.SizeChanged += (_, _) => AlignTabsToTitle();
