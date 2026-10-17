@@ -243,6 +243,7 @@ public sealed class KabukKucultAltMenuTests : IDisposable
     /// <summary>
     /// Dil değişince girdilerin etiketi de değişir; komut ve komutun altındaki işaret
     /// yerinde kalır (anahtar silinip kurulmaz). Aynı dille ikinci yenileme 0 döner.
+    /// 18 Ekim 2026: sayıma <c>ShellLabels</c>'taki değişen hedef etiketleri eklendi (later 81).
     /// </summary>
     [Fact]
     [SupportedOSPlatform("windows")]
@@ -275,7 +276,7 @@ public sealed class KabukKucultAltMenuTests : IDisposable
 
         var changedEntries = ShellIntegration.QuickShrinkMenu.Count(t => Catalog("fr", t.LabelKey) != Catalog("tr", t.LabelKey));
         Assert.True(changedEntries > 0, "fr ile tr etiketleri ayrışmıyor; ölçü kör");
-        Assert.Equal(1 + ShellIntegration.MediaExtensions.Count * (1 + changedEntries), first);
+        Assert.Equal(1 + changedEntries + ShellIntegration.MediaExtensions.Count * (1 + changedEntries), first);
         Assert.Equal(0, second);
 
         foreach (var extension in ShellIntegration.MediaExtensions)

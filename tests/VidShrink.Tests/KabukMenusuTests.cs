@@ -69,7 +69,8 @@ public class KabukMenusuTests
 
     /// <summary>
     /// Alt menü girdileri betikte ve <see cref="ShellIntegration.QuickShrinkMenu"/>'de aynı
-    /// sırada, aynı anahtar, ön ayar, megabayt ve yedek etiketle duruyor.
+    /// sırada, aynı anahtar, ön ayar, megabayt ve yedek etiketle duruyor. Windows 11 kabuk
+    /// eklentisinin dizisi de (later 81) aynı sırada aynı anahtar, megabayt ve yedeği taşıyor.
     /// </summary>
     [Fact]
     public void HedefListesiAyni()
@@ -80,6 +81,10 @@ public class KabukMenusuTests
 
         Assert.NotEmpty(beklenen);
         Assert.Equal(bizim, beklenen);
+
+        var eklenti = KabukEklentisiIlkMenuTests.ExtensionTargets();
+        Assert.NotEmpty(eklenti);
+        Assert.Equal(ShellIntegration.QuickShrinkMenu.Select(t => (t.Key, t.Megabytes, t.Fallback)).ToArray(), eklenti);
     }
 
     /// <summary>

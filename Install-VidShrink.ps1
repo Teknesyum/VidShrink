@@ -463,6 +463,7 @@ $shellShrinkMenuKeyName = 'VidShrinkKucult'
 $shellEnqueueMenuKeyName = 'VidShrinkSirayaEkle'
 $shellPackageName = 'Teknesyum.VidShrink.Shell'
 $shellCommandClsid = '7B8B4A16-E3F5-4C4A-A8D2-26B2F895BE58'
+$shellShrinkCommandClsid = '565576F4-81A6-4FE2-B3E2-02E8072B334A'
 $shellShrinkTargets = @(
     @{ Key = '01-size-8'; Preset = 'size-8'; Megabytes = 8; Fallback = '8 MB' }
     @{ Key = '02-whatsapp-chat'; Preset = 'whatsapp-chat'; Megabytes = 16; Fallback = 'WhatsApp (16 MB)' }
@@ -504,6 +505,13 @@ function Remove-Windows11ShellMenu([string]$Root) {
     return $packages.Count
 }
 
+function Get-Windows11ShellManifest([string]$template) {
+    $verbs = foreach ($extension in $shellMenuExtensions) {
+        "            <desktop5:ItemType Type=`".$extension`"><desktop5:Verb Id=`"VidShrink$extension`" Clsid=`"$shellCommandClsid`" /><desktop5:Verb Id=`"$shellShrinkMenuKeyName$extension`" Clsid=`"$shellShrinkCommandClsid`" /></desktop5:ItemType>"
+    }
+    return $template.Replace('__ITEM_TYPES__', ($verbs -join [Environment]::NewLine))
+}
+
 function Write-Windows11ShellMenu([string]$Root, [string]$InstallDirectory) {
     if (-not (Test-Windows11)) { return $false }
 
@@ -518,12 +526,9 @@ function Write-Windows11ShellMenu([string]$Root, [string]$InstallDirectory) {
 
     if (-not (Test-DefaultRegistryRoot $Root)) { return $false }
 
-    $verbs = foreach ($extension in $shellMenuExtensions) {
-        "            <desktop5:ItemType Type=`".$extension`"><desktop5:Verb Id=`"VidShrink$extension`" Clsid=`"$shellCommandClsid`" /></desktop5:ItemType>"
-    }
     $manifestPath = Join-Path $shellRoot 'AppxManifest.xml'
     $template = [IO.File]::ReadAllText($templatePath)
-    [IO.File]::WriteAllText($manifestPath, $template.Replace('__ITEM_TYPES__', ($verbs -join [Environment]::NewLine)), [Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText($manifestPath, (Get-Windows11ShellManifest $template), [Text.UTF8Encoding]::new($false))
 
     Remove-Windows11ShellMenu $Root | Out-Null
     try {

@@ -53,9 +53,10 @@ public static class ShellIntegration
     /// exe ve uygulama buradan, PowerShell kurucusu aynı sıradaki kendi dizisinden yazar ve
     /// testler üçünü karşılaştırır. Her girdinin megabaytı <see cref="PresetLibrary"/>'deki
     /// ön ayarın <c>TargetMb</c>'siyle eşit olmak zorunda.
-    /// <para>Alt menü klasik kabuk yoludur (<c>SubCommands</c>): Windows 11'de yalnız
-    /// "Daha fazla seçenek göster" altında görünür, üst düzey Appx menüsü yalnız açma
-    /// girdisini taşır.</para>
+    /// <para>Alt menü iki yoldan yazılır: klasik kabuk yolu (<c>SubCommands</c>) "Daha fazla
+    /// seçenek göster" altında, Windows 11'in ilk menüsünde ise kabuk eklentisinin
+    /// <c>QuickShrinkMenu</c> dizisi aynı sırayla. Eklenti etiketleri <c>ShellLabels</c>
+    /// anahtarındaki <see cref="QuickShrinkTarget.ShellLabelName"/> değerlerinden okur.</para>
     /// </summary>
     public static IReadOnlyList<QuickShrinkTarget> QuickShrinkMenu { get; } = new QuickShrinkTarget[]
     {
@@ -181,4 +182,7 @@ public sealed record QuickShrinkTarget(string Key, string PresetId, int Megabyte
 {
     /// <summary><c>Locales/&lt;dil&gt;/main.json</c>'daki etiket anahtarı.</summary>
     public string LabelKey => "shell.menu.target." + PresetId;
+
+    /// <summary>Windows 11 kabuk eklentisinin etiketi okuduğu <c>ShellLabels</c> değer adı.</summary>
+    public string ShellLabelName => "target." + Key;
 }
