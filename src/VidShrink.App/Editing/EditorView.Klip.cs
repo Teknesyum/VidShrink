@@ -94,6 +94,7 @@ internal partial class EditorView
 
         TxtClipLabel.LostFocus += (_, _) => { if (_showingClip) CommitClipLabel(); };
         TxtClipLabel.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitClipLabel());
+        InitClipGrade();
         ShowClipPanel();
     }
 
@@ -324,6 +325,7 @@ internal partial class EditorView
         TxtClipContrast.Text = effects.Contrast.ToString("0.##", Strings.Culture);
         TxtClipSaturation.Text = effects.Saturation.ToString("0.##", Strings.Culture);
         TxtClipTemperature.Text = effects.Temperature.ToString(CultureInfo.InvariantCulture);
+        ShowClipGrade(effects);
         TxtClipLabel.Text = model.Clips[index].Label;
         var transition = model.Clips[index].Transition;
         CmbClipTransition.SelectedIndex = transition is null ? 0 : Array.IndexOf(TransitionChoices, transition.Kind);

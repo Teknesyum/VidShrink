@@ -196,7 +196,7 @@ public sealed class KaydediciYalnizSesTests
                 Satirlar: Bul<Control>(view, "RowScreen").IsVisible || Bul<Control>(view, "RowWindow").IsVisible || Bul<Control>(view, "RowRegion").IsVisible);
         }));
 
-        Assert.Equal(4, olcu.adet);
+        Assert.Equal(5, olcu.adet);
         Assert.NotNull(olcu.istek);
         Assert.Equal(RecorderTargetKind.AudioOnly, olcu.istek!.Target);
         Assert.Equal(new[] { "0:a" }, olcu.istek.Audio!.Maps);

@@ -375,6 +375,7 @@ public sealed class EditProject
             writer.WriteNumber("trebleDb", effects.TrebleDb);
             writer.WriteNumber("fadeIn", effects.FadeIn);
             writer.WriteNumber("fadeOut", effects.FadeOut);
+            ClipGrade.Write(writer, effects);
             if (effects.HasFit)
             {
                 writer.WriteNumber("fitNum", effects.FitNum);
@@ -432,7 +433,7 @@ public sealed class EditProject
             FitDen = e.TryGetProperty("fitDen", out var fitDen) ? fitDen.GetInt32() : 0,
             PadColor = e.TryGetProperty("padColor", out var padColor) ? padColor.GetString() ?? ClipEffects.DefaultPadColor : ClipEffects.DefaultPadColor,
         };
-        return clip with { Effects = effects.Normalized() };
+        return clip with { Effects = ClipGrade.Read(e, effects).Normalized() };
     }
 
     private static void WriteText(Utf8JsonWriter writer, TextLayer text)

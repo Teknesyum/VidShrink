@@ -9,7 +9,7 @@
 /// (<see cref="FitNum"/>:<see cref="FitDen"/>) kirpmayi dislar: kare olcekle kuculur, kalan alan
 /// <see cref="PadColor"/> duz rengiyle dolar; renk veri olarak "RRGGBB" tutulur.
 /// </summary>
-public sealed record ClipEffects
+public sealed partial record ClipEffects
 {
     public const double MinVolumeDb = -60;
     public const double MaxVolumeDb = 20;
@@ -89,7 +89,7 @@ public sealed record ClipEffects
 
     public bool HasAudio => Muted || VolumeDb != 0 || HasCleanup;
 
-    public bool HasColor => Brightness != 0 || Contrast != 1 || Saturation != 1 || Temperature != NeutralTemperature;
+    public bool HasColor => Brightness != 0 || Contrast != 1 || Saturation != 1 || Temperature != NeutralTemperature || HasGrade;
 
     public bool IsNeutral => !HasGeometry && !HasAudio && !HasColor && FadeIn == 0 && FadeOut == 0;
 
@@ -107,7 +107,7 @@ public sealed record ClipEffects
         var bottom = Math.Min(Edge(CropBottom), 0.95 - top);
         var rotation = ((Rotation / 90 * 90) % 360 + 360) % 360;
         var volume = double.IsFinite(VolumeDb) ? Math.Round(Math.Clamp(VolumeDb, MinVolumeDb, MaxVolumeDb), 1) : 0;
-        return FitOnly() with
+        return (FitOnly() with
         {
             CropLeft = left,
             CropRight = right,
@@ -124,7 +124,7 @@ public sealed record ClipEffects
             BassDb = Band(BassDb),
             MidDb = Band(MidDb),
             TrebleDb = Band(TrebleDb),
-        };
+        }).GradeNormalized();
     }
 
     /// <summary>Kirpma dikdortgeni, depolanan degil gorunen piksel olarak; kenarlar cift, en az 2x2.</summary>

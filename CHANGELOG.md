@@ -15,6 +15,11 @@ ship as part of it.
   `/dev/v4l/by-id` (falling back to `/sys/class/video4linux`), keeping only picture nodes; the macOS list no
   longer offers `Capture screen N` entries as cameras.
 - Editor: images become clips. A dropped or added picture turns into a five-second clip fitted to the first source's frame, the timeline menu adds a black or white solid color clip at the playhead, and Freeze frame grabs the frame under the playhead into a two-second still and inserts it there, splitting the clip. Each is a short silent video kept in the editor's project folder and used like any other source, so preview and export work as before.
+- Editor: advanced clip colour. One-click Auto color evens out the channels with ffmpeg `normalize`, a master curve
+  sets the output of the 0.25 / 0.5 / 0.75 input points (`curves`), and three colour wheels shift shadows, midtones and
+  highlights by hue angle and amount (`colorbalance` with preserved lightness). Preview and export use the same filter
+  chain, the values are saved in the project file, and older projects open neutral. Colour matching between shots has
+  no ready-made filter and is left out; it was only measured.
 - Command line: `donustur` gains the Convert tab's tags, cover, Repair and chapters. `--etiket-baslik`,
   `--etiket-sanatci`, `--etiket-yil`, `--etiket-yorum` write the container tags, `--kapak` adds a PNG or JPEG cover,
   `--onar` is the Repair preset (corrupt packets dropped, timestamps rebuilt, MKV remux unless a container or codec
