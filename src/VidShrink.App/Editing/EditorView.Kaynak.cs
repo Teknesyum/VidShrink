@@ -139,6 +139,7 @@ internal partial class EditorView
     internal async Task<bool> AddSourceAsync(string path)
     {
         if (_model is not { } model || _source is null || Exporting) return false;
+        if (ImageSequence.IsImage(path)) return await AddImageAsync(path).ConfigureAwait(true);
 
         var info = await ProbeSourceAsync(path).ConfigureAwait(true);
         if (!ReferenceEquals(model, _model) || Exporting) return false;
@@ -169,16 +170,16 @@ internal partial class EditorView
     }
 
     /// <summary>
-    /// Birakilan ya da secilen dosyalar: cizelge aciksa hepsi sona eklenir, kapaliysa ilki acilir ve
-    /// kalani eklenir.
+    /// Birakilan ya da secilen dosyalar: cizelge aciksa hepsi sona eklenir, kapaliysa resim olmayan ilki acilir ve
+    /// kalani eklenir; resimler ara videoya cevrilir.
     /// </summary>
     internal async Task TakeFilesAsync(IReadOnlyList<string> files)
     {
         var rest = files;
-        if (_model is null && files.Count > 0)
+        if (_model is null && files.FirstOrDefault(file => !ImageSequence.IsImage(file)) is { } first)
         {
-            await OpenSourceAsync(files[0]).ConfigureAwait(true);
-            rest = files.Skip(1).ToArray();
+            await OpenSourceAsync(first).ConfigureAwait(true);
+            rest = files.Where(file => !ReferenceEquals(file, first)).ToArray();
         }
 
         foreach (var file in rest) await AddSourceAsync(file).ConfigureAwait(true);

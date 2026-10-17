@@ -66,6 +66,7 @@ internal partial class EditorView : UserControl
         InitProject();
         InitSources();
         InitMusic();
+        InitStills();
         InitClipboard();
 
         MnuSplit.Click += (_, _) => Split();
