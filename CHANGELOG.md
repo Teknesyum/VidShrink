@@ -9,6 +9,10 @@ ship as part of it.
 
 ### Added
 
+- Recorder: the wizard's "Game" answer now picks the screen for you. When a recording or the replay buffer
+  starts, the screen target follows the foreground window (or the window right under VidShrink when VidShrink itself
+  is in front), falling back to the primary screen; an HDR screen still goes through the HDR-to-SDR path. Picking a
+  screen by hand turns this off. Windows only.
 - Player: "Speed through silence" mode (J, Playback menu). A labelled `silencedetect` ring sits at the head of the
   audio chain; when it reports a silence the speed rises to 4x and drops back to the previous speed when sound returns,
   so audio and picture stay in sync instead of jumping. Off by default; threshold (`silenceThresholdDb`, default

@@ -8,7 +8,7 @@ using VidShrink.Core;
 
 namespace VidShrink.App.Recorder;
 
-internal readonly record struct WindowEntry(string Title, bool Visible, bool Cloaked, bool ToolWindow, int ProcessId, bool Minimized, PixelRect Frame = default);
+internal readonly record struct WindowEntry(string Title, bool Visible, bool Cloaked, bool ToolWindow, int ProcessId, bool Minimized, PixelRect Frame = default, bool Foreground = false);
 
 internal static class RecorderWindows
 {
@@ -54,6 +54,33 @@ internal static class RecorderWindows
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Oyunun penceresi: ön plandaki pencere. Ön plan VidShrink'in kendisiyse (kayıt düğmesine
+    /// basılınca öyle olur) üst üste diziliş sırasında onun altındaki ilk gerçek pencere; bu,
+    /// kullanıcının VidShrink'e geçmeden önce baktığı penceredir. Görünmeyen, gizlenmiş,
+    /// küçültülmüş, araç penceresi ve başlıksız pencere sayılmaz. <paramref name="zOrder"/> üstten
+    /// alta sıralı verilir.
+    /// </summary>
+    internal static PixelRect? GameWindow(IReadOnlyList<WindowEntry> zOrder, int ownProcessId)
+    {
+        bool Real(WindowEntry w) => w.Visible && !w.Cloaked && !w.ToolWindow && !w.Minimized && w.ProcessId != ownProcessId
+            && w.Title.Trim().Length > 0 && w.Frame.Width > 0 && w.Frame.Height > 0;
+
+        foreach (var w in zOrder)
+            if (w.Foreground && Real(w)) return w.Frame;
+        foreach (var w in zOrder)
+            if (Real(w)) return w.Frame;
+        return null;
+    }
+
+    /// <summary>Bu makinede oyunun penceresi; yalnız Windows'ta okunur, okunamazsa <c>null</c>.</summary>
+    internal static PixelRect? ForegroundGameWindow()
+    {
+        if (!OperatingSystem.IsWindows()) return null;
+        try { return GameWindow(Enumerate(), Environment.ProcessId); }
+        catch (Exception) { return null; }
     }
 
     internal static IReadOnlyList<PixelRect> SnapFrames(IReadOnlyList<(PixelRect Bounds, double Scale)> screens)
@@ -111,6 +138,7 @@ internal static class RecorderWindows
     private static List<WindowEntry> Enumerate()
     {
         var found = new List<WindowEntry>();
+        var foreground = GetForegroundWindow();
         EnumWindows((hwnd, _) =>
         {
             if (!IsWindowVisible(hwnd)) return true;
@@ -123,7 +151,7 @@ internal static class RecorderWindows
             var frame = DwmGetFrame(hwnd, DwmExtendedFrameBounds, out FrameRect r, Marshal.SizeOf<FrameRect>()) == 0
                 ? new PixelRect(r.Left, r.Top, Math.Max(0, r.Right - r.Left), Math.Max(0, r.Bottom - r.Top))
                 : default;
-            found.Add(new WindowEntry(text.ToString(), IsWindowVisible(hwnd), cloaked, tool, (int)pid, IsIconic(hwnd), frame));
+            found.Add(new WindowEntry(text.ToString(), IsWindowVisible(hwnd), cloaked, tool, (int)pid, IsIconic(hwnd), frame, hwnd == foreground));
             return true;
         }, IntPtr.Zero);
         return found;
@@ -145,6 +173,9 @@ internal static class RecorderWindows
 
     [DllImport("user32.dll")]
     private static extern bool IsIconic(IntPtr hwnd);
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetForegroundWindow();
 
     [DllImport("user32.dll")]
     private static extern uint GetWindowThreadProcessId(IntPtr hwnd, out uint processId);

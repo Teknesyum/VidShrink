@@ -87,6 +87,33 @@ public static class RecorderWizard
         };
     }
 
+    /// <summary>
+    /// "Oyun" cevabında kaydın hedef ekranı: oyun penceresinin en çok örtüştüğü ekran. Pencere
+    /// bilinmiyorsa ya da hiçbir ekrana değmiyorsa birincil ekran. Liste boşsa 0.
+    /// </summary>
+    public static int GameScreen(IReadOnlyList<ScreenBounds> screens, RecorderRegion? window)
+    {
+        if (screens is null || screens.Count == 0) return 0;
+        if (window is { Width: > 0, Height: > 0 } && screens.Any(s => Overlaps(s, window)))
+            return RecorderArguments.ScreenOf(screens, window);
+        return PrimaryScreen(screens);
+    }
+
+    /// <summary>
+    /// Birincil ekran: masaüstü kökünü (0,0) içeren ekran. Windows'ta ve macOS'ta birincil ekranın
+    /// sol üst köşesi köktür; kökü içeren yoksa listenin ilki.
+    /// </summary>
+    public static int PrimaryScreen(IReadOnlyList<ScreenBounds> screens)
+    {
+        if (screens is null || screens.Count == 0) return 0;
+        var primary = screens.FirstOrDefault(s => s.X <= 0 && s.X + s.Width > 0 && s.Y <= 0 && s.Y + s.Height > 0);
+        return (primary ?? screens[0]).Index;
+    }
+
+    private static bool Overlaps(ScreenBounds screen, RecorderRegion window)
+        => Math.Min(window.X + window.Width, screen.X + screen.Width) > Math.Max(window.X, screen.X)
+            && Math.Min(window.Y + window.Height, screen.Y + screen.Height) > Math.Max(window.Y, screen.Y);
+
     public static IReadOnlyList<RecorderAutoChoice> Shape(
         IReadOnlyList<RecorderAutoChoice> candidates,
         RecorderWizardAnswers answers,
