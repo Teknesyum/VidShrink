@@ -251,6 +251,7 @@
   "recorder.finish.copy": "Skopiuj plik do schowka",
   "recorder.finish.shrink-copy": "Zmniejsz i skopiuj do schowka",
   "recorder.finish.upload-copy": "Prześlij i skopiuj link",
+  "recorder.finish.shrink-upload-copy": "Zmniejsz, prześlij i skopiuj link",
   "recorder.finish.copied": "Skopiowano do schowka.",
   "recorder.finish.shrinking": "Zmniejszanie do rozmiaru docelowego przed skopiowaniem.",
   "recorder.finish.shrunk-copied": "Zmniejszony plik skopiowano do schowka.",

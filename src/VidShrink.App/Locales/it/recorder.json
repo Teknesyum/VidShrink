@@ -251,6 +251,7 @@
   "recorder.finish.copy": "Copia il file negli appunti",
   "recorder.finish.shrink-copy": "Riduci e copia negli appunti",
   "recorder.finish.upload-copy": "Carica e copia il link",
+  "recorder.finish.shrink-upload-copy": "Riduci, carica e copia il link",
   "recorder.finish.copied": "Copiato negli appunti.",
   "recorder.finish.shrinking": "Riduzione alla dimensione di destinazione prima della copia.",
   "recorder.finish.shrunk-copied": "File ridotto copiato negli appunti.",

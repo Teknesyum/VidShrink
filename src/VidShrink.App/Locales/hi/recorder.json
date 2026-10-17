@@ -251,6 +251,7 @@
   "recorder.finish.copy": "फ़ाइल को क्लिपबोर्ड पर कॉपी करें",
   "recorder.finish.shrink-copy": "छोटा करें और क्लिपबोर्ड पर कॉपी करें",
   "recorder.finish.upload-copy": "अपलोड करें और लिंक कॉपी करें",
+  "recorder.finish.shrink-upload-copy": "छोटा करें, अपलोड करें और लिंक कॉपी करें",
   "recorder.finish.copied": "क्लिपबोर्ड पर कॉपी किया गया।",
   "recorder.finish.shrinking": "कॉपी करने से पहले लक्ष्य आकार तक छोटा किया जा रहा है।",
   "recorder.finish.shrunk-copied": "छोटी की गई फ़ाइल क्लिपबोर्ड पर कॉपी की गई।",

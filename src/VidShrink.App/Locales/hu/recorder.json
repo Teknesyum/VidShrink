@@ -251,6 +251,7 @@
   "recorder.finish.copy": "Fájl másolása a vágólapra",
   "recorder.finish.shrink-copy": "Kicsinyítés és másolás a vágólapra",
   "recorder.finish.upload-copy": "Feltöltés és hivatkozás másolása",
+  "recorder.finish.shrink-upload-copy": "Kicsinyítés, feltöltés és hivatkozás másolása",
   "recorder.finish.copied": "Vágólapra másolva.",
   "recorder.finish.shrinking": "Kicsinyítés a célméretre a másolás előtt.",
   "recorder.finish.shrunk-copied": "A kicsinyített fájl a vágólapra került.",

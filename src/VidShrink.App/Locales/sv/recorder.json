@@ -251,6 +251,7 @@
   "recorder.finish.copy": "Kopiera filen till urklipp",
   "recorder.finish.shrink-copy": "Förminska och kopiera till urklipp",
   "recorder.finish.upload-copy": "Ladda upp och kopiera länken",
+  "recorder.finish.shrink-upload-copy": "Förminska, ladda upp och kopiera länken",
   "recorder.finish.copied": "Kopierat till urklipp.",
   "recorder.finish.shrinking": "Förminskar till målstorleken före kopiering.",
   "recorder.finish.shrunk-copied": "Den förminskade filen har kopierats till urklipp.",

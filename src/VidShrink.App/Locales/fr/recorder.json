@@ -251,6 +251,7 @@
   "recorder.finish.copy": "Copier le fichier dans le presse-papiers",
   "recorder.finish.shrink-copy": "Réduire puis copier dans le presse-papiers",
   "recorder.finish.upload-copy": "Envoyer et copier le lien",
+  "recorder.finish.shrink-upload-copy": "Réduire, envoyer et copier le lien",
   "recorder.finish.copied": "Copié dans le presse-papiers.",
   "recorder.finish.shrinking": "Réduction à la taille cible avant la copie.",
   "recorder.finish.shrunk-copied": "Fichier réduit copié dans le presse-papiers.",

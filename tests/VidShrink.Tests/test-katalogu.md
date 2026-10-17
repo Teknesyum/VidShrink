@@ -26,6 +26,10 @@
 - `SesGirisiTests.cs` — 8c dalgası, ses girişi: pimli ffmpeg çıktısı üzerinden cihaz listesi ayrıştırması, dshow/
   avfoundation/pulse argümanları, iki girdide `amix`, uydurma cihaz adının negatif kontrolü. İki canlı kol gerçek
   cihaz ister. Kanıt `.calisma/dalga8c/`.
+- `KaydediciPaylasimSatiriTests.cs` — later 72 (EKB-27, EKB-33), sonuç panelinin Paylaş satırı: hedef ve ömür kutusu
+  `paylasim-hedefleri.json`'dan dolar ve ayara yazılır, yükleme seçili hedef ve günle gider, Sil jetonlu bağlantıyı
+  kapatıp satırı gizler, "küçült, yükle, bağlantıyı kopyala" zinciri küçültülen çıktıyı yükler ve bağlantıyı panoya
+  koyar, zincir adı 42 dilde. Sahte sağlayıcı, ağa çıkmaz. Kanıt `.calisma/kaydedici-paylasim-satiri/`.
 - `KaydediciArayuzTests.cs` — 8b dalgası, Kaydedici sekmesi: kodlayıcı ve ön ayar listeleri motorun doğrulamasından
   geçer, uydurma ad reddedilir, süre yazımı ve aynı saniyedeki ikinci kaydın ayrı dosyaya gitmesi. Kaydedici ayarının
   `VIDSHRINK_SETTINGS_PATH` klasörüne gitmesi; "Kare al" düğmesi (sahte kare işiyle yolun görünmesi, başarısız ve atan

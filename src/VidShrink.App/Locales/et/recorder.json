@@ -251,6 +251,7 @@
   "recorder.finish.copy": "Kopeeri fail lõikelauale",
   "recorder.finish.shrink-copy": "Vähenda ja kopeeri lõikelauale",
   "recorder.finish.upload-copy": "Laadi üles ja kopeeri link",
+  "recorder.finish.shrink-upload-copy": "Vähenda, laadi üles ja kopeeri link",
   "recorder.finish.copied": "Kopeeritud lõikelauale.",
   "recorder.finish.shrinking": "Enne kopeerimist vähendatakse sihtsuuruseni.",
   "recorder.finish.shrunk-copied": "Vähendatud fail kopeeriti lõikelauale.",

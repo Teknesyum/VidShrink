@@ -251,6 +251,7 @@
   "recorder.finish.copy": "Copiar o arquivo para a área de transferência",
   "recorder.finish.shrink-copy": "Reduzir e copiar para a área de transferência",
   "recorder.finish.upload-copy": "Enviar e copiar o link",
+  "recorder.finish.shrink-upload-copy": "Reduzir, enviar e copiar o link",
   "recorder.finish.copied": "Copiado para a área de transferência.",
   "recorder.finish.shrinking": "Reduzindo para o tamanho de destino antes de copiar.",
   "recorder.finish.shrunk-copied": "Arquivo reduzido copiado para a área de transferência.",

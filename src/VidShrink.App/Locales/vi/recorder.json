@@ -251,6 +251,7 @@
   "recorder.finish.copy": "Sao chép tệp vào bảng nhớ tạm",
   "recorder.finish.shrink-copy": "Thu nhỏ rồi sao chép vào bảng nhớ tạm",
   "recorder.finish.upload-copy": "Tải lên và sao chép liên kết",
+  "recorder.finish.shrink-upload-copy": "Thu nhỏ, tải lên rồi sao chép liên kết",
   "recorder.finish.copied": "Đã sao chép vào bảng nhớ tạm.",
   "recorder.finish.shrinking": "Đang thu nhỏ về kích thước mục tiêu trước khi sao chép.",
   "recorder.finish.shrunk-copied": "Đã sao chép tệp đã thu nhỏ vào bảng nhớ tạm.",

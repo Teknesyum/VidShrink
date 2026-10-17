@@ -251,6 +251,7 @@
   "recorder.finish.copy": "Datei in die Zwischenablage kopieren",
   "recorder.finish.shrink-copy": "Verkleinern und in die Zwischenablage kopieren",
   "recorder.finish.upload-copy": "Hochladen und Link kopieren",
+  "recorder.finish.shrink-upload-copy": "Verkleinern, hochladen und Link kopieren",
   "recorder.finish.copied": "In die Zwischenablage kopiert.",
   "recorder.finish.shrinking": "Wird vor dem Kopieren auf die Zielgröße verkleinert.",
   "recorder.finish.shrunk-copied": "Verkleinerte Datei in die Zwischenablage kopiert.",

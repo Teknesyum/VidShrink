@@ -251,6 +251,7 @@
   "recorder.finish.copy": "Copiază fișierul în clipboard",
   "recorder.finish.shrink-copy": "Micșorează și copiază în clipboard",
   "recorder.finish.upload-copy": "Încarcă și copiază linkul",
+  "recorder.finish.shrink-upload-copy": "Micșorează, încarcă și copiază linkul",
   "recorder.finish.copied": "Copiat în clipboard.",
   "recorder.finish.shrinking": "Se micșorează la dimensiunea țintă înainte de copiere.",
   "recorder.finish.shrunk-copied": "Fișierul micșorat a fost copiat în clipboard.",

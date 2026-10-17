@@ -251,6 +251,7 @@
   "recorder.finish.copy": "کپی فایل در کلیپ‌بورد",
   "recorder.finish.shrink-copy": "کوچک کردن و کپی در کلیپ‌بورد",
   "recorder.finish.upload-copy": "بارگذاری و کپی پیوند",
+  "recorder.finish.shrink-upload-copy": "کوچک کردن، بارگذاری و کپی پیوند",
   "recorder.finish.copied": "در کلیپ‌بورد کپی شد.",
   "recorder.finish.shrinking": "در حال کوچک کردن به اندازه هدف پیش از کپی.",
   "recorder.finish.shrunk-copied": "فایل کوچک‌شده در کلیپ‌بورد کپی شد.",

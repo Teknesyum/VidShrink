@@ -251,6 +251,7 @@
   "recorder.finish.copy": "将文件复制到剪贴板",
   "recorder.finish.shrink-copy": "压缩后复制到剪贴板",
   "recorder.finish.upload-copy": "上传并复制链接",
+  "recorder.finish.shrink-upload-copy": "压缩、上传并复制链接",
   "recorder.finish.copied": "已复制到剪贴板。",
   "recorder.finish.shrinking": "复制前正在压缩到目标大小。",
   "recorder.finish.shrunk-copied": "已将压缩后的文件复制到剪贴板。",

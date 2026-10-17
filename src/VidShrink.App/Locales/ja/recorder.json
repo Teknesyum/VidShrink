@@ -251,6 +251,7 @@
   "recorder.finish.copy": "ファイルをクリップボードにコピー",
   "recorder.finish.shrink-copy": "縮小してクリップボードにコピー",
   "recorder.finish.upload-copy": "アップロードしてリンクをコピー",
+  "recorder.finish.shrink-upload-copy": "縮小してアップロードし、リンクをコピー",
   "recorder.finish.copied": "クリップボードにコピーしました。",
   "recorder.finish.shrinking": "コピーの前に目標サイズへ縮小しています。",
   "recorder.finish.shrunk-copied": "縮小したファイルをクリップボードにコピーしました。",

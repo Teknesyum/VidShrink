@@ -251,6 +251,7 @@
   "recorder.finish.copy": "Αντιγραφή αρχείου στο πρόχειρο",
   "recorder.finish.shrink-copy": "Σμίκρυνση και αντιγραφή στο πρόχειρο",
   "recorder.finish.upload-copy": "Μεταφόρτωση και αντιγραφή συνδέσμου",
+  "recorder.finish.shrink-upload-copy": "Σμίκρυνση, μεταφόρτωση και αντιγραφή συνδέσμου",
   "recorder.finish.copied": "Αντιγράφηκε στο πρόχειρο.",
   "recorder.finish.shrinking": "Σμίκρυνση στο μέγεθος στόχου πριν από την αντιγραφή.",
   "recorder.finish.shrunk-copied": "Το σμικρυμένο αρχείο αντιγράφηκε στο πρόχειρο.",

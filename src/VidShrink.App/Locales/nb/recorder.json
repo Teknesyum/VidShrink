@@ -251,6 +251,7 @@
   "recorder.finish.copy": "Kopier filen til utklippstavlen",
   "recorder.finish.shrink-copy": "Krymp og kopier til utklippstavlen",
   "recorder.finish.upload-copy": "Last opp og kopier lenken",
+  "recorder.finish.shrink-upload-copy": "Krymp, last opp og kopier lenken",
   "recorder.finish.copied": "Kopiert til utklippstavlen.",
   "recorder.finish.shrinking": "Krymper til målstørrelsen før kopiering.",
   "recorder.finish.shrunk-copied": "Den krympede filen er kopiert til utklippstavlen.",

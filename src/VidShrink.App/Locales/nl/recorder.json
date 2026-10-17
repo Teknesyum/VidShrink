@@ -251,6 +251,7 @@
   "recorder.finish.copy": "Bestand naar het klembord kopiëren",
   "recorder.finish.shrink-copy": "Verkleinen en naar het klembord kopiëren",
   "recorder.finish.upload-copy": "Uploaden en de link kopiëren",
+  "recorder.finish.shrink-upload-copy": "Verkleinen, uploaden en de link kopiëren",
   "recorder.finish.copied": "Naar het klembord gekopieerd.",
   "recorder.finish.shrinking": "Wordt vóór het kopiëren verkleind tot de doelgrootte.",
   "recorder.finish.shrunk-copied": "Verkleind bestand naar het klembord gekopieerd.",

@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:izi="using:VidShrink.App"
              xmlns:auto="using:Avalonia.Automation"
@@ -301,6 +301,19 @@
               </Flyout>
             </Button.Flyout>
           </Button>
+          <ComboBox x:Name="CmbRecShareTarget"
+                    Margin="{StaticResource WrapItemMargin}"
+                    VerticalAlignment="Center"
+                    auto:AutomationProperties.Name="{loc:Text settings.share.title}"/>
+          <ComboBox x:Name="CmbRecShareRetention"
+                    Margin="{StaticResource WrapItemMargin}"
+                    VerticalAlignment="Center"
+                    auto:AutomationProperties.Name="{loc:Text settings.share.lifetime}"/>
+          <SarilanMetin x:Name="TxtRecShareRetentionFixed"
+                        Margin="{StaticResource WrapItemMargin}"
+                        VerticalAlignment="Center"
+                        Theme="{StaticResource Hint}"
+                        IsVisible="False"/>
           <Button x:Name="BtnRecShare"
                   Theme="{StaticResource GhostButton}"
                   Margin="{StaticResource WrapItemMargin}"
@@ -319,6 +332,19 @@
                   Theme="{StaticResource GhostButton}"
                   Margin="{StaticResource WrapItemMargin}"
                   IsVisible="False"/>
+          <Button x:Name="BtnRecShareDelete"
+                  Theme="{StaticResource GhostButton}"
+                  Margin="{StaticResource WrapItemMargin}"
+                  IsEnabled="False"
+                  Content="{loc:Text settings.share.delete}"
+                  auto:AutomationProperties.Name="{loc:Text settings.share.delete}"
+                  Click="OnShareDelete">
+            <Button.Styles>
+              <Style Selector="Button:disabled">
+                <Setter Property="ToolTip.Tip" Value="{loc:Text settings.share.delete.disabled-tip}"/>
+              </Style>
+            </Button.Styles>
+          </Button>
         </WrapPanel>
 
         <ProgressBar x:Name="RecShareProgress" Maximum="1" IsVisible="False"/>

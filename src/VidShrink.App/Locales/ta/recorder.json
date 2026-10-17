@@ -251,6 +251,7 @@
   "recorder.finish.copy": "கோப்பை கிளிப்போர்டுக்கு நகலெடு",
   "recorder.finish.shrink-copy": "சுருக்கி கிளிப்போர்டுக்கு நகலெடு",
   "recorder.finish.upload-copy": "பதிவேற்றி இணைப்பை நகலெடு",
+  "recorder.finish.shrink-upload-copy": "சுருக்கி, பதிவேற்றி இணைப்பை நகலெடு",
   "recorder.finish.copied": "கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது.",
   "recorder.finish.shrinking": "நகலெடுக்கும் முன் இலக்கு அளவுக்குச் சுருக்கப்படுகிறது.",
   "recorder.finish.shrunk-copied": "சுருக்கிய கோப்பு கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது.",

@@ -251,6 +251,7 @@
   "recorder.finish.copy": "Salin fail ke papan keratan",
   "recorder.finish.shrink-copy": "Kecilkan dan salin ke papan keratan",
   "recorder.finish.upload-copy": "Muat naik dan salin pautan",
+  "recorder.finish.shrink-upload-copy": "Kecilkan, muat naik dan salin pautan",
   "recorder.finish.copied": "Disalin ke papan keratan.",
   "recorder.finish.shrinking": "Mengecilkan ke saiz sasaran sebelum menyalin.",
   "recorder.finish.shrunk-copied": "Fail yang dikecilkan disalin ke papan keratan.",

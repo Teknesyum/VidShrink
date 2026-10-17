@@ -251,6 +251,7 @@
   "recorder.finish.copy": "Копирай файла в клипборда",
   "recorder.finish.shrink-copy": "Смали и копирай в клипборда",
   "recorder.finish.upload-copy": "Качи и копирай връзката",
+  "recorder.finish.shrink-upload-copy": "Смали, качи и копирай връзката",
   "recorder.finish.copied": "Копирано в клипборда.",
   "recorder.finish.shrinking": "Смаляване до целевия размер преди копиране.",
   "recorder.finish.shrunk-copied": "Смаленият файл е копиран в клипборда.",

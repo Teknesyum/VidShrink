@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -800,7 +800,7 @@ public sealed class OluUyeTests
     /// listeden dustu, uretimde okunan Pointer.Captured'di. Satiri silmeden once okuyanin
     /// gercekten o tur oldugunu dogrula. RemoteZip.Paths de ayni yoldan dustu: OYB-P7 ile
     /// ForwardedRequest.Paths uretimde okunuyor, RemoteZip.Paths hala okunmuyor. QualityScore.Ssim
-    /// later 122 ile dustu: OutputQualityCheck SSIM kolunda uretimde okuyor. Kosum: 1642 ozellik, 69 isaretli.
+    /// later 122 ile dustu: OutputQualityCheck SSIM kolunda uretimde okuyor. ShareLink.TargetId 18 Ekim 2026 (later 72, EKB-27) ile dustu: ShareSession.DeleteAsync kaydedicinin Sil dugmesinde baglantinin hedefini ondan buluyor. Kosum (18 Ekim 2026): 1643 ozellik, 68 isaretli.
     /// </summary>
     private static readonly string[] PinnedOzellik =
     {
@@ -858,7 +858,6 @@ public sealed class OluUyeTests
         "SetupResult.LibMpvReused  yalniz-disarida",
         "SetupResult.ModernMenu  hic-gorunmeyen",
         "ShareLink.SharedAt  hic-gorunmeyen",
-        "ShareLink.TargetId  yalniz-disarida",
         "ShareTarget.HasFixedRetention  yalniz-disarida",
         "ShareTarget.PlaysInBrowser  yalniz-disarida",
         "ShrinkRequestQueue.PipeName  yalniz-disarida",

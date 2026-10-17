@@ -251,6 +251,7 @@
   "recorder.finish.copy": "Copiar el archivo al portapapeles",
   "recorder.finish.shrink-copy": "Reducir y copiar al portapapeles",
   "recorder.finish.upload-copy": "Subir y copiar el enlace",
+  "recorder.finish.shrink-upload-copy": "Reducir, subir y copiar el enlace",
   "recorder.finish.copied": "Copiado al portapapeles.",
   "recorder.finish.shrinking": "Reduciendo al tamaño objetivo antes de copiar.",
   "recorder.finish.shrunk-copied": "Archivo reducido copiado al portapapeles.",

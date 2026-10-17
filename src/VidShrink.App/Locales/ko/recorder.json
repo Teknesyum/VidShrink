@@ -251,6 +251,7 @@
   "recorder.finish.copy": "파일을 클립보드에 복사",
   "recorder.finish.shrink-copy": "축소 후 클립보드에 복사",
   "recorder.finish.upload-copy": "업로드 후 링크 복사",
+  "recorder.finish.shrink-upload-copy": "축소 후 업로드하고 링크 복사",
   "recorder.finish.copied": "클립보드에 복사했습니다.",
   "recorder.finish.shrinking": "복사하기 전에 목표 크기로 축소하는 중입니다.",
   "recorder.finish.shrunk-copied": "축소한 파일을 클립보드에 복사했습니다.",
