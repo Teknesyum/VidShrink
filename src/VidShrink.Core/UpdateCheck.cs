@@ -429,13 +429,29 @@ public sealed class UpdateSettings
     public static readonly string FileName = "settings.json";
 
     /// <summary>
-    /// Windows'ta varsayılan açık: uygulama açılış bittikten sonra yeni sürümü arka planda
-    /// indirir ve kapanırken kurar. macOS ve Linux'ta varsayılan kapalı kalır; orada rozet
-    /// haber verir. Dosyada yazılı değer, <c>false</c> dahil, korunur; yalnız
-    /// <see cref="AutoUpdateDefaultMarker"/> taşımayan eski dosyanın <c>false</c>'u Windows'ta
-    /// bir kez açılır, çünkü eski kayıt varsayılanı da seçimi de aynı alana yazıyordu.
+    /// Windows'ta ve macOS'ta varsayılan açık (<see cref="DefaultOn"/>): Windows açılış bittikten
+    /// sonra yeni sürümü arka planda indirir ve kapanırken kurar, macOS paketi yanında hazırlayıp
+    /// çıkışta takas eder. Linux'ta kapalı kalır; orada rozet haber verir. Dosyada yazılı değer,
+    /// <c>false</c> dahil, korunur; yalnız platformun işaretini (<see cref="AutoUpdateDefaultMarker"/>,
+    /// <see cref="AutoUpdateDefaultMacMarker"/>) taşımayan eski dosyanın <c>false</c>'u bir kez
+    /// açılır, çünkü eski kayıt varsayılanı da seçimi de aynı alana yazıyordu.
     /// </summary>
-    public bool AutoUpdate { get; set; } = OperatingSystem.IsWindows();
+    public bool AutoUpdate { get; set; } = DefaultOn;
+
+    /// <summary>Otomatik güncellemenin varsayılan açık olduğu platformlar.</summary>
+    public static bool DefaultOn => OperatingSystem.IsWindows() || OperatingSystem.IsMacOS();
+
+    /// <summary>
+    /// macOS'ta varsayılan açıldıktan sonra yazılmış dosyanın işareti. Ondan önce macOS kaydı
+    /// varsayılan <c>false</c>'u <see cref="AutoUpdateDefaultMarker"/> ile birlikte yazıyordu; o
+    /// işaret macOS'ta seçim sayılmaz.
+    /// </summary>
+    public const string AutoUpdateDefaultMacMarker = "autoUpdateDefaultOnMac";
+
+    /// <summary>Kayıtlı <c>false</c> bu platformda göçle bir kez açılır mı.</summary>
+    internal static bool MigratesOff(JsonElement root, bool windows, bool mac)
+        => (windows && !root.TryGetProperty(AutoUpdateDefaultMarker, out _))
+            || (mac && !root.TryGetProperty(AutoUpdateDefaultMacMarker, out _));
 
     /// <summary>
     /// Otomatik güncellemenin varsayılan açık olduğu sürümden sonra yazılmış dosyanın işareti.
@@ -514,8 +530,8 @@ public sealed class UpdateSettings
                 (value.ValueKind == JsonValueKind.True || value.ValueKind == JsonValueKind.False))
             {
                 settings.AutoUpdate = value.GetBoolean();
-                if (!settings.AutoUpdate && OperatingSystem.IsWindows() &&
-                    !document.RootElement.TryGetProperty(AutoUpdateDefaultMarker, out _))
+                if (!settings.AutoUpdate &&
+                    MigratesOff(document.RootElement, OperatingSystem.IsWindows(), OperatingSystem.IsMacOS()))
                 {
                     settings.AutoUpdate = true;
                 }
@@ -594,6 +610,7 @@ public sealed class UpdateSettings
         var root = ReadRoot(file);
         root["autoUpdate"] = AutoUpdate;
         root[AutoUpdateDefaultMarker] = true;
+        root[AutoUpdateDefaultMacMarker] = true;
         SetOrRemove(root, "fastGpu", FastGpu is { } fastGpu ? JsonValue.Create(fastGpu) : null);
         SetOrRemove(root, "language", string.IsNullOrWhiteSpace(Language) ? null : JsonValue.Create(Language));
         root["targetMb"] = TargetMb;

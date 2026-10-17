@@ -244,7 +244,7 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - name: Platform testleri
-        run: dotnet test tests/VidShrink.Tests/VidShrink.Tests.csproj -c Release --filter "FullyQualifiedName~MacUpdateTests|FullyQualifiedName~UpdateCheckTests|FullyQualifiedName~GuncellemeSagligiTests|FullyQualifiedName~SistemSesiTests|FullyQualifiedName~SesGirisiTests" --logger "console;verbosity=normal"
+        run: dotnet test tests/VidShrink.Tests/VidShrink.Tests.csproj -c Release --filter "FullyQualifiedName~MacUpdateTests|FullyQualifiedName~UpdateCheckTests|FullyQualifiedName~GuncellemeSagligiTests|FullyQualifiedName~SistemSesiTests|FullyQualifiedName~SesGirisiTests|FullyQualifiedName~UpdaterTests.MacOnce|FullyQualifiedName~UpdaterTests.OldUnmarked|FullyQualifiedName~UpdaterTests.AnExisting" --logger "console;verbosity=normal"
 
   # Kaydedicinin Linux pencere kolu: Xvfb uzerinde gercek bir X penceresi (xlogo) acilir,
   # pencere listesi hem xwininfo'dan hem libX11 _NET_CLIENT_LIST'ten okunur ve x11grab

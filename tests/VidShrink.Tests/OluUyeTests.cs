@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -732,7 +732,7 @@ public sealed class OluUyeTests
     /// <para><b>15 Ekim 2026:</b> tasinabilir kip (AYR-P8) <c>CanSelfUpdateAt</c> ile dort satir ekledi, ayar
     /// yolunu <c>PortableMode</c>a tasiyip uc satir sildi (210 -> 214, 1689 -> 1690). Deger degismedi, yeri degisti.</para>
     /// <para><b>16 Ekim 2026:</b> <c>UpdateSettings.Save</c> bilinmeyen anahtarlari korumak icin <c>System.Text.Json.Nodes</c>
-    /// using satiri ve birlestiren yazim ekledi (214 -> 215, 1690 -> 1717). Deger degismedi, yeri degisti.</para>
+    /// using satiri ve birlestiren yazim ekledi (214 -> 215, 1690 -> 1717). Deger degismedi, yeri degisti. 2026-10-17: macOS varsayilani ve hazirlik sagligi UpdateSettings ile MacUpdate govdesine satir ekledi (1717 -> 1757).</para>
     /// </summary>
     [Fact]
     public void NitelenmemisOkumaGoruluyor()
@@ -742,7 +742,7 @@ public sealed class OluUyeTests
         foreach (var (ad, dosya, satir) in new[]
                  {
                      ("UpdateCheck.ManifestTimeout", "src/VidShrink.Core/UpdateCheck.cs", 215),
-                     ("MacUpdate.DownloadTimeout", "src/VidShrink.Core/UpdateCheck.cs", 1717),
+                     ("MacUpdate.DownloadTimeout", "src/VidShrink.Core/UpdateCheck.cs", 1757),
                      ("DeveloperUnlock.Window", "src/VidShrink.Core/DeveloperUnlock.cs", 22)
                  })
         {

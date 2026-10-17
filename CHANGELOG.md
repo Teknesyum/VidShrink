@@ -11,6 +11,15 @@ ship as part of it.
 
 - Recorder: on Windows the "System Audio" source stays in the list when the device list cannot be read; before, a failed
   device query left both microphone and system audio at "Silent".
+- Recorder: on macOS and Linux an unreadable device list still offers the default microphone; on Linux also the
+  default output monitor as system audio.
+- Update: on macOS a failed background preparation now counts toward update health; after the third failure the
+  update badge comes back instead of staying silent.
+
+### Changed
+
+- Update: automatic update is on by default on macOS too. A saved "off" written before this release counts as the
+  old default and turns on once; an "off" saved from now on is kept.
 
 ## [1.2.23] - 2026-10-16
 
