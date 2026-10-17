@@ -31,6 +31,10 @@ ship as part of it.
   cover art (the chosen cover image, or the file's embedded cover) or a waveform drawn by ffmpeg's `showwaves`;
   picking one opens MP4, MKV, MOV and WebM and the output runs exactly as long as the (trimmed) audio. The
   slideshow wizard from the same roadmap item waits on the image clip.
+- Recorder: the result panel's Share row now has a target box, a lifetime box (or the host's fixed lifetime as text)
+  and a Delete button that closes a link the host lets you close, like the Shrink tab. The choice is remembered.
+- Recorder: a new finish action, "Shrink, upload and copy the link", shrinks the recording, uploads the smaller file
+  to the chosen host and puts the link on the clipboard.
 - Recorder: the wizard's "Game" answer now picks the screen for you. When a recording or the replay buffer
   starts, the screen target follows the foreground window (or the window right under VidShrink when VidShrink itself
   is in front), falling back to the primary screen; an HDR screen still goes through the HDR-to-SDR path. Picking a

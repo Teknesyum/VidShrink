@@ -261,6 +261,7 @@
   "recorder.finish.copy": "Kopijuoti failą į iškarpinę",
   "recorder.finish.shrink-copy": "Sumažinti ir kopijuoti į iškarpinę",
   "recorder.finish.upload-copy": "Įkelti ir kopijuoti nuorodą",
+  "recorder.finish.shrink-upload-copy": "Sumažinti, įkelti ir kopijuoti nuorodą",
   "recorder.finish.copied": "Nukopijuota į iškarpinę.",
   "recorder.finish.shrinking": "Prieš kopijuojant mažinama iki tikslinio dydžio.",
   "recorder.finish.shrunk-copied": "Sumažintas failas nukopijuotas į iškarpinę.",

@@ -261,6 +261,7 @@
   "recorder.finish.copy": "Kopēt failu starpliktuvē",
   "recorder.finish.shrink-copy": "Samazināt un kopēt starpliktuvē",
   "recorder.finish.upload-copy": "Augšupielādēt un kopēt saiti",
+  "recorder.finish.shrink-upload-copy": "Samazināt, augšupielādēt un kopēt saiti",
   "recorder.finish.copied": "Nokopēts starpliktuvē.",
   "recorder.finish.shrinking": "Pirms kopēšanas samazina līdz mērķa izmēram.",
   "recorder.finish.shrunk-copied": "Samazinātais fails nokopēts starpliktuvē.",

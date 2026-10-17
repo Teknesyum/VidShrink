@@ -261,6 +261,7 @@
   "recorder.finish.copy": "Copy the file to the clipboard",
   "recorder.finish.shrink-copy": "Shrink, then copy to the clipboard",
   "recorder.finish.upload-copy": "Upload and copy the link",
+  "recorder.finish.shrink-upload-copy": "Shrink, upload and copy the link",
   "recorder.finish.copied": "Copied to the clipboard.",
   "recorder.finish.shrinking": "Shrinking to the target size before copying.",
   "recorder.finish.shrunk-copied": "Shrunk file copied to the clipboard.",

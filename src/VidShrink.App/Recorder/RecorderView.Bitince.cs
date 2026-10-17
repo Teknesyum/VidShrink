@@ -18,7 +18,8 @@ internal enum RecorderFinishAction
     Nothing,
     CopyFile,
     ShrinkAndCopy,
-    UploadAndCopyLink
+    UploadAndCopyLink,
+    ShrinkUploadAndCopyLink
 }
 
 /// <summary>
@@ -108,6 +109,7 @@ internal partial class RecorderView
         RecorderFinishAction.CopyFile => "recorder.finish.copy",
         RecorderFinishAction.ShrinkAndCopy => "recorder.finish.shrink-copy",
         RecorderFinishAction.UploadAndCopyLink => "recorder.finish.upload-copy",
+        RecorderFinishAction.ShrinkUploadAndCopyLink => "recorder.finish.shrink-upload-copy",
         _ => "recorder.finish.nothing"
     };
 
@@ -144,7 +146,10 @@ internal partial class RecorderView
                     await ShrinkAndCopyAsync(path);
                     break;
                 case RecorderFinishAction.UploadAndCopyLink:
-                    await UploadAndCopyAsync();
+                    await UploadAndCopyAsync(null);
+                    break;
+                case RecorderFinishAction.ShrinkUploadAndCopyLink:
+                    if (await ShrinkForChainAsync(path) is { } shrunk) await UploadAndCopyAsync(shrunk);
                     break;
             }
         }
@@ -156,10 +161,18 @@ internal partial class RecorderView
 
     private async Task ShrinkAndCopyAsync(string path)
     {
+        if (await ShrinkForChainAsync(path) is not { } output) return;
+        await FinishClipboard.SetFileAsync(output);
+        ShowFinish(Say("recorder.finish.shrunk-copied"), error: false);
+    }
+
+    /// <summary>Küçültme adımı; düşerse satıra hatayı yazar ve <c>null</c> döner, zincirin sonraki adımı koşmaz.</summary>
+    private async Task<string?> ShrinkForChainAsync(string path)
+    {
         if (ShrinkForFinish is not { } shrink)
         {
             ShowFinish(Say("recorder.finish.shrink-failed"), error: true);
-            return;
+            return null;
         }
 
         ShowFinish(Say("recorder.finish.shrinking"), error: false);
@@ -167,16 +180,15 @@ internal partial class RecorderView
         if (string.IsNullOrWhiteSpace(output) || !File.Exists(output))
         {
             ShowFinish(Say("recorder.finish.shrink-failed"), error: true);
-            return;
+            return null;
         }
 
-        await FinishClipboard.SetFileAsync(output);
-        ShowFinish(Say("recorder.finish.shrunk-copied"), error: false);
+        return output;
     }
 
-    private async Task UploadAndCopyAsync()
+    private async Task UploadAndCopyAsync(string? pathOverride)
     {
-        if (await ShareCoreAsync(null) is { Ok: true, Link: { } link })
+        if (await ShareCoreAsync(null, pathOverride) is { Ok: true, Link: { } link })
         {
             await FinishClipboard.SetTextAsync(link.Url);
             ShowFinish(Say("recorder.finish.link-copied"), error: false);

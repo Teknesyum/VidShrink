@@ -261,6 +261,7 @@
   "recorder.finish.copy": "Скопіювати файл до буфера обміну",
   "recorder.finish.shrink-copy": "Зменшити й скопіювати до буфера обміну",
   "recorder.finish.upload-copy": "Вивантажити й скопіювати посилання",
+  "recorder.finish.shrink-upload-copy": "Зменшити, вивантажити й скопіювати посилання",
   "recorder.finish.copied": "Скопійовано до буфера обміну.",
   "recorder.finish.shrinking": "Зменшення до цільового розміру перед копіюванням.",
   "recorder.finish.shrunk-copied": "Зменшений файл скопійовано до буфера обміну.",

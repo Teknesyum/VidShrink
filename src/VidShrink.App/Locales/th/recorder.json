@@ -261,6 +261,7 @@
   "recorder.finish.copy": "คัดลอกไฟล์ไปยังคลิปบอร์ด",
   "recorder.finish.shrink-copy": "ย่อขนาดแล้วคัดลอกไปยังคลิปบอร์ด",
   "recorder.finish.upload-copy": "อัปโหลดแล้วคัดลอกลิงก์",
+  "recorder.finish.shrink-upload-copy": "ย่อขนาด อัปโหลด แล้วคัดลอกลิงก์",
   "recorder.finish.copied": "คัดลอกไปยังคลิปบอร์ดแล้ว",
   "recorder.finish.shrinking": "กำลังย่อเป็นขนาดเป้าหมายก่อนคัดลอก",
   "recorder.finish.shrunk-copied": "คัดลอกไฟล์ที่ย่อแล้วไปยังคลิปบอร์ดแล้ว",

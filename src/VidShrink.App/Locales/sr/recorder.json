@@ -261,6 +261,7 @@
   "recorder.finish.copy": "Kopiraj datoteku u privremenu memoriju",
   "recorder.finish.shrink-copy": "Smanji i kopiraj u privremenu memoriju",
   "recorder.finish.upload-copy": "Otpremi i kopiraj vezu",
+  "recorder.finish.shrink-upload-copy": "Smanji, otpremi i kopiraj vezu",
   "recorder.finish.copied": "Kopirano u privremenu memoriju.",
   "recorder.finish.shrinking": "Smanjivanje na ciljnu veličinu pre kopiranja.",
   "recorder.finish.shrunk-copied": "Smanjena datoteka je kopirana u privremenu memoriju.",

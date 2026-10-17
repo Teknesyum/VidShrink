@@ -261,6 +261,7 @@
   "recorder.finish.copy": "ফাইলটি ক্লিপবোর্ডে কপি করুন",
   "recorder.finish.shrink-copy": "ছোট করে ক্লিপবোর্ডে কপি করুন",
   "recorder.finish.upload-copy": "আপলোড করে লিংক কপি করুন",
+  "recorder.finish.shrink-upload-copy": "ছোট করে আপলোড করুন ও লিংক কপি করুন",
   "recorder.finish.copied": "ক্লিপবোর্ডে কপি হয়েছে।",
   "recorder.finish.shrinking": "কপি করার আগে লক্ষ্য আকারে ছোট করা হচ্ছে।",
   "recorder.finish.shrunk-copied": "ছোট করা ফাইল ক্লিপবোর্ডে কপি হয়েছে।",

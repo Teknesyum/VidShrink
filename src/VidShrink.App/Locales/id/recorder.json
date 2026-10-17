@@ -261,6 +261,7 @@
   "recorder.finish.copy": "Salin file ke papan klip",
   "recorder.finish.shrink-copy": "Perkecil lalu salin ke papan klip",
   "recorder.finish.upload-copy": "Unggah dan salin tautan",
+  "recorder.finish.shrink-upload-copy": "Perkecil, unggah, lalu salin tautan",
   "recorder.finish.copied": "Disalin ke papan klip.",
   "recorder.finish.shrinking": "Memperkecil ke ukuran target sebelum menyalin.",
   "recorder.finish.shrunk-copied": "File yang diperkecil disalin ke papan klip.",

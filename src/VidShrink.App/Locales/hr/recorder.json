@@ -261,6 +261,7 @@
   "recorder.finish.copy": "Kopiraj datoteku u međuspremnik",
   "recorder.finish.shrink-copy": "Smanji i kopiraj u međuspremnik",
   "recorder.finish.upload-copy": "Prenesi i kopiraj poveznicu",
+  "recorder.finish.shrink-upload-copy": "Smanji, prenesi i kopiraj poveznicu",
   "recorder.finish.copied": "Kopirano u međuspremnik.",
   "recorder.finish.shrinking": "Smanjivanje na ciljnu veličinu prije kopiranja.",
   "recorder.finish.shrunk-copied": "Smanjena datoteka kopirana je u međuspremnik.",

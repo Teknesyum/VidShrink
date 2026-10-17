@@ -261,6 +261,7 @@
   "recorder.finish.copy": "Nakili faili kwenye ubao wa kunakili",
   "recorder.finish.shrink-copy": "Punguza kisha nakili kwenye ubao wa kunakili",
   "recorder.finish.upload-copy": "Pakia na unakili kiungo",
+  "recorder.finish.shrink-upload-copy": "Punguza, pakia kisha unakili kiungo",
   "recorder.finish.copied": "Imenakiliwa kwenye ubao wa kunakili.",
   "recorder.finish.shrinking": "Inapunguzwa hadi ukubwa lengwa kabla ya kunakili.",
   "recorder.finish.shrunk-copied": "Faili iliyopunguzwa imenakiliwa kwenye ubao wa kunakili.",

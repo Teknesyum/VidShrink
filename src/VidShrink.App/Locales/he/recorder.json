@@ -261,6 +261,7 @@
   "recorder.finish.copy": "העתק את הקובץ ללוח",
   "recorder.finish.shrink-copy": "הקטן והעתק ללוח",
   "recorder.finish.upload-copy": "העלה והעתק את הקישור",
+  "recorder.finish.shrink-upload-copy": "הקטן, העלה והעתק את הקישור",
   "recorder.finish.copied": "הועתק ללוח.",
   "recorder.finish.shrinking": "מקטין לגודל היעד לפני ההעתקה.",
   "recorder.finish.shrunk-copied": "הקובץ המוקטן הועתק ללוח.",

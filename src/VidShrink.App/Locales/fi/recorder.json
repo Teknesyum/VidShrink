@@ -261,6 +261,7 @@
   "recorder.finish.copy": "Kopioi tiedosto leikepöydälle",
   "recorder.finish.shrink-copy": "Pienennä ja kopioi leikepöydälle",
   "recorder.finish.upload-copy": "Lähetä ja kopioi linkki",
+  "recorder.finish.shrink-upload-copy": "Pienennä, lähetä ja kopioi linkki",
   "recorder.finish.copied": "Kopioitu leikepöydälle.",
   "recorder.finish.shrinking": "Pienennetään tavoitekokoon ennen kopiointia.",
   "recorder.finish.shrunk-copied": "Pienennetty tiedosto kopioitu leikepöydälle.",

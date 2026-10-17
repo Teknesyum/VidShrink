@@ -261,6 +261,7 @@
   "recorder.finish.copy": "Skopírovať súbor do schránky",
   "recorder.finish.shrink-copy": "Zmenšiť a skopírovať do schránky",
   "recorder.finish.upload-copy": "Nahrať a skopírovať odkaz",
+  "recorder.finish.shrink-upload-copy": "Zmenšiť, nahrať a skopírovať odkaz",
   "recorder.finish.copied": "Skopírované do schránky.",
   "recorder.finish.shrinking": "Zmenšuje sa na cieľovú veľkosť pred skopírovaním.",
   "recorder.finish.shrunk-copied": "Zmenšený súbor bol skopírovaný do schránky.",

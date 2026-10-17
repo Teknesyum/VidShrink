@@ -78,6 +78,10 @@ internal sealed class RecorderSettings
 
     internal string? NamePattern { get; set; }
 
+    internal string? ShareTargetId { get; set; }
+
+    internal int? ShareRetentionDays { get; set; }
+
     internal bool ShowClicks { get; set; }
 
     /// <summary>Prompter'ın metni; pencere kapanınca ve düzenleme bitince yazılır.</summary>
@@ -325,6 +329,8 @@ internal sealed class RecorderSettings
             settings.PushToTalk = (bool?)root["pushToTalk"] ?? false;
             if (Enum.TryParse<RecorderFinishAction>((string?)root["finishAction"], true, out var finish) && Enum.IsDefined(finish)) settings.FinishAction = finish;
             if ((string?)root["namePattern"] is { } namePattern && AdlandirmaDeseni.KayitHata(namePattern) is null) settings.NamePattern = namePattern;
+            if ((string?)root["shareTarget"] is { Length: > 0 } shareTarget) settings.ShareTargetId = shareTarget;
+            if ((int?)root["shareRetentionDays"] is { } shareDays && shareDays > 0) settings.ShareRetentionDays = shareDays;
             settings.ShowClicks = (bool?)root["showClicks"] ?? false;
             settings.PrompterText = (string?)root["prompterText"] ?? string.Empty;
             settings.PrompterStep = PrompterScroll.ClampStep((int?)root["prompterStep"] ?? PrompterScroll.DefaultStep);
@@ -464,6 +470,8 @@ internal sealed class RecorderSettings
                 writer.WriteBoolean("pushToTalk", PushToTalk);
                 writer.WriteString("finishAction", FinishAction.ToString());
                 if (NamePattern is not null) writer.WriteString("namePattern", NamePattern);
+                if (ShareTargetId is not null) writer.WriteString("shareTarget", ShareTargetId);
+                if (ShareRetentionDays is { } shareDays) writer.WriteNumber("shareRetentionDays", shareDays);
                 writer.WriteBoolean("showClicks", ShowClicks);
                 writer.WriteString("prompterText", PrompterText);
                 writer.WriteNumber("prompterStep", PrompterStep);

@@ -261,6 +261,7 @@
   "recorder.finish.copy": "Kopiraj datoteko v odložišče",
   "recorder.finish.shrink-copy": "Pomanjšaj in kopiraj v odložišče",
   "recorder.finish.upload-copy": "Naloži in kopiraj povezavo",
+  "recorder.finish.shrink-upload-copy": "Pomanjšaj, naloži in kopiraj povezavo",
   "recorder.finish.copied": "Kopirano v odložišče.",
   "recorder.finish.shrinking": "Pomanjševanje na ciljno velikost pred kopiranjem.",
   "recorder.finish.shrunk-copied": "Pomanjšana datoteka je kopirana v odložišče.",

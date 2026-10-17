@@ -261,6 +261,7 @@
   "recorder.finish.copy": "Kopiér filen til udklipsholderen",
   "recorder.finish.shrink-copy": "Formindsk og kopiér til udklipsholderen",
   "recorder.finish.upload-copy": "Upload og kopiér linket",
+  "recorder.finish.shrink-upload-copy": "Formindsk, upload og kopiér linket",
   "recorder.finish.copied": "Kopieret til udklipsholderen.",
   "recorder.finish.shrinking": "Formindsker til målstørrelsen før kopiering.",
   "recorder.finish.shrunk-copied": "Den formindskede fil er kopieret til udklipsholderen.",

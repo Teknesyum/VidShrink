@@ -261,6 +261,7 @@
   "recorder.finish.copy": "Dosyayı panoya kopyala",
   "recorder.finish.shrink-copy": "Küçült ve panoya kopyala",
   "recorder.finish.upload-copy": "Yükle ve bağlantıyı kopyala",
+  "recorder.finish.shrink-upload-copy": "Küçült, yükle ve bağlantıyı kopyala",
   "recorder.finish.copied": "Panoya kopyalandı.",
   "recorder.finish.shrinking": "Kopyalamadan önce hedef boyuta küçültülüyor.",
   "recorder.finish.shrunk-copied": "Küçültülen dosya panoya kopyalandı.",

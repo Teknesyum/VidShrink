@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -37,10 +37,29 @@ internal sealed class ShareSession
             _targets));
 
     internal Task<CoreShare.ShareResult> ShareAsync(CoreShare.ShareTarget target, string path, IProgress<CoreShare.UploadProgress> progress)
+        => ShareAsync(target, path, target.DefaultRetentionDays, progress);
+
+    internal Task<CoreShare.ShareResult> ShareAsync(CoreShare.ShareTarget target, string path, int? retentionDays, IProgress<CoreShare.UploadProgress> progress)
     {
         var flow = Flow();
-        return flow.ShareAsync(target, path, target.DefaultRetentionDays, progress);
+        return flow.ShareAsync(target, path, retentionDays, progress);
     }
+
+    internal bool CanDelete => _flow?.CanDelete ?? false;
+
+    internal Task<CoreShare.ShareResult> DeleteAsync()
+    {
+        var flow = Flow();
+        var target = flow.Link is { } link ? _targets?.Find(link.TargetId) ?? Target() : Target();
+        return target is null
+            ? Task.FromResult(CoreShare.ShareResult.Failed(new CoreShare.ShareDiagnosis(
+                CoreShare.ShareFailure.Unknown, Strings.Get("settings.share.nothing-to-close"))))
+            : flow.DeleteAsync(target);
+    }
+
+    internal static string Closed() => Say("settings.share.closed");
+
+    internal static string CloseFailed(CoreShare.ShareResult result) => $"{Say("settings.share.close-failed")}: {ShareMessage.Of(result)}";
 
     internal static string MissingTargets() => Say("settings.share.targets-missing", CoreShare.ShareTargetTable.FileName);
 

@@ -22,7 +22,7 @@ public sealed class KayitTeslimBitinceTests
 {
     private static readonly string[] Anahtarlar =
     {
-        "title", "hint", "nothing", "copy", "shrink-copy", "upload-copy", "copied", "shrinking",
+        "title", "hint", "nothing", "copy", "shrink-copy", "upload-copy", "shrink-upload-copy", "copied", "shrinking",
         "shrunk-copied", "link-copied", "shrink-failed", "upload-failed", "failed", "no-clipboard"
     };
 
@@ -156,6 +156,7 @@ public sealed class KayitTeslimBitinceTests
     [InlineData("CopyFile")]
     [InlineData("ShrinkAndCopy")]
     [InlineData("UploadAndCopyLink")]
+    [InlineData("ShrinkUploadAndCopyLink")]
     public void HerSecimKendiEyleminiCagirir(string ad)
     {
         var secim = Enum.Parse<RecorderFinishAction>(ad);
@@ -177,6 +178,7 @@ public sealed class KayitTeslimBitinceTests
                     RecorderFinishAction.CopyFile => Metin("recorder.finish.copied"),
                     RecorderFinishAction.ShrinkAndCopy => Metin("recorder.finish.shrunk-copied"),
                     RecorderFinishAction.UploadAndCopyLink => Metin("recorder.finish.link-copied"),
+                    RecorderFinishAction.ShrinkUploadAndCopyLink => Metin("recorder.finish.link-copied"),
                     _ => string.Empty
                 };
                 return (d.Pano.Dosyalar.ToList(), d.Pano.Metinler.ToList(), d.Kucultulen.ToList(),
@@ -214,6 +216,12 @@ public sealed class KayitTeslimBitinceTests
                 Assert.Empty(dosyalar);
                 Assert.Empty(kucultulen);
                 break;
+            case RecorderFinishAction.ShrinkUploadAndCopyLink:
+                Assert.Equal(new[] { kayit }, kucultulen);
+                Assert.Equal(new[] { cikti }, yuklenen);
+                Assert.Equal(new[] { "https://ornek.test/b1" }, metinler);
+                Assert.Empty(dosyalar);
+                break;
         }
 
         Assert.Equal(beklenen, satir);
@@ -248,7 +256,7 @@ public sealed class KayitTeslimBitinceTests
                     new RecordResult(true, kayit, 1, false, 0, string.Empty, 1, DeliveryError: "kilitli")
                 };
                 var satirlar = new List<string>();
-                foreach (var secim in new[] { RecorderFinishAction.CopyFile, RecorderFinishAction.ShrinkAndCopy, RecorderFinishAction.UploadAndCopyLink })
+                foreach (var secim in new[] { RecorderFinishAction.CopyFile, RecorderFinishAction.ShrinkAndCopy, RecorderFinishAction.UploadAndCopyLink, RecorderFinishAction.ShrinkUploadAndCopyLink })
                 {
                     d.View.SelectedFinishAction = secim;
                     foreach (var sonuc in sonuclar)
@@ -383,7 +391,7 @@ public sealed class KayitTeslimBitinceTests
         Kapat("ayar-kalici.json", "ayar-bos.json", "paylasimlar.json");
     }
 
-    /// <summary>On dört anahtar kırk iki dilde dolu; hata metni yer tutucusunu korur.</summary>
+    /// <summary>On beş anahtar kırk iki dilde dolu; hata metni yer tutucusunu korur.</summary>
     [Fact]
     public void AnahtarlarButunDillerde()
     {

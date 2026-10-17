@@ -261,6 +261,7 @@
   "recorder.finish.copy": "نسخ الملف إلى الحافظة",
   "recorder.finish.shrink-copy": "تصغير ثم النسخ إلى الحافظة",
   "recorder.finish.upload-copy": "رفع ونسخ الرابط",
+  "recorder.finish.shrink-upload-copy": "تصغير ثم رفع ونسخ الرابط",
   "recorder.finish.copied": "تم النسخ إلى الحافظة.",
   "recorder.finish.shrinking": "جارٍ التصغير إلى الحجم المستهدف قبل النسخ.",
   "recorder.finish.shrunk-copied": "تم نسخ الملف المصغّر إلى الحافظة.",
