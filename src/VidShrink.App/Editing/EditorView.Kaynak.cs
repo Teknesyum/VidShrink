@@ -133,28 +133,16 @@ internal partial class EditorView
         => _extraStamps.All(stamp => stamp is not null) ? _extraStamps.Select(stamp => stamp!).ToArray() : null;
 
     /// <summary>
-    /// Dosyayi cizelgenin sonuna yeni kaynak olarak ekler. Sure okunamazsa ya da dosyada goruntu yoksa
-    /// cizelge degismez ve durum satiri nedenini soyler.
+    /// Dosyayi cizelgenin sonuna yeni kaynak olarak ekler. Goruntusu olmayan ses dosyasi A2 muzik izine konur
+    /// (<see cref="PlaceMusic"/>). Sure okunamazsa cizelge degismez ve durum satiri nedenini soyler.
     /// </summary>
     internal async Task<bool> AddSourceAsync(string path)
     {
         if (_model is not { } model || _source is null || Exporting) return false;
 
-        MediaInfo? info = KnownInfo?.Invoke(path);
-        if (info is null)
-        {
-            try
-            {
-                var prober = SourceProber ?? FfprobeClient.ProbeAsync;
-                info = await prober(path, CancellationToken.None).ConfigureAwait(true);
-            }
-            catch (Exception ex) when (ex is IOException or InvalidOperationException or UnauthorizedAccessException or System.Text.Json.JsonException or System.ComponentModel.Win32Exception)
-            {
-                info = null;
-            }
-        }
-
+        var info = await ProbeSourceAsync(path).ConfigureAwait(true);
         if (!ReferenceEquals(model, _model) || Exporting) return false;
+        if (info is not null && IsMusicFile(info)) return PlaceMusic(path, info);
         var duration = info is { Width: > 0, Height: > 0 } ? EditTime.FromSeconds(info.DurationSeconds) : 0;
         if (duration <= 0)
         {
@@ -164,6 +152,20 @@ internal partial class EditorView
 
         var index = Remember(path, SourceStamp.Of(path));
         return Apply(m => m.AddSource(duration) == index, model.Clips.Count, reload: true);
+    }
+
+    private async Task<MediaInfo?> ProbeSourceAsync(string path)
+    {
+        if (KnownInfo?.Invoke(path) is { } known) return known;
+        try
+        {
+            var prober = SourceProber ?? ((file, ct) => FfprobeClient.ProbeAsync(file, allowAudioOnly: true, ct));
+            return await prober(path, CancellationToken.None).ConfigureAwait(true);
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or UnauthorizedAccessException or System.Text.Json.JsonException or System.ComponentModel.Win32Exception)
+        {
+            return null;
+        }
     }
 
     /// <summary>

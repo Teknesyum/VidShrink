@@ -25,7 +25,7 @@ internal sealed partial class EditorTimeline
     private double _thumbnailAspect;
     private bool _stripPaused;
 
-    internal double StripTop => TracksBottom + Metric("EditorTrackGap");
+    internal double StripTop => MusicBottom + Metric("EditorTrackGap");
 
     internal double StripHeight => Metric("EditorThumbnailStripHeight");
 

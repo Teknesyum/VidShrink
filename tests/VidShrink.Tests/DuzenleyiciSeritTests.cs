@@ -390,6 +390,7 @@ public sealed class DuzenleyiciSeritTests
             var sonuc = (
                 Istenen: cizelge.DesiredSize.Height,
                 cizelge.TracksBottom,
+                cizelge.MusicBottom,
                 cizelge.StripTop,
                 cizelge.StripHeight,
                 cizelge.StripBottom,
@@ -402,7 +403,7 @@ public sealed class DuzenleyiciSeritTests
 
         Assert.True(olcum.Serit > 0);
         Assert.Equal(olcum.Dugme, olcum.Serit, 6);
-        Assert.Equal(olcum.TracksBottom + olcum.Aralik, olcum.StripTop, 6);
+        Assert.Equal(olcum.MusicBottom + olcum.Aralik, olcum.StripTop, 6);
         Assert.Equal(olcum.Serit, olcum.StripHeight, 6);
         Assert.Equal(olcum.StripTop + olcum.Serit, olcum.StripBottom, 6);
         Assert.InRange(olcum.Istenen, olcum.StripBottom, olcum.StripBottom + 1);

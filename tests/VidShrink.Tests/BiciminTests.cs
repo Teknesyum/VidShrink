@@ -1348,8 +1348,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3888, toplam);
-        Assert.Equal(373, dilBasina["en"]);
+        Assert.Equal(3901, toplam);
+        Assert.Equal(374, dilBasina["en"]);
         Assert.Equal(126, dilBasina["tr"]);
     }
 
@@ -1630,6 +1630,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-16, ekrana cizim (later 42): iki yeni anahtar (<c>recorder.hotkeys.draw</c>, <c>recorder.sketch.tools</c>) 42 dilde, dusen yok; olculen toplam 3818 + 3 = 3821, en 368 + 1 = 369, tr 124 degismedi, gezilen 82388 + 86 = 82474.</para>
     /// <para>2026-10-16, prompter (later 42 adim 2): on iki yeni anahtar (<c>recorder.prompter.*</c>) 42 dilde, dusen yok; olculen toplam 3821 + 47 = 3868, en 369 + 3 = 372, tr 124 + 2 = 126, gezilen 82474 + 516 = 82990.</para>
     /// <para>2026-10-16, bolum listesi (later 44): on bir yeni anahtar (<c>main.convert.chapters*</c>) 42 dilde, dusen yok; olculen toplam 3868 + 2 = 3870, en 372, tr 126 degismedi, gezilen 82990 + 473 = 83463.</para>
+    /// <para>2026-10-18, muzik izi (later 103): sekiz yeni anahtar (<c>editor.music.*</c>) 42 dilde, dusen yok; etiket 6 dilde 13 kola girdi (en 1, es 3, fr 2, hu 1, pl 1, pt 5): olculen toplam 3888 + 13 = 3901, en 373 + 1 = 374, tr 126 degismedi, gezilen 84280 + 8 x 43 = 84624. <c>kayip</c> 0.</para>
     /// <para>2026-10-17, kaydedici HDR rengi: alti yeni anahtar (<c>recorder.capture.fallback-hdr</c>, <c>hdr-no-tonemap</c>, <c>sdr-white-assumed</c>, <c>hdr-no-hevc</c>, <c>hdr-kept-hevc</c>, <c>hdr-kept</c>) 42 dilde, dusen yok; olculen toplam 3874 + 3 = 3877, tepsi turuyla birlesince 3885 + 3 = 3888 (th ve ur <c>hdr-kept-hevc</c>, ur <c>recorder.advanced.hdr-to-sdr-hint</c>), en ve tr degismedi, gezilen 83678 + 258 = 83936, tepsi turuyla birlesince 83936 + 258 = 84194, <c>kayip</c> 0.</para>
     /// <para>2026-10-16, atanmamis tus ve prompter gorunumu: bes yeni anahtar (<c>recorder.hotkeys.unassigned</c>, <c>recorder.prompter.smaller-text</c>/<c>larger-text</c>/<c>mirror</c>/<c>line</c>) 42 dilde, dusen yok; olculen toplam 3870 + 4 = 3874, en 372, tr 126 degismedi, gezilen 83463 + 215 = 83678.</para>
     /// <para>2026-10-17, tepsiye kucultme (later 120): alti yeni anahtar (<c>settings-tab.minimize-to-tray.*</c>, <c>main.tray.*</c>) 42 dilde, dusen yok; etiket 11 dilde kola girdi: olculen toplam 3874 + 11 = 3885, en 372 + 1 = 373, tr 126 degismedi, gezilen 83678 + 258 = 83936.</para>
@@ -1670,7 +1671,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(84280, gezilen);
+        Assert.Equal(84624, gezilen);
         Assert.Empty(kayip);
     }
 

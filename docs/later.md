@@ -189,6 +189,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.Core/Editing/EditTimeline.cs, src/VidShrink.Core/Editing/EditExport.cs, src/VidShrink.Core/Editing/EdlPreview.cs, src/VidShrink.Core/Editing/EditProject.cs, src/VidShrink.App/Editing/EditorTimeline.cs, src/VidShrink.App/Editing/EditorView.Kaynak.cs, src/VidShrink.Player/MpvEngine.cs, tests/VidShrink.Tests/
 - Sahibin kararı: Düzenleyici tek şeritten çıkıp videonun altına ikinci bir ses izi (müzik, anlatım) alsın mı?
 - Plan: Çizelgeye A2 izi eklenir; görüntüsü olmayan dosya artık reddedilmez (EditorView.Kaynak.cs:89-93), bu ize başlangıç anı ve düzeyiyle konur. Teslimde iki ses ffmpeg `amix` süzgeciyle karıştırılır. Önizlemede iki sesi birlikte duymanın yolu ölçülmedi: mpv tek ses izi çalar, karıştırma `lavfi-complex` ister ve bunun `edl://` ile çalışması ilk iş denenir. Doğrulama: teslim dosyasında iki sesin de duyulduğunu gösteren düzey ölçümü ve proje dosyasını yazıp geri okuma testi.
+- Durum (18 Ekim 2026, `yan/muzik-izi`): A2 izi, görüntüsüz dosyanın A2'ye inmesi (oynatma başı, -12 dB), sürükleme ve sağ tık menüsü (düzey, başa taşı, değiştir, kaldır) yapıldı; model, `amix` teslimi ve proje kaydı önceden vardı. Açık: önizleme müziği çalmıyor; `lavfi-complex` + `edl://` denenmedi (hız değişen klipte EDL zamanı çizelge zamanından ayrılıyor, arama davranışı bilinmiyor).
 
 ## 105. Uygulama Başına Ses
 

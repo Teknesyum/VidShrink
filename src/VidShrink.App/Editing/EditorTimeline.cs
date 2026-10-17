@@ -361,6 +361,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
     {
         _model = model;
         ResetTexts();
+        EndMusic();
         _selected = -1;
         _all = false;
         _set.Clear();
@@ -543,6 +544,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         context.DrawRectangle(Paint("PanelSurface"), null, new Rect(0, TextTop, width, TextHeight));
         context.DrawRectangle(Paint("Surface"), null, new Rect(0, VideoTop, width, VideoHeight));
         context.DrawRectangle(Paint("PanelSurface"), null, new Rect(0, AudioTop, width, AudioHeight));
+        context.DrawRectangle(Paint("PanelSurface"), null, new Rect(0, MusicTop, width, MusicHeight));
         context.DrawRectangle(Paint("PanelSurface"), null, new Rect(0, StripTop, width, StripHeight));
 
         var line = new Pen(Paint("HeaderRestBorder"), Metric("EditorClipBorder"));
@@ -551,10 +553,12 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         context.DrawLine(line, new Point(0, StripTop), new Point(width, StripTop));
         context.DrawLine(line, new Point(0, VideoTop), new Point(width, VideoTop));
         context.DrawLine(line, new Point(0, AudioTop), new Point(width, AudioTop));
+        context.DrawLine(line, new Point(0, MusicTop), new Point(width, MusicTop));
 
         DrawHeaderIcon(context, null, TextTop, TextHeight, TextTrackName);
         DrawHeaderIcon(context, "IconPlayer", VideoTop, VideoHeight, VideoTrackName);
         DrawHeaderIcon(context, "IconVolume", AudioTop, AudioHeight, AudioTrackName);
+        DrawHeaderIcon(context, "IconVolume", MusicTop, MusicHeight, MusicTrackName);
 
         WaveformBucketsDrawn = 0;
         if (_model is null || _ppt <= 0) return;
@@ -562,6 +566,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         DrawStrip(context);
         DrawRuler(context);
         DrawTexts(context);
+        DrawMusic(context);
         if (_peaks is { IsEmpty: false } || _extraPeaks.Values.Any(p => !p.IsEmpty)) DrawWaveform(context);
         else DrawAudioMirror(context);
     }
@@ -606,6 +611,13 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         if (PressText(position, plain))
         {
             _pressIndex = -1;
+            return;
+        }
+
+        if (PressMusic(position))
+        {
+            _pressIndex = -1;
+            SelectedText = -1;
             return;
         }
 
@@ -673,6 +685,13 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
             return;
         }
 
+        if (_musicPress)
+        {
+            AutoScroll(position.X);
+            DragMusic(position.X);
+            return;
+        }
+
         if (_pressIndex < 0)
         {
             UpdateCursor(position);
@@ -710,6 +729,11 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
             DragText(position.X);
             CommitText();
         }
+        else if (_musicPress)
+        {
+            DragMusic(position.X);
+            CommitMusic();
+        }
         else if (_dragging && _pressIndex >= 0 && _dropIndex >= 0 && _dropIndex != _pressIndex)
         {
             var from = _pressIndex;
@@ -728,6 +752,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         Scrubbing = false;
         EndTrim();
         EndText();
+        EndMusic();
         EndDrag();
     }
 
@@ -759,6 +784,12 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
 
     private void UpdateCursor(Point position)
     {
+        if (_model is not null && position.X >= HeaderWidth && OnMusicRow(position))
+        {
+            UpdateMusicCursor(position);
+            return;
+        }
+
         if (_model is not null && position.X >= HeaderWidth && OnTextRow(position))
         {
             SetCursor(TextEdgeAt(position, out _, out _) ? StandardCursorType.SizeWestEast : StandardCursorType.Arrow);

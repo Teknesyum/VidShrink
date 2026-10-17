@@ -9,6 +9,10 @@ ship as part of it.
 
 ### Added
 
+- Editor: music track (A2). An audio-only file dropped or added as a source no longer gets rejected; it lands on A2
+  at the playhead (or at 0 when the playhead is at the end) at -12 dB, and replacing it keeps the level. Drag the
+  block to move it; right-click > Music track adds, replaces, sets the level (-24..+6 dB), moves it to the playhead
+  or removes it. Export mixes it with `amix`. The preview does not play the music yet.
 - Player: "Speed through silence" mode (J, Playback menu). A labelled `silencedetect` ring sits at the head of the
   audio chain; when it reports a silence the speed rises to 4x and drops back to the previous speed when sound returns,
   so audio and picture stay in sync instead of jumping. Off by default; threshold (`silenceThresholdDb`, default
