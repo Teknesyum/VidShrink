@@ -19,6 +19,10 @@ ship as part of it.
   -35 dB) and shortest silence (`silenceMinimumSeconds`, default 0.5 s) live in the player settings file.
 - Tests: the list of human-reviewed languages is pinned to exactly English and Turkish, so adding a third language to
   it without review fails the build.
+- Editor: lossless merge. A multi-source Fast or Smart export whose sources match (video codec, profile,
+  resolution, pixel aspect, pixel format, frame rate, time base, audio codec, sample rate, channels and stream
+  layout) and whose timeline needs no re-encode is joined with the concat demuxer and `-c copy` instead of being
+  re-encoded. Smart copies only when every cut lands on a keyframe; anything else keeps the re-encode path.
 
 ### Fixed
 

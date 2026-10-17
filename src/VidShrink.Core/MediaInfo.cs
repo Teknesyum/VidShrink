@@ -49,6 +49,9 @@ public sealed record MediaInfo
     /// <summary>Kabin video etiketi (<c>codec_tag_string</c>): "avc1", "hvc1", "hev1".</summary>
     public string? VideoCodecTag { get; init; }
 
+    /// <summary>ffprobe'un goruntu akisi <c>time_base</c> alani ("1/15360"); okunamazsa <c>null</c>.</summary>
+    public string? VideoTimeBase { get; init; }
+
     /// <summary>ffprobe'un <c>has_b_frames</c> alani: yeniden siralama gecikmesi, kare olarak.</summary>
     public int VideoDelayFrames { get; init; }
 

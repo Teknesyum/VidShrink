@@ -107,6 +107,7 @@ public static class FfprobeClient
             FieldOrder = fieldOrder,
             VideoProfile = GetString(v, "profile"),
             VideoCodecTag = GetString(v, "codec_tag_string"),
+            VideoTimeBase = GetString(v, "time_base"),
             VideoDelayFrames = GetInt(v, "has_b_frames") ?? 0,
             FormatName = GetString(format, "format_name"),
             AudioCodec = audio is null ? null : GetString(audio.Value, "codec_name"),

@@ -55,6 +55,9 @@ public sealed record ExportPlan(
     /// <summary>Cizelge birden cok kaynaktan parca tasidigi icin kopyalama yolu birakilip Tam'a gecildi.</summary>
     public bool MergeForcedFull { get; init; }
 
+    /// <summary>Cok kaynakli teslimde <see cref="MergeCompatibility.Decide"/> karari; tek kaynakta <c>null</c>.</summary>
+    public MergeDecision? MergeDecision { get; init; }
+
     /// <summary>Teslim ayarlari (cozunurluk, kare hizi, kodek, kalite, yalniz ses) varsayilandan farkli oldugu icin Tam'a gecildi.</summary>
     public bool SettingsForcedFull { get; init; }
 
@@ -393,7 +396,8 @@ public static class EditExport
 
     /// <summary>
     /// Cok kaynakli proje icin plan. Parcalarin hepsi tek kaynaktansa o kaynagin bilgisiyle tek kaynakli
-    /// yol aynen kosar. Birden cok kaynak varsa kip ne olursa olsun tek adimda yeniden kodlanir: her parca
+    /// yol aynen kosar. Birden cok kaynak varsa <see cref="MergeCompatibility.Decide"/> karar verir: kaynaklar uyumlu ve
+    /// cizelge yeniden kodlama istemiyorsa parcalar concat girisiyle kopyalanir; yoksa tek adimda yeniden kodlanir: her parca
     /// ilk kaynagin gorunen boyutuna sigdirilir, onun kare hizina ve ortak ses bicimine getirilir.
     /// </summary>
     public static ExportPlan Build(
@@ -407,9 +411,19 @@ public static class EditExport
         ExportPlan plan;
         if (used.Count > 1)
         {
-            var merged = Merge(timeline, WithTrack(sources, audioTrack, out var track), used, mode, outputPath, workDirectory, memoryBudgetBytes, dropMetadata,
-                settings ?? EditExportSettings.Default, track);
-            plan = timeline.Music is { } music ? WithMusic(merged, music, settings ?? EditExportSettings.Default, outputPath) : merged;
+            var decision = MergeCompatibility.Decide(timeline, sources, mode, settings ?? EditExportSettings.Default, audioTrack);
+            if (decision == MergeDecision.Copy)
+            {
+                plan = MergeCopy(timeline, sources, mode, outputPath, workDirectory, memoryBudgetBytes, dropMetadata);
+            }
+            else
+            {
+                var merged = Merge(timeline, WithTrack(sources, audioTrack, out var track), used, mode, outputPath, workDirectory, memoryBudgetBytes, dropMetadata,
+                    settings ?? EditExportSettings.Default, track);
+                plan = timeline.Music is { } music ? WithMusic(merged, music, settings ?? EditExportSettings.Default, outputPath) : merged;
+            }
+
+            plan = plan with { MergeDecision = decision };
         }
         else
         {
@@ -693,6 +707,46 @@ public static class EditExport
             FontsDirectory = fonts,
             FontFamilies = timeline.Texts.Select(t => t.FontName).Distinct(StringComparer.OrdinalIgnoreCase).ToArray()
         };
+    }
+
+    /// <summary>
+    /// Kayipsiz birlestirme: her parca kendi kaynagindan concat listesine <c>inpoint</c> (onceki anahtar kare) ve
+    /// <c>outpoint</c> ile yazilir, tek adimda <c>-c copy</c> kopyalanir. Hizli kipteki tek kaynakli yolun
+    /// (<see cref="FastDirect"/>) cok kaynakli hali; kaymalar <see cref="ExportPlan.KeyframeLeads"/>'e girer.
+    /// </summary>
+    private static ExportPlan MergeCopy(
+        EditTimeline timeline, IReadOnlyDictionary<int, ExportSource> sources, ExportMode requested,
+        string output, string work, long memoryBudgetBytes, bool dropMetadata)
+    {
+        var list = new StringBuilder("ffconcat version 1.0\n");
+        var leads = new List<double>(timeline.Clips.Count);
+        double expected = 0;
+        foreach (var clip in timeline.Clips)
+        {
+            var source = SourceOf(sources, clip.Source);
+            var start = EditTime.ToSeconds(clip.SourceStart);
+            var end = EditTime.ToSeconds(clip.SourceEnd);
+            var inpoint = KeyframeAtOrBefore(source.Keyframes, start);
+            leads.Add(start - inpoint);
+            expected += end - inpoint;
+            list.Append("file ").Append(Quote(source.Info.FilePath)).Append('\n');
+            if (inpoint > 0) list.Append("inpoint ").Append(Number(inpoint + source.StartTime)).Append('\n');
+            list.Append("outpoint ").Append(Number(end + source.StartTime)).Append('\n');
+        }
+
+        var first = SourceOf(sources, timeline.Clips[0].Source).Info;
+        var listPath = Path.Combine(work, VideoListName);
+        var args = new List<string> { "-hide_banner", "-nostdin", "-y", "-f", "concat", "-safe", "0", "-i", listPath, "-map", "0:v:0" };
+        if (first.HasAudio) args.AddRange(new[] { "-map", "0:a:0" });
+        args.AddRange(new[] { "-c", "copy" });
+        args.AddRange(Faststart(output));
+        if (dropMetadata) args.AddRange(StreamMapping.MetadataArguments(true, Array.Empty<string?>(), Array.Empty<string?>()));
+        args.Add(output);
+
+        var used = UsedSources(timeline);
+        var limit = used.Min(s => ReverseLimitSeconds(SourceOf(sources, s).Info, memoryBudgetBytes));
+        return new ExportPlan(requested, requested, new[] { new ExportStep(args, expected, listPath, list.ToString()) },
+            Array.Empty<int>(), limit, output, work) { KeyframeLeads = leads };
     }
 
     private static ExportPlan MergeAudioOnly(
