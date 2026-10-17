@@ -140,7 +140,8 @@ public sealed class KaydirmasizSekmeTests
             if (!oge.IsVisible) continue;
             sekmeler.SelectedIndex = sira;
             Yerlestir(pencere, boyut);
-            if (oge.Content is not ScrollViewer sayfa) continue;
+            var sayfa = oge.Content as ScrollViewer ?? (oge.Content as DockPanel)?.Children.OfType<ScrollViewer>().FirstOrDefault();
+            if (sayfa is null) continue;
             if (Environment.GetEnvironmentVariable("KAYDIRMASIZ_CEK") == "1") Cek(pencere, boyut, olcek, $"{etiket}-{sira}");
             var bos = new List<string>();
             foreach (var kutu in sayfa.GetVisualDescendants().OfType<Border>()
