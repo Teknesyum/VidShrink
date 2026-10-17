@@ -1348,8 +1348,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3874, toplam);
-        Assert.Equal(372, dilBasina["en"]);
+        Assert.Equal(3885, toplam);
+        Assert.Equal(373, dilBasina["en"]);
         Assert.Equal(126, dilBasina["tr"]);
     }
 
@@ -1631,6 +1631,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-16, prompter (later 42 adim 2): on iki yeni anahtar (<c>recorder.prompter.*</c>) 42 dilde, dusen yok; olculen toplam 3821 + 47 = 3868, en 369 + 3 = 372, tr 124 + 2 = 126, gezilen 82474 + 516 = 82990.</para>
     /// <para>2026-10-16, bolum listesi (later 44): on bir yeni anahtar (<c>main.convert.chapters*</c>) 42 dilde, dusen yok; olculen toplam 3868 + 2 = 3870, en 372, tr 126 degismedi, gezilen 82990 + 473 = 83463.</para>
     /// <para>2026-10-16, atanmamis tus ve prompter gorunumu: bes yeni anahtar (<c>recorder.hotkeys.unassigned</c>, <c>recorder.prompter.smaller-text</c>/<c>larger-text</c>/<c>mirror</c>/<c>line</c>) 42 dilde, dusen yok; olculen toplam 3870 + 4 = 3874, en 372, tr 126 degismedi, gezilen 83463 + 215 = 83678.</para>
+    /// <para>2026-10-17, tepsiye kucultme (later 120): alti yeni anahtar (<c>settings-tab.minimize-to-tray.*</c>, <c>main.tray.*</c>) 42 dilde, dusen yok; etiket 11 dilde kola girdi: olculen toplam 3874 + 11 = 3885, en 372 + 1 = 373, tr 126 degismedi, gezilen 83678 + 258 = 83936.</para>
     /// <para>2026-10-16, later 44 (etiket ve Onar): on sekiz yeni anahtar; olculen toplam 3781 + 2 = 3783 (lt main.convert.tags.cover.none, ro main.convert.tags.year), en 364, tr 123, gezilen 80453 + 774 = 81227.</para>
     /// <para>2026-10-15, uzun iste oncelik ve bitis sesi (later 76): dort yeni anahtar (<c>settings-tab.encode-priority.above-normal</c>, <c>settings-tab.finish-sound-file.choose</c>, <c>.hint</c>, <c>.reset</c>) 42 dilde, dusen yok; olculen gezilen 78604 + 172 = 78776.</para>
     /// <para>2026-10-15, bas konus (later 68): iki yeni anahtar (<c>recorder.audio.push-to-talk</c>, <c>.hint</c>), dusen yok; olculen 78604 + 43 x 2 = 78690. <c>kayip</c> 0.</para>
@@ -1667,7 +1668,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(83678, gezilen);
+        Assert.Equal(83936, gezilen);
         Assert.Empty(kayip);
     }
 
