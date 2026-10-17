@@ -912,5 +912,14 @@
   "main.share.qr": "Jakolinkin QR-koodi",
   "main.share.qr-hint": "Avaa linkki skannaamalla koodi puhelimella.",
   "main.startup.no-display": "VidShrink ei voinut avata graafista näyttöä. Käynnistä se työpöytäistunnosta; Waylandissa Xwaylandin on oltava käytettävissä.",
-  "main.about.guide": "Käyttöopas"
+  "main.about.guide": "Käyttöopas",
+  "main.convert.encoder.label": "Koodain ja värit",
+  "main.convert.encoder.profile": "Profiili",
+  "main.convert.encoder.level": "Taso",
+  "main.convert.encoder.two-pass": "Kaksivaiheinen koodaus",
+  "main.convert.encoder.two-pass.tip": "• Ensimmäinen vaihe analysoi videon, toinen koodaa sen.\n• Bittinopeus jakautuu tasaisemmin; koodaus kestää noin kaksi kertaa kauemmin.\n• Vain bittinopeustilassa.",
+  "main.convert.color.range": "Värialue",
+  "main.convert.color.range.limited": "Rajattu (TV)",
+  "main.convert.color.range.full": "Täysi (PC)",
+  "main.validation.encoder-setting": "Koodain {0} ei tue asetusta {1}."
 }

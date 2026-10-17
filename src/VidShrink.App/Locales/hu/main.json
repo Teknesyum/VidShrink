@@ -912,5 +912,14 @@
   "main.share.qr": "A megosztási hivatkozás QR-kódja",
   "main.share.qr-hint": "Olvassa be a telefonjával a hivatkozás megnyitásához.",
   "main.startup.no-display": "A VidShrink nem tudott grafikus kijelzőt megnyitni. Indítsa asztali munkamenetből; Waylanden az Xwaylandnek elérhetőnek kell lennie.",
-  "main.about.guide": "Felhasználói útmutató"
+  "main.about.guide": "Felhasználói útmutató",
+  "main.convert.encoder.label": "Kódoló és szín",
+  "main.convert.encoder.profile": "Profil",
+  "main.convert.encoder.level": "Szint",
+  "main.convert.encoder.two-pass": "Kétmenetes kódolás",
+  "main.convert.encoder.two-pass.tip": "• Az első menet elemzi a videót, a második kódolja.\n• A bitráta egyenletesebben oszlik el; a kódolás nagyjából kétszer annyi ideig tart.\n• Csak bitráta módban.",
+  "main.convert.color.range": "Színtartomány",
+  "main.convert.color.range.limited": "Korlátozott (TV)",
+  "main.convert.color.range.full": "Teljes (PC)",
+  "main.validation.encoder-setting": "A(z) {0} kódoló nem támogatja a(z) {1} beállítást."
 }

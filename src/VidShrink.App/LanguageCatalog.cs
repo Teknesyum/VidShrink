@@ -436,7 +436,9 @@ internal static class LanguageCatalog
         (new Regex(@"^The (.+) container carries only one audio track\.$", RegexOptions.Compiled),
             "main.validation.single-audio-container"),
         (new Regex(@"^The (.+) audio encoder does not support (.+) Hz\.$", RegexOptions.Compiled),
-            "main.validation.audio-sample-rate")
+            "main.validation.audio-sample-rate"),
+        (new Regex(@"^The (.+) encoder does not support the (.+) setting\.$", RegexOptions.Compiled),
+            "main.validation.encoder-setting")
     };
 
     internal const string TrimFormatError = "Trim times must use HH:MM:SS format.";

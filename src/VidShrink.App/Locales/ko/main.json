@@ -912,5 +912,14 @@
   "main.share.qr": "공유 링크 QR 코드",
   "main.share.qr-hint": "휴대폰으로 스캔하면 링크가 열립니다.",
   "main.startup.no-display": "VidShrink가 그래픽 디스플레이를 열 수 없습니다. 데스크톱 세션에서 실행하세요. Wayland에서는 Xwayland가 필요합니다.",
-  "main.about.guide": "사용 설명서"
+  "main.about.guide": "사용 설명서",
+  "main.convert.encoder.label": "인코더 및 색상",
+  "main.convert.encoder.profile": "프로필",
+  "main.convert.encoder.level": "레벨",
+  "main.convert.encoder.two-pass": "2패스 인코딩",
+  "main.convert.encoder.two-pass.tip": "• 첫 번째 패스는 동영상을 분석하고 두 번째 패스는 인코딩합니다.\n• 비트레이트가 더 고르게 분배되며, 인코딩 시간은 약 두 배 걸립니다.\n• 비트레이트 모드에서만.",
+  "main.convert.color.range": "색 범위",
+  "main.convert.color.range.limited": "제한 (TV)",
+  "main.convert.color.range.full": "전체 (PC)",
+  "main.validation.encoder-setting": "인코더 {0}은(는) {1} 설정을 지원하지 않습니다."
 }

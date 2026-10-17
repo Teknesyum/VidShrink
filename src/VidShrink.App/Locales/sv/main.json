@@ -912,5 +912,14 @@
   "main.share.qr": "QR-kod för delningslänken",
   "main.share.qr-hint": "Skanna med telefonen för att öppna länken.",
   "main.startup.no-display": "VidShrink kunde inte öppna en grafisk skärm. Starta programmet från en skrivbordssession; under Wayland måste Xwayland finnas.",
-  "main.about.guide": "Användarguide"
+  "main.about.guide": "Användarguide",
+  "main.convert.encoder.label": "Kodare och färg",
+  "main.convert.encoder.profile": "Profil",
+  "main.convert.encoder.level": "Nivå",
+  "main.convert.encoder.two-pass": "Kodning i två pass",
+  "main.convert.encoder.two-pass.tip": "• Första passet analyserar videon, det andra kodar den.\n• Bithastigheten fördelas jämnare; kodningen tar ungefär dubbelt så lång tid.\n• Endast i bithastighetsläge.",
+  "main.convert.color.range": "Färgomfång",
+  "main.convert.color.range.limited": "Begränsat (TV)",
+  "main.convert.color.range.full": "Fullt (PC)",
+  "main.validation.encoder-setting": "Kodaren {0} stöder inte inställningen {1}."
 }

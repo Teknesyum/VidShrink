@@ -912,5 +912,14 @@
   "main.share.qr": "QR kód odkazu na zdieľanie",
   "main.share.qr-hint": "Naskenujte telefónom a otvorte odkaz.",
   "main.startup.no-display": "VidShrink nemohol otvoriť grafický displej. Spustite ho z relácie pracovnej plochy; vo Waylande musí byť k dispozícii Xwayland.",
-  "main.about.guide": "Používateľská príručka"
+  "main.about.guide": "Používateľská príručka",
+  "main.convert.encoder.label": "Kodér a farby",
+  "main.convert.encoder.profile": "Profil",
+  "main.convert.encoder.level": "Úroveň",
+  "main.convert.encoder.two-pass": "Dvojpriechodové kódovanie",
+  "main.convert.encoder.two-pass.tip": "• Prvý priechod video analyzuje, druhý ho zakóduje.\n• Dátový tok sa rozloží rovnomernejšie; kódovanie trvá zhruba dvakrát dlhšie.\n• Iba v režime dátového toku.",
+  "main.convert.color.range": "Farebný rozsah",
+  "main.convert.color.range.limited": "Obmedzený (TV)",
+  "main.convert.color.range.full": "Plný (PC)",
+  "main.validation.encoder-setting": "Kodér {0} nepodporuje nastavenie {1}."
 }

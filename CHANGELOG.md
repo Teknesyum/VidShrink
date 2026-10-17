@@ -9,6 +9,11 @@ ship as part of it.
 
 ### Added
 
+- Convert: an Encoder section with the encoder preset, tune, profile and level, each listing only what the
+  selected encoder accepts (Automatic keeps today's command). Two-pass encoding is offered in bitrate mode for
+  H.264, H.265 and VP9; the preview shows both passes and the pass log is removed afterwards. An HDR source can be
+  kept as HDR or tone-mapped to SDR, and an SDR source can be converted to BT.601, BT.709 or BT.2020 and to limited
+  or full range; the pixels are converted, not only the tags (`bench color-frame`).
 - Recorder: the wizard's "Game" answer now picks the screen for you. When a recording or the replay buffer
   starts, the screen target follows the foreground window (or the window right under VidShrink when VidShrink itself
   is in front), falling back to the primary screen; an HDR screen still goes through the HDR-to-SDR path. Picking a

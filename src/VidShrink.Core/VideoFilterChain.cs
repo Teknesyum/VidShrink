@@ -15,7 +15,10 @@ public enum ChromaSmoothMode { Off, Light, Medium, Strong }
 
 public enum TransposeMode { None, Clockwise, CounterClockwise, UpsideDown, FlipHorizontal, FlipVertical }
 
-public enum ColorMatrixTarget { Keep, Bt709, Bt601 }
+public enum ColorMatrixTarget { Keep, Bt709, Bt601, Bt2020 }
+
+/// <summary>DON-26: Dönüştür'ün renk aralığı; <see cref="Keep"/> kaynağın aralığını bırakır.</summary>
+public enum ColorRangeTarget { Keep, Limited, Full }
 
 /// <summary>DON-P10: ölçek süzgecinin algoritması (<c>scale</c>'in <c>flags</c> değeri); varsayılan <see cref="Lanczos"/>.</summary>
 public enum ScaleAlgorithm { Lanczos, Bicubic, Bilinear, Spline, Neighbor }
@@ -516,13 +519,49 @@ public static class VideoFilterChain
     public static IReadOnlyList<string> ColorArgs(EncodePlan plan)
     {
         if (!string.IsNullOrEmpty(plan.HdrVideoFilter) || plan.HdrColorArgs.Count > 0) return Array.Empty<string>();
-        return (plan.Filters?.ColorMatrix ?? ColorMatrixTarget.Keep) switch
-        {
-            ColorMatrixTarget.Bt709 => new[] { "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709" },
-            ColorMatrixTarget.Bt601 => new[] { "-colorspace", "smpte170m", "-color_primaries", "smpte170m", "-color_trc", "smpte170m" },
-            _ => Array.Empty<string>()
-        };
+        return MatrixTags(plan.Filters?.ColorMatrix ?? ColorMatrixTarget.Keep);
     }
+
+    private static IReadOnlyList<string> MatrixTags(ColorMatrixTarget target) => target switch
+    {
+        ColorMatrixTarget.Bt709 => new[] { "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709" },
+        ColorMatrixTarget.Bt601 => new[] { "-colorspace", "smpte170m", "-color_primaries", "smpte170m", "-color_trc", "smpte170m" },
+        ColorMatrixTarget.Bt2020 => new[] { "-colorspace", "bt2020nc", "-color_primaries", "bt2020", "-color_trc", "bt2020-10" },
+        _ => Array.Empty<string>()
+    };
+
+    /// <summary>
+    /// DON-26: Dönüştür'ün renk dönüşümü. Matris kolu Küçült'ün <see cref="ColorMatrixFilter"/>'ıyla aynı
+    /// kaynak okumasını ve hedef tablosunu kullanır; BT.2020 ve aralık (<c>rin</c>/<c>r</c>) burada eklenir.
+    /// Kaynak zaten istenen matris ve aralıktaysa süzgeç yazılmaz.
+    /// </summary>
+    public static string? ConversionColorFilter(MediaInfo info, ColorMatrixTarget target, ColorRangeTarget range)
+    {
+        if (target == ColorMatrixTarget.Keep && range == ColorRangeTarget.Keep) return null;
+        var source = SourceMatrix(info);
+        var wanted = target == ColorMatrixTarget.Keep ? source : TargetMatrix(target);
+        var sourceRange = SourceRange(info);
+        var wantedRange = range switch
+        {
+            ColorRangeTarget.Limited => "limited",
+            ColorRangeTarget.Full => "full",
+            _ => sourceRange
+        };
+        if (wanted.Matrix == source.Matrix && wantedRange == sourceRange) return null;
+        return $"zscale=min={source.Matrix}:tin={source.Transfer}:pin={source.Primaries}:rin={sourceRange}:m={wanted.Matrix}:t={wanted.Transfer}:p={wanted.Primaries}:r={wantedRange}";
+    }
+
+    /// <summary>DON-26: <see cref="ConversionColorFilter"/>'ın yazdığı matris ve aralığın çıktı etiketleri.</summary>
+    public static IReadOnlyList<string> ConversionColorArgs(ColorMatrixTarget target, ColorRangeTarget range)
+    {
+        var args = MatrixTags(target).ToList();
+        if (range == ColorRangeTarget.Limited) args.AddRange(new[] { "-color_range", "tv" });
+        else if (range == ColorRangeTarget.Full) args.AddRange(new[] { "-color_range", "pc" });
+        return args;
+    }
+
+    private static string SourceRange(MediaInfo info)
+        => info.ColorRange?.ToLowerInvariant() is "pc" or "full" or "jpeg" ? "full" : "limited";
 
     public static string? DenoiseText(VideoFilterOptions options) => options.Denoise switch
     {
@@ -573,12 +612,17 @@ public static class VideoFilterChain
     {
         if (target == ColorMatrixTarget.Keep) return null;
         var source = SourceMatrix(info);
-        var wanted = target == ColorMatrixTarget.Bt709 ? "709" : "170m";
-        if (source.Matrix == wanted) return null;
-        return target == ColorMatrixTarget.Bt709
-            ? $"zscale=min={source.Matrix}:tin={source.Transfer}:pin={source.Primaries}:m=709:t=709:p=709"
-            : $"zscale=min={source.Matrix}:tin={source.Transfer}:pin={source.Primaries}:m=170m:t=601:p=170m";
+        var wanted = TargetMatrix(target);
+        if (source.Matrix == wanted.Matrix) return null;
+        return $"zscale=min={source.Matrix}:tin={source.Transfer}:pin={source.Primaries}:m={wanted.Matrix}:t={wanted.Transfer}:p={wanted.Primaries}";
     }
+
+    private static (string Matrix, string Transfer, string Primaries) TargetMatrix(ColorMatrixTarget target) => target switch
+    {
+        ColorMatrixTarget.Bt709 => ("709", "709", "709"),
+        ColorMatrixTarget.Bt2020 => ("2020_ncl", "2020_10", "2020"),
+        _ => ("170m", "601", "170m")
+    };
 
     private static (string Matrix, string Transfer, string Primaries) SourceMatrix(MediaInfo info)
         => info.ColorSpace?.ToLowerInvariant() switch
@@ -586,6 +630,7 @@ public static class VideoFilterChain
             "bt709" => ("709", "709", "709"),
             "smpte170m" => ("170m", "601", "170m"),
             "bt470bg" => ("470bg", "601", "470bg"),
+            "bt2020nc" => ("2020_ncl", "2020_10", "2020"),
             _ => info.Height >= 720 ? ("709", "709", "709") : ("170m", "601", "170m")
         };
 
@@ -634,7 +679,12 @@ public static class VideoFilterChain
         if (options.Pad is { } pad)
             parts.Add(string.Create(CultureInfo.InvariantCulture, $"pad={pad.Top}:{pad.Bottom}:{pad.Left}:{pad.Right}"));
         if (options.ColorMatrix != ColorMatrixTarget.Keep)
-            parts.Add(options.ColorMatrix == ColorMatrixTarget.Bt709 ? "colorspace=bt709" : "colorspace=bt601");
+            parts.Add(options.ColorMatrix switch
+            {
+                ColorMatrixTarget.Bt709 => "colorspace=bt709",
+                ColorMatrixTarget.Bt2020 => "colorspace=bt2020",
+                _ => "colorspace=bt601"
+            });
         if (options.Crop is { } crop) parts.Add("crop=" + crop);
         if (options.Scaler != ScaleAlgorithm.Lanczos) parts.Add("scaler=" + ScaleFlags(options.Scaler));
         return string.Join(", ", parts);
@@ -699,6 +749,7 @@ public static class VideoFilterChain
                 {
                     "bt709" => ColorMatrixTarget.Bt709,
                     "bt601" => ColorMatrixTarget.Bt601,
+                    "bt2020" => ColorMatrixTarget.Bt2020,
                     _ => throw Bad(raw)
                 } },
                 "crop" => ParseCrop(options, value, raw),

@@ -912,5 +912,14 @@
   "main.share.qr": "Paylaşım bağlantısının QR kodu",
   "main.share.qr-hint": "Bağlantıyı telefonda açmak için okutun.",
   "main.startup.no-display": "VidShrink grafik ekranı açamadı. Bir masaüstü oturumundan başlatın; Wayland'de Xwayland kurulu olmalı.",
-  "main.about.guide": "Kullanım kılavuzu"
+  "main.about.guide": "Kullanım kılavuzu",
+  "main.convert.encoder.label": "Kodlayıcı ve renk",
+  "main.convert.encoder.profile": "Profil",
+  "main.convert.encoder.level": "Seviye",
+  "main.convert.encoder.two-pass": "İki geçişli kodlama",
+  "main.convert.encoder.two-pass.tip": "• İlk geçiş videoyu inceler, ikincisi kodlar.\n• Bit hızı daha dengeli dağılır; kodlama yaklaşık iki kat sürer.\n• Yalnız bit hızı kipinde.",
+  "main.convert.color.range": "Renk aralığı",
+  "main.convert.color.range.limited": "Sınırlı (TV)",
+  "main.convert.color.range.full": "Tam (PC)",
+  "main.validation.encoder-setting": "{0} kodlayıcısı {1} ayarını desteklemiyor."
 }

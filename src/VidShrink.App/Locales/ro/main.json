@@ -912,5 +912,14 @@
   "main.share.qr": "Cod QR pentru linkul de partajare",
   "main.share.qr-hint": "Scanați cu telefonul pentru a deschide linkul.",
   "main.startup.no-display": "VidShrink nu a putut deschide un afișaj grafic. Porniți-l dintr-o sesiune de desktop; în Wayland trebuie să fie disponibil Xwayland.",
-  "main.about.guide": "Ghid de utilizare"
+  "main.about.guide": "Ghid de utilizare",
+  "main.convert.encoder.label": "Codor și culoare",
+  "main.convert.encoder.profile": "Profil",
+  "main.convert.encoder.level": "Nivel",
+  "main.convert.encoder.two-pass": "Codare în două treceri",
+  "main.convert.encoder.two-pass.tip": "• Prima trecere analizează videoclipul, a doua îl codează.\n• Rata de biți se distribuie mai uniform; codarea durează cam de două ori mai mult.\n• Doar în modul rată de biți.",
+  "main.convert.color.range": "Gamă de culori",
+  "main.convert.color.range.limited": "Limitată (TV)",
+  "main.convert.color.range.full": "Completă (PC)",
+  "main.validation.encoder-setting": "Codorul {0} nu acceptă setarea {1}."
 }

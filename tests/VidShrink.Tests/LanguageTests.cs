@@ -103,6 +103,7 @@ public sealed class LanguageTests : IDisposable
         "Lanczos", "Spline",
         "APNG", "FFV1", "CineForm",
         "Sierra-2-4A", "Bayer", "Heckbert", "Floyd-Steinberg", "Sierra-2", "Sierra-3", "Burkes", "Atkinson",
+        "BT.601", "BT.709", "BT.2020",
         "T"
     };
 
@@ -341,6 +342,7 @@ public sealed class LanguageTests : IDisposable
         "Cover art can be written only to MP4 or MKV.",
         "Cover art in MP4 requires video stream copy.",
         "^The (.+) audio encoder does not support (.+) Hz.$",
+        "^The (.+) encoder does not support the (.+) setting.$",
         "Localization key ' ' is missing in ' ' and in ' '."
     };
 

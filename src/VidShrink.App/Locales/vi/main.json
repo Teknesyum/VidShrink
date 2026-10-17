@@ -912,5 +912,14 @@
   "main.share.qr": "Mã QR của liên kết chia sẻ",
   "main.share.qr-hint": "Quét bằng điện thoại để mở liên kết.",
   "main.startup.no-display": "VidShrink không thể mở màn hình đồ họa. Hãy khởi động từ một phiên máy tính để bàn; trên Wayland cần có Xwayland.",
-  "main.about.guide": "Hướng dẫn sử dụng"
+  "main.about.guide": "Hướng dẫn sử dụng",
+  "main.convert.encoder.label": "Bộ mã hóa và màu",
+  "main.convert.encoder.profile": "Hồ sơ",
+  "main.convert.encoder.level": "Cấp độ",
+  "main.convert.encoder.two-pass": "Mã hóa hai lượt",
+  "main.convert.encoder.two-pass.tip": "• Lượt đầu phân tích video, lượt thứ hai mã hóa nó.\n• Tốc độ bit được phân bổ đều hơn; mã hóa mất khoảng gấp đôi thời gian.\n• Chỉ ở chế độ tốc độ bit.",
+  "main.convert.color.range": "Dải màu",
+  "main.convert.color.range.limited": "Giới hạn (TV)",
+  "main.convert.color.range.full": "Đầy đủ (PC)",
+  "main.validation.encoder-setting": "Bộ mã hóa {0} không hỗ trợ thiết lập {1}."
 }

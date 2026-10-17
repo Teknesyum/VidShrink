@@ -912,5 +912,14 @@
   "main.share.qr": "คิวอาร์โค้ดของลิงก์แชร์",
   "main.share.qr-hint": "สแกนด้วยโทรศัพท์เพื่อเปิดลิงก์",
   "main.startup.no-display": "VidShrink ไม่สามารถเปิดจอแสดงผลกราฟิกได้ ให้เริ่มจากเซสชันเดสก์ท็อป บน Wayland ต้องมี Xwayland",
-  "main.about.guide": "คู่มือการใช้งาน"
+  "main.about.guide": "คู่มือการใช้งาน",
+  "main.convert.encoder.label": "ตัวเข้ารหัสและสี",
+  "main.convert.encoder.profile": "โปรไฟล์",
+  "main.convert.encoder.level": "ระดับ",
+  "main.convert.encoder.two-pass": "การเข้ารหัสสองรอบ",
+  "main.convert.encoder.two-pass.tip": "• รอบแรกวิเคราะห์วิดีโอ รอบที่สองเข้ารหัส\n• บิตเรตกระจายสม่ำเสมอขึ้น การเข้ารหัสใช้เวลาประมาณสองเท่า\n• เฉพาะโหมดบิตเรต",
+  "main.convert.color.range": "ช่วงสี",
+  "main.convert.color.range.limited": "จำกัด (TV)",
+  "main.convert.color.range.full": "เต็ม (PC)",
+  "main.validation.encoder-setting": "ตัวเข้ารหัส {0} ไม่รองรับการตั้งค่า {1}"
 }

@@ -912,5 +912,14 @@
   "main.share.qr": "பகிர்வு இணைப்பின் QR குறியீடு",
   "main.share.qr-hint": "இணைப்பைத் திறக்க உங்கள் தொலைபேசியால் ஸ்கேன் செய்யவும்.",
   "main.startup.no-display": "VidShrink வரைகலைத் திரையைத் திறக்க முடியவில்லை. அதை ஒரு மேசைக்கணினி அமர்விலிருந்து தொடங்கவும்; Wayland-இல் Xwayland கிடைக்க வேண்டும்.",
-  "main.about.guide": "பயன்பாட்டு வழிகாட்டி"
+  "main.about.guide": "பயன்பாட்டு வழிகாட்டி",
+  "main.convert.encoder.label": "குறியாக்கி மற்றும் வண்ணம்",
+  "main.convert.encoder.profile": "சுயவிவரம்",
+  "main.convert.encoder.level": "நிலை",
+  "main.convert.encoder.two-pass": "இரு-சுற்று குறியாக்கம்",
+  "main.convert.encoder.two-pass.tip": "• முதல் சுற்று வீடியோவை பகுப்பாய்கிறது, இரண்டாவது அதைக் குறியாக்குகிறது.\n• பிட்ரேட் சீராகப் பரவுகிறது; குறியாக்கம் சுமார் இருமடங்கு நேரம் எடுக்கும்.\n• பிட்ரேட் பயன்முறையில் மட்டும்.",
+  "main.convert.color.range": "வண்ண வரம்பு",
+  "main.convert.color.range.limited": "வரம்புக்குட்பட்டது (TV)",
+  "main.convert.color.range.full": "முழு (PC)",
+  "main.validation.encoder-setting": "{0} குறியாக்கி {1} அமைப்பை ஆதரிக்காது."
 }

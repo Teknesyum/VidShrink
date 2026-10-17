@@ -337,7 +337,8 @@ public sealed class VideoFilterChainTests
         Assert.True(VideoFilterChain.Parse("detelecine").Detelecine);
         Assert.Equal(DenoiseFilter.NlMeans, VideoFilterChain.Parse("denoise=nlmeans").Denoise);
         Assert.Equal(DeinterlaceMode.Off, VideoFilterChain.Parse("deinterlace=off").Deinterlace);
-        foreach (var kotu in new[] { "blur", "deinterlace=maybe", "denoise=median", "rotate=45", "crop=1:2:3", "pad=a:b:c:d", "colorspace=bt2020" })
+        Assert.Equal(ColorMatrixTarget.Bt2020, VideoFilterChain.Parse("colorspace=bt2020").ColorMatrix);
+        foreach (var kotu in new[] { "blur", "deinterlace=maybe", "denoise=median", "rotate=45", "crop=1:2:3", "pad=a:b:c:d", "colorspace=bt470" })
             Assert.StartsWith("unknown filter option:", Assert.Throws<ArgumentException>(() => VideoFilterChain.Parse(kotu)).Message);
     }
 

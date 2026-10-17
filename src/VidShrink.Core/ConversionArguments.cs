@@ -79,7 +79,67 @@ public static class ConversionArguments
                 errors.Add("Cover art in MP4 requires video stream copy.");
         }
         if (plan.BurnSubtitle is not null || !plan.AudioOnly) errors.AddRange(VideoFilterChain.Validate(info, plan.BurnOptions));
+        if (EncodesWithTuning(plan)) errors.AddRange(TuningErrors(plan));
         return errors;
+    }
+
+    private static readonly string[] H264Profiles = { "baseline", "main", "high" };
+    private static readonly string[] H264Levels = { "3.0", "3.1", "4.0", "4.1", "4.2", "5.0", "5.1", "5.2" };
+    private static readonly HashSet<string> ProfileCodecs = new(StringComparer.OrdinalIgnoreCase) { "libx264", "h264_nvenc" };
+    private static readonly HashSet<string> TuneCodecs = new(StringComparer.OrdinalIgnoreCase) { "libx264", "libx265" };
+    private static readonly HashSet<string> TwoPassCodecs = new(StringComparer.OrdinalIgnoreCase) { "libx264", "libx265", "libvpx-vp9" };
+
+    /// <summary>DON-15: kodeğin seçilebilir hız ön ayarları; tek basamaklı ya da merdivensiz kodekte boş.</summary>
+    public static IReadOnlyList<string> PresetOptions(string codec)
+        => FfmpegArguments.PresetLadder(codec) is { Count: > 1 } ladder ? ladder : Array.Empty<string>();
+
+    /// <summary>DON-15: <c>-tune</c> değerleri; yalnız x264 ve x265 (SVT-AV1'in tune'u <c>-svtav1-params</c> ister).</summary>
+    public static IReadOnlyList<string> TuneOptions(string codec)
+        => TuneCodecs.Contains(codec) ? FfmpegArguments.TunesFor(codec) : Array.Empty<string>();
+
+    /// <summary>DON-15: H.264 profilleri; öteki kodeklerde boş.</summary>
+    public static IReadOnlyList<string> ProfileOptions(string codec)
+        => ProfileCodecs.Contains(codec) ? H264Profiles : Array.Empty<string>();
+
+    /// <summary>DON-15: H.264 seviyeleri; öteki kodeklerde boş.</summary>
+    public static IReadOnlyList<string> LevelOptions(string codec)
+        => ProfileCodecs.Contains(codec) ? H264Levels : Array.Empty<string>();
+
+    /// <summary>DON-15: iki geçişi okuyan kodlayıcılar; donanım kodlayıcısı tek geçişte oran denetler.</summary>
+    public static bool TwoPassAvailable(string codec) => TwoPassCodecs.Contains(codec);
+
+    /// <summary>
+    /// DON-15: plan iki geçişle kodlanır mı. Yalnız bit hızı kipinde, yeniden kodlanan videoda ve
+    /// <see cref="TwoPassAvailable"/> kodekte; CRF kipinde seçim okunmaz.
+    /// </summary>
+    public static bool UsesTwoPass(MediaInfo info, ConversionPlan plan)
+    {
+        plan = ResolveVideo(info, ResolveAudio(info, plan));
+        return plan.TwoPass && plan.QualityMode == ConversionQualityMode.Bitrate
+            && EncodesWithTuning(plan) && TwoPassAvailable(plan.VideoCodec);
+    }
+
+    private static bool EncodesWithTuning(ConversionPlan plan)
+        => !plan.AudioOnly && !plan.Gif && !plan.AnimatedImage && !plan.ImageSequenceOutput
+           && plan.VideoCodec != "copy" && IntermediateCodecs.Find(plan.VideoCodec, plan.VideoProfile) is null;
+
+    private static IEnumerable<string> TuningErrors(ConversionPlan plan)
+    {
+        if (plan.EncoderPreset is { } preset && !PresetOptions(plan.VideoCodec).Contains(preset, StringComparer.OrdinalIgnoreCase))
+            yield return $"The {plan.VideoCodec} encoder does not support the {preset} setting.";
+        if (plan.Tune is { } tune && !TuneOptions(plan.VideoCodec).Contains(tune, StringComparer.OrdinalIgnoreCase))
+            yield return $"The {plan.VideoCodec} encoder does not support the {tune} setting.";
+        if (plan.CodecProfile is { } profile && !ProfileOptions(plan.VideoCodec).Contains(profile, StringComparer.OrdinalIgnoreCase))
+            yield return $"The {plan.VideoCodec} encoder does not support the {profile} setting.";
+        if (plan.Level is { } level && !LevelOptions(plan.VideoCodec).Contains(level, StringComparer.Ordinal))
+            yield return $"The {plan.VideoCodec} encoder does not support the {level} setting.";
+    }
+
+    private static IEnumerable<string> TuningArgs(ConversionPlan plan)
+    {
+        if (plan.Tune is { } tune) { yield return "-tune"; yield return tune; }
+        if (plan.CodecProfile is { } profile) { yield return "-profile:v"; yield return profile; }
+        if (plan.Level is { } level) { yield return "-level:v"; yield return level; }
     }
 
     /// <summary>
@@ -130,7 +190,8 @@ public static class ConversionArguments
     public static bool ContainerFitsSource(string container, MediaInfo? source)
         => source is not { IsAudioOnly: true } || new ConversionPlan { Container = container }.AudioOnly;
 
-    public static IReadOnlyList<string> Build(MediaInfo info, ConversionPlan plan, string outputPath, string? palettePath = null, IEncoderAvailability? availability = null)
+    public static IReadOnlyList<string> Build(MediaInfo info, ConversionPlan plan, string outputPath, string? palettePath = null, IEncoderAvailability? availability = null,
+        int pass = 0, string? passLogPrefix = null)
     {
         var errors = Validate(info, plan);
         plan = ResolveVideo(info, ResolveAudio(info, plan));
@@ -251,6 +312,8 @@ public static class ConversionArguments
                 dolbyVisionCarriable: FfmpegArguments.SupportsRateLimits(plan.VideoCodec) is false);
             dolbyVision = hdr.DolbyVisionCarried;
             if (!string.IsNullOrEmpty(hdr.VideoFilter)) after.Add(hdr.VideoFilter);
+            var recolors = hdr.VideoFilter is null && hdr.ColorArgs.Count == 0;
+            if (recolors && VideoFilterChain.ConversionColorFilter(info, plan.Filters.ColorMatrix, plan.ColorRange) is { } color) after.Add(color);
             var pixelFormat = CodecModel.OutputPixelFormat(plan.VideoCodec, hdr.PixelFormat);
             after.AddRange(CodecModel.UploadFilters(plan.VideoCodec, pixelFormat));
             if (VideoFilterChain.BurnFilter(info, plan.BurnOptions, plan.Start?.TotalSeconds ?? 0) is { } burn) before.Add(burn);
@@ -268,17 +331,30 @@ public static class ConversionArguments
                 a.AddRange(new[] { "-profile:v", intermediate.Profile, "-pix_fmt", intermediate.PixelFormat });
             else
             {
-                a.AddRange(FfmpegArguments.SpeedArgs(plan.VideoCodec, FfmpegArguments.DefaultPreset(plan.VideoCodec)));
+                a.AddRange(FfmpegArguments.SpeedArgs(plan.VideoCodec, plan.EncoderPreset ?? FfmpegArguments.DefaultPreset(plan.VideoCodec)));
+                a.AddRange(TuningArgs(plan));
                 a.AddRange(plan.QualityMode == ConversionQualityMode.Crf
                     ? CodecModel.QualityArgs(plan.VideoCodec, plan.Crf)
                     : new[] { "-b:v", $"{plan.VideoBitrateK}k" });
+                if (pass > 0 && UsesTwoPass(info, plan))
+                {
+                    a.AddRange(new[] { "-pass", pass.ToString(CultureInfo.InvariantCulture) });
+                    if (passLogPrefix is not null) a.AddRange(new[] { "-passlogfile", passLogPrefix });
+                }
                 if (CodecModel.TakesPixelFormatFlag(plan.VideoCodec))
                     a.AddRange(new[] { "-pix_fmt", pixelFormat });
             }
             var rate = plan.Fps ?? info.Fps;
             a.AddRange(VideoFilterChain.FrameRateArgs(plan.FrameRate, rate, rate));
             if (hdr.ColorArgs.Count > 0) a.AddRange(hdr.ColorArgs);
+            else if (recolors) a.AddRange(VideoFilterChain.ConversionColorArgs(plan.Filters.ColorMatrix, plan.ColorRange));
             if (dolbyVision) a.AddRange(HdrResolver.DolbyVisionArgs);
+            if (pass == 1 && UsesTwoPass(info, plan))
+            {
+                a.AddRange(plan.ExtraArgs);
+                a.AddRange(new[] { "-an", "-sn", "-dn", "-f", "null", OperatingSystem.IsWindows() ? "NUL" : "/dev/null" });
+                return a;
+            }
         }
         AddAudio(a, info, plan);
         if (subtitles is not null)
@@ -602,7 +678,8 @@ public static class ConversionArguments
     /// </summary>
     public static bool FiltersVideo(MediaInfo info, ConversionPlan plan)
         => !plan.AudioOnly && !plan.Gif && !plan.AnimatedImage && !plan.ImageSequenceOutput
-           && (plan.Filters.ChangesPictureFor(info) || plan.FrameRate != FrameRateMode.Auto || plan.PadsToFrame);
+           && (plan.Filters.ChangesPictureFor(info) || plan.FrameRate != FrameRateMode.Auto || plan.PadsToFrame
+               || plan.ColorRange != ColorRangeTarget.Keep);
 
     /// <summary>
     /// Akış kopyası süzgeç taşıyamaz; görüntüye dokunan seçim varsa kopya kabın kendi kodlayıcısına

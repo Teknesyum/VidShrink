@@ -912,5 +912,14 @@
   "main.share.qr": "Kod QR untuk pautan kongsi",
   "main.share.qr-hint": "Imbas dengan telefon anda untuk membuka pautan.",
   "main.startup.no-display": "VidShrink tidak dapat membuka paparan grafik. Mulakannya daripada sesi desktop; pada Wayland, Xwayland mesti tersedia.",
-  "main.about.guide": "Panduan pengguna"
+  "main.about.guide": "Panduan pengguna",
+  "main.convert.encoder.label": "Pengekod dan warna",
+  "main.convert.encoder.profile": "Profil",
+  "main.convert.encoder.level": "Tahap",
+  "main.convert.encoder.two-pass": "Pengekodan dua laluan",
+  "main.convert.encoder.two-pass.tip": "• Laluan pertama menganalisis video, laluan kedua mengekodnya.\n• Kadar bit diagihkan dengan lebih sekata; pengekodan mengambil masa kira-kira dua kali ganda.\n• Hanya dalam mod kadar bit.",
+  "main.convert.color.range": "Julat warna",
+  "main.convert.color.range.limited": "Terhad (TV)",
+  "main.convert.color.range.full": "Penuh (PC)",
+  "main.validation.encoder-setting": "Pengekod {0} tidak menyokong tetapan {1}."
 }

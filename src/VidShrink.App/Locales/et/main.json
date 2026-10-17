@@ -912,5 +912,14 @@
   "main.share.qr": "Jagamislingi QR-kood",
   "main.share.qr-hint": "Lingi avamiseks skanni see telefoniga.",
   "main.startup.no-display": "VidShrink ei saanud graafilist kuva avada. Käivitage see töölauaseansist; Waylandis peab Xwayland olemas olema.",
-  "main.about.guide": "Kasutusjuhend"
+  "main.about.guide": "Kasutusjuhend",
+  "main.convert.encoder.label": "Kooder ja värv",
+  "main.convert.encoder.profile": "Profiil",
+  "main.convert.encoder.level": "Tase",
+  "main.convert.encoder.two-pass": "Kahekäiguline kodeerimine",
+  "main.convert.encoder.two-pass.tip": "• Esimene käik analüüsib videot, teine kodeerib selle.\n• Bitikiirus jaotub ühtlasemalt; kodeerimine võtab umbes kaks korda kauem.\n• Ainult bitikiiruse režiimis.",
+  "main.convert.color.range": "Värvivahemik",
+  "main.convert.color.range.limited": "Piiratud (TV)",
+  "main.convert.color.range.full": "Täielik (PC)",
+  "main.validation.encoder-setting": "Kooder {0} ei toeta sätet {1}."
 }

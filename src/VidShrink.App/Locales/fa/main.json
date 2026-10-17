@@ -912,5 +912,14 @@
   "main.share.qr": "کد QR پیوند اشتراک‌گذاری",
   "main.share.qr-hint": "برای باز کردن پیوند، آن را با تلفن خود اسکن کنید.",
   "main.startup.no-display": "VidShrink نتوانست نمایشگر گرافیکی را باز کند. آن را از یک نشست میزکار اجرا کنید؛ در Wayland باید Xwayland در دسترس باشد.",
-  "main.about.guide": "راهنمای استفاده"
+  "main.about.guide": "راهنمای استفاده",
+  "main.convert.encoder.label": "رمزگذار و رنگ",
+  "main.convert.encoder.profile": "پروفایل",
+  "main.convert.encoder.level": "سطح",
+  "main.convert.encoder.two-pass": "رمزگذاری دومرحله‌ای",
+  "main.convert.encoder.two-pass.tip": "• مرحلهٔ اول ویدیو را تحلیل می‌کند و مرحلهٔ دوم آن را رمزگذاری می‌کند.\n• نرخ بیت یکنواخت‌تر پخش می‌شود؛ رمزگذاری حدود دو برابر طول می‌کشد.\n• فقط در حالت نرخ بیت.",
+  "main.convert.color.range": "محدودهٔ رنگ",
+  "main.convert.color.range.limited": "محدود (TV)",
+  "main.convert.color.range.full": "کامل (PC)",
+  "main.validation.encoder-setting": "رمزگذار {0} از تنظیم {1} پشتیبانی نمی‌کند."
 }

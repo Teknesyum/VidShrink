@@ -912,5 +912,14 @@
   "main.share.qr": "QR kod poveznice za dijeljenje",
   "main.share.qr-hint": "Skenirajte telefonom da biste otvorili poveznicu.",
   "main.startup.no-display": "VidShrink nije mogao otvoriti grafički zaslon. Pokrenite ga iz sesije radne površine; na Waylandu mora biti dostupan Xwayland.",
-  "main.about.guide": "Upute za korištenje"
+  "main.about.guide": "Upute za korištenje",
+  "main.convert.encoder.label": "Koder i boja",
+  "main.convert.encoder.profile": "Profil",
+  "main.convert.encoder.level": "Razina",
+  "main.convert.encoder.two-pass": "Kodiranje u dva prolaza",
+  "main.convert.encoder.two-pass.tip": "• Prvi prolaz analizira video, drugi ga kodira.\n• Brzina prijenosa raspoređuje se ravnomjernije; kodiranje traje otprilike dvostruko dulje.\n• Samo u načinu brzine prijenosa.",
+  "main.convert.color.range": "Raspon boja",
+  "main.convert.color.range.limited": "Ograničen (TV)",
+  "main.convert.color.range.full": "Pun (PC)",
+  "main.validation.encoder-setting": "Koder {0} ne podržava postavku {1}."
 }

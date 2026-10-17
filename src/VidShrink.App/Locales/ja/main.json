@@ -912,5 +912,14 @@
   "main.share.qr": "共有リンクの QR コード",
   "main.share.qr-hint": "スマートフォンでスキャンするとリンクが開きます。",
   "main.startup.no-display": "VidShrink はグラフィカルディスプレイを開けませんでした。デスクトップセッションから起動してください。Wayland では Xwayland が必要です。",
-  "main.about.guide": "使い方ガイド"
+  "main.about.guide": "使い方ガイド",
+  "main.convert.encoder.label": "エンコーダーと色",
+  "main.convert.encoder.profile": "プロファイル",
+  "main.convert.encoder.level": "レベル",
+  "main.convert.encoder.two-pass": "2パスエンコード",
+  "main.convert.encoder.two-pass.tip": "• 1回目のパスで動画を解析し、2回目でエンコードします。\n• ビットレートがより均等に配分されます。エンコードには約2倍の時間がかかります。\n• ビットレートモードのみ。",
+  "main.convert.color.range": "色範囲",
+  "main.convert.color.range.limited": "リミテッド (TV)",
+  "main.convert.color.range.full": "フル (PC)",
+  "main.validation.encoder-setting": "エンコーダー{0}は設定{1}に対応していません。"
 }

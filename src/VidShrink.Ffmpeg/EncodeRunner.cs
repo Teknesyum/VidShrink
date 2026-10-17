@@ -788,11 +788,22 @@ public sealed class EncodeRunner
                 var chapters = ConversionChapters.Metadata(info, plan);
                 var chapterPath = ConversionChapters.MetadataPath(partialPath);
                 if (chapters is not null) await File.WriteAllTextAsync(chapterPath, chapters, ct);
+                var passLog = Path.Combine(Path.GetTempPath(), $"vidshrink_pass_{Guid.NewGuid():N}");
                 try
                 {
-                    await RunCommandAsync(ConversionArguments.Build(info, plan, partialPath, availability: EncoderCapabilities.Instance), duration, progress, "converting", 0, 1, ct);
+                    if (ConversionArguments.UsesTwoPass(info, plan))
+                    {
+                        await RunCommandAsync(ConversionArguments.Build(info, plan, partialPath, availability: EncoderCapabilities.Instance, pass: 1, passLogPrefix: passLog), duration, progress, "converting 1/2", 0, 0.5, ct);
+                        await RunCommandAsync(ConversionArguments.Build(info, plan, partialPath, availability: EncoderCapabilities.Instance, pass: 2, passLogPrefix: passLog), duration, progress, "converting 2/2", 0.5, 1, ct);
+                    }
+                    else
+                        await RunCommandAsync(ConversionArguments.Build(info, plan, partialPath, availability: EncoderCapabilities.Instance), duration, progress, "converting", 0, 1, ct);
                 }
-                finally { if (chapters is not null) TryDelete(chapterPath); }
+                finally
+                {
+                    if (chapters is not null) TryDelete(chapterPath);
+                    CleanupPassLogs(passLog);
+                }
             }
 
             File.Move(partialPath, outputPath, overwrite: true);
