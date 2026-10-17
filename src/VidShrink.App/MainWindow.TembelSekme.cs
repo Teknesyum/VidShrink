@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using VidShrink.App.Editing;
+using VidShrink.App.Playback;
 using VidShrink.App.Recorder;
 
 namespace VidShrink.App;
@@ -108,5 +109,12 @@ public partial class MainWindow
         }
 
         _editorPane?.Deactivate();
+    }
+
+    /// <summary>OYB-08: oynatıcı sekmesi ilk kez görünürken saklanan kuyruk geri gelir; açılış dosyası varsa gelmez.</summary>
+    private void OynaticiSekmesiSecildi()
+    {
+        if (PlayerView.QueueRestoreDisabled || _startupFile is not null || Tabs.SelectedItem is not TabItem secili || !ReferenceEquals(secili, TabPlayer)) return;
+        Player.RestoreQueue();
     }
 }

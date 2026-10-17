@@ -236,6 +236,7 @@ public partial class MainWindow : Window
         Tabs.SelectionChanged += (_, _) => ApplyWindowFrame();
         Tabs.SelectionChanged += (_, _) => KaydediciSekmesiSecildi();
         Tabs.SelectionChanged += (_, _) => DuzenleyiciSekmesiSecildi();
+        Tabs.SelectionChanged += (_, _) => OynaticiSekmesiSecildi();
 
 
         if (OperatingSystem.IsMacOS())
@@ -368,6 +369,7 @@ public partial class MainWindow : Window
         ShowPerformanceResult(PerformanceCheckResult.NotMeasured);
         if (_startupFile is not null) Tabs.SelectedIndex = PlayerTabIndex;
         Opened += OnWindowLoaded;
+        Opened += (_, _) => OynaticiSekmesiSecildi();
         IlkBoyayiBekle();
         AcilisGoruntusunuBildir();
         AcilisIzi.Yaz("yapici-bitti");
