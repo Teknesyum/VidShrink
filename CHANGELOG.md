@@ -7,6 +7,13 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Added
+
+- Player: "Speed through silence" mode (J, Playback menu). A labelled `silencedetect` ring sits at the head of the
+  audio chain; when it reports a silence the speed rises to 4x and drops back to the previous speed when sound returns,
+  so audio and picture stay in sync instead of jumping. Off by default; threshold (`silenceThresholdDb`, default
+  -35 dB) and shortest silence (`silenceMinimumSeconds`, default 0.5 s) live in the player settings file.
+
 ### Fixed
 
 - Recorder: on Windows the "System Audio" source stays in the list when the device list cannot be read; before, a failed

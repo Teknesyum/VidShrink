@@ -253,6 +253,13 @@ internal partial class PlayerView
             case PlayerCommandKind.FileStep:
                 _trace.Add("file " + command.Amount.ToString("0", CultureInfo.InvariantCulture) + " -> " + StepFile(command.Amount > 0));
                 return true;
+            case PlayerCommandKind.ToggleSilenceSkip:
+                EnsureSettings();
+                _settings.SilenceSkip = !_settings.SilenceSkip;
+                SaveSettings();
+                _engine?.SetSilenceSkip(_settings.Silence);
+                _trace.Add("silenceskip -> " + _settings.SilenceSkip);
+                return true;
             case PlayerCommandKind.ToggleShuffle:
                 EnsureSettings();
                 _settings.Shuffle = !_settings.Shuffle;
@@ -491,6 +498,7 @@ internal partial class PlayerView
             PlayerCommandKind.Mirror => _mirrored,
             PlayerCommandKind.ToggleInfo => _infoVisible,
             PlayerCommandKind.ToggleShuffle => _settings.Shuffle,
+            PlayerCommandKind.ToggleSilenceSkip => _settings.SilenceSkip,
             _ => null
         };
     }
@@ -778,6 +786,7 @@ internal partial class PlayerView
         if (_settings.Repeat == RepeatMode.All) parts.Add(Strings.Get("player.list.repeat-all"));
         if (_settings.Repeat == RepeatMode.One) parts.Add(Strings.Get("player.list.repeat-one"));
         if (_settings.Shuffle) parts.Add(Strings.Get("player.list.state-shuffle"));
+        if (_settings.SilenceSkip) parts.Add(Strings.Get("player.view.state-silenceskip"));
         if (_notice is not null) parts.Add(_notice);
 
         TxtView.Text = LanguageCatalog.Display(string.Join(" - ", parts));

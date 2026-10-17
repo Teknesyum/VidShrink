@@ -97,6 +97,7 @@ internal static class Keymap
     internal static readonly PlayerAction Slower = new(PlayerCommandKind.Speed, -SpeedStep, "main.player.menu.slower");
     internal static readonly PlayerAction NormalSpeed = new(PlayerCommandKind.SpeedReset, 0, "main.player.menu.normalspeed");
     internal static readonly PlayerAction SpeedAb = new(PlayerCommandKind.SpeedAb, 0, "main.player.menu.speedab");
+    internal static readonly PlayerAction SilenceSkip = new(PlayerCommandKind.ToggleSilenceSkip, 0, "player.menu.silenceskip");
     internal static readonly PlayerAction NextFrame = new(PlayerCommandKind.FrameStep, 1, "main.player.menu.nextframe");
     internal static readonly PlayerAction PreviousFrame = new(PlayerCommandKind.FrameStep, -1, "main.player.menu.prevframe");
     internal static readonly PlayerAction LoopStart = new(PlayerCommandKind.LoopStart, 0, "main.player.menu.loopstart");
@@ -152,6 +153,7 @@ internal static class Keymap
         new(PlayerInput.OnKey(Key.X), Slower),
         new(PlayerInput.OnKey(Key.Z), NormalSpeed),
         new(PlayerInput.OnKey(Key.V), SpeedAb),
+        new(PlayerInput.OnKey(Key.J), SilenceSkip),
         new(PlayerInput.OnKey(Key.F, KeyModifiers.Control | KeyModifiers.Shift), Faster),
         new(PlayerInput.OnKey(Key.B, KeyModifiers.Control | KeyModifiers.Shift), Slower),
         new(PlayerInput.OnKey(Key.N, KeyModifiers.Control | KeyModifiers.Shift), NormalSpeed),
@@ -266,7 +268,7 @@ internal static class Keymap
 
     internal static readonly IReadOnlyList<PlayerAction?> PlaybackMenu = new[]
     {
-        Faster, Slower, NormalSpeed, null,
+        Faster, Slower, NormalSpeed, SilenceSkip, null,
         NextFrame, PreviousFrame, null,
         NextChapter, PreviousChapter, GoToTime, null,
         PreviousFile, NextFile, Shuffle, RepeatCycle
