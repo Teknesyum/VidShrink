@@ -10,14 +10,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 **Dalga 2 — Karar Gerekmez, Küçük İş Öncelik 2 Ya Da Orta İş Öncelik 1**
 
-## 40. Düzenleyicide Proje Sırası Ve Toplu Teslim
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DZA-P9 · Düzenleyici · iş orta · öncelik 1 · karar gerekmez
-
-- İlk adım 16 Ekim 2026'da main'de: `vidshrink teslim <proje>` pencere açmadan proje dosyasını teslim ediyor (`src/VidShrink.Cli/CliEdit.cs`, `EditProject.ToJob`).
-- Toplu teslim (DZA-09) 16 Ekim 2026'da main'de: düzenleyici sağ tık menüsünde "Toplu Teslim…" (`EditBatch`, `EditBatchWindow`); projeler komut satırı yoluyla sırayla teslim edilir, düşen proje ötekini durdurmaz.
-- Ölçülmeyen: komut satırı tesliminde hızlı ve akıllı kip, çok kaynaklı ve müzikli proje uçtan uca gerçek ffmpeg ile.
-
 ## 42. Ekrana Çizim Ve Prompter
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P7 · Kaydedici · iş büyük · öncelik 1 · karar gerekmez
