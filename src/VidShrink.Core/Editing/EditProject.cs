@@ -341,6 +341,7 @@ public sealed class EditProject
         if (clip.Source != 0) writer.WriteNumber("source", clip.Source);
         if (clip.Label is { } label) writer.WriteString("label", label);
         if (clip.Group is { } group) writer.WriteNumber("group", group);
+        if (clip.Smooth) writer.WriteBoolean("smooth", true);
         if (clip.Transition is { } transition)
         {
             writer.WriteStartObject("transition");
@@ -401,6 +402,7 @@ public sealed class EditProject
             Label = item.TryGetProperty("label", out var label) ? label.GetString() : null,
             Group = item.TryGetProperty("group", out var group) ? group.GetInt32() : null,
             Transition = item.TryGetProperty("transition", out var transition) ? ReadTransition(transition) : null,
+            Smooth = item.TryGetProperty("smooth", out var smooth) && smooth.GetBoolean(),
         };
         if (!item.TryGetProperty("effects", out var e)) return clip;
 

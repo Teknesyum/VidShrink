@@ -459,7 +459,7 @@ internal partial class EditorView
     private static string ClipNumbers(IEnumerable<int> indexes) => string.Join(", ", indexes.Select(i => (i + 1).ToString(Strings.Culture)));
 
     internal static string Fingerprint(EditTimeline model)
-        => string.Join(";", model.Clips.Select(c => $"{c.Source}:{c.SourceStart}-{c.SourceEnd}-{c.Speed}-{c.Reversed}-{c.Effects}-{c.Transition}"))
+        => string.Join(";", model.Clips.Select(c => $"{c.Source}:{c.SourceStart}-{c.SourceEnd}-{c.Speed}-{c.Reversed}-{c.Effects}-{c.Transition}-{c.Smooth}"))
            + "|" + string.Join(";", model.Texts.Select(t => $"{t.Start}-{t.End}-{t.Size}-{t.Color}-{t.Bold}-{t.Italic}-{t.FontName}-{t.FadeIn}-{t.FadeOut}-{t.MotionIn}:{t.MotionInLength}-{t.MotionOut}:{t.MotionOutLength}-{t.Outline}:{t.Shadow}:{t.Box}-"
                + string.Join(",", t.Keyframes.Select(k => $"{k.Offset}:{k.X}:{k.Y}")) + "-" + t.Text.Length + ":" + t.Text))
            + "|" + model.Music;

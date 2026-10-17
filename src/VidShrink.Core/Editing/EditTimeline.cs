@@ -647,6 +647,53 @@ public sealed class EditTimeline
         return true;
     }
 
+    /// <summary>
+    /// Parcayi hiz rampasina boler (<see cref="SpeedRamp.Pieces"/>): dilim hizlari
+    /// <paramref name="from"/>'dan <paramref name="to"/>'ya dogrusal gider. Tek adimda geri alinir;
+    /// parca rampaya yetecek kadar uzun degilse <c>false</c> doner.
+    /// </summary>
+    public bool RampSpeed(int index, decimal from, decimal to, int slices = SpeedRamp.DefaultSlices)
+    {
+        CheckIndex(index);
+        var pieces = SpeedRamp.Pieces(_clips[index], from, to, slices);
+        if (pieces.Count < 2) return false;
+
+        var steps = new List<IEditCommand>();
+        var first = new ReplaceCommand(index, _clips[index], pieces[0]);
+        first.Apply(_clips);
+        steps.Add(first);
+        for (var k = 1; k < pieces.Count; k++)
+        {
+            var insert = new InsertCommand(index + k, pieces[k]);
+            insert.Apply(_clips);
+            steps.Add(insert);
+        }
+
+        Record(new CompositeCommand(steps));
+        return true;
+    }
+
+    /// <summary>Secili parcalarin akici agir cekimini acar ya da kapatir; tek adimda geri alinir. Degisiklik yoksa <c>false</c> doner.</summary>
+    public bool SetSmooth(IReadOnlyList<int> indices, bool smooth)
+    {
+        ArgumentNullException.ThrowIfNull(indices);
+        foreach (var index in indices) CheckIndex(index);
+
+        var steps = new List<IEditCommand>();
+        foreach (var index in indices.Distinct())
+        {
+            var before = _clips[index];
+            if (before.Smooth == smooth) continue;
+            var step = new ReplaceCommand(index, before, before with { Smooth = smooth });
+            step.Apply(_clips);
+            steps.Add(step);
+        }
+
+        if (steps.Count == 0) return false;
+        Record(new CompositeCommand(steps));
+        return true;
+    }
+
     public bool HasEffects => _clips.Any(c => !c.Effects.IsNeutral);
 
     /// <summary>
