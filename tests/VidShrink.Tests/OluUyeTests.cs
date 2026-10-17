@@ -799,8 +799,8 @@ public sealed class OluUyeTests
     /// adli uyesi uretimde okununca olu uye canli gorunuyor — RecordProgress.Captured bu yuzden
     /// listeden dustu, uretimde okunan Pointer.Captured'di. Satiri silmeden once okuyanin
     /// gercekten o tur oldugunu dogrula. RemoteZip.Paths de ayni yoldan dustu: OYB-P7 ile
-    /// ForwardedRequest.Paths uretimde okunuyor, RemoteZip.Paths hala okunmuyor. Kosum: 1478
-    /// ozellik, 70 isaretli.
+    /// ForwardedRequest.Paths uretimde okunuyor, RemoteZip.Paths hala okunmuyor. QualityScore.Ssim
+    /// later 122 ile dustu: OutputQualityCheck SSIM kolunda uretimde okuyor. Kosum: 1642 ozellik, 69 isaretli.
     /// </summary>
     private static readonly string[] PinnedOzellik =
     {
@@ -842,7 +842,6 @@ public sealed class OluUyeTests
         "QualityLevel.SlopeMeasured  yalniz-disarida",
         "QualityMeasurementFailedException.PartialScore  yalniz-disarida",
         "QualityScore.ColorNormalization  yalniz-disarida",
-        "QualityScore.Ssim  yalniz-disarida",
         "QualityScore.TonemappedReference  yalniz-disarida",
         "QualityScore.Xpsnr  yalniz-disarida",
         "QualityTargetResult.Evaluations  yalniz-disarida",
