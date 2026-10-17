@@ -72,7 +72,7 @@ public sealed class KaydediciKameraTests
         var metin = string.Join(" ", kamerali);
         Assert.Contains("-f dshow -rtbufsize 256M -i video=Kam A", metin);
         Assert.True(kamerali.ToList().IndexOf("gdigrab") < kamerali.ToList().IndexOf("dshow"));
-        Assert.Equal("[0:v]null[base];[1:v]scale=240:-2[cam];[base][cam]overlay=16:16:eof_action=repeat[vout]", Deger(kamerali, "-filter_complex"));
+        Assert.Equal("[0:v]null[base];[1:v]scale=240:-2[cam];[base][cam]overlay=16:16:eof_action=repeat,scale=out_color_matrix=bt709:out_range=tv,format=yuv420p,setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709:range=tv[vout]", Deger(kamerali, "-filter_complex"));
         Assert.Equal("[vout]", Deger(kamerali, "-map"));
         Assert.Contains("-an", kamerali);
         Assert.Null(Deger(kamerali, "-vf"));
@@ -214,7 +214,7 @@ public sealed class KaydediciKameraTests
         var graf = Deger(RecorderArguments.Build(istek, "a.mkv"), "-filter_complex")!;
 
         Assert.Contains(beklenen, graf);
-        Assert.EndsWith("[base][cam]overlay=16:16:eof_action=repeat[vout]", graf);
+        Assert.EndsWith("[base][cam]overlay=16:16:eof_action=repeat,scale=out_color_matrix=bt709:out_range=tv,format=yuv420p,setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709:range=tv[vout]", graf);
         Assert.Empty(RecorderArguments.Validate(istek, "a.mkv"));
     }
 
@@ -236,7 +236,7 @@ public sealed class KaydediciKameraTests
         Assert.Equal("[0:v]scale=640:480,split[base][wref];"
                      + "[1:v]hflip,crop='min(iw,ih)':'min(iw,ih)'[wsrc];"
                      + "[wsrc][wref]scale=w='trunc(rw*0.25/2)*2':h=-2," + DaireMaskesi + "[cam];"
-                     + "[base][cam]overlay=x='16+(main_w-overlay_w-32)*0.5':y='16+(main_h-overlay_h-32)*1':eof_action=repeat[vout]", graf);
+                     + "[base][cam]overlay=x='16+(main_w-overlay_w-32)*0.5':y='16+(main_h-overlay_h-32)*1':eof_action=repeat,scale=out_color_matrix=bt709:out_range=tv,format=yuv420p,setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709:range=tv[vout]", graf);
         Assert.Empty(RecorderArguments.Validate(istek, "a.mkv"));
     }
 

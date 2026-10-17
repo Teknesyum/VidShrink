@@ -21,6 +21,9 @@ namespace VidShrink.Tests;
 /// <para>
 /// 2026-10-15: <c>ScheduleAt</c> saniyeye kadar yazilir; tik kesirli bir uretilmis deger geri donmez, sabit tarih <c>Kisitli</c>'da.
 /// </para>
+/// <para>
+/// 2026-10-17: <c>HdrToSdr</c> yaninda goc isareti <c>hdrToSdrDefaultOn</c> yazilir; iki anahtar sayilir.
+/// </para>
 /// </summary>
 public sealed class KaydediciAyarGidisDonusTests
 {
@@ -46,7 +49,8 @@ public sealed class KaydediciAyarGidisDonusTests
     private static readonly Dictionary<string, int> CokAnahtarli = new()
     {
         ["KeyCaption"] = 3,
-        ["PrompterLook"] = 3
+        ["PrompterLook"] = 3,
+        ["HdrToSdr"] = 2
     };
 
     internal static IReadOnlyList<PropertyInfo> Ozellikler() => typeof(RecorderSettings)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -282,7 +282,7 @@ public sealed class KaydediciAyarTests
             (_, a, yol) => yol.EndsWith(".mkv", StringComparison.Ordinal) && Deger(a, "-movflags") is null ? null : "yol " + yol,
             p => Oku(p, "format_name")?.Contains("matroska", StringComparison.Ordinal) == true ? null : "format_name " + Oku(p, "format_name"));
         yield return new("olcek", v => { Yaz(v, "TxtScaleWidth", "320"); Yaz(v, "TxtScaleHeight", "180"); }, "scaleWidth", "320",
-            (_, a, _) => Deger(a, "-vf") == "scale=320:180" ? null : "-vf " + Deger(a, "-vf"),
+            (_, a, _) => Deger(a, "-vf")?.StartsWith("scale=320:180,", StringComparison.Ordinal) == true ? null : "-vf " + Deger(a, "-vf"),
             p => Oku(p, "width") == "320" && Oku(p, "height") == "180" ? null : $"{Oku(p, "width")}x{Oku(p, "height")}");
         yield return new("anahtar kare", v => { Yaz(v, "TxtFps", "30"); Yaz(v, "TxtKeyframe", "5"); }, "keyframeSeconds", "5",
             (_, a, _) => Deger(a, "-g") == "150" ? null : "-g " + Deger(a, "-g"));
@@ -309,9 +309,9 @@ public sealed class KaydediciAyarTests
                 ? null : $"-b:v {Deger(a, "-b:v")} -maxrate {Deger(a, "-maxrate")} -bufsize {Deger(a, "-bufsize")} -crf {Deger(a, "-crf")}",
             p => new[] { Oku(p, "stream_bit_rate"), Oku(p, "bit_rate") }.Any(s => long.TryParse(s, out var bit) && bit > 2_000_000)
                 ? null : $"bit_rate {Oku(p, "stream_bit_rate")} / {Oku(p, "bit_rate")}");
-        yield return new("renk uzayi", v => Sec(v, "CmbColorSpace", "bt709"), "colorSpace", "\"bt709\"",
-            (_, a, _) => Deger(a, "-colorspace") == "bt709" ? null : "-colorspace " + Deger(a, "-colorspace"),
-            p => Oku(p, "color_space") == "bt709" ? null : "color_space " + Oku(p, "color_space"));
+        yield return new("renk uzayi", v => Sec(v, "CmbColorSpace", "smpte170m"), "colorSpace", "\"smpte170m\"",
+            (_, a, _) => Deger(a, "-colorspace") == "smpte170m" ? null : "-colorspace " + Deger(a, "-colorspace"),
+            p => Oku(p, "color_space") == "smpte170m" ? null : "color_space " + Oku(p, "color_space"));
         yield return new("renk araligi", v => Sec(v, "CmbColorRange", "pc"), "colorRange", "\"pc\"",
             (_, a, _) => Deger(a, "-color_range") == "pc" ? null : "-color_range " + Deger(a, "-color_range"),
             p => Oku(p, "color_range") == "pc" ? null : "color_range " + Oku(p, "color_range"));

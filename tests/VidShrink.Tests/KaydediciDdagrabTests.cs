@@ -314,6 +314,12 @@ public sealed class KaydediciDdagrabTests
     [Theory]
     [InlineData("recorder.capture.fallback-unavailable")]
     [InlineData("recorder.capture.fallback-layout")]
+    [InlineData("recorder.capture.fallback-hdr")]
+    [InlineData("recorder.capture.hdr-no-tonemap")]
+    [InlineData("recorder.capture.hdr-no-hevc")]
+    [InlineData("recorder.capture.hdr-kept-hevc")]
+    [InlineData("recorder.capture.hdr-kept")]
+    [InlineData("recorder.capture.sdr-white-assumed")]
     public void DususMetniButunDillerde(string anahtar)
     {
         Assert.Equal(42, Locales.Languages.Count);

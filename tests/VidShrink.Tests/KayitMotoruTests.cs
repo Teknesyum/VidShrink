@@ -164,7 +164,7 @@ public sealed class KayitMotoruTests
 
         Assert.Contains("-offset_x 40 -offset_y 20 -video_size 640x480", Arg(args));
         Assert.Contains("-i desktop", Arg(args));
-        Assert.DoesNotContain("-vf", args);
+        Assert.Contains("-vf scale=out_color_matrix=bt709:out_range=tv,format=yuv420p,setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709:range=tv", Arg(args));
     }
 
     [Fact]

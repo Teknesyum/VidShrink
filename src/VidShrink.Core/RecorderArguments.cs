@@ -126,9 +126,35 @@ public enum RecorderCapture
 /// ekrani <see cref="Index"/> ile seciyor (<c>output_idx</c>); bu sira Avalonia'nin ekran
 /// sirasiyla ayni degil, bu yuzden eslesme masaustu koordinatindan yapiliyor. Dondurulmus
 /// cikis listeye girmez. <see cref="Hdr"/>: Windows bu cikisi HDR10 renk uzayinda
-/// (<c>DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020</c>) suruyor.
+/// (<c>DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020</c>) suruyor. <see cref="SdrWhiteNits"/>:
+/// Windows'un SDR icerigi koydugu parlaklik (<c>DISPLAYCONFIG_SDR_WHITE_LEVEL</c>); okunamadiysa <c>null</c>.
 /// </summary>
-public sealed record DdaOutput(int Index, int X, int Y, int Width, int Height, bool Hdr = false);
+public sealed record DdaOutput(int Index, int X, int Y, int Width, int Height, bool Hdr = false, DdaDisplayInfo? Display = null, double? SdrWhiteNits = null);
+
+/// <summary>
+/// Cikisin <c>DXGI_OUTPUT_DESC1</c>'den okunan renk ve parlaklik bilgisi: renk koordinatlari
+/// CIE 1931 xy, parlaklik nit. Surucu bos birakabilir; sifir ya da aralik disi deger
+/// "bilinmiyor" sayilir.
+/// </summary>
+public sealed record DdaDisplayInfo(
+    double RedX, double RedY, double GreenX, double GreenY, double BlueX, double BlueY,
+    double WhiteX, double WhiteY, double MinNits, double MaxNits, double MaxFullFrameNits);
+
+/// <summary>HDR10 statik verisi: x265 bicimli <c>master-display</c> ve <c>MaxCLL,MaxFALL</c>.</summary>
+public sealed record HdrStaticMetadata(string MasterDisplay, string ContentLight);
+
+/// <summary>HDR korunurken kodlayici seciminin sonucu (<see cref="RecorderArguments.WithHdrCodec"/>).</summary>
+public enum HdrCodecOutcome
+{
+    /// <summary>Kodlayici degismedi.</summary>
+    Unchanged,
+
+    /// <summary>H.264 yerine HEVC 10 bit secildi.</summary>
+    SwitchedToHevc,
+
+    /// <summary>HEVC yok; kayit SDR'ye cevrildi.</summary>
+    NoHevc
+}
 
 /// <summary>
 /// <c>ddagrab</c> yerine <c>gdigrab</c>'a dusulmesinin sebebi. <see cref="None"/> disindaki
@@ -231,10 +257,27 @@ public sealed record RecorderRequest
 
     /// <summary>
     /// HDR ekranda kaydi SDR'ye cevir. Varsayilan <c>false</c>: HDR cikista kayit 10 bit HDR10
-    /// kalir (<see cref="RecorderArguments.HdrCapture"/>); acikken kare bugunku gibi 8 bit
-    /// <c>bgra</c> iner ve donusumu Windows yapar.
+    /// kalir (<see cref="RecorderArguments.HdrCapture"/>). Acikken kare 10 bit iner ve
+    /// <c>zscale</c> ile ton eslenir (<see cref="RecorderArguments.HdrTonemapCapture"/>);
+    /// <see cref="CanTonemap"/> kapaliysa eski yol: 8 bit <c>bgra</c>, donusumu Windows yapar.
     /// </summary>
     public bool HdrToSdr { get; init; }
+
+    /// <summary>
+    /// ffmpeg'de <c>zscale</c> var mi. Varsayilan <c>true</c>; arayuz yetenek listesinden kurar.
+    /// Kapaliyken <see cref="HdrToSdr"/> ton eslemesiz eski yola duser ve
+    /// <see cref="RecorderArguments.HdrTonemapMissing"/> bunu soyler.
+    /// </summary>
+    public bool CanTonemap { get; init; } = true;
+
+    /// <summary>
+    /// Istek bir GIF kaydinin ara Matroska yakalamasi (<see cref="RecorderArguments.CaptureRequest"/>).
+    /// GIF yolu renk etiketi ve BT.709 donusumu almaz: palet RGB'den kurulur.
+    /// </summary>
+    public bool GifCapture { get; init; }
+
+    /// <summary>`gdigrab`'a dusulmenin sebebi, <see cref="RecorderArguments.ChooseCapture"/> kurar; tani gunlugune yazilir.</summary>
+    public DdagrabFallback CaptureFallback { get; init; }
 
     /// <summary>Bolge kaydinda dikdortgen.</summary>
     public RecorderRegion? Region { get; init; }
@@ -661,7 +704,7 @@ public static class RecorderArguments
     {
         ArgumentNullException.ThrowIfNull(request);
         return request.Container == RecorderContainer.Gif
-            ? request with { Container = CaptureContainer(request.Container) }
+            ? request with { Container = CaptureContainer(request.Container), GifCapture = true }
             : request;
     }
 
@@ -1224,6 +1267,7 @@ public static class RecorderArguments
         var mask = WebcamMask(cam.Shape);
         var after = key + (mask.Length == 0 ? string.Empty : (key.Length == 0 ? ",format=yuva420p," : ",") + mask);
         var source = VideoFilter(request) ?? "null";
+        var colour = SdrColour(request) ? "," + SdrColourLink(request) : string.Empty;
         var margin = Number(WebcamMargin);
 
         if (cam.Placement is not { } place)
@@ -1231,7 +1275,7 @@ public static class RecorderArguments
             var chain = string.Join(",", before.Append($"scale={Number(cam.Width)}:-2"));
             return $"[0:v]{source}[base];"
                    + $"[{index}:v]{chain}{after}[cam];"
-                   + $"[base][cam]overlay={WebcamPosition(cam.Corner)}:eof_action=repeat[{WebcamOutputLabel}]";
+                   + $"[base][cam]overlay={WebcamPosition(cam.Corner)}:eof_action=repeat{colour}[{WebcamOutputLabel}]";
         }
 
         var room = Number(2 * WebcamMargin);
@@ -1239,7 +1283,7 @@ public static class RecorderArguments
                + $"[{index}:v]{(before.Count == 0 ? "null" : string.Join(",", before))}[wsrc];"
                + $"[wsrc][wref]scale=w='trunc(rw*{Ratio(place.Size)}/2)*2':h=-2{after}[cam];"
                + $"[base][cam]overlay=x='{margin}+(main_w-overlay_w-{room})*{Ratio(place.X)}'"
-               + $":y='{margin}+(main_h-overlay_h-{room})*{Ratio(place.Y)}':eof_action=repeat[{WebcamOutputLabel}]";
+               + $":y='{margin}+(main_h-overlay_h-{room})*{Ratio(place.Y)}':eof_action=repeat{colour}[{WebcamOutputLabel}]";
     }
 
     private static IEnumerable<string> ScreenSelectionErrors(RecorderRequest request)
@@ -1382,7 +1426,7 @@ public static class RecorderArguments
 
         reason = DdagrabBlocker(request);
         if (reason == DdagrabFallback.None && !ddagrabWorks) reason = DdagrabFallback.Unavailable;
-        return request with { Capture = reason == DdagrabFallback.None ? RecorderCapture.Ddagrab : RecorderCapture.Gdigrab };
+        return request with { Capture = reason == DdagrabFallback.None ? RecorderCapture.Ddagrab : RecorderCapture.Gdigrab, CaptureFallback = reason };
     }
 
     /// <summary>
@@ -1403,6 +1447,24 @@ public static class RecorderArguments
     }
 
     /// <summary>
+    /// Oz sinamanin tek karelik yakalamasi: kaydin kendi <c>ddagrab</c> girdisi, kodlayici yerine
+    /// <paramref name="rawPath"/>'e ham <c>rgb24</c>. Renk karti boylece kaydin goruntu yolundan
+    /// gecer, kodlayicinin kaybi olcuye karismaz.
+    /// </summary>
+    public static IReadOnlyList<string> BuildFrameGrab(RecorderRequest request, string rawPath)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        ArgumentException.ThrowIfNullOrWhiteSpace(rawPath);
+        if (DdagrabBlocker(request) is var blocker and not DdagrabFallback.None)
+            throw new InvalidOperationException($"ddagrab cannot capture this request ({blocker}).");
+
+        var a = new List<string> { "-hide_banner", "-nostdin", "-v", "error", "-y" };
+        a.AddRange(DdagrabInput(request));
+        a.AddRange(new[] { "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", "rgb24", rawPath });
+        return a;
+    }
+
+    /// <summary>
     /// <c>ddagrab</c> girdisi. Kaynak D3D11 yuzeyi veriyor; <c>hwdownload,format=bgra</c> ayni
     /// grafikte kareyi bellege indiriyor, boylece <c>-vf</c>, kamera bindirmesi, onizleme ve
     /// her kodlayici <c>gdigrab</c>'daki gibi bgra kare goruyor. NVENC'e dogrudan D3D11 yuzeyi
@@ -1417,17 +1479,69 @@ public static class RecorderArguments
             source += $":offset_x={Number(local.X)}:offset_y={Number(local.Y)}:video_size={Size(local)}";
         if (HdrCapture(request))
             return new[] { "-f", "lavfi", "-i", source + ":output_fmt=10bit,hwdownload,format=x2bgr10," + HdrFrameChain };
+        if (HdrTonemapCapture(request))
+            return new[] { "-f", "lavfi", "-i", source + ":output_fmt=10bit,hwdownload,format=x2bgr10," + HdrSdrChain(SdrWhite(request), PeakNits(request)) };
         return new[] { "-f", "lavfi", "-i", source + ",hwdownload,format=bgra" };
     }
+
+    /// <summary>Windows'un SDR beyaz duzeyi okunamazsa varsayilan: Windows'un kendi varsayilani degil, HDR10 referans beyazi (BT.2408).</summary>
+    public const double DefaultSdrWhiteNits = 203;
+
+    /// <summary>Ekran tepe parlakligini bildirmiyorsa egrinin tavani.</summary>
+    public const double DefaultPeakNits = 1000;
+
+    /// <summary>Hedef cikisin SDR beyaz duzeyi (nit); okunamadiysa <see cref="DefaultSdrWhiteNits"/>.</summary>
+    public static double SdrWhite(RecorderRequest request)
+        => ReadSdrWhite(request) ?? DefaultSdrWhiteNits;
+
+    /// <summary>HDR'den SDR'ye cevrilen kayitta SDR beyaz duzeyi okunamadi ve varsayilan kullanildi; cagiran soyler.</summary>
+    public static bool SdrWhiteAssumed(RecorderRequest request)
+        => HdrTonemapCapture(request) && ReadSdrWhite(request) is null;
+
+    /// <summary>Varsayilan beyaz kullanildiginda gunluge yazilan makine satiri; dili sabit, ekrana cikmaz.</summary>
+    public static string SdrWhiteAssumedLogLine
+        => "recorder: SDR white level unreadable, assumed "
+           + DefaultSdrWhiteNits.ToString("0", System.Globalization.CultureInfo.InvariantCulture) + " nits";
+
+    private static double? ReadSdrWhite(RecorderRequest request)
+        => DdagrabTarget(request) is { Output.SdrWhiteNits: { } w } && double.IsFinite(w) && w >= 80 ? w : null;
+
+    /// <summary>Hedef ekranin bildirdigi tepe parlaklik (nit); bilinmiyorsa <see cref="DefaultPeakNits"/>.</summary>
+    public static double PeakNits(RecorderRequest request)
+        => DdagrabTarget(request) is { Output.Display.MaxNits: var m } && double.IsFinite(m) && m >= 1 ? m : DefaultPeakNits;
+
+    /// <summary>
+    /// HDR masaustunu SDR'ye Windows'un SDR'yi HDR'ye cevirmesinin tersiyle indirir. Windows SDR
+    /// pikseli <paramref name="whiteNits"/> parlakliga koyar; PQ dogrusala <c>npl</c> ile acilinca
+    /// o parlaklik 1.0 olur ve SDR piksel kendi degerine doner. 1.0'in ustu (Auto HDR, yerel HDR
+    /// parlaklari) <c>mobius</c> ile kirilir: 0.99'un alti oldugu gibi kalir, ust ekranin tepe
+    /// parlakligina kadar 1.0'a sikisir, renk tonu korunur (en parlak bilesene gore olceklenir).
+    /// Sonra sRGB egrisi ve 8 bit <c>bgra</c>: kodlayiciya kadar yol 8 bit yakalamayla ayni.
+    /// <para>ddagrab'in <c>rgbaf16</c> cikisi denendi ve birakildi: ffmpeg 9.0'da swscale yarim
+    /// kayan noktayi 1.0'da kirpiyor, 1.0'in ustu kayboluyor (<c>docs/olcumler/kaydedici-hdr.md</c>).</para>
+    /// </summary>
+    public static string HdrSdrChain(double whiteNits, double peakNits)
+    {
+        var w = double.IsFinite(whiteNits) && whiteNits >= 80 ? whiteNits : DefaultSdrWhiteNits;
+        var peak = Math.Max(double.IsFinite(peakNits) ? peakNits : DefaultPeakNits, w * 1.05) / w;
+        return $"zscale=tin=smpte2084:pin=bt2020:rin=full:t=linear:p=bt709:npl={Decimal(w)},format=gbrpf32le,"
+               + $"tonemap=mobius:param=0.99:desat=0:peak={Decimal(peak)},"
+               + "zscale=tin=linear:pin=bt709:rin=full:t=iec61966-2-1:p=bt709:r=full,format=gbrp,format=bgra";
+    }
+
+    private static string Decimal(double value) => Math.Round(value, 4).ToString("0.####", CultureInfo.InvariantCulture);
 
     /// <summary>
     /// HDR karenin bellekteki yolu. <c>ddagrab</c>'in 10 bit cikisi BT.2020 + PQ'lu RGB; matris
     /// BT.2020 ile acikca YUV'a cevrilir, yoksa sonraki suzgecler ffmpeg'in varsayilan BT.601
     /// donusumunu kuruyor. <c>setparams</c> olmadan kodlayicinin <c>-color_trc</c>/<c>-color_primaries</c>
     /// secenekleri ffmpeg 9.0'da dosyaya "unknown" yaziliyordu (<c>docs/olcumler/kaydedici-hdr.md</c>).
+    /// <c>limiter</c> TV araligini zorlar (Y 64-940, renk 64-960): yasal araligin ustundeki
+    /// "super beyaz" oynaticida kirpiliyor ya da tepe parlakligi sasirtiyor.
     /// </summary>
     internal const string HdrFrameChain =
         "scale=out_color_matrix=bt2020:out_range=tv,format=yuv444p10le,"
+        + "limiter=min=64:max=940:planes=1,limiter=min=64:max=960:planes=6,"
         + "setparams=color_primaries=bt2020:color_trc=smpte2084:colorspace=bt2020nc:range=tv";
 
     /// <summary>
@@ -1445,10 +1559,146 @@ public static class RecorderArguments
     public static bool HdrLost(RecorderRequest request)
         => HdrDisplay(request) && !request.HdrToSdr && HdrPixelFormat(request) is null;
 
+    /// <summary>
+    /// HDR cikista SDR'ye cevirme istendi ve <c>zscale</c> var: kare 10 bit iner ve
+    /// <see cref="HdrSdrChain"/> ile Windows'un SDR beyaz duzeyinden geri cevrilir. Genel bir ton
+    /// esleme (hable) SDR icerigin rengini de degistiriyordu; bu yol SDR pikseli yerinde birakir.
+    /// GIF yakalamasi eski yolda kalir.
+    /// </summary>
+    public static bool HdrTonemapCapture(RecorderRequest request)
+        => HdrDisplay(request) && request.HdrToSdr && request.CanTonemap && !GifPath(request);
+
+    /// <summary>SDR'ye cevirme istendi ama <c>zscale</c> yok: kayit eski 8 bit yolda, cagiran soyler.</summary>
+    public static bool HdrTonemapMissing(RecorderRequest request)
+        => HdrDisplay(request) && request.HdrToSdr && !request.CanTonemap && !GifPath(request);
+
+    /// <summary>
+    /// Kayit <c>gdigrab</c>'a dustu ve yakalanan ekran HDR: GDI kareyi HDR masaustunden
+    /// dogru okumuyor, renkler bozuk cikabilir. Hedef cikis <see cref="RecorderRequest.DdaOutputs"/>'tan
+    /// bilinir; alan tek cikisa oturmuyorsa herhangi bir cikis HDR ise <c>true</c>.
+    /// </summary>
+    public static bool HdrOnGdigrab(RecorderRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        if (request.Platform != RecorderPlatform.Windows || request.Capture != RecorderCapture.Gdigrab
+            || request.Target == RecorderTargetKind.AudioOnly)
+            return false;
+        return DdagrabTarget(request) is { } target ? target.Output.Hdr : request.DdaOutputs.Any(o => o.Hdr);
+    }
+
+    /// <summary>
+    /// HDR korunurken H.264 kullanilmaz: High 10 profili donanim cozuculerinde ve paylasim
+    /// uygulamalarinda yesil bant ya da ezik renk olarak cikiyor. Ayni ureticinin HEVC'si,
+    /// sonra diger donanim HEVC'leri, sonra <c>libx265</c> denenir; <paramref name="works"/>
+    /// kodlayicinin bu makinede acildigini soyler.
+    /// <para>Kodlayici H.264 degilse <c>null</c> (degisiklik yok), HEVC bulunamazsa bos dize.</para>
+    /// </summary>
+    public static string? HdrHevcCodec(string codec, Func<string, bool> works)
+    {
+        ArgumentNullException.ThrowIfNull(works);
+        if (!IsH264(codec)) return null;
+        foreach (var candidate in HdrHevcOrder(codec))
+            if (works(candidate)) return candidate;
+        return string.Empty;
+    }
+
+    /// <summary>H.264 kodlayicisinin HDR icin denenecek HEVC sirasi; H.264 degilse bos.</summary>
+    public static IReadOnlyList<string> HdrHevcOrder(string codec)
+    {
+        var c = (codec ?? string.Empty).ToLowerInvariant();
+        if (!IsH264(c)) return Array.Empty<string>();
+        var same = c switch
+        {
+            "h264_nvenc" => "hevc_nvenc",
+            "h264_amf" => "hevc_amf",
+            "h264_qsv" => "hevc_qsv",
+            _ => null
+        };
+        return new[] { same, "hevc_nvenc", "hevc_amf", "hevc_qsv", "libx265" }
+            .Where(n => n is not null).Select(n => n!).Distinct(StringComparer.Ordinal)
+            .Where(n => PixelFormatsFor(n).Contains("yuv420p10le", StringComparer.Ordinal))
+            .ToArray();
+    }
+
+    /// <summary>Kodlayici H.264 ailesinden mi.</summary>
+    public static bool IsH264(string codec)
+    {
+        var c = (codec ?? string.Empty).ToLowerInvariant();
+        return c == "libx264" || c.StartsWith("h264_", StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// HDR korunacaksa H.264'u HEVC 10 bit'e ceviren istek. Kodlayici zaten H.264 degilse ya
+    /// da HDR korunmuyorsa istek aynen doner. HEVC yoksa kayit SDR'ye cevrilir
+    /// (<see cref="RecorderRequest.HdrToSdr"/>) ve <paramref name="outcome"/> bunu soyler.
+    /// </summary>
+    public static RecorderRequest WithHdrCodec(RecorderRequest request, Func<string, bool> works, out HdrCodecOutcome outcome)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        outcome = HdrCodecOutcome.Unchanged;
+        if (!HdrCapture(request)) return request;
+        var hevc = HdrHevcCodec(request.VideoCodec, works);
+        if (hevc is null) return request;
+        if (hevc.Length == 0)
+        {
+            outcome = HdrCodecOutcome.NoHevc;
+            return request with { HdrToSdr = true };
+        }
+        outcome = HdrCodecOutcome.SwitchedToHevc;
+        return request with { VideoCodec = hevc, Profile = null, Tune = null };
+    }
+
+    private static bool GifPath(RecorderRequest request)
+        => request.GifCapture || request.Container == RecorderContainer.Gif;
+
     private static bool HdrDisplay(RecorderRequest request)
         => request.Platform == RecorderPlatform.Windows
            && request.Capture == RecorderCapture.Ddagrab
            && DdagrabTarget(request) is { Output.Hdr: true };
+
+    /// <summary>
+    /// Windows'ta SDR kaydin RGB'den YUV'a donusumu acikca yazilir. Yazilmazsa ffmpeg
+    /// <c>bgra</c>'yi BT.601 ile ceviriyor ve dosya etiketsiz kaliyordu; oynatici etiketsizi
+    /// BT.709 sayinca renkler kayiyordu. HDR10 kayit ve GIF yolu bunu almaz.
+    /// </summary>
+    private static bool SdrColour(RecorderRequest request)
+        => request.Platform == RecorderPlatform.Windows
+           && request.Target != RecorderTargetKind.AudioOnly
+           && !HdrCapture(request)
+           && !GifPath(request);
+
+    private static string SdrColorSpace(RecorderRequest request)
+        => string.IsNullOrWhiteSpace(request.ColorSpace) ? "bt709" : request.ColorSpace!;
+
+    private static string SdrColorRange(RecorderRequest request)
+        => string.IsNullOrWhiteSpace(request.ColorRange) ? "tv" : request.ColorRange!;
+
+    /// <summary>
+    /// Donusumun suzgeci: matris ve aralik etiketle ayni, bicim kodlayicinin bicimi. Bicim
+    /// burada sabitlenmezse ffmpeg donusumu kodlayicinin onune kendi varsayilaniyla koyar.
+    /// <c>setparams</c> karenin kendisini etiketler: ffmpeg kodlayiciya karenin renk bilgisini
+    /// gecirir ve etiketsiz kare <c>-color_primaries</c>/<c>-color_trc</c>'yi dosyada "unknown" birakiyor.
+    /// </summary>
+    internal static string SdrColourLink(RecorderRequest request)
+    {
+        var matrix = SdrColorSpace(request).ToLowerInvariant() switch
+        {
+            "bt470bg" => "bt470",
+            "smpte170m" => "smpte170m",
+            "smpte240m" => "smpte240m",
+            "bt2020nc" or "bt2020c" => "bt2020",
+            _ => "bt709"
+        };
+        var range = SdrColorRange(request).ToLowerInvariant() is "pc" or "full" or "jpeg" ? "pc" : "tv";
+        var space = matrix switch
+        {
+            "bt470" => "bt470bg",
+            "bt2020" => "bt2020nc",
+            _ => matrix
+        };
+        return $"scale=out_color_matrix={matrix}:out_range={range},format={OutputPixelFormat(request)},"
+               + $"setparams=color_primaries=bt709:color_trc=bt709:colorspace={space}:range={range}";
+    }
 
     private static string? HdrPixelFormat(RecorderRequest request)
     {
@@ -1793,16 +2043,71 @@ public static class RecorderArguments
             {
                 "-pix_fmt", PixelFormatArgument(request.VideoCodec, HdrPixelFormat(request)!),
                 "-color_primaries", "bt2020", "-color_trc", "smpte2084", "-colorspace", "bt2020nc", "-color_range", "tv"
-            };
+            }.Concat(HdrStaticArgs(request)).ToArray();
 
         var a = new List<string>();
         var format = OutputPixelFormat(request);
         if (CodecModel.TakesPixelFormatFlag(request.VideoCodec)) a.AddRange(new[] { "-pix_fmt", format });
         if (string.IsNullOrWhiteSpace(request.Profile) && CodecModel.OutputProfile(request.VideoCodec, format) is { } profile)
             a.AddRange(new[] { "-profile:v", profile });
+        if (SdrColour(request))
+        {
+            a.AddRange(new[]
+            {
+                "-color_primaries", "bt709", "-color_trc", "bt709",
+                "-colorspace", SdrColorSpace(request), "-color_range", SdrColorRange(request)
+            });
+            return a;
+        }
+
         if (!string.IsNullOrWhiteSpace(request.ColorSpace)) a.AddRange(new[] { "-colorspace", request.ColorSpace! });
         if (!string.IsNullOrWhiteSpace(request.ColorRange)) a.AddRange(new[] { "-color_range", request.ColorRange! });
         return a;
+    }
+
+    private static readonly DdaDisplayInfo Bt2020D65 = new(0.708, 0.292, 0.170, 0.797, 0.131, 0.046, 0.3127, 0.3290, 0, 0, 0);
+
+    /// <summary>
+    /// HDR10 kaydin statik verisi hedef ekranin DXGI bilgisinden: <c>master-display</c> ekranin
+    /// renk koordinatlari ve en dusuk/en yuksek parlakligi, <c>MaxCLL</c> en yuksek parlaklik,
+    /// <c>MaxFALL</c> tam kare parlakligi. Koordinatlar bos ya da aralik disiysa BT.2020 D65
+    /// yazilir. HDR10 kayit degilse ya da ekran en yuksek parlakligi bildirmiyorsa <c>null</c>:
+    /// oynatici o zaman tepe parlakligi tahmin eder.
+    /// </summary>
+    public static HdrStaticMetadata? HdrStatic(RecorderRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        if (!HdrCapture(request) || DdagrabTarget(request) is not { } target || target.Output.Display is not { } d) return null;
+        if (!double.IsFinite(d.MaxNits) || d.MaxNits < 1) return null;
+
+        double[] xy = { d.GreenX, d.GreenY, d.BlueX, d.BlueY, d.RedX, d.RedY, d.WhiteX, d.WhiteY };
+        if (xy.Any(v => !double.IsFinite(v) || v <= 0 || v >= 1))
+            xy = new[] { Bt2020D65.GreenX, Bt2020D65.GreenY, Bt2020D65.BlueX, Bt2020D65.BlueY, Bt2020D65.RedX, Bt2020D65.RedY, Bt2020D65.WhiteX, Bt2020D65.WhiteY };
+        string C(int i) => Math.Round(xy[i] * 50000).ToString(CultureInfo.InvariantCulture);
+        var min = double.IsFinite(d.MinNits) ? Math.Clamp(d.MinNits, 0, d.MaxNits) : 0;
+        var md = $"G({C(0)},{C(1)})B({C(2)},{C(3)})R({C(4)},{C(5)})WP({C(6)},{C(7)})"
+                 + $"L({Math.Round(d.MaxNits * 10000).ToString(CultureInfo.InvariantCulture)},{Math.Round(min * 10000).ToString(CultureInfo.InvariantCulture)})";
+        var cll = (int)Math.Round(d.MaxNits);
+        var fall = double.IsFinite(d.MaxFullFrameNits) && d.MaxFullFrameNits >= 1 ? Math.Min(cll, (int)Math.Round(d.MaxFullFrameNits)) : cll;
+        return new HdrStaticMetadata(md, Number(cll) + "," + Number(fall));
+    }
+
+    /// <summary>
+    /// <see cref="HdrStatic"/>'in kodlayici parametresi: libx265 <c>master-display</c>/<c>max-cll</c>,
+    /// libx264 <c>mastering-display</c>/<c>cll</c>, libsvtav1 kesirli <c>mastering-display</c> ve
+    /// <c>content-light</c>. Donanim kodlayicilari ffmpeg'de bu veriyi parametreyle almiyor; bos doner.
+    /// </summary>
+    internal static IReadOnlyList<string> HdrStaticArgs(RecorderRequest request)
+    {
+        if (HdrStatic(request) is not { } m) return Array.Empty<string>();
+        return request.VideoCodec.ToLowerInvariant() switch
+        {
+            "libx265" => new[] { "-x265-params", $"hdr10=1:master-display={m.MasterDisplay}:max-cll={m.ContentLight}" },
+            "libx264" => new[] { "-x264-params", $"mastering-display={m.MasterDisplay}:cll={m.ContentLight}" },
+            "libsvtav1" when HdrResolver.SvtAv1MasteringDisplay(m.MasterDisplay) is { } svt
+                => new[] { "-svtav1-params", $"mastering-display={svt}:content-light={m.ContentLight}" },
+            _ => Array.Empty<string>()
+        };
     }
 
     /// <summary>
@@ -1937,10 +2242,18 @@ public static class RecorderArguments
     private static string? EncoderFilter(RecorderRequest request)
     {
         var upload = CodecModel.UploadFilters(request.VideoCodec, OutputPixelFormat(request));
-        var filter = VideoFilter(request);
+        var filter = ColouredFilter(request);
         if (upload.Count == 0) return filter;
         var tail = string.Join(",", upload);
         return filter is null ? tail : filter + "," + tail;
+    }
+
+    private static string? ColouredFilter(RecorderRequest request)
+    {
+        var filter = VideoFilter(request);
+        if (!SdrColour(request)) return filter;
+        var link = SdrColourLink(request);
+        return filter is null ? link : filter + "," + link;
     }
 
     private static string? VideoFilter(RecorderRequest request)

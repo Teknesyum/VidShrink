@@ -33,6 +33,11 @@ public partial class App : Application
 
     private readonly Integration.ForwardedFiles? _files;
 
+    private readonly bool _selfTest;
+
+    /// <summary>Kaydedici oz sinamasi (<c>--recorder-selftest</c>): yalniz renk karti acilir.</summary>
+    internal App(bool selfTest) => _selfTest = selfTest;
+
     internal App(ShellShrinkStartup startup, ShrinkRequestQueue? queue)
     {
         _shrink = startup;
@@ -92,6 +97,14 @@ public partial class App : Application
         }
         catch { }
         AcilisIzi.Yaz("palet");
+
+        if (_selfTest && ApplicationLifetime is IClassicDesktopStyleApplicationLifetime card)
+        {
+            card.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+            card.MainWindow = Recorder.RecorderSelfTest.CardWindow(card);
+            base.OnFrameworkInitializationCompleted();
+            return;
+        }
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

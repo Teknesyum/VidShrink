@@ -22,8 +22,8 @@ namespace VidShrink.Tests;
 /// kare koordinatına çevrilir ve <c>split</c>, <c>crop</c>, <c>boxblur</c>, <c>overlay</c>
 /// dörtlüsüyle kayda yakılır. Bileşik kare <see cref="KaydediciArkaPlanTests"/> düzeninde lavfi
 /// girdisiyle koşturulur: maske içi bulanık (ızgaranın sapması düşer), maske dışı ham kareyle
-/// bayt bayt aynı. Kamera kolunda kıyas maskesiz kamera karesiyle; kamera bindirmesi kareyi
-/// 4:2:0'a çevirdiği için kutunun 2 px çevresi renk taşmasıyla farklı (ölçüm: 400 piksel), o halka dışarıda. Kanıt <c>.calisma/worktree-agent-afe1c767c9d909a33/maske/</c>.
+/// bayt bayt aynı. Kamera kolunda kıyas maskesiz kamera karesiyle. Windows kaydının BT.709
+/// bağı da kamera bindirmesi de kareyi 4:2:0'a çevirdiği için kutunun 2 px çevresi renk taşmasıyla farklı (ölçüm: 400 piksel), o halka dışarıda. Kanıt <c>.calisma/worktree-agent-afe1c767c9d909a33/maske/</c>.
 /// </summary>
 public sealed class KaydediciMaskeTests
 {
@@ -59,9 +59,9 @@ public sealed class KaydediciMaskeTests
         var args = RecorderArguments.Build(Istek(new RecorderRegion(140, 90, 80, 60)) with { Scale = new RecorderScale(160, 120) }, "a.mkv");
 
         Assert.Equal(
-            "split[pm0][pb0];[pb0]crop=80:60:40:40,boxblur=luma_radius=14:luma_power=3[pk0];[pm0][pk0]overlay=40:40:format=auto,scale=160:120",
+            "split[pm0][pb0];[pb0]crop=80:60:40:40,boxblur=luma_radius=14:luma_power=3[pk0];[pm0][pk0]overlay=40:40:format=auto,scale=160:120,scale=out_color_matrix=bt709:out_range=tv,format=yuv420p,setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709:range=tv",
             Deger(args, "-vf"));
-        Assert.DoesNotContain("-vf", RecorderArguments.Build(Istek(), "a.mkv"));
+        Assert.DoesNotContain("split", Deger(RecorderArguments.Build(Istek(), "a.mkv"), "-vf"));
     }
 
     [Fact]
@@ -170,7 +170,7 @@ public sealed class KaydediciMaskeTests
     {
         var istek = Istek(new RecorderRegion(140, 90, 80, 60), new RecorderRegion(400, 60, 40, 40));
         var kutular = RecorderArguments.MaskBoxes(istek);
-        var ham = Kare("ham", "null");
+        var ham = Kare("ham", RecorderArguments.SdrColourLink(istek));
         var maskeli = Kare("maskeli", Deger(RecorderArguments.Build(istek, "a.mkv"), "-vf")!);
 
         var kameraIstek = istek with { Webcam = new RecorderWebcam("Kam", 64) };
@@ -178,7 +178,7 @@ public sealed class KaydediciMaskeTests
         var kameraKaresi = Kare("kamerali", RecorderArguments.WebcamGraph(kameraIstek)!, kamera: true);
 
         var olcu = kutular.Select(k => (k, ham: Sapma(ham, k), maskeli: Sapma(maskeli, k), kamerali: Sapma(kameraKaresi, k))).ToList();
-        var dis = DisFarki(ham, maskeli, kutular);
+        var dis = DisFarki(ham, maskeli, kutular, pay: 2);
         var kameraDis = DisFarki(kameraHam, kameraKaresi, kutular, pay: 2);
         var kameraHalka = DisFarki(kameraHam, kameraKaresi, kutular) - kameraDis;
         File.WriteAllLines(Path.Combine(Kanit, "olcum.txt"),

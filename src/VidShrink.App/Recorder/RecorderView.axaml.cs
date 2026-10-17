@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
@@ -55,6 +55,7 @@ internal partial class RecorderView : UserControl
     internal RecorderView(string? settingsPath)
     {
         _settingsPath = settingsPath;
+        DiagnosticFolder = DefaultDiagnosticFolder;
         InitializeComponent();
         HideUnavailableInputOptions();
         _settings = RecorderSettings.Load(_settingsPath);

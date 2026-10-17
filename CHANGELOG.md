@@ -7,10 +7,24 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Added
+
+- Recorder: `VidShrink.exe --recorder-selftest` shows a colour card for one second, captures it through the recording's
+  HDR-to-SDR path and the 8-bit path, and writes the per-patch colour difference to `recorder-last.log`.
+
 ### Fixed
 
 - Recorder: on Windows the "System Audio" source stays in the list when the device list cannot be read; before, a failed
   device query left both microphone and system audio at "Silent".
+- Recorder: on an HDR display the recording now looks like the screen. "Convert HDR to SDR" is on by default (existing
+  settings switch once) and undoes Windows' own SDR brightness instead of applying a generic tone map; HDR highlights
+  are softly compressed. If Windows' SDR brightness cannot be read, 203 nits is assumed and the recorder says so.
+- Recorder: SDR recordings are converted with the BT.709 matrix and tagged BT.709/limited range; before, the tags were
+  written without the conversion, so colours shifted in players that trust the tags.
+- Recorder: HDR10 recordings carry the display's mastering and content light levels (x265, x264, SVT-AV1), super-white
+  is clipped to the limited range, and keeping HDR with H.264 switches to an HEVC encoder when one works.
+- Recorder: an HDR display that falls back to GDI capture is now named in the notice, since that capture washes out
+  colours.
 
 ## [1.2.23] - 2026-10-16
 

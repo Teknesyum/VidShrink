@@ -98,7 +98,7 @@ public sealed class KayitFfmpegKoluTests
     {
         var args = RecorderArguments.Build(Istek() with { Scale = new RecorderScale(1280, 720) }, @"C:\kayit\a.mp4");
 
-        Assert.Equal("scale=1280:720", Deger(args, "-vf"));
+        Assert.Equal("scale=1280:720,scale=out_color_matrix=bt709:out_range=tv,format=yuv420p,setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709:range=tv", Deger(args, "-vf"));
     }
 
     /// <summary>
@@ -121,13 +121,13 @@ public sealed class KayitFfmpegKoluTests
         Assert.Equal("crop=640:480:10:30,scale=320:240", Deger(args, "-vf"));
     }
 
-    /// <summary>Olcekleme secilmemisse zincir hic kurulmuyor; bugunku arguman degismiyor.</summary>
+    /// <summary>Olcekleme secilmemisse zincirde yalniz Windows kaydinin BT.709 renk donusumu kalir.</summary>
     [Fact]
     public void OlceklemeYokkenVfYazilmaz()
     {
         var args = RecorderArguments.Build(Istek(), @"C:\kayit\a.mp4");
 
-        Assert.DoesNotContain("-vf", args);
+        Assert.Equal("scale=out_color_matrix=bt709:out_range=tv,format=yuv420p,setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709:range=tv", Deger(args, "-vf"));
     }
 
     /// <summary>Negatif kontrol: tek sayili ve sifir olcek reddedilir.</summary>
@@ -331,15 +331,16 @@ public sealed class KayitFfmpegKoluTests
         Assert.Equal("pc", Deger(args, "-color_range"));
     }
 
-    /// <summary>Renk uzayi ve araligi secilmezse yazilmiyor; piksel bicimi her zaman var.</summary>
+    /// <summary>Renk uzayi ve araligi secilmezse Windows kaydi BT.709 ve TV araligini bir kez yazar; piksel bicimi her zaman var.</summary>
     [Fact]
     public void SecilmeyenRenkAyarlariYazilmaz()
     {
         var args = RecorderArguments.Build(Istek(), @"C:\kayit\a.mp4");
 
         Assert.Equal(RecorderArguments.DefaultPixelFormat, Deger(args, "-pix_fmt"));
-        Assert.DoesNotContain("-colorspace", args);
-        Assert.DoesNotContain("-color_range", args);
+        Assert.Equal("bt709", Deger(args, "-colorspace"));
+        Assert.Equal("tv", Deger(args, "-color_range"));
+        Assert.Equal(1, args.Count(a => a == "-colorspace"));
     }
 
     /// <summary>Negatif kontrol: uydurma bicim, uzay ve aralik reddedilir.</summary>

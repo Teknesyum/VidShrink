@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -145,7 +145,8 @@ internal partial class RecorderView
             PreparePreview(request.PreviewPath);
             _audioShown = null;
             _session = await RecorderSession.StartAsync(
-                request, path, new Progress<RecordProgress>(ShowProgress));
+                request, path, new Progress<RecordProgress>(ShowProgress));            WriteDiagnostic(request, _session.StartArguments, null);
+
             _session.TitleChapters(LanguageCatalog.Display(Strings.Get("recorder.chapter.title")));
             _frameRegion = RegionOf(request);
             _ = FollowEndAsync(_session.Ended, _session);
@@ -153,6 +154,7 @@ internal partial class RecorderView
         catch (Exception ex) when (ex is InvalidOperationException or IOException or UnauthorizedAccessException or ArgumentException)
         {
             _session = null;
+            WriteDiagnostic(request, null, ex.Message);
             ShowError(Say("recorder.error.start", ex.Message));
         }
         finally

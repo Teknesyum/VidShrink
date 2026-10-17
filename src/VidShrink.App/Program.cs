@@ -134,6 +134,8 @@ internal static class Program
         if (global::VidShrink.Launcher.UygulamaKlasoruKapisi.BaslaticiyaDevret(AppContext.BaseDirectory, args)) return 0;
         Task.Run(() => InPlaceUpdate.SweepRetired(AppContext.BaseDirectory));
         Playback.UykuEngeli.SistemiBagla();
+        if (Recorder.RecorderSelfTest.Requested(args))
+            return PencereyiAc(() => BuildSelfTest().StartWithClassicDesktopLifetime(args));
         var startup = StartupFor(args);
         if (startup is null) return RunMain(args);
 
@@ -374,6 +376,11 @@ internal static class Program
 
     private static AppBuilder Build(string? startupFile, Integration.ForwardedFiles? files)
         => EkranKapisi(Cizim(AppBuilder.Configure(() => new App(startupFile, files))
+            .UsePlatformDetect()
+            .LogToTrace()), OperatingSystem.IsLinux());
+
+    private static AppBuilder BuildSelfTest()
+        => EkranKapisi(Cizim(AppBuilder.Configure(() => new App(selfTest: true))
             .UsePlatformDetect()
             .LogToTrace()), OperatingSystem.IsLinux());
 

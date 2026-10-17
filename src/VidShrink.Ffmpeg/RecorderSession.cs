@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using VidShrink.Core;
 
 namespace VidShrink.Ffmpeg;
@@ -182,6 +182,9 @@ public sealed class RecorderSession : IAsyncDisposable
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException) { return 0; }
         }
     }
+
+    /// <summary>Ilk parcanin ffmpeg argumanlari; kaydin tani gunlugu bunu yazar.</summary>
+    public IReadOnlyList<string> StartArguments { get; private set; } = Array.Empty<string>();
 
     /// <summary>
     /// Kaydi baslatir ve ilk ilerleme blogunu bekler. Surec o blogu uretmeden olurse
@@ -559,6 +562,7 @@ public sealed class RecorderSession : IAsyncDisposable
         };
         args.AddRange(RecorderArguments.Build(segment, path));
 
+        if (_segments.Count == 0) StartArguments = args.ToArray();
         var feed = LoopbackFeed.Bind(args, _openSystemAudio);
         var startInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args);
         startInfo.RedirectStandardInput = true;

@@ -50,7 +50,12 @@ internal static class DdaOutputs
                         if (desc.Rotation != RotationUnspecified && desc.Rotation != RotationIdentity) continue;
                         var width = desc.Right - desc.Left;
                         var height = desc.Bottom - desc.Top;
-                        if (width > 1 && height > 1) found.Add(new DdaOutput((int)index, desc.Left, desc.Top, width, height, IsHdr(output)));
+                        if (width > 1 && height > 1)
+                        {
+                            var display = HdrDisplay(output);
+                            found.Add(new DdaOutput((int)index, desc.Left, desc.Top, width, height, display is not null, display,
+                                display is null ? null : SdrWhiteLevel.Read(desc.DeviceName)));
+                        }
                     }
                     finally { Marshal.ReleaseComObject(output); }
                 }
@@ -71,15 +76,17 @@ internal static class DdaOutputs
     internal static bool IsHdrColorSpace(int colorSpace) => colorSpace == HdrColorSpace;
 
     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
-    private static bool IsHdr(IDxgiOutput output)
+    private static DdaDisplayInfo? HdrDisplay(IDxgiOutput output)
     {
         try
         {
-            return output is IDxgiOutput6 six && six.GetDesc1(out var desc) >= 0 && IsHdrColorSpace(desc.ColorSpace);
+            if (output is not IDxgiOutput6 six || six.GetDesc1(out var d) < 0 || !IsHdrColorSpace(d.ColorSpace)) return null;
+            return new DdaDisplayInfo(d.RedX, d.RedY, d.GreenX, d.GreenY, d.BlueX, d.BlueY, d.WhiteX, d.WhiteY,
+                d.MinLuminance, d.MaxLuminance, d.MaxFullFrameLuminance);
         }
         catch (Exception ex) when (ex is COMException or InvalidCastException)
         {
-            return false;
+            return null;
         }
     }
 

@@ -25,6 +25,14 @@ internal partial class RecorderView
     /// <summary>Son yoklamanin sonucu; yoklama kosmadiysa <c>null</c>.</summary>
     internal bool? DdagrabWorks { get; set; }
 
+    /// <summary>`zscale` var mi; ffmpeg listesi okunmadiysa var sayilir, kodlayici acilmazsa kayit hatayla doner.</summary>
+    internal Func<bool> TonemapCheck { get; set; } =
+        () => !EncoderCapabilities.Instance.Loaded || EncoderCapabilities.Instance.HasFilter("zscale");
+
+    /// <summary>HDR korunurken H.264 yerine denenecek HEVC kodlayicisi bu makinede aciliyor mu.</summary>
+    internal Func<string, Task<bool>> HevcCheck { get; set; } =
+        codec => Task.Run(() => EncoderCapabilities.Instance.WorksAsEncoder(codec));
+
     internal async Task<RecorderRequest> ChooseCaptureAsync(RecorderRequest request, bool notify = true)
     {
         if (request.Platform != RecorderPlatform.Windows) return request;
@@ -32,6 +40,7 @@ internal partial class RecorderView
         var candidate = request with
         {
             DdaOutputs = DdaOutputSource(),
+            CanTonemap = TonemapCheck(),
             WindowRegion = request.Target == RecorderTargetKind.Window && !string.IsNullOrWhiteSpace(request.WindowTitle)
                            && WindowRect(request.WindowTitle) is { } window
                 ? new RecorderRegion(window.X, window.Y, window.Width, window.Height)
@@ -52,9 +61,72 @@ internal partial class RecorderView
         }
 
         var chosen = RecorderArguments.ChooseCapture(candidate, works, out var reason);
-        if (notify && reason != DdagrabFallback.None) ShowNotice(Say(FallbackKey(reason)));
-        else if (notify && RecorderArguments.HdrLost(chosen)) ShowNotice(Say("recorder.capture.hdr-lost"));
+        var outcome = HdrCodecOutcome.Unchanged;
+        if (RecorderArguments.HdrCapture(chosen))
+        {
+            string? hevc = null;
+            foreach (var codec in RecorderArguments.HdrHevcOrder(chosen.VideoCodec))
+            {
+                bool ok;
+                try { ok = await HevcCheck(codec); }
+                catch (Exception ex) when (ex is InvalidOperationException or IOException or UnauthorizedAccessException)
+                {
+                    ok = false;
+                }
+                if (!ok) continue;
+                hevc = codec;
+                break;
+            }
+            chosen = RecorderArguments.WithHdrCodec(chosen, codec => codec == hevc, out outcome);
+        }
+
+        if (notify && CaptureNotice(chosen, reason, outcome) is { } notice) ShowNotice(notice);
         return chosen;
+    }
+
+    /// <summary>
+    /// Yakalama seciminin tek bildirim satiri. Satir tek oldugu icin ayni kayitta iki durum
+    /// birlesik metinle soylenir: HDR ekranda GDI'ye dusus, dusus metninden once gelir cunku
+    /// bozuk renk kare kaybindan agirdir.
+    /// </summary>
+    internal string? CaptureNotice(RecorderRequest chosen, DdagrabFallback reason, HdrCodecOutcome outcome)
+    {
+        if (reason != DdagrabFallback.None)
+            return RecorderArguments.HdrOnGdigrab(chosen) ? Say("recorder.capture.fallback-hdr") : Say(FallbackKey(reason));
+        if (outcome == HdrCodecOutcome.NoHevc) return Say("recorder.capture.hdr-no-hevc");
+        if (RecorderArguments.HdrLost(chosen)) return Say("recorder.capture.hdr-lost");
+        if (RecorderArguments.HdrTonemapMissing(chosen)) return Say("recorder.capture.hdr-no-tonemap");
+        if (RecorderArguments.SdrWhiteAssumed(chosen))
+            return Say("recorder.capture.sdr-white-assumed", RecorderArguments.DefaultSdrWhiteNits.ToString("0", Strings.Culture));
+        if (outcome == HdrCodecOutcome.SwitchedToHevc) return Say("recorder.capture.hdr-kept-hevc", chosen.VideoCodec);
+        if (RecorderArguments.HdrCapture(chosen)) return Say("recorder.capture.hdr-kept");
+        return null;
+    }
+
+    /// <summary>
+    /// Kayit tani gunlugunun klasoru. Ayar dosyasi verilmis gorunumde onun yanindaki
+    /// <c>gunluk</c> klasoru, verilmemisse uygulamanin gunluk klasoru; testler buradan yonlendirir.
+    /// </summary>
+    internal Func<string> DiagnosticFolder { get; set; }
+
+    /// <summary>Son yazilan tani gunlugunun yolu; yazilamadiysa <c>null</c>.</summary>
+    internal string? LastDiagnosticPath { get; private set; }
+
+    private string DefaultDiagnosticFolder()
+    {
+        var folder = string.IsNullOrEmpty(_settingsPath) ? null : Path.GetDirectoryName(_settingsPath);
+        return string.IsNullOrEmpty(folder) ? Gunluk.Klasor : Path.Combine(folder, Gunluk.KlasorAdi);
+    }
+
+    internal void WriteDiagnostic(RecorderRequest request, IReadOnlyList<string>? args, string? error)
+    {
+        var version = UpdateCheck.CurrentVersion();
+        var text = KayitTanisi.Metin(request, args, version, DateTimeOffset.Now, error);
+        var folder = DiagnosticFolder();
+        LastDiagnosticPath = KayitTanisi.Yaz(folder, text);
+        if (RecorderArguments.SdrWhiteAssumed(request))
+            Gunluk.Yaz(folder, Gunluk.Blok(RecorderArguments.SdrWhiteAssumedLogLine,
+                version, "-", 0, TimeSpan.Zero, Array.Empty<string>()));
     }
 
     internal static string FallbackKey(DdagrabFallback reason) => reason switch
