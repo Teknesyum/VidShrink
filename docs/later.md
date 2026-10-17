@@ -145,15 +145,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 **Sahibin Kararını Bekleyenler**
 
-## 94. Açılış Varsayılanları
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · OYA-P5 · Oynatıcı · iş orta · öncelik 1 · karar sahibin
-
-- Satırlar (OYA-P5): OYA-04 Ses ve altyazı dil tercihi; OYA-31 Zorunlu altyazıyı kendiliğinden gösterme; OYA-36 Devam sınırı; OYA-51 Otomatik deinterlace. [Tablo](piyasa/2026-10-13/oynatici-cekirdek-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Playback/PlayerView.Tracks.cs, src/VidShrink.App/Playback/PlayerSettings.cs, src/VidShrink.App/Playback/PlaybackHistory.cs, src/VidShrink.Player/MpvEngine.cs, src/VidShrink.Player/MpvEngine.Advanced.cs
-- Sahibin kararı: dosya açılırken dört varsayılan değişsin mi: tercih edilen dilde ses ve altyazı izi seçimi, zorunlu altyazının kendiliğinden açılması, devamdaki son beş dosya sınırının kalkması ve deinterlace'in otomatik olması
-- Plan: Ayarlara ses ve altyazı için dil tercihi eklenir; `ApplyTrackOptions` açılışta iz listesindeki dil alanına bakıp eşleşen izi seçer, zorunlu (forced) izi `track-list/N/forced` ile tanır; tercih boşsa bugünkü davranış kalır. Devam sınırı `PlaybackHistory.ResumeRecent` (5) kaldırılır ya da kayıt tavanına (200) çekilir. Deinterlace (taramalı videodaki tarak izini giderme) anahtarı `auto` değerini de alır. Sahibin onaylamadığı satır paketten düşer; doğrulama çok dilli örnekle iz seçimi, altıncı dosyada `ResumeFor` ve taramalı örnekte `deinterlace` geri okuması testleridir.
-
 ## 95. Çift Tık Ve Basılı Tutma
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · OYA-P6 · Oynatıcı · iş orta · öncelik 1 · karar sahibin
@@ -171,24 +162,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: tools/VidShrink.Bench/, docs/olcumler/, src/VidShrink.Player/MpvEngine.Advanced.cs, src/VidShrink.App/Playback/PlayerAdvancedPanel.axaml.cs
 - Sahibin kararı: HDR video işlemcide ton eşlemeyle gösterilsin mi; 4K'da kare düşürürse yalnız elle açılan bir seçenek mi olsun
 - Plan: Önce ölçüm: bir HDR10 ve bir HLG örnek bugünkü yolda açılıp kare kaydedilir, soluk ya da patlak görünüp görünmediği `docs/olcumler/`e yazılır. Sonra etiketli bir `vf` halkası (ffmpeg `zscale` ve `tonemap` süzgeçleri) eklenir; halka yalnız aktarım eğrisi PQ ya da HLG iken takılır (MediaDetails.cs:26–38). Süzgeçler libmpv derlemesinde yoksa paket burada durur ve sahibe döner. Doğrulama: aynı karede eşlemeli ve eşlemesiz ortalama parlaklık farkı; 1080p ve 4K'da `Stats` ile düşen kare sayısı.
-
-## 97. Sessiz Bölümleri Atlama
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · OYA-P8 · Oynatıcı · iş orta · öncelik 1 · karar sahibin
-
-- Satırlar (OYA-P8): OYA-37 Sessiz bölümleri atlama. [Tablo](piyasa/2026-10-13/oynatici-cekirdek-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Player/MpvEngine.Advanced.cs, src/VidShrink.Player/IPlaybackEngine.cs, src/VidShrink.App/Playback/PlayerView.axaml.cs, src/VidShrink.App/Playback/Keymap.cs
-- Sahibin kararı: sessiz yerleri hızlandıran yeni bir oynatma kipi eklensin mi; hazır sunan rakip bulunamadı, istek yalnız oyla kanıtlı
-- Plan: Etiketli bir `af` halkası olarak ffmpeg `silencedetect` süzgeci takılır; motor süzgecin bildirdiği sessizlik başlangıcında hızı yükseltir, bitişinde eski hıza döner. Atlamak yerine hızlandırmak ses ile görüntünün eşliğini bozmaz. Kip bir anahtarla açılır ve kapalı gelir; eşik ile en kısa sessizlik süresi ayardır. Doğrulama: ortasında bilinen uzunlukta sessizlik olan üretilmiş örnekte oynatma süresinin kısaldığı ve konuşmalı kısımda hızın değişmediği motor testi.
-
-## 98. Devam Kapsamı Ve Kalıcı Kuyruk
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · OYB-P5 · Oynatıcı · iş orta · öncelik 1 · karar sahibin
-
-- Satırlar (OYB-P5): OYB-08 Kuyruğun kalıcılığı; OYB-12 Devam kapsamı. [Tablo](piyasa/2026-10-13/oynatici-kitaplik-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Playback/PlaybackHistory.cs, src/VidShrink.App/Playback/PlayerView.Kuyruk.cs, src/VidShrink.App/Playback/PlayerSettings.cs
-- Sahibin kararı: kaldığı yerden devam son beş dosyayla sınırlı kalsın mı ve uygulama açılınca son kuyruk geri gelsin mi
-- Plan: Devam sınırı tek sabittir (`PlaybackHistory.cs:18`); karar "kalksın" olursa sabit deponun sığasına (200 kayıt) çekilir ve sınırı ölçen testler birlikte güncellenir. Kuyruk için kapanışta kuyruk ve çalan öge diske yazılır, açılışta geri yüklenir; diskte artık olmayan dosyalar atılır. İki soru birbirinden bağımsızdır: biri "evet" alırsa o yarı tek başına yapılır. Kardeş tablodaki OYA-36 aynı iştir ve orada OYA-P5 paketine girmiştir; iş bir kez yapılır.
 
 ## 99. Windows Ortam Denetimi Bağlantısı
 
@@ -333,15 +306,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: yeni packaging/flatpak/, packaging/appimage/, .github/workflows/release.yml, src/VidShrink.Core/UpdateCheck.cs, install-vidshrink.sh
 - Sahibin kararı: Flathub'a uygulama başvurusu yapılsın mı (sahibin hesabından; ffmpeg ve libmpv paketin içinde gelir) ve yayına AppImage eklensin mi.
 - Plan: Flatpak bildirimi (uygulamanın nasıl derleneceğini ve hangi izinlerle çalışacağını söyleyen dosya) yazılır; ffmpeg ve libmpv Flathub çalışma ortamından ya da bildirimde kaynaktan derlenerek gelir, uygulama kimliği, tanıtım dosyası ve simge eklenir. Paketin içinde kendini güncelleme kapatılır, güncellemeyi Flathub yapar. AppImage aynı yayın çıktısından `release.yml` içinde üretilir ve sha256 listesine girer. Doğrulama: CI'da paketi kurup küçültme ve oynatma denemesi; AppImage için temiz bir Ubuntu koşucusunda açılış.
-
-## 120. Tepsiye Küçültme
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · AYR-P9 · Ayarlar Ve Kabuk · iş küçük · öncelik 2 · karar sahibin
-
-- Satırlar (AYR-P9): AYR-22 Tepsiye Küçültme. [Tablo](piyasa/2026-10-13/ayarlar-kabuk-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Recorder/RecorderTray.cs, src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.App/MainWindow.axaml
-- Sahibin kararı: Ana pencere için kapalı gelen bir "tepsiye küçült" seçeneği eklensin mi; eklenecekse kapatma düğmesi de tepsiye mi gitsin?
-- Plan: Kaydedicinin tepsi simgesi kodu ana pencerenin de kullanabileceği ortak bir parçaya çıkarılır. Seçenek açıkken küçültülen pencere görev çubuğundan kalkar, tepsi simgesine tıklanınca geri gelir; kuyruk ilerlemesi simgenin ipucunda yazar. Doğrulama: pencere durumu geçişlerinin testi; tepsi simgesi Windows'ta bir kez elle görülür.
 
 ## 122. Biten Çıktının Kalite Ölçümü
 
