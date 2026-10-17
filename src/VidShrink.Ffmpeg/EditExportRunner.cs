@@ -100,14 +100,15 @@ public static class EditExportRunner
     }
 
     /// <summary>
-    /// Anahtar kareler yalniz kopyalama yolunun kosabilecegi yerde okunur: tek kaynakli cizelgede ve
-    /// parcalari ayri yazan teslimde. Birlestirme hep yeniden kodladigi icin yalniz akis bilgisi okunur.
+    /// Anahtar kareler yalniz kopyalama yolunun kosabilecegi yerde okunur: tek kaynakli cizelgede,
+    /// parcalari ayri yazan teslimde ve kayipsiz birlestirmede (<see cref="MergeCompatibility"/>). Birlestirmede
+    /// akilli kesim sinirlari okunmaz; kopya yalniz anahtar kareye dusen kesimde kosar.
     /// </summary>
     private static async Task<IReadOnlyDictionary<int, ExportSource>> ProbeSourcesAsync(
         IReadOnlyList<string> sources, EditTimeline timeline, ExportMode mode, bool segments, CancellationToken ct)
     {
         var used = EditExport.UsedSources(timeline);
-        var deep = segments || used.Count == 1 ? mode : ExportMode.Full;
+        var deep = segments || used.Count == 1 ? mode : mode == ExportMode.Full ? ExportMode.Full : ExportMode.Fast;
         var probed = new Dictionary<int, ExportSource>();
         foreach (var index in used.Count > 1 ? used.Prepend(0).Distinct() : used)
         {

@@ -13,6 +13,10 @@ ship as part of it.
   audio chain; when it reports a silence the speed rises to 4x and drops back to the previous speed when sound returns,
   so audio and picture stay in sync instead of jumping. Off by default; threshold (`silenceThresholdDb`, default
   -35 dB) and shortest silence (`silenceMinimumSeconds`, default 0.5 s) live in the player settings file.
+- Editor: lossless merge. A multi-source Fast or Smart export whose sources match (video codec, profile,
+  resolution, pixel aspect, pixel format, frame rate, time base, audio codec, sample rate, channels and stream
+  layout) and whose timeline needs no re-encode is joined with the concat demuxer and `-c copy` instead of being
+  re-encoded. Smart copies only when every cut lands on a keyframe; anything else keeps the re-encode path.
 
 ### Fixed
 
