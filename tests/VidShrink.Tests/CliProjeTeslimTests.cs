@@ -11,6 +11,9 @@ namespace VidShrink.Tests;
 /// later.md #40, ilk adim: <c>teslim</c> pencere acmadan proje dosyasini okur, cok parcali cizelgeyi kurar ve teslim eder.
 /// Cekirdek <see cref="EditProject.ToJob"/>; komutun akisi sahte hazirlama ve kosu katmaniyla, uctan uca yol kisa bir
 /// ffmpeg klibiyle olculur. Gecici dosyalar <c>.calisma/test-ciktilari/cli-teslim/</c>, test siler.
+/// 18 Ekim 2026: Hizli ve Akilli kip gercek ffmpeg ile kendi kipinde teslim eder; iki kaynakli muzikli proje Tam'a duser,
+/// muzik karisir (ortalama ses -40 dB ustu), ikinci parca ek kaynaktan gelir. Kaynaklar tek kodlamadan bolunur: ayri
+/// x264 kodlamalarinin extradata'si farkli, kopya yolu acilmaz ve muziksiz kontrol de Tam'a duserdi.
 /// </summary>
 public sealed class CliProjeTeslimTests : IDisposable
 {
@@ -351,6 +354,135 @@ public sealed class CliProjeTeslimTests : IDisposable
         Assert.True(cikis == ExitCodes.InBand, stderr);
         var sonuc = await FfprobeClient.ProbeAsync(cikti);
         Assert.InRange(sonuc.DurationSeconds, 1.8, 2.3);
+    }
+
+    private string SesliKaynak(string ad, string desen)
+    {
+        var yol = Path.Combine(_klasor, ad);
+        Ffmpeg("-hide_banner", "-y", "-f", "lavfi", "-i", desen + "=s=160x120:r=25:d=4", "-f", "lavfi", "-i", "anullsrc=r=48000:cl=stereo",
+            "-t", "4", "-c:v", "libx264", "-preset", "ultrafast", "-g", "25", "-threads", "2", "-c:a", "aac", "-b:a", "64k", "-shortest", yol);
+        return yol;
+    }
+
+    private (string A, string B) AyniKodlamadanIkiKaynak()
+    {
+        var butun = Path.Combine(_klasor, "butun.mp4");
+        Ffmpeg("-hide_banner", "-y", "-f", "lavfi", "-i", "testsrc2=s=160x120:r=25:d=4", "-f", "lavfi", "-i", "smptebars=s=160x120:r=25:d=4",
+            "-f", "lavfi", "-i", "anullsrc=r=48000:cl=stereo", "-filter_complex", "[0:v][1:v]concat=n=2:v=1:a=0[v]", "-map", "[v]", "-map", "2:a",
+            "-t", "8", "-c:v", "libx264", "-preset", "ultrafast", "-g", "25", "-threads", "2", "-c:a", "aac", "-b:a", "64k", butun);
+        var a = Path.Combine(_klasor, "a.mp4");
+        var b = Path.Combine(_klasor, "b.mp4");
+        Ffmpeg("-hide_banner", "-y", "-i", butun, "-t", "4", "-c", "copy", a);
+        Ffmpeg("-hide_banner", "-y", "-ss", "4", "-i", butun, "-c", "copy", b);
+        return (a, b);
+    }
+
+    private async Task<(int Cikis, JsonElement Sonuc, string Stderr)> GercekTeslim(EditProject proje, string cikti, params string[] ek)
+    {
+        var (cikis, stdout, stderr) = await Kos(new CliServices(), new[] { "teslim", ProjeYaz(proje), "--cikti", cikti, "--json" }.Concat(ek).ToArray());
+        Assert.True(cikis == ExitCodes.InBand, stderr);
+        using var belge = JsonDocument.Parse(stdout);
+        return (cikis, belge.RootElement.Clone(), stderr);
+    }
+
+    [FfmpegTheory]
+    [InlineData("hizli", "Fast", 0.0, 1.0, 2.0, 3.0)]
+    [InlineData("akilli", "Smart", 0.4, 1.4, 2.3, 3.3)]
+    public async Task GercekProjeHizliVeAkilliKiptaKipindeTeslimEdilir(string kip, string etkin, double a0, double a1, double b0, double b1)
+    {
+        var kaynak = SesliKaynak("kaynak.mp4", "testsrc2");
+        var bilgi = await FfprobeClient.ProbeAsync(kaynak);
+        var model = new EditTimeline(new[] { new EditClip(S(a0), S(a1)), new EditClip(S(b0), S(b1)) }, S(bilgi.DurationSeconds));
+        var cikti = Path.Combine(_klasor, kip + ".mp4");
+
+        var (_, sonuc, _) = await GercekTeslim(EditProject.From(SourceStamp.Of(kaynak)!, model, "Full"), cikti, "--kip", kip);
+
+        Assert.Equal(etkin, sonuc.GetProperty("requestedMode").GetString());
+        Assert.Equal(etkin, sonuc.GetProperty("effectiveMode").GetString());
+        var cikan = await FfprobeClient.ProbeAsync(cikti);
+        Assert.InRange(cikan.DurationSeconds, 1.8, 2.4);
+        Assert.Equal("h264", cikan.VideoCodec);
+        Assert.NotNull(cikan.AudioCodec);
+    }
+
+    [FfmpegFact]
+    public async Task GercekCokKaynakliMuzikliProjeTekDosyadaKarisir()
+    {
+        var (a, b) = AyniKodlamadanIkiKaynak();
+        var muzik = Path.Combine(_klasor, "muzik.m4a");
+        Ffmpeg("-hide_banner", "-y", "-f", "lavfi", "-i", "sine=frequency=440:sample_rate=48000:duration=6", "-c:a", "aac", "-b:a", "64k", "-threads", "2", muzik);
+        var sureA = (await FfprobeClient.ProbeAsync(a)).DurationSeconds;
+        var sureB = (await FfprobeClient.ProbeAsync(b)).DurationSeconds;
+
+        EditProject Proje(bool muzikli)
+        {
+            var model = new EditTimeline(new[]
+            {
+                new EditClip(S(0), S(1)),
+                new EditClip(S(1), S(2)) { Source = 1 },
+                new EditClip(S(2), S(3))
+            }, S(sureA), extraSources: new[] { S(sureB) });
+            if (muzikli) model.SetMusic(new EditMusic(muzik, S(6)));
+            return EditProject.From(SourceStamp.Of(a)!, model, "Fast", new[] { SourceStamp.Of(b)! });
+        }
+
+        var cikti = Path.Combine(_klasor, "muzikli.mp4");
+        var sessiz = Path.Combine(_klasor, "sessiz.mp4");
+        var (_, sonuc, _) = await GercekTeslim(Proje(true), cikti);
+        var (_, sessizSonuc, _) = await GercekTeslim(Proje(false), sessiz);
+        Assert.Equal("Fast", sessizSonuc.GetProperty("effectiveMode").GetString());
+
+        Assert.Equal(3, sonuc.GetProperty("clips").GetInt32());
+        Assert.Equal(new[] { a, b }, sonuc.GetProperty("sources").EnumerateArray().Select(e => e.GetString()));
+        Assert.Equal("Fast", sonuc.GetProperty("requestedMode").GetString());
+        Assert.Equal("Full", sonuc.GetProperty("effectiveMode").GetString());
+        var cikan = await FfprobeClient.ProbeAsync(cikti);
+        Assert.InRange(cikan.DurationSeconds, 2.8, 3.4);
+        Assert.NotNull(cikan.AudioCodec);
+        Assert.InRange(OrtalamaSes(cikti), -40, 0);
+        Assert.True(OrtalamaSes(sessiz) < -70, "muziksiz teslim sessiz kalmali");
+        var orta = Kare(cikti, 1.5);
+        Assert.InRange(Fark(orta, Kare(b, 1.5)), 0, 8);
+        Assert.True(Fark(orta, Kare(a, 1.5)) > 20, "ikinci parca ek kaynaktan gelmeli");
+        Assert.InRange(Fark(Kare(cikti, 2.5), Kare(a, 2.5)), 0, 8);
+    }
+
+    private static double OrtalamaSes(string yol)
+    {
+        var cikti = FfmpegCikti(false, "-hide_banner", "-nostats", "-i", yol, "-vn", "-af", "volumedetect", "-f", "null", "-");
+        var satir = cikti.Split('\n').Last(s => s.Contains("mean_volume:", StringComparison.Ordinal));
+        var deger = satir[(satir.IndexOf("mean_volume:", StringComparison.Ordinal) + 12)..].Replace("dB", "").Trim();
+        return double.Parse(deger, System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    private static double Fark(string x, string y)
+    {
+        var p = Convert.FromHexString(x);
+        var q = Convert.FromHexString(y);
+        Assert.Equal(p.Length, q.Length);
+        return p.Zip(q, (u, v) => Math.Abs(u - v)).Average();
+    }
+
+    private static string Kare(string yol, double an)
+        => FfmpegCikti(true, "-hide_banner", "-ss", an.ToString(System.Globalization.CultureInfo.InvariantCulture), "-i", yol, "-frames:v", "1",
+            "-vf", "scale=16:12", "-pix_fmt", "gray", "-f", "rawvideo", "-");
+
+    private static string FfmpegCikti(bool stdout, params string[] args)
+    {
+        var psi = new ProcessStartInfo("ffmpeg") { RedirectStandardError = true, RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
+        foreach (var a in args) psi.ArgumentList.Add(a);
+        using var surec = Process.Start(psi)!;
+        var hata = surec.StandardError.ReadToEndAsync();
+        var bellek = new MemoryStream();
+        var oku = surec.StandardOutput.BaseStream.CopyToAsync(bellek);
+        if (!surec.WaitForExit(30000))
+        {
+            surec.Kill(true);
+            Assert.Fail("ffmpeg 30 sn icinde bitmedi.");
+        }
+        oku.GetAwaiter().GetResult();
+        Assert.True(surec.ExitCode == 0, hata.GetAwaiter().GetResult());
+        return stdout ? Convert.ToHexString(bellek.ToArray()) : hata.GetAwaiter().GetResult();
     }
 
     private static void Ffmpeg(params string[] args)

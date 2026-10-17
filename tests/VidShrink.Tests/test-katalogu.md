@@ -468,3 +468,7 @@
   gizler, kısayol kartını açıp satırı süzer, temizleyince kartları ve açıklığı geri verir; tablo tuş metnine göre de
   süzülür. Kısayol dosyası `.calisma/kabuk-kisayol/` altında (`ShortcutBindings.UseFile`). 16 python mutasyonunun 16'sı
   kırmızı.
+- `CliProjeTeslimTests.cs` — `vidshrink teslim`: proje dosyası pencere açmadan çizelgeye iner (`EditProject.ToJob`), kip,
+  çıktı ve hata yolları sahte hazırlama ile; dört `[FfmpegFact]` gerçek teslim: Tam iki parça, Hızlı ve Akıllı kendi kipinde,
+  iki kaynaklı müzikli proje Tam'a düşer ve müziği karıştırır (müziksiz kontrol Hızlı kopyada kalır, sessiz okunur).
+  Yedi python mutasyonunun yedisi kırmızı. Geçici dosyalar `.calisma/test-ciktilari/cli-teslim/`, test siler.

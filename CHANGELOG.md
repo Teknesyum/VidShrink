@@ -47,6 +47,9 @@ ship as part of it.
   resolution, pixel aspect, pixel format, frame rate, time base, audio codec, sample rate, channels and stream
   layout, and the same codec header data) and whose timeline needs no re-encode is joined with the concat demuxer and `-c copy` instead of being
   re-encoded. Smart copies only when every cut lands on a keyframe; anything else keeps the re-encode path.
+- Command line: `vidshrink teslim` is now checked end to end with real ffmpeg in Fast and Smart mode, and for a
+  project that cuts between two sources with a music track (the music forces Full and is mixed in; without music the
+  same project stays on the Fast copy path).
 
 ### Fixed
 
