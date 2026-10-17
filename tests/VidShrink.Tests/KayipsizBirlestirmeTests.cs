@@ -48,7 +48,7 @@ public sealed class KayipsizBirlestirmeTests
 
     private static Dictionary<int, ExportSource> Kaynaklar(MediaInfo? ikinci = null, double[]? kareler = null) => new()
     {
-        [0] = new ExportSource(Bilgi("birinci.mp4"), new[] { 0.0, 2.0, 4.0 }, 0),
+        [0] = new ExportSource(Bilgi("birinci.mp4"), new[] { 0.0, 2.0, 4.0 }, 0.5),
         [1] = new ExportSource(ikinci ?? Bilgi("ikinci.mp4"), kareler ?? new[] { 0.0, 2.0 }, 0.1)
     };
 
@@ -135,6 +135,9 @@ public sealed class KayipsizBirlestirmeTests
         Assert.Equal(MergeMismatch.TimeBase, MergeCompatibility.Check(new[] { Bilgi("a.mp4") with { VideoTimeBase = null }, Bilgi("b.mp4") }));
         Assert.Equal(MergeMismatch.SampleRate, MergeCompatibility.Check(new[] { SesHizi(Bilgi("a.mp4"), 0), Bilgi("b.mp4") }));
         Assert.Equal(MergeMismatch.Unsupported, MergeCompatibility.Check(Array.Empty<MediaInfo>()));
+        Assert.Equal(MergeMismatch.PixelFormat, MergeCompatibility.Check(new[] { Bilgi("a.mp4") with { PixelFormat = null }, Bilgi("b.mp4") with { PixelFormat = null } }));
+        Assert.Equal(MergeMismatch.TimeBase, MergeCompatibility.Check(new[] { Bilgi("a.mp4") with { VideoTimeBase = null }, Bilgi("b.mp4") with { VideoTimeBase = null } }));
+        Assert.Equal(MergeMismatch.SampleRate, MergeCompatibility.Check(new[] { SesHizi(Bilgi("a.mp4"), 0), SesHizi(Bilgi("b.mp4"), 0) }));
     }
 
     [Fact]
@@ -190,7 +193,7 @@ public sealed class KayipsizBirlestirmeTests
         Assert.Equal(new[] { "-map", "0:v:0", "-map", "0:a:0", "-c", "copy" }, args.Skip(9).Take(6));
         Assert.Equal("cikti.mp4", args[^1]);
         Assert.Equal(Path.Combine("is", EditExport.VideoListName), adim.ListPath);
-        Assert.Equal("ffconcat version 1.0\nfile 'birinci.mp4'\ninpoint 2\noutpoint 10\nfile 'ikinci.mp4'\noutpoint 4.1\n", adim.ListContent);
+        Assert.Equal("ffconcat version 1.0\nfile 'birinci.mp4'\ninpoint 2.5\noutpoint 10.5\nfile 'ikinci.mp4'\noutpoint 4.1\n", adim.ListContent);
         Assert.Equal(12.0, adim.DurationSeconds, 6);
         Assert.Equal(new[] { 1.0, 0.0 }, plan.KeyframeLeads);
 
