@@ -122,6 +122,14 @@ single spelling.
 | `--ses-bit-hizi` | `--audio-bitrate` |
 | `--disa-aktar` | `--export` |
 | `--ek-arguman` | `--extra-args` |
+| `--etiket-baslik` | `--tag-title` |
+| `--etiket-sanatci` | `--tag-artist` |
+| `--etiket-yil` | `--tag-year` |
+| `--etiket-yorum` | `--tag-comment` |
+| `--kapak` | `--cover` |
+| `--onar` | `--repair` |
+| `--bolum-ekle` | `--add-chapter` |
+| `--bolumsuz` | `--no-chapters` |
 | `--kip` | `--mode` |
 
 Exit codes: `0` in band, `2` under the band (quality saturated, the smaller file kept), `3`
@@ -207,6 +215,21 @@ keep spaces, repeating the flag appends; `-i`, `-y`, `-n`, `-f`, `-progress`, `-
 bare value that would become a second output are refused with `64`), `--json`. A combination the tab would refuse (an audio codec the container cannot carry, an
 odd size) is refused with the same reason and exit code `64`; a container whose encoder the
 local ffmpeg lacks gives `1`.
+
+Tags, cover, Repair and chapters follow the tab's Tags and Chapters drop-downs:
+`--etiket-baslik`, `--etiket-sanatci`, `--etiket-yil`, `--etiket-yorum` write the container's
+title, artist, date and comment (an empty value writes no key; `--meta-yok` does not remove them);
+`--kapak <png|jpg>` adds a cover (MKV attachment, MP4 cover track with video copy only; a missing
+file gives `1`). `--onar` is the tab's Repair preset: corrupt packets dropped, missing timestamps
+rebuilt, output starting at zero; without `--kap`, `--kodek`, `--ses-kodek` it remuxes video and
+audio into MKV. `--bolum-ekle <time>=<name>` (repeatable, `90=Main` or `1:30=Main`) replaces the
+source chapters with this list, counted from the source start and shifted by `--kes`;
+`--bolumsuz` writes no chapters. Both need mp4, mkv or mov and cannot be given together (`64`).
+
+```bash
+vidshrink donustur broken.ts --onar
+vidshrink donustur talk.mkv --etiket-baslik "Talk" --bolum-ekle 0=Intro --bolum-ekle 12:30=Questions
+```
 
 The CLI does not carry the tab's GIF-from-GIF size target, its audio track picker or its
 external audio file.

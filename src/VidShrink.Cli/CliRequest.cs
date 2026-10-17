@@ -209,6 +209,9 @@ public sealed record CliRequest
     /// <summary><c>donustur --ek-arguman</c>: <see cref="CustomArguments"/> ile bölünmüş ek ffmpeg argümanları; çıktı yolundan önce yazılır.</summary>
     public IReadOnlyList<string> ExtraArguments { get; init; } = Array.Empty<string>();
 
+    /// <summary><c>donustur --etiket-*</c>, <c>--kapak</c>, <c>--onar</c>, <c>--bolum-ekle</c>, <c>--bolumsuz</c>: Dönüştür'ün etiket ve bölüm açılırlarının seçimi.</summary>
+    public CliConvertTags ConvertTags { get; init; } = new();
+
     /// <summary><c>profiller --disa-aktar</c>: profillerin yazılacağı dosya.</summary>
     public string? ExportPath { get; init; }
 

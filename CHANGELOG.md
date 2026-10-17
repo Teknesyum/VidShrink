@@ -9,6 +9,12 @@ ship as part of it.
 
 ### Added
 
+- Command line: `donustur` gains the Convert tab's tags, cover, Repair and chapters. `--etiket-baslik`,
+  `--etiket-sanatci`, `--etiket-yil`, `--etiket-yorum` write the container tags, `--kapak` adds a PNG or JPEG cover,
+  `--onar` is the Repair preset (corrupt packets dropped, timestamps rebuilt, MKV remux unless a container or codec
+  is given), `--bolum-ekle TIME=NAME` replaces the source chapters and `--bolumsuz` drops them. With the same choices
+  the command line and the tab write the same ffmpeg command. Repair is now measured on a truncated, corrupted
+  MPEG-TS recording: the plain remux fails to decode cleanly, the repaired MKV decodes without an error.
 - Recorder: the wizard's "Game" answer now picks the screen for you. When a recording or the replay buffer
   starts, the screen target follows the foreground window (or the window right under VidShrink when VidShrink itself
   is in front), falling back to the primary screen; an HDR screen still goes through the HDR-to-SDR path. Picking a

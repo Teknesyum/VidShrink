@@ -444,6 +444,11 @@
   Canlı kol `ConvertAsync` ile kırpılmış çıktının bölümlerini ffprobe'dan okur, metin dosyası kalmaz; başlangıcı 10 sn'de
   olan kaynağın bölümleri el değmemiş listeyle de çıktıya geçer. Pencere kolu satırları,
   hatalı zamanı, hepsini silmeyi, GIF'te gizlenmeyi ve yeni kaynakta sıfırlanmayı ölçer. Kırpma atlama mutasyonu kırıyor.
+- `BolumDuzenleyiciCliTests.cs` — Bölüm Düzenleyici'nin komut satırı yüzü (later 44): `donustur`'un `--etiket-*`,
+  `--kapak`, `--onar`, `--bolum-ekle`, `--bolumsuz` seçenekleri plana geçer, hatalı bölüm ve çelişen seçim reddedilir,
+  aynı seçimle panelin komutu ile CLI'nın komutu aynıdır (başsız pencere). Canlı kol (`FfmpegFact`) ortası bozulmuş,
+  yarıda kesilmiş MPEG-TS kaydını `--onar` ile MKV'ye sarar: düz sarma çözülürken hata verir, onarılan hatasız çözülür,
+  0'dan başlar, bölüm ve başlık ffprobe'dan okunur. Kanıt dosyaları `B1KalanGirdi` klasöründe, test siler.
 - `PrompterTests.cs` — prompter (`PrompterScroll`, `RecorderPrompter`): hız basamakları ve uçlar, sona varınca durma ve
   sondan başa sarma, ayarda metin ve hız (geçersiz basamak varsayılana). Gerçek pencere `GetWindowDisplayAffinity` 0x11
   okur (negatif kontrol 0, uyarı satırı görünür); akış saatle değil `Advance`'a verilen zamanla ölçülür, tuşlar ve

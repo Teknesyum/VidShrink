@@ -48,7 +48,7 @@ public static class CliCompletion
     private static readonly string[] WatchOnlyFlags = { "--bir-kez", "--once" };
     private static readonly string[] WatchOnlyValues = { "--aralik", "--interval" };
 
-    private static readonly string[] ConvertFlags = { "-h", "--yardim", "--help", "--meta-yok", "--no-metadata", "--json" };
+    private static readonly string[] ConvertFlags = { "-h", "--yardim", "--help", "--meta-yok", "--no-metadata", "--onar", "--repair", "--bolumsuz", "--no-chapters", "--json" };
 
     private static readonly string[] RecordFlags = { "-h", "--yardim", "--help", "--json" };
 
@@ -58,7 +58,8 @@ public static class CliCompletion
     {
         "--kap", "--container", "--kodek", "--codec", "--crf", "--bit-hizi", "--bitrate", "--cozunurluk", "--resolution",
         "--kare-hizi", "--fps", "--ses-kodek", "--audio-codec", "--ses-bit-hizi", "--audio-bitrate", "--kes", "--cut",
-        "--cikti", "--output", "-o", "--ek-arguman", "--extra-args"
+        "--cikti", "--output", "-o", "--ek-arguman", "--extra-args", "--etiket-baslik", "--tag-title", "--etiket-sanatci", "--tag-artist",
+        "--etiket-yil", "--tag-year", "--etiket-yorum", "--tag-comment", "--kapak", "--cover", "--bolum-ekle", "--add-chapter"
     };
 
     private static readonly string[] EditFlags = { "-h", "--yardim", "--help", "--meta-yok", "--no-metadata", "--json" };

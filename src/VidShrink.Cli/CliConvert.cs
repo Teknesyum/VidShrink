@@ -78,6 +78,11 @@ public static class CliConvert
         string? container = null;
         double? crf = null;
         int? bitrate = null;
+        var videoSet = false;
+        var audioSet = false;
+        var tags = new CliConvertTags();
+        var added = new List<ChapterEntry>();
+        var noChapters = false;
         for (var i = 1; i < args.Count; i++)
         {
             var arg = args[i];
@@ -94,6 +99,7 @@ public static class CliConvert
                     if (!CliParser.TryValue(args, ref i, out var kodek)) return CliParser.Fail("error.missing-value", arg);
                     if (!TryVideoCodec(kodek, out var video)) return CliParser.Fail("error.convert-codec", kodek);
                     preset = preset with { VideoCodec = video };
+                    videoSet = true;
                     break;
                 case "--crf":
                     if (!CliParser.TryValue(args, ref i, out var crfText)) return CliParser.Fail("error.missing-value", arg);
@@ -129,6 +135,7 @@ public static class CliConvert
                     if (!CliParser.TryValue(args, ref i, out var ses)) return CliParser.Fail("error.missing-value", arg);
                     if (!TryAudioCodec(ses, out var audio)) return CliParser.Fail("error.convert-audio-codec", ses);
                     preset = preset with { AudioCodec = audio };
+                    audioSet = true;
                     break;
                 case "--ses-bit-hizi" or "--audio-bitrate":
                     if (!CliParser.TryValue(args, ref i, out var sesBit)) return CliParser.Fail("error.missing-value", arg);
@@ -145,6 +152,37 @@ public static class CliConvert
                     break;
                 case "--meta-yok" or "--no-metadata":
                     preset = preset with { DropMetadata = true };
+                    break;
+                case "--etiket-baslik" or "--tag-title":
+                    if (!CliParser.TryValue(args, ref i, out var title)) return CliParser.Fail("error.missing-value", arg);
+                    tags = tags with { Title = title };
+                    break;
+                case "--etiket-sanatci" or "--tag-artist":
+                    if (!CliParser.TryValue(args, ref i, out var artist)) return CliParser.Fail("error.missing-value", arg);
+                    tags = tags with { Artist = artist };
+                    break;
+                case "--etiket-yil" or "--tag-year":
+                    if (!CliParser.TryValue(args, ref i, out var year)) return CliParser.Fail("error.missing-value", arg);
+                    tags = tags with { Year = year };
+                    break;
+                case "--etiket-yorum" or "--tag-comment":
+                    if (!CliParser.TryValue(args, ref i, out var comment)) return CliParser.Fail("error.missing-value", arg);
+                    tags = tags with { Comment = comment };
+                    break;
+                case "--kapak" or "--cover":
+                    if (!CliParser.TryValue(args, ref i, out var cover)) return CliParser.Fail("error.missing-value", arg);
+                    tags = tags with { CoverPath = cover };
+                    break;
+                case "--onar" or "--repair":
+                    tags = tags with { Repair = true };
+                    break;
+                case "--bolum-ekle" or "--add-chapter":
+                    if (!CliParser.TryValue(args, ref i, out var chapter)) return CliParser.Fail("error.missing-value", arg);
+                    if (ParseChapter(chapter) is not { } entry) return CliParser.Fail("error.bad-chapter", chapter);
+                    added.Add(entry);
+                    break;
+                case "--bolumsuz" or "--no-chapters":
+                    noChapters = true;
                     break;
                 case "--ek-arguman" or "--extra-args":
                     if (!CliParser.TryValue(args, ref i, out var ek)) return CliParser.Fail("error.missing-value", arg);
@@ -174,11 +212,19 @@ public static class CliConvert
 
         if (request.Input is null) return CliParser.Fail("error.no-input", null);
 
+        if (noChapters && added.Count > 0) return CliParser.Fail("error.chapters-conflict", null);
+        if (tags.Repair)
+            preset = preset with
+            {
+                VideoCodec = videoSet ? preset.VideoCodec : "copy",
+                AudioCodec = audioSet ? preset.AudioCodec : "copy"
+            };
+
         var fromOutput = request.Output is { } outputPath ? ContainerOfPath(outputPath) : null;
         if (container is null)
         {
             if (request.Output is { } named && fromOutput is null) return CliParser.Fail("error.convert-output-extension", named);
-            container = fromOutput ?? preset.Container;
+            container = fromOutput ?? (tags.Repair ? "mkv" : preset.Container);
         }
         else if (request.Output is { } named && !IsSequence(container) && fromOutput != container)
             return CliParser.Fail("error.convert-output-extension", named);
@@ -193,7 +239,19 @@ public static class CliConvert
         else if (bitrate is { } kbps)
             preset = preset with { QualityMode = ConversionQualityMode.Bitrate, Quality = kbps };
 
-        return CliParser.Success(request with { Conversion = preset with { Container = container } });
+        IReadOnlyList<ChapterEntry>? chapters = noChapters ? Array.Empty<ChapterEntry>() : added.Count > 0 ? added.ToArray() : null;
+        if (chapters is not null && !ConversionChapters.Carries(container)) return CliParser.Fail("error.chapters-container", container);
+
+        return CliParser.Success(request with { Conversion = preset with { Container = container }, ConvertTags = tags with { Chapters = chapters } });
+    }
+
+    /// <summary><c>--bolum-ekle ZAMAN=AD</c>: zaman <c>--kes</c>'in saat yazımıyla, ad boş olabilir.</summary>
+    internal static ChapterEntry? ParseChapter(string text)
+    {
+        var split = text.IndexOf('=');
+        var time = split < 0 ? text : text[..split];
+        var title = split < 0 ? "" : text[(split + 1)..];
+        return CliParser.TryParseClock(time.Trim(), out var seconds) ? new ChapterEntry(TimeSpan.FromSeconds(seconds), title.Trim()) : null;
     }
 
     private static Func<ConversionPreset, ConversionPreset>? ParseResolution(string text)
@@ -221,7 +279,14 @@ public static class CliConvert
         {
             Start = request.TrimStartSeconds is { } start ? TimeSpan.FromSeconds(start) : null,
             End = request.TrimEndSeconds is { } end ? TimeSpan.FromSeconds(end) : null,
-            ExtraArgs = request.ExtraArguments
+            ExtraArgs = request.ExtraArguments,
+            Title = request.ConvertTags.Title,
+            Artist = request.ConvertTags.Artist,
+            Year = request.ConvertTags.Year,
+            Comment = request.ConvertTags.Comment,
+            CoverPath = request.ConvertTags.CoverPath is { } cover ? Path.GetFullPath(cover) : null,
+            Repair = request.ConvertTags.Repair,
+            Chapters = request.ConvertTags.Chapters
         };
 
     /// <summary>
@@ -264,6 +329,11 @@ public static class CliConvert
         }
 
         var plan = Plan(request);
+        if (plan.CoverPath is { } coverPath && !File.Exists(coverPath))
+        {
+            stderr.WriteLine(text.Format("error.cover-missing", coverPath));
+            return ExitCodes.Error;
+        }
         var availability = services.Availability();
         if (!ConversionArguments.ContainerAvailable(plan.Container, availability))
         {
@@ -340,4 +410,19 @@ public static class CliConvert
         }
         return System.Text.Encoding.UTF8.GetString(stream.ToArray()) + Environment.NewLine;
     }
+}
+
+/// <summary>
+/// <c>donustur</c>'un etiket, kapak, Onar ve bölüm seçimi; panelin etiket ve bölüm açılırlarının eşi.
+/// <see cref="Chapters"/> <c>null</c> kaynağın bölümleri, boş liste bölümsüz (<see cref="ConversionPlan.Chapters"/>).
+/// </summary>
+public sealed record CliConvertTags
+{
+    public string? Title { get; init; }
+    public string? Artist { get; init; }
+    public string? Year { get; init; }
+    public string? Comment { get; init; }
+    public string? CoverPath { get; init; }
+    public bool Repair { get; init; }
+    public IReadOnlyList<ChapterEntry>? Chapters { get; init; }
 }
