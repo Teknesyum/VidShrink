@@ -126,6 +126,8 @@ internal sealed class PlayerSettings
 
     internal HardwareDecoding Hardware { get; set; }
 
+    internal bool ToneMapping { get; set; } = true;
+
     internal string? AudioDevice { get; set; }
 
     internal AudioOutput AudioOutput { get; set; } = AudioOutput.Plain;
@@ -177,6 +179,7 @@ internal sealed class PlayerSettings
             settings.SpeedModeB = string.Equals((string?)root["speedMode"], "B", StringComparison.OrdinalIgnoreCase);
             if (Enum.TryParse<HardwareDecoding>((string?)root["hardwareDecoding"], true, out var hardware) && Enum.IsDefined(hardware))
                 settings.Hardware = hardware;
+            settings.ToneMapping = (bool?)root["toneMapping"] ?? true;
             settings.AudioDevice = (string?)root["audioDevice"] is { Length: > 0 } device && device != VidShrink.Player.AudioDevice.Auto ? device : null;
             settings.AudioOutput = new AudioOutput(
                 (bool?)root["audioPassthrough"] ?? false,
@@ -229,6 +232,7 @@ internal sealed class PlayerSettings
                 writer.WriteNumber("speedB", SpeedB);
                 writer.WriteString("speedMode", SpeedModeB ? "B" : "A");
                 writer.WriteString("hardwareDecoding", Hardware.ToString());
+                writer.WriteBoolean("toneMapping", ToneMapping);
                 if (AudioDevice is null) writer.WriteNull("audioDevice");
                 else writer.WriteString("audioDevice", AudioDevice);
                 writer.WriteBoolean("audioPassthrough", AudioOutput.Passthrough);

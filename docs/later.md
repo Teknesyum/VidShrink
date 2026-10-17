@@ -163,6 +163,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: tools/VidShrink.Bench/, docs/olcumler/, src/VidShrink.Player/MpvEngine.Advanced.cs, src/VidShrink.App/Playback/PlayerAdvancedPanel.axaml.cs
 - Sahibin kararı: HDR video işlemcide ton eşlemeyle gösterilsin mi; 4K'da kare düşürürse yalnız elle açılan bir seçenek mi olsun
 - Plan: Önce ölçüm: bir HDR10 ve bir HLG örnek bugünkü yolda açılıp kare kaydedilir, soluk ya da patlak görünüp görünmediği `docs/olcumler/`e yazılır. Sonra etiketli bir `vf` halkası (ffmpeg `zscale` ve `tonemap` süzgeçleri) eklenir; halka yalnız aktarım eğrisi PQ ya da HLG iken takılır (MediaDetails.cs:26–38). Süzgeçler libmpv derlemesinde yoksa paket burada durur ve sahibe döner. Doğrulama: aynı karede eşlemeli ve eşlemesiz ortalama parlaklık farkı; 1080p ve 4K'da `Stats` ile düşen kare sayısı.
+- Durum (18 Ekim 2026, `yan/oynatici-hdr`): PQ/HLG videoda `@vstone:gpu` halkası (hedef BT.709/BT.1886) varsayılan açık, Gelişmiş panelde anahtar; ölçüm `docs/olcumler/oynatici-hdr-ton-esleme.md`. Açık: HDR ekrana geçişte halkanın kalkması, `target-peak` değeri (sahibin kararı), GPU'suz makinede düşen kare ölçümü.
 
 ## 99. Windows Ortam Denetimi Bağlantısı
 

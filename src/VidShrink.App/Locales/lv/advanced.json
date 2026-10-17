@@ -14,6 +14,7 @@
   "player.advanced.less": "Samazināt",
   "player.advanced.deinterlace": "Rindpārleces novēršana",
   "player.advanced.hardware": "Aparatūras dekodēšana",
+  "player.advanced.tone-mapping": "HDR toņu kartēšana",
   "player.advanced.picture-reset": "Atiestatīt attēlu",
   "player.advanced.sound": "Skaņa",
   "player.advanced.equalizer-flat": "Līdzena",

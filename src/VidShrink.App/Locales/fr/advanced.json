@@ -14,6 +14,7 @@
   "player.advanced.less": "Diminuer",
   "player.advanced.deinterlace": "Désentrelacer",
   "player.advanced.hardware": "Décodage matériel",
+  "player.advanced.tone-mapping": "Mappage tonal HDR",
   "player.advanced.picture-reset": "Réinitialiser l'image",
   "player.advanced.sound": "Son",
   "player.advanced.equalizer-flat": "Plat",

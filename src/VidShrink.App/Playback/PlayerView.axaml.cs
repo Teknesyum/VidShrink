@@ -798,6 +798,7 @@ internal partial class PlayerView : UserControl
         if (HistoryPath?.Invoke() is { } file) _history = PlaybackHistory.Load(file);
         ApplyAdvanced(engine);
         ApplyHardwareDecoding(engine);
+        ApplyToneMapping(engine);
         ApplyAudioOutput(engine);
         RestoreSound();
         if (_volume != 100) engine.SetVolume(_volume);

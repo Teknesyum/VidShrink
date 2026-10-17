@@ -14,6 +14,7 @@
   "player.advanced.less": "Μείωση",
   "player.advanced.deinterlace": "Αποδιαπλοκή",
   "player.advanced.hardware": "Αποκωδικοποίηση υλικού",
+  "player.advanced.tone-mapping": "Αντιστοίχιση τόνων HDR",
   "player.advanced.picture-reset": "Επαναφορά εικόνας",
   "player.advanced.sound": "Ήχος",
   "player.advanced.equalizer-flat": "Επίπεδο",

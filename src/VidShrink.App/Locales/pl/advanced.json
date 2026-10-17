@@ -14,6 +14,7 @@
   "player.advanced.less": "Zmniejsz",
   "player.advanced.deinterlace": "Usuwanie przeplotu",
   "player.advanced.hardware": "Dekodowanie sprzętowe",
+  "player.advanced.tone-mapping": "Mapowanie tonów HDR",
   "player.advanced.picture-reset": "Przywróć obraz",
   "player.advanced.sound": "Dźwięk",
   "player.advanced.equalizer-flat": "Płaski",

@@ -24,6 +24,12 @@ ship as part of it.
   (palette-filtered, 10 fps, at most 640 px wide, saved next to the recording). Recording names come from a
   pattern (default `kayit_{damga}`, same as before) with `{damga}`, `{tarih}`, `{saat}`, `{pencere}` (window title) and
   `{sayac}` (first free number); the CLI reads the same `namePattern`.
+- Player: HDR tone mapping. HDR10 (PQ) and HLG video is tone mapped to SDR by mpv's own GPU tone mapper (`gpu`
+  video filter, labelled `@vstone`, target BT.709/BT.1886) instead of being clipped; a 1000-nit clip no longer blows
+  out 6.5% of its pixels. On by default, attached only to PQ/HLG video, and switchable in the Advanced panel
+  (`toneMapping` in `player-settings.json`). If the filter cannot start, playback continues on the old path. HDR
+  display passthrough is not available in the software render path. Measurement in
+  `docs/olcumler/oynatici-hdr-ton-esleme.md`.
 - Player: "Speed through silence" mode (J, Playback menu). A labelled `silencedetect` ring sits at the head of the
   audio chain; when it reports a silence the speed rises to 4x and drops back to the previous speed when sound returns,
   so audio and picture stay in sync instead of jumping. Off by default; threshold (`silenceThresholdDb`, default

@@ -14,6 +14,7 @@
   "player.advanced.less": "Уменьшить",
   "player.advanced.deinterlace": "Деинтерлейсинг",
   "player.advanced.hardware": "Аппаратное декодирование",
+  "player.advanced.tone-mapping": "Тональное отображение HDR",
   "player.advanced.picture-reset": "Сбросить изображение",
   "player.advanced.sound": "Звук",
   "player.advanced.equalizer-flat": "Плоский",

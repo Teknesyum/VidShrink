@@ -14,6 +14,7 @@
   "player.advanced.less": "Scade",
   "player.advanced.deinterlace": "Deîntrețesere",
   "player.advanced.hardware": "Decodare hardware",
+  "player.advanced.tone-mapping": "Maparea tonurilor HDR",
   "player.advanced.picture-reset": "Resetează imaginea",
   "player.advanced.sound": "Sunet",
   "player.advanced.equalizer-flat": "Plat",

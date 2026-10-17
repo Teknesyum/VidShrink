@@ -14,6 +14,7 @@
   "player.advanced.less": "Смањи",
   "player.advanced.deinterlace": "Деинтерлејсинг",
   "player.advanced.hardware": "Хардверско декодирање",
+  "player.advanced.tone-mapping": "HDR мапирање тонова",
   "player.advanced.picture-reset": "Ресетуј слику",
   "player.advanced.sound": "Звук",
   "player.advanced.equalizer-flat": "Равно",

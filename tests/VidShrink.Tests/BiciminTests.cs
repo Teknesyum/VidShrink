@@ -1324,6 +1324,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-16, onizlemede elle kirpma (later 57): iki yeni anahtar (<c>main.advanced.filters.manualcrop</c>, <c>.tip</c>) kola girmiyor; en etiketi "Crop in preview" iken kola girip baslik denetiminde kusur sayildi, "Manual crop" yapildi. SAYIM satirindan olculdu: toplam 3781, en 364, tr 123.</para>
     /// <para>2026-10-18, biten ciktinin kalite olcumu (later 122): dokuz yeni anahtardan (<c>main.advanced.quality-check.*</c>, <c>main.output.quality-check</c>, <c>main.run.quality*</c>) 6 kol (en, hu, pt, sw <c>main.advanced.quality-check.label</c>; fr, pt <c>main.output.quality-check</c>), KOL dokumunden ve SAYIM satirindan olculdu, tr girmiyor: toplam 3888 + 6 = 3894, en 373 + 1 = 374, tr 126.</para>
     /// <para>2026-10-12, Linux Wayland: <c>recorder.error.window-wayland</c> metni artik her kaydi reddediyor ve "Wayland" ile basliyor; bn, hi, th, ur kola giriyor (KOL dokumu). 3086 + 4 = 3090, en ve tr degismedi.</para>
+    /// <para>2026-10-18, oynatici HDR ton esleme (later 96): yeni <c>player.advanced.tone-mapping</c> es ("Mapeo de tonos HDR") ve pt ("Mapeamento de tons HDR") dillerinde kola giriyor, en ve tr haric: 3888 + 2 = 3890, en 373, tr 126.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1349,7 +1350,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3922, toplam);
+        Assert.Equal(3924, toplam);
         Assert.Equal(377, dilBasina["en"]);
         Assert.Equal(126, dilBasina["tr"]);
     }
@@ -1640,6 +1641,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-18, 122 ve 103 birlikte: toplam 3888 + 6 + 13 = 3907, en 375, tr 126; gezilen 84280 + 387 + 344 = 85011.</para>
     /// <para>2026-10-18, sonuc paneli (later 72): sekiz yeni anahtar (<c>recorder.output.copy-file</c>/<c>to-gif</c>/<c>gif-*</c>, <c>recorder.name.*</c>) 42 dilde, dusen yok; olculen toplam 3888 + 15 = 3903, en 373 + 2 = 375, tr 126 degismedi, gezilen 84280 + 344 = 84624.</para>
     /// <para>2026-10-18, 122, 103 ve 72 birlikte: toplam 3907 + 15 = 3922, en 377, tr 126; gezilen 85011 + 344 = 85355.</para>
+    /// <para>2026-10-18, ve 96 (HDR ton esleme, tek anahtar): toplam 3922 + 2 = 3924, en 377, tr 126; gezilen 85355 + 43 = 85398.</para>
     /// <para>2026-10-16, later 44 (etiket ve Onar): on sekiz yeni anahtar; olculen toplam 3781 + 2 = 3783 (lt main.convert.tags.cover.none, ro main.convert.tags.year), en 364, tr 123, gezilen 80453 + 774 = 81227.</para>
     /// <para>2026-10-15, uzun iste oncelik ve bitis sesi (later 76): dort yeni anahtar (<c>settings-tab.encode-priority.above-normal</c>, <c>settings-tab.finish-sound-file.choose</c>, <c>.hint</c>, <c>.reset</c>) 42 dilde, dusen yok; olculen gezilen 78604 + 172 = 78776.</para>
     /// <para>2026-10-15, bas konus (later 68): iki yeni anahtar (<c>recorder.audio.push-to-talk</c>, <c>.hint</c>), dusen yok; olculen 78604 + 43 x 2 = 78690. <c>kayip</c> 0.</para>
@@ -1649,6 +1651,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-16, onizlemede elle kirpma (later 57): iki yeni anahtar (<c>main.advanced.filters.manualcrop</c>, <c>.tip</c>), dusen yok; olculen gezilen 80453 + 43 x 2 = 80539. <c>kayip</c> 0.</para>
     /// <para>2026-10-12, Linux turu: is surerken pasif Kucult/Donustur ipucu <c>main.action.busy-tip</c>, dusen yok. 1362 + 1 = 1363, 43 x 1363 = 58609. <c>kayip</c> 0.</para>
     /// <para>2026-10-12, Linux'ta ekran acilamayinca temiz cikis: tek yeni anahtar (<c>main.startup.no-display</c>, <c>Program.EkranYokIletisi</c>), dusen yok: 1363 + 1 = 1364, 43 x 1364 = 58652. <c>kayip</c> 0.</para>
+    /// <para>2026-10-18, oynatici HDR ton esleme (later 96): tek yeni anahtar (<c>player.advanced.tone-mapping</c>), dusen yok: 84280 + 43 = 84323. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1676,7 +1679,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(85355, gezilen);
+        Assert.Equal(85398, gezilen);
         Assert.Empty(kayip);
     }
 
