@@ -21,6 +21,8 @@ ship as part of it.
   default output monitor as system audio.
 - Update: on macOS a failed background preparation now counts toward update health; after the third failure the
   update badge comes back instead of staying silent.
+- "Keep the computer awake while encoding" now also covers the Convert queue, the editor's export and its Batch
+  Export; before, only the Shrink tab and its queue held the request, so the machine could sleep mid-conversion.
 
 ### Changed
 

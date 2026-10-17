@@ -38,6 +38,18 @@ internal sealed class SleepGuard
         get { lock (_gate) return _holders; }
     }
 
+    /// <summary>
+    /// SIK-P2: ana pencere dışındaki kodlama yolları (dönüştürme kuyruğu, toplu ve tekli düzenleme
+    /// teslimi) Ayarlar'daki kutuyu iş başlarken diskten okur. Okunamazsa varsayılan açık kalır.
+    /// </summary>
+    internal static bool PreventSleepSetting()
+    {
+        try { return AppSettings.Load().PreventSleepWhileEncoding; }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { return true; }
+    }
+
+    internal IDisposable? HoldIf(bool on) => on ? Hold() : null;
+
     internal IDisposable Hold()
     {
         lock (_gate)
