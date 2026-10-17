@@ -1616,15 +1616,26 @@
 
                   </Grid>
                   <StackPanel x:Name="ConvertFilterPanel" Spacing="{StaticResource SpaceSm}">
-                    <Button x:Name="BtnConvertFiltersToggle"
-                            Click="OnConvertFiltersToggle"
-                            Theme="{StaticResource PanelHeaderToggle}"
-                            auto:AutomationProperties.Name="{loc:Text main.advanced.filters.label}">
-                      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
-                        <Path x:Name="ConvertFiltersGlyph" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
-                        <SarilanMetin Grid.Column="1" Text="{loc:Text main.advanced.filters.label}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                      </Grid>
-                    </Button>
+                    <WrapPanel ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                      <Button x:Name="BtnConvertFiltersToggle"
+                              Click="OnConvertFiltersToggle"
+                              Theme="{StaticResource PanelHeaderToggle}"
+                              auto:AutomationProperties.Name="{loc:Text main.advanced.filters.label}">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
+                          <Path x:Name="ConvertFiltersGlyph" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
+                          <SarilanMetin Grid.Column="1" Text="{loc:Text main.advanced.filters.label}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                        </Grid>
+                      </Button>
+                      <Button x:Name="BtnConvertEncoderToggle"
+                              Click="OnConvertEncoderToggle"
+                              Theme="{StaticResource PanelHeaderToggle}"
+                              auto:AutomationProperties.Name="{loc:Text main.convert.encoder.label}">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
+                          <Path x:Name="ConvertEncoderGlyph" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
+                          <SarilanMetin Grid.Column="1" Text="{loc:Text main.convert.encoder.label}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                        </Grid>
+                      </Button>
+                    </WrapPanel>
                     <WrapPanel x:Name="ConvertFilterBody" Classes="disclose" IsVisible="False" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
                         <SarilanMetin Text="{loc:Text main.advanced.filters.deinterlace}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
@@ -1700,17 +1711,6 @@
                         </TextBox>
                       </StackPanel>
                     </WrapPanel>
-                  </StackPanel>
-                  <StackPanel x:Name="ConvertEncoderPanel" Spacing="{StaticResource SpaceSm}">
-                    <Button x:Name="BtnConvertEncoderToggle"
-                            Click="OnConvertEncoderToggle"
-                            Theme="{StaticResource PanelHeaderToggle}"
-                            auto:AutomationProperties.Name="{loc:Text main.convert.encoder.label}">
-                      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
-                        <Path x:Name="ConvertEncoderGlyph" Classes="chevron" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
-                        <SarilanMetin Grid.Column="1" Text="{loc:Text main.convert.encoder.label}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                      </Grid>
-                    </Button>
                     <WrapPanel x:Name="ConvertEncoderBody" Classes="disclose" IsVisible="False" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                       <StackPanel x:Name="ConvertPresetRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
                         <SarilanMetin Text="{loc:Text main.advanced.preset.label}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>

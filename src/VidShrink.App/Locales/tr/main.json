@@ -913,7 +913,7 @@
   "main.share.qr-hint": "Bağlantıyı telefonda açmak için okutun.",
   "main.startup.no-display": "VidShrink grafik ekranı açamadı. Bir masaüstü oturumundan başlatın; Wayland'de Xwayland kurulu olmalı.",
   "main.about.guide": "Kullanım kılavuzu",
-  "main.convert.encoder.label": "Kodlayıcı ve renk",
+  "main.convert.encoder.label": "Kodlayıcı ve Renk",
   "main.convert.encoder.profile": "Profil",
   "main.convert.encoder.level": "Seviye",
   "main.convert.encoder.two-pass": "İki geçişli kodlama",
