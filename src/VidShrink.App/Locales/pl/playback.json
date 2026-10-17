@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Brak ostatnich plików",
   "player.list.repeat-all": "powtarzaj folder",
   "player.list.repeat-one": "powtarzaj plik",
+  "player.menu.silenceskip": "Przyspieszaj ciszę",
+  "player.view.state-silenceskip": "cisza przyspieszona",
   "player.list.state-shuffle": "losowo",
   "player.list.end": "brak kolejnych plików w tym folderze",
   "player.list.missing": "tego pliku już nie ma",

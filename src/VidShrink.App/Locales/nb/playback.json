@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Ingen nylige filer",
   "player.list.repeat-all": "gjenta mappe",
   "player.list.repeat-one": "gjenta fil",
+  "player.menu.silenceskip": "Raskere gjennom stillhet",
+  "player.view.state-silenceskip": "rask stillhet",
   "player.list.state-shuffle": "tilfeldig",
   "player.list.end": "ingen flere filer i denne mappen",
   "player.list.missing": "den filen finnes ikke lenger",

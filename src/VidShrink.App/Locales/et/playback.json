@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Viimaseid faile ei ole",
   "player.list.repeat-all": "korda kausta",
   "player.list.repeat-one": "korda faili",
+  "player.menu.silenceskip": "Kiirenda vaikuses",
+  "player.view.state-silenceskip": "vaikus kiirendatud",
   "player.list.state-shuffle": "juhuslik",
   "player.list.end": "selles kaustas pole rohkem faile",
   "player.list.missing": "see fail ei ole enam olemas",

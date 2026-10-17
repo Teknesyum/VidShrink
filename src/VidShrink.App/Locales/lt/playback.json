@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Nėra naujausių failų",
   "player.list.repeat-all": "kartoti aplanką",
   "player.list.repeat-one": "kartoti failą",
+  "player.menu.silenceskip": "Greitinti tylą",
+  "player.view.state-silenceskip": "tyla greitinama",
   "player.list.state-shuffle": "atsitiktinai",
   "player.list.end": "šiame aplanke daugiau failų nėra",
   "player.list.missing": "šio failo daugiau nėra",

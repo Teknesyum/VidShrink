@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Nincsenek legutóbbi fájlok",
   "player.list.repeat-all": "mappa ismétlése",
   "player.list.repeat-one": "fájl ismétlése",
+  "player.menu.silenceskip": "Gyorsítás csendben",
+  "player.view.state-silenceskip": "csend gyorsítva",
   "player.list.state-shuffle": "véletlen sorrend",
   "player.list.end": "nincs több fájl ebben a mappában",
   "player.list.missing": "ez a fájl már nem létezik",

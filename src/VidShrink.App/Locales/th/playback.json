@@ -52,6 +52,8 @@
   "player.list.recent-empty": "ไม่มีไฟล์ล่าสุด",
   "player.list.repeat-all": "เล่นซ้ำโฟลเดอร์",
   "player.list.repeat-one": "เล่นซ้ำไฟล์",
+  "player.menu.silenceskip": "เร่งช่วงเงียบ",
+  "player.view.state-silenceskip": "เร่งความเงียบ",
   "player.list.state-shuffle": "สุ่ม",
   "player.list.end": "ไม่มีไฟล์อื่นในโฟลเดอร์นี้แล้ว",
   "player.list.missing": "ไฟล์นั้นไม่มีอยู่แล้ว",

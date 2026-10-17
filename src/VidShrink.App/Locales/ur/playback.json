@@ -52,6 +52,8 @@
   "player.list.recent-empty": "کوئی حالیہ فائل نہیں",
   "player.list.repeat-all": "فولڈر دہرائیں",
   "player.list.repeat-one": "فائل دہرائیں",
+  "player.menu.silenceskip": "خاموشی میں تیز کریں",
+  "player.view.state-silenceskip": "خاموشی تیز",
   "player.list.state-shuffle": "اتفاقی",
   "player.list.end": "اس فولڈر میں مزید فائلیں نہیں ہیں",
   "player.list.missing": "وہ فائل مزید موجود نہیں",

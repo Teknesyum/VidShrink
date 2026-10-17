@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Δεν υπάρχουν πρόσφατα αρχεία",
   "player.list.repeat-all": "επανάληψη φακέλου",
   "player.list.repeat-one": "επανάληψη αρχείου",
+  "player.menu.silenceskip": "Επιτάχυνση στη σιωπή",
+  "player.view.state-silenceskip": "επιτάχυνση σιωπής",
   "player.list.state-shuffle": "τυχαία αναπαραγωγή",
   "player.list.end": "δεν υπάρχουν άλλα αρχεία σε αυτόν τον φάκελο",
   "player.list.missing": "αυτό το αρχείο δεν υπάρχει πια",

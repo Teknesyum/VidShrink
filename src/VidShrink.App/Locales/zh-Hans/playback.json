@@ -52,6 +52,8 @@
   "player.list.recent-empty": "没有最近文件",
   "player.list.repeat-all": "重复文件夹",
   "player.list.repeat-one": "重复文件",
+  "player.menu.silenceskip": "静音处加速",
+  "player.view.state-silenceskip": "静音加速",
   "player.list.state-shuffle": "随机播放中",
   "player.list.end": "此文件夹中没有更多文件",
   "player.list.missing": "该文件已不存在",

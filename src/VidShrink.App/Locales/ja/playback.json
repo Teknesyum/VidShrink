@@ -52,6 +52,8 @@
   "player.list.recent-empty": "最近使用したファイルはありません",
   "player.list.repeat-all": "フォルダーをリピート",
   "player.list.repeat-one": "ファイルをリピート",
+  "player.menu.silenceskip": "無音部分を早送り",
+  "player.view.state-silenceskip": "無音を早送り",
   "player.list.state-shuffle": "シャッフル中",
   "player.list.end": "このフォルダーに他のファイルはありません",
   "player.list.missing": "そのファイルは存在しません",

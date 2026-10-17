@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Ingen seneste filer",
   "player.list.repeat-all": "gentag mappe",
   "player.list.repeat-one": "gentag fil",
+  "player.menu.silenceskip": "Hurtigere gennem stilhed",
+  "player.view.state-silenceskip": "hurtig stilhed",
   "player.list.state-shuffle": "blandet",
   "player.list.end": "ingen flere filer i denne mappe",
   "player.list.missing": "den fil findes ikke længere",

@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Нема недавних датотека",
   "player.list.repeat-all": "понављај фолдер",
   "player.list.repeat-one": "понављај датотеку",
+  "player.menu.silenceskip": "Убрзај тишину",
+  "player.view.state-silenceskip": "убрзана тишина",
   "player.list.state-shuffle": "насумично",
   "player.list.end": "у овом фолдеру нема више датотека",
   "player.list.missing": "та датотека више не постоји",

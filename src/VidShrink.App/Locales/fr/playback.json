@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Aucun fichier récent",
   "player.list.repeat-all": "répéter le dossier",
   "player.list.repeat-one": "répéter le fichier",
+  "player.menu.silenceskip": "Accélérer les silences",
+  "player.view.state-silenceskip": "silences accélérés",
   "player.list.state-shuffle": "aléatoire",
   "player.list.end": "plus aucun fichier dans ce dossier",
   "player.list.missing": "ce fichier n'existe plus",

@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Nema nedavnih datoteka",
   "player.list.repeat-all": "ponavljaj mapu",
   "player.list.repeat-one": "ponavljaj datoteku",
+  "player.menu.silenceskip": "Ubrzaj tišinu",
+  "player.view.state-silenceskip": "ubrzana tišina",
   "player.list.state-shuffle": "nasumično",
   "player.list.end": "u ovoj mapi nema više datoteka",
   "player.list.missing": "te datoteke više nema",

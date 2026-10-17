@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Keine zuletzt verwendeten Dateien",
   "player.list.repeat-all": "Ordner wiederholen",
   "player.list.repeat-one": "Datei wiederholen",
+  "player.menu.silenceskip": "Stille beschleunigen",
+  "player.view.state-silenceskip": "Stille beschleunigt",
   "player.list.state-shuffle": "zufällig",
   "player.list.end": "keine weiteren Dateien in diesem Ordner",
   "player.list.missing": "diese Datei ist nicht mehr vorhanden",

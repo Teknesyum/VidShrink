@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Ei viimeisimpiä tiedostoja",
   "player.list.repeat-all": "toista kansio",
   "player.list.repeat-one": "toista tiedosto",
+  "player.menu.silenceskip": "Nopeuta hiljaisuudessa",
+  "player.view.state-silenceskip": "hiljaisuus nopeutettu",
   "player.list.state-shuffle": "satunnaistoisto",
   "player.list.end": "tässä kansiossa ei ole enempää tiedostoja",
   "player.list.missing": "tätä tiedostoa ei enää ole",

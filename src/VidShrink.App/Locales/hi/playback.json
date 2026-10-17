@@ -52,6 +52,8 @@
   "player.list.recent-empty": "कोई हाल की फ़ाइल नहीं",
   "player.list.repeat-all": "फ़ोल्डर दोहराएं",
   "player.list.repeat-one": "फ़ाइल दोहराएं",
+  "player.menu.silenceskip": "मौन में तेज़ चलाएँ",
+  "player.view.state-silenceskip": "मौन तेज़",
   "player.list.state-shuffle": "शफल",
   "player.list.end": "इस फ़ोल्डर में और फ़ाइलें नहीं हैं",
   "player.list.missing": "वह फ़ाइल अब मौजूद नहीं है",

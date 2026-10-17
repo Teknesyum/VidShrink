@@ -52,6 +52,8 @@
   "player.list.recent-empty": "No hay archivos recientes",
   "player.list.repeat-all": "repetir carpeta",
   "player.list.repeat-one": "repetir archivo",
+  "player.menu.silenceskip": "Acelerar en silencios",
+  "player.view.state-silenceskip": "silencios acelerados",
   "player.list.state-shuffle": "aleatorio",
   "player.list.end": "no hay más archivos en esta carpeta",
   "player.list.missing": "ese archivo ya no existe",

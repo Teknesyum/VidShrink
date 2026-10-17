@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Niciun fișier recent",
   "player.list.repeat-all": "repetă folderul",
   "player.list.repeat-one": "repetă fișierul",
+  "player.menu.silenceskip": "Accelerează în liniște",
+  "player.view.state-silenceskip": "liniște accelerată",
   "player.list.state-shuffle": "amestecat",
   "player.list.end": "nu mai sunt fișiere în acest folder",
   "player.list.missing": "acel fișier nu mai există",
