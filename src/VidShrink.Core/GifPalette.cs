@@ -31,6 +31,26 @@ public static class GifPalette
         };
     }
 
+    public static IReadOnlyList<string> BuildFitted(string source, string target, int fps, int maxWidth)
+    {
+        if (string.IsNullOrWhiteSpace(source)) throw new ArgumentException("Source path is required.", nameof(source));
+        if (string.IsNullOrWhiteSpace(target)) throw new ArgumentException("Target path is required.", nameof(target));
+        if (maxWidth <= 0) throw new ArgumentOutOfRangeException(nameof(maxWidth));
+        var width = maxWidth.ToString(CultureInfo.InvariantCulture);
+        return new[]
+        {
+            "-hide_banner", "-y", "-nostdin",
+            "-i", source,
+            "-an",
+            "-vf", string.Concat(
+                "fps=", Math.Clamp(fps, 1, MaxFps).ToString(CultureInfo.InvariantCulture),
+                ",scale='min(iw,", width, ")':-1:flags=lanczos",
+                ",split[a][b];[a]palettegen[p];[b][p]paletteuse"),
+            "-loop", "0",
+            target
+        };
+    }
+
     private static readonly double[] FpsCaps = { double.PositiveInfinity, 15, 12, 10, 10, 8, 6, 5 };
     private static readonly double[] Scales = { 1, 1, 0.85, 0.7, 0.55, 0.45, 0.35, 0.25 };
     private static readonly int[] ColorSteps = { 256, 128, 128, 64, 64, 32, 32, 16 };

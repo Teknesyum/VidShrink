@@ -1349,8 +1349,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3907, toplam);
-        Assert.Equal(375, dilBasina["en"]);
+        Assert.Equal(3922, toplam);
+        Assert.Equal(377, dilBasina["en"]);
         Assert.Equal(126, dilBasina["tr"]);
     }
 
@@ -1638,6 +1638,8 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-17, sessiz bolum hizlandirma: iki yeni anahtar (<c>player.menu.silenceskip</c>, <c>player.view.state-silenceskip</c>) 42 dilde, dusen yok; gezilen 84194 + 86 = 84280.</para>
     /// <para>2026-10-18, biten ciktinin kalite olcumu (later 122): dokuz yeni anahtar, dusen yok; gezilen 84280 + 9 x 43 = 84667.</para>
     /// <para>2026-10-18, 122 ve 103 birlikte: toplam 3888 + 6 + 13 = 3907, en 375, tr 126; gezilen 84280 + 387 + 344 = 85011.</para>
+    /// <para>2026-10-18, sonuc paneli (later 72): sekiz yeni anahtar (<c>recorder.output.copy-file</c>/<c>to-gif</c>/<c>gif-*</c>, <c>recorder.name.*</c>) 42 dilde, dusen yok; olculen toplam 3888 + 15 = 3903, en 373 + 2 = 375, tr 126 degismedi, gezilen 84280 + 344 = 84624.</para>
+    /// <para>2026-10-18, 122, 103 ve 72 birlikte: toplam 3907 + 15 = 3922, en 377, tr 126; gezilen 85011 + 344 = 85355.</para>
     /// <para>2026-10-16, later 44 (etiket ve Onar): on sekiz yeni anahtar; olculen toplam 3781 + 2 = 3783 (lt main.convert.tags.cover.none, ro main.convert.tags.year), en 364, tr 123, gezilen 80453 + 774 = 81227.</para>
     /// <para>2026-10-15, uzun iste oncelik ve bitis sesi (later 76): dort yeni anahtar (<c>settings-tab.encode-priority.above-normal</c>, <c>settings-tab.finish-sound-file.choose</c>, <c>.hint</c>, <c>.reset</c>) 42 dilde, dusen yok; olculen gezilen 78604 + 172 = 78776.</para>
     /// <para>2026-10-15, bas konus (later 68): iki yeni anahtar (<c>recorder.audio.push-to-talk</c>, <c>.hint</c>), dusen yok; olculen 78604 + 43 x 2 = 78690. <c>kayip</c> 0.</para>
@@ -1674,7 +1676,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(85011, gezilen);
+        Assert.Equal(85355, gezilen);
         Assert.Empty(kayip);
     }
 

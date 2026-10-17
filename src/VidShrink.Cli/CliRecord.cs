@@ -27,6 +27,7 @@ public sealed record CliRecordSettings
     public bool ShowClicks { get; init; }
     public RecorderTargetKind Target { get; init; } = RecorderTargetKind.Screen;
     public string? WindowTitle { get; init; }
+    public string? NamePattern { get; init; }
     public int RegionX { get; init; }
     public int RegionY { get; init; }
     public int RegionWidth { get; init; } = 1280;
@@ -127,6 +128,7 @@ public sealed record CliRecordSettings
                 ShowClicks = (bool?)root["showClicks"] ?? false,
                 Target = Enum.TryParse<RecorderTargetKind>((string?)root["target"], true, out var target) ? target : settings.Target,
                 WindowTitle = (string?)root["windowTitle"],
+                NamePattern = (string?)root["namePattern"] is { } namePattern && AdlandirmaDeseni.KayitHata(namePattern) is null ? namePattern : null,
                 RegionX = (int?)root["regionX"] ?? 0,
                 RegionY = (int?)root["regionY"] ?? 0,
                 RegionWidth = (int?)root["regionWidth"] is { } width && width > 0 ? width : settings.RegionWidth,
@@ -184,16 +186,13 @@ public sealed record CliRecordSettings
         return Environment.CurrentDirectory;
     }
 
-    /// <summary>Pencerenin adlandırması: <c>kayit_&lt;damga&gt;</c>, aynı saniyede ikinci kayıt sayı alır.</summary>
+    /// <summary>Pencerenin adlandırması: <c>namePattern</c> deseni, boşsa <c>kayit_&lt;damga&gt;</c>; çakışan ad sayı alır.</summary>
     public string OutputPath(DateTime now, RecorderContainer container)
     {
         var folder = ResolveFolder();
         var extension = "." + RecorderArguments.Extension(container);
-        var stem = "kayit_" + Bicim.DosyaDamgasi(now);
-        var candidate = Path.Combine(folder, stem + extension);
-        for (var index = 2; File.Exists(candidate); index++)
-            candidate = Path.Combine(folder, stem + "_" + index.ToString(CultureInfo.InvariantCulture) + extension);
-        return candidate;
+        var window = Target == RecorderTargetKind.Window ? WindowTitle : null;
+        return AdlandirmaDeseni.KayitYolu(folder, NamePattern, extension, now, window, File.Exists);
     }
 }
 

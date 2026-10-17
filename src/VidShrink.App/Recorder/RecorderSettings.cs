@@ -76,6 +76,8 @@ internal sealed class RecorderSettings
 
     internal RecorderFinishAction FinishAction { get; set; } = RecorderFinishAction.Nothing;
 
+    internal string? NamePattern { get; set; }
+
     internal bool ShowClicks { get; set; }
 
     /// <summary>Prompter'ın metni; pencere kapanınca ve düzenleme bitince yazılır.</summary>
@@ -319,6 +321,7 @@ internal sealed class RecorderSettings
             settings.ShowResultCard = (bool?)root["showResultCard"] ?? true;
             settings.PushToTalk = (bool?)root["pushToTalk"] ?? false;
             if (Enum.TryParse<RecorderFinishAction>((string?)root["finishAction"], true, out var finish) && Enum.IsDefined(finish)) settings.FinishAction = finish;
+            if ((string?)root["namePattern"] is { } namePattern && AdlandirmaDeseni.KayitHata(namePattern) is null) settings.NamePattern = namePattern;
             settings.ShowClicks = (bool?)root["showClicks"] ?? false;
             settings.PrompterText = (string?)root["prompterText"] ?? string.Empty;
             settings.PrompterStep = PrompterScroll.ClampStep((int?)root["prompterStep"] ?? PrompterScroll.DefaultStep);
@@ -456,6 +459,7 @@ internal sealed class RecorderSettings
                 writer.WriteBoolean("showResultCard", ShowResultCard);
                 writer.WriteBoolean("pushToTalk", PushToTalk);
                 writer.WriteString("finishAction", FinishAction.ToString());
+                if (NamePattern is not null) writer.WriteString("namePattern", NamePattern);
                 writer.WriteBoolean("showClicks", ShowClicks);
                 writer.WriteString("prompterText", PrompterText);
                 writer.WriteNumber("prompterStep", PrompterStep);
@@ -565,8 +569,8 @@ internal sealed class RecorderSettings
     }
 
     /// <summary>
-    /// Yeni kaydın dosya yolu. Ad zaman damgasından geliyor; aynı saniyede ikinci kayıt
-    /// başlarsa sona sayı ekleniyor, var olan dosyanın üstüne yazılmıyor. Uzantı
+    /// Yeni kaydın dosya yolu. Ad <see cref="NamePattern"/> deseninden kuruluyor, boşsa
+    /// <c>kayit_&lt;damga&gt;</c>; çakışmada sona sayı ekleniyor, var olan dosyanın üstüne yazılmıyor. Uzantı
     /// <see cref="Container"/>'dan okunuyor — motorun doğrulaması kapla uzantının
     /// ayrışmasını reddediyor, o yüzden burada sabit bir uzantı yazılamaz.
     /// </summary>
@@ -574,11 +578,8 @@ internal sealed class RecorderSettings
     {
         var folder = ResolveFolder();
         var extension = "." + RecorderArguments.Extension(Container);
-        var stem = "kayit_" + Bicim.DosyaDamgasi(now);
-        var candidate = Path.Combine(folder, stem + extension);
-        for (var index = 2; File.Exists(candidate); index++)
-            candidate = Path.Combine(folder, stem + "_" + index.ToString(CultureInfo.InvariantCulture) + extension);
-        return candidate;
+        var window = Target == RecorderTargetKind.Window ? WindowTitle : null;
+        return AdlandirmaDeseni.KayitYolu(folder, NamePattern, extension, now, window, File.Exists);
     }
 
     /// <summary>
