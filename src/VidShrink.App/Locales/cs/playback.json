@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Žádné nedávné soubory",
   "player.list.repeat-all": "opakovat složku",
   "player.list.repeat-one": "opakovat soubor",
+  "player.menu.silenceskip": "Zrychlit v tichu",
+  "player.view.state-silenceskip": "zrychlené ticho",
   "player.list.state-shuffle": "náhodně",
   "player.list.end": "v této složce už nejsou žádné další soubory",
   "player.list.missing": "tento soubor už neexistuje",

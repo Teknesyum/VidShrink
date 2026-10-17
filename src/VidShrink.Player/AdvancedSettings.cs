@@ -81,3 +81,25 @@ public sealed record SubtitleStyle(
 
     public bool IsInherited => Equals(Inherited);
 }
+
+/// <summary>
+/// Sessiz bolumleri hizlandirma kipi. <c>ThresholdDb</c> altinda en az <c>MinimumSeconds</c>
+/// suren ses sessizlik sayilir; motor o aralikta hizi <see cref="RushSpeed"/>'e cikarir.
+/// </summary>
+public sealed record SilenceSkip(bool On = false, double ThresholdDb = SilenceSkip.DefaultThresholdDb, double MinimumSeconds = SilenceSkip.DefaultMinimumSeconds)
+{
+    public const double DefaultThresholdDb = -35;
+    public const double DefaultMinimumSeconds = 0.5;
+    public const double MinimumThresholdDb = -80;
+    public const double MaximumThresholdDb = -10;
+    public const double ShortestSeconds = 0.1;
+    public const double LongestSeconds = 10;
+    public const double RushSpeed = 4;
+
+    public static SilenceSkip Off { get; } = new();
+
+    public SilenceSkip Clamped() => new(
+        On,
+        double.IsFinite(ThresholdDb) ? Math.Clamp(ThresholdDb, MinimumThresholdDb, MaximumThresholdDb) : DefaultThresholdDb,
+        double.IsFinite(MinimumSeconds) ? Math.Clamp(MinimumSeconds, ShortestSeconds, LongestSeconds) : DefaultMinimumSeconds);
+}

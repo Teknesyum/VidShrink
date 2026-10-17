@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Tidak ada file terbaru",
   "player.list.repeat-all": "ulangi folder",
   "player.list.repeat-one": "ulangi file",
+  "player.menu.silenceskip": "Percepat saat hening",
+  "player.view.state-silenceskip": "hening dipercepat",
   "player.list.state-shuffle": "acak",
   "player.list.end": "tidak ada file lain di folder ini",
   "player.list.missing": "file itu sudah tidak ada",

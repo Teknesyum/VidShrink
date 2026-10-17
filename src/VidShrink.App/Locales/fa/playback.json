@@ -52,6 +52,8 @@
   "player.list.recent-empty": "فایل اخیری وجود ندارد",
   "player.list.repeat-all": "تکرار پوشه",
   "player.list.repeat-one": "تکرار فایل",
+  "player.menu.silenceskip": "سرعت در سکوت",
+  "player.view.state-silenceskip": "سکوت سریع",
   "player.list.state-shuffle": "تصادفی",
   "player.list.end": "فایل دیگری در این پوشه نیست",
   "player.list.missing": "آن فایل دیگر وجود ندارد",

@@ -52,6 +52,8 @@
   "player.list.recent-empty": "لا توجد ملفات أخيرة",
   "player.list.repeat-all": "تكرار المجلد",
   "player.list.repeat-one": "تكرار الملف",
+  "player.menu.silenceskip": "تسريع أثناء الصمت",
+  "player.view.state-silenceskip": "تسريع الصمت",
   "player.list.state-shuffle": "عشوائي",
   "player.list.end": "لا توجد ملفات أخرى في هذا المجلد",
   "player.list.missing": "هذا الملف غير موجود بعد الآن",

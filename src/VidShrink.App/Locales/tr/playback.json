@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Son dosya yok",
   "player.list.repeat-all": "klasörü tekrarla",
   "player.list.repeat-one": "dosyayı tekrarla",
+  "player.menu.silenceskip": "Sessizlikte hızlan",
+  "player.view.state-silenceskip": "sessizlik hızlı",
   "player.list.state-shuffle": "karışık",
   "player.list.end": "bu klasörde başka dosya yok",
   "player.list.missing": "o dosya artık yok",

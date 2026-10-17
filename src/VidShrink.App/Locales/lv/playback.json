@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Nav nesenu datņu",
   "player.list.repeat-all": "atkārtot mapi",
   "player.list.repeat-one": "atkārtot datni",
+  "player.menu.silenceskip": "Paātrināt klusumu",
+  "player.view.state-silenceskip": "klusums paātrināts",
   "player.list.state-shuffle": "jaukta secība",
   "player.list.end": "šajā mapē vairs nav datņu",
   "player.list.missing": "šī datne vairs nepastāv",

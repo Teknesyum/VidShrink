@@ -52,6 +52,8 @@
   "player.list.recent-empty": "சமீபத்திய கோப்புகள் இல்லை",
   "player.list.repeat-all": "கோப்புறையை மீட்டு",
   "player.list.repeat-one": "கோப்பை மீட்டு",
+  "player.menu.silenceskip": "அமைதியில் வேகப்படுத்து",
+  "player.view.state-silenceskip": "அமைதி வேகம்",
   "player.list.state-shuffle": "குலுக்கல்",
   "player.list.end": "இந்த கோப்புறையில் மேலும் கோப்புகள் இல்லை",
   "player.list.missing": "அந்த கோப்பு இனி இல்லை",

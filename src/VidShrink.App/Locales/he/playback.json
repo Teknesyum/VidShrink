@@ -52,6 +52,8 @@
   "player.list.recent-empty": "אין קבצים אחרונים",
   "player.list.repeat-all": "חזור על התיקייה",
   "player.list.repeat-one": "חזור על הקובץ",
+  "player.menu.silenceskip": "האצה בשקט",
+  "player.view.state-silenceskip": "האצת שקט",
   "player.list.state-shuffle": "אקראי",
   "player.list.end": "אין קבצים נוספים בתיקייה זו",
   "player.list.missing": "הקובץ הזה כבר לא קיים",

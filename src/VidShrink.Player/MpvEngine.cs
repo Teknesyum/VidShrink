@@ -281,7 +281,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
         await open.Task.ConfigureAwait(false);
     }
 
-    public double Speed => Finite(GetDouble("speed"), 1);
+    public double Speed => RestSpeed is var rest && double.IsFinite(rest) ? rest : Finite(GetDouble("speed"), 1);
 
     public double Volume => Finite(GetDouble("volume"), 100);
 
@@ -300,7 +300,10 @@ public sealed partial class MpvEngine : IPlaybackEngine
 
     public double LoopEndSeconds => GetDouble("ab-loop-b");
 
-    public void SetSpeed(double speed) => TrySet("speed", Number(speed));
+    public void SetSpeed(double speed)
+    {
+        if (!SpeedWhileRushing(speed)) TrySet("speed", Number(speed));
+    }
 
     public void SetVolume(double volume) => TrySet("volume", Number(volume));
 
@@ -857,6 +860,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
 
     private void OnSeek()
     {
+        SilenceSeeked();
         lock (_seekGate)
         {
             if (_seekDone is null || _replyGen != _seekGen || _armedGen == _seekGen) return;
@@ -949,6 +953,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
                 break;
             case TimeId when property->Format == MPV_FORMAT_DOUBLE:
                 OnTimePosChanged(*(double*)property->Data);
+                WatchSilence();
                 break;
         }
     }

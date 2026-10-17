@@ -52,6 +52,8 @@
   "player.list.recent-empty": "কোনো সাম্প্রতিক ফাইল নেই",
   "player.list.repeat-all": "ফোল্ডার পুনরাবৃত্তি করুন",
   "player.list.repeat-one": "ফাইল পুনরাবৃত্তি করুন",
+  "player.menu.silenceskip": "নীরবতায় দ্রুত চালাও",
+  "player.view.state-silenceskip": "নীরবতা দ্রুত",
   "player.list.state-shuffle": "শাফল",
   "player.list.end": "এই ফোল্ডারে আর কোনো ফাইল নেই",
   "player.list.missing": "সেই ফাইলটি আর নেই",

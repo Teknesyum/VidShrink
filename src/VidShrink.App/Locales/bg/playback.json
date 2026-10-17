@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Няма скорошни файлове",
   "player.list.repeat-all": "повтори папката",
   "player.list.repeat-one": "повтори файла",
+  "player.menu.silenceskip": "Ускоряване при тишина",
+  "player.view.state-silenceskip": "ускоряване на тишината",
   "player.list.state-shuffle": "разбъркано",
   "player.list.end": "няма повече файлове в тази папка",
   "player.list.missing": "този файл вече не съществува",

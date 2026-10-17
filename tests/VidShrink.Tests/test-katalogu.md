@@ -16,6 +16,7 @@
   `KaydediciAyarTests`'e ve `KaydediciAyarYalitimTests`'e 2026-09-18'de uygulandı — kuralı uygulamayan
   sınıf kalmadı.
 - `OynaticiGorunumTests.cs` — 3. dalga, `.calisma/dalga3/gecici`; OYA-P1: ses düzeyi ve sessiz `PlayerSettings`'e gidip yeniden açılışta motora döner, rozet parça/gecikme/A-B/bölüm/kare sonucunu söyler, bölüm adı arama çipinde ve sağ tık "Bölümler" menüsünde (sahte `BildirimMotoru`; canlı ad okuması `OynaticiParcaTests`); `OynaticiAracTests.cs` — 4b dalga: küçük resim ≤300 ms (medyan/p95, gösterim sahte motorla CI'da da), klip/GIF, mini mod, yerel sunucudan adres; `.calisma/dalga4b/`.
+- `SessizBolumAtlamaTests.cs` — OYA-37: 3 sn tonda 1,6 sn sessizlik libmpv `silencedetect` ile 4x geçer, sesli kısımda hız 1, bitince eski hıza döner; ayar dosyası gidiş dönüşü ve kırpma. `.calisma/yan-sessiz-atla/`.
 - `OynaticiGelismisTests.cs` — 4a dalga: her gelişmiş ayar motora yazılır, **motordan** okunur, sıfırlanır; negatif kontrol kareden. `.calisma/dalga4a/`.
 - `KayitMotoruTests.cs` — 8a dalgası, ekran kaydı motoru: üç platformun yakalama argümanı (gdigrab/avfoundation/x11grab),
   `-nostdin` verilmediğinin pimi, negatif kontroller (uydurma kodek, kırpmasız macOS pencere, tek sayılı bölge). Canlı kol

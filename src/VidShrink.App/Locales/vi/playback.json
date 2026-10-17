@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Không có tệp gần đây",
   "player.list.repeat-all": "lặp thư mục",
   "player.list.repeat-one": "lặp tệp",
+  "player.menu.silenceskip": "Tua nhanh đoạn im lặng",
+  "player.view.state-silenceskip": "tua nhanh im lặng",
   "player.list.state-shuffle": "ngẫu nhiên",
   "player.list.end": "không còn tệp nào khác trong thư mục này",
   "player.list.missing": "tệp đó không còn tồn tại",

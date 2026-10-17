@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Немає останніх файлів",
   "player.list.repeat-all": "повтор папки",
   "player.list.repeat-one": "повтор файлу",
+  "player.menu.silenceskip": "Прискорювати тишу",
+  "player.view.state-silenceskip": "тиша прискорена",
   "player.list.state-shuffle": "перемішано",
   "player.list.end": "у цій папці більше немає файлів",
   "player.list.missing": "цього файлу більше немає",

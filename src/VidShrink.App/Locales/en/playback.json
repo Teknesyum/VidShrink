@@ -52,6 +52,8 @@
   "player.list.recent-empty": "No recent files",
   "player.list.repeat-all": "repeat folder",
   "player.list.repeat-one": "repeat file",
+  "player.menu.silenceskip": "Speed through silence",
+  "player.view.state-silenceskip": "skipping silence",
   "player.list.state-shuffle": "shuffle",
   "player.list.end": "no more files in this folder",
   "player.list.missing": "that file is gone",

@@ -226,6 +226,9 @@ public interface IPlaybackEngine : IDisposable
     /// <summary>Duzenleyicinin EDL zamaninda <c>enable</c> pencereli solma ve ses zincirleri; <c>null</c> kaldirir.</summary>
     void SetEditTimed(string? video, string? audio) { }
 
+    /// <summary>Sessiz bolumleri hizlandirma kipini acar, kapatir ya da esigini degistirir.</summary>
+    void SetSilenceSkip(SilenceSkip skip) { }
+
     /// <summary>Ses tepe olcerini acar ya da kapatir; motor olcemiyorsa <c>false</c>.</summary>
     bool MeterAudio(bool on) => false;
 

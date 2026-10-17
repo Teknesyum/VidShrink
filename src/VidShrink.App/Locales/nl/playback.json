@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Geen recente bestanden",
   "player.list.repeat-all": "map herhalen",
   "player.list.repeat-one": "bestand herhalen",
+  "player.menu.silenceskip": "Stilte versnellen",
+  "player.view.state-silenceskip": "stilte versneld",
   "player.list.state-shuffle": "shuffelen",
   "player.list.end": "geen bestanden meer in deze map",
   "player.list.missing": "dat bestand bestaat niet meer",

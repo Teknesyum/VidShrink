@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Tiada fail terbaru",
   "player.list.repeat-all": "ulang folder",
   "player.list.repeat-one": "ulang fail",
+  "player.menu.silenceskip": "Percepat ketika senyap",
+  "player.view.state-silenceskip": "senyap dipercepat",
   "player.list.state-shuffle": "rawak",
   "player.list.end": "tiada lagi fail dalam folder ini",
   "player.list.missing": "fail itu tidak lagi wujud",

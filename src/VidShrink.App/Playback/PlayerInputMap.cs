@@ -68,7 +68,8 @@ internal enum PlayerCommandKind
     BookmarkList,
     ToggleFill,
     FrameExport,
-    ContactSheet
+    ContactSheet,
+    ToggleSilenceSkip
 }
 
 internal readonly record struct PlayerCommand(PlayerCommandKind Kind, double Amount)

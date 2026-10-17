@@ -105,6 +105,14 @@ internal sealed class PlayerSettings
 
     internal bool Shuffle { get; set; }
 
+    internal bool SilenceSkip { get; set; }
+
+    internal double SilenceThresholdDb { get; set; } = VidShrink.Player.SilenceSkip.DefaultThresholdDb;
+
+    internal double SilenceMinimumSeconds { get; set; } = VidShrink.Player.SilenceSkip.DefaultMinimumSeconds;
+
+    internal SilenceSkip Silence => new SilenceSkip(SilenceSkip, SilenceThresholdDb, SilenceMinimumSeconds).Clamped();
+
     internal const double DefaultSpeedA = 1;
     internal const double DefaultSpeedB = 1.8;
 
@@ -156,6 +164,13 @@ internal sealed class PlayerSettings
             settings.ScreenshotSubtitles = (bool?)root["screenshotSubtitles"] ?? false;
             if (Enum.TryParse<RepeatMode>((string?)root["repeat"], true, out var repeat)) settings.Repeat = repeat;
             settings.Shuffle = (bool?)root["shuffle"] ?? false;
+            settings.SilenceSkip = (bool?)root["silenceSkip"] ?? false;
+            var silence = new SilenceSkip(
+                settings.SilenceSkip,
+                (double?)root["silenceThresholdDb"] ?? VidShrink.Player.SilenceSkip.DefaultThresholdDb,
+                (double?)root["silenceMinimumSeconds"] ?? VidShrink.Player.SilenceSkip.DefaultMinimumSeconds).Clamped();
+            settings.SilenceThresholdDb = silence.ThresholdDb;
+            settings.SilenceMinimumSeconds = silence.MinimumSeconds;
             settings.ShowRemaining = (bool?)root["showRemaining"] ?? false;
             settings.SpeedA = Speed((double?)root["speedA"], DefaultSpeedA);
             settings.SpeedB = Speed((double?)root["speedB"], DefaultSpeedB);
@@ -206,6 +221,9 @@ internal sealed class PlayerSettings
                 writer.WriteBoolean("screenshotSubtitles", ScreenshotSubtitles);
                 writer.WriteString("repeat", Repeat.ToString());
                 writer.WriteBoolean("shuffle", Shuffle);
+                writer.WriteBoolean("silenceSkip", SilenceSkip);
+                writer.WriteNumber("silenceThresholdDb", Silence.ThresholdDb);
+                writer.WriteNumber("silenceMinimumSeconds", Silence.MinimumSeconds);
                 writer.WriteBoolean("showRemaining", ShowRemaining);
                 writer.WriteNumber("speedA", SpeedA);
                 writer.WriteNumber("speedB", SpeedB);

@@ -803,6 +803,8 @@ internal partial class PlayerView : UserControl
         if (_volume != 100) engine.SetVolume(_volume);
         if (_muted) engine.SetMuted(true);
         RestoreSpeedMode();
+        EnsureSettings();
+        if (_settings.SilenceSkip) engine.SetSilenceSkip(_settings.Silence);
         if (_speed != 1) engine.SetSpeed(_speed);
         ApplyTrackOptions(engine);
 

@@ -1633,6 +1633,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-17, kaydedici HDR rengi: alti yeni anahtar (<c>recorder.capture.fallback-hdr</c>, <c>hdr-no-tonemap</c>, <c>sdr-white-assumed</c>, <c>hdr-no-hevc</c>, <c>hdr-kept-hevc</c>, <c>hdr-kept</c>) 42 dilde, dusen yok; olculen toplam 3874 + 3 = 3877, tepsi turuyla birlesince 3885 + 3 = 3888 (th ve ur <c>hdr-kept-hevc</c>, ur <c>recorder.advanced.hdr-to-sdr-hint</c>), en ve tr degismedi, gezilen 83678 + 258 = 83936, tepsi turuyla birlesince 83936 + 258 = 84194, <c>kayip</c> 0.</para>
     /// <para>2026-10-16, atanmamis tus ve prompter gorunumu: bes yeni anahtar (<c>recorder.hotkeys.unassigned</c>, <c>recorder.prompter.smaller-text</c>/<c>larger-text</c>/<c>mirror</c>/<c>line</c>) 42 dilde, dusen yok; olculen toplam 3870 + 4 = 3874, en 372, tr 126 degismedi, gezilen 83463 + 215 = 83678.</para>
     /// <para>2026-10-17, tepsiye kucultme (later 120): alti yeni anahtar (<c>settings-tab.minimize-to-tray.*</c>, <c>main.tray.*</c>) 42 dilde, dusen yok; etiket 11 dilde kola girdi: olculen toplam 3874 + 11 = 3885, en 372 + 1 = 373, tr 126 degismedi, gezilen 83678 + 258 = 83936.</para>
+    /// <para>2026-10-17, sessiz bolum hizlandirma: iki yeni anahtar (<c>player.menu.silenceskip</c>, <c>player.view.state-silenceskip</c>) 42 dilde, dusen yok; gezilen 84194 + 86 = 84280.</para>
     /// <para>2026-10-16, later 44 (etiket ve Onar): on sekiz yeni anahtar; olculen toplam 3781 + 2 = 3783 (lt main.convert.tags.cover.none, ro main.convert.tags.year), en 364, tr 123, gezilen 80453 + 774 = 81227.</para>
     /// <para>2026-10-15, uzun iste oncelik ve bitis sesi (later 76): dort yeni anahtar (<c>settings-tab.encode-priority.above-normal</c>, <c>settings-tab.finish-sound-file.choose</c>, <c>.hint</c>, <c>.reset</c>) 42 dilde, dusen yok; olculen gezilen 78604 + 172 = 78776.</para>
     /// <para>2026-10-15, bas konus (later 68): iki yeni anahtar (<c>recorder.audio.push-to-talk</c>, <c>.hint</c>), dusen yok; olculen 78604 + 43 x 2 = 78690. <c>kayip</c> 0.</para>
@@ -1669,7 +1670,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(84194, gezilen);
+        Assert.Equal(84280, gezilen);
         Assert.Empty(kayip);
     }
 

@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Inga senaste filer",
   "player.list.repeat-all": "upprepa mapp",
   "player.list.repeat-one": "upprepa fil",
+  "player.menu.silenceskip": "Snabba upp tystnad",
+  "player.view.state-silenceskip": "snabb tystnad",
   "player.list.state-shuffle": "blandat",
   "player.list.end": "inga fler filer i den här mappen",
   "player.list.missing": "den filen finns inte längre",

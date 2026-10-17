@@ -52,6 +52,8 @@
   "player.list.recent-empty": "Hakuna faili za hivi karibuni",
   "player.list.repeat-all": "rudia folda",
   "player.list.repeat-one": "rudia faili",
+  "player.menu.silenceskip": "Harakisha ukimya",
+  "player.view.state-silenceskip": "ukimya umeharakishwa",
   "player.list.state-shuffle": "mchanganyiko",
   "player.list.end": "hakuna faili nyingine katika folda hii",
   "player.list.missing": "faili hiyo haipo tena",

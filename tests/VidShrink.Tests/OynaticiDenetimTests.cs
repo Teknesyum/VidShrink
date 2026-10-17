@@ -142,6 +142,7 @@ public sealed class KeymapTests
         [PlayerCommandKind.FileStep] = "file ",
         [PlayerCommandKind.ChapterStep] = "chapter ",
         [PlayerCommandKind.ToggleShuffle] = "shuffle -> ",
+        [PlayerCommandKind.ToggleSilenceSkip] = "silenceskip -> ",
         [PlayerCommandKind.RepeatCycle] = "repeat -> ",
         [PlayerCommandKind.ClipExport] = "clip -> ",
         [PlayerCommandKind.GifExport] = "gif -> ",
@@ -218,6 +219,7 @@ public sealed class KeymapTests
         var ayna = view.IsMirrored;
         var bilgi = view.InfoVisible;
         var karisik = view.Settings.Shuffle;
+        var sessizAtla = view.Settings.SilenceSkip;
         var tekrar = view.Settings.Repeat;
         var mini = view.IsMiniMode;
         var hizModu = view.SpeedModeB;
@@ -261,6 +263,7 @@ public sealed class KeymapTests
             PlayerCommandKind.FileStep when !yeni[0].StartsWith("file " + action.Amount.ToString("0", CultureInfo.InvariantCulture) + " -> ", StringComparison.Ordinal) => $"iz '{yeni[0]}' yon {action.Amount}",
             PlayerCommandKind.ChapterStep when yeni[0] != "chapter " + action.Amount.ToString("0", CultureInfo.InvariantCulture) + " -> no" => $"motorsuz bolum izi '{yeni[0]}'",
             PlayerCommandKind.ToggleShuffle when view.Settings.Shuffle == karisik => "karistirma degismedi",
+            PlayerCommandKind.ToggleSilenceSkip when view.Settings.SilenceSkip == sessizAtla => "sessizlik kipi degismedi",
             PlayerCommandKind.RepeatCycle when view.Settings.Repeat == tekrar => $"tekrar {tekrar} degismedi",
             PlayerCommandKind.ClipExport when yeni[0] != "clip -> no" => $"kaynaksiz klip izi '{yeni[0]}'",
             PlayerCommandKind.ClipExport when !view.ViewStateText.Contains(Strings.Get("player.tools.novideo"), StringComparison.Ordinal) => $"kaynaksiz klip bildirimi yok: '{view.ViewStateText}'",
