@@ -132,8 +132,12 @@ public sealed class CaptureDevices
     internal static CaptureDeviceList WithLoopback(CaptureDeviceList list)
         => list with { Audio = list.Audio.Append(LoopbackAudio.Device).ToList() };
 
+    /// <summary>
+    /// Cihaz listesi okunamadiginda donen bos liste. Windows'ta sistem sesi ffmpeg'in listesine
+    /// bagli olmadigi icin burada da durur; yoksa liste dustugunde secenek de kayboluyor.
+    /// </summary>
     internal static CaptureDeviceList Unloaded() => new(
-        Array.Empty<AudioCaptureDevice>(),
+        OperatingSystem.IsWindows() ? [LoopbackAudio.Device] : Array.Empty<AudioCaptureDevice>(),
         Array.Empty<string>(),
         Backend,
         Loaded: false);

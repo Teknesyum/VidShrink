@@ -93,6 +93,15 @@ public sealed class SistemSesiTests
     }
 
     [Fact]
+    public void CihazListesiOkunamazsaSistemSesiYineListede()
+    {
+        var liste = CaptureDevices.Unloaded();
+        Assert.False(liste.Loaded);
+        if (OperatingSystem.IsWindows()) Assert.Contains(LoopbackAudio.Device, liste.Audio);
+        else Assert.DoesNotContain(LoopbackAudio.Device, liste.Audio);
+    }
+
+    [Fact]
     public void SessizlikteDuvarSaatiKadarSessizlikYazilir()
     {
         var cizgi = new LoopbackTimeline();

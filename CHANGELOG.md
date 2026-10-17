@@ -7,6 +7,11 @@ ship as part of it.
 
 ## [Unreleased]
 
+### Fixed
+
+- Recorder: on Windows the "System Audio" source stays in the list when the device list cannot be read; before, a failed
+  device query left both microphone and system audio at "Silent".
+
 ## [1.2.23] - 2026-10-16
 
 ### Added
