@@ -1563,6 +1563,19 @@
                       </ToolTip.Tip>
                     </CheckBox>
 
+                    <StackPanel x:Name="ConvertAudioVisualPanel" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" IsVisible="False" HorizontalAlignment="Left" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                      <ToolTip.Tip>
+                        <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.convert.audio-visual.tip}"/>
+                      </ToolTip.Tip>
+                      <SarilanMetin Text="{loc:Text main.convert.audio-visual}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+                      <ComboBox x:Name="CmbConvertAudioVisual" SelectedIndex="0"
+                                auto:AutomationProperties.Name="{loc:Text main.convert.audio-visual}">
+                        <ComboBoxItem Content="{loc:Text main.convert.audio-visual.none}" Tag="none"/>
+                        <ComboBoxItem Content="{loc:Text main.convert.audio-visual.cover}" Tag="cover"/>
+                        <ComboBoxItem Content="{loc:Text main.convert.audio-visual.waveform}" Tag="waveform"/>
+                      </ComboBox>
+                    </StackPanel>
+
                     <WrapPanel x:Name="ConvertGifPanel" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" IsVisible="False" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                       <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
                         <ToolTip.Tip>

@@ -340,6 +340,8 @@ public sealed class LanguageTests : IDisposable
         "Cover art must be a PNG or JPEG image.",
         "Cover art can be written only to MP4 or MKV.",
         "Cover art in MP4 requires video stream copy.",
+        "Making video from audio needs an H.264, H.265, VP9 or AV1 encoder.",
+        "The audio file has no embedded cover; pick a cover image.",
         "^The (.+) audio encoder does not support (.+) Hz.$",
         "Localization key ' ' is missing in ' ' and in ' '."
     };

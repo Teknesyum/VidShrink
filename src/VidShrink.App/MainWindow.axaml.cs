@@ -298,6 +298,7 @@ public partial class MainWindow : Window
         Watch(ChkConvertLoudnorm, ToggleButton.IsCheckedProperty, OnConvertChanged);
         Watch(ChkConvertDropMetadata, ToggleButton.IsCheckedProperty, OnConvertChanged);
         Watch(ChkConvertSingleFrame, ToggleButton.IsCheckedProperty, OnConvertChanged);
+        Watch(CmbConvertAudioVisual, SelectingItemsControl.SelectedIndexProperty, OnSesGoruntusuDegisti);
         Watch(ChkConvertAudioReplace, ToggleButton.IsCheckedProperty, OnConvertChanged);
         Watch(ChkConvertAudioShortest, ToggleButton.IsCheckedProperty, OnConvertChanged);
         Watch(CmbConvertBurn, SelectingItemsControl.SelectedIndexProperty, OnConvertBurnChanged);
@@ -4893,7 +4894,8 @@ public partial class MainWindow : Window
             GifLoop = container == "gif" ? ConvertAudioNumber(CmbConvertGifLoop) : null,
             GifColors = container == "gif" ? ConvertAudioNumber(CmbConvertGifColors) : null,
             GifDither = container == "gif" && SelectedTag(CmbConvertGifDither) is { Length: > 0 } dither ? dither : null,
-            ExtraArgs = CustomArguments.Parse(TxtConvertExtraArgs.Text).Arguments
+            ExtraArgs = CustomArguments.Parse(TxtConvertExtraArgs.Text).Arguments,
+            AudioVisual = SesGoruntusu()
         });
     }
 
@@ -4972,6 +4974,7 @@ public partial class MainWindow : Window
         CmbQualityMode.IsEnabled = SliderQuality.IsEnabled = TxtQuality.IsEnabled = kaliteOkunur;
         ChkConvertSingleFrame.IsVisible = plan.ImageSequenceOutput;
         ConvertGifPanel.IsVisible = plan.Gif;
+        ConvertAudioVisualPanel.IsVisible = SesKaynagiAcik;
         BtnConvertChapters.IsVisible = ConversionChapters.Carries(plan.Container);
     }
 

@@ -1352,7 +1352,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3958, toplam);
+        Assert.Equal(3964, toplam);
         Assert.Equal(382, dilBasina["en"]);
         Assert.Equal(128, dilBasina["tr"]);
     }
@@ -1648,6 +1648,8 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-18, cizim arac paneli (later 42): dokuz yeni <c>recorder.sketch.*</c> anahtari 42 dilde, dusen yok; olculen gezilen 85828 + 9 x 43 = 86215. <c>kayip</c> 0.</para>
     /// <para>2026-10-18, kamera ana kaynak (later 69): iki yeni anahtar (<c>recorder.target.device</c>, <c>.device-pick</c>) 42 dilde, dusen yok; gezilen 85828 + 2 x 43 = 85914. <c>kayip</c> 0.</para>
     /// <para>2026-10-18, 42 ve 69 birlikte: toplam 3948 + 4 + 6 = 3958, en 382, tr 128; gezilen 85828 + 387 + 86 = 86301.</para>
+    /// <para>2026-10-18, ve 90 (sesten video, yedi anahtar: <c>main.convert.audio-visual*</c>, <c>main.validation.audio-video-*</c>): olculen toplam 3948 + 6 = 3954, en 381, tr 127 degismedi; gezilen 85828 + 7 x 43 = 86129.</para>
+    /// <para>2026-10-18, 90 ile: toplam 3958 + 6 = 3964, en 382, tr 128; gezilen 86301 + 301 = 86602.</para>
     /// <para>2026-10-16, later 44 (etiket ve Onar): on sekiz yeni anahtar; olculen toplam 3781 + 2 = 3783 (lt main.convert.tags.cover.none, ro main.convert.tags.year), en 364, tr 123, gezilen 80453 + 774 = 81227.</para>
     /// <para>2026-10-15, uzun iste oncelik ve bitis sesi (later 76): dort yeni anahtar (<c>settings-tab.encode-priority.above-normal</c>, <c>settings-tab.finish-sound-file.choose</c>, <c>.hint</c>, <c>.reset</c>) 42 dilde, dusen yok; olculen gezilen 78604 + 172 = 78776.</para>
     /// <para>2026-10-15, bas konus (later 68): iki yeni anahtar (<c>recorder.audio.push-to-talk</c>, <c>.hint</c>), dusen yok; olculen 78604 + 43 x 2 = 78690. <c>kayip</c> 0.</para>
@@ -1685,7 +1687,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(86301, gezilen);
+        Assert.Equal(86602, gezilen);
         Assert.Empty(kayip);
     }
 

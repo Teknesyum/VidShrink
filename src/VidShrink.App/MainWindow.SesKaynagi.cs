@@ -36,7 +36,33 @@ public partial class MainWindow
     }
 
     private bool KapKaynagaUyar(ComboBoxItem item)
-        => ConversionArguments.ContainerFitsSource(item.Tag as string ?? "", ConvertInfo);
+        => ConversionArguments.ContainerFitsSource(item.Tag as string ?? "", ConvertInfo, SesGoruntusu());
+
+    private bool SesKaynagiAcik => _sesKaynagi is not null && _info is null && _sequence is null;
+
+    /// <summary>ARC-20: ses kaynağında seçilen görüntü; ses kaynağı yoksa hep <see cref="AudioVisual.None"/>.</summary>
+    private AudioVisual SesGoruntusu() => !SesKaynagiAcik ? AudioVisual.None : SelectedTag(CmbConvertAudioVisual) switch
+    {
+        "cover" => AudioVisual.Cover,
+        "waveform" => AudioVisual.Waveform,
+        _ => AudioVisual.None
+    };
+
+    /// <summary>Görüntü seçilince video kapları açılır; seçili kap ses kabıysa MP4'e geçilir. Görüntü kalkınca ses kabına dönülür.</summary>
+    private void OnSesGoruntusuDegisti()
+    {
+        if (_syncing) return;
+        KapSecenekleriniYokla();
+        if (SesGoruntusu() != AudioVisual.None && new ConversionPlan { Container = SelectedTag(CmbContainer) ?? "" }.AudioOnly
+            && CmbContainer.Items.OfType<ComboBoxItem>().FirstOrDefault(item => item.Tag as string == "mp4" && item.IsVisible) is { } mp4)
+        {
+            var wasSyncing = _syncing;
+            _syncing = true;
+            CmbContainer.SelectedItem = mp4;
+            _syncing = wasSyncing;
+        }
+        OnConvertChanged();
+    }
 
     private void SesOncesiKabiGeriKoy()
     {
