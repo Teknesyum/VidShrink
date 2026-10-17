@@ -74,6 +74,10 @@
   ölçekle tek `-filter_complex`, dört köşe, geçersiz aygıt/genişlik/köşe reddi; sahte `CameraSource` ile kutu → json →
   istek. `[KameraFact]` OBS Virtual Camera varsa 3 sn kayıt, köşe parlaklığı karşı köşeyle kıyaslanır (CI'da atlanır).
   Büyüteç: saf yerleşim, gerçek pencere `Follow`, sahte `IMagnifier` ile yalnız kayıtta açılma. Kanıt `.calisma/paket-2/`.
+- `KaydediciAygitHedefTests.cs` — later 69, kamera ya da yakalama kartı ana kaynak: `Device` hedefi ekran girdisi
+  yerine `-f dshow -i video=<ad>` kurar, kamera katmanı aynı kurucudan ve ses girdilerinden sonra gelir; Windows dışı,
+  boş ad, aynı aygıtı katman yapmak, ddagrab ve gizlilik maskesi reddedilir; anlık kare aynı aygıttan. Sahte
+  `CameraSource` ile kutu → istek → json → sonraki görünüm, kayıtlı ayardan CLI isteği. Gerçek kamera açılmaz.
   EKB-P5 biçim ve konum: dikdörtgen/yuvarlak köşe/daire `geq` alfa maskesi, ayna `hflip`, yer ve boy oran (`WebcamPlacement`, boy 0,05–0,5 `WebcamLayout`) ve tabana göre ölçek; `Placement` yokken eski köşe grafiği. Bölge düzenleyicisinde sürüklenen kamera kutusu sahte `IRegionEditorHost` ile json'a gider. lavfi bileşik karesi köşenin saydam kaldığını ve kameranın yerine düştüğünü pikselden okur; gerçek kamera açılmaz. Mutasyonlar (26 kol): `hflip` 4, daire yarıçapı /5 2 (piksel kolu yarıçapı ölçmez), X oranını ters çevirmek 1, boy kelepçesi 1 kırmızı.
 - Paket 2b kaydedici sınıfları, kanıt `.calisma/paket-2b/<konu>/`: `KayitOdakTakibiTests` (T7, "Kaydı izle" açıkken biten kayıt
   küçültme ve oynatıcıya sekme değişmeden yüklenir; kapalıyken yüklenmez, `VIDSHRINK_LIBMPV` ister), `KaydediciAyarGidisDonusTests`

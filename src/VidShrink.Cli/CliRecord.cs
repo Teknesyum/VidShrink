@@ -35,6 +35,7 @@ public sealed record CliRecordSettings
     public string? MicrophoneName { get; init; }
     public string? SystemAudioName { get; init; }
     public string? WebcamName { get; init; }
+    public string? DeviceName { get; init; }
     public WebcamShape WebcamShape { get; init; } = WebcamShape.Rectangle;
     public bool WebcamMirror { get; init; }
     public double WebcamX { get; init; } = 1;
@@ -136,6 +137,7 @@ public sealed record CliRecordSettings
                 MicrophoneName = (string?)root["microphoneName"],
                 SystemAudioName = (string?)root["systemAudioName"],
                 WebcamName = (string?)root["webcamName"],
+                DeviceName = (string?)root["deviceName"],
                 WebcamShape = Enum.TryParse<WebcamShape>((string?)root["webcamShape"], true, out var shape) && Enum.IsDefined(shape) ? shape : settings.WebcamShape,
                 WebcamMirror = (bool?)root["webcamMirror"] ?? settings.WebcamMirror,
                 WebcamX = camX,
@@ -330,9 +332,10 @@ public static class CliRecord
             Region = region,
             Audio = audio,
             Webcam = webcam,
+            Device = saved.Target == RecorderTargetKind.Device ? saved.DeviceName : null,
             Container = saved.Container,
             ScreenIndex = saved.Target == RecorderTargetKind.Screen ? saved.ScreenIndex : 0,
-            PrivacyMasks = saved.PrivacyMasks,
+            PrivacyMasks = saved.Target == RecorderTargetKind.Device ? Array.Empty<RecorderRegion>() : saved.PrivacyMasks,
             Scale = saved.ScaleWidth > 0 && saved.ScaleHeight > 0 ? new RecorderScale(saved.ScaleWidth, saved.ScaleHeight) : null,
             KeyframeSeconds = saved.KeyframeSeconds,
             Profile = string.IsNullOrWhiteSpace(saved.Profile) ? null : saved.Profile,

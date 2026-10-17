@@ -77,6 +77,51 @@ internal partial class RecorderView
         CmbWebcamBackground.ItemsSource = WebcamBackgrounds.Select(b => Say(BackgroundKey(b))).ToList();
         CmbWebcamBackground.SelectedIndex = Array.IndexOf(WebcamBackgrounds, background);
         KameraSecenekleri();
+        RefreshDeviceBox();
+    }
+
+    /// <summary>
+    /// Ana kaynak olacak aygıtın kutusu: kamera katmanıyla aynı DirectShow listesi. Seçim addan
+    /// korunur; hatırlanan aygıt takılı değilse kutu boş kalır ve motor adı eksik isteği reddeder,
+    /// başka bir kamera sessizce yerine geçmez.
+    /// </summary>
+    private void RefreshDeviceBox()
+    {
+        if (!_deviceLoaded)
+        {
+            _deviceLoaded = true;
+            _chosenDevice = _settings.DeviceName;
+            CmbDevice.SelectionChanged += (_, _) =>
+            {
+                if (!_fillingDevice && CmbDevice.SelectedItem is string device) _chosenDevice = device;
+            };
+        }
+
+        var list = _cameras.ToList();
+        var index = string.IsNullOrEmpty(_chosenDevice) ? 0 : list.FindIndex(c => string.Equals(c, _chosenDevice, StringComparison.OrdinalIgnoreCase));
+        _fillingDevice = true;
+        try
+        {
+            CmbDevice.ItemsSource = list;
+            CmbDevice.SelectedIndex = list.Count == 0 ? -1 : index;
+        }
+        finally
+        {
+            _fillingDevice = false;
+        }
+    }
+
+    private bool _deviceLoaded;
+
+    private bool _fillingDevice;
+
+    private string? _chosenDevice;
+
+    internal string? ChosenDevice => CmbDevice.SelectedItem as string;
+
+    private void CollectDevice()
+    {
+        if (CmbDevice.SelectedItem is string device) _settings.DeviceName = device;
     }
 
     /// <summary>

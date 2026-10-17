@@ -805,6 +805,7 @@ public sealed class OluUyeTests
     /// gercekten o tur oldugunu dogrula. RemoteZip.Paths de ayni yoldan dustu: OYB-P7 ile
     /// ForwardedRequest.Paths uretimde okunuyor, RemoteZip.Paths hala okunmuyor. QualityScore.Ssim
     /// later 122 ile dustu: OutputQualityCheck SSIM kolunda uretimde okuyor. Kosum: 1642 ozellik, 69 isaretli.
+    /// later 69 ile dustu: UnknownCaptureDeviceException.DeviceName kamera hata metninde okunuyor.
     /// </summary>
     private static readonly string[] PinnedOzellik =
     {
@@ -874,7 +875,6 @@ public sealed class OluUyeTests
         "TimeEstimate.HighSeconds  yalniz-disarida",
         "TimeEstimate.LowSeconds  yalniz-disarida",
         "TrimOutcome.Rounds  yalniz-disarida",
-        "UnknownCaptureDeviceException.DeviceName  yalniz-disarida",
         "WatchEntry.ProcessedUtc  yalniz-disarida",
         "WatchFileStamp.LastWriteUtc  yalniz-disarida"
     };

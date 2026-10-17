@@ -33,7 +33,13 @@ public enum RecorderTargetKind
     Region,
 
     /// <summary>Goruntusuz kayit: yalniz secilen ses girdileri yazilir.</summary>
-    AudioOnly
+    AudioOnly,
+
+    /// <summary>
+    /// Web kamerasi ya da yakalama karti ekranin yerine ana goruntu: Windows'ta DirectShow aygiti
+    /// (<see cref="RecorderRequest.Device"/>), kamera katmaninin girdisiyle ayni kurucudan.
+    /// </summary>
+    Device
 }
 
 /// <summary>
@@ -361,6 +367,9 @@ public sealed record RecorderRequest
     public AudioCapturePlan? Audio { get; init; }
 
     public RecorderWebcam? Webcam { get; init; }
+
+    /// <summary><see cref="RecorderTargetKind.Device"/> hedefinde ana goruntuyu veren DirectShow aygitinin adi.</summary>
+    public string? Device { get; init; }
 
     public string? PreviewPath { get; init; }
 }
@@ -945,6 +954,7 @@ public static class RecorderArguments
         errors.AddRange(WebcamErrors(request));
         errors.AddRange(PreviewErrors(request));
         errors.AddRange(MaskErrors(request));
+        errors.AddRange(DeviceErrors(request));
 
         if (request.Target == RecorderTargetKind.Window)
             errors.AddRange(WindowErrors(request));
@@ -958,6 +968,24 @@ public static class RecorderArguments
         errors.AddRange(AudioCodecErrors(request));
         return errors;
     }
+
+    private static IEnumerable<string> DeviceErrors(RecorderRequest request)
+    {
+        if (request.Target != RecorderTargetKind.Device) yield break;
+        if (request.Platform != RecorderPlatform.Windows)
+            yield return "A camera or capture card as the main picture is only available on Windows.";
+        if (string.IsNullOrWhiteSpace(request.Device))
+            yield return "Device capture needs a camera or capture card name.";
+        else if (request.Webcam is { } cam && string.Equals(cam.Device, request.Device, StringComparison.OrdinalIgnoreCase))
+            yield return "The webcam overlay cannot use the device that is already the main picture.";
+    }
+
+    /// <summary>
+    /// DirectShow video girdisi: kamera katmani da ana goruntu de buradan kurulur. Kare hizi
+    /// yazilmaz; aygitin desteklemedigi hiz istenince dshow girdiyi hic acmiyor.
+    /// </summary>
+    public static IReadOnlyList<string> DirectShowVideoInput(string device)
+        => new[] { "-f", "dshow", "-rtbufsize", WebcamBufferSize, "-i", "video=" + device };
 
     private static List<string> AudioOnlyErrors(RecorderRequest request, string outputPath)
     {
@@ -1340,6 +1368,12 @@ public static class RecorderArguments
     {
         if (request.Capture != RecorderCapture.Ddagrab) yield break;
 
+        if (request.Target == RecorderTargetKind.Device)
+        {
+            yield return "ddagrab captures the desktop; a camera or capture card is read through DirectShow.";
+            yield break;
+        }
+
         if (request.Platform != RecorderPlatform.Windows)
         {
             yield return "ddagrab (Desktop Duplication) exists only on Windows.";
@@ -1367,7 +1401,7 @@ public static class RecorderArguments
         {
             RecorderTargetKind.Region => request.Region,
             RecorderTargetKind.Window => request.WindowRegion,
-            RecorderTargetKind.AudioOnly => null,
+            RecorderTargetKind.AudioOnly or RecorderTargetKind.Device => null,
             _ when request.Screens.Count > 0 => RegionForScreen(request.Screens, request.ScreenIndex),
             _ when request.ScreenIndex == 0 => request.DdaOutputs.FirstOrDefault(o => o.X == 0 && o.Y == 0) is { } primary
                 ? new RecorderRegion(primary.X, primary.Y, primary.Width - primary.Width % 2, primary.Height - primary.Height % 2)
@@ -1455,7 +1489,7 @@ public static class RecorderArguments
     {
         ArgumentNullException.ThrowIfNull(request);
         reason = DdagrabFallback.None;
-        if (request.Platform != RecorderPlatform.Windows || request.Target == RecorderTargetKind.AudioOnly)
+        if (request.Platform != RecorderPlatform.Windows || request.Target is RecorderTargetKind.AudioOnly or RecorderTargetKind.Device)
             return request with { Capture = RecorderCapture.Gdigrab };
 
         reason = DdagrabBlocker(request);
@@ -1615,7 +1649,7 @@ public static class RecorderArguments
     {
         ArgumentNullException.ThrowIfNull(request);
         if (request.Platform != RecorderPlatform.Windows || request.Capture != RecorderCapture.Gdigrab
-            || request.Target == RecorderTargetKind.AudioOnly)
+            || request.Target is RecorderTargetKind.AudioOnly or RecorderTargetKind.Device)
             return false;
         return DdagrabTarget(request) is { } target ? target.Output.Hdr : request.DdaOutputs.Any(o => o.Hdr);
     }
@@ -1861,7 +1895,7 @@ public static class RecorderArguments
 
         var webcam = WebcamGraph(request with { Audio = audio });
         if (request.Webcam is { } cam)
-            a.AddRange(new[] { "-f", "dshow", "-rtbufsize", WebcamBufferSize, "-i", "video=" + cam.Device });
+            a.AddRange(DirectShowVideoInput(cam.Device));
 
         if (webcam is null && EncoderFilter(request) is { } filter) a.AddRange(new[] { "-vf", filter });
 
@@ -2184,6 +2218,7 @@ public static class RecorderArguments
 
     private static IReadOnlyList<string> WindowsInput(RecorderRequest request)
     {
+        if (request.Target == RecorderTargetKind.Device) return DirectShowVideoInput(request.Device!);
         if (request.Capture == RecorderCapture.Ddagrab) return DdagrabInput(request);
 
         var a = new List<string> { "-f", "gdigrab", "-framerate", Number(request.Fps), "-draw_mouse", Flag(request.ShowCursor) };
@@ -2372,7 +2407,7 @@ public static class RecorderArguments
         if (request.PrivacyMasks.Count == 0) yield break;
         if (request.PrivacyMasks.Any(m => m.Width <= 0 || m.Height <= 0))
             yield return "Every privacy mask must have a positive width and height.";
-        if (request.Target == RecorderTargetKind.Window)
+        if (request.Target is RecorderTargetKind.Window or RecorderTargetKind.Device)
             yield return "A privacy mask needs a screen or region target; the window frame does not follow desktop pixels.";
         else if (CaptureArea(request) is null)
             yield return "The privacy mask cannot be placed because the capture area is unknown.";
