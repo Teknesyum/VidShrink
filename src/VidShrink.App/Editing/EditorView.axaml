@@ -318,6 +318,33 @@
               <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.temperature}"/>
               <TextBox x:Name="TxtClipTemperature" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.temperature}"/>
             </StackPanel>
+            <ToggleButton x:Name="BtnClipAutoColor" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.clip.auto-color}" AutomationProperties.Name="{loc:Text editor.clip.auto-color}"/>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.curve-shadows}"/>
+              <TextBox x:Name="TxtClipCurveShadows" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.curve-shadows}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.curve-mids}"/>
+              <TextBox x:Name="TxtClipCurveMids" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.curve-mids}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.curve-highlights}"/>
+              <TextBox x:Name="TxtClipCurveHighlights" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.curve-highlights}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.shadow-hue}"/>
+              <TextBox x:Name="TxtClipShadowHue" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.shadow-hue}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.shadow-amount}"/>
+              <TextBox x:Name="TxtClipShadowAmount" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.shadow-amount}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.mid-hue}"/>
+              <TextBox x:Name="TxtClipMidHue" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.mid-hue}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.mid-amount}"/>
+              <TextBox x:Name="TxtClipMidAmount" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.mid-amount}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.highlight-hue}"/>
+              <TextBox x:Name="TxtClipHighlightHue" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.highlight-hue}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.highlight-amount}"/>
+              <TextBox x:Name="TxtClipHighlightAmount" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.highlight-amount}"/>
+            </StackPanel>
             <Button x:Name="BtnClipReset" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.reset}" AutomationProperties.Name="{loc:Text editor.clip.reset}"/>
           </WrapPanel>
           <WrapPanel x:Name="MediaPanel" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.media.open}">

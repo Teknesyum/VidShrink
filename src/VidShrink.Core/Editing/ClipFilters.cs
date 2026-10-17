@@ -89,18 +89,22 @@ public static class ClipFilters
     }
 
     /// <summary>
-    /// Renk zinciri, basinda virgul olmadan: degisen alanlarla <c>eq</c>, ardindan sicaklik
-    /// notr degilse <c>colortemperature</c>. Renk ayari yoksa bos.
+    /// Renk zinciri, basinda virgul olmadan: otomatik renk aciksa <c>normalize</c>, degisen alanlarla <c>eq</c>, sicaklik
+    /// notr degilse <c>colortemperature</c>, en sonda <see cref="ClipGrade.Filters"/> egri ve tekerleri. Renk ayari yoksa bos.
     /// </summary>
     public static string Color(ClipEffects effects)
     {
         var parts = new List<string>();
+        var auto = ClipGrade.Auto(effects);
+        if (auto.Length > 0) parts.Add(auto);
         var eq = new List<string>();
         if (effects.Brightness != 0) eq.Add("brightness=" + Number(effects.Brightness));
         if (effects.Contrast != 1) eq.Add("contrast=" + Number(effects.Contrast));
         if (effects.Saturation != 1) eq.Add("saturation=" + Number(effects.Saturation));
         if (eq.Count > 0) parts.Add("eq=" + string.Join(":", eq));
         if (effects.Temperature != ClipEffects.NeutralTemperature) parts.Add("colortemperature=temperature=" + Int(effects.Temperature));
+        var grade = ClipGrade.Filters(effects);
+        if (grade.Length > 0) parts.Add(grade);
         return string.Join(",", parts);
     }
 

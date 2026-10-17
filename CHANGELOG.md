@@ -9,6 +9,11 @@ ship as part of it.
 
 ### Added
 
+- Editor: advanced clip colour. One-click Auto color evens out the channels with ffmpeg `normalize`, a master curve
+  sets the output of the 0.25 / 0.5 / 0.75 input points (`curves`), and three colour wheels shift shadows, midtones and
+  highlights by hue angle and amount (`colorbalance` with preserved lightness). Preview and export use the same filter
+  chain, the values are saved in the project file, and older projects open neutral. Colour matching between shots has
+  no ready-made filter and is left out; it was only measured.
 - Command line: `donustur` gains the Convert tab's tags, cover, Repair and chapters. `--etiket-baslik`,
   `--etiket-sanatci`, `--etiket-yil`, `--etiket-yorum` write the container tags, `--kapak` adds a PNG or JPEG cover,
   `--onar` is the Repair preset (corrupt packets dropped, timestamps rebuilt, MKV remux unless a container or codec
