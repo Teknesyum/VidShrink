@@ -79,6 +79,11 @@ ship as part of it.
 
 ### Fixed
 
+- Keyboard and screen reader: Tab no longer gets stuck on the last control of every tab; it now wraps back to the
+  tab strip (an Avalonia quirk kept the strip pointing at the content's last focused control). 45 controls that
+  Narrator and NVDA announced without a name (target size, quality target, every Convert and Settings picker, the
+  player surface, the editor's program monitor, the comparison panel) now read their field label, and the player's
+  volume slider reads "Volume" instead of "Volume {0}". Record in `docs/olcumler/erisilebilirlik-denemesi.md`.
 - Recorder: on an HDR display a window that hangs off the screen or spans two monitors is captured from the monitor
   that holds most of it, through the colour-correct HDR-to-SDR path, instead of falling back to GDI with washed-out
   colours. Windows spanning only SDR monitors are still captured whole.

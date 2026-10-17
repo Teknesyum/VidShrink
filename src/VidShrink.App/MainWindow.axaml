@@ -244,7 +244,7 @@
         </StackPanel>
         </TabControl.Tag>
         <TabItem x:Name="TabPlayer" izi:AcilisIsareti.Ad="xaml-oynatici" Header="{loc:Text main.tab.player}" Tag="{StaticResource IconPlayer}" Theme="{StaticResource NeonTabItem}">
-          <playback:PlayerView x:Name="Player"/>
+          <playback:PlayerView x:Name="Player" auto:AutomationProperties.Name="{loc:Text main.tab.player}"/>
         </TabItem>
 
         <TabItem x:Name="TabEditor" izi:AcilisIsareti.Ad="xaml-duzenleyici" Header="{loc:Text main.tab.editor}" Tag="{StaticResource IconEditor}" Theme="{StaticResource NeonTabItem}">
@@ -319,7 +319,7 @@
 
                     <Grid x:Name="TitleRow" IsVisible="False" ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceMd}">
                       <SarilanMetin Text="{loc:Text main.title.label}" Theme="{StaticResource Label}" VerticalAlignment="Center"/>
-                      <ComboBox Grid.Column="1" x:Name="CmbTitle" HorizontalAlignment="Left" VerticalAlignment="Center" SelectionChanged="OnTitleChanged"/>
+                      <ComboBox Grid.Column="1" x:Name="CmbTitle" auto:AutomationProperties.Name="{loc:Text main.title.label}" HorizontalAlignment="Left" VerticalAlignment="Center" SelectionChanged="OnTitleChanged"/>
                     </Grid>
 
                     <izi:SutunIzgara x:Name="InfoGrid" MaxColumns="4" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}" IsVisible="False">
@@ -377,7 +377,7 @@
                           <ColumnDefinition Width="Auto" SharedSizeGroup="HedefBirim"/>
                         </izi:KaydiriciSatiri.ColumnDefinitions>
                         <Slider x:Name="SliderTarget" auto:AutomationProperties.Name="{loc:Text main.target.title}" Minimum="1" Maximum="500" Value="16" VerticalAlignment="Center"/>
-                        <TextBox x:Name="TxtTarget" Text="16" Width="{StaticResource NumberBoxWidth}" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
+                        <TextBox x:Name="TxtTarget" auto:AutomationProperties.Name="{loc:Text main.target.title}" Text="16" Width="{StaticResource NumberBoxWidth}" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
                         <SarilanMetin Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                       </izi:KaydiriciSatiri>
                     <!--
@@ -476,7 +476,7 @@
                           <Flyout>
                             <StackPanel Spacing="{StaticResource SpaceSm}" MinWidth="220">
                               <SarilanMetin Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.preset.name.label}"/>
-                              <TextBox x:Name="TxtPresetName" MaxLength="60"/>
+                              <TextBox x:Name="TxtPresetName" auto:AutomationProperties.Name="{loc:Text main.preset.name.label}" MaxLength="60"/>
                               <SarilanMetin x:Name="TxtPresetNotice" Theme="{StaticResource Hint}"
                                          TextWrapping="Wrap" IsVisible="False"/>
                               <Button x:Name="BtnPresetSave" Content="{loc:Text main.preset.save}" Click="OnPresetSave"/>
@@ -514,7 +514,7 @@
                           <ColumnDefinition Width="Auto" SharedSizeGroup="HedefBirim"/>
                         </izi:KaydiriciSatiri.ColumnDefinitions>
                         <Slider x:Name="SliderQualityTarget" auto:AutomationProperties.Name="{loc:Text main.quality.title}" Minimum="1" Maximum="100" Value="60" VerticalAlignment="Center"/>
-                        <TextBox x:Name="TxtQualityTarget" Text="60" Width="{StaticResource NumberBoxWidth}" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
+                        <TextBox x:Name="TxtQualityTarget" auto:AutomationProperties.Name="{loc:Text main.quality.title}" Text="60" Width="{StaticResource NumberBoxWidth}" TextAlignment="Center" Foreground="{StaticResource NeonBlue}" FontWeight="Bold"/>
                         <SarilanMetin Text="{loc:Text main.unit.score-suffix}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                       </izi:KaydiriciSatiri>
                       <SarilanMetin x:Name="TxtQualityTargetNotice" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
@@ -861,14 +861,14 @@
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
                           <SarilanMetin Text="{loc:Text main.advanced.audio-kbps.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
-                            <ComboBox x:Name="CmbAdvAudioKbps" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="CmbAdvAudioKbps" auto:AutomationProperties.Name="{loc:Text main.advanced.audio-kbps.label}" SelectedIndex="0" VerticalAlignment="Center"/>
                             <SarilanMetin x:Name="TxtAdvAudioKbpsNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
                           <SarilanMetin Text="{loc:Text main.advanced.audio-channels.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
-                            <ComboBox x:Name="CmbAdvAudioChannels" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="CmbAdvAudioChannels" auto:AutomationProperties.Name="{loc:Text main.advanced.audio-channels.label}" SelectedIndex="0" VerticalAlignment="Center"/>
                             <SarilanMetin x:Name="TxtAdvAudioChannelsNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
@@ -1004,14 +1004,14 @@
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
                           <SarilanMetin Text="{loc:Text main.advanced.min-resolution.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
-                            <ComboBox x:Name="CmbAdvMinResolution" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="CmbAdvMinResolution" auto:AutomationProperties.Name="{loc:Text main.advanced.min-resolution.label}" SelectedIndex="0" VerticalAlignment="Center"/>
                             <SarilanMetin x:Name="TxtAdvMinResolutionNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
                           <SarilanMetin Text="{loc:Text main.advanced.min-fps.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
-                            <ComboBox x:Name="CmbAdvMinFps" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="CmbAdvMinFps" auto:AutomationProperties.Name="{loc:Text main.advanced.min-fps.label}" SelectedIndex="0" VerticalAlignment="Center"/>
                             <SarilanMetin x:Name="TxtAdvMinFpsNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
@@ -1045,28 +1045,28 @@
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
                           <SarilanMetin Text="{loc:Text main.advanced.crf.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
-                            <ComboBox x:Name="CmbAdvCrf" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="CmbAdvCrf" auto:AutomationProperties.Name="{loc:Text main.advanced.crf.label}" SelectedIndex="0" VerticalAlignment="Center"/>
                             <SarilanMetin x:Name="TxtAdvCrfNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
                           <SarilanMetin Text="{loc:Text main.advanced.preset.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
-                            <ComboBox x:Name="CmbAdvPreset" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="CmbAdvPreset" auto:AutomationProperties.Name="{loc:Text main.advanced.preset.label}" SelectedIndex="0" VerticalAlignment="Center"/>
                             <SarilanMetin x:Name="TxtAdvPresetNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
                           <SarilanMetin Text="{loc:Text main.advanced.tune.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
-                            <ComboBox x:Name="CmbAdvTune" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="CmbAdvTune" auto:AutomationProperties.Name="{loc:Text main.advanced.tune.label}" SelectedIndex="0" VerticalAlignment="Center"/>
                             <SarilanMetin x:Name="TxtAdvTuneNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
                           <SarilanMetin Text="{loc:Text main.advanced.modulus.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
-                            <ComboBox x:Name="CmbAdvModulus" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="CmbAdvModulus" auto:AutomationProperties.Name="{loc:Text main.advanced.modulus.label}" SelectedIndex="0" VerticalAlignment="Center"/>
                             <SarilanMetin Text="{loc:Text main.advanced.modulus.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
@@ -1082,7 +1082,7 @@
                         <Grid RowDefinitions="Auto,Auto" RowSpacing="{StaticResource SpaceSm}">
                           <SarilanMetin Text="{loc:Text main.advanced.codec-lock.label}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                           <WrapPanel Grid.Row="1" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
-                            <ComboBox x:Name="CmbAdvCodecLock" SelectedIndex="0" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="CmbAdvCodecLock" auto:AutomationProperties.Name="{loc:Text main.advanced.codec-lock.label}" SelectedIndex="0" VerticalAlignment="Center"/>
                             <SarilanMetin x:Name="TxtAdvCodecLockNow" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                           </WrapPanel>
                         </Grid>
@@ -1200,7 +1200,7 @@
                           <Flyout>
                             <StackPanel Spacing="{StaticResource SpaceSm}" MinWidth="220">
                               <SarilanMetin Theme="{StaticResource Label}" Margin="0" Text="{loc:Text main.preset.name.label}"/>
-                              <TextBox x:Name="TxtConvertPresetName" MaxLength="60"/>
+                              <TextBox x:Name="TxtConvertPresetName" auto:AutomationProperties.Name="{loc:Text main.preset.name.label}" MaxLength="60"/>
                               <SarilanMetin x:Name="TxtConvertPresetNotice" Theme="{StaticResource Hint}"
                                          TextWrapping="Wrap" IsVisible="False"/>
                               <Button x:Name="BtnConvertPresetSave" Content="{loc:Text main.preset.save}" Click="OnConvertPresetSave"/>
@@ -1238,7 +1238,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <ComboBox Grid.Row="1" x:Name="CmbContainer" SelectedIndex="0" HorizontalAlignment="Stretch">
+                      <ComboBox Grid.Row="1" x:Name="CmbContainer" auto:AutomationProperties.Name="{loc:Text main.convert.container}" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="MP4" Tag="mp4"/>
                         <ComboBoxItem Content="MKV" Tag="mkv"/>
                         <ComboBoxItem Content="WebM" Tag="webm"/>
@@ -1275,7 +1275,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <ComboBox Grid.Row="1" x:Name="CmbConvertCodec" SelectedIndex="0" HorizontalAlignment="Stretch">
+                      <ComboBox Grid.Row="1" x:Name="CmbConvertCodec" auto:AutomationProperties.Name="{loc:Text main.convert.video-codec}" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="H.264" Tag="libx264"/>
                         <ComboBoxItem Content="H.265" Tag="libx265"/>
                         <ComboBoxItem Content="VP9" Tag="libvpx-vp9"/>
@@ -1318,7 +1318,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <ComboBox Grid.Row="1" x:Name="CmbQualityMode" SelectedIndex="0" HorizontalAlignment="Stretch">
+                      <ComboBox Grid.Row="1" x:Name="CmbQualityMode" auto:AutomationProperties.Name="{loc:Text main.convert.quality-mode}" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="{loc:Text main.advanced.mode.crf}"/>
                         <ComboBoxItem Content="{loc:Text main.convert.fixed-bitrate}"/>
                       </ComboBox>
@@ -1340,7 +1340,7 @@
                       <izi:KaydiriciSatiri Grid.Row="1" x:Name="CrfSliderRow" ColumnDefinitions="*,Auto" EnDarKaydirici="{StaticResource SliderMinWidth}"
                                            ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceSm}">
                         <Slider x:Name="SliderQuality" auto:AutomationProperties.Name="{loc:Text main.convert.crf-label}" Minimum="10" Maximum="45" Value="23" VerticalAlignment="Center"/>
-                        <TextBox x:Name="TxtQuality" Text="23" Width="{StaticResource NumberBoxWidth}" TextAlignment="Center" FontWeight="Bold" Foreground="{StaticResource NeonBlue}"/>
+                        <TextBox x:Name="TxtQuality" auto:AutomationProperties.Name="{loc:Text main.convert.crf-label}" Text="23" Width="{StaticResource NumberBoxWidth}" TextAlignment="Center" FontWeight="Bold" Foreground="{StaticResource NeonBlue}"/>
                       </izi:KaydiriciSatiri>
                     </Grid>
 
@@ -1357,7 +1357,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <ComboBox Grid.Row="1" x:Name="CmbResolution" SelectedIndex="0" HorizontalAlignment="Stretch">
+                      <ComboBox Grid.Row="1" x:Name="CmbResolution" auto:AutomationProperties.Name="{loc:Text main.convert.resolution}" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="{loc:Text main.convert.source-option}"/>
                         <ComboBoxItem Content="2160" Tag="2160"/>
                         <ComboBoxItem Content="1440" Tag="1440"/>
@@ -1381,7 +1381,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <TextBox Grid.Row="1" x:Name="TxtCustomResolution" Text="1280x720"/>
+                      <TextBox Grid.Row="1" x:Name="TxtCustomResolution" auto:AutomationProperties.Name="{loc:Text main.convert.custom-resolution}" Text="1280x720"/>
                     </Grid>
 
                     <Grid Grid.Row="3" Grid.Column="0">
@@ -1397,7 +1397,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <ComboBox Grid.Row="1" x:Name="CmbConvertFps" SelectedIndex="0" HorizontalAlignment="Stretch">
+                      <ComboBox Grid.Row="1" x:Name="CmbConvertFps" auto:AutomationProperties.Name="{loc:Text main.convert.frame-rate}" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="{loc:Text main.convert.source-option}"/>
                         <ComboBoxItem Content="60" Tag="60"/>
                         <ComboBoxItem Content="30" Tag="30"/>
@@ -1419,7 +1419,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <TextBox Grid.Row="1" x:Name="TxtCustomFps" Text="25"/>
+                      <TextBox Grid.Row="1" x:Name="TxtCustomFps" auto:AutomationProperties.Name="{loc:Text main.convert.custom-fps}" Text="25"/>
                     </Grid>
 
                     <Grid Grid.Row="4" Grid.Column="0">
@@ -1435,7 +1435,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <ComboBox Grid.Row="1" x:Name="CmbConvertAudio" SelectedIndex="0" HorizontalAlignment="Stretch">
+                      <ComboBox Grid.Row="1" x:Name="CmbConvertAudio" auto:AutomationProperties.Name="{loc:Text main.convert.audio}" SelectedIndex="0" HorizontalAlignment="Stretch">
                         <ComboBoxItem Content="AAC" Tag="aac"/>
                         <ComboBoxItem Content="Opus" Tag="libopus"/>
                         <ComboBoxItem Content="MP3" Tag="libmp3lame"/>
@@ -1461,7 +1461,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <TextBox Grid.Row="1" x:Name="TxtAudioBitrate" Text="128"/>
+                      <TextBox Grid.Row="1" x:Name="TxtAudioBitrate" auto:AutomationProperties.Name="{loc:Text main.convert.audio-bitrate}" Text="128"/>
                     </Grid>
 
                     <Grid Grid.Row="5" Grid.Column="0">
@@ -1477,7 +1477,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <TextBox Grid.Row="1" x:Name="TxtTrimStart"/>
+                      <TextBox Grid.Row="1" x:Name="TxtTrimStart" auto:AutomationProperties.Name="{loc:Text main.convert.trim-start}"/>
                     </Grid>
 
                     <Grid Grid.Row="5" Grid.Column="1">
@@ -1493,7 +1493,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <TextBox Grid.Row="1" x:Name="TxtTrimEnd"/>
+                      <TextBox Grid.Row="1" x:Name="TxtTrimEnd" auto:AutomationProperties.Name="{loc:Text main.convert.trim-end}"/>
                     </Grid>
 
                     <WrapPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
@@ -1809,7 +1809,7 @@
                 <Border Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
                     <SarilanMetin Text="{loc:Text main.convert.command}" Theme="{StaticResource H2}"/>
-                    <TextBox x:Name="TxtConvertCommand" FlowDirection="LeftToRight" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinLines="2"/>
+                    <TextBox x:Name="TxtConvertCommand" auto:AutomationProperties.Name="{loc:Text main.convert.command}" FlowDirection="LeftToRight" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinLines="2"/>
                     <SarilanMetin x:Name="TxtConvertValidation" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                   </StackPanel>
                 </Border>
@@ -1869,7 +1869,7 @@
                             Content="{loc:Text main.window.close}"
                             Click="OnHideAdvanced"/>
                   </Grid>
-                  <TextBox x:Name="TxtCommand" FlowDirection="LeftToRight" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinLines="1"/>
+                  <TextBox x:Name="TxtCommand" auto:AutomationProperties.Name="{loc:Text main.command.title}" FlowDirection="LeftToRight" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" MinLines="1"/>
                 </StackPanel>
               </Border>
 
@@ -1904,7 +1904,7 @@
                       <Button Content="{loc:Text main.ai.apply-json}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" Click="OnApplyJson"/>
                       <Button x:Name="BtnRevert" Content="{loc:Text main.ai.revert}" Theme="{StaticResource GhostButton}" Margin="{StaticResource WrapItemMargin}" IsVisible="False" Click="OnRevertAuto"/>
                     </WrapPanel>
-                    <TextBox x:Name="TxtAiJson" AcceptsReturn="True" TextWrapping="Wrap" MinLines="4" MaxLines="4"/>
+                    <TextBox x:Name="TxtAiJson" auto:AutomationProperties.Name="{loc:Text main.ai.title}" AcceptsReturn="True" TextWrapping="Wrap" MinLines="4" MaxLines="4"/>
                     <SarilanMetin x:Name="TxtAiStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                   </StackPanel>
                 </StackPanel>
@@ -1983,7 +1983,7 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <ComboBox x:Name="CmbLanguage" HorizontalAlignment="Stretch">
+                      <ComboBox x:Name="CmbLanguage" auto:AutomationProperties.Name="{loc:Text settings-tab.language.label}" HorizontalAlignment="Stretch">
                         <ComboBox.ItemTemplate>
                           <DataTemplate x:DataType="x:String">
                             <SarilanMetin Text="{Binding}" TextWrapping="Wrap"/>
@@ -2005,12 +2005,12 @@
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
-                      <ComboBox x:Name="CmbTheme" HorizontalAlignment="Stretch"/>
+                      <ComboBox x:Name="CmbTheme" auto:AutomationProperties.Name="{loc:Text settings-tab.theme.label}" HorizontalAlignment="Stretch"/>
                       <Grid x:Name="SystemThemePairRow" ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceSm}" RowSpacing="{StaticResource SpaceSm}" IsVisible="False">
                         <SarilanMetin Text="{loc:Text settings-tab.theme.light}" Theme="{StaticResource Label}" VerticalAlignment="Center"/>
-                        <ComboBox Grid.Column="1" x:Name="CmbThemeLight" HorizontalAlignment="Stretch"/>
+                        <ComboBox Grid.Column="1" x:Name="CmbThemeLight" auto:AutomationProperties.Name="{loc:Text settings-tab.theme.light}" HorizontalAlignment="Stretch"/>
                         <SarilanMetin Grid.Row="1" Text="{loc:Text settings-tab.theme.dark}" Theme="{StaticResource Label}" VerticalAlignment="Center"/>
-                        <ComboBox Grid.Row="1" Grid.Column="1" x:Name="CmbThemeDark" HorizontalAlignment="Stretch"/>
+                        <ComboBox Grid.Row="1" Grid.Column="1" x:Name="CmbThemeDark" auto:AutomationProperties.Name="{loc:Text settings-tab.theme.dark}" HorizontalAlignment="Stretch"/>
                       </Grid>
                       <CheckBox x:Name="ChkFollowSystemTheme" Theme="{StaticResource CheckStyle}" HorizontalAlignment="Left" Content="{loc:Text settings-tab.follow-system-theme.label}">
                         <ToolTip.Tip>
@@ -2023,7 +2023,7 @@
                   <StackPanel Spacing="{StaticResource SpaceSm}">
                     <SarilanMetin Text="{loc:Text settings-tab.default-target.label}" Theme="{StaticResource Label}"/>
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                      <TextBox x:Name="TxtDefaultTargetMb" Width="{StaticResource FieldWidthSm}" TextAlignment="Center"/>
+                      <TextBox x:Name="TxtDefaultTargetMb" auto:AutomationProperties.Name="{loc:Text settings-tab.default-target.label}" Width="{StaticResource FieldWidthSm}" TextAlignment="Center"/>
                       <SarilanMetin Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                     </StackPanel>
                     <SarilanMetin Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.default-target.hint}"/>
@@ -2094,7 +2094,7 @@
                       <RadioButton x:Name="RbFfmpegManual" GroupName="FfmpegPathMode" Content="{loc:Text settings-tab.ffmpeg-path.manual}"/>
                     </WrapPanel>
                     <Grid x:Name="FfmpegPathPickerRow" ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}" IsVisible="False">
-                      <TextBox x:Name="TxtFfmpegPath"/>
+                      <TextBox x:Name="TxtFfmpegPath" auto:AutomationProperties.Name="{loc:Text settings-tab.ffmpeg-path.label}"/>
                       <Button Grid.Column="1" x:Name="BtnBrowseFfmpegPath" Content="{loc:Text settings-tab.ffmpeg-path.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowseFfmpegPath"/>
                     </Grid>
                     <SarilanMetin x:Name="TxtFfmpegPathError" Classes="reveal" Theme="{StaticResource Hint}" Foreground="{StaticResource EmberBlaze}" TextWrapping="Wrap" IsVisible="False"/>
@@ -2130,7 +2130,7 @@
                       <RadioButton x:Name="RbOutputFixed" GroupName="OutputFolderMode" Content="{loc:Text settings-tab.output-folder.fixed}"/>
                     </WrapPanel>
                     <Grid x:Name="OutputFolderPickerRow" ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}" IsVisible="False">
-                      <TextBox x:Name="TxtOutputFolder" IsReadOnly="True"/>
+                      <TextBox x:Name="TxtOutputFolder" auto:AutomationProperties.Name="{loc:Text settings-tab.output-folder.label}" IsReadOnly="True"/>
                       <Button Grid.Column="1" x:Name="BtnBrowseOutputFolder" Content="{loc:Text settings-tab.output-folder.browse}" Theme="{StaticResource GhostButton}" Click="OnBrowseOutputFolder"/>
                     </Grid>
                     <SarilanMetin Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.output-folder.hint}"/>
@@ -2146,7 +2146,7 @@
                       </Button>
                     </Grid>
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
-                      <TextBox x:Name="TxtOutputName" FlowDirection="LeftToRight"/>
+                      <TextBox x:Name="TxtOutputName" auto:AutomationProperties.Name="{loc:Text settings-tab.output-name.label}" FlowDirection="LeftToRight"/>
                       <Button Grid.Column="1" x:Name="BtnResetOutputName" Content="{loc:Text settings-tab.output-name.reset}" Theme="{StaticResource GhostButton}" Click="OnResetOutputName"/>
                     </Grid>
                     <SarilanMetin x:Name="LblOutputNamePreview" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
@@ -2161,7 +2161,7 @@
                         </ToolTip.Tip>
                       </Button>
                     </Grid>
-                    <ComboBox Grid.Row="0" Grid.Column="1" x:Name="CmbParallelJobs" HorizontalAlignment="Stretch" VerticalAlignment="Center" MinWidth="{StaticResource FieldWidthSm}"/>
+                    <ComboBox Grid.Row="0" Grid.Column="1" x:Name="CmbParallelJobs" auto:AutomationProperties.Name="{loc:Text settings-tab.parallel-jobs.label}" HorizontalAlignment="Stretch" VerticalAlignment="Center" MinWidth="{StaticResource FieldWidthSm}"/>
                     <Grid Grid.Row="1" ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Center">
                       <SarilanMetin Text="{loc:Text settings-tab.encode-priority.label}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
                       <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.encode-priority.label}">
@@ -2170,7 +2170,7 @@
                         </ToolTip.Tip>
                       </Button>
                     </Grid>
-                    <ComboBox Grid.Row="1" Grid.Column="1" x:Name="CmbEncodePriority" HorizontalAlignment="Stretch" VerticalAlignment="Center" MinWidth="{StaticResource FieldWidthSm}"/>
+                    <ComboBox Grid.Row="1" Grid.Column="1" x:Name="CmbEncodePriority" auto:AutomationProperties.Name="{loc:Text settings-tab.encode-priority.label}" HorizontalAlignment="Stretch" VerticalAlignment="Center" MinWidth="{StaticResource FieldWidthSm}"/>
                     <Grid Grid.Row="2" x:Name="EncoderThreadsRow" ColumnDefinitions="*,Auto" HorizontalAlignment="Left" VerticalAlignment="Center">
                       <SarilanMetin Text="{loc:Text settings-tab.encoder-threads.label}" Theme="{StaticResource Label}" TextWrapping="Wrap"/>
                       <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.encoder-threads.label}">
@@ -2179,7 +2179,7 @@
                         </ToolTip.Tip>
                       </Button>
                     </Grid>
-                    <ComboBox Grid.Row="2" Grid.Column="1" x:Name="CmbEncoderThreads" IsVisible="{Binding #EncoderThreadsRow.IsVisible}" HorizontalAlignment="Stretch" VerticalAlignment="Center" MinWidth="{StaticResource FieldWidthSm}"/>
+                    <ComboBox Grid.Row="2" Grid.Column="1" x:Name="CmbEncoderThreads" auto:AutomationProperties.Name="{loc:Text settings-tab.encoder-threads.label}" IsVisible="{Binding #EncoderThreadsRow.IsVisible}" HorizontalAlignment="Stretch" VerticalAlignment="Center" MinWidth="{StaticResource FieldWidthSm}"/>
                   </Grid>
                 </StackPanel>
               </Border>
@@ -2214,7 +2214,7 @@
                       </Button>
                     </Grid>
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
-                      <TextBox x:Name="TxtOpenSubtitlesKey" PasswordChar="*"/>
+                      <TextBox x:Name="TxtOpenSubtitlesKey" auto:AutomationProperties.Name="{loc:Text settings-tab.opensubtitles.label}" PasswordChar="*"/>
                       <Button Grid.Column="1" x:Name="BtnOpenSubtitlesKey" Content="{loc:Text settings-tab.opensubtitles.get}" Theme="{StaticResource GhostButton}" Click="OnOpenSubtitlesKeyPage"/>
                     </Grid>
                   </StackPanel>
@@ -2338,7 +2338,7 @@
 
                     <SarilanMetin Grid.Row="1" Grid.Column="0" Text="{loc:Text settings.share.lifetime}" Theme="{StaticResource PlanFactLabel}" VerticalAlignment="Center"/>
                     <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource SpaceSm}">
-                      <ComboBox x:Name="CmbShareRetention" HorizontalAlignment="Left"/>
+                      <ComboBox x:Name="CmbShareRetention" auto:AutomationProperties.Name="{loc:Text settings.share.lifetime}" HorizontalAlignment="Left"/>
                       <SarilanMetin x:Name="TxtShareRetentionFixed" Theme="{StaticResource PlanFactValue}" IsVisible="False"/>
                     </StackPanel>
 

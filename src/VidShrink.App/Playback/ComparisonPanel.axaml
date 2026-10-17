@@ -43,6 +43,7 @@
     </Border>
 
     <Border x:Name="Shell"
+            auto:AutomationProperties.Name="{loc:Text playback.panel.title}"
             Theme="{StaticResource Panel}"
             Padding="0"
             ClipToBounds="True"

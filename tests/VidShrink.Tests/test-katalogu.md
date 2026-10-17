@@ -490,3 +490,4 @@
   çıktı ve hata yolları sahte hazırlama ile; dört `[FfmpegFact]` gerçek teslim: Tam iki parça, Hızlı ve Akıllı kendi kipinde,
   iki kaynaklı müzikli proje Tam'a düşer ve müziği karıştırır (müziksiz kontrol Hızlı kopyada kalır, sessiz okunur).
   Yedi python mutasyonunun yedisi kırmızı. Geçici dosyalar `.calisma/test-ciktilari/cli-teslim/`, test siler.
+- `ErisilebilirlikDenemesiTests.cs` — Later 78 (AYR-16/17): yedi kolda (Oynatıcı, Düzenleyici, Küçült boş ve dolu, Dönüştür, Kaydedici, Ayarlar) gerçek Tab tuşuyla sekme sırası yürür; takılma yok, sıra sekme düğmesine döner, en az durak sayısı tutar (ölçülen 16/17/28/33/40/25/63), her durak görünür ve otomasyon adı boş değil, `{0}` taşımaz. `AnaPenceredeAdsizGirdiAlaniKalmaz` `MainWindow.axaml`'daki adsız TextBox/ComboBox/Slider'ı tarar, yalnız `TxtShareLink` izinli. Pencere ayarı `TestPaths.OutputRoot/erisilebilirlik/`. Kayıt `docs/olcumler/erisilebilirlik-denemesi.md`.
