@@ -625,14 +625,16 @@ public static class RecorderArguments
         };
     }
 
-    public static string RemuxTarget(string source, Func<string, bool> exists)
+    public static string RemuxTarget(string source, Func<string, bool> exists) => SiblingTarget(source, ".mp4", exists);
+
+    public static string SiblingTarget(string source, string extension, Func<string, bool> exists)
     {
         ArgumentNullException.ThrowIfNull(exists);
         var folder = Path.GetDirectoryName(source) ?? string.Empty;
         var stem = Path.GetFileNameWithoutExtension(source);
-        var candidate = Path.Combine(folder, stem + ".mp4");
+        var candidate = Path.Combine(folder, stem + extension);
         for (var index = 2; exists(candidate); index++)
-            candidate = Path.Combine(folder, stem + "_" + index.ToString(CultureInfo.InvariantCulture) + ".mp4");
+            candidate = Path.Combine(folder, stem + "_" + index.ToString(CultureInfo.InvariantCulture) + extension);
         return candidate;
     }
 

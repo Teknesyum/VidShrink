@@ -33,6 +33,47 @@ public static class AdlandirmaDeseni
 
     private static readonly AdBilgisi ParcaOrnegi = new("x") { Parca = "01", Etiket = "x", Zaman = "00h00m00s" };
 
+    public const string KayitVarsayilan = "kayit_{damga}";
+
+    public static readonly IReadOnlyList<string> KayitYerTutuculari =
+        ["damga", "tarih", "saat", "pencere", "sayac"];
+
+    public const int PencereSiniri = 60;
+
+    private const int SayacSiniri = 9999;
+
+    private static readonly AdBilgisi KayitOrnegi = new("x") { Pencere = "x", Sayac = 1 };
+
+    public static string? KayitHata(string? desen) => Hata(desen, KayitYerTutuculari, KayitOrnegi);
+
+    public static string KayitYolu(string klasor, string? desen, string uzanti, DateTime an, string? pencere, Func<string, bool> varMi)
+    {
+        ArgumentNullException.ThrowIfNull(varMi);
+        var bilgi = new AdBilgisi("kayit") { Tarih = an, Pencere = Kisalt(pencere) };
+        var kullanilan = KayitHata(desen) is null && UygulaHam(desen!, bilgi with { Sayac = 1 }).Length > 0 ? desen! : KayitVarsayilan;
+
+        if (kullanilan.Contains("{sayac}", StringComparison.Ordinal))
+        {
+            for (var sayac = 1; sayac <= SayacSiniri; sayac++)
+            {
+                var aday = Path.Combine(klasor, UygulaHam(kullanilan, bilgi with { Sayac = sayac }) + uzanti);
+                if (!varMi(aday)) return aday;
+            }
+        }
+
+        var kok = UygulaHam(kullanilan, bilgi with { Sayac = SayacSiniri + 1 });
+        var yol = Path.Combine(klasor, kok + uzanti);
+        for (var index = 2; varMi(yol); index++)
+            yol = Path.Combine(klasor, kok + "_" + index.ToString(CultureInfo.InvariantCulture) + uzanti);
+        return yol;
+    }
+
+    private static string Kisalt(string? pencere)
+    {
+        var temiz = Temizle(pencere);
+        return temiz.Length > PencereSiniri ? temiz[..PencereSiniri].TrimEnd() : temiz;
+    }
+
     /// <summary>Dosya adında duramayan işaretler; işletim sisteminin listesine ek.</summary>
     private static readonly char[] YasakIsaretler = ['/', '\\', ':', '*', '?', '"', '<', '>', '|'];
 
@@ -144,6 +185,8 @@ public static class AdlandirmaDeseni
         "sayac" => bilgi.Sayac is { } sayac && sayac > 0
             ? sayac.ToString("000", CultureInfo.InvariantCulture)
             : string.Empty,
+        "damga" => Bicim.DosyaDamgasi(bilgi.Tarih),
+        "pencere" => Temizle(bilgi.Pencere),
         "parca" => bilgi.Parca ?? string.Empty,
         "etiket" => Temizle(bilgi.Etiket),
         "zaman" => bilgi.Zaman ?? string.Empty,
@@ -235,4 +278,6 @@ public sealed record AdBilgisi(string Ad)
 
     /// <summary>Parça adında kesim zamanı (<c>00h01m15s</c>).</summary>
     public string? Zaman { get; init; }
+
+    public string? Pencere { get; init; }
 }

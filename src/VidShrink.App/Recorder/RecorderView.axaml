@@ -232,6 +232,12 @@
                   Content="{loc:Text recorder.output.reveal}"
                   auto:AutomationProperties.Name="{loc:Text recorder.output.reveal}"
                   Click="OnReveal"/>
+          <Button x:Name="BtnCopyFile"
+                  Theme="{StaticResource GhostButton}"
+                  Margin="{StaticResource WrapItemMargin}"
+                  Content="{loc:Text recorder.output.copy-file}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.output.copy-file}"
+                  Click="OnCopyFile"/>
           <Button x:Name="BtnToPlayer"
                   Theme="{StaticResource GhostButton}"
                   Margin="{StaticResource WrapItemMargin}"
@@ -252,6 +258,13 @@
                   Content="{loc:Text recorder.output.to-mp4}"
                   auto:AutomationProperties.Name="{loc:Text recorder.output.to-mp4}"
                   Click="OnToMp4"/>
+          <Button x:Name="BtnToGif"
+                  Theme="{StaticResource GhostButton}"
+                  Margin="{StaticResource WrapItemMargin}"
+                  IsVisible="False"
+                  Content="{loc:Text recorder.output.to-gif}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.output.to-gif}"
+                  Click="OnToGif"/>
           <Button x:Name="BtnTrimIdle"
                   Theme="{StaticResource GhostButton}"
                   Margin="{StaticResource WrapItemMargin}"
@@ -849,6 +862,29 @@
                         auto:AutomationProperties.Name="{loc:Text recorder.output.browse}"
                         Click="OnBrowse"/>
               </Grid>
+            </StackPanel>
+
+            <StackPanel Spacing="{StaticResource SpaceSm}">
+              <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                <SarilanMetin Text="{loc:Text recorder.name.title}" Theme="{StaticResource Label}"/>
+                <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text recorder.name.title}">
+                  <ToolTip.Tip>
+                    <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text recorder.name.hint}"/>
+                  </ToolTip.Tip>
+                </Button>
+              </Grid>
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
+                <TextBox x:Name="TxtNamePattern"
+                         FlowDirection="LeftToRight"
+                         auto:AutomationProperties.Name="{loc:Text recorder.name.title}"/>
+                <Button Grid.Column="1"
+                        x:Name="BtnResetNamePattern"
+                        Theme="{StaticResource GhostButton}"
+                        Content="{loc:Text settings-tab.output-name.reset}"
+                        auto:AutomationProperties.Name="{loc:Text settings-tab.output-name.reset}"
+                        Click="OnResetNamePattern"/>
+              </Grid>
+              <SarilanMetin x:Name="TxtNamePreview" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
             </StackPanel>
           </StackPanel>
         </Border>

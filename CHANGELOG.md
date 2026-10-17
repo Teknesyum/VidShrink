@@ -9,6 +9,10 @@ ship as part of it.
 
 ### Added
 
+- Recorder: the result panel gains Copy File (puts the recording on the clipboard as a file) and Convert to GIF
+  (palette-filtered, 10 fps, at most 640 px wide, saved next to the recording). Recording names come from a
+  pattern (default `kayit_{damga}`, same as before) with `{damga}`, `{tarih}`, `{saat}`, `{pencere}` (window title) and
+  `{sayac}` (first free number); the CLI reads the same `namePattern`.
 - Player: "Speed through silence" mode (J, Playback menu). A labelled `silencedetect` ring sits at the head of the
   audio chain; when it reports a silence the speed rises to 4x and drops back to the previous speed when sound returns,
   so audio and picture stay in sync instead of jumping. Off by default; threshold (`silenceThresholdDb`, default
