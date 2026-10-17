@@ -21,7 +21,7 @@ ship as part of it.
   it without review fails the build.
 - Editor: lossless merge. A multi-source Fast or Smart export whose sources match (video codec, profile,
   resolution, pixel aspect, pixel format, frame rate, time base, audio codec, sample rate, channels and stream
-  layout) and whose timeline needs no re-encode is joined with the concat demuxer and `-c copy` instead of being
+  layout, and the same codec header data) and whose timeline needs no re-encode is joined with the concat demuxer and `-c copy` instead of being
   re-encoded. Smart copies only when every cut lands on a keyframe; anything else keeps the re-encode path.
 
 ### Fixed

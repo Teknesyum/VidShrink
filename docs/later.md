@@ -172,14 +172,13 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Sahibin kararı: libmpv'nin kendi ortam denetimi anahtarı yetmezse Windows SDK bağı eklensin mi
 - Plan: İlk adım karar istemez: motor seçeneklerine `media-controls` yazılır ve gerçek pencerede Windows ses kutucuğunda görünüp görünmediği, ortam tuşlarının pencere arkadayken çalışıp çalışmadığı ölçülür. Yetmezse pencere Windows'un ortam denetimi arayüzüne doğrudan bağlanır (MPC-BE'nin yolu); bu yeni bir Windows SDK bağı demektir ve sahibin kararını ister. İki yolda da sonraki ve önceki tuşu uygulamanın kendi kuyruğuna bağlanmalıdır, çünkü kuyruk motora verilmiyor.
 
-## 100. Kayıpsız Birleştirme Yolu
+## 100. Kayıpsız Birleştirme Ölçümü
 
-13 Ekim 2026 · "bulduklarını later a eklersin" · DZA-P6 · Düzenleyici · iş orta · öncelik 1 · karar sahibin
+13 Ekim 2026 · "bulduklarını later a eklersin" · DZA-P6 · Düzenleyici · iş küçük · öncelik 1
 
 - Satırlar (DZA-P6): DZA-01 Kayıpsız birleştirme. [Tablo](piyasa/2026-10-13/duzenleyici-kesim-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/Editing/EditExport.cs, src/VidShrink.Core/Editing/SmartCutCodec.cs, src/VidShrink.App/Editing/EditorView.Teslim.cs, src/VidShrink.App/Locales/
-- Sahibin kararı: çok kaynakta Hızlı ve Akıllı kip, kaynaklar uyumluysa yeniden kodlamak yerine kopyalasın mı (K7 her zaman yeniden kodlamayı seçmişti)
-- Plan: Çok kaynak bugün kipe bakmadan yeniden kodlama yoluna gidiyor (EditExport.cs:252). Kaynaklar arası uyum denetimi eklenir: kodek, profil, çözünürlük, piksel biçimi, kare hızı, ses kodeği ve örnekleme hızı. Hepsi tutuyorsa parçalar ffmpeg'in concat girişiyle (dosyaları yeniden kodlamadan uç uca okuyan liste) kopyalanır; tutmuyorsa bugünkü yol ve notu kalır. Doğrulama: uyum denetimi birim testleri, örnek çıktıda kare sayısı ve süre.
+- Yapıldı (18 Ekim 2026): `Core/Editing/MergeCompatibility` kodek, profil, başlık verisi özeti (SPS/PPS), çözünürlük, piksel oranı ve biçimi, kare hızı, zaman tabanı ve ses tutan kaynakları Hızlı ve Akıllı kipte concat ile kopyalıyor; tutmayan bugünkü yeniden kodlamaya gidiyor.
+- Kalan: danışma 017'nin şartı. Gerçek örnek kümede (telefon, ekran kaydı, iki ayrı kodlayıcı) birleşim noktasında zaman damgası sıçraması, ses-görüntü kayması ve libmpv/VLC/Chrome oynatması `tools/VidShrink.Bench` ile ölçülür, `docs/olcumler/` altına yazılır. Hata çıkarsa kopya yolu kapanır, K7 döner.
 
 ## 103. Müzik İzi
 
