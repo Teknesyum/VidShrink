@@ -7,6 +7,8 @@ ship as part of it.
 
 ## [Unreleased]
 
+## [1.2.24] - 2026-10-17
+
 ### Added
 
 - Recorder: `VidShrink.exe --recorder-selftest` shows a colour card for one second, captures it through the recording's
