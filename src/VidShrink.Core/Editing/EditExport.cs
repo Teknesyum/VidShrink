@@ -1343,7 +1343,7 @@ public static class EditExport
         if (clip.Reversed) text.Append(",reverse");
         if (clip.Speed != 1m)
             text.Append(",setpts=PTS/").Append(clip.Speed.ToString(CultureInfo.InvariantCulture))
-                .Append(",fps=").Append(Number(info.Fps > 0 ? info.Fps : 30));
+                .Append(SpeedRamp.Interpolates(clip) ? "," + SpeedRamp.SmoothFilter(info.Fps, clip) : ",fps=" + Number(info.Fps > 0 ? info.Fps : 30));
         return text.ToString();
     }
 

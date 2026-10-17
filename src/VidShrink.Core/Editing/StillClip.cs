@@ -11,6 +11,10 @@ namespace VidShrink.Core.Editing;
 /// </summary>
 public static class StillClip
 {
+    public const string Black = "#000000";
+
+    public const string White = "#FFFFFF";
+
     public const double ImageSeconds = 5;
 
     public const double FreezeSeconds = 2;

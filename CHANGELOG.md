@@ -20,6 +20,11 @@ ship as part of it.
   highlights by hue angle and amount (`colorbalance` with preserved lightness). Preview and export use the same filter
   chain, the values are saved in the project file, and older projects open neutral. Colour matching between shots has
   no ready-made filter and is left out; it was only measured.
+- Editor: speed ramp and smooth slow motion. The clip's Speed menu gains "Slow-down ramp" and "Speed-up ramp", which
+  split the clip into five equal source slices whose speeds step linearly between the clip's speed and a quarter of it
+  (each slice carries its own `setpts`/`atempo`, one undo step), and a "Smooth slow motion" check that makes slow clips
+  build in-between frames with `minterpolate` instead of repeating frames. The preview plays the ramp slice by slice;
+  interpolation is export-only and costly, so keep it to short clips. The flag is saved in the project file.
 - Command line: `donustur` gains the Convert tab's tags, cover, Repair and chapters. `--etiket-baslik`,
   `--etiket-sanatci`, `--etiket-yil`, `--etiket-yorum` write the container tags, `--kapak` adds a PNG or JPEG cover,
   `--onar` is the Repair preset (corrupt packets dropped, timestamps rebuilt, MKV remux unless a container or codec

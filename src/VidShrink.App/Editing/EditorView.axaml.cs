@@ -454,6 +454,8 @@ internal partial class EditorView : UserControl
             MnuSpeed.Items.Add(item);
         }
 
+        AddRampItems();
+
         var hasClip = ActiveIndex >= 0;
         MnuSpeed.IsEnabled = hasClip;
         MnuReverse.IsEnabled = hasClip;
@@ -461,6 +463,39 @@ internal partial class EditorView : UserControl
         MnuSplit.IsEnabled = BtnSplit.IsEnabled;
         MnuAddSource.IsEnabled = BtnAddSource.IsEnabled;
         MnuDeleteRange.IsEnabled = Timeline.MarkIn is { } a && Timeline.MarkOut is { } b && b > a;
+    }
+
+    private void AddRampItems()
+    {
+        var index = ActiveIndex;
+        if (_model is not { } model || index < 0 || index >= model.Clips.Count) return;
+        var clip = model.Clips[index];
+        var fast = clip.Speed;
+        var slow = Math.Max(EditClip.MinSpeed, decimal.Round(fast / SpeedRamp.DefaultFactor, 2, MidpointRounding.AwayFromZero));
+        string Range(decimal a, decimal b) => " (" + Bicim.Kat((double)a, Strings.Culture) + "× → " + Bicim.Kat((double)b, Strings.Culture) + "×)";
+
+        MnuSpeed.Items.Add(new Separator());
+        var down = new MenuItem { Header = Strings.Get("editor.speed-ramp-down") + Range(fast, slow), IsEnabled = fast != slow };
+        down.Click += (_, _) => RampSpeed(fast, slow);
+        MnuSpeed.Items.Add(down);
+        var up = new MenuItem { Header = Strings.Get("editor.speed-ramp-up") + Range(slow, fast), IsEnabled = fast != slow };
+        up.Click += (_, _) => RampSpeed(slow, fast);
+        MnuSpeed.Items.Add(up);
+        var smooth = new MenuItem { Header = Strings.Get("editor.smooth-slow"), ToggleType = MenuItemToggleType.CheckBox, IsChecked = clip.Smooth };
+        smooth.Click += (_, _) => SetSmooth(!clip.Smooth);
+        MnuSpeed.Items.Add(smooth);
+    }
+
+    internal bool RampSpeed(decimal from, decimal to)
+    {
+        var index = ActiveIndex;
+        return Apply(model => index >= 0 && index < model.Clips.Count && model.RampSpeed(index, from, to), index);
+    }
+
+    internal bool SetSmooth(bool smooth)
+    {
+        var targets = ClipTargets();
+        return Apply(model => targets.Count > 0 && model.SetSmooth(targets, smooth), -1);
     }
 
     internal int ActiveIndex => Timeline.AllSelected && _model is { Clips.Count: > 0 } ? 0 : Timeline.SelectedIndex;

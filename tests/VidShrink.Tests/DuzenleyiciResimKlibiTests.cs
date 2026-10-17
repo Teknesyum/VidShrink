@@ -225,7 +225,7 @@ public sealed class DuzenleyiciResimKlibiTests
                     Assert.Equal(1, view.Timeline.SelectedIndex);
 
                     view.Timeline.Playhead = S(12);
-                    Assert.True(Bekle(view, view.AddColorClipAsync(EditorView.ColorWhite)));
+                    Assert.True(Bekle(view, view.AddColorClipAsync(StillClip.White)));
                     Assert.Equal("color=c=0xFFFFFF:s=320x240:r=30:d=5", Sonraki(kosumlar[3], "-i"));
                     Assert.Equal(new EditClip(0, S(5)) { Source = 4 }, model.Clips[2]);
                     Assert.Equal(S(10 + 2 + 5 + 590 + 5 + 5), model.Duration);

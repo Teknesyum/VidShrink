@@ -18,10 +18,6 @@ namespace VidShrink.App.Editing;
 /// </summary>
 internal partial class EditorView
 {
-    internal const string ColorBlack = "#000000";
-
-    internal const string ColorWhite = "#FFFFFF";
-
     private string? _stillRoot;
 
     /// <summary>Ara videolari kosan dikis; verilmezse ffmpeg kosar.</summary>
@@ -37,8 +33,8 @@ internal partial class EditorView
 
     private void InitStills()
     {
-        MnuColorBlack.Click += (_, _) => _ = AddColorClipAsync(ColorBlack);
-        MnuColorWhite.Click += (_, _) => _ = AddColorClipAsync(ColorWhite);
+        MnuColorBlack.Click += (_, _) => _ = AddColorClipAsync(StillClip.Black);
+        MnuColorWhite.Click += (_, _) => _ = AddColorClipAsync(StillClip.White);
         MnuFreeze.Click += (_, _) => _ = FreezeFrameAsync();
         TimelineMenu.Opening += (_, _) =>
         {

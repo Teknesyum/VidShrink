@@ -70,7 +70,7 @@ public static class SceneSplit
             var effects = clip.Effects;
             if (i > 0) effects = effects with { FadeIn = 0 };
             if (i < ranges.Count - 1) effects = effects with { FadeOut = 0 };
-            pieces[i] = new EditClip(ranges[i].Start, ranges[i].End, clip.Speed, clip.Reversed) { Effects = effects, Source = clip.Source, Label = clip.Label, Group = clip.Group, Transition = i == 0 ? clip.Transition : null };
+            pieces[i] = new EditClip(ranges[i].Start, ranges[i].End, clip.Speed, clip.Reversed) { Effects = effects, Source = clip.Source, Label = clip.Label, Group = clip.Group, Transition = i == 0 ? clip.Transition : null, Smooth = clip.Smooth };
         }
 
         return pieces;
