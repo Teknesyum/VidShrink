@@ -443,3 +443,7 @@
   diskte olmayanı at, çalan yoksa ilk kalan, bozuk dosya kuyruksuz; kapanışta yazılan kuyruk yeni oynatıcıda düzenlenmiş
   sırasıyla, duraklatılmış ve bir kez gelir; geçmiş kapalıyken dosya silinir; pencere oynatıcı sekmesine geçince getirir.
   Duraklatma ve sekme bağı mutasyonları kırıyor. Dosyaları `TestPaths.OutputRoot` altında, kendisi siler.
+- `TepsiyeKucultmeTests.cs` — AYR-22: "Tepsiye küçült" açıkken simge durumuna küçültme pencereyi gizler, sahte tepsi
+  simgesi görünür; tıklama küçültmeden önceki hale döndürür ve simgeyi kaldırır. Kapalıyken küçültme bugünkü gibi.
+  İpucu iş ve kuyruk yüzdesini sırayla yazar; ayar gidip döner, eski dosya kapalı okunur. Tepsiye gönderme çağrısını
+  kaldırmak 1/9 kırmızı. Gerçek tepsi simgesi açılmaz; dosyalar `TestPaths.OutputRoot/tepsiye-kucultme` altında, test siler.

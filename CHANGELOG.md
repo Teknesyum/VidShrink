@@ -12,6 +12,9 @@ ship as part of it.
 - Player: the play queue and the playing file are kept between sessions. When the Player tab first opens, the last
   queue comes back paused at the file and position it was left at; files no longer on disk are dropped. Nothing is
   kept while "Keep History" is off.
+- Settings: "Minimize to Tray" (off by default). A minimized main window leaves the taskbar and waits in the system
+  tray; clicking the icon brings it back, and its tooltip shows the running job and queue progress. The close button
+  still quits.
 
 ### Fixed
 

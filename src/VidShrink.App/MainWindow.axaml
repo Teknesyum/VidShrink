@@ -2041,6 +2041,12 @@
                     </ToolTip.Tip>
                   </CheckBox>
 
+                  <CheckBox x:Name="ChkMinimizeToTray" Theme="{StaticResource CheckStyle}" HorizontalAlignment="Left" Content="{loc:Text settings-tab.minimize-to-tray.label}">
+                    <ToolTip.Tip>
+                      <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.minimize-to-tray.hint}"/>
+                    </ToolTip.Tip>
+                  </CheckBox>
+
                   <CheckBox x:Name="ChkKeepDates" Theme="{StaticResource CheckStyle}" HorizontalAlignment="Left" Content="{loc:Text settings-tab.keep-dates.label}">
                     <ToolTip.Tip>
                       <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.keep-dates.hint}"/>

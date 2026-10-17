@@ -758,6 +758,8 @@ public partial class ShrinkJobWindow : Window
     /// "Dosya N / toplam". Toplam iş başlarken dondurulmuyor: kabuktan gelen istekler ilk iş
     /// koşarken sıraya düşüyor ve dondurulan başlık "1 / 1" derken altında "Bekleyen: 2" yazıyordu.
     /// </summary>
+    internal double? TepsiKesri => _aktif.Count > 0 ? Progress.Value : null;
+
     private string TargetText(AktifIs job)
         => job.TargetLabel is null ? "" : Say("main.shrink-job.target", job.TargetLabel, job.Order, _accepted);
 

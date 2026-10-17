@@ -219,6 +219,7 @@ public partial class MainWindow : Window
         TitleBar.PointerPressed += OnTitleBarPointerPressed;
         TrackBackgroundDrag();
         TrackWindowMode();
+        TepsiyiIzle();
         TitleBrand.SizeChanged += (_, _) => AlignTabsToTitle();
         SizeChanged += (_, _) => AlignTabsToTitle();
         TitleBarRight.SizeChanged += (_, _) => AlignTabsToTitle();
@@ -323,6 +324,7 @@ public partial class MainWindow : Window
         Watch(ChkNotifyWhenDone, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkFinishSound, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkPreventSleep, ToggleButton.IsCheckedProperty, SaveAppSettings);
+        Watch(ChkMinimizeToTray, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkKeepDates, ToggleButton.IsCheckedProperty, SaveAppSettings);
         CmbParallelJobs.ItemsSource = ParallelJobChoices(Environment.ProcessorCount);
         CmbParallelJobs.SelectedIndex = 0;
@@ -727,6 +729,7 @@ public partial class MainWindow : Window
     protected override void OnClosing(WindowClosingEventArgs e)
     {
         Strings.Changed -= OnLanguageChanged;
+        TepsiyiKaldir();
         _probeCts?.Cancel();
         _cts?.Cancel();
         // Kaynak burada kapanır: pencere kapanırken öksüz ffmpeg kalmaz.
@@ -1639,6 +1642,7 @@ public partial class MainWindow : Window
             FinishSound = ChkFinishSound.IsChecked == true,
             FinishSoundFile = _finishSoundFile,
             PreventSleepWhileEncoding = ChkPreventSleep.IsChecked == true,
+            MinimizeToTray = ChkMinimizeToTray.IsChecked == true,
             KeepSourceDates = ChkKeepDates.IsChecked == true,
             ParallelJobs = Math.Max(0, CmbParallelJobs.SelectedIndex) + 1,
             EncodePriority = SelectedEncodePriority,
@@ -1708,6 +1712,7 @@ public partial class MainWindow : Window
             ChkFinishSound.IsChecked = settings.FinishSound;
             SetFinishSoundFile(settings.FinishSoundFile);
             ChkPreventSleep.IsChecked = settings.PreventSleepWhileEncoding;
+            ChkMinimizeToTray.IsChecked = settings.MinimizeToTray;
             ChkKeepDates.IsChecked = settings.KeepSourceDates;
             CmbParallelJobs.SelectedIndex = ParallelJobs.Clamp(settings.ParallelJobs, Environment.ProcessorCount) - 1;
             RestoreEncodeLoad(settings);
@@ -5011,6 +5016,7 @@ public partial class MainWindow : Window
             var progress = new Progress<EncodeProgress>(p =>
             {
                 ConvertProgress.Value = p.Fraction;
+                _isKesri = p.Fraction;
                 SetStage(TxtConvertStage, LocalizeStage(p.Stage));
             });
 
@@ -5098,6 +5104,7 @@ public partial class MainWindow : Window
     private void ShowEncodeProgress(EncodeProgress p)
     {
         Progress.Value = p.Fraction;
+        _isKesri = p.Fraction;
         SetStage(TxtStage, LocalizeStage(p.Stage));
         TxtRemaining.Text = Saat.Kalan(p.Remaining);
         if (p.OutputMb > 0) TxtOutSize.Text = Say("main.unit.mb-value", Num(p.OutputMb, "0.0"));
@@ -5171,6 +5178,7 @@ public partial class MainWindow : Window
         BtnPauseRun.IsVisible = BtnPauseRun.IsEnabled = running && pausable;
         if (!BtnPauseRun.IsEnabled) RunPause.Resume();
         HoldSleep(running);
+        _isKesri = running ? 0 : null;
         if (running)
         {
             ShowRunPause();
