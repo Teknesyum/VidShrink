@@ -474,7 +474,7 @@ public sealed class CliTests
         Availability = () => throw new InvalidOperationException("availability must not run")
     };
 
-    private const int BeklenenTakmaAdSayisi = 57;
+    private const int BeklenenTakmaAdSayisi = 65;
 
     /// <summary>
     /// <para>Ingilizce takma adlar iki CLI belgesinde (<c>docs/cli.md</c>, <c>docs/cli.tr.md</c>) yaziliydi diye degil, <b>kaynaktan
@@ -496,6 +496,9 @@ public sealed class CliTests
     /// <c>--cozunurluk</c>/<c>--resolution</c>, <c>--ses-bit-hizi</c>/<c>--audio-bitrate</c>, <c>--disa-aktar</c>/<c>--export</c>; sayim 51 → 56.
     /// <c>donustur</c> kollari <c>CliConvert.cs</c>'te durdugu icin o dosyanin <c>case</c> kollari da taranir.</para>
     /// <para>Later 62 (ek arguman) bir cift ekledi: <c>--ek-arguman</c>/<c>--extra-args</c>; sayim 56 → 57.</para>
+    /// <para>Later 44 (18 Ekim 2026, bolum duzenleyicinin komut satiri yuzu) sekiz cift ekledi: <c>--etiket-baslik</c>,
+    /// <c>--etiket-sanatci</c>, <c>--etiket-yil</c>, <c>--etiket-yorum</c>, <c>--kapak</c>, <c>--onar</c>, <c>--bolum-ekle</c>,
+    /// <c>--bolumsuz</c>; sayim 57 → 65.</para>
     /// <para>Belgelerin "hepsi" demesi de veriyle pimli: takma adi olmayan uzun anahtarlar
     /// (<c>--json</c>, <c>--vmaf</c>) kaynaktan cikarilip cumlede istisna olarak araniyor.</para>
     /// </summary>

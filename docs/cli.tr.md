@@ -124,6 +124,14 @@ bunların tek yazımı var.
 | `--ses-bit-hizi` | `--audio-bitrate` |
 | `--disa-aktar` | `--export` |
 | `--ek-arguman` | `--extra-args` |
+| `--etiket-baslik` | `--tag-title` |
+| `--etiket-sanatci` | `--tag-artist` |
+| `--etiket-yil` | `--tag-year` |
+| `--etiket-yorum` | `--tag-comment` |
+| `--kapak` | `--cover` |
+| `--onar` | `--repair` |
+| `--bolum-ekle` | `--add-chapter` |
+| `--bolumsuz` | `--no-chapters` |
 | `--kip` | `--mode` |
 
 Çıkış kodları: bantta `0`, bandın altında `2` (kalite doyduğu için daha küçük dosya
@@ -212,6 +220,22 @@ boşluğu korur, bayrak tekrarlanınca eklenir; `-i`, `-y`, `-n`, `-f`, `-progre
 ikinci çıktı olacak başıboş değer `64` ile reddedilir), `--json`. Sekmenin reddedeceği bileşim (kabın taşımadığı ses kodeği, tek sayılı boyut) aynı
 gerekçeyle ve `64` çıkış koduyla reddediliyor; yerel ffmpeg'de kodlayıcısı olmayan kap `1`
 veriyor.
+
+Etiket, kapak, Onar ve bölümler sekmenin Etiketler ve Bölümler açılırlarını izliyor:
+`--etiket-baslik`, `--etiket-sanatci`, `--etiket-yil`, `--etiket-yorum` kabın başlık, sanatçı,
+tarih ve yorum etiketini yazıyor (boş değer anahtar yazmıyor; `--meta-yok` onları silmiyor);
+`--kapak <png|jpg>` kapak ekliyor (MKV'de ek, MP4'te yalnız video kopyasında kapak izi; dosya
+yoksa `1`). `--onar` sekmenin Onar hazır ayarı: bozuk paket atılıyor, eksik zaman damgası
+üretiliyor, çıktı sıfırdan başlıyor; `--kap`, `--kodek`, `--ses-kodek` verilmezse video ve ses
+MKV'ye kopyalanıyor. `--bolum-ekle <zaman>=<ad>` (tekrarlanabilir, `90=Ana` ya da `1:30=Ana`)
+kaynağın bölümlerinin yerine bu listeyi yazıyor; zaman kaynağın başından sayılıyor, `--kes`
+kaydırıyor. `--bolumsuz` bölüm yazmıyor. İkisi mp4, mkv ya da mov istiyor ve birlikte
+verilemiyor (`64`).
+
+```bash
+vidshrink donustur bozuk.ts --onar
+vidshrink donustur konusma.mkv --etiket-baslik "Konuşma" --bolum-ekle 0=Giriş --bolum-ekle 12:30=Sorular
+```
 
 Komut satırı sekmenin GIF'ten GIF'e boyut hedefini, ses izi seçimini ve harici ses dosyasını
 taşımıyor.
