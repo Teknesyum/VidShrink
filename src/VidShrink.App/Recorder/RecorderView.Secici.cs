@@ -118,7 +118,11 @@ internal partial class RecorderView
         };
         CmbRegionSize.SelectionChanged += (_, _) => ApplyPresetSize();
         CmbAspect.SelectionChanged += (_, _) => PersistChoices();
-        CmbScreen.SelectionChanged += (_, _) => PersistChoices();
+        CmbScreen.SelectionChanged += (_, _) =>
+        {
+            OnScreenPicked();
+            PersistChoices();
+        };
     }
 
     internal string SelectedAspect

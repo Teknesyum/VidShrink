@@ -46,6 +46,39 @@ internal partial class RecorderView
 
     internal Func<Task>? WizardMeasure { get; set; }
 
+    /// <summary>Oyun penceresinin piksel karesi; testte sahte kaynak verilir.</summary>
+    internal Func<Avalonia.PixelRect?>? GameWindowSource { get; set; }
+
+    /// <summary>
+    /// Sihirbaz "Oyun" dendiyse ekran hedefi kayıt başlarken oyunun ekranını kendisi seçer.
+    /// Kullanıcı ekranı elle değiştirince söner; sihirbaz yeniden cevaplanınca yeniden kurulur.
+    /// </summary>
+    internal bool FollowsGameScreen { get; private set; }
+
+    /// <summary>
+    /// Ekran hedefinde ve "Oyun" cevabında ekran kutusunu oyunun ekranına çevirir
+    /// (<see cref="RecorderWizard.GameScreen"/>). İstek kutudan okunduğu için ekranın HDR
+    /// olup olmadığı da bu ekranın çıkışından çözülür.
+    /// </summary>
+    internal void FollowGameScreen()
+    {
+        if (!FollowsGameScreen || SelectedTarget != RecorderTargetKind.Screen) return;
+        var monitors = Monitors();
+        if (monitors.Count == 0 || CmbScreen.ItemCount == 0) return;
+
+        RecorderRegion? window = (GameWindowSource ?? RecorderWindows.ForegroundGameWindow)() is { } f
+            ? new RecorderRegion(f.X, f.Y, f.Width, f.Height)
+            : null;
+        var screen = RecorderWizard.GameScreen(monitors, window);
+        var index = monitors.Select((m, i) => (m, i)).FirstOrDefault(p => p.m.Index == screen).i;
+        Quietly(() => CmbScreen.SelectedIndex = Math.Clamp(index, 0, CmbScreen.ItemCount - 1));
+    }
+
+    private void OnScreenPicked()
+    {
+        if (_quiet == 0) FollowsGameScreen = false;
+    }
+
     internal bool WizardOpen => PanelWizard.IsVisible;
 
     internal int WizardStep => _wizardPicks.Count;
@@ -169,6 +202,7 @@ internal partial class RecorderView
         _settings.WizardAudio = answers.Audio;
         _settings.WizardDestination = answers.Destination;
         _settings.Save(_settingsPath);
+        FollowsGameScreen = answers.Content == RecorderWizardContent.Game;
 
         var plan = RecorderWizard.Plan(answers);
         var notes = new List<string>();

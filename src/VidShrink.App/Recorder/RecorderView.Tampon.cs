@@ -110,6 +110,7 @@ internal partial class RecorderView
             return false;
         }
 
+        FollowGameScreen();
         if (BuildRequest() is not { } request) return false;
         StoreChoices();
         var seconds = SelectedReplaySeconds;

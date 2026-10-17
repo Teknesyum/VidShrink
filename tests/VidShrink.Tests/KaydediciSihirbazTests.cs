@@ -1,3 +1,5 @@
+using Avalonia;
+using Avalonia.Controls;
 using VidShrink.App.Recorder;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
@@ -191,6 +193,141 @@ public sealed class KaydediciSihirbazTests
         Assert.True(olcu.WizardOpen);
         Assert.Equal(string.Empty, olcu.WizardSummary);
         Assert.Null(olcu.WizardAnswers);
+    }
+
+    private static readonly ScreenBounds SdrEkran = new(0, 0, 0, 1920, 1080);
+    private static readonly ScreenBounds HdrEkran = new(1, 1920, 0, 2560, 1440);
+
+    private static IReadOnlyList<ScreenBounds> IkiEkran() => new[] { SdrEkran, HdrEkran };
+
+    private static RecorderRequest Ddagrabla(RecorderRequest istek) => istek with
+    {
+        Capture = RecorderCapture.Ddagrab,
+        HdrToSdr = true,
+        DdaOutputs = new[]
+        {
+            new DdaOutput(0, SdrEkran.X, SdrEkran.Y, SdrEkran.Width, SdrEkran.Height),
+            new DdaOutput(1, HdrEkran.X, HdrEkran.Y, HdrEkran.Width, HdrEkran.Height, Hdr: true)
+        }
+    };
+
+    [Fact]
+    public void OyunEkraniPencereninEnCokOrtustuguEkrandir()
+    {
+        var solda = new ScreenBounds(0, -1920, 0, 1920, 1080);
+        var birincil = new ScreenBounds(1, 0, 0, 2560, 1440);
+        var ekranlar = new[] { solda, birincil };
+
+        Assert.Equal(0, RecorderWizard.GameScreen(ekranlar, new RecorderRegion(-1800, 100, 1600, 900)));
+        Assert.Equal(0, RecorderWizard.GameScreen(ekranlar, new RecorderRegion(-1000, 0, 1200, 800)));
+        Assert.Equal(1, RecorderWizard.GameScreen(ekranlar, new RecorderRegion(-200, 0, 1200, 800)));
+        Assert.Equal(1, RecorderWizard.GameScreen(ekranlar, null));
+        Assert.Equal(1, RecorderWizard.GameScreen(ekranlar, new RecorderRegion(9000, 9000, 800, 600)));
+        Assert.Equal(1, RecorderWizard.GameScreen(ekranlar, new RecorderRegion(-1800, 100, 0, 0)));
+        Assert.Equal(0, RecorderWizard.GameScreen(Array.Empty<ScreenBounds>(), null));
+        Assert.Equal(1, RecorderWizard.PrimaryScreen(ekranlar));
+        Assert.Equal(0, RecorderWizard.PrimaryScreen(new[] { new ScreenBounds(0, 100, 100, 800, 600), new ScreenBounds(1, 900, 100, 800, 600) }));
+    }
+
+    [Fact]
+    public void OyunPenceresiOnPlandakiYaDaVidShrinkinAltindakidir()
+    {
+        const int ben = 7;
+        var oyun = new PixelRect(1920, 0, 2560, 1440);
+        var tarayici = new PixelRect(0, 0, 1920, 1080);
+        var vidshrink = new WindowEntry("VidShrink", true, false, false, ben, false, new PixelRect(100, 100, 1200, 800), Foreground: true);
+        var kucuk = new WindowEntry("Küçük", true, false, false, 9, true, new PixelRect(0, 0, 800, 600));
+        var arac = new WindowEntry("Araç", true, false, true, 9, false, new PixelRect(0, 0, 300, 200));
+        var basliksiz = new WindowEntry(" ", true, false, false, 9, false, new PixelRect(0, 0, 300, 200));
+        var oyunPenceresi = new WindowEntry("Oyun", true, false, false, 11, false, oyun);
+        var tarayiciPenceresi = new WindowEntry("Tarayıcı", true, false, false, 12, false, tarayici);
+
+        Assert.Equal(oyun, RecorderWindows.GameWindow(new[] { vidshrink, kucuk, arac, basliksiz, oyunPenceresi, tarayiciPenceresi }, ben));
+        Assert.Equal(tarayici, RecorderWindows.GameWindow(new[] { oyunPenceresi, tarayiciPenceresi with { Foreground = true } }, ben));
+        Assert.Null(RecorderWindows.GameWindow(new[] { vidshrink, kucuk, arac }, ben));
+    }
+
+    [Fact]
+    public void OyunCevabiKayittaOyununEkraniniVeHdrYolunuSecer()
+    {
+        PixelRect? pencere = null;
+        var olcu = KaydediciAyarTests.AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            var gorunum = new RecorderView(ayarYolu)
+            {
+                SkipAutoMeasure = true,
+                CapturePlatform = RecorderPlatform.Windows,
+                ScreenSource = IkiEkran,
+                GameWindowSource = () => pencere,
+                WizardMeasure = () => Task.CompletedTask
+            };
+            KaydediciAyarTests.Elle(gorunum);
+            gorunum.RefreshScreens();
+            var kutu = KaydediciAyarTests.Bul<ComboBox>(gorunum, "CmbScreen");
+            kutu.SelectedIndex = 0;
+
+            gorunum.OpenWizard();
+            gorunum.PickWizardAsync((int)RecorderWizardContent.Game).GetAwaiter().GetResult();
+            gorunum.PickWizardAsync((int)RecorderWizardAudio.Silent).GetAwaiter().GetResult();
+            gorunum.PickWizardAsync((int)RecorderWizardDestination.Archive).GetAwaiter().GetResult();
+            KaydediciAyarTests.Elle(gorunum);
+            var izliyor = gorunum.FollowsGameScreen;
+
+            RecorderRequest Kayit(PixelRect? p)
+            {
+                pencere = p;
+                return gorunum.PrepareRecording()!.Value.Request;
+            }
+
+            var hdrde = Kayit(new PixelRect(2000, 100, 1600, 900));
+            var kutuHdr = kutu.SelectedIndex;
+            var sdrde = Kayit(new PixelRect(100, 100, 1600, 900));
+            var hdrdeYine = Kayit(new PixelRect(1900, 0, 2400, 1400));
+            var yok = Kayit(null);
+
+            kutu.SelectedIndex = 1;
+            var elle = Kayit(new PixelRect(100, 100, 1600, 900));
+            return (izliyor, hdrde, kutuHdr, sdrde, hdrdeYine, yok, elle, sonraIzliyor: gorunum.FollowsGameScreen);
+        }));
+
+        Assert.True(olcu.izliyor);
+        Assert.Equal(1, olcu.hdrde.ScreenIndex);
+        Assert.Equal(1, olcu.kutuHdr);
+        Assert.True(RecorderArguments.HdrTonemapCapture(Ddagrabla(olcu.hdrde)));
+        Assert.Equal(0, olcu.sdrde.ScreenIndex);
+        Assert.False(RecorderArguments.HdrTonemapCapture(Ddagrabla(olcu.sdrde)));
+        Assert.Equal(1, olcu.hdrdeYine.ScreenIndex);
+        Assert.Equal(0, olcu.yok.ScreenIndex);
+        Assert.False(olcu.sonraIzliyor);
+        Assert.Equal(1, olcu.elle.ScreenIndex);
+    }
+
+    [Fact]
+    public void OyunDisiCevapSecilenEkraniKorur()
+    {
+        var olcu = KaydediciAyarTests.AyarDosyasiyla(ayarYolu => AppHost.Run(() =>
+        {
+            var gorunum = new RecorderView(ayarYolu)
+            {
+                SkipAutoMeasure = true,
+                CapturePlatform = RecorderPlatform.Windows,
+                ScreenSource = IkiEkran,
+                GameWindowSource = () => new PixelRect(2000, 100, 1600, 900),
+                WizardMeasure = () => Task.CompletedTask
+            };
+            KaydediciAyarTests.Elle(gorunum);
+            gorunum.RefreshScreens();
+            KaydediciAyarTests.Bul<ComboBox>(gorunum, "CmbScreen").SelectedIndex = 0;
+
+            gorunum.OpenWizard();
+            gorunum.PickWizardAsync((int)RecorderWizardContent.Lesson).GetAwaiter().GetResult();
+            gorunum.PickWizardAsync((int)RecorderWizardAudio.Silent).GetAwaiter().GetResult();
+            gorunum.PickWizardAsync((int)RecorderWizardDestination.Archive).GetAwaiter().GetResult();
+            KaydediciAyarTests.Elle(gorunum);
+            return (gorunum.FollowsGameScreen, gorunum.PrepareRecording()!.Value.Request.ScreenIndex);
+        }));
+
+        Assert.Equal((false, 0), olcu);
     }
 
     private sealed class NotKarsilastirici : IEqualityComparer<IReadOnlyList<RecorderAutoNote>>

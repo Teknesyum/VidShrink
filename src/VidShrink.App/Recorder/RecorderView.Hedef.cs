@@ -333,6 +333,7 @@ internal partial class RecorderView
 
     internal (RecorderRequest Request, string Path)? PrepareRecording()
     {
+        FollowGameScreen();
         if (BuildRequest(pushToTalk: ChkPushToTalk.IsChecked == true) is not { } request) return null;
         StoreChoices();
         return (request, _settings.OutputPath(DateTime.Now));
