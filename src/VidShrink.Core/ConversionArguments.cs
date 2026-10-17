@@ -1,8 +1,8 @@
-﻿using System.Globalization;
+using System.Globalization;
 
 namespace VidShrink.Core;
 
-public static class ConversionArguments
+public static partial class ConversionArguments
 {
     public const string AnimatedWebpEncoder = "libwebp_anim";
     public const string AnimatedAvifEncoder = "libsvtav1";
@@ -23,7 +23,12 @@ public static class ConversionArguments
         if (plan.VideoCodec == "copy" && plan.ImageSequenceOutput) errors.Add("Image sequence output requires video encoding and cannot use stream copy.");
         if (plan.CarriesAudio && plan.AudioCodec == "copy" && !info.HasAudio && AddedAudio(plan) is null) errors.Add("The source has no audio stream to copy.");
         if (plan.AudioOnly && !info.HasAudio && plan.ExternalAudio is null) errors.Add("The source has no audio stream to extract.");
-        if (info.IsAudioOnly && !plan.AudioOnly) errors.Add("The source has no video stream; choose an audio container.");
+        var fromAudio = MakesVideoFromAudio(info, plan);
+        if (info.IsAudioOnly && !plan.AudioOnly && !fromAudio) errors.Add("The source has no video stream; choose an audio container.");
+        if (fromAudio && (plan.VideoCodec == "copy" || IntermediateCodecs.IsIntermediate(plan.VideoCodec)))
+            errors.Add("Making video from audio needs an H.264, H.265, VP9 or AV1 encoder.");
+        if (fromAudio && plan.AudioVisual == AudioVisual.Cover && AudioVideoCoverSource(info, plan) is null)
+            errors.Add("The audio file has no embedded cover; pick a cover image.");
 
         if (!plan.AudioOnly && !plan.Gif && !plan.AnimatedImage && !plan.ImageSequenceOutput && plan.VideoCodec != "copy" && !VideoEncodeCompatible(plan.Container, plan.VideoCodec))
             errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support the selected {plan.VideoCodec} video encoder.");
@@ -31,7 +36,7 @@ public static class ConversionArguments
             errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support the selected {audioCodec} audio encoder.");
 
         var source = info.VideoCodec.ToLowerInvariant();
-        if (plan.VideoCodec == "copy" && !plan.ImageSequenceOutput && !VideoCopyCompatible(plan.Container, source))
+        if (plan.VideoCodec == "copy" && !plan.ImageSequenceOutput && !fromAudio && !VideoCopyCompatible(plan.Container, source))
             errors.Add($"The {plan.Container.ToUpperInvariant()} container does not support copying the source {source} video stream.");
         if (plan.Start is { } trimStart && plan.End is { } trimEnd && trimEnd <= trimStart)
             errors.Add("The trim end must come after the trim start.");
@@ -73,12 +78,13 @@ public static class ConversionArguments
         if (!string.IsNullOrWhiteSpace(plan.CoverPath))
         {
             if (CoverImage(plan.CoverPath) is null) errors.Add("Cover art must be a PNG or JPEG image.");
+            if (fromAudio) return errors;
             if (plan.AudioOnly || plan.Gif || plan.AnimatedImage || plan.ImageSequenceOutput || plan.Container is not ("mp4" or "mkv"))
                 errors.Add("Cover art can be written only to MP4 or MKV.");
             else if (plan.Container == "mp4" && plan.VideoCodec != "copy")
                 errors.Add("Cover art in MP4 requires video stream copy.");
         }
-        if (plan.BurnSubtitle is not null || !plan.AudioOnly) errors.AddRange(VideoFilterChain.Validate(info, plan.BurnOptions));
+        if (!fromAudio && (plan.BurnSubtitle is not null || !plan.AudioOnly)) errors.AddRange(VideoFilterChain.Validate(info, plan.BurnOptions));
         return errors;
     }
 
@@ -139,6 +145,7 @@ public static class ConversionArguments
             throw new ArgumentException($"Rejected extra argument: {extra.Offender ?? extra.Problem.ToString()}", nameof(plan));
         if (WritesIntermediate(plan) && IntermediateCodecs.Find(plan.VideoCodec, plan.VideoProfile) is null)
             throw new ArgumentException($"Unsupported {plan.VideoCodec} profile: {plan.VideoProfile ?? "none"}", nameof(plan));
+        if (MakesVideoFromAudio(info, plan)) return AudioVideoArgs(info, plan, outputPath);
         var a = new List<string> { "-hide_banner", "-y" };
         var encodesVideo = !plan.AudioOnly && !plan.Gif && !plan.AnimatedImage && !plan.ImageSequenceOutput && plan.VideoCodec != "copy";
         if (encodesVideo) a.AddRange(CodecModel.DeviceArgs(plan.VideoCodec));

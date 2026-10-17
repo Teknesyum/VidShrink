@@ -1,8 +1,11 @@
-﻿namespace VidShrink.Core;
+namespace VidShrink.Core;
 
 public enum ConversionQualityMode { Crf, Bitrate }
 
 public enum ConversionNote { WebpBitrateIgnored, GifFitsTarget, FiltersReencode }
+
+/// <summary>Yalnız ses kaynağından video yazılırken görüntünün kaynağı: yok, kapak resmi ya da ses dalgası (<c>showwaves</c>).</summary>
+public enum AudioVisual { None, Cover, Waveform }
 
 public sealed record ConversionPlan
 {
@@ -164,6 +167,12 @@ public sealed record ConversionPlan
     /// GIF'in palet geçişine girmez.
     /// </summary>
     public IReadOnlyList<string> ExtraArgs { get; init; } = Array.Empty<string>();
+
+    /// <summary>
+    /// Yalnız ses kaynağında video kabı seçilince görüntü: kapak (seçilen kapak dosyası, yoksa sesin gömülü kapağı) ya da dalga biçimi.
+    /// <see cref="AudioVisual.None"/> bugünkü davranış: ses kaynağı yalnız ses kabına çevrilir. Görüntülü kaynakta okunmaz.
+    /// </summary>
+    public AudioVisual AudioVisual { get; init; }
 
     /// <summary>GIF titreme yöntemi (<c>paletteuse=dither</c>); <c>null</c> <c>sierra2_4a</c>.</summary>
     public string? GifDither { get; init; }

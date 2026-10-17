@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -420,7 +420,9 @@ internal static class LanguageCatalog
             ["The GIF dither mode is not supported."] = "main.validation.gif-dither",
             ["Cover art must be a PNG or JPEG image."] = "main.validation.cover-image",
             ["Cover art can be written only to MP4 or MKV."] = "main.validation.cover-container",
-            ["Cover art in MP4 requires video stream copy."] = "main.validation.cover-copy"
+            ["Cover art in MP4 requires video stream copy."] = "main.validation.cover-copy",
+            ["Making video from audio needs an H.264, H.265, VP9 or AV1 encoder."] = "main.validation.audio-video-codec",
+            ["The audio file has no embedded cover; pick a cover image."] = "main.validation.audio-video-cover"
         };
 
     private static readonly (Regex Pattern, string Key)[] ValidationPatternKeys =
