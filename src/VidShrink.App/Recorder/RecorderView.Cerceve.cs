@@ -17,7 +17,7 @@ internal partial class RecorderView
 
     internal PixelRect? RegionOf(RecorderRequest request) => request.Target switch
     {
-        RecorderTargetKind.AudioOnly => null,
+        RecorderTargetKind.AudioOnly or RecorderTargetKind.Device => null,
         RecorderTargetKind.Region => request.Region is { } r ? new PixelRect(r.X, r.Y, r.Width, r.Height) : null,
         RecorderTargetKind.Window => string.IsNullOrWhiteSpace(request.WindowTitle) ? null : WindowRect(request.WindowTitle),
         _ => RecorderArguments.RegionForScreen(request.Screens, request.ScreenIndex) is { } s

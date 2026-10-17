@@ -73,7 +73,7 @@ internal partial class RecorderView
 
     private void InitHedef()
     {
-        CmbTarget.ItemsSource = TargetLabels();
+        CmbTarget.ItemsSource = TargetLabels(CapturePlatform);
 
         var codecs = CodecsFor(CapturePlatform);
         CmbCodec.ItemsSource = codecs;
@@ -107,13 +107,24 @@ internal partial class RecorderView
         RefreshTargetRows();
     }
 
-    private static List<string> TargetLabels() => new[]
+    /// <summary>
+    /// Kutuda sunulan hedefler; sıra <see cref="RecorderTargetKind"/> ile aynı. Kamera ya da
+    /// yakalama kartı yalnız Windows'ta ana kaynak olur: girdisi DirectShow.
+    /// </summary>
+    internal static IReadOnlyList<RecorderTargetKind> TargetKinds(RecorderPlatform platform)
     {
-        RecorderTargetKind.Screen,
-        RecorderTargetKind.Window,
-        RecorderTargetKind.Region,
-        RecorderTargetKind.AudioOnly
-    }.Select(TargetLabel).ToList();
+        var kinds = new List<RecorderTargetKind>
+        {
+            RecorderTargetKind.Screen,
+            RecorderTargetKind.Window,
+            RecorderTargetKind.Region,
+            RecorderTargetKind.AudioOnly
+        };
+        if (platform == RecorderPlatform.Windows) kinds.Add(RecorderTargetKind.Device);
+        return kinds;
+    }
+
+    private static List<string> TargetLabels(RecorderPlatform platform) => TargetKinds(platform).Select(TargetLabel).ToList();
 
     /// <summary>
     /// Kutunun öğelerini o anki dilde yeniden üretir. Seçim indeksten korunuyor: liste sırası
@@ -121,9 +132,10 @@ internal partial class RecorderView
     /// </summary>
     private void RefreshTargetLabels()
     {
-        var selected = CmbTarget.SelectedIndex;
-        CmbTarget.ItemsSource = TargetLabels();
-        CmbTarget.SelectedIndex = selected >= 0 ? selected : (int)_settings.Target;
+        var selected = CmbTarget.SelectedIndex >= 0 ? CmbTarget.SelectedIndex : (int)_settings.Target;
+        var labels = TargetLabels(CapturePlatform);
+        CmbTarget.ItemsSource = labels;
+        CmbTarget.SelectedIndex = selected < labels.Count ? selected : 0;
     }
 
     private static string TargetLabel(RecorderTargetKind kind) => kind switch
@@ -131,6 +143,7 @@ internal partial class RecorderView
         RecorderTargetKind.Window => Say("recorder.target.window"),
         RecorderTargetKind.Region => Say("recorder.target.region"),
         RecorderTargetKind.AudioOnly => Say("recorder.target.audio"),
+        RecorderTargetKind.Device => Say("recorder.target.device"),
         _ => Say("recorder.target.screen")
     };
 
@@ -144,6 +157,7 @@ internal partial class RecorderView
         RowRegion.IsVisible = SelectedTarget == RecorderTargetKind.Region;
         RowRegionTools.IsVisible = RowRegion.IsVisible;
         RowScreen.IsVisible = SelectedTarget == RecorderTargetKind.Screen;
+        RowDevice.IsVisible = SelectedTarget == RecorderTargetKind.Device;
         if (RowWindow.IsVisible) RefreshWindowList();
     }
 
@@ -184,6 +198,7 @@ internal partial class RecorderView
 
         var target = SelectedTarget;
         var audioOnly = target == RecorderTargetKind.AudioOnly;
+        var device = target == RecorderTargetKind.Device;
         RecorderRegion? region = null;
 
         if (target == RecorderTargetKind.Region)
@@ -209,11 +224,12 @@ internal partial class RecorderView
             Region = region,
             Audio = audio,
             Webcam = audioOnly ? null : ChosenWebcam(),
+            Device = device ? ChosenDevice : null,
             Container = _settings.Container,
             AudioCodec = ChosenAudioCodec(_settings.Container),
             ScreenIndex = ScreenFor(target, region),
             Screens = Monitors(),
-            PrivacyMasks = audioOnly ? Array.Empty<RecorderRegion>() : _settings.PrivacyMasks.ToArray(),
+            PrivacyMasks = audioOnly || device ? Array.Empty<RecorderRegion>() : _settings.PrivacyMasks.ToArray(),
             Scale = _settings.Scale,
             KeyframeSeconds = _settings.KeyframeSeconds,
             Profile = string.IsNullOrWhiteSpace(_settings.Profile) ? null : _settings.Profile,
@@ -364,6 +380,7 @@ internal partial class RecorderView
         _settings.MicrophoneName = DeviceChoice(CmbMicrophone, AudioSourceRole.Microphone, _settings.MicrophoneName);
         _settings.SystemAudioName = DeviceChoice(CmbSystemAudio, AudioSourceRole.SystemAudio, _settings.SystemAudioName);
         CollectWebcam();
+        CollectDevice();
         CollectPointer();
 
         if (int.TryParse(TxtFps.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var fps)) _settings.Fps = fps;

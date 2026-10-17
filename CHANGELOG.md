@@ -9,6 +9,10 @@ ship as part of it.
 
 ### Added
 
+- Recorder: a webcam or capture card can be the main picture instead of the screen (Windows). Pick "Camera or capture
+  card" as the target and choose the device; it is read through DirectShow with the same input builder as the webcam
+  overlay. The choice is remembered and the command-line recorder follows it. Privacy masks, ddagrab and using the same
+  device as the overlay are refused.
 - Recorder: the wizard's "Game" answer now picks the screen for you. When a recording or the replay buffer
   starts, the screen target follows the foreground window (or the window right under VidShrink when VidShrink itself
   is in front), falling back to the primary screen; an HDR screen still goes through the HDR-to-SDR path. Picking a

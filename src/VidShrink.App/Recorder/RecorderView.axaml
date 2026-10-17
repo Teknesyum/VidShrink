@@ -509,6 +509,13 @@
                           HorizontalAlignment="Stretch"
                           auto:AutomationProperties.Name="{loc:Text recorder.target.screen-pick}"/>
               </StackPanel>
+
+              <StackPanel x:Name="RowDevice" IsVisible="False">
+                <SarilanMetin Text="{loc:Text recorder.target.device-pick}" Theme="{StaticResource Label}"/>
+                <ComboBox x:Name="CmbDevice"
+                          HorizontalAlignment="Stretch"
+                          auto:AutomationProperties.Name="{loc:Text recorder.target.device-pick}"/>
+              </StackPanel>
             </izi:SutunIzgara>
 
             <StackPanel x:Name="RowWindow" IsVisible="False" Spacing="{StaticResource SpaceMd}">
