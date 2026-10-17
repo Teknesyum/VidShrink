@@ -1,0 +1,60 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:auto="using:Avalonia.Automation"
+        xmlns:loc="using:VidShrink.App.Localization"
+        x:Class="VidShrink.App.Recorder.RecorderSketchTools"
+        Title="{loc:Text recorder.sketch.toolbar}"
+        FontSize="{StaticResource FontSizeMd}" FontFamily="{StaticResource FontSans}"
+        WindowDecorations="None"
+        CanResize="False" CanMaximize="False"
+        SizeToContent="WidthAndHeight"
+        ShowInTaskbar="False"
+        ShowActivated="False"
+        Topmost="True"
+        Background="Transparent"
+        TransparencyLevelHint="Transparent"
+        auto:AutomationProperties.Name="{loc:Text recorder.sketch.toolbar}">
+  <Border Theme="{StaticResource Panel}" Padding="{StaticResource RecorderRegionToolbarPadding}">
+    <StackPanel Orientation="Horizontal" Spacing="{StaticResource RecorderRegionButtonGap}">
+      <ToggleButton x:Name="BtnPen" Theme="{StaticResource EditorToolButton}"
+                    Content="{loc:Text recorder.sketch.pen}"
+                    auto:AutomationProperties.Name="{loc:Text recorder.sketch.pen}"/>
+      <ToggleButton x:Name="BtnArrow" Theme="{StaticResource EditorToolButton}"
+                    Content="{loc:Text recorder.sketch.arrow}"
+                    auto:AutomationProperties.Name="{loc:Text recorder.sketch.arrow}"/>
+      <ToggleButton x:Name="BtnBox" Theme="{StaticResource EditorToolButton}"
+                    Content="{loc:Text recorder.sketch.box}"
+                    auto:AutomationProperties.Name="{loc:Text recorder.sketch.box}"/>
+      <ToggleButton x:Name="BtnNumber" Theme="{StaticResource EditorToolButton}"
+                    Content="{loc:Text recorder.sketch.number}"
+                    auto:AutomationProperties.Name="{loc:Text recorder.sketch.number}"/>
+      <ToggleButton x:Name="BtnText" Theme="{StaticResource EditorToolButton}"
+                    Content="{loc:Text recorder.sketch.text}"
+                    auto:AutomationProperties.Name="{loc:Text recorder.sketch.text}"/>
+      <ToggleButton x:Name="BtnEmber" Theme="{StaticResource EditorToolButton}">
+        <Ellipse Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Fill="{DynamicResource NeonEmber}"/>
+      </ToggleButton>
+      <ToggleButton x:Name="BtnBlue" Theme="{StaticResource EditorToolButton}">
+        <Ellipse Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Fill="{DynamicResource NeonBlue}"/>
+      </ToggleButton>
+      <ToggleButton x:Name="BtnPink" Theme="{StaticResource EditorToolButton}">
+        <Ellipse Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Fill="{DynamicResource NeonPink}"/>
+      </ToggleButton>
+      <ToggleButton x:Name="BtnGreen" Theme="{StaticResource EditorToolButton}">
+        <Ellipse Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Fill="{DynamicResource NeonSuccess}"/>
+      </ToggleButton>
+      <Button x:Name="BtnUndo" Theme="{StaticResource GhostButton}"
+              Content="{loc:Text editor.undo}"
+              auto:AutomationProperties.Name="{loc:Text editor.undo}"/>
+      <Button x:Name="BtnClear" Theme="{StaticResource GhostButton}"
+              Content="{loc:Text recorder.sketch.clear}"
+              auto:AutomationProperties.Name="{loc:Text recorder.sketch.clear}"/>
+      <Button x:Name="BtnClose" Theme="{StaticResource GhostButton}"
+              ToolTip.Tip="{loc:Text recorder.sketch.close}"
+              auto:AutomationProperties.Name="{loc:Text recorder.sketch.close}">
+        <Path Width="{StaticResource RecorderRegionIconSize}" Height="{StaticResource RecorderRegionIconSize}"
+              Stretch="Uniform" Data="{StaticResource IconClose}" Fill="{DynamicResource TextBody}"/>
+      </Button>
+    </StackPanel>
+  </Border>
+</Window>

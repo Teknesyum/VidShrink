@@ -438,6 +438,9 @@
 - `EkranaCizimTests.cs` — ekrana çizim (`ScreenSketch`, `RecorderSketch`): iz modeli, geri alma ve numara sırası, kutu ve
   ok başı geometrisi, Ctrl+F2 varsayılanı ve yedi eylemli eski ayar, kayıtsız basış. Gerçek pencerede Windows isabet testi
   çizim kipinde pencereyi, geçiş kipinde alttakini bulur; kutu pencerenin kendi çiziminde görünür. Geçiş biçimi mutasyonu kırıyor.
+  Araç paneli (`RecorderSketchTools`): mürekkep iz başına tutulur; Windows'un `GetWindowDisplayAffinity`'si panelde
+  `WDA_EXCLUDEFROMCAPTURE`, çizimde sıfır okur; panel bölgenin dışında, seçim panelden çizime ve tuştan panele geçer, mavi kutu
+  paletin `NeonBlue`'su ile boyanır, kapat düğmesi ikisini de kapatır. Yedi mutasyonun yedisi kırıyor.
 - `BolumDuzenleyiciTests.cs` — Dönüştür'ün bölüm listesi (`ConversionChapters`, `MainWindow.DonusturBolum.cs`): kırpmaya
   göre kayma, kırpma başını içeren bölümün 0'a çekilmesi, sona sığmayanın ve 1 sn'den yakının atılması; argümanda üç hal
   (`null` dokunmaz, boş `-map_chapters -1`, dolu ffmetadata girdisi `-t`'den önce), bölüm taşımayan kapta değişmeyen komut.

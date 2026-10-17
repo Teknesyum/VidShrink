@@ -62,12 +62,15 @@ internal sealed class RecorderSketchHost : ISketchLayer
 /// <summary>
 /// later.md #42, EKB-04: kayıt bölgesini kaplayan saydam çizim penceresi. Kayda girer; kayıttan çıkarılmaz.
 /// Çizim kipinde fareyi ve klavyeyi alır: P kalem, A ok, B kutu, N numara, T yazı, Ctrl+Z geri al, Delete temizle,
-/// Esc siler ve kapatır. Kipten çıkınca çizimler ekranda kalır ve pencere tıklamayı alttaki uygulamaya geçirir;
+/// Esc siler ve kapatır. Aynı seçimler kayda girmeyen araç panelinde de durur (<see cref="RecorderSketchTools"/>); panel
+/// yalnız çizim kipinde görünür. Kipten çıkınca çizimler ekranda kalır ve pencere tıklamayı alttaki uygulamaya geçirir;
 /// bu geçiş Windows'ta pencere biçimiyle yapılır, öbür sistemlerde kipten çıkmak çizimi siler ve pencereyi kapatır.
 /// </summary>
 internal sealed partial class RecorderSketch : Window
 {
     private SketchPoint? _textAt;
+    private PixelRect _area;
+    private RecorderSketchTools? _tools;
 
     public RecorderSketch()
     {
@@ -100,7 +103,16 @@ internal sealed partial class RecorderSketch : Window
             e.Handled = true;
         };
         KeyDown += (_, e) => e.Handled = Press(e.Key, e.KeyModifiers);
+        Closed += (_, _) =>
+        {
+            var tools = _tools;
+            _tools = null;
+            tools?.Close();
+        };
     }
+
+    /// <summary>Araç paneli; ilk çizim kipinde kurulur.</summary>
+    internal RecorderSketchTools? Tools => _tools;
 
     internal ScreenSketch Sketch { get; } = new();
 
@@ -112,6 +124,7 @@ internal sealed partial class RecorderSketch : Window
 
     internal void Place(PixelRect area)
     {
+        _area = area;
         var scaling = (Screens.ScreenFromPoint(area.Center) ?? Screens.Primary)?.Scaling ?? 1;
         Position = area.Position;
         Width = area.Width / scaling;
@@ -125,6 +138,9 @@ internal sealed partial class RecorderSketch : Window
         Drawing = true;
         Cursor = new Cursor(StandardCursorType.Cross);
         SetPassThrough(false);
+        _tools ??= new RecorderSketchTools(this);
+        _tools.Show();
+        _tools.Place(_area);
         Activate();
         Focus();
     }
@@ -134,6 +150,7 @@ internal sealed partial class RecorderSketch : Window
         CommitText();
         Drawing = false;
         Cursor = Cursor.Default;
+        _tools?.Hide();
         if (!OperatingSystem.IsWindows())
         {
             Dismissed?.Invoke(this, EventArgs.Empty);
@@ -153,6 +170,7 @@ internal sealed partial class RecorderSketch : Window
             Canvas.SetLeft(Entry, point.X);
             Canvas.SetTop(Entry, point.Y);
             Entry.Text = string.Empty;
+            Entry.Foreground = Ink.Brush(Sketch.Ink);
             Entry.IsVisible = true;
             Entry.Focus();
             return;
@@ -237,7 +255,10 @@ internal sealed partial class RecorderSketch : Window
     private static extern IntPtr SetWindowLongPtrW(nint hwnd, int index, IntPtr value);
 }
 
-/// <summary>Çizimin kendisi: izler sırayla, sürmekte olan iz en üstte. Renk paletin <c>NeonEmber</c>'ı, numaranın yazısı <c>OnNeon</c>.</summary>
+/// <summary>
+/// Çizimin kendisi: izler sırayla, sürmekte olan iz en üstte. Her iz kendi mürekkebiyle: <c>NeonEmber</c>, <c>NeonBlue</c>,
+/// <c>NeonPink</c>, <c>NeonSuccess</c>; numaranın yazısı <c>OnNeon</c>.
+/// </summary>
 internal sealed class SketchCanvas : Control
 {
     internal ScreenSketch? Sketch { get; set; }
@@ -245,14 +266,24 @@ internal sealed class SketchCanvas : Control
     public override void Render(DrawingContext context)
     {
         if (Sketch is null) return;
-        var ink = Brush("NeonEmber");
-        var pen = new Pen(ink, Token("RecorderSketchStroke"), lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round);
-        foreach (var stroke in Sketch.Strokes) Draw(context, stroke, ink, pen);
-        if (Sketch.Active is { } active) Draw(context, active, ink, pen);
+        foreach (var stroke in Sketch.Strokes) Draw(context, stroke);
+        if (Sketch.Active is { } active) Draw(context, active);
     }
 
-    private void Draw(DrawingContext context, SketchStroke stroke, IBrush ink, Pen pen)
+    internal static string BrushKey(SketchInk ink) => ink switch
     {
+        SketchInk.Blue => "NeonBlue",
+        SketchInk.Pink => "NeonPink",
+        SketchInk.Green => "NeonSuccess",
+        _ => "NeonEmber"
+    };
+
+    internal IBrush Brush(SketchInk ink) => Brush(BrushKey(ink));
+
+    private void Draw(DrawingContext context, SketchStroke stroke)
+    {
+        var ink = Brush(stroke.Ink);
+        var pen = new Pen(ink, Token("RecorderSketchStroke"), lineCap: PenLineCap.Round, lineJoin: PenLineJoin.Round);
         var points = stroke.Vertices.Select(p => new Point(p.X, p.Y)).ToArray();
         switch (stroke.Tool)
         {

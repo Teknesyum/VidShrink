@@ -9,10 +9,19 @@ public enum SketchTool
     Text
 }
 
+/// <summary>Çizimin mürekkebi; uygulama her birini paletin bir rengine bağlar.</summary>
+public enum SketchInk
+{
+    Ember,
+    Blue,
+    Pink,
+    Green
+}
+
 public readonly record struct SketchPoint(double X, double Y);
 
-/// <summary>Ekrana çizilmiş tek iz. Numara izinde <see cref="Number"/>, yazı izinde <see cref="Text"/> dolu.</summary>
-public sealed record SketchStroke(SketchTool Tool, IReadOnlyList<SketchPoint> Vertices, int Number = 0, string Text = "");
+/// <summary>Ekrana çizilmiş tek iz. Numara izinde <see cref="Number"/>, yazı izinde <see cref="Text"/> dolu; <see cref="Ink"/> çizildiği andaki mürekkep.</summary>
+public sealed record SketchStroke(SketchTool Tool, IReadOnlyList<SketchPoint> Vertices, int Number = 0, string Text = "", SketchInk Ink = SketchInk.Ember);
 
 /// <summary>
 /// later.md #42, EKB-04: kayıt sürerken ekrana çizim. İzler eklendiği sırayla durur; geri alma son izi düşürür,
@@ -24,12 +33,39 @@ public sealed class ScreenSketch
     private readonly List<SketchStroke> _strokes = new();
     private List<SketchPoint>? _active;
     private SketchTool _activeTool;
+    private SketchInk _activeInk;
+    private SketchTool _tool = SketchTool.Pen;
+    private SketchInk _ink = SketchInk.Ember;
 
-    public SketchTool Tool { get; set; } = SketchTool.Pen;
+    public SketchTool Tool
+    {
+        get => _tool;
+        set
+        {
+            if (_tool == value) return;
+            _tool = value;
+            Selected?.Invoke();
+        }
+    }
+
+    /// <summary>Bundan sonra çizilecek izlerin mürekkebi; çizilmiş izler kendi mürekkebinde kalır.</summary>
+    public SketchInk Ink
+    {
+        get => _ink;
+        set
+        {
+            if (_ink == value) return;
+            _ink = value;
+            Selected?.Invoke();
+        }
+    }
+
+    /// <summary>Araç ya da mürekkep değişti; araç paneli seçimini buna göre gösterir.</summary>
+    public event Action? Selected;
 
     public IReadOnlyList<SketchStroke> Strokes => _strokes;
 
-    public SketchStroke? Active => _active is null ? null : new SketchStroke(_activeTool, _active.ToArray());
+    public SketchStroke? Active => _active is null ? null : new SketchStroke(_activeTool, _active.ToArray(), Ink: _activeInk);
 
     public int NextNumber => _strokes.Count(s => s.Tool == SketchTool.Number) + 1;
 
@@ -40,7 +76,7 @@ public sealed class ScreenSketch
         switch (Tool)
         {
             case SketchTool.Number:
-                _strokes.Add(new SketchStroke(SketchTool.Number, new[] { point }, NextNumber));
+                _strokes.Add(new SketchStroke(SketchTool.Number, new[] { point }, NextNumber, Ink: Ink));
                 Changed?.Invoke();
                 return;
             case SketchTool.Text:
@@ -48,6 +84,7 @@ public sealed class ScreenSketch
         }
 
         _activeTool = Tool;
+        _activeInk = Ink;
         _active = new List<SketchPoint> { point };
         Changed?.Invoke();
     }
@@ -77,14 +114,14 @@ public sealed class ScreenSketch
         var points = _active;
         _active = null;
         if (_activeTool == SketchTool.Pen || (points.Count == 2 && points[0] != points[1]))
-            _strokes.Add(new SketchStroke(_activeTool, points.ToArray()));
+            _strokes.Add(new SketchStroke(_activeTool, points.ToArray(), Ink: _activeInk));
         Changed?.Invoke();
     }
 
     public void AddText(SketchPoint point, string text)
     {
         if (string.IsNullOrWhiteSpace(text)) return;
-        _strokes.Add(new SketchStroke(SketchTool.Text, new[] { point }, Text: text.Trim()));
+        _strokes.Add(new SketchStroke(SketchTool.Text, new[] { point }, Text: text.Trim(), Ink: Ink));
         Changed?.Invoke();
     }
 
