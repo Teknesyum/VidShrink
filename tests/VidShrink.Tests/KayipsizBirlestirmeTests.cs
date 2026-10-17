@@ -27,6 +27,7 @@ public sealed class KayipsizBirlestirmeTests
         VideoProfile = "High",
         PixelFormat = "yuv420p",
         VideoTimeBase = "1/15360",
+        VideoExtradataHash = "CRC32:9f62cb5f",
         AudioCodec = ses ? "aac" : null,
         AudioChannels = ses ? 2 : 0,
         TotalBitrateBps = 1_000_000,
@@ -65,6 +66,7 @@ public sealed class KayipsizBirlestirmeTests
         {
             { "kodek", MergeMismatch.VideoCodec },
             { "profil", MergeMismatch.VideoProfile },
+            { "baslik-verisi", MergeMismatch.Extradata },
             { "genislik", MergeMismatch.Resolution },
             { "yukseklik", MergeMismatch.Resolution },
             { "piksel-orani", MergeMismatch.PixelAspect },
@@ -91,6 +93,7 @@ public sealed class KayipsizBirlestirmeTests
         {
             "kodek" => b with { VideoCodec = "hevc" },
             "profil" => b with { VideoProfile = "Main" },
+            "baslik-verisi" => b with { VideoExtradataHash = "CRC32:58ff8c70" },
             "genislik" => b with { Width = 322 },
             "yukseklik" => b with { Height = 238 },
             "piksel-orani" => b with { ParNum = 4, ParDen = 3 },
@@ -229,11 +232,11 @@ public sealed class KayipsizBirlestirmeTests
         return int.Parse(cikti.Trim(), CultureInfo.InvariantCulture);
     }
 
-    private static void Uret(string yol)
+    private static void Uret(string yol, int referans = 1)
         => Ffmpeg("-hide_banner", "-y",
             "-f", "lavfi", "-i", "testsrc2=s=320x240:r=30:d=1",
             "-f", "lavfi", "-i", "sine=f=440:d=1:sample_rate=48000",
-            "-c:v", "libx264", "-preset", "ultrafast", "-g", "15", "-pix_fmt", "yuv420p", "-threads", "2",
+            "-c:v", "libx264", "-preset", "ultrafast", "-g", "15", "-x264-params", $"ref={referans}", "-pix_fmt", "yuv420p", "-threads", "2",
             "-c:a", "aac", "-ac", "2", "-shortest", yol);
 
     [FfmpegFact]
@@ -254,6 +257,12 @@ public sealed class KayipsizBirlestirmeTests
             Assert.NotNull(ilk.VideoTimeBase);
             Assert.Equal(ilk.VideoTimeBase, ek.VideoTimeBase);
             Assert.Equal(MergeMismatch.None, MergeCompatibility.Check(new[] { ilk, ek }));
+
+            var farkli = Path.Combine(klasor, "c.mp4");
+            Uret(farkli, 3);
+            var baska = await FfprobeClient.ProbeAsync(farkli);
+            Assert.NotNull(baska.VideoExtradataHash);
+            Assert.Equal(MergeMismatch.Extradata, MergeCompatibility.Check(new[] { ilk, baska }));
 
             var model = EditTimeline.FromSource(EditTime.FromSeconds(ilk.DurationSeconds));
             Assert.Equal(1, model.AddSource(EditTime.FromSeconds(ek.DurationSeconds)));

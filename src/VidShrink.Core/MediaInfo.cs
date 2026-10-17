@@ -52,6 +52,9 @@ public sealed record MediaInfo
     /// <summary>ffprobe'un goruntu akisi <c>time_base</c> alani ("1/15360"); okunamazsa <c>null</c>.</summary>
     public string? VideoTimeBase { get; init; }
 
+    /// <summary>ffprobe'un goruntu akisi <c>extradata_hash</c> alani (SPS/PPS gibi baslik verisinin CRC32 ozeti); yoksa <c>null</c>.</summary>
+    public string? VideoExtradataHash { get; init; }
+
     /// <summary>ffprobe'un <c>has_b_frames</c> alani: yeniden siralama gecikmesi, kare olarak.</summary>
     public int VideoDelayFrames { get; init; }
 

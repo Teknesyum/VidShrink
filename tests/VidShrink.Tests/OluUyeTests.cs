@@ -515,6 +515,8 @@ internal readonly record struct PinnedFinding(string Member, string Shape, strin
 public sealed class OluUyeTests
 {
     private const string Legitimate = "mesru";
+    private const string MergeReason = "Kayipsiz birlestirme kararinin yeniden kodlama nedenleri. EditExport.Build yalniz Copy kolunu adiyla soruyor; kalan alti uye o kosulun else'i ve hepsi bugunku yeniden kodlama yoluna gidiyor, kullaniciya MergeForcedFull notu cikiyor. Neden ayrimi KayipsizBirlestirmeTests'te tek tek olculuyor.";
+    private const string MismatchReason = "Kayipsiz birlestirmeyi kapatan ilk fark. MergeCompatibility.Decide yalniz None mi diye soruyor; kalan uyeler o kosulun else'i, ayrimi KayipsizBirlestirmeTests.TekAlanFarkiKopyayiKapatir alan alan olcuyor.";
     private const string Debt = "borc";
 
     /// <summary>
@@ -647,7 +649,28 @@ public sealed class OluUyeTests
         new("ForeignAudioOutcome.NoCandidate", "varsayilan-kol", Legitimate,
             "Yabanci ses aramasinin 'seyrek iz yok' hali. ForeignAudioPick.Slug bes sonucu adiyla yazip '_' koluna 'no-candidate' veriyor (StreamNotes.Slug ile ayni kalip); CLI sonucu yalniz Slug uzerinden okuyor, ayri bir kol ayni degeri verirdi."),
         new("HdrCodecOutcome.Unchanged", "varsayilan-kol", Legitimate,
-            "HDR kodek gecisinin 'degismedi' hali ve varsayilani. RecorderView.CaptureNotice NoHevc ile SwitchedToHevc'i adiyla sorup kendi bildirimini veriyor; Unchanged iki kosulun da else'i, bildirim siradaki kola kalir. Ayri bir kol ayni sonucu verirdi.")
+            "HDR kodek gecisinin 'degismedi' hali ve varsayilani. RecorderView.CaptureNotice NoHevc ile SwitchedToHevc'i adiyla sorup kendi bildirimini veriyor; Unchanged iki kosulun da else'i, bildirim siradaki kola kalir. Ayri bir kol ayni sonucu verirdi."),
+        new("MergeDecision.AudioTrack", "varsayilan-kol", Legitimate, MergeReason),
+        new("MergeDecision.CutOffKeyframe", "varsayilan-kol", Legitimate, MergeReason),
+        new("MergeDecision.Edits", "varsayilan-kol", Legitimate, MergeReason),
+        new("MergeDecision.FullRequested", "varsayilan-kol", Legitimate, MergeReason),
+        new("MergeDecision.Incompatible", "varsayilan-kol", Legitimate, MergeReason),
+        new("MergeDecision.NoKeyframes", "varsayilan-kol", Legitimate, MergeReason),
+        new("MergeDecision.Settings", "varsayilan-kol", Legitimate, MergeReason),
+        new("MergeMismatch.AudioCodec", "varsayilan-kol", Legitimate, MismatchReason),
+        new("MergeMismatch.AudioPresence", "varsayilan-kol", Legitimate, MismatchReason),
+        new("MergeMismatch.Channels", "varsayilan-kol", Legitimate, MismatchReason),
+        new("MergeMismatch.Extradata", "varsayilan-kol", Legitimate, MismatchReason),
+        new("MergeMismatch.FrameRate", "varsayilan-kol", Legitimate, MismatchReason),
+        new("MergeMismatch.PixelAspect", "varsayilan-kol", Legitimate, MismatchReason),
+        new("MergeMismatch.PixelFormat", "varsayilan-kol", Legitimate, MismatchReason),
+        new("MergeMismatch.Resolution", "varsayilan-kol", Legitimate, MismatchReason),
+        new("MergeMismatch.SampleRate", "varsayilan-kol", Legitimate, MismatchReason),
+        new("MergeMismatch.StreamLayout", "varsayilan-kol", Legitimate, MismatchReason),
+        new("MergeMismatch.TimeBase", "varsayilan-kol", Legitimate, MismatchReason),
+        new("MergeMismatch.Unsupported", "varsayilan-kol", Legitimate, MismatchReason),
+        new("MergeMismatch.VideoCodec", "varsayilan-kol", Legitimate, MismatchReason),
+        new("MergeMismatch.VideoProfile", "varsayilan-kol", Legitimate, MismatchReason)
     };
 
     private readonly ITestOutputHelper _output;

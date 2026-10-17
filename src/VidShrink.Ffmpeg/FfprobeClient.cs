@@ -24,6 +24,7 @@ public static class FfprobeClient
             "-hide_banner", "-v", "error",
             "-print_format", "json",
             "-show_format", "-show_streams", "-show_chapters", "-show_programs",
+            "-show_data_hash", "CRC32",
             filePath
         };
 
@@ -108,6 +109,7 @@ public static class FfprobeClient
             VideoProfile = GetString(v, "profile"),
             VideoCodecTag = GetString(v, "codec_tag_string"),
             VideoTimeBase = GetString(v, "time_base"),
+            VideoExtradataHash = GetString(v, "extradata_hash"),
             VideoDelayFrames = GetInt(v, "has_b_frames") ?? 0,
             FormatName = GetString(format, "format_name"),
             AudioCodec = audio is null ? null : GetString(audio.Value, "codec_name"),

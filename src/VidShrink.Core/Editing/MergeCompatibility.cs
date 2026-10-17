@@ -7,6 +7,7 @@ public enum MergeMismatch
     Unsupported,
     VideoCodec,
     VideoProfile,
+    Extradata,
     Resolution,
     PixelAspect,
     PixelFormat,
@@ -33,7 +34,7 @@ public enum MergeDecision
 }
 
 /// <summary>
-/// Kayipsiz birlestirme kapisi. Butun kaynaklar ayni kodek, profil, cozunurluk, piksel orani, piksel bicimi,
+/// Kayipsiz birlestirme kapisi. Butun kaynaklar ayni kodek, profil, baslik verisi, cozunurluk, piksel orani, piksel bicimi,
 /// kare hizi, zaman tabani, ayni ses (kodek, ornekleme hizi, kanal) ve ayni akis dizilisi tasiyorsa ve cizelge yeniden kodlama
 /// istemiyorsa parcalar ffmpeg'in concat girisiyle <c>-c copy</c> kopyalanir; yoksa bugunku yeniden kodlama.
 /// Okunamayan piksel bicimi, zaman tabani ya da ornekleme hizi uyumsuz sayilir.
@@ -68,7 +69,7 @@ public static class MergeCompatibility
         if (timeline.HasText || timeline.HasEffects || timeline.HasTransitions || timeline.HasMusic || timeline.Clips.Any(EditExport.NeedsReencode))
             return MergeDecision.Edits;
         if (!settings.IsDefault) return MergeDecision.Settings;
-
+        if (audioTrack != EditAudioTrack.All && audioTrack != EditAudioTrack.First) return MergeDecision.AudioTrack;
         var used = EditExport.UsedSources(timeline);
         if (used.Any(s => !sources.ContainsKey(s))) throw new ArgumentException("Parcanin kaynagi okunmamis", nameof(sources));
         if (used.Any(s => sources[s].Keyframes.Count == 0)) return MergeDecision.NoKeyframes;
@@ -81,6 +82,7 @@ public static class MergeCompatibility
     {
         if (!Same(a.VideoCodec, b.VideoCodec)) return MergeMismatch.VideoCodec;
         if (!Same(a.VideoProfile, b.VideoProfile)) return MergeMismatch.VideoProfile;
+        if (!Same(a.VideoExtradataHash, b.VideoExtradataHash)) return MergeMismatch.Extradata;
         if (a.Width != b.Width || a.Height != b.Height) return MergeMismatch.Resolution;
         if ((long)a.ParNum * b.ParDen != (long)b.ParNum * a.ParDen) return MergeMismatch.PixelAspect;
         if (b.PixelFormat is null || !Same(a.PixelFormat, b.PixelFormat)) return MergeMismatch.PixelFormat;
