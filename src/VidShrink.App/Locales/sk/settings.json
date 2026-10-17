@@ -129,5 +129,14 @@
   "share.step.confirm": "potvrdzovania",
   "share.step.probe": "kontroly stavu",
   "share.step.delete": "mazania",
-  "share.error.token-lost": "Nemáme token na zmazanie tohto súboru, takže odkaz na {0} sa nedá zatvoriť skôr. Súbor sa zmaže, keď uplynie jeho vlastná životnosť."
+  "share.error.token-lost": "Nemáme token na zmazanie tohto súboru, takže odkaz na {0} sa nedá zatvoriť skôr. Súbor sa zmaže, keď uplynie jeho vlastná životnosť.",
+  "settings.shell-shortcuts.title": "Klávesové skratky okna",
+  "settings.shell-shortcuts.hint": "Fungujú na každej karte; kláves, ktorý používa prehrávač alebo editor, tam má prednosť.",
+  "shortcuts.shell.tab": "Otvoriť kartu {0}",
+  "shortcuts.shell.open": "Otvoriť súbor",
+  "shortcuts.shell.region-next": "Ďalšia oblasť (karty, stránka, záhlavie)",
+  "shortcuts.shell.region-prev": "Predchádzajúca oblasť",
+  "shortcuts.shell.help": "Otvoriť používateľskú príručku",
+  "settings.search.placeholder": "Hľadať v nastaveniach a skratkách",
+  "settings.search.empty": "Nič nezodpovedá „{0}“."
 }

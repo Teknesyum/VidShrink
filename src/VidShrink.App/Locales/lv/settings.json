@@ -127,5 +127,14 @@
   "share.step.confirm": "apstiprināšanas",
   "share.step.probe": "statusa pārbaudes",
   "share.step.delete": "dzēšanas",
-  "share.error.token-lost": "Mums nav šī faila dzēšanas pilnvaras, tāpēc saiti {0} vietnē nevar aizvērt agrāk. Fails tiek dzēsts, kad beidzas tā paša darbības laiks."
+  "share.error.token-lost": "Mums nav šī faila dzēšanas pilnvaras, tāpēc saiti {0} vietnē nevar aizvērt agrāk. Fails tiek dzēsts, kad beidzas tā paša darbības laiks.",
+  "settings.shell-shortcuts.title": "Loga īsinājumtaustiņi",
+  "settings.shell-shortcuts.hint": "Darbojas katrā cilnē; taustiņam, ko izmanto atskaņotājs vai redaktors, tur ir priekšroka.",
+  "shortcuts.shell.tab": "Atvērt cilni {0}",
+  "shortcuts.shell.open": "Atvērt failu",
+  "shortcuts.shell.region-next": "Nākamais apgabals (cilnes, lapa, virsrakstjosla)",
+  "shortcuts.shell.region-prev": "Iepriekšējais apgabals",
+  "shortcuts.shell.help": "Atvērt lietošanas pamācību",
+  "settings.search.placeholder": "Meklēt iestatījumos un īsinājumtaustiņos",
+  "settings.search.empty": "Nekas neatbilst “{0}”."
 }

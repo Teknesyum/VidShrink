@@ -911,5 +911,6 @@
   "main.preset.handbrake.dropped.structural": "এড়ানো হয়েছে: HandBrake তালিকার গঠন",
   "main.share.qr": "শেয়ার লিংকের QR কোড",
   "main.share.qr-hint": "লিংকটি খুলতে ফোন দিয়ে স্ক্যান করুন।",
-  "main.startup.no-display": "VidShrink কোনো গ্রাফিক্যাল ডিসপ্লে খুলতে পারেনি। এটি একটি ডেস্কটপ সেশন থেকে চালু করুন; Wayland-এ Xwayland থাকা আবশ্যক।"
+  "main.startup.no-display": "VidShrink কোনো গ্রাফিক্যাল ডিসপ্লে খুলতে পারেনি। এটি একটি ডেস্কটপ সেশন থেকে চালু করুন; Wayland-এ Xwayland থাকা আবশ্যক।",
+  "main.about.guide": "ব্যবহার নির্দেশিকা"
 }

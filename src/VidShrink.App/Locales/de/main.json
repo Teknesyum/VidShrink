@@ -911,5 +911,6 @@
   "main.preset.handbrake.dropped.structural": "Übersprungen: HandBrake-Listenstruktur",
   "main.share.qr": "QR-Code des Freigabelinks",
   "main.share.qr-hint": "Mit dem Handy scannen, um den Link zu öffnen.",
-  "main.startup.no-display": "VidShrink konnte keine grafische Anzeige öffnen. Starten Sie es aus einer Desktop-Sitzung; unter Wayland muss Xwayland verfügbar sein."
+  "main.startup.no-display": "VidShrink konnte keine grafische Anzeige öffnen. Starten Sie es aus einer Desktop-Sitzung; unter Wayland muss Xwayland verfügbar sein.",
+  "main.about.guide": "Benutzerhandbuch"
 }

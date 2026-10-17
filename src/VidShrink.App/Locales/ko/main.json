@@ -911,5 +911,6 @@
   "main.preset.handbrake.dropped.structural": "건너뜀: HandBrake 목록 구조",
   "main.share.qr": "공유 링크 QR 코드",
   "main.share.qr-hint": "휴대폰으로 스캔하면 링크가 열립니다.",
-  "main.startup.no-display": "VidShrink가 그래픽 디스플레이를 열 수 없습니다. 데스크톱 세션에서 실행하세요. Wayland에서는 Xwayland가 필요합니다."
+  "main.startup.no-display": "VidShrink가 그래픽 디스플레이를 열 수 없습니다. 데스크톱 세션에서 실행하세요. Wayland에서는 Xwayland가 필요합니다.",
+  "main.about.guide": "사용 설명서"
 }

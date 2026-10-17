@@ -127,5 +127,14 @@
   "share.step.confirm": "pengesahan",
   "share.step.probe": "pemeriksaan status",
   "share.step.delete": "pemadaman",
-  "share.error.token-lost": "Kami tidak mempunyai token padam bagi fail ini, jadi pautan di {0} tidak boleh ditutup lebih awal. Fail dipadam apabila tempoh hayatnya tamat."
+  "share.error.token-lost": "Kami tidak mempunyai token padam bagi fail ini, jadi pautan di {0} tidak boleh ditutup lebih awal. Fail dipadam apabila tempoh hayatnya tamat.",
+  "settings.shell-shortcuts.title": "Pintasan tetingkap",
+  "settings.shell-shortcuts.hint": "Berfungsi di setiap tab; kekunci yang digunakan pemain atau editor diutamakan di sana.",
+  "shortcuts.shell.tab": "Buka tab {0}",
+  "shortcuts.shell.open": "Buka fail",
+  "shortcuts.shell.region-next": "Kawasan seterusnya (tab, halaman, bar tajuk)",
+  "shortcuts.shell.region-prev": "Kawasan sebelumnya",
+  "shortcuts.shell.help": "Buka panduan pengguna",
+  "settings.search.placeholder": "Cari dalam tetapan dan pintasan",
+  "settings.search.empty": "Tiada yang sepadan dengan “{0}”."
 }

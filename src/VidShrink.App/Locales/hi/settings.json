@@ -129,5 +129,14 @@
   "share.step.confirm": "पुष्टि",
   "share.step.probe": "स्थिति जाँच",
   "share.step.delete": "हटाने",
-  "share.error.token-lost": "इस फ़ाइल का हटाने वाला टोकन हमारे पास नहीं है, इसलिए {0} पर लिंक जल्दी बंद नहीं किया जा सकता। फ़ाइल अपनी अवधि पूरी होने पर हट जाती है।"
+  "share.error.token-lost": "इस फ़ाइल का हटाने वाला टोकन हमारे पास नहीं है, इसलिए {0} पर लिंक जल्दी बंद नहीं किया जा सकता। फ़ाइल अपनी अवधि पूरी होने पर हट जाती है।",
+  "settings.shell-shortcuts.title": "विंडो शॉर्टकट",
+  "settings.shell-shortcuts.hint": "हर टैब पर काम करते हैं; प्लेयर या एडिटर जिस कुंजी का उपयोग करता है, वहाँ उसे प्राथमिकता मिलती है।",
+  "shortcuts.shell.tab": "{0} टैब खोलें",
+  "shortcuts.shell.open": "फ़ाइल खोलें",
+  "shortcuts.shell.region-next": "अगला क्षेत्र (टैब, पेज, शीर्षक पट्टी)",
+  "shortcuts.shell.region-prev": "पिछला क्षेत्र",
+  "shortcuts.shell.help": "उपयोग गाइड खोलें",
+  "settings.search.placeholder": "सेटिंग्स और शॉर्टकट में खोजें",
+  "settings.search.empty": "“{0}” से कुछ मेल नहीं खाता।"
 }

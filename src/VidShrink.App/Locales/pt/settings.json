@@ -129,5 +129,14 @@
   "share.step.confirm": "a confirmação",
   "share.step.probe": "a verificação de estado",
   "share.step.delete": "a exclusão",
-  "share.error.token-lost": "Não temos o token de exclusão deste arquivo, então o link em {0} não pode ser fechado antes da hora. O arquivo é excluído quando seu próprio tempo de vida acaba."
+  "share.error.token-lost": "Não temos o token de exclusão deste arquivo, então o link em {0} não pode ser fechado antes da hora. O arquivo é excluído quando seu próprio tempo de vida acaba.",
+  "settings.shell-shortcuts.title": "Atalhos da janela",
+  "settings.shell-shortcuts.hint": "Funcionam em todas as abas; uma tecla usada pelo player ou pelo editor tem prioridade ali.",
+  "shortcuts.shell.tab": "Abrir a aba {0}",
+  "shortcuts.shell.open": "Abrir um arquivo",
+  "shortcuts.shell.region-next": "Próxima região (abas, página, barra de título)",
+  "shortcuts.shell.region-prev": "Região anterior",
+  "shortcuts.shell.help": "Abrir o guia de uso",
+  "settings.search.placeholder": "Pesquisar configurações e atalhos",
+  "settings.search.empty": "Nada corresponde a “{0}”."
 }

@@ -218,6 +218,7 @@ public partial class MainWindow : Window
         AddHandler(DragDrop.DropEvent, OnDrop);
         TitleBar.PointerPressed += OnTitleBarPointerPressed;
         TrackBackgroundDrag();
+        TrackShellShortcuts();
         TrackWindowMode();
         TepsiyiIzle();
         TitleBrand.SizeChanged += (_, _) => AlignTabsToTitle();

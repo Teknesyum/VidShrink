@@ -129,5 +129,14 @@
   "share.step.confirm": "kinnitamise",
   "share.step.probe": "oleku kontrolli",
   "share.step.delete": "kustutamise",
-  "share.error.token-lost": "Meil pole selle faili kustutusluba, seega ei saa linki teenuses {0} varem sulgeda. Fail kustutatakse, kui selle enda eluiga läbi saab."
+  "share.error.token-lost": "Meil pole selle faili kustutusluba, seega ei saa linki teenuses {0} varem sulgeda. Fail kustutatakse, kui selle enda eluiga läbi saab.",
+  "settings.shell-shortcuts.title": "Akna kiirklahvid",
+  "settings.shell-shortcuts.hint": "Töötavad igal vahekaardil; mängija või redaktori kasutatav klahv on seal eelisjärjekorras.",
+  "shortcuts.shell.tab": "Ava vahekaart {0}",
+  "shortcuts.shell.open": "Ava fail",
+  "shortcuts.shell.region-next": "Järgmine ala (vahekaardid, leht, tiitliriba)",
+  "shortcuts.shell.region-prev": "Eelmine ala",
+  "shortcuts.shell.help": "Ava kasutusjuhend",
+  "settings.search.placeholder": "Otsi seadetest ja kiirklahvidest",
+  "settings.search.empty": "Midagi ei vasta otsingule „{0}“."
 }

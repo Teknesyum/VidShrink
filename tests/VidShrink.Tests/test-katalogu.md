@@ -458,3 +458,13 @@
   simgesi görünür; tıklama küçültmeden önceki hale döndürür ve simgeyi kaldırır. Kapalıyken küçültme bugünkü gibi.
   İpucu iş ve kuyruk yüzdesini sırayla yazar; ayar gidip döner, eski dosya kapalı okunur. Tepsiye gönderme çağrısını
   kaldırmak 1/9 kırmızı. Gerçek tepsi simgesi açılmaz; dosyalar `TestPaths.OutputRoot/tepsiye-kucultme` altında, test siler.
+- `KabukKisayolTests.cs` — pencere kısayolları (`ShellKeymap`, `MainWindow.KabukKisayol.cs`) ve ayar araması
+  (`SettingsSearch`, `ShortcutTable.Filter`): Ctrl+1..6 sekme, Ctrl+O, Ctrl+F6/Ctrl+Shift+F6, F1 komutlara iner, düz F6
+  ve düz rakam inmez; kabuk varsayılanları oynatıcı, düzenleyici ve kaydedici (F6 bölüm) tuşlarıyla çakışmaz; kabuk
+  ataması takım içinde tuşu alır, `shell` olarak yazılıp geri okunur; pencereye basılan tuş sekme seçer, işlenmiş tuşa
+  dokunulmaz; fare düğmesine atanan komut çalışır; Ctrl+O Ayarlar'da Küçült'e geçip çoklu, Oynatıcı'da tekli seçici açar
+  (`SourcePicker` dikişi); F1 dile ve sekmeye göre belge adresini `DisAcici` dikişine verir (tarayıcı açılmaz), çapa
+  başlıkları belgede var; bölge geçişi odağı sekme, sayfa ve başlık çubuğu arasında dolaştırır; arama eşleşmeyen kartı
+  gizler, kısayol kartını açıp satırı süzer, temizleyince kartları ve açıklığı geri verir; tablo tuş metnine göre de
+  süzülür. Kısayol dosyası `.calisma/kabuk-kisayol/` altında (`ShortcutBindings.UseFile`). 16 python mutasyonunun 16'sı
+  kırmızı.

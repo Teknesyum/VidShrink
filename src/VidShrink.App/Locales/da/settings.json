@@ -127,5 +127,14 @@
   "share.step.confirm": "bekræftelsen",
   "share.step.probe": "statustjekket",
   "share.step.delete": "sletningen",
-  "share.error.token-lost": "Vi har ikke denne fils sletningstoken, så linket kan ikke lukkes før tid på {0}. Filen slettes, når dens egen levetid udløber."
+  "share.error.token-lost": "Vi har ikke denne fils sletningstoken, så linket kan ikke lukkes før tid på {0}. Filen slettes, når dens egen levetid udløber.",
+  "settings.shell-shortcuts.title": "Vinduesgenveje",
+  "settings.shell-shortcuts.hint": "Virker på alle faner; en tast, som afspilleren eller editoren bruger, har forrang der.",
+  "shortcuts.shell.tab": "Åbn fanen {0}",
+  "shortcuts.shell.open": "Åbn en fil",
+  "shortcuts.shell.region-next": "Næste område (faner, side, titellinje)",
+  "shortcuts.shell.region-prev": "Forrige område",
+  "shortcuts.shell.help": "Åbn brugervejledningen",
+  "settings.search.placeholder": "Søg i indstillinger og genveje",
+  "settings.search.empty": "Intet matcher “{0}”."
 }

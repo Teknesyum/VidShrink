@@ -9,6 +9,15 @@ using VidShrink.App.Localization;
 
 namespace VidShrink.App.Playback;
 
+internal interface IShortcutCard
+{
+    ShortcutTable Table { get; }
+
+    string Heading { get; }
+
+    bool IsOpen { get; set; }
+}
+
 /// <summary>
 /// Oynatıcı ve düzenleyici kısayol panellerinin ortak tablosu: tuş kutusu, açıklama, çakışma
 /// bildirimi ve varsayılana dönüş. Tekerlek satırları değiştirilemez, düz metin kalır.
@@ -19,6 +28,7 @@ internal sealed class ShortcutTable
     private readonly TextBlock _notice;
     private readonly ShortcutMap _map;
     private readonly Func<string, ControlTheme?> _find;
+    private string _filter = "";
 
     internal ShortcutTable(Grid rows, TextBlock notice, ShortcutMap map, Func<string, ControlTheme?> find)
     {
@@ -41,6 +51,26 @@ internal sealed class ShortcutTable
     }
 
     internal IEnumerable<ShortcutKeyButton> Buttons => _rows.Children.OfType<ShortcutKeyButton>();
+
+    internal string Filter
+    {
+        get => _filter;
+        set
+        {
+            var next = (value ?? "").Trim();
+            if (next == _filter) return;
+            _filter = next;
+            Build();
+        }
+    }
+
+    internal int Matches(string query)
+        => ShortcutBindings.Slots(_map).Count(slot => Fits(slot, query.Trim()));
+
+    private static bool Fits(ShortcutSlot slot, string query)
+        => query.Length == 0
+           || SettingsSearch.Matches(slot.Label, query)
+           || SettingsSearch.Matches(ShortcutKeyButton.Display(slot.Current), query);
 
     internal string Notice
     {
@@ -73,6 +103,7 @@ internal sealed class ShortcutTable
         var index = 0;
         foreach (var slot in ShortcutBindings.Slots(_map))
         {
+            if (!Fits(slot, _filter)) continue;
             _rows.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
 
             Control gesture;

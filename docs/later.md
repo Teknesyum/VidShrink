@@ -80,14 +80,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Plan: Sonuç paneline Kopyala ve GIF düğmeleri eklenir; kopyalama bitiş eylemindeki yolu, GIF oynatıcıdaki palet süzgecini kullanır (ClipExport.cs:55-63). Paylaş satırına hedef ve süre kutusu ile Sil düğmesi gelir; Küçült sekmesindeki parçalar örnek alınır (MainWindow.axaml.cs:2593-2613, :2769-2785). Bitiş eylemlerine "küçült, yükle, bağlantıyı kopyala" eklenir ve kayıt adı Küçült'teki ad deseninden kurulur; desene pencere adı ve sıra numarası yer tutucusu eklenir. Yükleme sahte sağlayıcıyla, ağa çıkmadan ölçülür (`DuzenleKaydetPaylasTests` düzeni).
 - Durum (18 Ekim 2026, `yan/sonuc-paneli`): EKB-22 Kopyala, EKB-23 GIF'e çevir (640 px) ve EKB-26 ad deseni (`{damga}` `{tarih}` `{saat}` `{pencere}` `{sayac}`, CLI da okur) yapıldı. Açık: EKB-27 Paylaş satırında hedef, süre ve Sil; EKB-33 "küçült, yükle, bağlantıyı kopyala" zinciri. İkisi de sahte sağlayıcıyla ölçülecek.
 
-## 77. Kabuk Kısayolları Ve Ayar Araması
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · AYR-P6 · Ayarlar Ve Kabuk · iş orta · öncelik 2 · karar gerekmez
-
-- Satırlar (AYR-P6): AYR-08 Ayarlarda Arama; AYR-18 Ana Pencere Kısayolları; AYR-26 Yardım Girişi; AYR-33 Bölgeler Arası Geçiş Tuşu; AYR-43 Kısayol Tablosunda Arama. [Tablo](piyasa/2026-10-13/ayarlar-kabuk-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Playback/ShortcutBindings.cs, src/VidShrink.App/Playback/ShortcutTable.cs, src/VidShrink.App/MainWindow.PencereKipi.cs, src/VidShrink.App/MainWindow.axaml
-- Plan: Kısayol eşlemesine oynatıcı ve düzenleyicinin yanına bir kabuk takımı eklenir: sekmeler arası geçiş, Ayarlar, dosya açma, bölgeler arası geçiş ve kullanım belgesini açan yardım tuşu; hepsi aynı düzenlenebilir tabloda görünür. Ayarlar sayfasına ve kısayol tablosuna aynı süzme kutusu konur. Bölge geçişinin varsayılan tuşu F6 olamaz, çünkü kaydedici onu bölüm işareti için tutuyor. Doğrulama: tuş eşleme ve çakışma testleri ile süzme kutusu için kart görünürlüğü testi.
-
 ## 78. Erişilebilirlik Denemesi
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · AYR-P7 · Ayarlar Ve Kabuk · iş orta · öncelik 2 · karar gerekmez

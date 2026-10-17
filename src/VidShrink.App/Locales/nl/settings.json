@@ -129,5 +129,14 @@
   "share.step.confirm": "de bevestiging",
   "share.step.probe": "de statuscontrole",
   "share.step.delete": "het verwijderen",
-  "share.error.token-lost": "Wij hebben het verwijdertoken van dit bestand niet, dus de link kan op {0} niet vroegtijdig worden gesloten. Het bestand wordt verwijderd wanneer zijn eigen levensduur afloopt."
+  "share.error.token-lost": "Wij hebben het verwijdertoken van dit bestand niet, dus de link kan op {0} niet vroegtijdig worden gesloten. Het bestand wordt verwijderd wanneer zijn eigen levensduur afloopt.",
+  "settings.shell-shortcuts.title": "Venstersneltoetsen",
+  "settings.shell-shortcuts.hint": "Werken op elk tabblad; een toets die de speler of editor gebruikt, gaat daar voor.",
+  "shortcuts.shell.tab": "Tabblad {0} openen",
+  "shortcuts.shell.open": "Bestand openen",
+  "shortcuts.shell.region-next": "Volgend gebied (tabbladen, pagina, titelbalk)",
+  "shortcuts.shell.region-prev": "Vorig gebied",
+  "shortcuts.shell.help": "Gebruikershandleiding openen",
+  "settings.search.placeholder": "Zoeken in instellingen en sneltoetsen",
+  "settings.search.empty": "Niets komt overeen met ‘{0}’."
 }

@@ -911,5 +911,6 @@
   "main.preset.handbrake.dropped.structural": "Ohitettu: HandBraken luettelorakenne",
   "main.share.qr": "Jakolinkin QR-koodi",
   "main.share.qr-hint": "Avaa linkki skannaamalla koodi puhelimella.",
-  "main.startup.no-display": "VidShrink ei voinut avata graafista näyttöä. Käynnistä se työpöytäistunnosta; Waylandissa Xwaylandin on oltava käytettävissä."
+  "main.startup.no-display": "VidShrink ei voinut avata graafista näyttöä. Käynnistä se työpöytäistunnosta; Waylandissa Xwaylandin on oltava käytettävissä.",
+  "main.about.guide": "Käyttöopas"
 }

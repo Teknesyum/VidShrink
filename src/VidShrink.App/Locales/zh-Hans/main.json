@@ -911,5 +911,6 @@
   "main.preset.handbrake.dropped.structural": "已跳过：HandBrake 列表结构",
   "main.share.qr": "分享链接的二维码",
   "main.share.qr-hint": "用手机扫描即可打开链接。",
-  "main.startup.no-display": "VidShrink 无法打开图形显示。请从桌面会话中启动；在 Wayland 下需要 Xwayland。"
+  "main.startup.no-display": "VidShrink 无法打开图形显示。请从桌面会话中启动；在 Wayland 下需要 Xwayland。",
+  "main.about.guide": "使用指南"
 }

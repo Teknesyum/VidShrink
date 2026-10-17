@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:auto="using:Avalonia.Automation"
+             xmlns:loc="using:VidShrink.App.Localization"
+             x:Class="VidShrink.App.Playback.ShellShortcutsPanel">
+  <Border x:Name="Root" Theme="{StaticResource Panel}" Classes="enter">
+    <Border.Transitions>
+      <Transitions>
+        <DoubleTransition Property="Opacity" Duration="{StaticResource MotionBase}" Easing="CubicEaseOut"/>
+        <TransformOperationsTransition Property="RenderTransform" Duration="{StaticResource MotionBase}" Easing="CubicEaseOut"/>
+      </Transitions>
+    </Border.Transitions>
+    <StackPanel Spacing="{StaticResource SpaceMd}">
+      <Button x:Name="BtnToggle"
+              Click="OnToggle"
+              Theme="{StaticResource PanelHeaderToggle}"
+              auto:AutomationProperties.Name="{loc:Text settings.shell-shortcuts.title}">
+        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="{StaticResource SpaceSm}">
+          <Path x:Name="Glyph" Classes="chevron open" Width="{StaticResource IconSizeSm}" Height="{StaticResource IconSizeSm}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}" VerticalAlignment="Center"/>
+          <SarilanMetin Grid.Column="1" Text="{loc:Text settings.shell-shortcuts.title}" Theme="{StaticResource H2}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+        </Grid>
+      </Button>
+      <StackPanel x:Name="Body" Classes="disclose" Spacing="{StaticResource SpaceMd}">
+        <SarilanMetin Text="{loc:Text settings.shell-shortcuts.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+        <Button x:Name="BtnReset" Theme="{StaticResource GhostButton}" HorizontalAlignment="Left" Content="{loc:Text shortcuts.reset}" Click="OnReset"/>
+        <SarilanMetin x:Name="TxtNotice" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+        <Grid x:Name="Rows"
+              ColumnDefinitions="Auto,*"
+              ColumnSpacing="{StaticResource SpaceMd}"
+              RowSpacing="{StaticResource SpaceXs}"/>
+      </StackPanel>
+    </StackPanel>
+  </Border>
+</UserControl>

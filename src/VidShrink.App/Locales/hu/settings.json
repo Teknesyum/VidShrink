@@ -129,5 +129,14 @@
   "share.step.confirm": "a megerősítés",
   "share.step.probe": "az állapot-ellenőrzés",
   "share.step.delete": "a törlés",
-  "share.error.token-lost": "Nincs meg ennek a fájlnak a törlési tokenje, így a hivatkozás a {0} szolgáltatásban nem zárható le korábban. A fájl a saját élettartama leteltével törlődik."
+  "share.error.token-lost": "Nincs meg ennek a fájlnak a törlési tokenje, így a hivatkozás a {0} szolgáltatásban nem zárható le korábban. A fájl a saját élettartama leteltével törlődik.",
+  "settings.shell-shortcuts.title": "Ablak billentyűparancsai",
+  "settings.shell-shortcuts.hint": "Minden lapon működnek; a lejátszó vagy a szerkesztő által használt billentyű ott elsőbbséget élvez.",
+  "shortcuts.shell.tab": "A(z) {0} lap megnyitása",
+  "shortcuts.shell.open": "Fájl megnyitása",
+  "shortcuts.shell.region-next": "Következő terület (lapok, oldal, címsor)",
+  "shortcuts.shell.region-prev": "Előző terület",
+  "shortcuts.shell.help": "Felhasználói útmutató megnyitása",
+  "settings.search.placeholder": "Keresés a beállításokban és a billentyűparancsokban",
+  "settings.search.empty": "Semmi nem egyezik ezzel: „{0}”."
 }

@@ -129,5 +129,14 @@
   "share.step.confirm": "потврђивања",
   "share.step.probe": "провере стања",
   "share.step.delete": "брисања",
-  "share.error.token-lost": "Немамо жетон за брисање ове датотеке, па се веза на {0} не може затворити раније. Датотека се брише када истекне њен сопствени век."
+  "share.error.token-lost": "Немамо жетон за брисање ове датотеке, па се веза на {0} не може затворити раније. Датотека се брише када истекне њен сопствени век.",
+  "settings.shell-shortcuts.title": "Пречице прозора",
+  "settings.shell-shortcuts.hint": "Раде на свакој картици; тастер који користи плејер или уређивач тамо има предност.",
+  "shortcuts.shell.tab": "Отвори картицу {0}",
+  "shortcuts.shell.open": "Отвори датотеку",
+  "shortcuts.shell.region-next": "Следећа област (картице, страница, насловна трака)",
+  "shortcuts.shell.region-prev": "Претходна област",
+  "shortcuts.shell.help": "Отвори упутство за употребу",
+  "settings.search.placeholder": "Претражи подешавања и пречице",
+  "settings.search.empty": "Ништа не одговара „{0}”."
 }

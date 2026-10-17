@@ -127,5 +127,14 @@
   "share.step.confirm": "la conferma",
   "share.step.probe": "il controllo dello stato",
   "share.step.delete": "l'eliminazione",
-  "share.error.token-lost": "Non abbiamo il token di eliminazione di questo file, quindi il collegamento su {0} non può essere chiuso in anticipo. Il file viene eliminato allo scadere della sua durata."
+  "share.error.token-lost": "Non abbiamo il token di eliminazione di questo file, quindi il collegamento su {0} non può essere chiuso in anticipo. Il file viene eliminato allo scadere della sua durata.",
+  "settings.shell-shortcuts.title": "Scorciatoie della finestra",
+  "settings.shell-shortcuts.hint": "Valgono in ogni scheda; un tasto usato dal lettore o dall’editor lì ha la precedenza.",
+  "shortcuts.shell.tab": "Apri la scheda {0}",
+  "shortcuts.shell.open": "Apri un file",
+  "shortcuts.shell.region-next": "Area successiva (schede, pagina, barra del titolo)",
+  "shortcuts.shell.region-prev": "Area precedente",
+  "shortcuts.shell.help": "Apri la guida d’uso",
+  "settings.search.placeholder": "Cerca nelle impostazioni e nelle scorciatoie",
+  "settings.search.empty": "Nessun risultato per «{0}»."
 }

@@ -911,5 +911,6 @@
   "main.preset.handbrake.dropped.structural": "Kihagyva: HandBrake listaszerkezet",
   "main.share.qr": "A megosztási hivatkozás QR-kódja",
   "main.share.qr-hint": "Olvassa be a telefonjával a hivatkozás megnyitásához.",
-  "main.startup.no-display": "A VidShrink nem tudott grafikus kijelzőt megnyitni. Indítsa asztali munkamenetből; Waylanden az Xwaylandnek elérhetőnek kell lennie."
+  "main.startup.no-display": "A VidShrink nem tudott grafikus kijelzőt megnyitni. Indítsa asztali munkamenetből; Waylanden az Xwaylandnek elérhetőnek kell lennie.",
+  "main.about.guide": "Felhasználói útmutató"
 }

@@ -127,5 +127,14 @@
   "share.step.confirm": "bekreftelsen",
   "share.step.probe": "statussjekken",
   "share.step.delete": "slettingen",
-  "share.error.token-lost": "Vi har ikke slettenøkkelen til denne filen, så lenken kan ikke stenges tidlig hos {0}. Filen slettes når dens egen levetid er ute."
+  "share.error.token-lost": "Vi har ikke slettenøkkelen til denne filen, så lenken kan ikke stenges tidlig hos {0}. Filen slettes når dens egen levetid er ute.",
+  "settings.shell-shortcuts.title": "Vindussnarveier",
+  "settings.shell-shortcuts.hint": "Virker på alle faner; en tast som spilleren eller redigeringsprogrammet bruker, har forrang der.",
+  "shortcuts.shell.tab": "Åpne fanen {0}",
+  "shortcuts.shell.open": "Åpne en fil",
+  "shortcuts.shell.region-next": "Neste område (faner, side, tittellinje)",
+  "shortcuts.shell.region-prev": "Forrige område",
+  "shortcuts.shell.help": "Åpne brukerveiledningen",
+  "settings.search.placeholder": "Søk i innstillinger og snarveier",
+  "settings.search.empty": "Ingenting samsvarer med «{0}»."
 }

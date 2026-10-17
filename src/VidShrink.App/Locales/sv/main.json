@@ -911,5 +911,6 @@
   "main.preset.handbrake.dropped.structural": "Hoppades över: HandBrakes liststruktur",
   "main.share.qr": "QR-kod för delningslänken",
   "main.share.qr-hint": "Skanna med telefonen för att öppna länken.",
-  "main.startup.no-display": "VidShrink kunde inte öppna en grafisk skärm. Starta programmet från en skrivbordssession; under Wayland måste Xwayland finnas."
+  "main.startup.no-display": "VidShrink kunde inte öppna en grafisk skärm. Starta programmet från en skrivbordssession; under Wayland måste Xwayland finnas.",
+  "main.about.guide": "Användarguide"
 }

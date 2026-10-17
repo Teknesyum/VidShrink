@@ -127,5 +127,14 @@
   "share.step.confirm": "bekräftelsen",
   "share.step.probe": "statuskontrollen",
   "share.step.delete": "raderingen",
-  "share.error.token-lost": "Vi har inte den här filens raderingstoken, så länken kan inte stängas i förtid på {0}. Filen raderas när dess egen livslängd tar slut."
+  "share.error.token-lost": "Vi har inte den här filens raderingstoken, så länken kan inte stängas i förtid på {0}. Filen raderas när dess egen livslängd tar slut.",
+  "settings.shell-shortcuts.title": "Fönstergenvägar",
+  "settings.shell-shortcuts.hint": "Fungerar på varje flik; en tangent som spelaren eller redigeraren använder går före där.",
+  "shortcuts.shell.tab": "Öppna fliken {0}",
+  "shortcuts.shell.open": "Öppna en fil",
+  "shortcuts.shell.region-next": "Nästa område (flikar, sida, namnlist)",
+  "shortcuts.shell.region-prev": "Föregående område",
+  "shortcuts.shell.help": "Öppna användarguiden",
+  "settings.search.placeholder": "Sök i inställningar och genvägar",
+  "settings.search.empty": "Inget matchar ”{0}”."
 }

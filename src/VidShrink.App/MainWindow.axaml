@@ -1930,6 +1930,15 @@
         </TabItem>
 
         <TabItem Header="{loc:Text main.tab.settings}" izi:AcilisIsareti.Ad="xaml-ayarlar" x:Name="TabSettings" Tag="{StaticResource IconSettings}" Theme="{StaticResource NeonTabItem}">
+          <DockPanel x:Name="SettingsPage">
+          <StackPanel x:Name="SettingsSearchRow" DockPanel.Dock="Top" Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceSm}">
+            <TextBox x:Name="TxtSettingsSearch"
+                     HorizontalAlignment="Left"
+                     Width="{StaticResource TipMaxWidth}"
+                     PlaceholderText="{loc:Text settings.search.placeholder}"
+                     auto:AutomationProperties.Name="{loc:Text settings.search.placeholder}"/>
+            <SarilanMetin x:Name="TxtSettingsSearchEmpty" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
+          </StackPanel>
           <ScrollViewer x:Name="PageSettings" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <!--
               Kart duvarı: sütun sayısı genişlikten. Tek sütunlu yığında ayarlar 1080p ekranda beş
@@ -2246,6 +2255,8 @@
 
               <playback:PlayerShortcutsPanel x:Name="PlayerShortcutsPanel" izi:KartDuvari.Sutun="3" IsOpen="False"/>
 
+              <playback:ShellShortcutsPanel x:Name="ShellShortcutsPanel" izi:KartDuvari.Sutun="1" IsOpen="False"/>
+
               <Border x:Name="AboutPanel" izi:KartDuvari.Sutun="3" Theme="{StaticResource Panel}">
                 <StackPanel Spacing="{StaticResource SpaceMd}">
                   <Button x:Name="BtnAboutToggle"
@@ -2259,6 +2270,7 @@
                   </Button>
                   <StackPanel x:Name="AboutBody" Classes="disclose" IsVisible="False" Spacing="{StaticResource SpaceMd}">
                     <WrapPanel x:Name="AboutLinks" ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceXs}">
+                      <Button x:Name="BtnUserGuide" Theme="{StaticResource LinkButton}" Content="{loc:Text main.about.guide}" Click="OnOpenUserGuide"/>
                       <Button x:Name="BtnReleaseNotes" Theme="{StaticResource LinkButton}" Content="{loc:Text main.about.notes}" Click="OnOpenReleaseNotes"/>
                       <Button x:Name="BtnLicenses" Theme="{StaticResource LinkButton}" Content="{loc:Text main.about.licenses}" Click="OnOpenLicenses"/>
                       <Button x:Name="BtnPrivacy" Theme="{StaticResource LinkButton}" Content="{loc:Text main.about.privacy}" Click="OnOpenPrivacy"/>
@@ -2365,6 +2377,7 @@
 
             </izi:KartDuvari>
           </ScrollViewer>
+          </DockPanel>
         </TabItem>
 
 

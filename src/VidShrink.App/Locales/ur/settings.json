@@ -127,5 +127,14 @@
   "share.step.confirm": "تصدیق",
   "share.step.probe": "حالت کی جانچ",
   "share.step.delete": "حذف",
-  "share.error.token-lost": "اس فائل کا حذف کرنے والا ٹوکن ہمارے پاس نہیں ہے، اس لیے {0} پر لنک وقت سے پہلے بند نہیں کیا جا سکتا۔ فائل اپنی مدت پوری ہونے پر حذف ہو جاتی ہے۔"
+  "share.error.token-lost": "اس فائل کا حذف کرنے والا ٹوکن ہمارے پاس نہیں ہے، اس لیے {0} پر لنک وقت سے پہلے بند نہیں کیا جا سکتا۔ فائل اپنی مدت پوری ہونے پر حذف ہو جاتی ہے۔",
+  "settings.shell-shortcuts.title": "ونڈو کے شارٹ کٹ",
+  "settings.shell-shortcuts.hint": "ہر ٹیب پر کام کرتے ہیں؛ پلیئر یا ایڈیٹر جو کلید استعمال کرے، وہاں اسے ترجیح ملتی ہے۔",
+  "shortcuts.shell.tab": "{0} ٹیب کھولیں",
+  "shortcuts.shell.open": "فائل کھولیں",
+  "shortcuts.shell.region-next": "اگلا حصہ (ٹیبز، صفحہ، عنوان بار)",
+  "shortcuts.shell.region-prev": "پچھلا حصہ",
+  "shortcuts.shell.help": "استعمال کی رہنمائی کھولیں",
+  "settings.search.placeholder": "ترتیبات اور شارٹ کٹ میں تلاش کریں",
+  "settings.search.empty": "“{0}” سے کچھ میل نہیں کھاتا۔"
 }

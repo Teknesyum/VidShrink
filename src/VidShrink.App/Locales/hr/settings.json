@@ -129,5 +129,14 @@
   "share.step.confirm": "potvrde",
   "share.step.probe": "provjere stanja",
   "share.step.delete": "brisanja",
-  "share.error.token-lost": "Nemamo token za brisanje ove datoteke, pa se veza na {0} ne može zatvoriti ranije. Datoteka se briše kad joj istekne vlastiti vijek."
+  "share.error.token-lost": "Nemamo token za brisanje ove datoteke, pa se veza na {0} ne može zatvoriti ranije. Datoteka se briše kad joj istekne vlastiti vijek.",
+  "settings.shell-shortcuts.title": "Prečaci prozora",
+  "settings.shell-shortcuts.hint": "Rade na svakoj kartici; tipka koju koristi reproduktor ili uređivač ondje ima prednost.",
+  "shortcuts.shell.tab": "Otvori karticu {0}",
+  "shortcuts.shell.open": "Otvori datoteku",
+  "shortcuts.shell.region-next": "Sljedeće područje (kartice, stranica, naslovna traka)",
+  "shortcuts.shell.region-prev": "Prethodno područje",
+  "shortcuts.shell.help": "Otvori upute za korištenje",
+  "settings.search.placeholder": "Pretraži postavke i prečace",
+  "settings.search.empty": "Ništa ne odgovara „{0}”."
 }

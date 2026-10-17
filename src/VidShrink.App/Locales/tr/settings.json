@@ -127,5 +127,14 @@
   "share.step.confirm": "onaylama",
   "share.step.probe": "yoklama",
   "share.step.delete": "silme",
-  "share.error.token-lost": "Bu dosyanın silme jetonu elimizde yok; {0} üzerinde yayın erken kapatılamaz. Dosya kendi ömrü dolunca silinecek."
+  "share.error.token-lost": "Bu dosyanın silme jetonu elimizde yok; {0} üzerinde yayın erken kapatılamaz. Dosya kendi ömrü dolunca silinecek.",
+  "settings.shell-shortcuts.title": "Pencere kısayolları",
+  "settings.shell-shortcuts.hint": "Her sekmede çalışır; oynatıcının ya da düzenleyicinin kullandığı tuş orada önceliklidir.",
+  "shortcuts.shell.tab": "{0} sekmesini aç",
+  "shortcuts.shell.open": "Dosya aç",
+  "shortcuts.shell.region-next": "Sonraki bölge (sekmeler, sayfa, başlık çubuğu)",
+  "shortcuts.shell.region-prev": "Önceki bölge",
+  "shortcuts.shell.help": "Kullanım belgesini aç",
+  "settings.search.placeholder": "Ayarlarda ve kısayollarda ara",
+  "settings.search.empty": "“{0}” ile eşleşen ayar yok."
 }
