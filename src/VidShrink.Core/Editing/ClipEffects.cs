@@ -1,4 +1,4 @@
-﻿namespace VidShrink.Core.Editing;
+namespace VidShrink.Core.Editing;
 
 /// <summary>
 /// Klibin kaynak ustune uygulanan ayarlari: kaynak koordinatinda kesirli kirpma, saat yonunde
@@ -20,6 +20,8 @@ public sealed record ClipEffects
     public const double MaxEqDb = 12;
     public const string DefaultPadColor = "000000";
     public const double MaxFitRatio = 4;
+    public const int MinLutMix = 0;
+    public const int MaxLutMix = 100;
 
     public static ClipEffects None { get; } = new();
 
@@ -77,6 +79,12 @@ public sealed record ClipEffects
 
     public string PadColor { get; init; } = DefaultPadColor;
 
+    public string? Lut { get; init; }
+
+    public int LutMix { get; init; } = MaxLutMix;
+
+    public bool HasLut => Lut is { Length: > 0 } && LutMix > MinLutMix;
+
     public bool HasFit => FitNum > 0 && FitDen > 0;
 
     public bool HasEqualizer => BassDb != 0 || MidDb != 0 || TrebleDb != 0;
@@ -89,9 +97,9 @@ public sealed record ClipEffects
 
     public bool HasAudio => Muted || VolumeDb != 0 || HasCleanup;
 
-    public bool HasColor => Brightness != 0 || Contrast != 1 || Saturation != 1 || Temperature != NeutralTemperature;
+    public bool HasColor => Brightness != 0 || Contrast != 1 || Saturation != 1 || Temperature != NeutralTemperature || HasLut;
 
-    public bool IsNeutral => !HasGeometry && !HasAudio && !HasColor && FadeIn == 0 && FadeOut == 0;
+    public bool IsNeutral => !HasGeometry && !HasAudio && !HasColor && Lut is null && FadeIn == 0 && FadeOut == 0;
 
     /// <summary>Degerleri gecerli araliga ceker: kirpma kenarlari toplamda karenin %95'ini asmaz, aci 90'in katina iner,
     /// renk alanlari araliga kirpilip iki ondaliga yuvarlanir; sayi olmayan renk degeri notre doner. Ekolayzir bantlari
@@ -124,6 +132,8 @@ public sealed record ClipEffects
             BassDb = Band(BassDb),
             MidDb = Band(MidDb),
             TrebleDb = Band(TrebleDb),
+            Lut = string.IsNullOrWhiteSpace(Lut) ? null : Lut.Trim(),
+            LutMix = Math.Clamp(LutMix, MinLutMix, MaxLutMix),
         };
     }
 

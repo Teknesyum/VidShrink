@@ -82,6 +82,8 @@ public sealed class EditProject
     /// <summary>Muzik izi (<see cref="EditMusic"/>). Yoksa dosyaya yazilmaz; alani olmayan proje muziksiz acilir.</summary>
     public EditMusic? Music { get; }
 
+    public IReadOnlyList<string> MissingLuts { get; private init; } = Array.Empty<string>();
+
     /// <summary>
     /// <paramref name="extraSources"/> cizelgenin ek kaynaklariyla ayni sirada ve ayni sayida olmalidir.
     /// </summary>
@@ -201,7 +203,9 @@ public sealed class EditProject
         return Utf8.GetString(stream.ToArray());
     }
 
-    public static EditProject? Parse(string? json)
+    public static EditProject? Parse(string? json) => Parse(json, null);
+
+    public static EditProject? Parse(string? json, string? folder)
     {
         if (string.IsNullOrWhiteSpace(json)) return null;
         try
@@ -217,7 +221,8 @@ public sealed class EditProject
             var stamp = new SourceStamp(path, source.GetProperty("size").GetInt64(), source.GetProperty("modifiedUtcTicks").GetInt64());
 
             var duration = root.GetProperty("sourceDuration").GetInt64();
-            var clips = root.GetProperty("clips").EnumerateArray().Select(ReadClip).ToArray();
+            var missing = new List<string>();
+            var clips = root.GetProperty("clips").EnumerateArray().Select(ReadClip).Select(c => WithLut(c, folder, missing)).ToArray();
             var texts = root.TryGetProperty("texts", out var layers) ? layers.EnumerateArray().Select(ReadText).ToArray() : Array.Empty<TextLayer>();
             var mode = root.TryGetProperty("exportMode", out var value) && value.ValueKind == JsonValueKind.String ? value.GetString() : null;
 
@@ -234,7 +239,7 @@ public sealed class EditProject
                 ? new EditMusic(tune.GetProperty("path").GetString() ?? "", tune.GetProperty("duration").GetInt64(),
                     tune.TryGetProperty("start", out var at) ? at.GetInt64() : 0, tune.TryGetProperty("level", out var db) ? db.GetDouble() : 0)
                 : null;
-            var project = new EditProject(stamp, duration, clips, texts, mode, extras, markers, track, music);
+            var project = new EditProject(stamp, duration, clips, texts, mode, extras, markers, track, music) { MissingLuts = missing.Distinct(StringComparer.Ordinal).ToArray() };
             return project.FitsIn(duration) ? project : null;
         }
         catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException or FormatException or ArgumentException or OverflowException)
@@ -261,7 +266,7 @@ public sealed class EditProject
     {
         try
         {
-            return File.Exists(path) ? Parse(File.ReadAllText(path, Utf8)) : null;
+            return File.Exists(path) ? Parse(File.ReadAllText(path, Utf8), System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(path))) : null;
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
         {
@@ -382,13 +387,28 @@ public sealed class EditProject
                 writer.WriteString("padColor", effects.PadColor);
             }
 
+            if (effects.Lut is { } lut)
+            {
+                writer.WriteString("lut", lut);
+                writer.WriteNumber("lutMix", effects.LutMix);
+            }
+
             writer.WriteEndObject();
         }
 
         writer.WriteEndObject();
     }
 
+    private static EditClip WithLut(EditClip clip, string? folder, List<string> missing)
+    {
+        if (clip.Effects.Lut is not { } stored) return clip;
+        if (LutFile.Resolve(stored, folder) is { } found) return clip with { Effects = clip.Effects with { Lut = found } };
+        missing.Add(stored);
+        return clip with { Effects = clip.Effects with { Lut = null, LutMix = ClipEffects.MaxLutMix } };
+    }
+
     private static ClipTransition ReadTransition(JsonElement item)
+
         => new(ClipTransition.FromKey(item.GetProperty("kind").GetString()) ?? throw new FormatException("Bilinmeyen gecis turu"),
             item.GetProperty("duration").GetInt64());
 
@@ -431,6 +451,8 @@ public sealed class EditProject
             FitNum = e.TryGetProperty("fitNum", out var fitNum) ? fitNum.GetInt32() : 0,
             FitDen = e.TryGetProperty("fitDen", out var fitDen) ? fitDen.GetInt32() : 0,
             PadColor = e.TryGetProperty("padColor", out var padColor) ? padColor.GetString() ?? ClipEffects.DefaultPadColor : ClipEffects.DefaultPadColor,
+            Lut = e.TryGetProperty("lut", out var lut) && lut.ValueKind == JsonValueKind.String ? lut.GetString() : null,
+            LutMix = e.TryGetProperty("lutMix", out var lutMix) && lutMix.ValueKind == JsonValueKind.Number ? lutMix.GetInt32() : ClipEffects.MaxLutMix,
         };
         return clip with { Effects = effects.Normalized() };
     }

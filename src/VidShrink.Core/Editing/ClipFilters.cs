@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Text;
 
 namespace VidShrink.Core.Editing;
@@ -92,7 +92,9 @@ public static class ClipFilters
     /// Renk zinciri, basinda virgul olmadan: degisen alanlarla <c>eq</c>, ardindan sicaklik
     /// notr degilse <c>colortemperature</c>. Renk ayari yoksa bos.
     /// </summary>
-    public static string Color(ClipEffects effects)
+    public static string Color(ClipEffects effects) => string.Join(",", ColorParts(effects));
+
+    public static IReadOnlyList<string> ColorParts(ClipEffects effects)
     {
         var parts = new List<string>();
         var eq = new List<string>();
@@ -101,7 +103,14 @@ public static class ClipFilters
         if (effects.Saturation != 1) eq.Add("saturation=" + Number(effects.Saturation));
         if (eq.Count > 0) parts.Add("eq=" + string.Join(":", eq));
         if (effects.Temperature != ClipEffects.NeutralTemperature) parts.Add("colortemperature=temperature=" + Int(effects.Temperature));
-        return string.Join(",", parts);
+        if (Lut(effects) is { } lut) parts.Add(lut);
+        return parts;
+    }
+
+    public static string? Lut(ClipEffects effects)
+    {
+        if (!effects.HasLut || effects.Lut is not { } path) return null;
+        return LutFile.ForMix(path, effects.LutMix) is { } file ? "lut3d=file=" + LutFile.FilterPath(file) : null;
     }
 
     public const string CompressorFilter = "acompressor=threshold=0.125:ratio=4:attack=20:release=250";
@@ -155,8 +164,7 @@ public static class ClipFilters
             var tail = Math.Min(end - start, EditTime.ToSeconds(fadeOut) * speed);
 
             var window = ":enable='" + Between(start, end) + "'";
-            var tone = Color(effects);
-            if (tone.Length > 0) color.AddRange(tone.Split(',').Select(f => f + window));
+            color.AddRange(ColorParts(effects).Select(f => f + window));
 
             if (effects.Muted) audio.Add("volume=volume=0:enable='" + Between(start, end) + "'");
             else

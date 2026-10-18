@@ -9,6 +9,10 @@ ship as part of it.
 
 ### Added
 
+- Editor: clips take a 3D LUT. Load LUT in the clip panel picks a `.cube` file, applied with ffmpeg `lut3d` in both
+  preview and export; Intensity (0-100) blends it with the original and Remove LUT clears it. The project file stores
+  the path (older projects open unchanged); a moved LUT is found next to the project, a missing one opens the clip
+  without it and says so. Paths with drive letters, quotes, commas, brackets or non-ASCII names are escaped.
 - Command line: `donustur` gains the Convert tab's tags, cover, Repair and chapters. `--etiket-baslik`,
   `--etiket-sanatci`, `--etiket-yil`, `--etiket-yorum` write the container tags, `--kapak` adds a PNG or JPEG cover,
   `--onar` is the Repair preset (corrupt packets dropped, timestamps rebuilt, MKV remux unless a container or codec

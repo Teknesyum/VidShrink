@@ -220,7 +220,7 @@ public sealed partial class MpvEngine
         if (wantedVideo != _editFades)
         {
             _editFades = wantedVideo;
-            Swap(ClipFadeLabel, wantedVideo is null ? null : "lavfi=[" + wantedVideo + "]");
+            Swap(ClipFadeLabel, wantedVideo is null ? null : Lavfi(wantedVideo));
             _update.Set();
         }
 
@@ -264,7 +264,13 @@ public sealed partial class MpvEngine
         if (filter is not null) CommandSync(property, "add", "@" + label + ":" + filter);
     }
 
+    internal static string Lavfi(string graph)
+        => graph.Contains(']', StringComparison.Ordinal)
+            ? "lavfi=%" + System.Text.Encoding.UTF8.GetByteCount(graph).ToString(CultureInfo.InvariantCulture) + "%" + graph
+            : "lavfi=[" + graph + "]";
+
     private static string F(double value) => value.ToString("0.######", CultureInfo.InvariantCulture);
+
 
     private static int Percent(double value) => (int)Math.Round(value * 100, MidpointRounding.AwayFromZero);
 
