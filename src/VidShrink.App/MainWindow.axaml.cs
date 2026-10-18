@@ -699,6 +699,7 @@ public partial class MainWindow : Window
             if (UpdateCheck.AutoUpdateEnabled(settings)) _ = OtomatikGuncellemeyiBaslatAsync();
             else _ = CheckForUpdateAsync();
             _ = KisayolSimgesiniTazeleAsync();
+            _ = KopruDevriniBaslatAsync();
             await LoadFfmpegVersionAsync();
             await ProbeHardwareEncodersAsync();
         }
