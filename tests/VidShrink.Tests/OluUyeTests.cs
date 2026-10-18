@@ -517,6 +517,7 @@ public sealed class OluUyeTests
     private const string Legitimate = "mesru";
     private const string MergeReason = "Kayipsiz birlestirme kararinin yeniden kodlama nedenleri. EditExport.Build yalniz Copy kolunu adiyla soruyor; kalan alti uye o kosulun else'i ve hepsi bugunku yeniden kodlama yoluna gidiyor, kullaniciya MergeForcedFull notu cikiyor. Neden ayrimi KayipsizBirlestirmeTests'te tek tek olculuyor.";
     private const string MismatchReason = "Kayipsiz birlestirmeyi kapatan ilk fark. MergeCompatibility.Decide yalniz None mi diye soruyor; kalan uyeler o kosulun else'i, ayrimi KayipsizBirlestirmeTests.TekAlanFarkiKopyayiKapatir alan alan olcuyor.";
+    private const string KopruReason = "Kopru devrinin dusus nedenleri. MainWindow.KopruDevri yalniz Tamam mi diye soruyor; kalan uyeler o kosulun else'i, hepsi UpdateHealth'e sayilip eski uygulamada kaliyor. Neden ayrimi KopruDevirTests'te tek tek olculuyor.";
     private const string Debt = "borc";
 
     /// <summary>
@@ -656,6 +657,13 @@ public sealed class OluUyeTests
             "HDR kodek gecisinin 'degismedi' hali ve varsayilani. RecorderView.CaptureNotice NoHevc ile SwitchedToHevc'i adiyla sorup kendi bildirimini veriyor; Unchanged iki kosulun da else'i, bildirim siradaki kola kalir. Ayri bir kol ayni sonucu verirdi."),
         new("KeyframeEase.Linear", "varsayilan-kol", Legitimate,
             "Anahtar kare gecisinin varsayilani. ClipKeyframes.Shape ve ShapeExpression EaseIn, EaseOut ve EaseInOut'u adiyla sorup egrisini yaziyor; Linear iki switch'in de '_' kolu, duz ara deger. Ayri bir kol ayni ifadeyi verirdi."),
+        new("KopruSonucu.BaslatmaDustu", "varsayilan-kol", Legitimate, KopruReason),
+        new("KopruSonucu.ImzaGecersiz", "varsayilan-kol", Legitimate, KopruReason),
+        new("KopruSonucu.IndirmeDustu", "varsayilan-kol", Legitimate, KopruReason),
+        new("KopruSonucu.KurulumDustu", "varsayilan-kol", Legitimate, KopruReason),
+        new("KopruSonucu.OzetTutmadi", "varsayilan-kol", Legitimate, KopruReason),
+        new("KopruSonucu.OzetYok", "varsayilan-kol", Legitimate, KopruReason),
+        new("KopruSonucu.YeniUygulamaYok", "varsayilan-kol", Legitimate, KopruReason),
         new("MergeDecision.AudioTrack", "varsayilan-kol", Legitimate, MergeReason),
         new("MergeDecision.CutOffKeyframe", "varsayilan-kol", Legitimate, MergeReason),
         new("MergeDecision.Edits", "varsayilan-kol", Legitimate, MergeReason),

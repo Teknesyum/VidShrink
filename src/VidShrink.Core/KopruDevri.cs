@@ -53,7 +53,6 @@ public static class KopruSabitleri
 
 public enum KopruSonucu
 {
-    Atlandi,
     OzetYok,
     IndirmeDustu,
     OzetTutmadi,
