@@ -173,7 +173,7 @@ public static class ClipFilters
         if (eq.Count > 0) parts.Add("eq=" + string.Join(":", eq));
         if (effects.Temperature != ClipEffects.NeutralTemperature) parts.Add("colortemperature=temperature=" + Int(effects.Temperature));
         var grade = ClipGrade.Filters(effects);
-        if (grade.Length > 0) parts.Add(grade);
+        if (grade.Length > 0) parts.AddRange(grade.Split(','));
         if (Lut(effects) is { } lut) parts.Add(lut);
         return parts;
     }

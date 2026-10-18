@@ -438,46 +438,46 @@ public sealed class EditProject
                 writer.WriteNumber("height", effects.BlurHeight);
             }
 
-            if (effects.VolumeKeys.Count > 0)
-            {
-                writer.WriteStartArray("volumeKeys");
-                foreach (var key in effects.VolumeKeys)
-                {
-                    writer.WriteStartObject();
-                    writer.WriteNumber("offset", key.Offset);
-                    writer.WriteNumber("db", key.Db);
-                    writer.WriteString("ease", KeyframeEaseKeys.Key(key.Ease));
-                    writer.WriteEndObject();
-                }
-
-                writer.WriteEndArray();
-            }
-
-            if (effects.CropKeys.Count > 0)
-            {
-                writer.WriteStartArray("cropKeys");
-                foreach (var key in effects.CropKeys)
-                {
-                    writer.WriteStartObject();
-                    writer.WriteNumber("offset", key.Offset);
-                    writer.WriteNumber("left", key.Left);
-                    writer.WriteNumber("top", key.Top);
-                    writer.WriteNumber("right", key.Right);
-                    writer.WriteNumber("bottom", key.Bottom);
-                    writer.WriteString("ease", KeyframeEaseKeys.Key(key.Ease));
-                    writer.WriteEndObject();
-                }
-
-                writer.WriteEndArray();
-            }
-
-            if (effects.Lut is { } lut)
-            {
-                writer.WriteString("lut", lut);
-                writer.WriteNumber("lutMix", effects.LutMix);
-            }
-
             writer.WriteEndObject();
+        }
+
+        if (effects.VolumeKeys.Count > 0)
+        {
+            writer.WriteStartArray("volumeKeys");
+            foreach (var key in effects.VolumeKeys)
+            {
+                writer.WriteStartObject();
+                writer.WriteNumber("offset", key.Offset);
+                writer.WriteNumber("db", key.Db);
+                writer.WriteString("ease", KeyframeEaseKeys.Key(key.Ease));
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
+        }
+
+        if (effects.CropKeys.Count > 0)
+        {
+            writer.WriteStartArray("cropKeys");
+            foreach (var key in effects.CropKeys)
+            {
+                writer.WriteStartObject();
+                writer.WriteNumber("offset", key.Offset);
+                writer.WriteNumber("left", key.Left);
+                writer.WriteNumber("top", key.Top);
+                writer.WriteNumber("right", key.Right);
+                writer.WriteNumber("bottom", key.Bottom);
+                writer.WriteString("ease", KeyframeEaseKeys.Key(key.Ease));
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
+        }
+
+        if (effects.Lut is { } lut)
+        {
+            writer.WriteString("lut", lut);
+            writer.WriteNumber("lutMix", effects.LutMix);
         }
 
         writer.WriteEndObject();
