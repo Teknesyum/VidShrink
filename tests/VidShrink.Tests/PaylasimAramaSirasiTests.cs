@@ -53,7 +53,7 @@ public sealed class PaylasimAramaSirasiTests
     {
         var kullanici = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "VidShrink",
+            VidShrink.Core.AppIdentity.FolderName,
             CoreShare.ShareTargetTable.FileName);
 
         Assert.Equal(kullanici, CoreShare.ShareTargetTable.AramaSirasi().First());

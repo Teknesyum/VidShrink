@@ -1117,7 +1117,7 @@ public sealed class LanguageTests : IDisposable
     // ---- ortak düzenek --------------------------------------------------------------
 
     private static string Cased(string language, string key)
-        => LanguageCatalog.Title(Locales.Values(language)[key], language);
+        => LanguageCatalog.Title(Locales.Values(language)[key].Replace(VidShrink.App.Localization.Strings.AppToken, VidShrink.Core.AppIdentity.Name), language);
 
     private static T OnScreen<T>(Func<MainWindow, T> read) =>
         AppHost.Run(() =>

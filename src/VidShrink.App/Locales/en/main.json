@@ -730,7 +730,7 @@
   "settings-tab.general.title": "General",
 
   "settings-tab.shell-menu.title": "Right-Click Menu",
-  "settings-tab.shell-menu.label": "Add {app} entries to the Windows right-click menu",
+  "settings-tab.shell-menu.label": "Add {app} to the Windows right-click menu",
   "settings-tab.shell-menu.hint": "While this is checked, right-clicking a video file shows the {app} entries. Clearing it removes them; you never need the installer script. The entries follow your interface language.",
   "settings-tab.shell-menu.done": "Right-click menu written for {0} file types.",
   "settings-tab.shell-menu.removed": "Right-click menu removed.",
