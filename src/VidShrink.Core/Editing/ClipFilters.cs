@@ -108,6 +108,23 @@ public static class ClipFilters
         return string.Join(",", parts);
     }
 
+    public static string Blur(ClipEffects effects, int width, int height, string label)
+    {
+        if (!effects.HasBlur) return string.Empty;
+        var gblur = "gblur=sigma=" + Number(effects.BlurSigma);
+        if (!effects.HasBlurRegion) return gblur;
+
+        var (x, y, w, h) = effects.BlurRect(Math.Max(2, width), Math.Max(2, height));
+        var main = "[" + label + "m]";
+        var cut = "[" + label + "c]";
+        var soft = "[" + label + "s]";
+        return "split" + main + cut + ";" + cut + "crop=" + Int(w) + ":" + Int(h) + ":" + Int(x) + ":" + Int(y) + "," + gblur + soft + ";"
+            + main + soft + "overlay=" + Int(x) + ":" + Int(y);
+    }
+
+    public static (int Width, int Height) Frame(int width, int height, (int Width, int Height)? canvas)
+        => canvas ?? (Math.Max(2, width), Math.Max(2, height));
+
     public const string CompressorFilter = "acompressor=threshold=0.125:ratio=4:attack=20:release=250";
 
     public const string LimiterFilter = "alimiter=limit=0.89:level=0";

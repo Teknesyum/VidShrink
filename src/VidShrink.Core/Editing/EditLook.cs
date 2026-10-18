@@ -23,6 +23,8 @@ public sealed class EditLook
         (TimedVideo, TimedAudio) = ClipFilters.Timed(preview);
     }
 
+    public const string PreviewBlurLabel = "vsblur";
+
     public (int Width, int Height)? Canvas => _canvas;
 
     public string? TimedVideo { get; }
@@ -31,7 +33,13 @@ public sealed class EditLook
 
     public string? Geometry(EdlPart part)
     {
-        var chain = ClipFilters.Geometry(part.Clip.Effects, _width, _height, _parNum, _parDen, _canvas);
+        var effects = part.Clip.Effects;
+        var (frameWidth, frameHeight) = ClipFilters.Frame(_width, _height, _canvas);
+        var chain = string.Join(",", new[]
+        {
+            ClipFilters.Geometry(effects, _width, _height, _parNum, _parDen, _canvas),
+            ClipFilters.Blur(effects, frameWidth, frameHeight, PreviewBlurLabel),
+        }.Where(s => s.Length > 0));
         return chain.Length == 0 ? null : chain;
     }
 }

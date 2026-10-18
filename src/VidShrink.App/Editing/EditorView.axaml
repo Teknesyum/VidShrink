@@ -345,6 +345,11 @@
               <TextBox x:Name="TxtClipHighlightHue" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.highlight-hue}"/>
               <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.highlight-amount}"/>
               <TextBox x:Name="TxtClipHighlightAmount" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.highlight-amount}"/>
+            </StackPanel>\n            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.blur}"/>
+              <TextBox x:Name="TxtClipBlur" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.blur}" ToolTip.Tip="{loc:Text editor.clip.blur.tip}"/>
+              <ToggleButton x:Name="BtnClipBlurRegion" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.clip.blur.region}" AutomationProperties.Name="{loc:Text editor.clip.blur.region}" ToolTip.Tip="{loc:Text editor.clip.blur.region.tip}"/>
+              <Button x:Name="BtnClipBlurWhole" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.blur.whole}" AutomationProperties.Name="{loc:Text editor.clip.blur.whole}"/>
             </StackPanel>
             <Button x:Name="BtnClipReset" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.reset}" AutomationProperties.Name="{loc:Text editor.clip.reset}"/>
           </WrapPanel>

@@ -30,6 +30,10 @@ ship as part of it.
   reopens at the same position without carrying the old track ids over. The decision not to hand the queue to mpv's own
   playlist was re-measured and kept: no samples were lost on any path, and the UI would stay on the first file.
   Measurement `docs/olcumler/akis-kalitesi-kesintisiz.md`.
+- Editor: clip blur and region hiding. A Blur strength box blurs the whole clip with `gblur`; Draw Region lets you drag a
+  rectangle on the monitor so only that area is blurred (crop, blur, overlay back), Whole Frame drops the region. The
+  preview and the export build the same filter chain, and project files keep the new `blur` fields while older files
+  open unblurred.
 - Command line: `donustur` gains the Convert tab's tags, cover, Repair and chapters. `--etiket-baslik`,
   `--etiket-sanatci`, `--etiket-yil`, `--etiket-yorum` write the container tags, `--kapak` adds a PNG or JPEG cover,
   `--onar` is the Repair preset (corrupt packets dropped, timestamps rebuilt, MKV remux unless a container or codec

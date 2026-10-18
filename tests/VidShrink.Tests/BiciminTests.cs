@@ -1672,6 +1672,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-12, Linux turu: is surerken pasif Kucult/Donustur ipucu <c>main.action.busy-tip</c>, dusen yok. 1362 + 1 = 1363, 43 x 1363 = 58609. <c>kayip</c> 0.</para>
     /// <para>2026-10-12, Linux'ta ekran acilamayinca temiz cikis: tek yeni anahtar (<c>main.startup.no-display</c>, <c>Program.EkranYokIletisi</c>), dusen yok: 1363 + 1 = 1364, 43 x 1364 = 58652. <c>kayip</c> 0.</para>
     /// <para>2026-10-18, oynatici HDR ton esleme (later 96): tek yeni anahtar (<c>player.advanced.tone-mapping</c>), dusen yok: 84280 + 43 = 84323. <c>kayip</c> 0.</para>
+    /// <para>2026-10-18, bulaniklik ve bolge gizleme (later 88, DZB-28): bes yeni anahtar yalniz en ve tr'de, dusen yok: 86645 + 5 x 2 = 86655. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()

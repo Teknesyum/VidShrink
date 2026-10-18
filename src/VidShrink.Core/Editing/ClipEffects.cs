@@ -20,6 +20,9 @@ public sealed partial record ClipEffects
     public const double MaxEqDb = 12;
     public const string DefaultPadColor = "000000";
     public const double MaxFitRatio = 4;
+    public const double MaxBlurSigma = 50;
+    public const double DefaultBlurSigma = 12;
+    public const double MinBlurSide = 0.02;
 
     public static ClipEffects None { get; } = new();
 
@@ -77,6 +80,20 @@ public sealed partial record ClipEffects
 
     public string PadColor { get; init; } = DefaultPadColor;
 
+    public double BlurSigma { get; init; }
+
+    public double BlurX { get; init; }
+
+    public double BlurY { get; init; }
+
+    public double BlurWidth { get; init; }
+
+    public double BlurHeight { get; init; }
+
+    public bool HasBlur => BlurSigma > 0;
+
+    public bool HasBlurRegion => HasBlur && BlurWidth > 0 && BlurHeight > 0;
+
     public bool HasFit => FitNum > 0 && FitDen > 0;
 
     public bool HasEqualizer => BassDb != 0 || MidDb != 0 || TrebleDb != 0;
@@ -91,7 +108,7 @@ public sealed partial record ClipEffects
 
     public bool HasColor => Brightness != 0 || Contrast != 1 || Saturation != 1 || Temperature != NeutralTemperature || HasGrade;
 
-    public bool IsNeutral => !HasGeometry && !HasAudio && !HasColor && FadeIn == 0 && FadeOut == 0;
+    public bool IsNeutral => !HasGeometry && !HasAudio && !HasColor && !HasBlur && FadeIn == 0 && FadeOut == 0;
 
     /// <summary>Degerleri gecerli araliga ceker: kirpma kenarlari toplamda karenin %95'ini asmaz, aci 90'in katina iner,
     /// renk alanlari araliga kirpilip iki ondaliga yuvarlanir; sayi olmayan renk degeri notre doner. Ekolayzir bantlari
@@ -107,7 +124,7 @@ public sealed partial record ClipEffects
         var bottom = Math.Min(Edge(CropBottom), 0.95 - top);
         var rotation = ((Rotation / 90 * 90) % 360 + 360) % 360;
         var volume = double.IsFinite(VolumeDb) ? Math.Round(Math.Clamp(VolumeDb, MinVolumeDb, MaxVolumeDb), 1) : 0;
-        return (FitOnly() with
+        return (BlurOnly(FitOnly()) with
         {
             CropLeft = left,
             CropRight = right,
@@ -183,6 +200,45 @@ public sealed partial record ClipEffects
     /// kalan alan <paramref name="color"/> ("RRGGBB") ile dolar. Oran gecersizse sigdirma da kirpma da kalkar.</summary>
     public ClipEffects WithFit(int num, int den, string color)
         => (this with { CropLeft = 0, CropTop = 0, CropRight = 0, CropBottom = 0, FitNum = num, FitDen = den, PadColor = color }).FitOnly();
+
+    public (int X, int Y, int Width, int Height) BlurRect(int width, int height)
+    {
+        if (!HasBlurRegion) return (0, 0, width, height);
+        var x = Math.Min(EvenFloor((int)(width * BlurX)), EvenFloor(width - 2));
+        var y = Math.Min(EvenFloor((int)(height * BlurY)), EvenFloor(height - 2));
+        var w = Math.Clamp(Even(width * BlurWidth), 2, Math.Max(2, EvenFloor(width - x)));
+        var h = Math.Clamp(Even(height * BlurHeight), 2, Math.Max(2, EvenFloor(height - y)));
+        return (x, y, w, h);
+    }
+
+    public ClipEffects WithBlurRegion(double x1, double y1, double x2, double y2)
+        => (this with
+        {
+            BlurSigma = HasBlur ? BlurSigma : DefaultBlurSigma,
+            BlurX = Math.Min(x1, x2),
+            BlurY = Math.Min(y1, y2),
+            BlurWidth = Math.Abs(x2 - x1),
+            BlurHeight = Math.Abs(y2 - y1),
+        }).Normalized();
+
+    private static ClipEffects BlurOnly(ClipEffects e)
+    {
+        var sigma = double.IsFinite(e.BlurSigma) ? Math.Round(Math.Clamp(e.BlurSigma, 0, MaxBlurSigma), 1) : 0;
+        static double Unit(double v) => double.IsFinite(v) ? Math.Clamp(v, 0, 1) : 0;
+        var x = Unit(e.BlurX);
+        var y = Unit(e.BlurY);
+        var w = Math.Min(Unit(e.BlurWidth), 1 - x);
+        var h = Math.Min(Unit(e.BlurHeight), 1 - y);
+        var region = sigma > 0 && w >= MinBlurSide && h >= MinBlurSide;
+        return e with
+        {
+            BlurSigma = sigma,
+            BlurX = region ? Math.Round(x, 4) : 0,
+            BlurY = region ? Math.Round(y, 4) : 0,
+            BlurWidth = region ? Math.Round(w, 4) : 0,
+            BlurHeight = region ? Math.Round(h, 4) : 0,
+        };
+    }
 
     private ClipEffects FitOnly()
     {
