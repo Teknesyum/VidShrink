@@ -653,6 +653,7 @@ public static class EditExport
             graph.Append('[').Append(input).Append(":v]trim=start=").Append(start).Append(":end=").Append(end).Append(",setpts=PTS-STARTPTS")
                 .Append(VideoMotion(clip, info))
                 .Append(Link(ClipFilters.Geometry(clip.Effects, info.Width, info.Height, info.ParNum, info.ParDen, canvas)))
+                .Append(Link(BlurChain(clip.Effects, info, canvas, i)))
                 .Append(Link(ClipFilters.Color(clip.Effects)))
                 .Append(",fps=").Append(fps).Append(",format=yuv420p")
                 .Append(Link(ClipFilters.VideoFades(clip.Effects, clip.TimelineLength)))
@@ -936,6 +937,7 @@ public static class EditExport
             graph.Append("[0:v]trim=start=").Append(start).Append(":end=").Append(end).Append(",setpts=PTS-STARTPTS")
                 .Append(VideoMotion(clip, info))
                 .Append(Link(ClipFilters.Geometry(clip.Effects, info.Width, info.Height, info.ParNum, info.ParDen, canvas)))
+                .Append(Link(BlurChain(clip.Effects, info, canvas, i)))
                 .Append(Link(ClipFilters.Color(clip.Effects)))
                 .Append(rate)
                 .Append(Link(ClipFilters.VideoFades(clip.Effects, clip.TimelineLength)))
@@ -1353,6 +1355,12 @@ public static class EditExport
         if (clip.Reversed) text.Append(",areverse");
         if (clip.Speed != 1m) text.Append(',').Append(AtempoFilter(clip.Speed));
         return text.ToString();
+    }
+
+    private static string BlurChain(ClipEffects effects, MediaInfo info, (int Width, int Height)? canvas, int index)
+    {
+        var (width, height) = ClipFilters.Frame(info.Width, info.Height, canvas);
+        return ClipFilters.Blur(effects, width, height, "b" + index.ToString(CultureInfo.InvariantCulture));
     }
 
     private static string Link(string chain) => chain.Length == 0 ? string.Empty : "," + chain;

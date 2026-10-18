@@ -9,6 +9,10 @@ ship as part of it.
 
 ### Added
 
+- Editor: clip blur and region hiding. A Blur strength box blurs the whole clip with `gblur`; Draw Region lets you drag a
+  rectangle on the monitor so only that area is blurred (crop, blur, overlay back), Whole Frame drops the region. The
+  preview and the export build the same filter chain, and project files keep the new `blur` fields while older files
+  open unblurred.
 - Command line: `donustur` gains the Convert tab's tags, cover, Repair and chapters. `--etiket-baslik`,
   `--etiket-sanatci`, `--etiket-yil`, `--etiket-yorum` write the container tags, `--kapak` adds a PNG or JPEG cover,
   `--onar` is the Repair preset (corrupt packets dropped, timestamps rebuilt, MKV remux unless a container or codec

@@ -382,6 +382,21 @@ public sealed class EditProject
                 writer.WriteString("padColor", effects.PadColor);
             }
 
+            if (effects.HasBlur)
+            {
+                writer.WriteStartObject("blur");
+                writer.WriteNumber("sigma", effects.BlurSigma);
+                if (effects.HasBlurRegion)
+                {
+                    writer.WriteNumber("x", effects.BlurX);
+                    writer.WriteNumber("y", effects.BlurY);
+                    writer.WriteNumber("width", effects.BlurWidth);
+                    writer.WriteNumber("height", effects.BlurHeight);
+                }
+
+                writer.WriteEndObject();
+            }
+
             writer.WriteEndObject();
         }
 
@@ -432,8 +447,21 @@ public sealed class EditProject
             FitDen = e.TryGetProperty("fitDen", out var fitDen) ? fitDen.GetInt32() : 0,
             PadColor = e.TryGetProperty("padColor", out var padColor) ? padColor.GetString() ?? ClipEffects.DefaultPadColor : ClipEffects.DefaultPadColor,
         };
+        if (e.TryGetProperty("blur", out var blur) && blur.ValueKind == JsonValueKind.Object)
+            effects = effects with
+            {
+                BlurSigma = BlurNumber(blur, "sigma"),
+                BlurX = BlurNumber(blur, "x"),
+                BlurY = BlurNumber(blur, "y"),
+                BlurWidth = BlurNumber(blur, "width"),
+                BlurHeight = BlurNumber(blur, "height"),
+            };
+
         return clip with { Effects = effects.Normalized() };
     }
+
+    private static double BlurNumber(JsonElement blur, string name)
+        => blur.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.Number ? value.GetDouble() : 0;
 
     private static void WriteText(Utf8JsonWriter writer, TextLayer text)
     {
