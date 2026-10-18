@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Nincs LUT",
   "editor.clip.lut.files": "LUT-fájlok",
   "editor.clip.lut.unreadable": "A LUT nem olvasható: {0}",
-  "editor.clip.lut.missing": "A LUT-fájl nem található; a klip nélküle nyílt meg: {0}"
+  "editor.clip.lut.missing": "A LUT-fájl nem található; a klip nélküle nyílt meg: {0}",
+  "editor.clip.blur": "Elmosás",
+  "editor.clip.blur.tip": "Elmosás erőssége (0-50), 0 = kikapcsolva",
+  "editor.clip.blur.region": "Terület rajzolása",
+  "editor.clip.blur.region.tip": "Téglalap húzása a monitoron",
+  "editor.clip.blur.whole": "Teljes kép",
+  "editor.clip.scale": "Méretezés %",
+  "editor.clip.offset-x": "Pozíció X %",
+  "editor.clip.offset-y": "Pozíció Y %",
+  "editor.clip.angle": "Szög °",
+  "editor.frame": "Projektkeret",
+  "editor.frame.source": "Forráskeret",
+  "editor.frame.tip": "A teljes projekt kimeneti kerete"
 }

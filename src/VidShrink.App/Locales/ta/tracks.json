@@ -1,7 +1,6 @@
 {
   "player.tracks.audio": "ஒலி தட்டு",
   "player.tracks.quality": "ஸ்ட்ரீம் தரம்",
-  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "அடுத்த ஒலி தட்டு",
   "player.tracks.delay": "ஒலி தாமதம் {0} வி",
   "player.tracks.delayreset": "ஒலி தாமதத்தை மீட்டமை",

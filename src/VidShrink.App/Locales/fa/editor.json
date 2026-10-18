@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "بدون LUT",
   "editor.clip.lut.files": "فایل‌های LUT",
   "editor.clip.lut.unreadable": "LUT خوانده نشد: {0}",
-  "editor.clip.lut.missing": "فایل LUT پیدا نشد؛ کلیپ بدون آن باز شد: {0}"
+  "editor.clip.lut.missing": "فایل LUT پیدا نشد؛ کلیپ بدون آن باز شد: {0}",
+  "editor.clip.blur": "محوسازی",
+  "editor.clip.blur.tip": "شدت محوسازی (0-50)، 0 یعنی خاموش",
+  "editor.clip.blur.region": "ترسیم ناحیه",
+  "editor.clip.blur.region.tip": "یک مستطیل روی نمایشگر بکشید",
+  "editor.clip.blur.whole": "کل کادر",
+  "editor.clip.scale": "مقیاس %",
+  "editor.clip.offset-x": "موقعیت X %",
+  "editor.clip.offset-y": "موقعیت Y %",
+  "editor.clip.angle": "زاویه °",
+  "editor.frame": "کادر پروژه",
+  "editor.frame.source": "کادر منبع",
+  "editor.frame.tip": "کادر خروجی کل پروژه"
 }

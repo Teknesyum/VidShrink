@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Χωρίς LUT",
   "editor.clip.lut.files": "Αρχεία LUT",
   "editor.clip.lut.unreadable": "Δεν ήταν δυνατή η ανάγνωση του LUT: {0}",
-  "editor.clip.lut.missing": "Το αρχείο LUT δεν βρέθηκε· το κλιπ άνοιξε χωρίς αυτό: {0}"
+  "editor.clip.lut.missing": "Το αρχείο LUT δεν βρέθηκε· το κλιπ άνοιξε χωρίς αυτό: {0}",
+  "editor.clip.blur": "Θόλωμα",
+  "editor.clip.blur.tip": "Ένταση θολώματος (0-50), 0 = ανενεργό",
+  "editor.clip.blur.region": "Σχεδίαση περιοχής",
+  "editor.clip.blur.region.tip": "Σύρετε ένα ορθογώνιο στην οθόνη",
+  "editor.clip.blur.whole": "Ολόκληρο καρέ",
+  "editor.clip.scale": "Κλίμακα %",
+  "editor.clip.offset-x": "Θέση X %",
+  "editor.clip.offset-y": "Θέση Y %",
+  "editor.clip.angle": "Γωνία °",
+  "editor.frame": "Καρέ έργου",
+  "editor.frame.source": "Καρέ πηγής",
+  "editor.frame.tip": "Καρέ εξόδου ολόκληρου του έργου"
 }

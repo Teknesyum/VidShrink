@@ -1,7 +1,6 @@
 {
   "player.tracks.audio": "Zvučni zapis",
   "player.tracks.quality": "Kvaliteta streama",
-  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Sljedeći zvučni zapis",
   "player.tracks.delay": "Kašnjenje zvuka {0} s",
   "player.tracks.delayreset": "Poništi kašnjenje zvuka",

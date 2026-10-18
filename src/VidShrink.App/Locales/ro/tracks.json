@@ -1,7 +1,6 @@
 {
   "player.tracks.audio": "Pistă audio",
   "player.tracks.quality": "Calitatea fluxului",
-  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Pista audio următoare",
   "player.tracks.delay": "Întârziere audio {0} s",
   "player.tracks.delayreset": "Resetează întârzierea audio",

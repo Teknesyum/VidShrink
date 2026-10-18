@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Geen LUT",
   "editor.clip.lut.files": "LUT-bestanden",
   "editor.clip.lut.unreadable": "LUT kon niet worden gelezen: {0}",
-  "editor.clip.lut.missing": "LUT-bestand niet gevonden; de clip is zonder geopend: {0}"
+  "editor.clip.lut.missing": "LUT-bestand niet gevonden; de clip is zonder geopend: {0}",
+  "editor.clip.blur": "Vervagen",
+  "editor.clip.blur.tip": "Sterkte van de vervaging (0-50), 0 is uit",
+  "editor.clip.blur.region": "Gebied tekenen",
+  "editor.clip.blur.region.tip": "Sleep een rechthoek op de monitor",
+  "editor.clip.blur.whole": "Volledig beeld",
+  "editor.clip.scale": "Schaal %",
+  "editor.clip.offset-x": "Positie X %",
+  "editor.clip.offset-y": "Positie Y %",
+  "editor.clip.angle": "Hoek °",
+  "editor.frame": "Projectkader",
+  "editor.frame.source": "Bronkader",
+  "editor.frame.tip": "Uitvoerkader van het hele project"
 }

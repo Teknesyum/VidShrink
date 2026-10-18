@@ -1,7 +1,6 @@
 {
   "player.tracks.audio": "Audiospoor",
   "player.tracks.quality": "Streamkwaliteit",
-  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Volgend audiospoor",
   "player.tracks.delay": "Audiovertraging {0} s",
   "player.tracks.delayreset": "Audiovertraging resetten",

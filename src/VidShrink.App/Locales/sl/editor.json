@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Brez LUT",
   "editor.clip.lut.files": "Datoteke LUT",
   "editor.clip.lut.unreadable": "LUT ni mogoče prebrati: {0}",
-  "editor.clip.lut.missing": "Datoteke LUT ni bilo mogoče najti; posnetek je odprt brez nje: {0}"
+  "editor.clip.lut.missing": "Datoteke LUT ni bilo mogoče najti; posnetek je odprt brez nje: {0}",
+  "editor.clip.blur": "Zameglitev",
+  "editor.clip.blur.tip": "Moč zameglitve (0-50), 0 je izklopljeno",
+  "editor.clip.blur.region": "Nariši območje",
+  "editor.clip.blur.region.tip": "Povleci pravokotnik na monitorju",
+  "editor.clip.blur.whole": "Celotna slika",
+  "editor.clip.scale": "Merilo %",
+  "editor.clip.offset-x": "Položaj X %",
+  "editor.clip.offset-y": "Položaj Y %",
+  "editor.clip.angle": "Kot °",
+  "editor.frame": "Okvir projekta",
+  "editor.frame.source": "Okvir vira",
+  "editor.frame.tip": "Izhodni okvir celotnega projekta"
 }

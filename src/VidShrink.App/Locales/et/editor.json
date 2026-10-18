@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "LUT puudub",
   "editor.clip.lut.files": "LUT-failid",
   "editor.clip.lut.unreadable": "LUT-i ei saanud lugeda: {0}",
-  "editor.clip.lut.missing": "LUT-faili ei leitud; klipp avati ilma selleta: {0}"
+  "editor.clip.lut.missing": "LUT-faili ei leitud; klipp avati ilma selleta: {0}",
+  "editor.clip.blur": "Hägu",
+  "editor.clip.blur.tip": "Hägu tugevus (0-50), 0 on väljas",
+  "editor.clip.blur.region": "Joonista ala",
+  "editor.clip.blur.region.tip": "Lohista monitoril ristkülik",
+  "editor.clip.blur.whole": "Terve kaader",
+  "editor.clip.scale": "Skaala %",
+  "editor.clip.offset-x": "Asukoht X %",
+  "editor.clip.offset-y": "Asukoht Y %",
+  "editor.clip.angle": "Nurk °",
+  "editor.frame": "Projekti kaader",
+  "editor.frame.source": "Allika kaader",
+  "editor.frame.tip": "Kogu projekti väljundkaader"
 }

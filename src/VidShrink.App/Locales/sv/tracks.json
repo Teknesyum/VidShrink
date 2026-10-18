@@ -1,7 +1,6 @@
 {
   "player.tracks.audio": "Ljudspår",
   "player.tracks.quality": "Strömningskvalitet",
-  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Nästa ljudspår",
   "player.tracks.delay": "Ljudfördröjning {0} s",
   "player.tracks.delayreset": "Återställ ljudfördröjning",

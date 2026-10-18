@@ -1,7 +1,6 @@
 {
   "player.tracks.audio": "Звуковая дорожка",
   "player.tracks.quality": "Качество потока",
-  "player.tracks.quality.rate": "{0} кбит/с",
   "player.tracks.cycle": "Следующая звуковая дорожка",
   "player.tracks.delay": "Задержка звука {0} с",
   "player.tracks.delayreset": "Сбросить задержку звука",

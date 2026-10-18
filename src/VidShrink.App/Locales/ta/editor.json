@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "LUT இல்லை",
   "editor.clip.lut.files": "LUT கோப்புகள்",
   "editor.clip.lut.unreadable": "LUT-ஐப் படிக்க முடியவில்லை: {0}",
-  "editor.clip.lut.missing": "LUT கோப்பு கிடைக்கவில்லை; கிளிப் அது இல்லாமல் திறக்கப்பட்டது: {0}"
+  "editor.clip.lut.missing": "LUT கோப்பு கிடைக்கவில்லை; கிளிப் அது இல்லாமல் திறக்கப்பட்டது: {0}",
+  "editor.clip.blur": "மங்கல்",
+  "editor.clip.blur.tip": "மங்கலின் வலிமை (0-50), 0 என்றால் அணைவு",
+  "editor.clip.blur.region": "பகுதியை வரை",
+  "editor.clip.blur.region.tip": "மானிட்டரில் ஒரு செவ்வகத்தை இழுக்கவும்",
+  "editor.clip.blur.whole": "முழு பிரேம்",
+  "editor.clip.scale": "அளவு %",
+  "editor.clip.offset-x": "நிலை X %",
+  "editor.clip.offset-y": "நிலை Y %",
+  "editor.clip.angle": "கோணம் °",
+  "editor.frame": "திட்டத்தின் பிரேம்",
+  "editor.frame.source": "மூலத்தின் பிரேம்",
+  "editor.frame.tip": "முழுத் திட்டத்தின் வெளியீட்டு பிரேம்"
 }

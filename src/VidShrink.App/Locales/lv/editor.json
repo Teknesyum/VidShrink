@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Bez LUT",
   "editor.clip.lut.files": "LUT faili",
   "editor.clip.lut.unreadable": "LUT nevarēja nolasīt: {0}",
-  "editor.clip.lut.missing": "LUT fails nav atrasts; klips atvērts bez tā: {0}"
+  "editor.clip.lut.missing": "LUT fails nav atrasts; klips atvērts bez tā: {0}",
+  "editor.clip.blur": "Izplūdums",
+  "editor.clip.blur.tip": "Izplūduma stiprums (0-50), 0 ir izslēgts",
+  "editor.clip.blur.region": "Zīmēt apgabalu",
+  "editor.clip.blur.region.tip": "Velciet taisnstūri uz monitora",
+  "editor.clip.blur.whole": "Viss kadrs",
+  "editor.clip.scale": "Mērogs %",
+  "editor.clip.offset-x": "Pozīcija X %",
+  "editor.clip.offset-y": "Pozīcija Y %",
+  "editor.clip.angle": "Leņķis °",
+  "editor.frame": "Projekta kadrs",
+  "editor.frame.source": "Avota kadrs",
+  "editor.frame.tip": "Visa projekta izvades kadrs"
 }

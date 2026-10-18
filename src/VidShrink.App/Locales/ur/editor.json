@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "کوئی LUT نہیں",
   "editor.clip.lut.files": "LUT فائلیں",
   "editor.clip.lut.unreadable": "LUT پڑھا نہیں جا سکا: {0}",
-  "editor.clip.lut.missing": "LUT فائل نہیں ملی؛ کلپ اس کے بغیر کھولا گیا: {0}"
+  "editor.clip.lut.missing": "LUT فائل نہیں ملی؛ کلپ اس کے بغیر کھولا گیا: {0}",
+  "editor.clip.blur": "دھندلاہٹ",
+  "editor.clip.blur.tip": "دھندلاہٹ کی شدت (0-50)، 0 یعنی بند",
+  "editor.clip.blur.region": "حصہ بنائیں",
+  "editor.clip.blur.region.tip": "مانیٹر پر ایک مستطیل کھینچیں",
+  "editor.clip.blur.whole": "پورا فریم",
+  "editor.clip.scale": "پیمانہ %",
+  "editor.clip.offset-x": "مقام X %",
+  "editor.clip.offset-y": "مقام Y %",
+  "editor.clip.angle": "زاویہ °",
+  "editor.frame": "پروجیکٹ فریم",
+  "editor.frame.source": "ماخذ فریم",
+  "editor.frame.tip": "پورے پروجیکٹ کا آؤٹ پٹ فریم"
 }

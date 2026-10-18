@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Ingen LUT",
   "editor.clip.lut.files": "LUT-filer",
   "editor.clip.lut.unreadable": "Kunne ikke lese LUT: {0}",
-  "editor.clip.lut.missing": "Fant ikke LUT-filen; klippet ble åpnet uten den: {0}"
+  "editor.clip.lut.missing": "Fant ikke LUT-filen; klippet ble åpnet uten den: {0}",
+  "editor.clip.blur": "Uskarphet",
+  "editor.clip.blur.tip": "Uskarphetsstyrke (0-50), 0 er av",
+  "editor.clip.blur.region": "Tegn område",
+  "editor.clip.blur.region.tip": "Dra et rektangel på monitoren",
+  "editor.clip.blur.whole": "Hele bildet",
+  "editor.clip.scale": "Skala %",
+  "editor.clip.offset-x": "Posisjon X %",
+  "editor.clip.offset-y": "Posisjon Y %",
+  "editor.clip.angle": "Vinkel °",
+  "editor.frame": "Prosjektramme",
+  "editor.frame.source": "Kilderamme",
+  "editor.frame.tip": "Utdataramme for hele prosjektet"
 }

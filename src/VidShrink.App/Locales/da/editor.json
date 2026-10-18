@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Ingen LUT",
   "editor.clip.lut.files": "LUT-filer",
   "editor.clip.lut.unreadable": "LUT kunne ikke læses: {0}",
-  "editor.clip.lut.missing": "LUT-filen blev ikke fundet; klippet blev åbnet uden den: {0}"
+  "editor.clip.lut.missing": "LUT-filen blev ikke fundet; klippet blev åbnet uden den: {0}",
+  "editor.clip.blur": "Sløring",
+  "editor.clip.blur.tip": "Sløringsstyrke (0-50), 0 er fra",
+  "editor.clip.blur.region": "Tegn område",
+  "editor.clip.blur.region.tip": "Træk et rektangel på monitoren",
+  "editor.clip.blur.whole": "Hele billedet",
+  "editor.clip.scale": "Skala %",
+  "editor.clip.offset-x": "Position X %",
+  "editor.clip.offset-y": "Position Y %",
+  "editor.clip.angle": "Vinkel °",
+  "editor.frame": "Projektramme",
+  "editor.frame.source": "Kilderamme",
+  "editor.frame.tip": "Outputramme for hele projektet"
 }

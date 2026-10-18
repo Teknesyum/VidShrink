@@ -1,7 +1,6 @@
 {
   "player.tracks.audio": "Zvuková stopa",
   "player.tracks.quality": "Kvalita streamu",
-  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Ďalšia zvuková stopa",
   "player.tracks.delay": "Zvukové oneskorenie {0} s",
   "player.tracks.delayreset": "Obnoviť zvukové oneskorenie",

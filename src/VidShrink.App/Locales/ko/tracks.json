@@ -1,7 +1,6 @@
 {
   "player.tracks.audio": "오디오 트랙",
   "player.tracks.quality": "스트림 화질",
-  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "다음 오디오 트랙",
   "player.tracks.delay": "오디오 지연 {0}초",
   "player.tracks.delayreset": "오디오 지연 초기화",

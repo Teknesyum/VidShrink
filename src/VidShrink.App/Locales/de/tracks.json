@@ -1,7 +1,6 @@
 {
   "player.tracks.audio": "Audiospur",
   "player.tracks.quality": "Streamqualität",
-  "player.tracks.quality.rate": "{0} kbit/s",
   "player.tracks.cycle": "Nächste Audiospur",
   "player.tracks.delay": "Audioverzögerung {0} s",
   "player.tracks.delayreset": "Audioverzögerung zurücksetzen",

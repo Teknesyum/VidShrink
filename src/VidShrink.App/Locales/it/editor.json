@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Nessuna LUT",
   "editor.clip.lut.files": "File LUT",
   "editor.clip.lut.unreadable": "Impossibile leggere la LUT: {0}",
-  "editor.clip.lut.missing": "File LUT non trovato; la clip è stata aperta senza: {0}"
+  "editor.clip.lut.missing": "File LUT non trovato; la clip è stata aperta senza: {0}",
+  "editor.clip.blur": "Sfocatura",
+  "editor.clip.blur.tip": "Intensità della sfocatura (0-50), 0 = disattivata",
+  "editor.clip.blur.region": "Disegna area",
+  "editor.clip.blur.region.tip": "Trascina un rettangolo sul monitor",
+  "editor.clip.blur.whole": "Intero fotogramma",
+  "editor.clip.scale": "Scala %",
+  "editor.clip.offset-x": "Posizione X %",
+  "editor.clip.offset-y": "Posizione Y %",
+  "editor.clip.angle": "Angolo °",
+  "editor.frame": "Cornice del progetto",
+  "editor.frame.source": "Cornice della sorgente",
+  "editor.frame.tip": "Cornice di uscita dell'intero progetto"
 }

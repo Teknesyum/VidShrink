@@ -71,7 +71,7 @@ internal partial class PlayerView
 
     internal static string VariantName(HlsVariant variant)
     {
-        var rate = Strings.Get("player.tracks.quality.rate", Math.Round(variant.Bandwidth / 1000.0).ToString("N0", Strings.Culture));
+        var rate = Strings.BitHizi(Math.Round(variant.Bandwidth / 1000.0).ToString("N0", Strings.Culture));
         return variant.Height > 0
             ? variant.Width.ToString(CultureInfo.InvariantCulture) + "×" + variant.Height.ToString(CultureInfo.InvariantCulture) + " · " + rate
             : rate;

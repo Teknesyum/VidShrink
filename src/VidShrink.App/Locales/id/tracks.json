@@ -1,7 +1,6 @@
 {
   "player.tracks.audio": "Trek audio",
   "player.tracks.quality": "Kualitas streaming",
-  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Trek audio berikutnya",
   "player.tracks.delay": "Keterlambatan audio {0} dtk",
   "player.tracks.delayreset": "Atur ulang keterlambatan audio",

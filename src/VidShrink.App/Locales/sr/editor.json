@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Без LUT-а",
   "editor.clip.lut.files": "LUT датотеке",
   "editor.clip.lut.unreadable": "LUT није могуће прочитати: {0}",
-  "editor.clip.lut.missing": "LUT датотека није пронађена; клип је отворен без ње: {0}"
+  "editor.clip.lut.missing": "LUT датотека није пронађена; клип је отворен без ње: {0}",
+  "editor.clip.blur": "Zamućenje",
+  "editor.clip.blur.tip": "Jačina zamućenja (0-50), 0 je isključeno",
+  "editor.clip.blur.region": "Nacrtaj oblast",
+  "editor.clip.blur.region.tip": "Prevuci pravougaonik na monitoru",
+  "editor.clip.blur.whole": "Ceo kadar",
+  "editor.clip.scale": "Razmera %",
+  "editor.clip.offset-x": "Položaj X %",
+  "editor.clip.offset-y": "Položaj Y %",
+  "editor.clip.angle": "Ugao °",
+  "editor.frame": "Kadar projekta",
+  "editor.frame.source": "Kadar izvora",
+  "editor.frame.tip": "Izlazni kadar celog projekta"
 }

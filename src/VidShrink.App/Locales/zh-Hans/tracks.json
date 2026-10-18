@@ -1,7 +1,6 @@
 {
   "player.tracks.audio": "音频轨道",
   "player.tracks.quality": "串流画质",
-  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "下一个音频轨道",
   "player.tracks.delay": "音频延迟 {0} 秒",
   "player.tracks.delayreset": "重置音频延迟",

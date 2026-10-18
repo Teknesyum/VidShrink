@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "بلا LUT",
   "editor.clip.lut.files": "ملفات LUT",
   "editor.clip.lut.unreadable": "تعذّرت قراءة LUT: {0}",
-  "editor.clip.lut.missing": "لم يُعثر على ملف LUT؛ فُتح المقطع بدونه: {0}"
+  "editor.clip.lut.missing": "لم يُعثر على ملف LUT؛ فُتح المقطع بدونه: {0}",
+  "editor.clip.blur": "طمس",
+  "editor.clip.blur.tip": "قوة الطمس (0-50)، 0 يعني إيقاف",
+  "editor.clip.blur.region": "ارسم منطقة",
+  "editor.clip.blur.region.tip": "اسحب مستطيلًا على الشاشة",
+  "editor.clip.blur.whole": "الإطار بأكمله",
+  "editor.clip.scale": "القياس %",
+  "editor.clip.offset-x": "الموضع X %",
+  "editor.clip.offset-y": "الموضع Y %",
+  "editor.clip.angle": "الزاوية °",
+  "editor.frame": "إطار المشروع",
+  "editor.frame.source": "إطار المصدر",
+  "editor.frame.tip": "إطار الإخراج للمشروع بأكمله"
 }

@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Sem LUT",
   "editor.clip.lut.files": "Arquivos LUT",
   "editor.clip.lut.unreadable": "Não foi possível ler o LUT: {0}",
-  "editor.clip.lut.missing": "Arquivo LUT não encontrado; o clipe foi aberto sem ele: {0}"
+  "editor.clip.lut.missing": "Arquivo LUT não encontrado; o clipe foi aberto sem ele: {0}",
+  "editor.clip.blur": "Desfoque",
+  "editor.clip.blur.tip": "Intensidade do desfoque (0-50), 0 é desativado",
+  "editor.clip.blur.region": "Desenhar região",
+  "editor.clip.blur.region.tip": "Arraste um retângulo no monitor",
+  "editor.clip.blur.whole": "Quadro inteiro",
+  "editor.clip.scale": "Escala %",
+  "editor.clip.offset-x": "Posição X %",
+  "editor.clip.offset-y": "Posição Y %",
+  "editor.clip.angle": "Ângulo °",
+  "editor.frame": "Quadro do projeto",
+  "editor.frame.source": "Quadro da origem",
+  "editor.frame.tip": "Quadro de saída de todo o projeto"
 }

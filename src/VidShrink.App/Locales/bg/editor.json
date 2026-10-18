@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Без LUT",
   "editor.clip.lut.files": "LUT файлове",
   "editor.clip.lut.unreadable": "LUT не може да бъде прочетен: {0}",
-  "editor.clip.lut.missing": "LUT файлът не е намерен; клипът е отворен без него: {0}"
+  "editor.clip.lut.missing": "LUT файлът не е намерен; клипът е отворен без него: {0}",
+  "editor.clip.blur": "Размазване",
+  "editor.clip.blur.tip": "Сила на размазването (0-50), 0 е изключено",
+  "editor.clip.blur.region": "Начертай област",
+  "editor.clip.blur.region.tip": "Плъзни правоъгълник върху монитора",
+  "editor.clip.blur.whole": "Целият кадър",
+  "editor.clip.scale": "Мащаб %",
+  "editor.clip.offset-x": "Позиция X %",
+  "editor.clip.offset-y": "Позиция Y %",
+  "editor.clip.angle": "Ъгъл °",
+  "editor.frame": "Кадър на проекта",
+  "editor.frame.source": "Кадър на източника",
+  "editor.frame.tip": "Изходен кадър на целия проект"
 }

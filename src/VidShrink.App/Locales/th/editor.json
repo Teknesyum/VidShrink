@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "ไม่มี LUT",
   "editor.clip.lut.files": "ไฟล์ LUT",
   "editor.clip.lut.unreadable": "อ่าน LUT ไม่ได้: {0}",
-  "editor.clip.lut.missing": "ไม่พบไฟล์ LUT จึงเปิดคลิปโดยไม่มี LUT: {0}"
+  "editor.clip.lut.missing": "ไม่พบไฟล์ LUT จึงเปิดคลิปโดยไม่มี LUT: {0}",
+  "editor.clip.blur": "เบลอ",
+  "editor.clip.blur.tip": "ความแรงของการเบลอ (0-50), 0 คือปิด",
+  "editor.clip.blur.region": "วาดพื้นที่",
+  "editor.clip.blur.region.tip": "ลากสี่เหลี่ยมบนมอนิเตอร์",
+  "editor.clip.blur.whole": "ทั้งเฟรม",
+  "editor.clip.scale": "สเกล %",
+  "editor.clip.offset-x": "ตำแหน่ง X %",
+  "editor.clip.offset-y": "ตำแหน่ง Y %",
+  "editor.clip.angle": "มุม °",
+  "editor.frame": "เฟรมโปรเจกต์",
+  "editor.frame.source": "เฟรมต้นฉบับ",
+  "editor.frame.tip": "เฟรมเอาต์พุตของทั้งโปรเจกต์"
 }

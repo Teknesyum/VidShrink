@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Ei LUT:ia",
   "editor.clip.lut.files": "LUT-tiedostot",
   "editor.clip.lut.unreadable": "LUT:ia ei voitu lukea: {0}",
-  "editor.clip.lut.missing": "LUT-tiedostoa ei löytynyt; leike avattiin ilman sitä: {0}"
+  "editor.clip.lut.missing": "LUT-tiedostoa ei löytynyt; leike avattiin ilman sitä: {0}",
+  "editor.clip.blur": "Sumennus",
+  "editor.clip.blur.tip": "Sumennuksen voimakkuus (0-50), 0 = pois",
+  "editor.clip.blur.region": "Piirrä alue",
+  "editor.clip.blur.region.tip": "Vedä suorakulmio monitoriin",
+  "editor.clip.blur.whole": "Koko kuva",
+  "editor.clip.scale": "Skaala %",
+  "editor.clip.offset-x": "Sijainti X %",
+  "editor.clip.offset-y": "Sijainti Y %",
+  "editor.clip.angle": "Kulma °",
+  "editor.frame": "Projektin kehys",
+  "editor.frame.source": "Lähteen kehys",
+  "editor.frame.tip": "Koko projektin tulostekehys"
 }

@@ -1,7 +1,6 @@
 {
   "player.tracks.audio": "Heliriba",
   "player.tracks.quality": "Voo kvaliteet",
-  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Järgmine heliriba",
   "player.tracks.delay": "Heli hilistus {0} s",
   "player.tracks.delayreset": "Lähtesta heli hilistus",

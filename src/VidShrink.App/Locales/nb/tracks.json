@@ -1,7 +1,6 @@
 {
   "player.tracks.audio": "Lydspor",
   "player.tracks.quality": "Strømmekvalitet",
-  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Neste lydspor",
   "player.tracks.delay": "Lydforsinkelse {0} s",
   "player.tracks.delayreset": "Nullstill lydforsinkelse",

@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Không có LUT",
   "editor.clip.lut.files": "Tệp LUT",
   "editor.clip.lut.unreadable": "Không đọc được LUT: {0}",
-  "editor.clip.lut.missing": "Không tìm thấy tệp LUT; clip đã mở mà không có nó: {0}"
+  "editor.clip.lut.missing": "Không tìm thấy tệp LUT; clip đã mở mà không có nó: {0}",
+  "editor.clip.blur": "Làm mờ",
+  "editor.clip.blur.tip": "Độ mờ (0-50), 0 là tắt",
+  "editor.clip.blur.region": "Vẽ vùng",
+  "editor.clip.blur.region.tip": "Kéo một hình chữ nhật trên màn hình",
+  "editor.clip.blur.whole": "Toàn bộ khung hình",
+  "editor.clip.scale": "Tỷ lệ %",
+  "editor.clip.offset-x": "Vị trí X %",
+  "editor.clip.offset-y": "Vị trí Y %",
+  "editor.clip.angle": "Góc °",
+  "editor.frame": "Khung dự án",
+  "editor.frame.source": "Khung nguồn",
+  "editor.frame.tip": "Khung đầu ra của toàn bộ dự án"
 }

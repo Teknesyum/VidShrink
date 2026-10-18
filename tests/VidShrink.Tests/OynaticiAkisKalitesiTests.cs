@@ -51,9 +51,9 @@ public sealed class OynaticiAkisKalitesiTests
     [Fact]
     public void KatmanAdiCozunurlukVeHizdir()
     {
-        var hiz = Strings.Get("player.tracks.quality.rate", Math.Round(1289680 / 1000.0).ToString("N0", Strings.Culture));
+        var hiz = Strings.BitHizi(Math.Round(1289680 / 1000.0).ToString("N0", Strings.Culture));
         Assert.Equal("640×360 · " + hiz, PlayerView.VariantName(new HlsVariant(1289680, 640, 360)));
-        Assert.Equal(Strings.Get("player.tracks.quality.rate", "64"), PlayerView.VariantName(new HlsVariant(64000, 0, 0)));
+        Assert.Equal(Strings.BitHizi("64"), PlayerView.VariantName(new HlsVariant(64000, 0, 0)));
         Assert.Equal("max", MpvEngine.StreamBitrateValue(0));
         Assert.Equal("346672", MpvEngine.StreamBitrateValue(346672));
     }

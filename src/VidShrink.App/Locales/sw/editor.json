@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Hakuna LUT",
   "editor.clip.lut.files": "Faili za LUT",
   "editor.clip.lut.unreadable": "LUT haikuweza kusomwa: {0}",
-  "editor.clip.lut.missing": "Faili ya LUT haikupatikana; klipu ilifunguliwa bila hiyo: {0}"
+  "editor.clip.lut.missing": "Faili ya LUT haikupatikana; klipu ilifunguliwa bila hiyo: {0}",
+  "editor.clip.blur": "Ukungu",
+  "editor.clip.blur.tip": "Nguvu ya ukungu (0-50), 0 ni imezimwa",
+  "editor.clip.blur.region": "Chora eneo",
+  "editor.clip.blur.region.tip": "Buruta mstatili kwenye kifuatiliaji",
+  "editor.clip.blur.whole": "Fremu nzima",
+  "editor.clip.scale": "Kipimo %",
+  "editor.clip.offset-x": "Nafasi X %",
+  "editor.clip.offset-y": "Nafasi Y %",
+  "editor.clip.angle": "Pembe °",
+  "editor.frame": "Fremu ya mradi",
+  "editor.frame.source": "Fremu ya chanzo",
+  "editor.frame.tip": "Fremu ya matokeo ya mradi mzima"
 }

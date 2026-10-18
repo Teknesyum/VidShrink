@@ -1,7 +1,6 @@
 {
   "player.tracks.audio": "แทร็กเสียง",
   "player.tracks.quality": "คุณภาพสตรีม",
-  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "แทร็กเสียงถัดไป",
   "player.tracks.delay": "หน่วงเสียง {0} วิ",
   "player.tracks.delayreset": "รีเซ็ตการหน่วงเสียง",

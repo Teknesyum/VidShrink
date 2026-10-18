@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Tiada LUT",
   "editor.clip.lut.files": "Fail LUT",
   "editor.clip.lut.unreadable": "LUT tidak dapat dibaca: {0}",
-  "editor.clip.lut.missing": "Fail LUT tidak ditemui; klip dibuka tanpanya: {0}"
+  "editor.clip.lut.missing": "Fail LUT tidak ditemui; klip dibuka tanpanya: {0}",
+  "editor.clip.blur": "Kabur",
+  "editor.clip.blur.tip": "Kekuatan kabur (0-50), 0 bermaksud mati",
+  "editor.clip.blur.region": "Lukis kawasan",
+  "editor.clip.blur.region.tip": "Seret segi empat tepat pada monitor",
+  "editor.clip.blur.whole": "Keseluruhan bingkai",
+  "editor.clip.scale": "Skala %",
+  "editor.clip.offset-x": "Kedudukan X %",
+  "editor.clip.offset-y": "Kedudukan Y %",
+  "editor.clip.angle": "Sudut °",
+  "editor.frame": "Bingkai projek",
+  "editor.frame.source": "Bingkai sumber",
+  "editor.frame.tip": "Bingkai output bagi keseluruhan projek"
 }

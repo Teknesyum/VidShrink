@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Be LUT",
   "editor.clip.lut.files": "LUT failai",
   "editor.clip.lut.unreadable": "Nepavyko perskaityti LUT: {0}",
-  "editor.clip.lut.missing": "LUT failas nerastas; klipas atvertas be jo: {0}"
+  "editor.clip.lut.missing": "LUT failas nerastas; klipas atvertas be jo: {0}",
+  "editor.clip.blur": "Suliejimas",
+  "editor.clip.blur.tip": "Suliejimo stiprumas (0-50), 0 – išjungta",
+  "editor.clip.blur.region": "Nupiešti sritį",
+  "editor.clip.blur.region.tip": "Vilkti stačiakampį monitoriuje",
+  "editor.clip.blur.whole": "Visas kadras",
+  "editor.clip.scale": "Mastelis %",
+  "editor.clip.offset-x": "Padėtis X %",
+  "editor.clip.offset-y": "Padėtis Y %",
+  "editor.clip.angle": "Kampas °",
+  "editor.frame": "Projekto kadras",
+  "editor.frame.source": "Šaltinio kadras",
+  "editor.frame.tip": "Viso projekto išvesties kadras"
 }

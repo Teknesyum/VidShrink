@@ -1,7 +1,6 @@
 {
   "player.tracks.audio": "Zvočna sled",
   "player.tracks.quality": "Kakovost pretoka",
-  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Naslednja zvočna sled",
   "player.tracks.delay": "Zvočni zamik {0} s",
   "player.tracks.delayreset": "Ponastavi zvočni zamik",

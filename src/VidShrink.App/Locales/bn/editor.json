@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "LUT নেই",
   "editor.clip.lut.files": "LUT ফাইল",
   "editor.clip.lut.unreadable": "LUT পড়া যায়নি: {0}",
-  "editor.clip.lut.missing": "LUT ফাইল পাওয়া যায়নি; ক্লিপটি LUT ছাড়া খোলা হয়েছে: {0}"
+  "editor.clip.lut.missing": "LUT ফাইল পাওয়া যায়নি; ক্লিপটি LUT ছাড়া খোলা হয়েছে: {0}",
+  "editor.clip.blur": "ঝাপসা",
+  "editor.clip.blur.tip": "ঝাপসার মাত্রা (0-50), 0 মানে বন্ধ",
+  "editor.clip.blur.region": "অঞ্চল আঁকুন",
+  "editor.clip.blur.region.tip": "মনিটরে একটি আয়তক্ষেত্র টেনে আনুন",
+  "editor.clip.blur.whole": "পুরো ফ্রেম",
+  "editor.clip.scale": "স্কেল %",
+  "editor.clip.offset-x": "অবস্থান X %",
+  "editor.clip.offset-y": "অবস্থান Y %",
+  "editor.clip.angle": "কোণ °",
+  "editor.frame": "প্রকল্পের ফ্রেম",
+  "editor.frame.source": "উৎসের ফ্রেম",
+  "editor.frame.tip": "পুরো প্রকল্পের আউটপুট ফ্রেম"
 }

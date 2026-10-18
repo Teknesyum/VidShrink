@@ -1,7 +1,6 @@
 {
   "player.tracks.audio": "Wimbo wa sauti",
   "player.tracks.quality": "Ubora wa mtiririko",
-  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "Wimbo unaofuata wa sauti",
   "player.tracks.delay": "Ucheleweshaji wa sauti {0} s",
   "player.tracks.delayreset": "Weka upya ucheleweshaji wa sauti",

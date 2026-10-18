@@ -1,7 +1,6 @@
 {
   "player.tracks.audio": "ऑडियो ट्रैक",
   "player.tracks.quality": "स्ट्रीम गुणवत्ता",
-  "player.tracks.quality.rate": "{0} kb/s",
   "player.tracks.cycle": "अगला ऑडियो ट्रैक",
   "player.tracks.delay": "ऑडियो विलंब {0} सेकंड",
   "player.tracks.delayreset": "ऑडियो विलंब रीसेट करें",

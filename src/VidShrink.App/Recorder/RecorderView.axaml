@@ -882,7 +882,45 @@
             </izi:SutunIzgara>
 
             <StackPanel>
-              <SarilanMetin Text="{loc:Text recorder.output.title}" Theme="{StaticResource Label}"/>
+              <Grid ColumnDefinitions="Auto,Auto" HorizontalAlignment="Left">
+                <SarilanMetin Text="{loc:Text recorder.output.title}" Theme="{StaticResource Label}"/>
+                <Button x:Name="BtnNamePattern" Grid.Column="1" Theme="{StaticResource GhostButton}"
+                        Width="{StaticResource InfoBadgeSize}" Height="{StaticResource InfoBadgeSize}"
+                        MinHeight="0" Padding="0" Margin="{StaticResource InfoBadgeLabelMargin}"
+                        CornerRadius="{StaticResource RadiusChip}" VerticalAlignment="Center"
+                        auto:AutomationProperties.Name="{loc:Text recorder.name.title}">
+                  <ToolTip.Tip>
+                    <SarilanMetin Theme="{StaticResource TipText}" Text="{loc:Text recorder.name.title}"/>
+                  </ToolTip.Tip>
+                  <Path Width="{StaticResource InfoBadgeGlyphSize}" Height="{StaticResource InfoBadgeGlyphSize}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
+                  <Button.Flyout>
+                    <Flyout>
+                      <StackPanel Spacing="{StaticResource SpaceSm}" Width="{StaticResource FieldWidth}">
+                        <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                          <SarilanMetin Text="{loc:Text recorder.name.title}" Theme="{StaticResource Label}"/>
+                          <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text recorder.name.title}">
+                            <ToolTip.Tip>
+                              <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text recorder.name.hint}"/>
+                            </ToolTip.Tip>
+                          </Button>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
+                          <TextBox x:Name="TxtNamePattern"
+                                   FlowDirection="LeftToRight"
+                                   auto:AutomationProperties.Name="{loc:Text recorder.name.title}"/>
+                          <Button Grid.Column="1"
+                                  x:Name="BtnResetNamePattern"
+                                  Theme="{StaticResource GhostButton}"
+                                  Content="{loc:Text settings-tab.output-name.reset}"
+                                  auto:AutomationProperties.Name="{loc:Text settings-tab.output-name.reset}"
+                                  Click="OnResetNamePattern"/>
+                        </Grid>
+                        <SarilanMetin x:Name="TxtNamePreview" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                      </StackPanel>
+                    </Flyout>
+                  </Button.Flyout>
+                </Button>
+              </Grid>
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
                 <TextBox Grid.Column="0"
                          x:Name="TxtOutputFolder"
@@ -895,29 +933,6 @@
                         auto:AutomationProperties.Name="{loc:Text recorder.output.browse}"
                         Click="OnBrowse"/>
               </Grid>
-            </StackPanel>
-
-            <StackPanel Spacing="{StaticResource SpaceSm}">
-              <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
-                <SarilanMetin Text="{loc:Text recorder.name.title}" Theme="{StaticResource Label}"/>
-                <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text recorder.name.title}">
-                  <ToolTip.Tip>
-                    <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text recorder.name.hint}"/>
-                  </ToolTip.Tip>
-                </Button>
-              </Grid>
-              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}">
-                <TextBox x:Name="TxtNamePattern"
-                         FlowDirection="LeftToRight"
-                         auto:AutomationProperties.Name="{loc:Text recorder.name.title}"/>
-                <Button Grid.Column="1"
-                        x:Name="BtnResetNamePattern"
-                        Theme="{StaticResource GhostButton}"
-                        Content="{loc:Text settings-tab.output-name.reset}"
-                        auto:AutomationProperties.Name="{loc:Text settings-tab.output-name.reset}"
-                        Click="OnResetNamePattern"/>
-              </Grid>
-              <SarilanMetin x:Name="TxtNamePreview" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
             </StackPanel>
           </StackPanel>
         </Border>

@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "LUT 없음",
   "editor.clip.lut.files": "LUT 파일",
   "editor.clip.lut.unreadable": "LUT를 읽을 수 없습니다: {0}",
-  "editor.clip.lut.missing": "LUT 파일을 찾을 수 없어 클립을 LUT 없이 열었습니다: {0}"
+  "editor.clip.lut.missing": "LUT 파일을 찾을 수 없어 클립을 LUT 없이 열었습니다: {0}",
+  "editor.clip.blur": "블러",
+  "editor.clip.blur.tip": "블러 강도 (0-50), 0은 꺼짐",
+  "editor.clip.blur.region": "영역 그리기",
+  "editor.clip.blur.region.tip": "모니터에서 사각형을 드래그하세요",
+  "editor.clip.blur.whole": "전체 프레임",
+  "editor.clip.scale": "크기 %",
+  "editor.clip.offset-x": "위치 X %",
+  "editor.clip.offset-y": "위치 Y %",
+  "editor.clip.angle": "각도 °",
+  "editor.frame": "프로젝트 프레임",
+  "editor.frame.source": "소스 프레임",
+  "editor.frame.tip": "전체 프로젝트의 출력 프레임"
 }

@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Fără LUT",
   "editor.clip.lut.files": "Fișiere LUT",
   "editor.clip.lut.unreadable": "LUT-ul nu a putut fi citit: {0}",
-  "editor.clip.lut.missing": "Fișierul LUT nu a fost găsit; clipul a fost deschis fără el: {0}"
+  "editor.clip.lut.missing": "Fișierul LUT nu a fost găsit; clipul a fost deschis fără el: {0}",
+  "editor.clip.blur": "Estompare",
+  "editor.clip.blur.tip": "Intensitatea estompării (0-50), 0 = dezactivat",
+  "editor.clip.blur.region": "Desenează o zonă",
+  "editor.clip.blur.region.tip": "Trage un dreptunghi pe monitor",
+  "editor.clip.blur.whole": "Tot cadrul",
+  "editor.clip.scale": "Scară %",
+  "editor.clip.offset-x": "Poziție X %",
+  "editor.clip.offset-y": "Poziție Y %",
+  "editor.clip.angle": "Unghi °",
+  "editor.frame": "Cadrul proiectului",
+  "editor.frame.source": "Cadrul sursei",
+  "editor.frame.tip": "Cadrul de ieșire al întregului proiect"
 }

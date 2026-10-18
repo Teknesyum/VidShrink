@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Aucun LUT",
   "editor.clip.lut.files": "Fichiers LUT",
   "editor.clip.lut.unreadable": "Impossible de lire le LUT : {0}",
-  "editor.clip.lut.missing": "Fichier LUT introuvable ; le clip a été ouvert sans lui : {0}"
+  "editor.clip.lut.missing": "Fichier LUT introuvable ; le clip a été ouvert sans lui : {0}",
+  "editor.clip.blur": "Flou",
+  "editor.clip.blur.tip": "Intensité du flou (0-50), 0 = désactivé",
+  "editor.clip.blur.region": "Dessiner une zone",
+  "editor.clip.blur.region.tip": "Faites glisser un rectangle sur le moniteur",
+  "editor.clip.blur.whole": "Image entière",
+  "editor.clip.scale": "Échelle %",
+  "editor.clip.offset-x": "Position X %",
+  "editor.clip.offset-y": "Position Y %",
+  "editor.clip.angle": "Angle °",
+  "editor.frame": "Cadre du projet",
+  "editor.frame.source": "Cadre source",
+  "editor.frame.tip": "Cadre de sortie de tout le projet"
 }

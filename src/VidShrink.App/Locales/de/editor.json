@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Keine LUT",
   "editor.clip.lut.files": "LUT-Dateien",
   "editor.clip.lut.unreadable": "LUT konnte nicht gelesen werden: {0}",
-  "editor.clip.lut.missing": "LUT-Datei nicht gefunden; der Clip wurde ohne sie geöffnet: {0}"
+  "editor.clip.lut.missing": "LUT-Datei nicht gefunden; der Clip wurde ohne sie geöffnet: {0}",
+  "editor.clip.blur": "Weichzeichnen",
+  "editor.clip.blur.tip": "Stärke des Weichzeichners (0-50), 0 ist aus",
+  "editor.clip.blur.region": "Bereich zeichnen",
+  "editor.clip.blur.region.tip": "Rechteck auf dem Monitor aufziehen",
+  "editor.clip.blur.whole": "Ganzes Bild",
+  "editor.clip.scale": "Skalierung %",
+  "editor.clip.offset-x": "Position X %",
+  "editor.clip.offset-y": "Position Y %",
+  "editor.clip.angle": "Winkel °",
+  "editor.frame": "Projektrahmen",
+  "editor.frame.source": "Quellrahmen",
+  "editor.frame.tip": "Ausgaberahmen des gesamten Projekts"
 }

@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Bez LUT",
   "editor.clip.lut.files": "Soubory LUT",
   "editor.clip.lut.unreadable": "LUT nelze přečíst: {0}",
-  "editor.clip.lut.missing": "Soubor LUT nebyl nalezen; klip byl otevřen bez něj: {0}"
+  "editor.clip.lut.missing": "Soubor LUT nebyl nalezen; klip byl otevřen bez něj: {0}",
+  "editor.clip.blur": "Rozostření",
+  "editor.clip.blur.tip": "Síla rozostření (0-50), 0 = vypnuto",
+  "editor.clip.blur.region": "Nakreslit oblast",
+  "editor.clip.blur.region.tip": "Přetáhněte na monitoru obdélník",
+  "editor.clip.blur.whole": "Celý snímek",
+  "editor.clip.scale": "Měřítko %",
+  "editor.clip.offset-x": "Pozice X %",
+  "editor.clip.offset-y": "Pozice Y %",
+  "editor.clip.angle": "Úhel °",
+  "editor.frame": "Rámec projektu",
+  "editor.frame.source": "Rámec zdroje",
+  "editor.frame.tip": "Výstupní rámec celého projektu"
 }

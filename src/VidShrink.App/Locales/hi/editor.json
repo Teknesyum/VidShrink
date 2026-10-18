@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "कोई LUT नहीं",
   "editor.clip.lut.files": "LUT फ़ाइलें",
   "editor.clip.lut.unreadable": "LUT पढ़ा नहीं जा सका: {0}",
-  "editor.clip.lut.missing": "LUT फ़ाइल नहीं मिली; क्लिप उसके बिना खोली गई: {0}"
+  "editor.clip.lut.missing": "LUT फ़ाइल नहीं मिली; क्लिप उसके बिना खोली गई: {0}",
+  "editor.clip.blur": "ब्लर",
+  "editor.clip.blur.tip": "ब्लर की तीव्रता (0-50), 0 यानी बंद",
+  "editor.clip.blur.region": "क्षेत्र बनाएँ",
+  "editor.clip.blur.region.tip": "मॉनिटर पर एक आयत खींचें",
+  "editor.clip.blur.whole": "पूरा फ़्रेम",
+  "editor.clip.scale": "स्केल %",
+  "editor.clip.offset-x": "स्थिति X %",
+  "editor.clip.offset-y": "स्थिति Y %",
+  "editor.clip.angle": "कोण °",
+  "editor.frame": "प्रोजेक्ट फ़्रेम",
+  "editor.frame.source": "स्रोत फ़्रेम",
+  "editor.frame.tip": "पूरे प्रोजेक्ट का आउटपुट फ़्रेम"
 }

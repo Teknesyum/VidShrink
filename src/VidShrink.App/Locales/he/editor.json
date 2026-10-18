@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "ללא LUT",
   "editor.clip.lut.files": "קובצי LUT",
   "editor.clip.lut.unreadable": "לא ניתן לקרוא את ה-LUT: {0}",
-  "editor.clip.lut.missing": "קובץ ה-LUT לא נמצא; הקליפ נפתח בלעדיו: {0}"
+  "editor.clip.lut.missing": "קובץ ה-LUT לא נמצא; הקליפ נפתח בלעדיו: {0}",
+  "editor.clip.blur": "טשטוש",
+  "editor.clip.blur.tip": "עוצמת הטשטוש (0-50), 0 כבוי",
+  "editor.clip.blur.region": "ציור אזור",
+  "editor.clip.blur.region.tip": "גררו מלבן על המסך",
+  "editor.clip.blur.whole": "כל הפריים",
+  "editor.clip.scale": "קנה מידה %",
+  "editor.clip.offset-x": "מיקום X %",
+  "editor.clip.offset-y": "מיקום Y %",
+  "editor.clip.angle": "זווית °",
+  "editor.frame": "מסגרת הפרויקט",
+  "editor.frame.source": "מסגרת המקור",
+  "editor.frame.tip": "מסגרת הפלט של כל הפרויקט"
 }

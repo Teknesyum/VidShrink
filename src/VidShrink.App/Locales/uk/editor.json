@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Без LUT",
   "editor.clip.lut.files": "Файли LUT",
   "editor.clip.lut.unreadable": "Не вдалося прочитати LUT: {0}",
-  "editor.clip.lut.missing": "Файл LUT не знайдено; кліп відкрито без нього: {0}"
+  "editor.clip.lut.missing": "Файл LUT не знайдено; кліп відкрито без нього: {0}",
+  "editor.clip.blur": "Розмиття",
+  "editor.clip.blur.tip": "Сила розмиття (0-50), 0 — вимкнено",
+  "editor.clip.blur.region": "Намалювати область",
+  "editor.clip.blur.region.tip": "Протягніть прямокутник на моніторі",
+  "editor.clip.blur.whole": "Весь кадр",
+  "editor.clip.scale": "Масштаб %",
+  "editor.clip.offset-x": "Позиція X %",
+  "editor.clip.offset-y": "Позиція Y %",
+  "editor.clip.angle": "Кут °",
+  "editor.frame": "Кадр проєкту",
+  "editor.frame.source": "Кадр джерела",
+  "editor.frame.tip": "Вихідний кадр усього проєкту"
 }

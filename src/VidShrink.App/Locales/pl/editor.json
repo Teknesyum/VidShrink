@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Brak LUT",
   "editor.clip.lut.files": "Pliki LUT",
   "editor.clip.lut.unreadable": "Nie można odczytać LUT: {0}",
-  "editor.clip.lut.missing": "Nie znaleziono pliku LUT; klip otwarto bez niego: {0}"
+  "editor.clip.lut.missing": "Nie znaleziono pliku LUT; klip otwarto bez niego: {0}",
+  "editor.clip.blur": "Rozmycie",
+  "editor.clip.blur.tip": "Siła rozmycia (0-50), 0 oznacza wyłączone",
+  "editor.clip.blur.region": "Narysuj obszar",
+  "editor.clip.blur.region.tip": "Przeciągnij prostokąt na monitorze",
+  "editor.clip.blur.whole": "Cały kadr",
+  "editor.clip.scale": "Skala %",
+  "editor.clip.offset-x": "Pozycja X %",
+  "editor.clip.offset-y": "Pozycja Y %",
+  "editor.clip.angle": "Kąt °",
+  "editor.frame": "Kadr projektu",
+  "editor.frame.source": "Kadr źródła",
+  "editor.frame.tip": "Kadr wyjściowy całego projektu"
 }

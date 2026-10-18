@@ -315,5 +315,17 @@
   "editor.clip.lut.none": "Bez LUT-a",
   "editor.clip.lut.files": "LUT datoteke",
   "editor.clip.lut.unreadable": "LUT nije moguće pročitati: {0}",
-  "editor.clip.lut.missing": "LUT datoteka nije pronađena; isječak je otvoren bez nje: {0}"
+  "editor.clip.lut.missing": "LUT datoteka nije pronađena; isječak je otvoren bez nje: {0}",
+  "editor.clip.blur": "Zamućenje",
+  "editor.clip.blur.tip": "Jačina zamućenja (0-50), 0 je isključeno",
+  "editor.clip.blur.region": "Nacrtaj područje",
+  "editor.clip.blur.region.tip": "Povuci pravokutnik na monitoru",
+  "editor.clip.blur.whole": "Cijeli kadar",
+  "editor.clip.scale": "Mjerilo %",
+  "editor.clip.offset-x": "Položaj X %",
+  "editor.clip.offset-y": "Položaj Y %",
+  "editor.clip.angle": "Kut °",
+  "editor.frame": "Kadar projekta",
+  "editor.frame.source": "Kadar izvora",
+  "editor.frame.tip": "Izlazni kadar cijelog projekta"
 }

@@ -1729,10 +1729,10 @@
                         <SarilanMetin Text="{loc:Text main.advanced.preset.label}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                         <ComboBox x:Name="CmbConvertSpeed" auto:AutomationProperties.Name="{loc:Text main.advanced.preset.label}"/>
                       </StackPanel>
-                      <StackPanel x:Name="ConvertTuneRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
-                        <SarilanMetin Text="{loc:Text main.advanced.tune.label}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
-                        <ComboBox x:Name="CmbConvertTune" auto:AutomationProperties.Name="{loc:Text main.advanced.tune.label}"/>
-                      </StackPanel>
+                      <Grid x:Name="ConvertTuneRow" ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
+                        <SarilanMetin Text="{loc:Text main.advanced.tune.label}" Theme="{StaticResource Hint}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                        <ComboBox Grid.Column="1" x:Name="CmbConvertTune" auto:AutomationProperties.Name="{loc:Text main.advanced.tune.label}"/>
+                      </Grid>
                       <StackPanel x:Name="ConvertProfileRow" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Center">
                         <SarilanMetin Text="{loc:Text main.convert.encoder.profile}" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
                         <ComboBox x:Name="CmbConvertCodecProfile" auto:AutomationProperties.Name="{loc:Text main.convert.encoder.profile}"/>
