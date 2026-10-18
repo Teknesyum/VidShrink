@@ -280,7 +280,7 @@ internal partial class EditorView
     }
 
     private static FilePickerFileType ProjectFileType()
-        => new("VidShrink") { Patterns = new[] { "*" + EditProject.Extension } };
+        => new(Core.AppIdentity.Name) { Patterns = new[] { "*" + EditProject.Extension } };
 
     /// <summary>
     /// Cizelgeyi uzantinin bicimindeki kesim listesine yazar (<see cref="CutList"/>): <c>.csv</c>, <c>.edl</c>, YouTube
