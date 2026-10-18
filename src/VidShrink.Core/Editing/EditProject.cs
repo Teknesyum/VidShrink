@@ -433,6 +433,39 @@ public sealed class EditProject
                 writer.WriteNumber("height", effects.BlurHeight);
             }
 
+            if (effects.VolumeKeys.Count > 0)
+            {
+                writer.WriteStartArray("volumeKeys");
+                foreach (var key in effects.VolumeKeys)
+                {
+                    writer.WriteStartObject();
+                    writer.WriteNumber("offset", key.Offset);
+                    writer.WriteNumber("db", key.Db);
+                    writer.WriteString("ease", KeyframeEaseKeys.Key(key.Ease));
+                    writer.WriteEndObject();
+                }
+
+                writer.WriteEndArray();
+            }
+
+            if (effects.CropKeys.Count > 0)
+            {
+                writer.WriteStartArray("cropKeys");
+                foreach (var key in effects.CropKeys)
+                {
+                    writer.WriteStartObject();
+                    writer.WriteNumber("offset", key.Offset);
+                    writer.WriteNumber("left", key.Left);
+                    writer.WriteNumber("top", key.Top);
+                    writer.WriteNumber("right", key.Right);
+                    writer.WriteNumber("bottom", key.Bottom);
+                    writer.WriteString("ease", KeyframeEaseKeys.Key(key.Ease));
+                    writer.WriteEndObject();
+                }
+
+                writer.WriteEndArray();
+            }
+
             writer.WriteEndObject();
         }
 
@@ -490,6 +523,13 @@ public sealed class EditProject
             OffsetX = e.TryGetProperty("offsetX", out var offsetX) ? offsetX.GetDouble() : 0,
             OffsetY = e.TryGetProperty("offsetY", out var offsetY) ? offsetY.GetDouble() : 0,
             Angle = e.TryGetProperty("angle", out var angle) ? angle.GetDouble() : 0,
+            VolumeKeys = e.TryGetProperty("volumeKeys", out var volumeKeys)
+                ? new KeyframeTrack<VolumeKey>(volumeKeys.EnumerateArray().Select(k => new VolumeKey(k.GetProperty("offset").GetInt64(), k.GetProperty("db").GetDouble(), Ease(k))))
+                : KeyframeTrack<VolumeKey>.Empty,
+            CropKeys = e.TryGetProperty("cropKeys", out var cropKeys)
+                ? new KeyframeTrack<CropKey>(cropKeys.EnumerateArray().Select(k => new CropKey(k.GetProperty("offset").GetInt64(),
+                    k.GetProperty("left").GetDouble(), k.GetProperty("top").GetDouble(), k.GetProperty("right").GetDouble(), k.GetProperty("bottom").GetDouble(), Ease(k))))
+                : KeyframeTrack<CropKey>.Empty,
         };
         if (e.TryGetProperty("blur", out var blur) && blur.ValueKind == JsonValueKind.Object)
             effects = effects with
@@ -506,6 +546,9 @@ public sealed class EditProject
 
     private static double BlurNumber(JsonElement blur, string name)
         => blur.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.Number ? value.GetDouble() : 0;
+
+    private static KeyframeEase Ease(JsonElement key)
+        => KeyframeEaseKeys.Parse(key.TryGetProperty("ease", out var ease) ? ease.GetString() : null);
 
     internal static void WriteText(Utf8JsonWriter writer, TextLayer text)
     {

@@ -26,6 +26,8 @@ internal partial class EditorView
 
     internal static readonly TransitionKind?[] TransitionChoices = { null, TransitionKind.Dissolve, TransitionKind.Wipe, TransitionKind.Slide, TransitionKind.Iris };
 
+    private static readonly string[] EaseKeys = { "editor.clip.keys.ease.linear", "editor.clip.keys.ease.in", "editor.clip.keys.ease.out", "editor.clip.keys.ease.in-out" };
+
     private bool _showingClip;
     private int _restyles;
 
@@ -50,6 +52,13 @@ internal partial class EditorView
         CmbClipTransition.Items.Clear();
         foreach (var kind in TransitionChoices)
             CmbClipTransition.Items.Add(new ComboBoxItem { Content = Strings.Get(kind is { } k ? "editor.clip.transition." + ClipTransition.Key(k) : "editor.clip.transition.none") });
+
+        CmbClipEase.Items.Clear();
+        foreach (var key in EaseKeys) CmbClipEase.Items.Add(new ComboBoxItem { Content = Strings.Get(key) });
+        CmbClipEase.SelectedIndex = 0;
+        BtnClipKeyVolume.Click += (_, _) => AddVolumeKey();
+        BtnClipKeyCrop.Click += (_, _) => AddCropKey();
+        BtnClipKeysClear.Click += (_, _) => { if (_showingClip) SetClipEffects(e => e with { VolumeKeys = KeyframeTrack<VolumeKey>.Empty, CropKeys = KeyframeTrack<CropKey>.Empty }); };
 
         Timeline.SelectionChanged += ShowClipPanel;
         Timeline.TextSelectionChanged += ShowClipPanel;
@@ -161,6 +170,31 @@ internal partial class EditorView
         var done = Apply(model => model.SetEffects(targets, change), -1);
         if (!done) ShowClipPanel();
         return done;
+    }
+
+    internal KeyframeEase SelectedEase => (KeyframeEase)Math.Clamp(CmbClipEase.SelectedIndex, 0, EaseKeys.Length - 1);
+
+    internal long KeyOffset()
+    {
+        var index = ActiveIndex;
+        if (_model is not { } model || index < 0 || index >= model.Clips.Count) return 0;
+        return Math.Clamp(Timeline.Playhead - model.ClipStart(index), 0, Math.Max(0, model.Clips[index].TimelineLength - 1));
+    }
+
+    internal bool AddVolumeKey()
+    {
+        if (!_showingClip) return false;
+        var offset = KeyOffset();
+        var ease = SelectedEase;
+        return SetClipEffects(e => e with { VolumeKeys = e.VolumeKeys.With(new VolumeKey(offset, e.VolumeDb, ease)) });
+    }
+
+    internal bool AddCropKey()
+    {
+        if (!_showingClip) return false;
+        var offset = KeyOffset();
+        var ease = SelectedEase;
+        return SetClipEffects(e => e.HasFit ? e : e with { CropKeys = e.CropKeys.With(new CropKey(offset, e.CropLeft, e.CropTop, e.CropRight, e.CropBottom, ease)) });
     }
 
     internal bool RotateClip()
@@ -331,6 +365,9 @@ internal partial class EditorView
         ShowClipGrade(effects);
         ShowClipBlur(effects);
         TxtClipLabel.Text = model.Clips[index].Label;
+        TxtClipKeys.Text = string.Format(Strings.Culture, Strings.Get("editor.clip.keys.count"), effects.VolumeKeys.Count, effects.CropKeys.Count);
+        BtnClipKeyCrop.IsEnabled = !effects.HasFit;
+        BtnClipKeysClear.IsEnabled = effects.HasKeyframes;
         var transition = model.Clips[index].Transition;
         CmbClipTransition.SelectedIndex = transition is null ? 0 : Array.IndexOf(TransitionChoices, transition.Kind);
         TxtClipTransition.Text = (transition is null ? ClipTransition.DefaultSeconds : EditTime.ToSeconds(transition.Duration)).ToString("0.##", Strings.Culture);

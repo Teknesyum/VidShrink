@@ -356,11 +356,20 @@
               <TextBox x:Name="TxtClipHighlightHue" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.highlight-hue}"/>
               <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.highlight-amount}"/>
               <TextBox x:Name="TxtClipHighlightAmount" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.highlight-amount}"/>
-            </StackPanel>\n            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
               <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.blur}"/>
               <TextBox x:Name="TxtClipBlur" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.blur}" ToolTip.Tip="{loc:Text editor.clip.blur.tip}"/>
               <ToggleButton x:Name="BtnClipBlurRegion" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.clip.blur.region}" AutomationProperties.Name="{loc:Text editor.clip.blur.region}" ToolTip.Tip="{loc:Text editor.clip.blur.region.tip}"/>
               <Button x:Name="BtnClipBlurWhole" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.blur.whole}" AutomationProperties.Name="{loc:Text editor.clip.blur.whole}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.keys.ease}"/>
+              <ComboBox x:Name="CmbClipEase" MinWidth="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.keys.ease}"/>
+              <Button x:Name="BtnClipKeyVolume" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.keys.add-volume}" AutomationProperties.Name="{loc:Text editor.clip.keys.add-volume}"/>
+              <Button x:Name="BtnClipKeyCrop" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.keys.add-crop}" AutomationProperties.Name="{loc:Text editor.clip.keys.add-crop}"/>
+              <Button x:Name="BtnClipKeysClear" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.keys.clear}" AutomationProperties.Name="{loc:Text editor.clip.keys.clear}"/>
+              <SarilanMetin x:Name="TxtClipKeys" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
             </StackPanel>
             <Button x:Name="BtnClipReset" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.reset}" AutomationProperties.Name="{loc:Text editor.clip.reset}"/>
           </WrapPanel>

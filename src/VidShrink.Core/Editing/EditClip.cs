@@ -113,17 +113,24 @@ public sealed record EditClip
         return Math.Min(CeilDiv(consumed * 100, Hundredths), TimelineLength - 1);
     }
 
-    internal EditClip WithMotion(decimal speed, bool reversed) => new(SourceStart, SourceEnd, speed, reversed) { Effects = Effects, Source = Source, Label = Label, Group = Group, Transition = Transition, Smooth = Smooth };
+    internal EditClip WithMotion(decimal speed, bool reversed) => new(SourceStart, SourceEnd, speed, reversed) { Effects = Effects.ScaledKeys((double)Speed / (double)speed), Source = Source, Label = Label, Group = Group, Transition = Transition, Smooth = Smooth };
 
-    internal EditClip WithRange(long sourceStart, long sourceEnd) => new(sourceStart, sourceEnd, Speed, Reversed) { Effects = Effects, Source = Source, Label = Label, Group = Group, Transition = Transition, Smooth = Smooth };
+    internal EditClip WithRange(long sourceStart, long sourceEnd)
+    {
+        var clip = new EditClip(sourceStart, sourceEnd, Speed, Reversed) { Effects = Effects, Source = Source, Label = Label, Group = Group, Transition = Transition, Smooth = Smooth };
+        if (!Effects.HasKeyframes) return clip;
+        var from = (Reversed ? SourceEnd - sourceEnd : sourceStart - SourceStart) * 100 / Hundredths;
+        return clip with { Effects = Effects.SlicedKeys(from, from + clip.TimelineLength) };
+    }
 
     internal (EditClip First, EditClip Second)? SplitAt(long offset)
     {
         var consumed = Consumed(offset);
         if (consumed <= 0 || consumed >= SourceLength) return null;
 
-        var head = Effects with { FadeOut = 0 };
-        var tail = Effects with { FadeIn = 0 };
+        var cut = CeilDiv(consumed * 100, Hundredths);
+        var head = (Effects with { FadeOut = 0 }).SlicedKeys(0, cut);
+        var tail = (Effects with { FadeIn = 0 }).SlicedKeys(cut, TimelineLength);
         return Reversed
             ? (new EditClip(SourceEnd - consumed, SourceEnd, Speed, true) { Effects = head, Source = Source, Label = Label, Group = Group, Transition = Transition, Smooth = Smooth }, new EditClip(SourceStart, SourceEnd - consumed, Speed, true) { Effects = tail, Source = Source, Label = Label, Group = Group, Smooth = Smooth })
             : (new EditClip(SourceStart, SourceStart + consumed, Speed, false) { Effects = head, Source = Source, Label = Label, Group = Group, Transition = Transition, Smooth = Smooth }, new EditClip(SourceStart + consumed, SourceEnd, Speed, false) { Effects = tail, Source = Source, Label = Label, Group = Group, Smooth = Smooth });
@@ -190,6 +197,13 @@ public sealed record EditClip
             var effects = Effects;
             if (i > 0) effects = effects with { FadeIn = 0 };
             if (i < kept.Count - 1) effects = effects with { FadeOut = 0 };
+            if (effects.HasKeyframes)
+            {
+                var from = OffsetOfConsumed(Reversed ? SourceEnd - kept[i].End : kept[i].Start - SourceStart);
+                var to = OffsetOfConsumed(Reversed ? SourceEnd - kept[i].Start : kept[i].End - SourceStart);
+                effects = effects.SlicedKeys(from, to);
+                if (kept[i].Fast) effects = effects.ScaledKeys((double)Speed / (double)fastSpeed);
+            }
             pieces[i] = new EditClip(kept[i].Start, kept[i].End, kept[i].Fast ? fastSpeed : Speed, Reversed) { Effects = effects, Source = Source, Label = Label, Group = Group, Transition = i == 0 ? Transition : null, Smooth = Smooth };
         }
 

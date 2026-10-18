@@ -48,6 +48,11 @@ ship as part of it.
 - Editor: each clip gains free Scale, Position X/Y and Angle, and the project gains an output frame (Source, 16:9,
   9:16, 1:1). Both run through the clip geometry chain, so the preview and the export draw the same frame; a frame
   other than the source forces a full re-encode. Old project files open unchanged.
+- Editor: clip volume and crop can now change over time with keyframes. "Add Volume Key" and "Add Crop Key" store
+  the current value at the playhead, "Clear Keys" removes them, and the ease list picks the curve to the next key
+  (linear, ease in, ease out, ease in-out). The filter chain writes a time-based ffmpeg expression instead of a fixed
+  number, and the preview carries the same expression, measured in libmpv. Moving crop keeps the size of the first
+  key. Older project files open unchanged; keys are written only when a clip has them.
 - Command line: `donustur` gains the Convert tab's tags, cover, Repair and chapters. `--etiket-baslik`,
   `--etiket-sanatci`, `--etiket-yil`, `--etiket-yorum` write the container tags, `--kapak` adds a PNG or JPEG cover,
   `--onar` is the Repair preset (corrupt packets dropped, timestamps rebuilt, MKV remux unless a container or codec

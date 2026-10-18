@@ -108,17 +108,25 @@ public sealed partial record ClipEffects
 
     public bool HasTransform => Scale != 1 || OffsetX != 0 || OffsetY != 0 || Angle != 0;
 
+    public KeyframeTrack<VolumeKey> VolumeKeys { get; init; } = KeyframeTrack<VolumeKey>.Empty;
+
+    public KeyframeTrack<CropKey> CropKeys { get; init; } = KeyframeTrack<CropKey>.Empty;
+
+    public bool HasKeyframes => VolumeKeys.Count > 0 || CropKeys.Count > 0;
+
+    public bool HasMovingCrop => CropKeys.Count > 1;
+
     public bool HasFit => FitNum > 0 && FitDen > 0;
 
     public bool HasEqualizer => BassDb != 0 || MidDb != 0 || TrebleDb != 0;
 
     public bool HasCleanup => Denoise || Loudnorm || Compressor || Limiter || HasEqualizer;
 
-    public bool HasCrop => CropLeft > 0 || CropTop > 0 || CropRight > 0 || CropBottom > 0;
+    public bool HasCrop => CropLeft > 0 || CropTop > 0 || CropRight > 0 || CropBottom > 0 || CropKeys.Count > 0;
 
     public bool HasGeometry => HasCrop || HasFit || Rotation != 0 || FlipH || FlipV || HasTransform;
 
-    public bool HasAudio => Muted || VolumeDb != 0 || HasCleanup;
+    public bool HasAudio => Muted || VolumeDb != 0 || VolumeKeys.Count > 0 || HasCleanup;
 
     public bool HasColor => Brightness != 0 || Contrast != 1 || Saturation != 1 || Temperature != NeutralTemperature || HasGrade;
 
@@ -159,16 +167,33 @@ public sealed partial record ClipEffects
             OffsetX = Offset(OffsetX),
             OffsetY = Offset(OffsetY),
             Angle = Turn(Angle),
+            VolumeKeys = VolumeKeys.Map(k => k with { Db = double.IsFinite(k.Db) ? Math.Round(Math.Clamp(k.Db, MinVolumeDb, MaxVolumeDb), 1) : 0 }),
+            CropKeys = FitOnly().HasFit ? KeyframeTrack<CropKey>.Empty : CropKeys.Map(CropEdges),
         }).GradeNormalized();
+    }
+
+    public ClipEffects SlicedKeys(long from, long to)
+        => HasKeyframes ? this with { VolumeKeys = VolumeKeys.Slice(from, to), CropKeys = CropKeys.Slice(from, to) } : this;
+
+    public ClipEffects ScaledKeys(double factor)
+        => HasKeyframes ? this with { VolumeKeys = VolumeKeys.Scaled(factor), CropKeys = CropKeys.Scaled(factor) } : this;
+
+    private static CropKey CropEdges(CropKey key)
+    {
+        static double Edge(double v) => double.IsFinite(v) ? Math.Clamp(v, 0, 0.95) : 0;
+        var left = Edge(key.Left);
+        var top = Edge(key.Top);
+        return key with { Left = left, Right = Math.Min(Edge(key.Right), 0.95 - left), Top = top, Bottom = Math.Min(Edge(key.Bottom), 0.95 - top) };
     }
 
     /// <summary>Kirpma dikdortgeni, depolanan degil gorunen piksel olarak; kenarlar cift, en az 2x2.</summary>
     public (int X, int Y, int Width, int Height) CropRect(int width, int height)
     {
-        var x = Even(width * CropLeft);
-        var y = Even(height * CropTop);
-        var w = Math.Max(2, Even(width * (1 - CropLeft - CropRight)));
-        var h = Math.Max(2, Even(height * (1 - CropTop - CropBottom)));
+        var (cl, ct, cr, cb) = CropKeys.Count > 0 ? (CropKeys[0].Left, CropKeys[0].Top, CropKeys[0].Right, CropKeys[0].Bottom) : (CropLeft, CropTop, CropRight, CropBottom);
+        var x = Even(width * cl);
+        var y = Even(height * ct);
+        var w = Math.Max(2, Even(width * (1 - cl - cr)));
+        var h = Math.Max(2, Even(height * (1 - ct - cb)));
         w = Math.Min(w, EvenFloor(width - x));
         h = Math.Min(h, EvenFloor(height - y));
         return (x, y, Math.Max(2, w), Math.Max(2, h));
@@ -217,7 +242,7 @@ public sealed partial record ClipEffects
     /// <summary><paramref name="num"/>:<paramref name="den"/> oranli cikti kare; kirpma kalkar, goruntu butunuyle sigar ve
     /// kalan alan <paramref name="color"/> ("RRGGBB") ile dolar. Oran gecersizse sigdirma da kirpma da kalkar.</summary>
     public ClipEffects WithFit(int num, int den, string color)
-        => (this with { CropLeft = 0, CropTop = 0, CropRight = 0, CropBottom = 0, FitNum = num, FitDen = den, PadColor = color }).FitOnly();
+        => (this with { CropLeft = 0, CropTop = 0, CropRight = 0, CropBottom = 0, CropKeys = KeyframeTrack<CropKey>.Empty, FitNum = num, FitDen = den, PadColor = color }).FitOnly();
 
     public (int X, int Y, int Width, int Height) BlurRect(int width, int height)
     {

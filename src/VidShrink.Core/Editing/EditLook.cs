@@ -37,7 +37,7 @@ public sealed class EditLook
         var (frameWidth, frameHeight) = ClipFilters.Frame(_width, _height, _canvas);
         var chain = string.Join(",", new[]
         {
-            ClipFilters.Geometry(effects, _width, _height, _parNum, _parDen, _canvas),
+            ClipFilters.Geometry(effects, _width, _height, _parNum, _parDen, _canvas, ClipFilters.PartTime(part)),
             ClipFilters.Blur(effects, frameWidth, frameHeight, PreviewBlurLabel),
         }.Where(s => s.Length > 0));
         return chain.Length == 0 ? null : chain;
