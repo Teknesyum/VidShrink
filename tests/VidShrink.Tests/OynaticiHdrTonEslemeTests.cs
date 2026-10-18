@@ -328,8 +328,8 @@ public sealed class OynaticiHdrTonEslemeTests
                 o.Bekle(() => o.Oku("vf").Contains("@vstone:gpu", StringComparison.Ordinal) || o.Motor.ToneRefused, 3);
                 var takili = o.Oku("vf").Contains("@vstone:gpu", StringComparison.Ordinal);
                 Assert.True(takili || o.Motor.ToneRefused, $"{ad}: vf '{o.Oku("vf")}'");
-                Assert.Equal("bt.709", o.Oku("target-prim"));
-                Assert.Equal("bt.1886", o.Oku("target-trc"));
+                if (takili) Assert.Equal("bt.709", o.Oku("target-prim"));
+                if (takili) Assert.Equal("bt.1886", o.Oku("target-trc"));
                 o.Git(1.5);
                 Assert.InRange(o.Sayi("time-pos"), 1.25, 1.75);
                 kayit.AppendLine($"{ad} acik: takili {takili} reddedildi {o.Motor.ToneRefused} etkin {o.Motor.ToneMappingActive} cikis {o.Oku("video-out-params/gamma")}");
@@ -366,5 +366,37 @@ public sealed class OynaticiHdrTonEslemeTests
         Assert.Contains("pq acik", rapor);
         Assert.Contains("hlg acik", rapor);
         TonKanit.Kapat("pq-160x90.mkv", "hlg-160x90.mkv", "sdr-160x90.mkv");
+    }
+
+    [Fact]
+    public void VulkanAygitiYokkenHalkaTakilmazOynatmaSurer()
+    {
+        var pq = TonKanit.Klip("pq-novk-160x90.mkv", "smpte2084");
+        VulkanProbe.Override = () => false;
+        try
+        {
+            AppHost.Run(() =>
+            {
+                var o = KisayolOrtam.Ac(pq, "ton-novk");
+                o.Bekle(() => o.Oku("video-params/gamma") != "", 3);
+                Assert.Equal("pq", o.Oku("video-params/gamma"));
+                o.Bekle(() => o.Motor.ToneRefused, 3);
+                Assert.True(o.Motor.ToneRefused);
+                Assert.DoesNotContain("@vstone", o.Oku("vf"), StringComparison.Ordinal);
+                Assert.False(o.Motor.ToneMappingActive);
+                var once = o.Motor.FramesRendered;
+                o.Git(1.0);
+                Assert.InRange(o.Sayi("time-pos"), 0.75, 1.25);
+                Assert.True(o.Motor.FramesRendered > once);
+                o.Kapat();
+                return 0;
+            });
+        }
+        finally
+        {
+            VulkanProbe.Override = null;
+        }
+
+        TonKanit.Kapat("pq-novk-160x90.mkv");
     }
 }

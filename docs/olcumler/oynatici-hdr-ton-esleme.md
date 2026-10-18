@@ -68,6 +68,8 @@ oynatmaya devam ediyor (bozuk libplacebo ile ölçüldü). Süzgeç takılırken
 canlandırılamadı: yönetici sürecinde `VK_LOADER_DRIVERS_SELECT`, `VK_ICD_FILENAMES`,
 `VK_DRIVER_FILES` yok sayıldı.
 
+18 Ekim 2026: Vulkan aygıtı olmayan CI koşucusunda `vf pre @vstone:gpu` süreci `AccessViolationException` ile düşürdü (`mpv_command` ← `ApplyToneMapping` ← olay döngüsü). Süzgeç artık `VulkanProbe` bir aygıt bulursa takılıyor (`vkCreateInstance` + `vkEnumeratePhysicalDevices`, süreç başına bir kez); yoksa `ToneRefused` ve bugünkü yol. Test: `VulkanAygitiYokkenHalkaTakilmazOynatmaSurer`.
+
 ## Açık Kalanlar
 
 - Ekran HDR'ye geçiş (`target-colorspace-hint`) yazılım çiziminde uygulanamıyor: Avalonia'ya giden

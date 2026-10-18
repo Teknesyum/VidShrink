@@ -64,6 +64,12 @@ public sealed partial class MpvEngine
             CommandSync("vf", "remove", "@" + ToneLabel);
             ToneRefused = false;
             if (!wanted) return;
+            if (!VulkanProbe.HasDevice)
+            {
+                ToneRefused = true;
+                return;
+            }
+
             foreach (var (name, value) in ToneTarget) TrySet(name, value);
             ToneRefused = CommandSync("vf", "pre", "@" + ToneLabel + ":" + ToneFilter) < 0;
         }

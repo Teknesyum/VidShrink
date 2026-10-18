@@ -2004,14 +2004,7 @@
 
         <TabItem Header="{loc:Text main.tab.settings}" izi:AcilisIsareti.Ad="xaml-ayarlar" x:Name="TabSettings" Tag="{StaticResource IconSettings}" Theme="{StaticResource NeonTabItem}">
           <DockPanel x:Name="SettingsPage">
-          <StackPanel x:Name="SettingsSearchRow" DockPanel.Dock="Top" Margin="{StaticResource SectionMargin}" Spacing="{StaticResource SpaceSm}">
-            <TextBox x:Name="TxtSettingsSearch"
-                     HorizontalAlignment="Left"
-                     Width="{StaticResource TipMaxWidth}"
-                     PlaceholderText="{loc:Text settings.search.placeholder}"
-                     auto:AutomationProperties.Name="{loc:Text settings.search.placeholder}"/>
-            <SarilanMetin x:Name="TxtSettingsSearchEmpty" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
-          </StackPanel>
+          <SarilanMetin x:Name="TxtSettingsSearchEmpty" DockPanel.Dock="Top" Margin="{StaticResource SectionMargin}" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="False"/>
           <ScrollViewer x:Name="PageSettings" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AllowAutoHide="False">
             <!--
               Kart duvarı: sütun sayısı genişlikten. Tek sütunlu yığında ayarlar 1080p ekranda beş
@@ -2472,6 +2465,13 @@
                 </SarilanMetin>
               </StackPanel>
               <StackPanel Grid.Column="2" x:Name="TitleBarRight" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+                <TextBox x:Name="TxtSettingsSearch"
+                         IsVisible="False"
+                         VerticalAlignment="Center"
+                         Width="{StaticResource TitleBarSearchWidth}"
+                         Margin="{StaticResource WindowButtonMargin}"
+                         PlaceholderText="{loc:Text settings.search.placeholder}"
+                         auto:AutomationProperties.Name="{loc:Text settings.search.placeholder}"/>
                 <Button x:Name="BtnUpdateBadge" Theme="{StaticResource TitleBarLinkButton}" IsVisible="False"
                         auto:AutomationProperties.Name="{loc:Text main.update.badge}"
                         ToolTip.Tip="{loc:Text main.update.checking}" Click="OnUpdateBadgeClicked">

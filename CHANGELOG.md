@@ -105,6 +105,12 @@ ship as part of it.
 
 ### Fixed
 
+- Player: HDR tone mapping no longer crashes the app on a machine without a Vulkan device. Before the `gpu`
+  filter is attached the player now checks once for a Vulkan device; without one the filter is skipped, the toggle
+  reports it as refused and playback continues on the plain path.
+- Settings: the search box moved from the top of the page to the title bar, where it shows only on the Settings tab
+  and Ctrl+F focuses it. The extra row had pushed the page 53 px past a full-HD screen, so Settings scrolled.
+- Advanced: "Measure Quality When Done" is now in title case like the other check boxes.
 - Keyboard and screen reader: Tab no longer gets stuck on the last control of every tab; it now wraps back to the
   tab strip (an Avalonia quirk kept the strip pointing at the content's last focused control). 45 controls that
   Narrator and NVDA announced without a name (target size, quality target, every Convert and Settings picker, the

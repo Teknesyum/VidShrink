@@ -263,6 +263,34 @@ public sealed class KabukKisayolTests
     }
 
     [Fact]
+    public void AyarAramasiBaslikCubugundaYalnizAyarlardaGorunurCtrlFOdaklar()
+    {
+        var sonuc = Pencereyle(pencere =>
+        {
+            pencere.Tabs.SelectedItem = pencere.TabSettings;
+            Dispatcher.UIThread.RunJobs();
+            var ayarlarda = pencere.TxtSettingsSearch.IsVisible;
+            var baslikta = pencere.TitleBarRight.IsVisualAncestorOf(pencere.TxtSettingsSearch);
+            var sayfadaDegil = !pencere.SettingsPage.IsVisualAncestorOf(pencere.TxtSettingsSearch);
+            var tutuldu = Bas(pencere, Key.F, KeyModifiers.Control);
+            var odakta = ReferenceEquals(pencere.FocusManager?.GetFocusedElement(), pencere.TxtSettingsSearch);
+            pencere.Tabs.SelectedItem = pencere.TabShrink;
+            Dispatcher.UIThread.RunJobs();
+            var baskaSekmede = pencere.TxtSettingsSearch.IsVisible;
+            var baskaCtrlF = Bas(pencere, Key.F, KeyModifiers.Control);
+            return (ayarlarda, baslikta, sayfadaDegil, tutuldu, odakta, baskaSekmede, baskaCtrlF);
+        });
+
+        Assert.True(sonuc.ayarlarda);
+        Assert.True(sonuc.baslikta);
+        Assert.True(sonuc.sayfadaDegil);
+        Assert.True(sonuc.tutuldu);
+        Assert.True(sonuc.odakta);
+        Assert.False(sonuc.baskaSekmede);
+        Assert.False(sonuc.baskaCtrlF);
+    }
+
+    [Fact]
     public void BolgeGecisiOdagiSekmeSayfaVeBaslikArasindaDolastirir()
     {
         var sonuc = Pencereyle(pencere =>

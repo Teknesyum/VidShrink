@@ -1035,6 +1035,9 @@ public sealed class WindowLayoutTests
             {
                 tabs.SelectedIndex = index;
                 RelayoutAt(window, size);
+                foreach (var secenek in window.GetVisualDescendants().OfType<Control>().Where(control => control.Name is "PanelOptions" or "PanelAdvanced"))
+                    secenek.IsVisible = true;
+                RelayoutAt(window, size);
                 ClearEntranceTransforms(window);
 
                 var header = (tabs.ContainerFromIndex(index) as TabItem)?.Header?.ToString() ?? $"{index}";
@@ -1094,8 +1097,8 @@ public sealed class WindowLayoutTests
             return (found, faults);
         });
 
-        var declared = Regex.Matches(
-            File.ReadAllText(TipSources.WindowXamlPath), "StaticResource InfoButton").Count;
+        var declared = new[] { TipSources.WindowXamlPath, Path.Combine(TipSources.Root, "src", "VidShrink.App", "Recorder", "RecorderView.axaml") }
+            .Sum(path => Regex.Matches(File.ReadAllText(path), "StaticResource InfoButton").Count);
 
         Assert.True(declared > 0, "Biçimlemede hiç bilgi rozeti bulunamadı; sayaç ölü.");
         Assert.True(

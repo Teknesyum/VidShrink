@@ -23,6 +23,8 @@ public partial class MainWindow
     {
         AddHandler(KeyDownEvent, OnKabukTusu, RoutingStrategies.Bubble);
         AddHandler(PointerPressedEvent, OnKabukBasisi, RoutingStrategies.Bubble);
+        Tabs.SelectionChanged += (_, _) => TxtSettingsSearch.IsVisible = ReferenceEquals(Tabs.SelectedItem, TabSettings);
+        TxtSettingsSearch.IsVisible = ReferenceEquals(Tabs.SelectedItem, TabSettings);
         TxtSettingsSearch.TextChanged += (_, _) => AyarlariSuz(TxtSettingsSearch.Text);
         Strings.Changed += (_, _) => Avalonia.Threading.Dispatcher.UIThread.Post(() => AyarlariSuz(TxtSettingsSearch.Text));
     }
@@ -30,6 +32,14 @@ public partial class MainWindow
     private void OnKabukTusu(object? sender, KeyEventArgs e)
     {
         if (e.Handled || ShortcutKeyButton.IsListening) return;
+        if (e.Key == Key.F && e.KeyModifiers == KeyModifiers.Control && TxtSettingsSearch.IsVisible)
+        {
+            TxtSettingsSearch.Focus();
+            TxtSettingsSearch.SelectAll();
+            e.Handled = true;
+            return;
+        }
+
         if (RunShell(ShellKeymap.For(e.Key, e.KeyModifiers))) e.Handled = true;
     }
 

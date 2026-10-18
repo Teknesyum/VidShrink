@@ -46,6 +46,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (DON-P11): DON-15 Kodlayıcı ince ayarı; DON-25 Dönüştür'de HDR seçimi; DON-26 Renk uzayı ve aralık dönüşümü. [Tablo](piyasa/2026-10-13/donustur-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Core/ConversionArguments.cs, src/VidShrink.Core/ConversionPlan.cs, src/VidShrink.Core/HdrResolver.cs, src/VidShrink.Core/VideoFilterChain.cs, src/VidShrink.App/MainWindow.axaml, src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.App/Locales/, tests/VidShrink.Tests/
 - Plan: Hız ön ayarı, tune, profil, seviye ve bit hızı kipinde iki geçiş Dönüştür'de seçilebilir olur; bugün sabit varsayılan yazılıyor (`ConversionArguments.cs:142`). HDR seçimi Küçült'teki düğmeden okunmak yerine (`MainWindow.axaml.cs:4777`) Dönüştür'ün kendi panelinde gösterilir. Renk için BT.601, BT.709 ve BT.2020 ile sınırlı ve tam aralık seçimi eklenir; BT.709 ve BT.601 kolu hazır (`VideoFilterChain.cs:397`), BT.2020 ve aralık yeni yazılır. Doğrulama: argüman testleri ve renk kolu için ölçüm aracıyla önce ve sonra kare karşılaştırması.
+- Durum (18 Ekim 2026, main): Dönüştür'de hız ön ayarı, tune, profil, seviye, iki geçiş, kendi HDR seçimi ve BT.601/709/2020 ile aralık seçimi (`yan/donustur-kodlayici`). Açık: matris değişen kollarda PSNR 28–32 dB, nedeni ölçülmedi.
 
 ## 69. Kamera Ana Kaynak Olarak
 
@@ -91,6 +92,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (OYB-P10): OYB-21 Akış kalite seçimi; OYB-43 Kesintisiz çalma. [Tablo](piyasa/2026-10-13/oynatici-kitaplik-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Player/MpvEngine.cs, src/VidShrink.Player/IPlaybackEngine.cs, src/VidShrink.App/Playback/PlayerView.Tracks.cs, src/VidShrink.App/Playback/PlayerView.Kuyruk.cs
 - Plan: İki adımda teslim edilir ve adımlar ayrı işçilere verilebilir. Önce akış kalitesi (orta): uyarlamalı yayının katmanlarının motorun iz listesinde nasıl göründüğü ölçülür, sonra iz menüsüne kalite seçimi eklenir (video izi değiştirme ya da `hls-bitrate` seçeneği); OYB-P1 bitmeden başlamaz. Sonra kesintisiz çalma (büyük): sıradaki dosyayı önden yükleme (`prefetch-playlist`, `gapless-audio`) kuyruğun motora verilmemesi kararına dokunur, bu yüzden önce o kararın gerekçesi (`PlayerView.Kuyruk.cs:13`) yeniden ölçülür. İki katmanlı yerel bir HLS yayını ve ardışık iki ses dosyasıyla doğrulanır.
+- Durum (18 Ekim 2026, main): akış kalite seçimi ve kesintisiz çalma (`yan/akis-kesintisiz`). Açık: gerçek aygıtta dosyalar arası boşluk ölçülemedi.
 
 ## 87. Resim Klibi, Tuval Ve Dönüşüm
 
@@ -108,6 +110,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (DZB-P13): DZB-36 Eğriler ve renk tekerleri; DZB-38 Otomatik renk ve renk eşleme; DZB-28 Bulanıklık ve bölge gizleme. [Tablo](piyasa/2026-10-13/duzenleyici-kurgu-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Core/Editing/ClipEffects.cs, src/VidShrink.Core/Editing/ClipFilters.cs, src/VidShrink.Core/Editing/EditLook.cs, src/VidShrink.App/Editing/EditorView.Klip.cs, src/VidShrink.App/Editing/EditorView.Monitor.cs, src/VidShrink.App/Editing/EditorView.axaml, src/VidShrink.App/Locales/, tests/VidShrink.Tests/DuzenleyiciKlipOzellikTests.cs
 - Plan: DZB-P3'ün üstüne gelir: eğriler ve üç bölgeli renk dengesi ffmpeg `curves` ve `colorbalance` süzgeçleriyle, tek tıkla düzeltme `normalize` ile yapılır. Bulanıklık `gblur` ile bütün kareye ya da monitörde çizilen dikdörtgene uygulanır (kırp, bulanıklaştır, geri bindir). İki çekimin rengini eşlemek için hazır süzgeç bilinmiyor; o yarı ayrı ölçüm ister. Paket ikiye bölünebilir: renk (DZB-36, DZB-38) ile bulanıklık (DZB-28); doğrulama argüman testleri ve kare karşılaştırması.
+- Durum (18 Ekim 2026, main): renk yarısı bitti, eğriler, renk dengesi ve tek tıkla düzeltme (`yan/egriler-renk`). Açık: renk eşleme süzgeci yok; bulanıklık ve bölge gizleme yarısı.
 
 ## 89. Anahtar Kare Ve Hız Rampası
 
@@ -116,6 +119,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (DZB-P14): DZB-25 Klip ayarlarına anahtar kare; DZB-48 Hız rampası; DZB-50 Akıcı ağır çekim; DZB-26 Yumuşatma eğrileri. [Tablo](piyasa/2026-10-13/duzenleyici-kurgu-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Core/Editing/ClipEffects.cs, src/VidShrink.Core/Editing/ClipFilters.cs, src/VidShrink.Core/Editing/EditLook.cs, src/VidShrink.Core/Editing/EditTimeline.cs, src/VidShrink.Core/Editing/EditExport.cs, src/VidShrink.Core/Editing/EditProject.cs, src/VidShrink.App/Editing/EditorView.Klip.cs, src/VidShrink.App/Editing/EditorTimeline.cs, tests/VidShrink.Tests/
 - Plan: Klip ayarları (ses düzeyi, kırpma, konum) klip içinde zamanla değişebilsin diye değerlere anahtar kare eklenir; süzgeç zinciri sabit sayı yerine zamana bağlı ifade yazar, yumuşatma eğrisi iki kare arasındaki geçişin biçimidir. Hız rampası klibi hız dilimlerine böler (`setpts`), akıcı ağır çekim ara kareyi `minterpolate` süzgeciyle üretir. Önizleme zinciri bugün sabit değer taşıyor; zamana bağlı ifadeyi taşıyıp taşımadığı ilk iş ölçülür. Paket ikiye bölünebilir: anahtar kare (DZB-25, DZB-26) ile hız (DZB-48, DZB-50); doğrulama argüman testleri ve çıktı süresinin ölçümü.
+- Durum (18 Ekim 2026, main): hız yarısı bitti, hız rampası ve akıcı ağır çekim (`yan/hiz-rampasi`). Açık: anahtar kare ve yumuşatma eğrileri yarısı.
 
 ## 90. Slayt Gösterisi Ve Sesten Video
 
