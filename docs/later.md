@@ -22,15 +22,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Plan: Çizim için ekranı kaplayan saydam bir pencere açılır; kısayolla çizim kipine girilir, kalem, ok, kutu, numara ve yazı çizilir, pencere kayda girer. Prompter (konuşma metnini akıtan pencere) ayrı penceredir ve `CaptureAffinity.Exclude` ile kayıttan çıkarılır; Windows 10 2004 öncesinde pencere kayıttan çıkmadığı için orada uyarı gösterilir (CaptureAffinity.cs:16-20). İki adımda teslim edilebilir: önce çizim, sonra prompter. Çizim araçları başsız pencere testiyle, kayıttan çıkarma bayrağı pencere başına ölçülür.
 - Durum (18 Ekim 2026, main): çizime araç paneli ve mürekkep rengi geldi (`yan/cizim-prompter`). Açık: çoklu ekranda yalnız kayıt bölgesi kaplanır, renk için kısayol yok, panelin görsel denetimi elle yapılacak.
 
-## 44. Bölüm Düzenleyici
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · ARC-P5 = DON-P14 · Bizde Olmayan Araçlar · iş orta · öncelik 1 · karar gerekmez
-
-- Etiketler ve "Onar" hazır ayarı 16 Ekim 2026'da main'de (`MainWindow.DonusturEtiket.cs`).
-- Bölüm listesi (ARC-15, DON-30) 16 Ekim 2026'da main'de: Dönüştür'de "Bölümler…" açılırı (`MainWindow.DonusturBolum.cs`), hesap `Core/ConversionChapters.cs`, ffmetadata metni kaydedicinin `RecorderChapters.Metadata`'sından. ffprobe ile okunarak doğrulandı (`BolumDuzenleyiciTests`).
-- Komut satırı yüzü 18 Ekim 2026'da main'de: `donustur --etiket-* --kapak --onar --bolum-ekle --bolumsuz` (`CliConvert.cs`), panelle aynı ffmpeg komutu; Onar yarıda kesilmiş bozuk MPEG-TS kayıtta ölçüldü (`BolumDuzenleyiciCliTests`).
-- Açık kalan (karar): etiketler ve bölümler ayara yazılmıyor; dosyaya özgü oldukları için ayara yazılırsa sonraki dosyaya taşınır. Kapandı: başlangıcı kaymış kaynakta (`start_time` ≠ 0) ffmpeg bölümlerin hepsini düşürüyordu; el değmemiş liste artık ffmetadata'dan yazılıyor (`BolumDuzenleyiciTests.BaslangiciKaymisKaynaginBolumleriDusmez`).
-
 ## 50. Mac Ortam Denetimi Bağlantısı
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · OYB-P9 · Oynatıcı · iş orta · öncelik 2 · karar gerekmez
