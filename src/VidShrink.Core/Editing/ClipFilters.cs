@@ -19,17 +19,18 @@ public static class ClipFilters
     /// Ciktinin tuvali. Geometrisi olan klip yoksa <c>null</c>: eski yol aynen kalir. Varsa butun
     /// kliplerin cikti boyutu ayniysa o boyut, degilse kaynagin gorunen boyutu, iki kenar cift.
     /// </summary>
-    public static (int Width, int Height)? Canvas(IReadOnlyList<EditClip> clips, int width, int height, int parNum, int parDen)
+    public static (int Width, int Height)? Canvas(IReadOnlyList<EditClip> clips, int width, int height, int parNum, int parDen, EditFrame frame = default)
     {
+        var displayWidth = DisplayWidth(width, parNum, parDen);
+        if (!frame.IsSource) return frame.Size(displayWidth, height);
         if (!clips.Any(c => c.Effects.HasGeometry)) return null;
 
-        var displayWidth = DisplayWidth(width, parNum, parDen);
         var sizes = clips.Select(c => c.Effects.OutputSize(displayWidth, height)).Distinct().ToList();
         return sizes.Count == 1 ? sizes[0] : (Math.Max(2, displayWidth / 2 * 2), Math.Max(2, height / 2 * 2));
     }
 
     public static (int Width, int Height)? Canvas(EditTimeline timeline, MediaInfo info)
-        => Canvas(timeline.Clips, info.Width, info.Height, info.ParNum, info.ParDen);
+        => Canvas(timeline.Clips, info.Width, info.Height, info.ParNum, info.ParDen, timeline.Frame);
 
     /// <summary>
     /// Tek klibin geometri zinciri, basinda virgul olmadan. Tuval <c>null</c> ise bos. Klibin
@@ -66,7 +67,9 @@ public static class ClipFilters
             }
         }
 
-        if (effects.OutputSize(displayWidth, height) != target)
+        var size = effects.OutputSize(displayWidth, height);
+        if (effects.HasTransform) parts.AddRange(Transform(effects, size, target));
+        else if (size != target)
         {
             var w = Int(target.Width);
             var h = Int(target.Height);
@@ -77,6 +80,44 @@ public static class ClipFilters
         parts.Add("setsar=1");
         return string.Join(",", parts);
     }
+
+    private static IEnumerable<string> Transform(ClipEffects effects, (int Width, int Height) size, (int Width, int Height) target)
+    {
+        var fit = Math.Min((double)target.Width / size.Width, (double)target.Height / size.Height);
+        var sw = Even(size.Width * fit * effects.Scale);
+        var sh = Even(size.Height * fit * effects.Scale);
+        yield return "scale=" + Int(sw) + ":" + Int(sh);
+
+        var (rw, rh) = (sw, sh);
+        if (effects.Angle != 0)
+        {
+            var radians = effects.Angle * Math.PI / 180;
+            var cos = Math.Abs(Math.Cos(radians));
+            var sin = Math.Abs(Math.Sin(radians));
+            rw = EvenUp(sw * cos + sh * sin);
+            rh = EvenUp(sw * sin + sh * cos);
+            yield return "rotate=" + Number(radians) + ":ow=" + Int(rw) + ":oh=" + Int(rh) + ":c=black";
+        }
+
+        var px = Even(target.Width / 2.0 + effects.OffsetX * target.Width - rw / 2.0, signed: true);
+        var py = Even(target.Height / 2.0 + effects.OffsetY * target.Height - rh / 2.0, signed: true);
+        var ix = Math.Clamp(px, 0, target.Width - 2);
+        var iy = Math.Clamp(py, 0, target.Height - 2);
+        var iw = Math.Max(2, Math.Min(target.Width, px + rw) - ix);
+        var ih = Math.Max(2, Math.Min(target.Height, py + rh) - iy);
+        if ((ix - px, iy - py, iw, ih) != (0, 0, rw, rh))
+            yield return "crop=" + Int(iw) + ":" + Int(ih) + ":" + Int(ix - px) + ":" + Int(iy - py);
+        if ((iw, ih) != target)
+            yield return "pad=" + Int(target.Width) + ":" + Int(target.Height) + ":" + Int(ix) + ":" + Int(iy);
+    }
+
+    private static int Even(double value, bool signed = false)
+    {
+        var even = (int)Math.Round(value / 2, MidpointRounding.AwayFromZero) * 2;
+        return signed ? even : Math.Max(2, even);
+    }
+
+    private static int EvenUp(double value) => Math.Max(2, (int)Math.Ceiling(value / 2 - 1e-9) * 2);
 
     /// <summary>Klip basinda sifirdan baslayan zamanla goruntu solmasi; <paramref name="length"/> cizelge tick'i.</summary>
     public static string VideoFades(ClipEffects effects, long length)

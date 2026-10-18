@@ -304,5 +304,12 @@
   "editor.remux.cover-title": "Choose Cover Image",
   "editor.remux.cover.set": "Cover: {0}",
   "editor.remux.cover.unsupported": "This container cannot carry a cover; choose MP4 or MKV.",
-  "editor.remux.empty": "At least one track must be included in the file."
+  "editor.remux.empty": "At least one track must be included in the file.",
+  "editor.clip.scale": "Scale %",
+  "editor.clip.offset-x": "Position X %",
+  "editor.clip.offset-y": "Position Y %",
+  "editor.clip.angle": "Angle °",
+  "editor.frame": "Project Frame",
+  "editor.frame.source": "Source Frame",
+  "editor.frame.tip": "Output Frame Of The Whole Project"
 }

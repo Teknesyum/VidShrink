@@ -77,6 +77,7 @@
                 <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconFullScreen}" Fill="{Binding $parent[Button].Foreground}"/>
               </Button>
               <ToggleButton x:Name="BtnSnap" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.snap}" AutomationProperties.Name="{loc:Text editor.snap}"/>
+              <ComboBox x:Name="CmbProjectFrame" MinWidth="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" ToolTip.Tip="{loc:Text editor.frame.tip}" AutomationProperties.Name="{loc:Text editor.frame}"/>
               <Button x:Name="BtnAddSource" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.source.add}"/>
               <ToggleButton x:Name="BtnMedia" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.media.open}" AutomationProperties.Name="{loc:Text editor.media.open}"/>
               <Button x:Name="BtnAddText" Theme="{StaticResource GhostButton}" MinWidth="{StaticResource EditorToolButtonSize}" Content="T" AutomationProperties.Name="{loc:Text editor.text.add}"/>
@@ -267,6 +268,16 @@
               <ToggleButton x:Name="BtnClipFit" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.clip.fit}" AutomationProperties.Name="{loc:Text editor.clip.fit}"/>
               <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.pad}"/>
               <ComboBox x:Name="CmbClipPad" MinWidth="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.pad}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.scale}"/>
+              <TextBox x:Name="TxtClipScale" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.scale}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.offset-x}"/>
+              <TextBox x:Name="TxtClipOffsetX" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.offset-x}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.offset-y}"/>
+              <TextBox x:Name="TxtClipOffsetY" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.offset-y}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.angle}"/>
+              <TextBox x:Name="TxtClipAngle" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.angle}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
               <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.volume}"/>

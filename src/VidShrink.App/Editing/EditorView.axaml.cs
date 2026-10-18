@@ -342,6 +342,7 @@ internal partial class EditorView : UserControl
     {
         if (_model is not { } model) return false;
         var before = model.Clips.ToArray();
+        var frame = model.Frame;
         if (!edit(model)) return false;
 
         var at = Math.Min(Timeline.Playhead, model.Duration);
@@ -354,7 +355,7 @@ internal partial class EditorView : UserControl
         if (reload || !SameCuts(before, model.Clips)) _ = ReloadAsync(at);
         else
         {
-            if (!before.SequenceEqual(model.Clips)) _ = RestyleAsync();
+            if (!before.SequenceEqual(model.Clips) || frame != model.Frame) _ = RestyleAsync();
             RefreshOverlay();
         }
 
@@ -516,6 +517,7 @@ internal partial class EditorView : UserControl
         RefreshMedia();
         var chosen = Timeline.SelectedIndices.Count;
         _canDelete = model is { Clips.Count: > 0 } && chosen > 0 && (Timeline.AllSelected || chosen < model.Clips.Count);
+        ShowFrame();
         BtnUndo.IsEnabled = model?.CanUndo ?? false;
         BtnRedo.IsEnabled = model?.CanRedo ?? false;
         BtnZoomIn.IsEnabled = model is not null;

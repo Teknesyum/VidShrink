@@ -45,6 +45,9 @@ ship as part of it.
   other clip settings, plus texts and markers, go under `metadata.vidshrink` and come back when present; a file from
   another tool imports without them. Gaps, extra video tracks and clips without a file reference are skipped and
   counted in the status line. Opening the file in Resolve or Premiere has not been measured.
+- Editor: each clip gains free Scale, Position X/Y and Angle, and the project gains an output frame (Source, 16:9,
+  9:16, 1:1). Both run through the clip geometry chain, so the preview and the export draw the same frame; a frame
+  other than the source forces a full re-encode. Old project files open unchanged.
 - Command line: `donustur` gains the Convert tab's tags, cover, Repair and chapters. `--etiket-baslik`,
   `--etiket-sanatci`, `--etiket-yil`, `--etiket-yorum` write the container tags, `--kapak` adds a PNG or JPEG cover,
   `--onar` is the Repair preset (corrupt packets dropped, timestamps rebuilt, MKV remux unless a container or codec

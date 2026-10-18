@@ -304,5 +304,12 @@
   "editor.remux.cover-title": "Kapak Resmini Seç",
   "editor.remux.cover.set": "Kapak: {0}",
   "editor.remux.cover.unsupported": "Bu kap kapak taşımaz; MP4 ya da MKV seç.",
-  "editor.remux.empty": "Dosyaya en az bir iz katılmalı."
+  "editor.remux.empty": "Dosyaya en az bir iz katılmalı.",
+  "editor.clip.scale": "Ölçek %",
+  "editor.clip.offset-x": "Konum X %",
+  "editor.clip.offset-y": "Konum Y %",
+  "editor.clip.angle": "Açı °",
+  "editor.frame": "Proje Çerçevesi",
+  "editor.frame.source": "Kaynak Çerçevesi",
+  "editor.frame.tip": "Bütün Projenin Çıktı Çerçevesi"
 }

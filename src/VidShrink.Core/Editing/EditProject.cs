@@ -48,8 +48,9 @@ public sealed class EditProject
     private static readonly UTF8Encoding Utf8 = new(false);
 
     private EditProject(SourceStamp source, long sourceDuration, IReadOnlyList<EditClip> clips, IReadOnlyList<TextLayer> texts, string? exportMode,
-        IReadOnlyList<ExtraSource> extraSources, IReadOnlyList<EditMarker> markers, int audioTrack, EditMusic? music)
+        IReadOnlyList<ExtraSource> extraSources, IReadOnlyList<EditMarker> markers, int audioTrack, EditMusic? music, EditFrame frame)
     {
+        Frame = frame.Normalized();
         Music = music;
         AudioTrack = audioTrack;
         Markers = markers;
@@ -82,6 +83,8 @@ public sealed class EditProject
     /// <summary>Muzik izi (<see cref="EditMusic"/>). Yoksa dosyaya yazilmaz; alani olmayan proje muziksiz acilir.</summary>
     public EditMusic? Music { get; }
 
+    public EditFrame Frame { get; }
+
     /// <summary>
     /// <paramref name="extraSources"/> cizelgenin ek kaynaklariyla ayni sirada ve ayni sayida olmalidir.
     /// </summary>
@@ -96,7 +99,7 @@ public sealed class EditProject
         var duration = timeline.SourceDuration ?? timeline.Clips.Where(c => c.Source == 0).Select(c => c.SourceEnd).DefaultIfEmpty(1).Max();
         var extras = stamps.Select((stamp, i) => new ExtraSource(stamp, timeline.ExtraSources[i])).ToArray();
         return new EditProject(source, duration, timeline.Clips.ToArray(), timeline.Texts.ToArray(), exportMode, extras, Sorted(markers ?? Array.Empty<EditMarker>()),
-            audioTrack, timeline.Music);
+            audioTrack, timeline.Music, timeline.Frame);
     }
 
     /// <summary>
@@ -126,7 +129,7 @@ public sealed class EditProject
 
         if (Clips.Count == 0) return null;
         var timeline = new EditTimeline(Array.Empty<EditClip>(), SourceDuration, extraSources: ExtraSources.Select(extra => extra.Duration));
-        timeline.Restore(Clips, Texts, Music);
+        timeline.Restore(Clips, Texts, Music, Frame);
         var mode = Enum.TryParse<Editing.ExportMode>(ExportMode, ignoreCase: false, out var parsed) && Enum.IsDefined(parsed) ? parsed : Editing.ExportMode.Smart;
         return new EditProjectJob(ExtraSources.Select(extra => extra.Stamp.Path).Prepend(Source.Path).ToArray(), timeline, mode, AudioTrack);
     }
@@ -201,6 +204,14 @@ public sealed class EditProject
                 writer.WriteEndObject();
             }
 
+            if (!Frame.IsSource)
+            {
+                writer.WriteStartObject("frame");
+                writer.WriteNumber("num", Frame.Num);
+                writer.WriteNumber("den", Frame.Den);
+                writer.WriteEndObject();
+            }
+
             writer.WriteEndObject();
         }
 
@@ -245,7 +256,10 @@ public sealed class EditProject
                     DuckReleaseMs = tune.TryGetProperty("duckRelease", out var release) ? release.GetInt32() : EditMusic.DefaultDuckReleaseMs
                 }
                 : null;
-            var project = new EditProject(stamp, duration, clips, texts, mode, extras, markers, track, music);
+            var frame = root.TryGetProperty("frame", out var box) && box.ValueKind == JsonValueKind.Object
+                ? new EditFrame(box.GetProperty("num").GetInt32(), box.GetProperty("den").GetInt32())
+                : EditFrame.Source;
+            var project = new EditProject(stamp, duration, clips, texts, mode, extras, markers, track, music, frame);
             return project.FitsIn(duration) ? project : null;
         }
         catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException or FormatException or ArgumentException or OverflowException)
@@ -391,6 +405,14 @@ public sealed class EditProject
         writer.WriteNumber("trebleDb", effects.TrebleDb);
         writer.WriteNumber("fadeIn", effects.FadeIn);
         writer.WriteNumber("fadeOut", effects.FadeOut);
+        if (effects.HasTransform)
+        {
+            writer.WriteNumber("scale", effects.Scale);
+            writer.WriteNumber("offsetX", effects.OffsetX);
+            writer.WriteNumber("offsetY", effects.OffsetY);
+            writer.WriteNumber("angle", effects.Angle);
+        }
+
         ClipGrade.Write(writer, effects);
         if (effects.HasFit)
         {
@@ -464,6 +486,10 @@ public sealed class EditProject
             FitNum = e.TryGetProperty("fitNum", out var fitNum) ? fitNum.GetInt32() : 0,
             FitDen = e.TryGetProperty("fitDen", out var fitDen) ? fitDen.GetInt32() : 0,
             PadColor = e.TryGetProperty("padColor", out var padColor) ? padColor.GetString() ?? ClipEffects.DefaultPadColor : ClipEffects.DefaultPadColor,
+            Scale = e.TryGetProperty("scale", out var scale) ? scale.GetDouble() : 1,
+            OffsetX = e.TryGetProperty("offsetX", out var offsetX) ? offsetX.GetDouble() : 0,
+            OffsetY = e.TryGetProperty("offsetY", out var offsetY) ? offsetY.GetDouble() : 0,
+            Angle = e.TryGetProperty("angle", out var angle) ? angle.GetDouble() : 0,
         };
         if (e.TryGetProperty("blur", out var blur) && blur.ValueKind == JsonValueKind.Object)
             effects = effects with

@@ -483,7 +483,7 @@ public static class EditExport
         {
             var index = i;
             var source = SourceOf(sources, timeline.Clips[i].Source);
-            var piece = new EditTimeline(new[] { timeline.Clips[i] }, texts: SegmentTexts(timeline, i));
+            var piece = new EditTimeline(new[] { timeline.Clips[i] }, texts: SegmentTexts(timeline, i), frame: timeline.Frame);
             var plan = Build(piece, source.Info, source.Keyframes, source.StartTime, mode, outputPaths[i], workDirectories[i], memoryBudgetBytes,
                 source.Cuts, hasEncoder, dropMetadata, settings, timeline.Clips[i].Source == 0 ? audioTrack : EditAudioTrack.Default);
             plans.Add(WithChapters(plan with
@@ -646,8 +646,10 @@ public static class EditExport
         var target = SourceOf(sources, sources.ContainsKey(0) ? 0 : used[0]).Info;
         var canvas = settings.HasSize
             ? (Width: settings.Width, Height: settings.Height)
-            : (Width: Math.Max(2, ClipFilters.DisplayWidth(target.Width, target.ParNum, target.ParDen) / 2 * 2),
-                Height: Math.Max(2, target.Height / 2 * 2));
+            : !timeline.Frame.IsSource
+                ? timeline.Frame.Size(ClipFilters.DisplayWidth(target.Width, target.ParNum, target.ParDen), target.Height)
+                : (Width: Math.Max(2, ClipFilters.DisplayWidth(target.Width, target.ParNum, target.ParDen) / 2 * 2),
+                    Height: Math.Max(2, target.Height / 2 * 2));
         var fps = Number(settings.Fps > 0 ? settings.Fps : target.Fps > 0 ? target.Fps : 30);
         var audio = used.Any(s => SourceOf(sources, s).Info.HasAudio);
         if (settings.AudioOnly) return MergeAudioOnly(timeline, sources, used, requested, output, work, memoryBudgetBytes, dropMetadata, settings, audio, track);
@@ -900,7 +902,7 @@ public static class EditExport
         for (var i = 0; i < timeline.Clips.Count; i++)
         {
             var index = i;
-            var piece = new EditTimeline(new[] { timeline.Clips[i] }, texts: SegmentTexts(timeline, i));
+            var piece = new EditTimeline(new[] { timeline.Clips[i] }, texts: SegmentTexts(timeline, i), frame: timeline.Frame);
             var plan = Build(piece, info, keyframes, startTime, whole.Effective, outputPaths[i], workDirectories[i], memoryBudgetBytes, cuts, hasEncoder, dropMetadata, settings,
                 audioTrack);
             plans.Add(plan with

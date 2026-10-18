@@ -19,7 +19,7 @@ public sealed class EditLook
         _height = Math.Max(2, height);
         _parNum = parNum;
         _parDen = parDen;
-        _canvas = ClipFilters.Canvas(preview.Parts.Select(p => p.Clip).ToList(), _width, _height, parNum, parDen);
+        _canvas = ClipFilters.Canvas(preview.Parts.Select(p => p.Clip).ToList(), _width, _height, parNum, parDen, preview.Frame);
         (TimedVideo, TimedAudio) = ClipFilters.Timed(preview);
     }
 
