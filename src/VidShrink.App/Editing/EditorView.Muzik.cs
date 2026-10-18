@@ -16,6 +16,15 @@ internal partial class EditorView
 
     private static readonly double[] MusicLevels = { -24, -18, -12, -6, 0, 6 };
 
+    internal static readonly double[] DuckAmounts = { 6, 12, 18, 24 };
+
+    internal static readonly (string Key, int Ms)[] DuckResponses =
+    {
+        ("editor.music.duck.fast", 150),
+        ("editor.music.duck.medium", EditMusic.DefaultDuckReleaseMs),
+        ("editor.music.duck.slow", 1000)
+    };
+
     private void InitMusic()
     {
         Timeline.MusicMoved += start => MoveMusic(start);
@@ -32,7 +41,9 @@ internal partial class EditorView
         var start = Timeline.RoundToFrame(Timeline.Playhead);
         if (start >= model.Duration - (long)Math.Ceiling(Timeline.FrameTicks)) start = 0;
         var level = model.Music?.LevelDb ?? MusicDefaultLevelDb;
-        if (!Apply(m => m.SetMusic(new EditMusic(path, duration, Math.Max(0, start), level)), -1)) return false;
+        var placed = new EditMusic(path, duration, Math.Max(0, start), level);
+        if (model.Music is { } previous) placed = placed with { Duck = previous.Duck, DuckDb = previous.DuckDb, DuckReleaseMs = previous.DuckReleaseMs };
+        if (!Apply(m => m.SetMusic(placed), -1)) return false;
         ShowProjectStatus("StatusSuccess", string.Format(Strings.Culture, Strings.Get("editor.music.placed"), Path.GetFileName(path)));
         return true;
     }
@@ -52,14 +63,25 @@ internal partial class EditorView
     {
         if (_model?.Music is not { } music || Exporting) return false;
         var level = EditMusic.ClampLevel(levelDb);
-        return Apply(m => m.SetMusic(new EditMusic(music.Path, music.Duration, music.Start, level)), -1);
+        return Apply(m => m.SetMusic(music.Placed(music.Start, level)), -1);
     }
 
     internal bool MoveMusic(long start)
     {
         if (_model is not { Music: { } music } model || Exporting) return false;
         var at = Math.Clamp(start, 0, Math.Max(0, model.Duration - 1));
-        return Apply(m => m.SetMusic(new EditMusic(music.Path, music.Duration, at, music.LevelDb)), -1);
+        return Apply(m => m.SetMusic(music.Placed(at, music.LevelDb)), -1);
+    }
+
+    internal bool SetMusicDuck(bool? on = null, double? duckDb = null, int? releaseMs = null)
+    {
+        if (_model?.Music is not { } music || Exporting) return false;
+        return Apply(m => m.SetMusic(music with
+        {
+            Duck = on ?? music.Duck,
+            DuckDb = duckDb is { } db ? EditMusic.ClampDuck(db) : music.DuckDb,
+            DuckReleaseMs = releaseMs is { } ms ? EditMusic.ClampRelease(ms) : music.DuckReleaseMs
+        }), -1);
     }
 
     internal bool RemoveMusic() => _model is { HasMusic: true } && !Exporting && Apply(m => m.SetMusic(null), -1);
@@ -90,6 +112,7 @@ internal partial class EditorView
         }
 
         MnuMusic.Items.Add(levels);
+        MnuMusic.Items.Add(BuildDuckMenu(music, idle));
 
         var here = new MenuItem { Header = Strings.Get("editor.music.to-playhead"), IsEnabled = idle && music is not null };
         here.Click += (_, _) => MoveMusic(Timeline.RoundToFrame(Timeline.Playhead));
@@ -99,6 +122,52 @@ internal partial class EditorView
         remove.Click += (_, _) => RemoveMusic();
         MnuMusic.Items.Add(remove);
         MnuMusic.IsEnabled = model is not null;
+    }
+
+    private MenuItem BuildDuckMenu(EditMusic? music, bool idle)
+    {
+        var duck = new MenuItem { Header = Strings.Get("editor.music.duck"), IsEnabled = idle && music is not null };
+        var on = new MenuItem
+        {
+            Header = Strings.Get("editor.music.duck.on"),
+            ToggleType = MenuItemToggleType.CheckBox,
+            IsChecked = music?.Duck == true
+        };
+        on.Click += (_, _) => SetMusicDuck(on: !(_model?.Music?.Duck ?? false));
+        duck.Items.Add(on);
+
+        var amounts = new MenuItem { Header = Strings.Get("editor.music.duck.amount"), IsEnabled = music?.Duck == true };
+        foreach (var preset in DuckAmounts)
+        {
+            var value = preset;
+            var item = new MenuItem
+            {
+                Header = EditorTimeline.MusicLevelText(-value),
+                ToggleType = MenuItemToggleType.Radio,
+                IsChecked = music is not null && Math.Abs(music.DuckDb - value) < 0.05
+            };
+            item.Click += (_, _) => SetMusicDuck(duckDb: value);
+            amounts.Items.Add(item);
+        }
+
+        duck.Items.Add(amounts);
+
+        var responses = new MenuItem { Header = Strings.Get("editor.music.duck.response"), IsEnabled = music?.Duck == true };
+        foreach (var (key, ms) in DuckResponses)
+        {
+            var value = ms;
+            var item = new MenuItem
+            {
+                Header = string.Format(Strings.Culture, Strings.Get(key), value),
+                ToggleType = MenuItemToggleType.Radio,
+                IsChecked = music?.DuckReleaseMs == value
+            };
+            item.Click += (_, _) => SetMusicDuck(releaseMs: value);
+            responses.Items.Add(item);
+        }
+
+        duck.Items.Add(responses);
+        return duck;
     }
 
     private async Task AddMusicClickedAsync()

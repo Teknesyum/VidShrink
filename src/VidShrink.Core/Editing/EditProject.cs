@@ -192,6 +192,12 @@ public sealed class EditProject
                 writer.WriteNumber("duration", music.Duration);
                 writer.WriteNumber("start", music.Start);
                 writer.WriteNumber("level", music.LevelDb);
+                if (music.HasDuckSettings)
+                {
+                    writer.WriteBoolean("duck", music.Duck);
+                    writer.WriteNumber("duckDb", music.DuckDb);
+                    writer.WriteNumber("duckRelease", music.DuckReleaseMs);
+                }
                 writer.WriteEndObject();
             }
 
@@ -233,6 +239,11 @@ public sealed class EditProject
             var music = root.TryGetProperty("music", out var tune) && tune.ValueKind == JsonValueKind.Object
                 ? new EditMusic(tune.GetProperty("path").GetString() ?? "", tune.GetProperty("duration").GetInt64(),
                     tune.TryGetProperty("start", out var at) ? at.GetInt64() : 0, tune.TryGetProperty("level", out var db) ? db.GetDouble() : 0)
+                {
+                    Duck = tune.TryGetProperty("duck", out var duck) && duck.GetBoolean(),
+                    DuckDb = tune.TryGetProperty("duckDb", out var amount) ? amount.GetDouble() : EditMusic.DefaultDuckDb,
+                    DuckReleaseMs = tune.TryGetProperty("duckRelease", out var release) ? release.GetInt32() : EditMusic.DefaultDuckReleaseMs
+                }
                 : null;
             var project = new EditProject(stamp, duration, clips, texts, mode, extras, markers, track, music);
             return project.FitsIn(duration) ? project : null;

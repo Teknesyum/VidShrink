@@ -367,7 +367,13 @@ public static class EditExport
             .Append(",adelay=").Append(Math.Round(EditTime.ToSeconds(music.Start) * 1000).ToString(CultureInfo.InvariantCulture)).Append(":all=1")
             .Append(",apad,atrim=duration=").Append(duration).Append(",asetpts=PTS-STARTPTS[mus]");
         var mapped = MapIndex(args, "[aout]");
-        if (mapped >= 0)
+        if (mapped >= 0 && music.Duck)
+        {
+            chain.Append(";[aout]").Append(MergeAudioFormat).Append("[asrcin];[asrcin]asplit=2[asrc][duckkey];[mus][duckkey]")
+                .Append(DuckFilter(music)).Append("[musduck];[asrc][musduck]amix=inputs=2:duration=first:dropout_transition=0:normalize=0[amix]");
+            args[mapped] = "[amix]";
+        }
+        else if (mapped >= 0)
         {
             chain.Append(";[aout]").Append(MergeAudioFormat).Append("[asrc];[asrc][mus]amix=inputs=2:duration=first:dropout_transition=0:normalize=0[amix]");
             args[mapped] = "[amix]";
@@ -382,6 +388,18 @@ public static class EditExport
         args[graphAt] += chain.ToString();
         return plan with { Steps = plan.Steps.Take(plan.Steps.Count - 1).Append(last with { Args = args }).ToArray() };
     }
+
+    public const string DuckThreshold = "0.01";
+    public const string DuckRatio = "20";
+    public const string DuckAttackMs = "20";
+    public const string DuckSidechainLevel = "4";
+
+    public static double DuckMix(double duckDb) => 1 - Math.Pow(10, -duckDb / 20);
+
+    public static string DuckFilter(EditMusic music)
+        => "sidechaincompress=threshold=" + DuckThreshold + ":ratio=" + DuckRatio + ":attack=" + DuckAttackMs
+           + ":release=" + music.DuckReleaseMs.ToString(CultureInfo.InvariantCulture) + ":level_sc=" + DuckSidechainLevel
+           + ":mix=" + DuckMix(music.DuckDb).ToString("0.000", CultureInfo.InvariantCulture);
 
     private static int MapIndex(IReadOnlyList<string> args, string label)
     {
