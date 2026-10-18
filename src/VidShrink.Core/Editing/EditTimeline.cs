@@ -13,8 +13,10 @@ public sealed class EditTimeline
     private readonly Stack<IEditCommand> _undo = new();
     private readonly Stack<IEditCommand> _redo = new();
 
-    public EditTimeline(IEnumerable<EditClip> clips, long? sourceDuration = null, IEnumerable<TextLayer>? texts = null, IEnumerable<long>? extraSources = null)
+    public EditTimeline(IEnumerable<EditClip> clips, long? sourceDuration = null, IEnumerable<TextLayer>? texts = null, IEnumerable<long>? extraSources = null,
+        EditFrame frame = default)
     {
+        Frame = frame.Normalized();
         ArgumentNullException.ThrowIfNull(clips);
         _clips = clips.ToList();
         _texts = texts?.ToList() ?? new List<TextLayer>();
@@ -647,7 +649,17 @@ public sealed class EditTimeline
         return true;
     }
 
-    public bool HasEffects => _clips.Any(c => !c.Effects.IsNeutral);
+    public bool HasEffects => !Frame.IsSource || _clips.Any(c => !c.Effects.IsNeutral);
+
+    public EditFrame Frame { get; private set; }
+
+    public bool SetFrame(EditFrame frame)
+    {
+        var next = frame.Normalized();
+        if (next == Frame) return false;
+        Execute(new FrameCommand(f => Frame = f, Frame, next));
+        return true;
+    }
 
     /// <summary>
     /// Verilen parcalarin ayarlarini <paramref name="change"/> ile yazar; sonuc gecerli araliga
@@ -843,6 +855,25 @@ public sealed class EditTimeline
 
         var musicStep = new MusicCommand(m => Music = m, Music, music);
         Execute(sameBody ? musicStep : new CompositeCommand(new IEditCommand[] { new RestoreCommand(_texts, _clips.ToArray(), _texts.ToArray(), nextClips, nextTexts), musicStep }));
+        return true;
+    }
+
+    public bool Restore(IEnumerable<EditClip> clips, IEnumerable<TextLayer> texts, EditMusic? music, EditFrame frame)
+    {
+        var next = frame.Normalized();
+        if (next == Frame) return Restore(clips, texts, music);
+        var before = Frame;
+        var body = Restore(clips, texts, music);
+        var step = new FrameCommand(f => Frame = f, before, next);
+        if (!body)
+        {
+            Execute(step);
+            return true;
+        }
+
+        var last = _undo.Pop();
+        step.Apply(_clips);
+        Record(new CompositeCommand(new[] { last, step }));
         return true;
     }
 

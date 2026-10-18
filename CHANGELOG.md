@@ -9,6 +9,9 @@ ship as part of it.
 
 ### Added
 
+- Editor: each clip gains free Scale, Position X/Y and Angle, and the project gains an output frame (Source, 16:9,
+  9:16, 1:1). Both run through the clip geometry chain, so the preview and the export draw the same frame; a frame
+  other than the source forces a full re-encode. Old project files open unchanged.
 - Command line: `donustur` gains the Convert tab's tags, cover, Repair and chapters. `--etiket-baslik`,
   `--etiket-sanatci`, `--etiket-yil`, `--etiket-yorum` write the container tags, `--kapak` adds a PNG or JPEG cover,
   `--onar` is the Repair preset (corrupt packets dropped, timestamps rebuilt, MKV remux unless a container or codec

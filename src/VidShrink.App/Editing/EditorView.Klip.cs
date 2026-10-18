@@ -94,6 +94,7 @@ internal partial class EditorView
 
         TxtClipLabel.LostFocus += (_, _) => { if (_showingClip) CommitClipLabel(); };
         TxtClipLabel.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitClipLabel());
+        InitTransform();
         ShowClipPanel();
     }
 
@@ -309,6 +310,7 @@ internal partial class EditorView
             BtnClipFit.IsChecked = false;
         }
 
+        ShowTransform(effects);
         TxtClipVolume.Text = effects.VolumeDb.ToString("0.#", Strings.Culture);
         BtnClipDenoise.IsChecked = effects.Denoise;
         BtnClipLoudnorm.IsChecked = effects.Loudnorm;
@@ -361,7 +363,7 @@ internal partial class EditorView
 
     private EditLook? LookFor(EdlPreview preview, IPlaybackEngine engine)
     {
-        if (!preview.Parts.Any(p => !p.Clip.Effects.IsNeutral)) return null;
+        if (preview.Frame.IsSource && !preview.Parts.Any(p => !p.Clip.Effects.IsNeutral)) return null;
         if (_source is { } source && KnownInfo?.Invoke(source) is { Width: > 0, Height: > 0 } info)
             return new EditLook(preview, info.Width, info.Height, info.ParNum, info.ParDen);
         var (width, height) = FrameSize(engine);

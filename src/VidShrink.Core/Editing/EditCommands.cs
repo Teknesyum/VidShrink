@@ -188,6 +188,24 @@ internal sealed class CompositeCommand : IEditCommand
     }
 }
 
+internal sealed class FrameCommand : IEditCommand
+{
+    private readonly Action<EditFrame> _set;
+    private readonly EditFrame _before;
+    private readonly EditFrame _after;
+
+    public FrameCommand(Action<EditFrame> set, EditFrame before, EditFrame after)
+    {
+        _set = set;
+        _before = before;
+        _after = after;
+    }
+
+    public void Apply(List<EditClip> clips) => _set(_after);
+
+    public void Revert(List<EditClip> clips) => _set(_before);
+}
+
 internal sealed class MusicCommand : IEditCommand
 {
     private readonly Action<EditMusic?> _set;

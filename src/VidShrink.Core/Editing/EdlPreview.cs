@@ -38,6 +38,7 @@ public sealed class EdlPreview
             throw new ArgumentException("Parcanin kaynagi yol listesinde yok", nameof(timeline));
 
         SourcePaths = sourcePaths.ToArray();
+        Frame = timeline.Frame;
         var parts = new List<EdlPart>(timeline.Clips.Count);
         long timelineStart = 0;
         long edlStart = 0;
@@ -55,6 +56,8 @@ public sealed class EdlPreview
     }
 
     public IReadOnlyList<string> SourcePaths { get; }
+
+    public EditFrame Frame { get; }
 
     public IReadOnlyList<EdlPart> Parts { get; }
 

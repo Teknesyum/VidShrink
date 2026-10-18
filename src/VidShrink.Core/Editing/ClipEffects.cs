@@ -20,6 +20,10 @@ public sealed record ClipEffects
     public const double MaxEqDb = 12;
     public const string DefaultPadColor = "000000";
     public const double MaxFitRatio = 4;
+    public const double MinScale = 0.1;
+    public const double MaxScale = 4;
+    public const double MaxOffset = 0.5;
+    public const double MaxAngle = 180;
 
     public static ClipEffects None { get; } = new();
 
@@ -77,6 +81,16 @@ public sealed record ClipEffects
 
     public string PadColor { get; init; } = DefaultPadColor;
 
+    public double Scale { get; init; } = 1;
+
+    public double OffsetX { get; init; }
+
+    public double OffsetY { get; init; }
+
+    public double Angle { get; init; }
+
+    public bool HasTransform => Scale != 1 || OffsetX != 0 || OffsetY != 0 || Angle != 0;
+
     public bool HasFit => FitNum > 0 && FitDen > 0;
 
     public bool HasEqualizer => BassDb != 0 || MidDb != 0 || TrebleDb != 0;
@@ -85,7 +99,7 @@ public sealed record ClipEffects
 
     public bool HasCrop => CropLeft > 0 || CropTop > 0 || CropRight > 0 || CropBottom > 0;
 
-    public bool HasGeometry => HasCrop || HasFit || Rotation != 0 || FlipH || FlipV;
+    public bool HasGeometry => HasCrop || HasFit || Rotation != 0 || FlipH || FlipV || HasTransform;
 
     public bool HasAudio => Muted || VolumeDb != 0 || HasCleanup;
 
@@ -124,6 +138,10 @@ public sealed record ClipEffects
             BassDb = Band(BassDb),
             MidDb = Band(MidDb),
             TrebleDb = Band(TrebleDb),
+            Scale = double.IsFinite(Scale) ? Math.Round(Math.Clamp(Scale, MinScale, MaxScale), 3) : 1,
+            OffsetX = Offset(OffsetX),
+            OffsetY = Offset(OffsetY),
+            Angle = Turn(Angle),
         };
     }
 
@@ -196,6 +214,17 @@ public sealed record ClipEffects
 
     private static double Color(double value, double neutral, double min, double max)
         => double.IsFinite(value) ? Math.Round(Math.Clamp(value, min, max), 2) : neutral;
+
+    private static double Offset(double value) => double.IsFinite(value) ? Math.Round(Math.Clamp(value, -MaxOffset, MaxOffset), 3) : 0;
+
+    private static double Turn(double value)
+    {
+        if (!double.IsFinite(value)) return 0;
+        var turned = Math.Round(value, 1) % 360;
+        if (turned > MaxAngle) turned -= 360;
+        if (turned <= -MaxAngle) turned += 360;
+        return turned == 0 ? 0 : turned;
+    }
 
     private static double Band(double value) => double.IsFinite(value) ? Math.Round(Math.Clamp(value, MinEqDb, MaxEqDb), 1) : 0;
 
