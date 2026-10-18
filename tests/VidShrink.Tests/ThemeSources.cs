@@ -15,7 +15,7 @@ internal static class ThemeSources
     private static readonly XNamespace X = "http://schemas.microsoft.com/winfx/2006/xaml";
 
     private static readonly Regex Include = new(
-        @"<ResourceInclude\s+Source=""avares://VidShrink\.App/(?<path>[^""]+)""", RegexOptions.Compiled);
+        @"<ResourceInclude\s+Source=""avares://VidShrinkPlayer\.App/(?<path>[^""]+)""", RegexOptions.Compiled);
 
     internal static readonly string AppPath =
         Path.Combine(TipSources.Root, "src", "VidShrink.App", "App.axaml");
