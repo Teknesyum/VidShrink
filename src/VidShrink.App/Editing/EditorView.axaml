@@ -319,6 +319,14 @@
               <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.temperature}"/>
               <TextBox x:Name="TxtClipTemperature" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.temperature}"/>
             </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.keys.ease}"/>
+              <ComboBox x:Name="CmbClipEase" MinWidth="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.keys.ease}"/>
+              <Button x:Name="BtnClipKeyVolume" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.keys.add-volume}" AutomationProperties.Name="{loc:Text editor.clip.keys.add-volume}"/>
+              <Button x:Name="BtnClipKeyCrop" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.keys.add-crop}" AutomationProperties.Name="{loc:Text editor.clip.keys.add-crop}"/>
+              <Button x:Name="BtnClipKeysClear" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.keys.clear}" AutomationProperties.Name="{loc:Text editor.clip.keys.clear}"/>
+              <SarilanMetin x:Name="TxtClipKeys" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+            </StackPanel>
             <Button x:Name="BtnClipReset" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.reset}" AutomationProperties.Name="{loc:Text editor.clip.reset}"/>
           </WrapPanel>
           <WrapPanel x:Name="MediaPanel" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.media.open}">

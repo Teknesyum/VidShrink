@@ -36,7 +36,7 @@ public static class ClipFilters
     /// boyutu tuvalden farkliysa oran korunarak kuculur ve ortalanarak doldurulur. Sigdirmali klip once kendi oranina
     /// olceklenip <see cref="ClipEffects.PadColor"/> ile doldurulur.
     /// </summary>
-    public static string Geometry(ClipEffects effects, int width, int height, int parNum, int parDen, (int Width, int Height)? canvas)
+    public static string Geometry(ClipEffects effects, int width, int height, int parNum, int parDen, (int Width, int Height)? canvas, string time = "t")
     {
         if (canvas is not { } target) return string.Empty;
 
@@ -45,7 +45,8 @@ public static class ClipFilters
         if (displayWidth != width) parts.Add("scale=" + Int(displayWidth) + ":" + Int(height));
 
         var rect = effects.CropRect(displayWidth, height);
-        if (rect != (0, 0, displayWidth, height))
+        if (effects.HasMovingCrop) parts.Add(MovingCrop(effects.CropKeys, rect.Width, rect.Height, time));
+        else if (rect != (0, 0, displayWidth, height))
             parts.Add("crop=" + Int(rect.Width) + ":" + Int(rect.Height) + ":" + Int(rect.X) + ":" + Int(rect.Y));
 
         if (effects.Rotation == 90) parts.Add("transpose=1");
@@ -76,6 +77,31 @@ public static class ClipFilters
 
         parts.Add("setsar=1");
         return string.Join(",", parts);
+    }
+
+    public static string MovingCrop(KeyframeTrack<CropKey> keys, int width, int height, string time)
+    {
+        var left = keys.Expression(k => k.Left, time);
+        var top = keys.Expression(k => k.Top, time);
+        var right = keys.Expression(k => k.Right, time);
+        var bottom = keys.Expression(k => k.Bottom, time);
+        var w = Int(width);
+        var h = Int(height);
+        return "scale=w='ceil(" + w + "/(1-(" + left + ")-(" + right + "))/2)*2':h='ceil(" + h + "/(1-(" + top + ")-(" + bottom + "))/2)*2':eval=frame"
+            + ",crop=" + w + ":" + h + ":x='min(iw-ow,max(0,floor((" + left + ")*iw)))':y='min(ih-oh,max(0,floor((" + top + ")*ih)))'";
+    }
+
+    public static string Gain(ClipEffects effects, string time)
+        => effects.VolumeKeys.Count > 0
+            ? "volume=volume='pow(10,(" + effects.VolumeKeys.Expression(k => k.Db, time) + ")/20)':eval=frame"
+            : "volume=volume=" + Number(effects.VolumeDb) + "dB";
+
+    public static string PartTime(EdlPart part)
+    {
+        var speed = Number((double)part.Clip.Speed);
+        return part.Clip.Reversed
+            ? "(" + Number(EditTime.ToSeconds(part.EdlEnd)) + "-t)/" + speed
+            : "(t-" + Number(EditTime.ToSeconds(part.EdlStart)) + ")/" + speed;
     }
 
     /// <summary>Klip basinda sifirdan baslayan zamanla goruntu solmasi; <paramref name="length"/> cizelge tick'i.</summary>
@@ -121,7 +147,8 @@ public static class ClipFilters
         {
             if (effects.Denoise) parts.Add(AudioCaptureArguments.NoiseSuppressionFilterName);
             parts.AddRange(Equalizer(effects));
-            if (effects.VolumeDb != 0) parts.Add("volume=" + Number(effects.VolumeDb) + "dB");
+            if (effects.VolumeKeys.Count > 0) parts.Add(Gain(effects, "t"));
+            else if (effects.VolumeDb != 0) parts.Add("volume=" + Number(effects.VolumeDb) + "dB");
             if (effects.Compressor) parts.Add(CompressorFilter);
             if (effects.Loudnorm) parts.Add(StreamMapping.LoudnormFilter + ",aresample=" + Int(StreamMapping.DefaultSampleRate));
             if (effects.Limiter) parts.Add(LimiterFilter);
@@ -163,8 +190,8 @@ public static class ClipFilters
             {
                 if (effects.Denoise) audio.Add(AudioCaptureArguments.NoiseSuppressionFilterName + "=enable='" + Between(start, end) + "'");
                 audio.AddRange(Equalizer(effects).Select(f => f + window));
-                if (effects.VolumeDb != 0)
-                    audio.Add("volume=volume=" + Number(effects.VolumeDb) + "dB:enable='" + Between(start, end) + "'");
+                if (effects.VolumeKeys.Count > 0 || effects.VolumeDb != 0)
+                    audio.Add(Gain(effects, PartTime(part)) + ":enable='" + Between(start, end) + "'");
                 if (effects.Limiter) audio.Add(LimiterFilter + window);
             }
 

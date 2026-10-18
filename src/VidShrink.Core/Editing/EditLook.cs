@@ -31,7 +31,7 @@ public sealed class EditLook
 
     public string? Geometry(EdlPart part)
     {
-        var chain = ClipFilters.Geometry(part.Clip.Effects, _width, _height, _parNum, _parDen, _canvas);
+        var chain = ClipFilters.Geometry(part.Clip.Effects, _width, _height, _parNum, _parDen, _canvas, ClipFilters.PartTime(part));
         return chain.Length == 0 ? null : chain;
     }
 }
