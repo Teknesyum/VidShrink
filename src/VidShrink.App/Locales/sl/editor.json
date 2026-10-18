@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Izberite sliko naslovnice",
   "editor.remux.cover.set": "Naslovnica: {0}",
   "editor.remux.cover.unsupported": "Ta vsebnik ne more nositi naslovnice; izberite MP4 ali MKV.",
-  "editor.remux.empty": "V datoteko mora biti vključena vsaj ena sled."
+  "editor.remux.empty": "V datoteko mora biti vključena vsaj ena sled.",
+  "editor.clip.lut.load": "Naloži LUT",
+  "editor.clip.lut.remove": "Odstrani LUT",
+  "editor.clip.lut.mix": "Intenzivnost (%)",
+  "editor.clip.lut.none": "Brez LUT",
+  "editor.clip.lut.files": "Datoteke LUT",
+  "editor.clip.lut.unreadable": "LUT ni mogoče prebrati: {0}",
+  "editor.clip.lut.missing": "Datoteke LUT ni bilo mogoče najti; posnetek je odprt brez nje: {0}"
 }

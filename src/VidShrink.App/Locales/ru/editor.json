@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Выберите изображение обложки",
   "editor.remux.cover.set": "Обложка: {0}",
   "editor.remux.cover.unsupported": "Этот контейнер не поддерживает обложку; выберите MP4 или MKV.",
-  "editor.remux.empty": "В файл должна входить хотя бы одна дорожка."
+  "editor.remux.empty": "В файл должна входить хотя бы одна дорожка.",
+  "editor.clip.lut.load": "Загрузить LUT",
+  "editor.clip.lut.remove": "Удалить LUT",
+  "editor.clip.lut.mix": "Интенсивность (%)",
+  "editor.clip.lut.none": "Без LUT",
+  "editor.clip.lut.files": "Файлы LUT",
+  "editor.clip.lut.unreadable": "Не удалось прочитать LUT: {0}",
+  "editor.clip.lut.missing": "Файл LUT не найден; клип открыт без него: {0}"
 }

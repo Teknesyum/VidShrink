@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Изберете изображение за корица",
   "editor.remux.cover.set": "Корица: {0}",
   "editor.remux.cover.unsupported": "Този контейнер не може да носи корица; изберете MP4 или MKV.",
-  "editor.remux.empty": "Поне една писта трябва да бъде включена във файла."
+  "editor.remux.empty": "Поне една писта трябва да бъде включена във файла.",
+  "editor.clip.lut.load": "Зареди LUT",
+  "editor.clip.lut.remove": "Премахни LUT",
+  "editor.clip.lut.mix": "Интензитет (%)",
+  "editor.clip.lut.none": "Без LUT",
+  "editor.clip.lut.files": "LUT файлове",
+  "editor.clip.lut.unreadable": "LUT не може да бъде прочетен: {0}",
+  "editor.clip.lut.missing": "LUT файлът не е намерен; клипът е отворен без него: {0}"
 }

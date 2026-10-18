@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "कवर छवि चुनें",
   "editor.remux.cover.set": "कवर: {0}",
   "editor.remux.cover.unsupported": "यह कंटेनर कवर नहीं रख सकता; MP4 या MKV चुनें।",
-  "editor.remux.empty": "फ़ाइल में कम से कम एक ट्रैक शामिल होना चाहिए।"
+  "editor.remux.empty": "फ़ाइल में कम से कम एक ट्रैक शामिल होना चाहिए।",
+  "editor.clip.lut.load": "LUT लोड करें",
+  "editor.clip.lut.remove": "LUT हटाएँ",
+  "editor.clip.lut.mix": "तीव्रता (%)",
+  "editor.clip.lut.none": "कोई LUT नहीं",
+  "editor.clip.lut.files": "LUT फ़ाइलें",
+  "editor.clip.lut.unreadable": "LUT पढ़ा नहीं जा सका: {0}",
+  "editor.clip.lut.missing": "LUT फ़ाइल नहीं मिली; क्लिप उसके बिना खोली गई: {0}"
 }

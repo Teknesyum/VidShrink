@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "เลือกภาพปก",
   "editor.remux.cover.set": "ปก: {0}",
   "editor.remux.cover.unsupported": "คอนเทนเนอร์นี้ใส่ปกไม่ได้ เลือก MP4 หรือ MKV",
-  "editor.remux.empty": "ต้องรวมแทร็กอย่างน้อยหนึ่งแทร็กในไฟล์"
+  "editor.remux.empty": "ต้องรวมแทร็กอย่างน้อยหนึ่งแทร็กในไฟล์",
+  "editor.clip.lut.load": "โหลด LUT",
+  "editor.clip.lut.remove": "นำ LUT ออก",
+  "editor.clip.lut.mix": "ความเข้ม (%)",
+  "editor.clip.lut.none": "ไม่มี LUT",
+  "editor.clip.lut.files": "ไฟล์ LUT",
+  "editor.clip.lut.unreadable": "อ่าน LUT ไม่ได้: {0}",
+  "editor.clip.lut.missing": "ไม่พบไฟล์ LUT จึงเปิดคลิปโดยไม่มี LUT: {0}"
 }

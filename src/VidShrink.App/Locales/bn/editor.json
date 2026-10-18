@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "কভার ছবি বেছে নিন",
   "editor.remux.cover.set": "কভার: {0}",
   "editor.remux.cover.unsupported": "এই কনটেইনার কভার বহন করতে পারে না; MP4 বা MKV বেছে নিন।",
-  "editor.remux.empty": "ফাইলে অন্তত একটি ট্র্যাক অন্তর্ভুক্ত থাকতে হবে।"
+  "editor.remux.empty": "ফাইলে অন্তত একটি ট্র্যাক অন্তর্ভুক্ত থাকতে হবে।",
+  "editor.clip.lut.load": "LUT লোড করুন",
+  "editor.clip.lut.remove": "LUT সরান",
+  "editor.clip.lut.mix": "তীব্রতা (%)",
+  "editor.clip.lut.none": "LUT নেই",
+  "editor.clip.lut.files": "LUT ফাইল",
+  "editor.clip.lut.unreadable": "LUT পড়া যায়নি: {0}",
+  "editor.clip.lut.missing": "LUT ফাইল পাওয়া যায়নি; ক্লিপটি LUT ছাড়া খোলা হয়েছে: {0}"
 }

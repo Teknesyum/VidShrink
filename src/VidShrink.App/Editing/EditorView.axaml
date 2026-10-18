@@ -371,6 +371,13 @@
               <Button x:Name="BtnClipKeysClear" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.keys.clear}" AutomationProperties.Name="{loc:Text editor.clip.keys.clear}"/>
               <SarilanMetin x:Name="TxtClipKeys" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
             </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <Button x:Name="BtnClipLut" Theme="{StaticResource GhostButton}" VerticalAlignment="Center" Content="{loc:Text editor.clip.lut.load}" AutomationProperties.Name="{loc:Text editor.clip.lut.load}"/>
+              <SarilanMetin x:Name="TxtClipLutName" Theme="{StaticResource Hint}" VerticalAlignment="Center" MaxWidth="{StaticResource FieldWidthSm}"/>
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.lut.mix}"/>
+              <TextBox x:Name="TxtClipLutMix" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.lut.mix}"/>
+              <Button x:Name="BtnClipLutRemove" Theme="{StaticResource GhostButton}" VerticalAlignment="Center" Content="{loc:Text editor.clip.lut.remove}" AutomationProperties.Name="{loc:Text editor.clip.lut.remove}"/>
+            </StackPanel>
             <Button x:Name="BtnClipReset" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.reset}" AutomationProperties.Name="{loc:Text editor.clip.reset}"/>
           </WrapPanel>
           <WrapPanel x:Name="MediaPanel" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.media.open}">

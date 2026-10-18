@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "选择封面图片",
   "editor.remux.cover.set": "封面：{0}",
   "editor.remux.cover.unsupported": "此容器无法携带封面；请选择 MP4 或 MKV。",
-  "editor.remux.empty": "文件中至少要包含一条轨道。"
+  "editor.remux.empty": "文件中至少要包含一条轨道。",
+  "editor.clip.lut.load": "加载 LUT",
+  "editor.clip.lut.remove": "移除 LUT",
+  "editor.clip.lut.mix": "强度 (%)",
+  "editor.clip.lut.none": "无 LUT",
+  "editor.clip.lut.files": "LUT 文件",
+  "editor.clip.lut.unreadable": "无法读取 LUT：{0}",
+  "editor.clip.lut.missing": "找不到 LUT 文件，片段已在没有 LUT 的情况下打开：{0}"
 }

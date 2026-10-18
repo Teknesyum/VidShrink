@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Виберіть зображення обкладинки",
   "editor.remux.cover.set": "Обкладинка: {0}",
   "editor.remux.cover.unsupported": "Цей контейнер не підтримує обкладинку; виберіть MP4 або MKV.",
-  "editor.remux.empty": "До файлу має входити принаймні одна доріжка."
+  "editor.remux.empty": "До файлу має входити принаймні одна доріжка.",
+  "editor.clip.lut.load": "Завантажити LUT",
+  "editor.clip.lut.remove": "Вилучити LUT",
+  "editor.clip.lut.mix": "Інтенсивність (%)",
+  "editor.clip.lut.none": "Без LUT",
+  "editor.clip.lut.files": "Файли LUT",
+  "editor.clip.lut.unreadable": "Не вдалося прочитати LUT: {0}",
+  "editor.clip.lut.missing": "Файл LUT не знайдено; кліп відкрито без нього: {0}"
 }

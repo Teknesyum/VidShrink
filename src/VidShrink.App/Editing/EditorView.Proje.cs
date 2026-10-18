@@ -141,7 +141,15 @@ internal partial class EditorView
         _pendingMarkers = project.Markers;
         UseExportMode(project.ExportMode);
         ShowProjectStatus("StatusSuccess", Strings.Get("editor.project.restored"));
+        WarnMissingLuts(project);
         return model;
+    }
+
+    private void WarnMissingLuts(EditProject project)
+    {
+        if (project.MissingLuts.Count == 0) return;
+        var names = string.Join(", ", project.MissingLuts.Select(p => Path.GetFileName(p.Replace('\\', '/').Split('/')[^1])));
+        ShowProjectStatus("StatusWarning", string.Format(Strings.Culture, Strings.Get("editor.clip.lut.missing"), names));
     }
 
     /// <summary>
@@ -219,7 +227,9 @@ internal partial class EditorView
             Timeline.SetMarkers(project.Markers);
             UseExportMode(project.ExportMode);
             ShowProjectStatus("StatusSuccess", Strings.Get("editor.project.restored"));
+            WarnMissingLuts(project);
             return true;
+
         }
 
         await OpenSourceAsync(source, 0, project).ConfigureAwait(true);

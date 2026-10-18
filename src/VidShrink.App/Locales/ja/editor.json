@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "カバー画像を選択",
   "editor.remux.cover.set": "カバー: {0}",
   "editor.remux.cover.unsupported": "このコンテナはカバーを持てません。MP4 か MKV を選んでください。",
-  "editor.remux.empty": "少なくとも 1 つのトラックをファイルに含める必要があります。"
+  "editor.remux.empty": "少なくとも 1 つのトラックをファイルに含める必要があります。",
+  "editor.clip.lut.load": "LUT を読み込む",
+  "editor.clip.lut.remove": "LUT を削除",
+  "editor.clip.lut.mix": "強度 (%)",
+  "editor.clip.lut.none": "LUT なし",
+  "editor.clip.lut.files": "LUT ファイル",
+  "editor.clip.lut.unreadable": "LUT を読み取れませんでした: {0}",
+  "editor.clip.lut.missing": "LUT ファイルが見つからないため、クリップを LUT なしで開きました: {0}"
 }

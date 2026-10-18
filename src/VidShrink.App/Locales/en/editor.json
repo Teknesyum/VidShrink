@@ -320,5 +320,12 @@
   "editor.clip.angle": "Angle °",
   "editor.frame": "Project Frame",
   "editor.frame.source": "Source Frame",
-  "editor.frame.tip": "Output Frame Of The Whole Project"
+  "editor.frame.tip": "Output Frame Of The Whole Project",
+  "editor.clip.lut.load": "Load LUT",
+  "editor.clip.lut.remove": "Remove LUT",
+  "editor.clip.lut.mix": "Intensity (%)",
+  "editor.clip.lut.none": "No LUT",
+  "editor.clip.lut.files": "LUT Files",
+  "editor.clip.lut.unreadable": "Could not read the LUT: {0}",
+  "editor.clip.lut.missing": "LUT file not found; the clip opened without it: {0}"
 }

@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Chagua picha ya jalada",
   "editor.remux.cover.set": "Jalada: {0}",
   "editor.remux.cover.unsupported": "Chombo hiki hakiwezi kubeba jalada; chagua MP4 au MKV.",
-  "editor.remux.empty": "Angalau wimbo mmoja lazima ujumuishwe kwenye faili."
+  "editor.remux.empty": "Angalau wimbo mmoja lazima ujumuishwe kwenye faili.",
+  "editor.clip.lut.load": "Pakia LUT",
+  "editor.clip.lut.remove": "Ondoa LUT",
+  "editor.clip.lut.mix": "Ukali (%)",
+  "editor.clip.lut.none": "Hakuna LUT",
+  "editor.clip.lut.files": "Faili za LUT",
+  "editor.clip.lut.unreadable": "LUT haikuweza kusomwa: {0}",
+  "editor.clip.lut.missing": "Faili ya LUT haikupatikana; klipu ilifunguliwa bila hiyo: {0}"
 }

@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "سرورق کی تصویر منتخب کریں",
   "editor.remux.cover.set": "سرورق: {0}",
   "editor.remux.cover.unsupported": "یہ کنٹینر سرورق نہیں رکھ سکتا؛ MP4 یا MKV منتخب کریں۔",
-  "editor.remux.empty": "فائل میں کم از کم ایک ٹریک شامل ہونا چاہیے۔"
+  "editor.remux.empty": "فائل میں کم از کم ایک ٹریک شامل ہونا چاہیے۔",
+  "editor.clip.lut.load": "LUT لوڈ کریں",
+  "editor.clip.lut.remove": "LUT ہٹائیں",
+  "editor.clip.lut.mix": "شدت (%)",
+  "editor.clip.lut.none": "کوئی LUT نہیں",
+  "editor.clip.lut.files": "LUT فائلیں",
+  "editor.clip.lut.unreadable": "LUT پڑھا نہیں جا سکا: {0}",
+  "editor.clip.lut.missing": "LUT فائل نہیں ملی؛ کلپ اس کے بغیر کھولا گیا: {0}"
 }

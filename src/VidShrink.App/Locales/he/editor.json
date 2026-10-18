@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "בחירת תמונת עטיפה",
   "editor.remux.cover.set": "עטיפה: {0}",
   "editor.remux.cover.unsupported": "מכל זה אינו יכול לשאת עטיפה; בחר MP4 או MKV.",
-  "editor.remux.empty": "יש לכלול בקובץ לפחות רצועה אחת."
+  "editor.remux.empty": "יש לכלול בקובץ לפחות רצועה אחת.",
+  "editor.clip.lut.load": "טעינת LUT",
+  "editor.clip.lut.remove": "הסרת LUT",
+  "editor.clip.lut.mix": "עוצמה (%)",
+  "editor.clip.lut.none": "ללא LUT",
+  "editor.clip.lut.files": "קובצי LUT",
+  "editor.clip.lut.unreadable": "לא ניתן לקרוא את ה-LUT: {0}",
+  "editor.clip.lut.missing": "קובץ ה-LUT לא נמצא; הקליפ נפתח בלעדיו: {0}"
 }

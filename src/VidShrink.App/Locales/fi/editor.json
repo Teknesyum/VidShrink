@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Valitse kansikuva",
   "editor.remux.cover.set": "Kansikuva: {0}",
   "editor.remux.cover.unsupported": "Tämä säiliö ei voi sisältää kansikuvaa; valitse MP4 tai MKV.",
-  "editor.remux.empty": "Tiedostoon on sisällytettävä vähintään yksi raita."
+  "editor.remux.empty": "Tiedostoon on sisällytettävä vähintään yksi raita.",
+  "editor.clip.lut.load": "Lataa LUT",
+  "editor.clip.lut.remove": "Poista LUT",
+  "editor.clip.lut.mix": "Voimakkuus (%)",
+  "editor.clip.lut.none": "Ei LUT:ia",
+  "editor.clip.lut.files": "LUT-tiedostot",
+  "editor.clip.lut.unreadable": "LUT:ia ei voitu lukea: {0}",
+  "editor.clip.lut.missing": "LUT-tiedostoa ei löytynyt; leike avattiin ilman sitä: {0}"
 }

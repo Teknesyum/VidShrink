@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Επιλογή εικόνας εξωφύλλου",
   "editor.remux.cover.set": "Εξώφυλλο: {0}",
   "editor.remux.cover.unsupported": "Αυτό το κοντέινερ δεν μπορεί να φέρει εξώφυλλο· επιλέξτε MP4 ή MKV.",
-  "editor.remux.empty": "Τουλάχιστον ένα κομμάτι πρέπει να συμπεριληφθεί στο αρχείο."
+  "editor.remux.empty": "Τουλάχιστον ένα κομμάτι πρέπει να συμπεριληφθεί στο αρχείο.",
+  "editor.clip.lut.load": "Φόρτωση LUT",
+  "editor.clip.lut.remove": "Αφαίρεση LUT",
+  "editor.clip.lut.mix": "Ένταση (%)",
+  "editor.clip.lut.none": "Χωρίς LUT",
+  "editor.clip.lut.files": "Αρχεία LUT",
+  "editor.clip.lut.unreadable": "Δεν ήταν δυνατή η ανάγνωση του LUT: {0}",
+  "editor.clip.lut.missing": "Το αρχείο LUT δεν βρέθηκε· το κλιπ άνοιξε χωρίς αυτό: {0}"
 }

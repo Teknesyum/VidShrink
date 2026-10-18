@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Pilih gambar sampul",
   "editor.remux.cover.set": "Sampul: {0}",
   "editor.remux.cover.unsupported": "Wadah ini tidak dapat membawa sampul; pilih MP4 atau MKV.",
-  "editor.remux.empty": "Setidaknya satu trek harus disertakan dalam file."
+  "editor.remux.empty": "Setidaknya satu trek harus disertakan dalam file.",
+  "editor.clip.lut.load": "Muat LUT",
+  "editor.clip.lut.remove": "Hapus LUT",
+  "editor.clip.lut.mix": "Intensitas (%)",
+  "editor.clip.lut.none": "Tanpa LUT",
+  "editor.clip.lut.files": "Berkas LUT",
+  "editor.clip.lut.unreadable": "LUT tidak dapat dibaca: {0}",
+  "editor.clip.lut.missing": "Berkas LUT tidak ditemukan; klip dibuka tanpanya: {0}"
 }

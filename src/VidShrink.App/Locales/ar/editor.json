@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "اختيار صورة الغلاف",
   "editor.remux.cover.set": "الغلاف: {0}",
   "editor.remux.cover.unsupported": "هذه الحاوية لا تحمل غلافًا؛ اختر MP4 أو MKV.",
-  "editor.remux.empty": "يجب تضمين مسار واحد على الأقل في الملف."
+  "editor.remux.empty": "يجب تضمين مسار واحد على الأقل في الملف.",
+  "editor.clip.lut.load": "تحميل LUT",
+  "editor.clip.lut.remove": "إزالة LUT",
+  "editor.clip.lut.mix": "الشدة (%)",
+  "editor.clip.lut.none": "بلا LUT",
+  "editor.clip.lut.files": "ملفات LUT",
+  "editor.clip.lut.unreadable": "تعذّرت قراءة LUT: {0}",
+  "editor.clip.lut.missing": "لم يُعثر على ملف LUT؛ فُتح المقطع بدونه: {0}"
 }

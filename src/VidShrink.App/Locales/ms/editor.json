@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Pilih imej kulit",
   "editor.remux.cover.set": "Kulit: {0}",
   "editor.remux.cover.unsupported": "Bekas ini tidak boleh membawa kulit; pilih MP4 atau MKV.",
-  "editor.remux.empty": "Sekurang-kurangnya satu trek mesti disertakan dalam fail."
+  "editor.remux.empty": "Sekurang-kurangnya satu trek mesti disertakan dalam fail.",
+  "editor.clip.lut.load": "Muat LUT",
+  "editor.clip.lut.remove": "Buang LUT",
+  "editor.clip.lut.mix": "Keamatan (%)",
+  "editor.clip.lut.none": "Tiada LUT",
+  "editor.clip.lut.files": "Fail LUT",
+  "editor.clip.lut.unreadable": "LUT tidak dapat dibaca: {0}",
+  "editor.clip.lut.missing": "Fail LUT tidak ditemui; klip dibuka tanpanya: {0}"
 }

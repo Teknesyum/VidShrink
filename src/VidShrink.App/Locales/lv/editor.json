@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Izvēlieties vāciņa attēlu",
   "editor.remux.cover.set": "Vāciņš: {0}",
   "editor.remux.cover.unsupported": "Šis konteiners nevar saturēt vāciņu; izvēlieties MP4 vai MKV.",
-  "editor.remux.empty": "Failā jāiekļauj vismaz viens celiņš."
+  "editor.remux.empty": "Failā jāiekļauj vismaz viens celiņš.",
+  "editor.clip.lut.load": "Ielādēt LUT",
+  "editor.clip.lut.remove": "Noņemt LUT",
+  "editor.clip.lut.mix": "Intensitāte (%)",
+  "editor.clip.lut.none": "Bez LUT",
+  "editor.clip.lut.files": "LUT faili",
+  "editor.clip.lut.unreadable": "LUT nevarēja nolasīt: {0}",
+  "editor.clip.lut.missing": "LUT fails nav atrasts; klips atvērts bez tā: {0}"
 }

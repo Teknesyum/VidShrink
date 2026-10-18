@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Wybierz obraz okładki",
   "editor.remux.cover.set": "Okładka: {0}",
   "editor.remux.cover.unsupported": "Ten kontener nie obsługuje okładki; wybierz MP4 lub MKV.",
-  "editor.remux.empty": "Do pliku musi trafić co najmniej jedna ścieżka."
+  "editor.remux.empty": "Do pliku musi trafić co najmniej jedna ścieżka.",
+  "editor.clip.lut.load": "Wczytaj LUT",
+  "editor.clip.lut.remove": "Usuń LUT",
+  "editor.clip.lut.mix": "Intensywność (%)",
+  "editor.clip.lut.none": "Brak LUT",
+  "editor.clip.lut.files": "Pliki LUT",
+  "editor.clip.lut.unreadable": "Nie można odczytać LUT: {0}",
+  "editor.clip.lut.missing": "Nie znaleziono pliku LUT; klip otwarto bez niego: {0}"
 }

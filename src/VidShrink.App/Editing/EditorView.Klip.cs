@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Platform.Storage;
+
 using VidShrink.App.Localization;
 using VidShrink.App.Playback;
 using VidShrink.Core.Editing;
@@ -86,6 +89,11 @@ internal partial class EditorView
             box.LostFocus += (_, _) => CommitClipColor(box, field);
             box.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitClipColor(box, field));
         }
+
+        BtnClipLut.Click += (_, _) => _ = PickClipLutAsync();
+        BtnClipLutRemove.Click += (_, _) => RemoveClipLut();
+        TxtClipLutMix.LostFocus += (_, _) => CommitClipLutMix();
+        TxtClipLutMix.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitClipLutMix());
 
         BtnClipDenoise.Click += (_, _) => { if (_showingClip) SetClipEffects(e => e with { Denoise = BtnClipDenoise.IsChecked == true }); };
         BtnClipLoudnorm.Click += (_, _) => { if (_showingClip) SetClipEffects(e => e with { Loudnorm = BtnClipLoudnorm.IsChecked == true }); };
@@ -285,6 +293,62 @@ internal partial class EditorView
         if (!done) ShowClipPanel();
     }
 
+    internal bool LoadClipLut(string path)
+    {
+        if (!_showingClip) return false;
+        string full;
+        try
+        {
+            full = Path.GetFullPath(path);
+        }
+        catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
+        {
+            full = path;
+        }
+
+        if (LutFile.Read(full) is null)
+        {
+            ShowProjectStatus("StatusError", string.Format(Strings.Culture, Strings.Get("editor.clip.lut.unreadable"), Path.GetFileName(full)));
+            return false;
+        }
+
+        return SetClipEffects(e => e with { Lut = full, LutMix = e.Lut is null ? ClipEffects.MaxLutMix : e.LutMix });
+    }
+
+    internal bool RemoveClipLut()
+        => _showingClip && SetClipEffects(e => e with { Lut = null, LutMix = ClipEffects.MaxLutMix });
+
+    internal bool CommitClipLutMix()
+    {
+        if (!_showingClip) return false;
+        var text = TxtClipLutMix.Text?.Trim().TrimEnd('%').Trim();
+        if (string.IsNullOrEmpty(text)
+            || (!double.TryParse(text, NumberStyles.Float, Strings.Culture, out var value)
+                && !double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value))
+            || !double.IsFinite(value))
+        {
+            ShowClipPanel();
+            return false;
+        }
+
+        var mix = (int)Math.Round(Math.Clamp(value, ClipEffects.MinLutMix, ClipEffects.MaxLutMix), MidpointRounding.AwayFromZero);
+        var done = SetClipEffects(e => e.Lut is null ? e : e with { LutMix = mix });
+        if (!done) ShowClipPanel();
+        return done;
+    }
+
+    private async Task PickClipLutAsync()
+    {
+        if (!_showingClip || TopLevel.GetTopLevel(this)?.StorageProvider is not { } storage) return;
+        var files = await storage.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = Strings.Get("editor.clip.lut.load"),
+            AllowMultiple = false,
+            FileTypeFilter = new[] { new FilePickerFileType(Strings.Get("editor.clip.lut.files")) { Patterns = new[] { "*" + LutFile.Extension } } }
+        }).ConfigureAwait(true);
+        if (files.Count > 0 && files[0].TryGetLocalPath() is { } path) LoadClipLut(path);
+    }
+
     private enum EqBand { Bass, Mid, Treble }
 
     /// <summary>Ekolayzir bandini kutudan yazar; okunamayan giris eski degere doner, sinir disi -12..12 dB'ye kirpilir.</summary>
@@ -364,6 +428,12 @@ internal partial class EditorView
         TxtClipTemperature.Text = effects.Temperature.ToString(CultureInfo.InvariantCulture);
         ShowClipGrade(effects);
         ShowClipBlur(effects);
+        var lut = effects.Lut;
+        TxtClipLutName.Text = lut is null ? Strings.Get("editor.clip.lut.none") : Path.GetFileName(lut);
+        ToolTip.SetTip(TxtClipLutName, lut);
+        TxtClipLutMix.Text = effects.LutMix.ToString(CultureInfo.InvariantCulture);
+        TxtClipLutMix.IsEnabled = lut is not null;
+        BtnClipLutRemove.IsEnabled = lut is not null;
         TxtClipLabel.Text = model.Clips[index].Label;
         TxtClipKeys.Text = string.Format(Strings.Culture, Strings.Get("editor.clip.keys.count"), effects.VolumeKeys.Count, effects.CropKeys.Count);
         BtnClipKeyCrop.IsEnabled = !effects.HasFit;

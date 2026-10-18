@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Omslagafbeelding kiezen",
   "editor.remux.cover.set": "Omslag: {0}",
   "editor.remux.cover.unsupported": "Deze container kan geen omslag bevatten; kies MP4 of MKV.",
-  "editor.remux.empty": "Er moet minstens één spoor in het bestand worden opgenomen."
+  "editor.remux.empty": "Er moet minstens één spoor in het bestand worden opgenomen.",
+  "editor.clip.lut.load": "LUT Laden",
+  "editor.clip.lut.remove": "LUT Verwijderen",
+  "editor.clip.lut.mix": "Intensiteit (%)",
+  "editor.clip.lut.none": "Geen LUT",
+  "editor.clip.lut.files": "LUT-bestanden",
+  "editor.clip.lut.unreadable": "LUT kon niet worden gelezen: {0}",
+  "editor.clip.lut.missing": "LUT-bestand niet gevonden; de clip is zonder geopend: {0}"
 }

@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "انتخاب تصویر جلد",
   "editor.remux.cover.set": "جلد: {0}",
   "editor.remux.cover.unsupported": "این قالب نمی‌تواند جلد داشته باشد؛ MP4 یا MKV را انتخاب کنید.",
-  "editor.remux.empty": "دست‌کم یک ترک باید در فایل گنجانده شود."
+  "editor.remux.empty": "دست‌کم یک ترک باید در فایل گنجانده شود.",
+  "editor.clip.lut.load": "بارگذاری LUT",
+  "editor.clip.lut.remove": "حذف LUT",
+  "editor.clip.lut.mix": "شدت (%)",
+  "editor.clip.lut.none": "بدون LUT",
+  "editor.clip.lut.files": "فایل‌های LUT",
+  "editor.clip.lut.unreadable": "LUT خوانده نشد: {0}",
+  "editor.clip.lut.missing": "فایل LUT پیدا نشد؛ کلیپ بدون آن باز شد: {0}"
 }

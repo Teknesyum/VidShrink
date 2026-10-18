@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Alege imaginea de copertă",
   "editor.remux.cover.set": "Copertă: {0}",
   "editor.remux.cover.unsupported": "Acest container nu poate purta copertă; alege MP4 sau MKV.",
-  "editor.remux.empty": "Cel puțin o pistă trebuie inclusă în fișier."
+  "editor.remux.empty": "Cel puțin o pistă trebuie inclusă în fișier.",
+  "editor.clip.lut.load": "Încarcă LUT",
+  "editor.clip.lut.remove": "Elimină LUT",
+  "editor.clip.lut.mix": "Intensitate (%)",
+  "editor.clip.lut.none": "Fără LUT",
+  "editor.clip.lut.files": "Fișiere LUT",
+  "editor.clip.lut.unreadable": "LUT-ul nu a putut fi citit: {0}",
+  "editor.clip.lut.missing": "Fișierul LUT nu a fost găsit; clipul a fost deschis fără el: {0}"
 }

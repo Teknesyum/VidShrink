@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "அட்டைப் படத்தைத் தேர்வுசெய்",
   "editor.remux.cover.set": "அட்டை: {0}",
   "editor.remux.cover.unsupported": "இந்தக் கொள்கலன் அட்டையைத் தாங்காது; MP4 அல்லது MKV தேர்வுசெய்.",
-  "editor.remux.empty": "கோப்பில் குறைந்தது ஒரு தடம் சேர்க்கப்பட வேண்டும்."
+  "editor.remux.empty": "கோப்பில் குறைந்தது ஒரு தடம் சேர்க்கப்பட வேண்டும்.",
+  "editor.clip.lut.load": "LUT ஏற்று",
+  "editor.clip.lut.remove": "LUT நீக்கு",
+  "editor.clip.lut.mix": "தீவிரம் (%)",
+  "editor.clip.lut.none": "LUT இல்லை",
+  "editor.clip.lut.files": "LUT கோப்புகள்",
+  "editor.clip.lut.unreadable": "LUT-ஐப் படிக்க முடியவில்லை: {0}",
+  "editor.clip.lut.missing": "LUT கோப்பு கிடைக்கவில்லை; கிளிப் அது இல்லாமல் திறக்கப்பட்டது: {0}"
 }

@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Borítókép választása",
   "editor.remux.cover.set": "Borító: {0}",
   "editor.remux.cover.unsupported": "Ez a tároló nem hordozhat borítót; válassz MP4-et vagy MKV-t.",
-  "editor.remux.empty": "Legalább egy sávot bele kell foglalni a fájlba."
+  "editor.remux.empty": "Legalább egy sávot bele kell foglalni a fájlba.",
+  "editor.clip.lut.load": "LUT Betöltése",
+  "editor.clip.lut.remove": "LUT Eltávolítása",
+  "editor.clip.lut.mix": "Erősség (%)",
+  "editor.clip.lut.none": "Nincs LUT",
+  "editor.clip.lut.files": "LUT-fájlok",
+  "editor.clip.lut.unreadable": "A LUT nem olvasható: {0}",
+  "editor.clip.lut.missing": "A LUT-fájl nem található; a klip nélküle nyílt meg: {0}"
 }

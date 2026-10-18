@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Velg omslagsbilde",
   "editor.remux.cover.set": "Omslag: {0}",
   "editor.remux.cover.unsupported": "Denne beholderen kan ikke bære omslag; velg MP4 eller MKV.",
-  "editor.remux.empty": "Minst ett spor må tas med i filen."
+  "editor.remux.empty": "Minst ett spor må tas med i filen.",
+  "editor.clip.lut.load": "Last Inn LUT",
+  "editor.clip.lut.remove": "Fjern LUT",
+  "editor.clip.lut.mix": "Intensitet (%)",
+  "editor.clip.lut.none": "Ingen LUT",
+  "editor.clip.lut.files": "LUT-filer",
+  "editor.clip.lut.unreadable": "Kunne ikke lese LUT: {0}",
+  "editor.clip.lut.missing": "Fant ikke LUT-filen; klippet ble åpnet uten den: {0}"
 }

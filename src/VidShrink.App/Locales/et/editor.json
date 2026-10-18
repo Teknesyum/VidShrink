@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Vali kaanepilt",
   "editor.remux.cover.set": "Kaanepilt: {0}",
   "editor.remux.cover.unsupported": "See konteiner ei saa kaanepilti kanda; vali MP4 või MKV.",
-  "editor.remux.empty": "Faili peab kaasama vähemalt ühe raja."
+  "editor.remux.empty": "Faili peab kaasama vähemalt ühe raja.",
+  "editor.clip.lut.load": "Laadi LUT",
+  "editor.clip.lut.remove": "Eemalda LUT",
+  "editor.clip.lut.mix": "Intensiivsus (%)",
+  "editor.clip.lut.none": "LUT puudub",
+  "editor.clip.lut.files": "LUT-failid",
+  "editor.clip.lut.unreadable": "LUT-i ei saanud lugeda: {0}",
+  "editor.clip.lut.missing": "LUT-faili ei leitud; klipp avati ilma selleta: {0}"
 }

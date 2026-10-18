@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Coverbild wählen",
   "editor.remux.cover.set": "Cover: {0}",
   "editor.remux.cover.unsupported": "Dieser Container kann kein Cover tragen; MP4 oder MKV wählen.",
-  "editor.remux.empty": "Mindestens eine Spur muss in die Datei aufgenommen werden."
+  "editor.remux.empty": "Mindestens eine Spur muss in die Datei aufgenommen werden.",
+  "editor.clip.lut.load": "LUT Laden",
+  "editor.clip.lut.remove": "LUT Entfernen",
+  "editor.clip.lut.mix": "Intensität (%)",
+  "editor.clip.lut.none": "Keine LUT",
+  "editor.clip.lut.files": "LUT-Dateien",
+  "editor.clip.lut.unreadable": "LUT konnte nicht gelesen werden: {0}",
+  "editor.clip.lut.missing": "LUT-Datei nicht gefunden; der Clip wurde ohne sie geöffnet: {0}"
 }

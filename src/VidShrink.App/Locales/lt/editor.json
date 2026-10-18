@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Pasirinkite viršelio paveikslėlį",
   "editor.remux.cover.set": "Viršelis: {0}",
   "editor.remux.cover.unsupported": "Šis konteineris negali turėti viršelio; pasirinkite MP4 arba MKV.",
-  "editor.remux.empty": "Į failą turi būti įtrauktas bent vienas takelis."
+  "editor.remux.empty": "Į failą turi būti įtrauktas bent vienas takelis.",
+  "editor.clip.lut.load": "Įkelti LUT",
+  "editor.clip.lut.remove": "Pašalinti LUT",
+  "editor.clip.lut.mix": "Intensyvumas (%)",
+  "editor.clip.lut.none": "Be LUT",
+  "editor.clip.lut.files": "LUT failai",
+  "editor.clip.lut.unreadable": "Nepavyko perskaityti LUT: {0}",
+  "editor.clip.lut.missing": "LUT failas nerastas; klipas atvertas be jo: {0}"
 }

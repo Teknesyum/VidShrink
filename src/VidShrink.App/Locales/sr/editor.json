@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Izaberite naslovnu sliku",
   "editor.remux.cover.set": "Naslovna slika: {0}",
   "editor.remux.cover.unsupported": "Ovaj kontejner ne može nositi naslovnu sliku; izaberite MP4 ili MKV.",
-  "editor.remux.empty": "U datoteku mora biti uključen bar jedan zapis."
+  "editor.remux.empty": "U datoteku mora biti uključen bar jedan zapis.",
+  "editor.clip.lut.load": "Учитај LUT",
+  "editor.clip.lut.remove": "Уклони LUT",
+  "editor.clip.lut.mix": "Интензитет (%)",
+  "editor.clip.lut.none": "Без LUT-а",
+  "editor.clip.lut.files": "LUT датотеке",
+  "editor.clip.lut.unreadable": "LUT није могуће прочитати: {0}",
+  "editor.clip.lut.missing": "LUT датотека није пронађена; клип је отворен без ње: {0}"
 }

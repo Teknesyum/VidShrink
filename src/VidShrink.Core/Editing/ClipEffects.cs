@@ -1,4 +1,4 @@
-﻿namespace VidShrink.Core.Editing;
+namespace VidShrink.Core.Editing;
 
 /// <summary>
 /// Klibin kaynak ustune uygulanan ayarlari: kaynak koordinatinda kesirli kirpma, saat yonunde
@@ -27,6 +27,8 @@ public sealed partial record ClipEffects
     public const double MaxScale = 4;
     public const double MaxOffset = 0.5;
     public const double MaxAngle = 180;
+    public const int MinLutMix = 0;
+    public const int MaxLutMix = 100;
 
     public static ClipEffects None { get; } = new();
 
@@ -116,6 +118,12 @@ public sealed partial record ClipEffects
 
     public bool HasMovingCrop => CropKeys.Count > 1;
 
+    public string? Lut { get; init; }
+
+    public int LutMix { get; init; } = MaxLutMix;
+
+    public bool HasLut => Lut is { Length: > 0 } && LutMix > MinLutMix;
+
     public bool HasFit => FitNum > 0 && FitDen > 0;
 
     public bool HasEqualizer => BassDb != 0 || MidDb != 0 || TrebleDb != 0;
@@ -128,9 +136,9 @@ public sealed partial record ClipEffects
 
     public bool HasAudio => Muted || VolumeDb != 0 || VolumeKeys.Count > 0 || HasCleanup;
 
-    public bool HasColor => Brightness != 0 || Contrast != 1 || Saturation != 1 || Temperature != NeutralTemperature || HasGrade;
+    public bool HasColor => Brightness != 0 || Contrast != 1 || Saturation != 1 || Temperature != NeutralTemperature || HasGrade || HasLut;
 
-    public bool IsNeutral => !HasGeometry && !HasAudio && !HasColor && !HasBlur && FadeIn == 0 && FadeOut == 0;
+    public bool IsNeutral => !HasGeometry && !HasAudio && !HasColor && !HasBlur && Lut is null && FadeIn == 0 && FadeOut == 0;
 
     /// <summary>Degerleri gecerli araliga ceker: kirpma kenarlari toplamda karenin %95'ini asmaz, aci 90'in katina iner,
     /// renk alanlari araliga kirpilip iki ondaliga yuvarlanir; sayi olmayan renk degeri notre doner. Ekolayzir bantlari
@@ -169,6 +177,8 @@ public sealed partial record ClipEffects
             Angle = Turn(Angle),
             VolumeKeys = VolumeKeys.Map(k => k with { Db = double.IsFinite(k.Db) ? Math.Round(Math.Clamp(k.Db, MinVolumeDb, MaxVolumeDb), 1) : 0 }),
             CropKeys = FitOnly().HasFit ? KeyframeTrack<CropKey>.Empty : CropKeys.Map(CropEdges),
+            Lut = string.IsNullOrWhiteSpace(Lut) ? null : Lut.Trim(),
+            LutMix = Math.Clamp(LutMix, MinLutMix, MaxLutMix),
         }).GradeNormalized();
     }
 

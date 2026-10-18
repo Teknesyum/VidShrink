@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Vybrať obrázok obalu",
   "editor.remux.cover.set": "Obal: {0}",
   "editor.remux.cover.unsupported": "Tento kontajner nemôže niesť obal; zvoľte MP4 alebo MKV.",
-  "editor.remux.empty": "Do súboru musí byť zahrnutá aspoň jedna stopa."
+  "editor.remux.empty": "Do súboru musí byť zahrnutá aspoň jedna stopa.",
+  "editor.clip.lut.load": "Načítať LUT",
+  "editor.clip.lut.remove": "Odstrániť LUT",
+  "editor.clip.lut.mix": "Intenzita (%)",
+  "editor.clip.lut.none": "Bez LUT",
+  "editor.clip.lut.files": "Súbory LUT",
+  "editor.clip.lut.unreadable": "LUT sa nepodarilo prečítať: {0}",
+  "editor.clip.lut.missing": "Súbor LUT sa nenašiel; klip bol otvorený bez neho: {0}"
 }

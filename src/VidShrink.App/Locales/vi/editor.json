@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "Chọn ảnh bìa",
   "editor.remux.cover.set": "Ảnh bìa: {0}",
   "editor.remux.cover.unsupported": "Định dạng chứa này không mang được ảnh bìa; chọn MP4 hoặc MKV.",
-  "editor.remux.empty": "Phải đưa ít nhất một rãnh vào tệp."
+  "editor.remux.empty": "Phải đưa ít nhất một rãnh vào tệp.",
+  "editor.clip.lut.load": "Tải LUT",
+  "editor.clip.lut.remove": "Gỡ LUT",
+  "editor.clip.lut.mix": "Cường độ (%)",
+  "editor.clip.lut.none": "Không có LUT",
+  "editor.clip.lut.files": "Tệp LUT",
+  "editor.clip.lut.unreadable": "Không đọc được LUT: {0}",
+  "editor.clip.lut.missing": "Không tìm thấy tệp LUT; clip đã mở mà không có nó: {0}"
 }

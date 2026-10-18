@@ -308,5 +308,12 @@
   "editor.remux.cover-title": "커버 이미지 선택",
   "editor.remux.cover.set": "커버: {0}",
   "editor.remux.cover.unsupported": "이 컨테이너는 커버를 담을 수 없습니다. MP4 또는 MKV를 선택하세요.",
-  "editor.remux.empty": "파일에 트랙을 하나 이상 포함해야 합니다."
+  "editor.remux.empty": "파일에 트랙을 하나 이상 포함해야 합니다.",
+  "editor.clip.lut.load": "LUT 불러오기",
+  "editor.clip.lut.remove": "LUT 제거",
+  "editor.clip.lut.mix": "강도 (%)",
+  "editor.clip.lut.none": "LUT 없음",
+  "editor.clip.lut.files": "LUT 파일",
+  "editor.clip.lut.unreadable": "LUT를 읽을 수 없습니다: {0}",
+  "editor.clip.lut.missing": "LUT 파일을 찾을 수 없어 클립을 LUT 없이 열었습니다: {0}"
 }
