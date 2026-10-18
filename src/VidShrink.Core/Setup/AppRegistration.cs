@@ -97,7 +97,7 @@ public static class UserPathRegistry
 [SupportedOSPlatform("windows")]
 public static class UninstallEntry
 {
-    public const string DisplayName = "VidShrink";
+    public const string DisplayName = AppIdentity.Name;
 
     public const string Publisher = "Teknesyum";
 

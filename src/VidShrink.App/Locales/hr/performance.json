@@ -22,7 +22,7 @@
   "performance.line.software-small": "To ostaje ispod jedne jezgre ({0} jezgri), pa se može rasporediti u praznine koje ostavlja drugi rad.",
   "performance.line.cpu-unreliable": "Brojač procesorskog vremena na ovom računalu nije pouzdan ({0}× prema zidnom satu), pa se procesorska vremena prikazuju, ali se iz njih ništa ne odlučuje.",
   "performance.line.budget-exhausted": "Proračun mjerenja je istekao ({0} ms od {1} ms), pa nedostaje jedan dio provjere.",
-  "performance.boundary": "VidShrink ne snima video. Ovdje se mjeri koliko kodiranje košta na ovom računalu, a ne što alat za snimanje radi s njim — njegova vlastita postavka kodera prvo je mjesto za provjeru.",
+  "performance.boundary": "{app} ne snima video. Ovdje se mjeri koliko kodiranje košta na ovom računalu, a ne što alat za snimanje radi s njim — njegova vlastita postavka kodera prvo je mjesto za provjeru.",
 
   "performance.fact.hardware-encoder": "Hardverski koder",
   "performance.fact.hardware-pipeline": "Hardverski cjevovod",

@@ -22,7 +22,7 @@
   "performance.line.software-small": "Isso fica abaixo de um núcleo ({0} núcleos), então pode ser distribuído nas folgas deixadas por outro trabalho.",
   "performance.line.cpu-unreliable": "O contador de tempo de processador desta máquina não é confiável ({0}× contra o relógio de parede), então os tempos de processador são mostrados, mas nada é decidido a partir deles.",
   "performance.line.budget-exhausted": "O orçamento de medição acabou ({0} ms de {1} ms), então uma parte da verificação está faltando.",
-  "performance.boundary": "O VidShrink não captura vídeo. O que se mede aqui é o que a codificação custa nesta máquina, não o que uma ferramenta de captura faz com isso — a configuração de codificador dela é o primeiro lugar a olhar.",
+  "performance.boundary": "O {app} não captura vídeo. O que se mede aqui é o que a codificação custa nesta máquina, não o que uma ferramenta de captura faz com isso — a configuração de codificador dela é o primeiro lugar a olhar.",
 
   "performance.fact.hardware-encoder": "Codificador de hardware",
   "performance.fact.hardware-pipeline": "Pipeline de hardware",

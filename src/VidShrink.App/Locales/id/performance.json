@@ -22,7 +22,7 @@
   "performance.line.software-small": "Itu tetap di bawah satu inti ({0} inti), jadi bisa disebar ke celah yang ditinggalkan pekerjaan lain.",
   "performance.line.cpu-unreliable": "Penghitung waktu prosesor di mesin ini tidak andal ({0}× terhadap jam dinding), jadi waktu prosesor ditampilkan tetapi tidak dijadikan dasar keputusan.",
   "performance.line.budget-exhausted": "Anggaran pengukuran habis ({0} ms dari {1} ms), jadi satu bagian pemeriksaan hilang.",
-  "performance.boundary": "VidShrink tidak merekam video. Yang diukur di sini adalah biaya encoding di mesin ini, bukan apa yang dilakukan alat perekam — pengaturan encoder alat itu adalah tempat pertama untuk dicek.",
+  "performance.boundary": "{app} tidak merekam video. Yang diukur di sini adalah biaya encoding di mesin ini, bukan apa yang dilakukan alat perekam — pengaturan encoder alat itu adalah tempat pertama untuk dicek.",
 
   "performance.fact.hardware-encoder": "Encoder perangkat keras",
   "performance.fact.hardware-pipeline": "Jalur perangkat keras",

@@ -22,7 +22,7 @@
   "performance.line.software-small": "Tas paliek zem viena kodola ({0} kodoli), tāpēc to var izkliedēt cita darba atstātajās spraugās.",
   "performance.line.cpu-unreliable": "Procesora laika skaitītājs šajā datorā nav uzticams ({0}× pret sienas pulksteni), tāpēc procesora laiki tiek rādīti, bet nekas no tiem netiek izlemts.",
   "performance.line.budget-exhausted": "Mērīšanas budžets izsīka ({0} ms no {1} ms), tāpēc viens pārbaudes posms trūkst.",
-  "performance.boundary": "VidShrink neieraksta video. Šeit mērīts, cik kodēšana maksā šajā datorā, nevis ko ar to dara ierakstīšanas rīks — tā paša kodētāja iestatījums ir pirmā vieta, kur skatīties.",
+  "performance.boundary": "{app} neieraksta video. Šeit mērīts, cik kodēšana maksā šajā datorā, nevis ko ar to dara ierakstīšanas rīks — tā paša kodētāja iestatījums ir pirmā vieta, kur skatīties.",
 
   "performance.fact.hardware-encoder": "Aparatūras kodētājs",
   "performance.fact.hardware-pipeline": "Aparatūras konveijers",

@@ -22,7 +22,7 @@
   "performance.line.software-small": "To mniej niż jeden rdzeń ({0} rdzeni), więc można je rozłożyć w przerwach po innej pracy.",
   "performance.line.cpu-unreliable": "Licznik czasu procesora na tej maszynie nie jest wiarygodny ({0}× wobec zegara ściennego), więc czasy procesora są pokazane, ale nic się z nich nie rozstrzyga.",
   "performance.line.budget-exhausted": "Budżet pomiaru wyczerpał się ({0} ms z {1} ms), więc brakuje jednej części testu.",
-  "performance.boundary": "VidShrink nie nagrywa wideo. Mierzone jest tu, ile kosztuje kodowanie na tej maszynie, nie to, co robi z nim narzędzie do nagrywania — jego własne ustawienie kodera to pierwsze miejsce do sprawdzenia.",
+  "performance.boundary": "{app} nie nagrywa wideo. Mierzone jest tu, ile kosztuje kodowanie na tej maszynie, nie to, co robi z nim narzędzie do nagrywania — jego własne ustawienie kodera to pierwsze miejsce do sprawdzenia.",
 
   "performance.fact.hardware-encoder": "Koder sprzętowy",
   "performance.fact.hardware-pipeline": "Potok sprzętowy",

@@ -22,7 +22,7 @@
   "performance.line.software-small": "これはコア1つ未満({0}コア)に収まるため、他の作業の隙間に分散できます。",
   "performance.line.cpu-unreliable": "このマシンのプロセッサ時間カウンターは信頼できません(実時間に対して{0}×)。プロセッサ時間は表示されますが、そこからは何も判断されません。",
   "performance.line.budget-exhausted": "測定予算を使い切ったため({1} ms中{0} ms)、確認の一部が欠けています。",
-  "performance.boundary": "VidShrinkは映像をキャプチャしません。ここで測定されるのはこのマシンでのエンコードコストであり、キャプチャツールの挙動ではありません — まずはそのツール自身のエンコーダー設定を確認してください。",
+  "performance.boundary": "{app}は映像をキャプチャしません。ここで測定されるのはこのマシンでのエンコードコストであり、キャプチャツールの挙動ではありません — まずはそのツール自身のエンコーダー設定を確認してください。",
 
   "performance.fact.hardware-encoder": "ハードウェアエンコーダー",
   "performance.fact.hardware-pipeline": "ハードウェアパイプライン",

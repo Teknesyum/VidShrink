@@ -22,7 +22,7 @@
   "performance.line.software-small": "Bu tek çekirdeğin altında kalıyor ({0} çekirdek), yani başka işlerin bıraktığı boşluklara yayılabilir.",
   "performance.line.cpu-unreliable": "Bu makinedeki işlemci zamanı sayacı güvenilir değil (duvar saatine karşı {0}×), bu yüzden işlemci süreleri gösteriliyor ama onlardan bir karar çıkarılmıyor.",
   "performance.line.budget-exhausted": "Ölçüm bütçesi tükendi ({1} ms bütçenin {0} ms'i), bu yüzden ölçümün bir ayağı eksik.",
-  "performance.boundary": "VidShrink video kaydı yapmaz. Burada ölçülen şey, bu makinede kodlamanın maliyetidir; bir kayıt aracının onunla ne yaptığı değil — ilk bakılacak yer o aracın kendi kodlayıcı ayarıdır.",
+  "performance.boundary": "{app} video kaydı yapmaz. Burada ölçülen şey, bu makinede kodlamanın maliyetidir; bir kayıt aracının onunla ne yaptığı değil — ilk bakılacak yer o aracın kendi kodlayıcı ayarıdır.",
 
   "performance.fact.hardware-encoder": "Donanım kodlayıcısı",
   "performance.fact.hardware-pipeline": "Donanım borusu",

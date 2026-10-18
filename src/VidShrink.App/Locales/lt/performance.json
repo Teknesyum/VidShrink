@@ -22,7 +22,7 @@
   "performance.line.software-small": "Tai mažiau nei vienas branduolys ({0} branduolių), todėl jį galima paskirstyti į kitų darbų paliktus tarpus.",
   "performance.line.cpu-unreliable": "Šio kompiuterio procesoriaus laiko skaitiklis nepatikimas ({0}× lyginant su realiu laiku), todėl procesoriaus laikai rodomi, bet pagal juos nieko nesprendžiama.",
   "performance.line.budget-exhausted": "Matavimo biudžetas išseko ({0} ms iš {1} ms), todėl trūksta vienos patikros dalies.",
-  "performance.boundary": "VidShrink vaizdo neįrašinėja. Čia matuojama, kiek kodavimas kainuoja šiame kompiuteryje, o ne ką su juo daro įrašymo įrankis — pirmiausia žiūrėkite jo paties koduotuvo nustatymus.",
+  "performance.boundary": "{app} vaizdo neįrašinėja. Čia matuojama, kiek kodavimas kainuoja šiame kompiuteryje, o ne ką su juo daro įrašymo įrankis — pirmiausia žiūrėkite jo paties koduotuvo nustatymus.",
 
   "performance.fact.hardware-encoder": "Aparatinis koduotuvas",
   "performance.fact.hardware-pipeline": "Aparatinis konvejeris",

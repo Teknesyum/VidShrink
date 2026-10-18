@@ -22,7 +22,7 @@
   "performance.line.software-small": "Det håller sig under en kärna ({0} kärnor), så det kan spridas i luckorna som annat arbete lämnar.",
   "performance.line.cpu-unreliable": "Processortidsräknaren på den här datorn är inte pålitlig ({0}× mot väggklockan), så processortider visas men inget avgörs utifrån dem.",
   "performance.line.budget-exhausted": "Mätbudgeten tog slut ({0} ms av {1} ms), så ett ben av kontrollen saknas.",
-  "performance.boundary": "VidShrink spelar inte in video. Det som mäts här är vad kodning kostar på den här datorn, inte vad ett inspelningsverktyg gör med den — dess egen kodarinställning är första stället att titta på.",
+  "performance.boundary": "{app} spelar inte in video. Det som mäts här är vad kodning kostar på den här datorn, inte vad ett inspelningsverktyg gör med den — dess egen kodarinställning är första stället att titta på.",
 
   "performance.fact.hardware-encoder": "Hårdvarukodare",
   "performance.fact.hardware-pipeline": "Hårdvarukedja",

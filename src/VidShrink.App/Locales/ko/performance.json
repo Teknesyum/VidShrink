@@ -22,7 +22,7 @@
   "performance.line.software-small": "코어 하나 미만({0}개)에 머무르므로 다른 작업이 남긴 틈에 분산할 수 있습니다.",
   "performance.line.cpu-unreliable": "이 컴퓨터의 프로세서 시간 카운터는 신뢰할 수 없어(벽시계 대비 {0}×) 프로세서 시간은 표시하지만 그것으로 아무것도 결정하지 않습니다.",
   "performance.line.budget-exhausted": "측정 예산이 소진되어({1} ms 중 {0} ms) 검사의 한 부분이 빠졌습니다.",
-  "performance.boundary": "VidShrink는 영상을 캡처하지 않습니다. 여기서 측정하는 것은 이 컴퓨터에서 인코딩에 드는 비용이지 캡처 도구가 하는 일이 아닙니다. 캡처 도구 자체의 인코더 설정을 먼저 살펴보세요.",
+  "performance.boundary": "{app} 앱은 영상을 캡처하지 않습니다. 여기서 측정하는 것은 이 컴퓨터에서 인코딩에 드는 비용이지 캡처 도구가 하는 일이 아닙니다. 캡처 도구 자체의 인코더 설정을 먼저 살펴보세요.",
 
   "performance.fact.hardware-encoder": "하드웨어 인코더",
   "performance.fact.hardware-pipeline": "하드웨어 파이프라인",

@@ -22,7 +22,7 @@
   "performance.line.software-small": "Hicho kinabaki chini ya kiini kimoja (viini {0}), kwa hiyo kinaweza kugawanywa katika mapengo yaliyoachwa na kazi nyingine.",
   "performance.line.cpu-unreliable": "Kihesabu cha muda wa kichakataji kwenye mashine hii hakitegemeki ({0}× dhidi ya saa ya ukutani), kwa hiyo muda wa kichakataji unaonyeshwa lakini hakuna kinachoamuliwa kutokana nao.",
   "performance.line.budget-exhausted": "Bajeti ya kipimo iliisha ({0} ms kati ya {1} ms), kwa hiyo sehemu moja ya ukaguzi inakosekana.",
-  "performance.boundary": "VidShrink hainasi video. Kinachopimwa hapa ni gharama ya usimbaji kwenye mashine hii, si kile zana ya kunasa hufanya nacho — mpangilio wa kisimbaji chake ndio mahali pa kwanza pa kuangalia.",
+  "performance.boundary": "{app} hainasi video. Kinachopimwa hapa ni gharama ya usimbaji kwenye mashine hii, si kile zana ya kunasa hufanya nacho — mpangilio wa kisimbaji chake ndio mahali pa kwanza pa kuangalia.",
 
   "performance.fact.hardware-encoder": "Kisimbaji cha maunzi",
   "performance.fact.hardware-pipeline": "Mkondo wa maunzi",

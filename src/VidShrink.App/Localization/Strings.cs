@@ -182,6 +182,10 @@ public static class Strings
         }
     }
 
+    public const string AppName = Core.AppIdentity.Name;
+
+    internal const string AppToken = "{app}";
+
     public static string Get(string key) => GetIn(Language, key);
 
     public static string GetIn(string language, string key)
@@ -261,7 +265,7 @@ public static class Strings
                 if (reader.TokenType != JsonTokenType.PropertyName) return null;
                 var match = reader.ValueTextEquals(wanted);
                 if (!reader.Read()) return null;
-                if (match && reader.TokenType == JsonTokenType.String) return reader.GetString();
+                if (match && reader.TokenType == JsonTokenType.String) return reader.GetString()?.Replace(AppToken, AppName, StringComparison.Ordinal);
                 reader.Skip();
             }
         }
@@ -385,7 +389,7 @@ public static class Strings
     {
         foreach (var pair in from)
         {
-            into[pair.Key] = pair.Value;
+            into[pair.Key] = pair.Value.Replace(AppToken, AppName, StringComparison.Ordinal);
         }
     }
 

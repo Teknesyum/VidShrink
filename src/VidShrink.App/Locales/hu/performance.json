@@ -22,7 +22,7 @@
   "performance.line.software-small": "Ez egy mag alatt marad ({0} mag), így beilleszthető a más munkák által hagyott résekbe.",
   "performance.line.cpu-unreliable": "A processzoridő-számláló ezen a gépen nem megbízható ({0}× a falióra ellenében), ezért a processzoridők megjelennek, de nem alapulunk rájuk.",
   "performance.line.budget-exhausted": "A mérési keret kimerült ({0} ms a {1} ms-ból), így a teszt egyik ága hiányzik.",
-  "performance.boundary": "A VidShrink nem rögzít videót. Itt azt mérjük, mennyibe kerül a kódolás ezen a gépen, nem azt, mit csinál vele egy rögzítő eszköz — annak saját kódolóbeállítása az első hely, ahol keresni kell.",
+  "performance.boundary": "A {app} nem rögzít videót. Itt azt mérjük, mennyibe kerül a kódolás ezen a gépen, nem azt, mit csinál vele egy rögzítő eszköz — annak saját kódolóbeállítása az első hely, ahol keresni kell.",
 
   "performance.fact.hardware-encoder": "Hardveres kódoló",
   "performance.fact.hardware-pipeline": "Hardveres csővezeték",

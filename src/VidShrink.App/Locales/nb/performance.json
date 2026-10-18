@@ -22,7 +22,7 @@
   "performance.line.software-small": "Det holder seg under én kjerne ({0} kjerner), så det kan fordeles i pausene fra annet arbeid.",
   "performance.line.cpu-unreliable": "Prosessortidtelleren på denne maskinen er ikke pålitelig ({0}× mot veggklokken), så prosessortider vises, men ingenting avgjøres ut fra dem.",
   "performance.line.budget-exhausted": "Målebudsjettet tok slutt ({0} ms av {1} ms), så én del av sjekken mangler.",
-  "performance.boundary": "VidShrink tar ikke opp video. Det som måles her er hva koding koster på denne maskinen, ikke hva et opptaksverktøy gjør med den — dets egen koderinnstilling er første sted å se.",
+  "performance.boundary": "{app} tar ikke opp video. Det som måles her er hva koding koster på denne maskinen, ikke hva et opptaksverktøy gjør med den — dets egen koderinnstilling er første sted å se.",
 
   "performance.fact.hardware-encoder": "Maskinvarekoder",
   "performance.fact.hardware-pipeline": "Maskinvarekjede",

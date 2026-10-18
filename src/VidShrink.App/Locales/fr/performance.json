@@ -22,7 +22,7 @@
   "performance.line.software-small": "Cela reste sous un cœur ({0} cœurs) : il peut se glisser dans les creux laissés par les autres tâches.",
   "performance.line.cpu-unreliable": "Le compteur de temps processeur de cette machine n'est pas fiable ({0}× par rapport à l'horloge) ; les temps sont affichés mais rien n'en est déduit.",
   "performance.line.budget-exhausted": "Le budget de mesure est épuisé ({0} ms sur {1} ms) ; une partie du test manque.",
-  "performance.boundary": "VidShrink ne capture pas de vidéo. Ce qui est mesuré ici est le coût de l'encodage sur cette machine, pas ce qu'en fait un outil de capture — son propre réglage d'encodeur est le premier endroit à vérifier.",
+  "performance.boundary": "{app} ne capture pas de vidéo. Ce qui est mesuré ici est le coût de l'encodage sur cette machine, pas ce qu'en fait un outil de capture — son propre réglage d'encodeur est le premier endroit à vérifier.",
 
   "performance.fact.hardware-encoder": "Encodeur matériel",
   "performance.fact.hardware-pipeline": "Chaîne matérielle",

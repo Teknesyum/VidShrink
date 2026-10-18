@@ -22,7 +22,7 @@
   "performance.line.software-small": "Mức đó dưới một lõi ({0} lõi), nên có thể chen vào khoảng trống của việc khác.",
   "performance.line.cpu-unreliable": "Bộ đếm thời gian xử lý trên máy này không đáng tin ({0}× so với đồng hồ thực), nên thời gian xử lý được hiển thị nhưng không quyết định gì từ đó.",
   "performance.line.budget-exhausted": "Ngân sách đo đã hết ({0} ms trên {1} ms), nên thiếu một nhánh kiểm tra.",
-  "performance.boundary": "VidShrink không quay video. Thứ đo ở đây là chi phí mã hóa trên máy này, không phải công cụ quay làm gì với nó — cài đặt bộ mã hóa của chính công cụ đó là nơi cần xem trước.",
+  "performance.boundary": "{app} không quay video. Thứ đo ở đây là chi phí mã hóa trên máy này, không phải công cụ quay làm gì với nó — cài đặt bộ mã hóa của chính công cụ đó là nơi cần xem trước.",
 
   "performance.fact.hardware-encoder": "Bộ mã hóa phần cứng",
   "performance.fact.hardware-pipeline": "Đường phần cứng",

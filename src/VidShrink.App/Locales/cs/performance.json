@@ -22,7 +22,7 @@
   "performance.line.software-small": "To zůstává pod jedním jádrem ({0} jader), lze to tedy rozložit do mezer mezi jinou prací.",
   "performance.line.cpu-unreliable": "Čítač procesorového času na tomto počítači není spolehlivý ({0}× oproti nástěnným hodinám), procesorové časy se tedy zobrazují, ale nic se z nich nerozhoduje.",
   "performance.line.budget-exhausted": "Rozpočet měření se vyčerpal ({0} ms z {1} ms), jedna část kontroly tedy chybí.",
-  "performance.boundary": "VidShrink nenahrává video. Zde se měří, kolik enkódování stojí na tomto počítači, ne co s ním dělá nahrávací nástroj — jeho vlastní nastavení enkodéru je první místo, kam se podívat.",
+  "performance.boundary": "{app} nenahrává video. Zde se měří, kolik enkódování stojí na tomto počítači, ne co s ním dělá nahrávací nástroj — jeho vlastní nastavení enkodéru je první místo, kam se podívat.",
 
   "performance.fact.hardware-encoder": "Hardwarový enkodér",
   "performance.fact.hardware-pipeline": "Hardwarový řetězec",

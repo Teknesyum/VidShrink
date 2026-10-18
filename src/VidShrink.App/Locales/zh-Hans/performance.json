@@ -22,7 +22,7 @@
   "performance.line.software-small": "这不到一个核心（{0} 个核心），因此可以分散到其他工作留下的空隙中。",
   "performance.line.cpu-unreliable": "本机的处理器时间计数器不可靠（相对挂钟时间为 {0}×），因此处理器时间仅供显示，不据此做出决定。",
   "performance.line.budget-exhausted": "测量预算已用尽（{1} 毫秒中的 {0} 毫秒），因此检测缺少一个环节。",
-  "performance.boundary": "VidShrink 不录制视频。此处测量的是编码在本机的开销，而不是录制工具的表现 — 录制工具自身的编码器设置才是首先要查看的地方。",
+  "performance.boundary": "{app} 不录制视频。此处测量的是编码在本机的开销，而不是录制工具的表现 — 录制工具自身的编码器设置才是首先要查看的地方。",
 
   "performance.fact.hardware-encoder": "硬件编码器",
   "performance.fact.hardware-pipeline": "硬件管线",

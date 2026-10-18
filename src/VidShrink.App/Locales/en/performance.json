@@ -22,7 +22,7 @@
   "performance.line.software-small": "That stays under one core ({0} cores), so it can be spread into the gaps left by other work.",
   "performance.line.cpu-unreliable": "The processor time counter on this machine is not dependable ({0}× against the wall clock), so processor times are shown but nothing is decided from them.",
   "performance.line.budget-exhausted": "The measurement budget ran out ({0} ms of {1} ms), so one leg of the check is missing.",
-  "performance.boundary": "VidShrink does not capture video. What is measured here is what encoding costs on this machine, not what a capture tool does with it — its own encoder setting is the first place to look.",
+  "performance.boundary": "{app} does not capture video. What is measured here is what encoding costs on this machine, not what a capture tool does with it — its own encoder setting is the first place to look.",
 
   "performance.fact.hardware-encoder": "Hardware encoder",
   "performance.fact.hardware-pipeline": "Hardware pipeline",

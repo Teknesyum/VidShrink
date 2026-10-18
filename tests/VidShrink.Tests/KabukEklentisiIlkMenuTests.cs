@@ -223,7 +223,7 @@ public sealed class KabukEklentisiIlkMenuTests : IDisposable
     private static string Catalog(string language, string key)
     {
         using var document = JsonDocument.Parse(File.ReadAllText(Path.Combine(LocalesSource, language, "main.json")));
-        return document.RootElement.GetProperty(key).GetString()!;
+        return document.RootElement.GetProperty(key).GetString()!.Replace("{app}", VidShrink.Core.AppIdentity.Name, StringComparison.Ordinal);
     }
 
     [SupportedOSPlatform("windows")]

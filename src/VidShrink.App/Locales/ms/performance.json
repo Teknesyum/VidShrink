@@ -22,7 +22,7 @@
   "performance.line.software-small": "Itu kekal di bawah satu teras ({0} teras), jadi ia boleh diselitkan ke celah yang ditinggalkan kerja lain.",
   "performance.line.cpu-unreliable": "Pembilang masa pemproses pada mesin ini tidak boleh dipercayai ({0}× berbanding jam dinding), jadi masa pemproses dipaparkan tetapi tiada keputusan dibuat daripadanya.",
   "performance.line.budget-exhausted": "Bajet pengukuran habis ({0} ms daripada {1} ms), jadi satu bahagian semakan tiada.",
-  "performance.boundary": "VidShrink tidak merakam video. Yang diukur di sini ialah kos pengekodan pada mesin ini, bukan apa yang alat rakaman lakukan dengannya — tetapan pengekodnya sendiri ialah tempat pertama untuk disemak.",
+  "performance.boundary": "{app} tidak merakam video. Yang diukur di sini ialah kos pengekodan pada mesin ini, bukan apa yang alat rakaman lakukan dengannya — tetapan pengekodnya sendiri ialah tempat pertama untuk disemak.",
 
   "performance.fact.hardware-encoder": "Pengekod perkakasan",
   "performance.fact.hardware-pipeline": "Saluran perkakasan",

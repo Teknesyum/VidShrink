@@ -132,7 +132,7 @@ public static class ShellRegistration
                     if (belge.RootElement.TryGetProperty(key, out var deger) &&
                         deger.ValueKind == JsonValueKind.String &&
                         deger.GetString() is { Length: > 0 } metin)
-                        return metin;
+                        return metin.Replace("{app}", AppIdentity.Name, StringComparison.Ordinal);
                 }
             }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException or JsonException)

@@ -30,7 +30,7 @@ public class KurucuMenuDiliTests
     {
         using var belge = JsonDocument.Parse(
             File.ReadAllText(Path.Combine(Locales, dil, "main.json")));
-        return belge.RootElement.GetProperty(anahtar).GetString()!;
+        return belge.RootElement.GetProperty(anahtar).GetString()!.Replace("{app}", VidShrink.Core.AppIdentity.Name, StringComparison.Ordinal);
     }
 
     [Theory]

@@ -22,7 +22,7 @@
   "performance.line.software-small": "To ostane pod enim jedrom ({0} jeder), zato se lahko porazdeli v vrzeli, ki jih pusti drugo delo.",
   "performance.line.cpu-unreliable": "Števec procesorskega časa na tem računalniku ni zanesljiv ({0}× glede na stensko uro), zato so procesorski časi prikazani, a nič se ne odloča po njih.",
   "performance.line.budget-exhausted": "Proračun merjenja je pošel ({0} ms od {1} ms), zato en del preverjanja manjka.",
-  "performance.boundary": "VidShrink ne zajema videa. Tu je izmerjeno, koliko kodiranje stane na tem računalniku, ne kaj z njim počne orodje za zajem — njegova lastna nastavitev kodirnika je prvo mesto za pogled.",
+  "performance.boundary": "{app} ne zajema videa. Tu je izmerjeno, koliko kodiranje stane na tem računalniku, ne kaj z njim počne orodje za zajem — njegova lastna nastavitev kodirnika je prvo mesto za pogled.",
 
   "performance.fact.hardware-encoder": "Strojni kodirnik",
   "performance.fact.hardware-pipeline": "Strojni cevovod",

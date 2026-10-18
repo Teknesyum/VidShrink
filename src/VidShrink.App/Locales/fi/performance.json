@@ -22,7 +22,7 @@
   "performance.line.software-small": "Se jää alle yhden ytimen ({0} ydintä), joten se mahtuu muun työn väliin.",
   "performance.line.cpu-unreliable": "Koneen suoritinaikalaskuri ei ole luotettava ({0}× seinäkelloon nähden), joten suoritinajat näytetään, mutta niistä ei päätetä mitään.",
   "performance.line.budget-exhausted": "Mittausbudjetti loppui ({0} ms / {1} ms), joten yksi testin osa puuttuu.",
-  "performance.boundary": "VidShrink ei tallenna videota. Tässä mitataan, mitä koodaus maksaa tällä koneella, ei sitä, mitä tallennustyökalu sille tekee — sen oma kooderiasetus on ensimmäinen tarkistuskohde.",
+  "performance.boundary": "{app} ei tallenna videota. Tässä mitataan, mitä koodaus maksaa tällä koneella, ei sitä, mitä tallennustyökalu sille tekee — sen oma kooderiasetus on ensimmäinen tarkistuskohde.",
 
   "performance.fact.hardware-encoder": "Laitteistokooderi",
   "performance.fact.hardware-pipeline": "Laitteistoputki",

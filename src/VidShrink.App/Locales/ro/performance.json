@@ -22,7 +22,7 @@
   "performance.line.software-small": "Rămâne sub un nucleu ({0} nuclee), deci se poate răspândi în golurile lăsate de alte sarcini.",
   "performance.line.cpu-unreliable": "Contorul de timp de procesor de pe acest calculator nu este de încredere ({0}× față de ceasul de perete), deci timpii de procesor sunt afișați, dar nu se decide nimic pe baza lor.",
   "performance.line.budget-exhausted": "Bugetul de măsurare s-a epuizat ({0} ms din {1} ms), deci o parte a verificării lipsește.",
-  "performance.boundary": "VidShrink nu captează video. Ce se măsoară aici este cât costă codarea pe acest calculator, nu ce face un instrument de captură cu ea — propria lui setare de codor este primul loc de verificat.",
+  "performance.boundary": "{app} nu captează video. Ce se măsoară aici este cât costă codarea pe acest calculator, nu ce face un instrument de captură cu ea — propria lui setare de codor este primul loc de verificat.",
 
   "performance.fact.hardware-encoder": "Codor hardware",
   "performance.fact.hardware-pipeline": "Lanț hardware",

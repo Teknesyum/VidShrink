@@ -22,7 +22,7 @@
   "performance.line.software-small": "Dat blijft onder één kern ({0} kernen), dus het kan in de gaten van ander werk worden verdeeld.",
   "performance.line.cpu-unreliable": "De processortijdteller op deze machine is niet betrouwbaar ({0}× tegenover de wandklok), dus processortijden worden getoond maar er wordt niets uit besloten.",
   "performance.line.budget-exhausted": "Het meetbudget raakte op ({0} ms van {1} ms), dus één deel van de controle ontbreekt.",
-  "performance.boundary": "VidShrink neemt geen video op. Wat hier gemeten wordt is wat encoding op deze machine kost, niet wat een opnametool ermee doet — de encoderinstelling daarvan is de eerste plek om te kijken.",
+  "performance.boundary": "{app} neemt geen video op. Wat hier gemeten wordt is wat encoding op deze machine kost, niet wat een opnametool ermee doet — de encoderinstelling daarvan is de eerste plek om te kijken.",
 
   "performance.fact.hardware-encoder": "Hardware-encoder",
   "performance.fact.hardware-pipeline": "Hardware-pijplijn",

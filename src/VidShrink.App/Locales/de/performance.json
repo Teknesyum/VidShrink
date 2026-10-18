@@ -22,7 +22,7 @@
   "performance.line.software-small": "Das bleibt unter einem Kern ({0} Kerne), es lässt sich also in die Lücken anderer Arbeit verteilen.",
   "performance.line.cpu-unreliable": "Der Prozessorzeit-Zähler dieses Rechners ist nicht verlässlich ({0}× gegenüber der Uhrzeit); Prozessorzeiten werden angezeigt, aber nichts wird daraus entschieden.",
   "performance.line.budget-exhausted": "Das Messbudget ist aufgebraucht ({0} ms von {1} ms), daher fehlt ein Teil der Prüfung.",
-  "performance.boundary": "VidShrink nimmt kein Video auf. Gemessen wird, was Encoding auf diesem Rechner kostet, nicht was ein Aufnahmeprogramm damit macht — dessen eigene Encoder-Einstellung ist der erste Anhaltspunkt.",
+  "performance.boundary": "{app} nimmt kein Video auf. Gemessen wird, was Encoding auf diesem Rechner kostet, nicht was ein Aufnahmeprogramm damit macht — dessen eigene Encoder-Einstellung ist der erste Anhaltspunkt.",
 
   "performance.fact.hardware-encoder": "Hardware-Encoder",
   "performance.fact.hardware-pipeline": "Hardware-Pipeline",

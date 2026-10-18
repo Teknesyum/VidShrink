@@ -22,7 +22,7 @@
   "performance.line.software-small": "Resta sotto un core ({0} core), quindi può distribuirsi negli spazi lasciati dagli altri lavori.",
   "performance.line.cpu-unreliable": "Il contatore del tempo di processore su questa macchina non è affidabile ({0}× rispetto all'orologio), quindi i tempi di processore sono mostrati ma non se ne trae alcuna decisione.",
   "performance.line.budget-exhausted": "Il budget di misurazione si è esaurito ({0} ms su {1} ms), quindi manca una parte della verifica.",
-  "performance.boundary": "VidShrink non registra video. Qui si misura quanto costa la codifica su questa macchina, non ciò che ne fa uno strumento di registrazione — la sua impostazione di encoder è il primo posto in cui guardare.",
+  "performance.boundary": "{app} non registra video. Qui si misura quanto costa la codifica su questa macchina, non ciò che ne fa uno strumento di registrazione — la sua impostazione di encoder è il primo posto in cui guardare.",
 
   "performance.fact.hardware-encoder": "Encoder hardware",
   "performance.fact.hardware-pipeline": "Pipeline hardware",
