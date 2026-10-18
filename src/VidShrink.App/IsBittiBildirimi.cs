@@ -32,7 +32,7 @@ internal sealed record IsBildirimi(string Baslik, string Metin, bool Hata);
 /// </summary>
 internal static class IsBittiBildirimi
 {
-    internal const string Baslik = "VidShrink";
+    internal const string Baslik = Core.AppIdentity.Name;
     internal const string TekBasarili = "main.notify.done";
     internal const string TekHatali = "main.notify.failed";
     internal const string KuyrukBasarili = "main.notify.queue";

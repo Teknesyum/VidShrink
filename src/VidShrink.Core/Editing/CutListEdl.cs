@@ -16,7 +16,7 @@ internal static class CutListEdl
     public static string Write(EditTimeline timeline, CutListContext context)
     {
         var fps = context.Fps;
-        var title = context.Title ?? (context.SourcePaths.Count > 0 ? Path.GetFileNameWithoutExtension(CutList.FileName(context.SourcePaths[0])) : "VidShrink");
+        var title = context.Title ?? (context.SourcePaths.Count > 0 ? Path.GetFileNameWithoutExtension(CutList.FileName(context.SourcePaths[0])) : AppIdentity.Name);
         var text = new StringBuilder();
         text.Append("TITLE: ").Append(title).Append("\r\n");
         var drop = EditTimecode.Format(0, fps).Contains(';');

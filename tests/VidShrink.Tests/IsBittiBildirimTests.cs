@@ -83,7 +83,7 @@ public sealed class IsBittiBildirimTests
         Assert.False(basari.Hata);
         Assert.Equal("main.notify.failed|kedi.mp4", hata!.Metin);
         Assert.True(hata.Hata);
-        Assert.Equal("VidShrink", basari.Baslik);
+        Assert.Equal(VidShrink.Core.AppIdentity.Name, basari.Baslik);
     }
 
     /// <summary>Pencere öndeyken, ayar kapalıyken ve iptalde haber yok; aynı iş arkada ve ayar açıkken haber verir.</summary>

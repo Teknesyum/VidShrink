@@ -49,6 +49,12 @@ public sealed class UygulamaAdiTests : IDisposable
     }
 
     [Fact]
+    public void AdKullanicininYazdigiGibi()
+    {
+        Assert.Equal("VidShrink Player", AppIdentity.Name);
+    }
+
+    [Fact]
     public void CevirilerdeAdDuzYazilmiyorYerTutucudanGeliyor()
     {
         var sikayet = new StringBuilder();

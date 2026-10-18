@@ -32,7 +32,7 @@ public static class FcpXml
             at += clip.TimelineLength;
         }
 
-        var title = context.Title ?? (context.SourcePaths.Count > 0 ? Path.GetFileNameWithoutExtension(CutList.FileName(context.SourcePaths[0])) : "VidShrink");
+        var title = context.Title ?? (context.SourcePaths.Count > 0 ? Path.GetFileNameWithoutExtension(CutList.FileName(context.SourcePaths[0])) : AppIdentity.Name);
         var output = new Utf8Writer();
         using (var xml = XmlWriter.Create(output, new XmlWriterSettings { Indent = true, IndentChars = "  ", Encoding = Encoding.UTF8 }))
         {

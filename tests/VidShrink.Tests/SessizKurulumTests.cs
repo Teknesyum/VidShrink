@@ -48,7 +48,7 @@ public sealed class SessizKurulumTests : IDisposable
         using (var key = Registry.CurrentUser.OpenSubKey(options.UninstallKey))
         {
             Assert.NotNull(key);
-            Assert.Equal("VidShrink", key!.GetValue("DisplayName"));
+            Assert.Equal(VidShrink.Core.AppIdentity.Name, key!.GetValue("DisplayName"));
             Assert.Equal("1.2.3", key.GetValue("DisplayVersion"));
             Assert.Equal("Teknesyum", key.GetValue("Publisher"));
             Assert.Equal(Path.Combine(root, "VidShrink.exe") + ",0", key.GetValue("DisplayIcon"));

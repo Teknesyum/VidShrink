@@ -35,7 +35,7 @@ internal static class TepsiKarari
         if (isKesri is { } kesir) parcalar.Add(say("main.tray.tip.job", new object?[] { Bicim.Yuzde.Isaretli(Math.Clamp(kesir, 0, 1), kultur) }));
         foreach (var kuyruk in kuyruklar)
             parcalar.Add(say("main.tray.tip.queue", new object?[] { Bicim.Yuzde.Isaretli(Math.Clamp(kuyruk, 0, 1), kultur) }));
-        return parcalar.Count == 0 ? "VidShrink" : "VidShrink · " + string.Join(" · ", parcalar);
+        return parcalar.Count == 0 ? Core.AppIdentity.Name : Core.AppIdentity.Name + " · " + string.Join(" · ", parcalar);
     }
 }
 

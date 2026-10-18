@@ -59,7 +59,7 @@ public static class Otio
         if (!double.IsFinite(context.Fps) || context.Fps < 1 || context.Fps > 240)
             throw new ArgumentOutOfRangeException(nameof(context), context.Fps, "Gecersiz kare hizi");
         var rate = context.Fps;
-        var title = context.Title ?? (context.SourcePaths.Count > 0 ? Path.GetFileNameWithoutExtension(CutList.FileName(context.SourcePaths[0])) : "VidShrink");
+        var title = context.Title ?? (context.SourcePaths.Count > 0 ? Path.GetFileNameWithoutExtension(CutList.FileName(context.SourcePaths[0])) : AppIdentity.Name);
         string PathOf(int source) => source < context.SourcePaths.Count ? context.SourcePaths[source] : string.Empty;
 
         using var stream = new MemoryStream();

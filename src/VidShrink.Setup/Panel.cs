@@ -667,7 +667,7 @@ internal sealed class Panel
     private void DrawHeader(IntPtr dc, int width)
     {
         if (icon != IntPtr.Zero) DrawIconEx(dc, Scaled(Margin), Scaled(24), icon, Scaled(40), Scaled(40), 0, IntPtr.Zero, DI_NORMAL);
-        const string product = "VidShrink";
+        const string product = VidShrink.Core.AppIdentity.Name;
         var titleLeft = Scaled(Margin + 54);
         var productWidth = TextWidth(dc, titleFont, product);
         DrawLine(dc, titleFont, product, Text, titleLeft, Scaled(20), productWidth + Scaled(4), Scaled(30));

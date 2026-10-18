@@ -35,9 +35,9 @@ public sealed class TepsiyeKucultmeTests
     public void IpucuIsVeKuyrukIlerlemesiniSirayalaYazar()
     {
         var tr = CultureInfo.GetCultureInfo("tr-TR");
-        Assert.Equal("VidShrink", TepsiKarari.Ipucu(null, Array.Empty<double>(), Say, tr));
-        Assert.Equal("VidShrink · main.tray.tip.job=%42,5", TepsiKarari.Ipucu(0.425, Array.Empty<double>(), Say, tr));
-        Assert.Equal("VidShrink · main.tray.tip.job=%100 · main.tray.tip.queue=%20 · main.tray.tip.queue=%0",
+        Assert.Equal(VidShrink.Core.AppIdentity.Name, TepsiKarari.Ipucu(null, Array.Empty<double>(), Say, tr));
+        Assert.Equal(VidShrink.Core.AppIdentity.Name + " · main.tray.tip.job=%42,5", TepsiKarari.Ipucu(0.425, Array.Empty<double>(), Say, tr));
+        Assert.Equal(VidShrink.Core.AppIdentity.Name + " · main.tray.tip.job=%100 · main.tray.tip.queue=%20 · main.tray.tip.queue=%0",
             TepsiKarari.Ipucu(1.4, new[] { 0.2, -0.1 }, Say, tr));
     }
 
@@ -78,8 +78,8 @@ public sealed class TepsiyeKucultmeTests
             Assert.False(sonuc.varsayilan);
             Assert.True(sonuc.gizli.TepsideGizli);
             Assert.False(sonuc.gizli.IsVisible);
-            Assert.Equal(new[] { "show:VidShrink" }, sonuc.gizli.Olaylar);
-            Assert.StartsWith("VidShrink · ", sonuc.ipucu, StringComparison.Ordinal);
+            Assert.Equal(new[] { "show:" + VidShrink.Core.AppIdentity.Name }, sonuc.gizli.Olaylar);
+            Assert.StartsWith(VidShrink.Core.AppIdentity.Name + " · ", sonuc.ipucu, StringComparison.Ordinal);
             Assert.False(sonuc.geri.TepsideGizli);
             Assert.True(sonuc.geri.IsVisible);
             Assert.Equal(WindowState.Normal, sonuc.geri.WindowState);

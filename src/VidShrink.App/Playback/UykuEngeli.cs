@@ -63,7 +63,7 @@ internal sealed class MacUykuSaglayici : IUykuSaglayici
     {
         if (_tutuluyor) return true;
         var tur = CFStringCreateWithCString(IntPtr.Zero, "PreventUserIdleDisplaySleep", Utf8);
-        var ad = CFStringCreateWithCString(IntPtr.Zero, "VidShrink", Utf8);
+        var ad = CFStringCreateWithCString(IntPtr.Zero, Core.AppIdentity.Name, Utf8);
         try
         {
             _tutuluyor = IOPMAssertionCreateWithName(tur, LevelOn, ad, out _kimlik) == 0;

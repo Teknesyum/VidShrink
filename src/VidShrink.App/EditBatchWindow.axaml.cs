@@ -100,7 +100,7 @@ public partial class EditBatchWindow : Window
         {
             Title = Say("editor.batch.add"),
             AllowMultiple = true,
-            FileTypeFilter = new[] { new FilePickerFileType("VidShrink") { Patterns = new[] { "*" + EditProject.Extension } } }
+            FileTypeFilter = new[] { new FilePickerFileType(Core.AppIdentity.Name) { Patterns = new[] { "*" + EditProject.Extension } } }
         }).ConfigureAwait(true);
         Add(files.Select(file => file.TryGetLocalPath()).OfType<string>());
     }
