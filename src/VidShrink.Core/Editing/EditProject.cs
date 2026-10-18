@@ -254,7 +254,7 @@ public sealed class EditProject
         }
     }
 
-    private static EditMarker ReadMarker(JsonElement item)
+    internal static EditMarker ReadMarker(JsonElement item)
         => new(item.GetProperty("time").GetInt64(), item.TryGetProperty("name", out var name) ? name.GetString() : null);
 
     private static EditMarker[] Sorted(IEnumerable<EditMarker> markers) => markers.OrderBy(m => m.Time).ToArray();
@@ -361,53 +361,54 @@ public sealed class EditProject
             writer.WriteEndObject();
         }
 
-        var effects = clip.Effects;
-        if (!effects.IsNeutral)
+        if (!clip.Effects.IsNeutral) WriteEffects(writer, clip.Effects);
+
+        writer.WriteEndObject();
+    }
+
+    internal static void WriteEffects(Utf8JsonWriter writer, ClipEffects effects)
+    {
+        writer.WriteStartObject("effects");
+        writer.WriteNumber("cropLeft", effects.CropLeft);
+        writer.WriteNumber("cropTop", effects.CropTop);
+        writer.WriteNumber("cropRight", effects.CropRight);
+        writer.WriteNumber("cropBottom", effects.CropBottom);
+        writer.WriteNumber("rotation", effects.Rotation);
+        writer.WriteBoolean("flipH", effects.FlipH);
+        writer.WriteBoolean("flipV", effects.FlipV);
+        writer.WriteNumber("volumeDb", effects.VolumeDb);
+        writer.WriteBoolean("muted", effects.Muted);
+        writer.WriteNumber("brightness", effects.Brightness);
+        writer.WriteNumber("contrast", effects.Contrast);
+        writer.WriteNumber("saturation", effects.Saturation);
+        writer.WriteNumber("temperature", effects.Temperature);
+        writer.WriteBoolean("denoise", effects.Denoise);
+        writer.WriteBoolean("loudnorm", effects.Loudnorm);
+        writer.WriteBoolean("compressor", effects.Compressor);
+        writer.WriteBoolean("limiter", effects.Limiter);
+        writer.WriteNumber("bassDb", effects.BassDb);
+        writer.WriteNumber("midDb", effects.MidDb);
+        writer.WriteNumber("trebleDb", effects.TrebleDb);
+        writer.WriteNumber("fadeIn", effects.FadeIn);
+        writer.WriteNumber("fadeOut", effects.FadeOut);
+        ClipGrade.Write(writer, effects);
+        if (effects.HasFit)
         {
-            writer.WriteStartObject("effects");
-            writer.WriteNumber("cropLeft", effects.CropLeft);
-            writer.WriteNumber("cropTop", effects.CropTop);
-            writer.WriteNumber("cropRight", effects.CropRight);
-            writer.WriteNumber("cropBottom", effects.CropBottom);
-            writer.WriteNumber("rotation", effects.Rotation);
-            writer.WriteBoolean("flipH", effects.FlipH);
-            writer.WriteBoolean("flipV", effects.FlipV);
-            writer.WriteNumber("volumeDb", effects.VolumeDb);
-            writer.WriteBoolean("muted", effects.Muted);
-            writer.WriteNumber("brightness", effects.Brightness);
-            writer.WriteNumber("contrast", effects.Contrast);
-            writer.WriteNumber("saturation", effects.Saturation);
-            writer.WriteNumber("temperature", effects.Temperature);
-            writer.WriteBoolean("denoise", effects.Denoise);
-            writer.WriteBoolean("loudnorm", effects.Loudnorm);
-            writer.WriteBoolean("compressor", effects.Compressor);
-            writer.WriteBoolean("limiter", effects.Limiter);
-            writer.WriteNumber("bassDb", effects.BassDb);
-            writer.WriteNumber("midDb", effects.MidDb);
-            writer.WriteNumber("trebleDb", effects.TrebleDb);
-            writer.WriteNumber("fadeIn", effects.FadeIn);
-            writer.WriteNumber("fadeOut", effects.FadeOut);
-            ClipGrade.Write(writer, effects);
-            if (effects.HasFit)
-            {
-                writer.WriteNumber("fitNum", effects.FitNum);
-                writer.WriteNumber("fitDen", effects.FitDen);
-                writer.WriteString("padColor", effects.PadColor);
-            }
+            writer.WriteNumber("fitNum", effects.FitNum);
+            writer.WriteNumber("fitDen", effects.FitDen);
+            writer.WriteString("padColor", effects.PadColor);
+        }
 
-            if (effects.HasBlur)
+        if (effects.HasBlur)
+        {
+            writer.WriteStartObject("blur");
+            writer.WriteNumber("sigma", effects.BlurSigma);
+            if (effects.HasBlurRegion)
             {
-                writer.WriteStartObject("blur");
-                writer.WriteNumber("sigma", effects.BlurSigma);
-                if (effects.HasBlurRegion)
-                {
-                    writer.WriteNumber("x", effects.BlurX);
-                    writer.WriteNumber("y", effects.BlurY);
-                    writer.WriteNumber("width", effects.BlurWidth);
-                    writer.WriteNumber("height", effects.BlurHeight);
-                }
-
-                writer.WriteEndObject();
+                writer.WriteNumber("x", effects.BlurX);
+                writer.WriteNumber("y", effects.BlurY);
+                writer.WriteNumber("width", effects.BlurWidth);
+                writer.WriteNumber("height", effects.BlurHeight);
             }
 
             writer.WriteEndObject();
@@ -416,7 +417,7 @@ public sealed class EditProject
         writer.WriteEndObject();
     }
 
-    private static ClipTransition ReadTransition(JsonElement item)
+    internal static ClipTransition ReadTransition(JsonElement item)
         => new(ClipTransition.FromKey(item.GetProperty("kind").GetString()) ?? throw new FormatException("Bilinmeyen gecis turu"),
             item.GetProperty("duration").GetInt64());
 
@@ -431,8 +432,11 @@ public sealed class EditProject
             Transition = item.TryGetProperty("transition", out var transition) ? ReadTransition(transition) : null,
             Smooth = item.TryGetProperty("smooth", out var smooth) && smooth.GetBoolean(),
         };
-        if (!item.TryGetProperty("effects", out var e)) return clip;
+        return item.TryGetProperty("effects", out var e) ? clip with { Effects = ReadEffects(e) } : clip;
+    }
 
+    internal static ClipEffects ReadEffects(JsonElement e)
+    {
         var effects = new ClipEffects
         {
             CropLeft = e.GetProperty("cropLeft").GetDouble(),
@@ -471,13 +475,13 @@ public sealed class EditProject
                 BlurHeight = BlurNumber(blur, "height"),
             };
 
-        return clip with { Effects = ClipGrade.Read(e, effects).Normalized() };
+        return ClipGrade.Read(e, effects).Normalized();
     }
 
     private static double BlurNumber(JsonElement blur, string name)
         => blur.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.Number ? value.GetDouble() : 0;
 
-    private static void WriteText(Utf8JsonWriter writer, TextLayer text)
+    internal static void WriteText(Utf8JsonWriter writer, TextLayer text)
     {
         writer.WriteStartObject();
         writer.WriteString("text", text.Text);
@@ -519,7 +523,7 @@ public sealed class EditProject
         writer.WriteEndObject();
     }
 
-    private static TextLayer ReadText(JsonElement item)
+    internal static TextLayer ReadText(JsonElement item)
     {
         var text = new TextLayer(item.GetProperty("text").GetString() ?? string.Empty, item.GetProperty("start").GetInt64(), item.GetProperty("end").GetInt64())
         {

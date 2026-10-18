@@ -46,11 +46,15 @@ internal partial class EditorView
         MnuBatchExport.Click += (_, _) => _ = BatchExportClickedAsync();
         MnuCutListExport.Click += (_, _) => _ = ExportCutListClickedAsync();
         MnuCutListImport.Click += (_, _) => _ = ImportCutListClickedAsync();
+        MnuOtioExport.Click += (_, _) => _ = ExportOtioClickedAsync();
+        MnuOtioImport.Click += (_, _) => _ = ImportOtioClickedAsync();
         TimelineMenu.Opening += (_, _) =>
         {
             MnuProjectSave.IsEnabled = _model is not null && _stamp is not null;
             MnuCutListExport.IsEnabled = _model is { Clips.Count: > 0 };
             MnuCutListImport.IsEnabled = _model is not null && !Exporting;
+            MnuOtioExport.IsEnabled = _model is { Clips.Count: > 0 };
+            MnuOtioImport.IsEnabled = !Exporting;
         };
     }
 
@@ -189,6 +193,11 @@ internal partial class EditorView
             return false;
         }
 
+        return await OpenProjectAsync(project).ConfigureAwait(true);
+    }
+
+    private async Task<bool> OpenProjectAsync(EditProject project)
+    {
         var source = project.Source.Path;
         if (SourceStamp.Of(source) is not { } stamp || !project.Source.Matches(stamp))
         {
@@ -326,6 +335,92 @@ internal partial class EditorView
         Apply(m => m.Restore(clips, m.Texts), 0, reload: true);
         ShowProjectStatus("StatusSuccess", string.Format(Strings.Culture, Strings.Get("editor.cutlist.imported"), clips.Count));
         return true;
+    }
+
+    internal bool ExportOtioTo(string path)
+    {
+        if (_model is not { Clips.Count: > 0 } model) return false;
+        var info = _source is { } source ? KnownInfo?.Invoke(source) : null;
+        var context = new CutListContext(SourcePaths, MonitorFps)
+        {
+            HasAudio = info?.HasAudio ?? true,
+            Title = _source is { } named ? Path.GetFileNameWithoutExtension(named) : null
+        };
+        bool ok;
+        try
+        {
+            File.WriteAllText(path, Otio.Write(model, context, Timeline.MarkerList));
+            ok = true;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            ok = false;
+        }
+
+        ShowProjectStatus(ok ? "StatusSuccess" : "StatusError",
+            string.Format(Strings.Culture, Strings.Get(ok ? "editor.otio.exported" : "editor.otio.failed"), path));
+        return ok;
+    }
+
+    internal async Task<bool> ImportOtioAsync(string path)
+    {
+        if (Exporting) return false;
+        OtioImport? read;
+        try
+        {
+            read = Otio.Read(File.ReadAllText(path));
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            read = null;
+        }
+
+        if (read is null)
+        {
+            ShowProjectStatus("StatusError", string.Format(Strings.Culture, Strings.Get("editor.otio.unreadable"), path));
+            return false;
+        }
+
+        if (read.ToProject(SourceStamp.Of, out var missing) is not { } project)
+        {
+            ShowProjectStatus("StatusWarning", string.Format(Strings.Culture, Strings.Get("editor.otio.missing"), missing));
+            return false;
+        }
+
+        if (!await OpenProjectAsync(project).ConfigureAwait(true)) return false;
+        ShowProjectStatus(read.Skipped > 0 ? "StatusWarning" : "StatusSuccess", read.Skipped > 0
+            ? string.Format(Strings.Culture, Strings.Get("editor.otio.imported-partial"), read.Clips.Count, read.Skipped)
+            : string.Format(Strings.Culture, Strings.Get("editor.otio.imported"), read.Clips.Count));
+        return true;
+    }
+
+    private static FilePickerFileType OtioFileType() => new("OpenTimelineIO") { Patterns = new[] { "*" + Otio.Extension } };
+
+    private async Task ExportOtioClickedAsync()
+    {
+        if (_model is null || _source is not { } source) return;
+        if (TopLevel.GetTopLevel(this)?.StorageProvider is not { } storage) return;
+        var file = await storage.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = Strings.Get("editor.otio.export"),
+            SuggestedFileName = Path.GetFileNameWithoutExtension(source) + Otio.Extension,
+            DefaultExtension = Otio.Extension.TrimStart('.'),
+            ShowOverwritePrompt = true,
+            FileTypeChoices = new[] { OtioFileType() }
+        }).ConfigureAwait(true);
+        if (file?.TryGetLocalPath() is { } path) ExportOtioTo(path);
+    }
+
+    private async Task ImportOtioClickedAsync()
+    {
+        if (TopLevel.GetTopLevel(this)?.StorageProvider is not { } storage) return;
+        var files = await storage.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = Strings.Get("editor.otio.import"),
+            AllowMultiple = false,
+            FileTypeFilter = new[] { OtioFileType() }
+        }).ConfigureAwait(true);
+        if (files.Count > 0 && files[0].TryGetLocalPath() is { } path) await ImportOtioAsync(path).ConfigureAwait(true);
     }
 
     private async Task ExportCutListClickedAsync()
