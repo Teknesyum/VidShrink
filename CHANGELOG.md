@@ -9,6 +9,13 @@ ship as part of it.
 
 ### Added
 
+- Editor: OpenTimelineIO project export and import ("Export As OTIO…" and "Import OTIO…" in the timeline menu).
+  The `.otio` JSON is written and read by hand (`Core/Editing/Otio`, schemas Timeline.1, Stack.1, Track.1, Clip.1/2,
+  Gap.1, ExternalReference.1, RationalTime.1, TimeRange.1): V1 carries the clips with their source in/out and file URL,
+  A1 mirrors the source audio, A2 holds the music track after a Gap for its start. Speed, direction, grade, crop and the
+  other clip settings, plus texts and markers, go under `metadata.vidshrink` and come back when present; a file from
+  another tool imports without them. Gaps, extra video tracks and clips without a file reference are skipped and
+  counted in the status line. Opening the file in Resolve or Premiere has not been measured.
 - Command line: `donustur` gains the Convert tab's tags, cover, Repair and chapters. `--etiket-baslik`,
   `--etiket-sanatci`, `--etiket-yil`, `--etiket-yorum` write the container tags, `--kapak` adds a PNG or JPEG cover,
   `--onar` is the Repair preset (corrupt packets dropped, timestamps rebuilt, MKV remux unless a container or codec
