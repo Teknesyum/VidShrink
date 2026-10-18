@@ -1327,6 +1327,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-18, cizim arac paneli (later 42): dokuz yeni <c>recorder.sketch.*</c> anahtarindan yalniz <c>recorder.sketch.toolbar</c> 4 dilde kola giriyor (es, fr, pt, ro), KOL dokumunden ve SAYIM satirindan olculdu, en ve tr girmiyor: toplam 3948 + 4 = 3952, en 381, tr 127.</para>
     /// <para>2026-10-18, oynatici HDR ton esleme (later 96): yeni <c>player.advanced.tone-mapping</c> es ("Mapeo de tonos HDR") ve pt ("Mapeamento de tons HDR") dillerinde kola giriyor, en ve tr haric: 3888 + 2 = 3890, en 373, tr 126.</para>
     /// <para>2026-10-18, kamera ana kaynak (later 69): iki yeni anahtar (<c>recorder.target.device</c>, <c>.device-pick</c>); yalniz <c>recorder.target.device</c> 6 dilde kola giriyor (en, nl, pt, ro, sw, tr), KOL dokumunden ve SAYIM satirindan olculdu: toplam 3948 + 6 = 3954, en 381 + 1 = 382, tr 127 + 1 = 128.</para>
+    /// <para>2026-10-18, muzik kisma (yan/muzik-kisma): yedi yeni <c>editor.music.duck*</c> anahtarindan 8 kol 4 dilde (es: amount, response; fr: response; pt: amount, on, response; ro: amount, response), KOL dokumunden ve SAYIM satirindan olculdu, en ve tr girmiyor: toplam 3970 + 8 = 3978, en 383, tr 129.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1352,7 +1353,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(3970, toplam);
+        Assert.Equal(3978, toplam);
         Assert.Equal(383, dilBasina["en"]);
         Assert.Equal(129, dilBasina["tr"]);
     }
@@ -1662,6 +1663,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-12, Linux turu: is surerken pasif Kucult/Donustur ipucu <c>main.action.busy-tip</c>, dusen yok. 1362 + 1 = 1363, 43 x 1363 = 58609. <c>kayip</c> 0.</para>
     /// <para>2026-10-12, Linux'ta ekran acilamayinca temiz cikis: tek yeni anahtar (<c>main.startup.no-display</c>, <c>Program.EkranYokIletisi</c>), dusen yok: 1363 + 1 = 1364, 43 x 1364 = 58652. <c>kayip</c> 0.</para>
     /// <para>2026-10-18, oynatici HDR ton esleme (later 96): tek yeni anahtar (<c>player.advanced.tone-mapping</c>), dusen yok: 84280 + 43 = 84323. <c>kayip</c> 0.</para>
+    /// <para>2026-10-18, muzik kisma (yan/muzik-kisma): yedi yeni <c>editor.music.duck*</c> anahtari, dusen yok; olculen gezilen 86645 + 43 x 7 = 86946. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1689,7 +1691,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(86645, gezilen);
+        Assert.Equal(86946, gezilen);
         Assert.Empty(kayip);
     }
 

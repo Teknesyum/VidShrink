@@ -9,6 +9,10 @@ ship as part of it.
 
 ### Added
 
+- Editor: the music track can duck automatically under speech. Music menu > Auto Ducking turns it on and sets the
+  amount (6-24 dB, default 12) and response time (150/400/1000 ms). Export keys an ffmpeg `sidechaincompress` from the
+  source audio; the project file stores it, older projects open without ducking. Preview does not play music, so it
+  is heard only in the export.
 - Command line: `donustur` gains the Convert tab's tags, cover, Repair and chapters. `--etiket-baslik`,
   `--etiket-sanatci`, `--etiket-yil`, `--etiket-yorum` write the container tags, `--kapak` adds a PNG or JPEG cover,
   `--onar` is the Repair preset (corrupt packets dropped, timestamps rebuilt, MKV remux unless a container or codec
