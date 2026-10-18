@@ -1098,7 +1098,9 @@ public sealed class WindowLayoutTests
         });
 
         var declared = new[] { TipSources.WindowXamlPath, Path.Combine(TipSources.Root, "src", "VidShrink.App", "Recorder", "RecorderView.axaml") }
-            .Sum(path => Regex.Matches(File.ReadAllText(path), "StaticResource InfoButton").Count);
+            .Sum(path => Regex.Matches(
+                Regex.Replace(File.ReadAllText(path), @"<Flyout>.*?</Flyout>", string.Empty, RegexOptions.Singleline),
+                "StaticResource InfoButton").Count);
 
         Assert.True(declared > 0, "Biçimlemede hiç bilgi rozeti bulunamadı; sayaç ölü.");
         Assert.True(
