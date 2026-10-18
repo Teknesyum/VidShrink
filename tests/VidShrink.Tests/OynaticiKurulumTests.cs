@@ -1,3 +1,4 @@
+using VidShrink.Core;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
@@ -238,7 +239,7 @@ public sealed class OynaticiKurulumTests
         Assert.Contains($"mac_libmpv_sha256='{sha}'", kurulum, StringComparison.Ordinal);
         Assert.Contains("\"$stage_root/tools/libmpv/libmpv.2.dylib\"", kurulum, StringComparison.Ordinal);
         Assert.Contains("cp -R \"$payload/.\" \"$bundle/Contents/MacOS/\"", Oku("macos-app-bundle.sh"), StringComparison.Ordinal);
-        var macos = Path.Combine(KurulumKoku("macos-paket"), "VidShrink.app", "Contents", "MacOS");
+        var macos = Path.Combine(KurulumKoku("macos-paket"), AppIdentity.MacBundleName, "Contents", "MacOS");
         Assert.Contains(Path.Combine(macos, "tools", "libmpv"), LibMpvLocator.AppDirectories(macos));
         Kapat("macos-paket");
     }

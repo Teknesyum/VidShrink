@@ -28,7 +28,7 @@ public sealed class DosyaIliskiTests : IDisposable
         var id = Guid.NewGuid().ToString("n");
         _work = Path.Combine(TestPaths.OutputRoot, "dosya-iliski", id);
         _installRoot = Path.Combine(_work, "kurulum");
-        _launcher = Path.Combine(_installRoot, "VidShrink.exe");
+        _launcher = Path.Combine(_installRoot, AppIdentity.LauncherExecutable);
         _testKey = $@"Software\VidShrink-Test-{Environment.ProcessId}-{id}";
         _registryRoot = $@"HKCU:\{_testKey}";
 
@@ -103,7 +103,7 @@ public sealed class DosyaIliskiTests : IDisposable
     [SupportedOSPlatform("windows")]
     private bool ShellMenuPresent(string extension)
     {
-        using var key = Open($@"SystemFileAssociations\.{extension}\shell\VidShrink\command");
+        using var key = Open($@"SystemFileAssociations\.{extension}\shell\{VidShrink.Core.Setup.ShellRegistration.MenuKey}\command");
         return key is not null;
     }
 
@@ -130,10 +130,10 @@ public sealed class DosyaIliskiTests : IDisposable
     {
         Assert.Empty(ExtensionsListingUs());
         Assert.Null(Open(FileAssociation.ProgId));
-        Assert.Null(Open(@"Applications\VidShrink.exe"));
-        Assert.Null(Open(@"Teknesyum\VidShrink\Capabilities"));
+        Assert.Null(Open(@"Applications\VidShrinkPlayer.exe"));
+        Assert.Null(Open(@"Teknesyum\VidShrinkPlayer\Capabilities"));
         using var registered = Open("RegisteredApplications");
-        Assert.True(registered is null || !registered.GetValueNames().Contains("VidShrink"));
+        Assert.True(registered is null || !registered.GetValueNames().Contains(AppIdentity.Name));
     }
 
     [Fact]
@@ -146,24 +146,24 @@ public sealed class DosyaIliskiTests : IDisposable
         var failed = FileAssociation.Register(_launcher, _testKey);
 
         Assert.Empty(failed);
-        Assert.Equal($"\"{Path.Combine(_installRoot, "app", "VidShrink.App.exe")}\" \"%1\"", Read($@"{FileAssociation.ProgId}\shell\open\command"));
+        Assert.Equal($"\"{Path.Combine(_installRoot, "app", AppIdentity.AppExecutable)}\" \"%1\"", Read($@"{FileAssociation.ProgId}\shell\open\command"));
         Assert.Equal($"{_launcher},0", Read($@"{FileAssociation.ProgId}\DefaultIcon"));
         Assert.Equal(Sorted(ShellIntegration.MediaExtensions), Sorted(ExtensionsListingUs()));
         AssertForeignEntriesSurvive();
         using var real = Registry.CurrentUser.OpenSubKey($@"Software\Classes\{FileAssociation.ProgId}\shell\open\command");
         Assert.DoesNotContain(_launcher, real?.GetValue("") as string ?? "", StringComparison.OrdinalIgnoreCase);
 
-        Assert.Equal("VidShrink", Read(@"Applications\VidShrink.exe", "FriendlyAppName"));
-        using var supported = Open(@"Applications\VidShrink.exe\SupportedTypes");
+        Assert.Equal(AppIdentity.Name, Read(@"Applications\VidShrinkPlayer.exe", "FriendlyAppName"));
+        using var supported = Open(@"Applications\VidShrinkPlayer.exe\SupportedTypes");
         Assert.NotNull(supported);
         Assert.Equal(Sorted(ShellIntegration.MediaExtensions.Select(extension => "." + extension)), Sorted(supported!.GetValueNames()));
-        Assert.Null(Open(@"Applications\VidShrink.App.exe"));
+        Assert.Null(Open(@"Applications\VidShrinkPlayer.App.exe"));
     }
 
     [SupportedOSPlatform("windows")]
     private void PlantLegacyApplication(string target)
     {
-        using var command = Registry.CurrentUser.CreateSubKey($@"{_testKey}\Applications\VidShrink.App.exe\shell\open\command");
+        using var command = Registry.CurrentUser.CreateSubKey($@"{_testKey}\Applications\VidShrinkPlayer.App.exe\shell\open\command");
         command.SetValue("", $"\"{target}\" \"%1\"");
     }
 
@@ -172,14 +172,14 @@ public sealed class DosyaIliskiTests : IDisposable
     public void Derleme_ciktisini_gosteren_eski_uygulama_anahtari_kayitta_siliniyor()
     {
         if (!OperatingSystem.IsWindows()) return;
-        PlantLegacyApplication(Path.Combine(_work, "src", "VidShrink.App", "bin", "Release", "net8.0", "VidShrink.App.exe"));
-        Assert.NotNull(Open(@"Applications\VidShrink.App.exe"));
+        PlantLegacyApplication(Path.Combine(_work, "src", "VidShrink.App", "bin", "Release", "net8.0", AppIdentity.AppExecutable));
+        Assert.NotNull(Open(@"Applications\VidShrinkPlayer.App.exe"));
 
         var failed = FileAssociation.Register(_launcher, _testKey);
 
         Assert.Empty(failed);
-        Assert.Null(Open(@"Applications\VidShrink.App.exe"));
-        Assert.Equal("VidShrink", Read(@"Applications\VidShrink.exe", "FriendlyAppName"));
+        Assert.Null(Open(@"Applications\VidShrinkPlayer.App.exe"));
+        Assert.Equal(AppIdentity.Name, Read(@"Applications\VidShrinkPlayer.exe", "FriendlyAppName"));
     }
 
     [Fact]
@@ -187,17 +187,17 @@ public sealed class DosyaIliskiTests : IDisposable
     public void Kurulu_duzeni_gosteren_eski_uygulama_anahtari_korunuyor()
     {
         if (!OperatingSystem.IsWindows()) return;
-        var app = Path.Combine(_installRoot, "app", "VidShrink.App.exe");
+        var app = Path.Combine(_installRoot, "app", AppIdentity.AppExecutable);
         Directory.CreateDirectory(Path.GetDirectoryName(app)!);
         File.WriteAllText(app, "uygulama");
         PlantLegacyApplication(app);
 
         Assert.False(VidShrink.Core.Setup.ShellRegistration.RemoveStaleLegacyApplication(_testKey));
-        Assert.NotNull(Open(@"Applications\VidShrink.App.exe"));
+        Assert.NotNull(Open(@"Applications\VidShrinkPlayer.App.exe"));
 
         File.Delete(_launcher);
         Assert.True(VidShrink.Core.Setup.ShellRegistration.RemoveStaleLegacyApplication(_testKey));
-        Assert.Null(Open(@"Applications\VidShrink.App.exe"));
+        Assert.Null(Open(@"Applications\VidShrinkPlayer.App.exe"));
         Assert.False(VidShrink.Core.Setup.ShellRegistration.RemoveStaleLegacyApplication(_testKey));
     }
 
@@ -206,7 +206,7 @@ public sealed class DosyaIliskiTests : IDisposable
     {
         var app = Path.Combine(_installRoot, "app");
         Directory.CreateDirectory(app);
-        var appExe = Path.Combine(app, "VidShrink.App.exe");
+        var appExe = Path.Combine(app, AppIdentity.AppExecutable);
         File.WriteAllText(appExe, "uygulama");
 
         Assert.Equal(_launcher, FileAssociation.LaunchTarget(appExe));
@@ -214,7 +214,7 @@ public sealed class DosyaIliskiTests : IDisposable
         File.Delete(_launcher);
         Assert.Equal(appExe, FileAssociation.LaunchTarget(appExe));
 
-        var loose = Path.Combine(_work, "gevsek", "VidShrink.App.exe");
+        var loose = Path.Combine(_work, "gevsek", AppIdentity.AppExecutable);
         Assert.Equal(loose, FileAssociation.LaunchTarget(loose));
     }
 
@@ -227,20 +227,20 @@ public sealed class DosyaIliskiTests : IDisposable
         var run = WriteAll();
         Assert.True(run.Code == 0, run.Output);
 
-        var command = $"\"{Path.Combine(_installRoot, "app", "VidShrink.App.exe")}\" \"%1\"";
+        var command = $"\"{Path.Combine(_installRoot, "app", AppIdentity.AppExecutable)}\" \"%1\"";
         Assert.Equal(command, Read($@"{FileAssociation.ProgId}\shell\open\command"));
-        Assert.Equal(command, Read(@"Applications\VidShrink.exe\shell\open\command"));
+        Assert.Equal(command, Read(@"Applications\VidShrinkPlayer.exe\shell\open\command"));
         Assert.Equal($"{_launcher},0", Read($@"{FileAssociation.ProgId}\DefaultIcon"));
         Assert.Equal(Sorted(ShellIntegration.MediaExtensions), Sorted(ExtensionsListingUs()));
 
-        using var associations = Open(@"Teknesyum\VidShrink\Capabilities\FileAssociations");
+        using var associations = Open(@"Teknesyum\VidShrinkPlayer\Capabilities\FileAssociations");
         Assert.NotNull(associations);
         Assert.Equal(Sorted(ShellIntegration.DefaultAppExtensions.Select(extension => "." + extension)),
             Sorted(associations!.GetValueNames()));
         Assert.All(associations.GetValueNames(), name => Assert.Equal(FileAssociation.ProgId, associations.GetValue(name)));
 
-        var capabilities = Read("RegisteredApplications", "VidShrink");
-        Assert.Equal($@"{_testKey}\Teknesyum\VidShrink\Capabilities", capabilities);
+        var capabilities = Read("RegisteredApplications", AppIdentity.Name);
+        Assert.Equal($@"{_testKey}\Teknesyum\VidShrinkPlayer\Capabilities", capabilities);
         using var target = Registry.CurrentUser.OpenSubKey(capabilities!);
         Assert.NotNull(target);
     }
@@ -353,8 +353,8 @@ public sealed class DosyaIliskiTests : IDisposable
     {
         var home = Path.Combine(_work, "ev");
         Directory.CreateDirectory(home);
-        var entry = Path.Combine(home, ".local", "share", "applications", "vidshrink.desktop");
-        var mimePackage = Path.Combine(home, ".local", "share", "mime", "packages", "vidshrink.xml");
+        var entry = Path.Combine(home, ".local", "share", "applications", "vidshrink-player.desktop");
+        var mimePackage = Path.Combine(home, ".local", "share", "mime", "packages", "vidshrink-player.xml");
         const string executable = "/opt/vid shrink/VidShrink.App";
 
         var write = Sh(home, "install-vidshrink.sh", "--desktop-entry", executable);
@@ -399,7 +399,7 @@ public sealed class DosyaIliskiTests : IDisposable
             if (gorselVar) File.WriteAllBytes(Path.Combine(klasor, "VidShrink.png"), new byte[] { 0x89, 0x50, 0x4E, 0x47 });
             var write = Sh(home, "install-vidshrink.sh", "--desktop-entry", executable);
             Assert.True(write.Code == 0, write.Output);
-            return File.ReadAllLines(Path.Combine(home, ".local", "share", "applications", "vidshrink.desktop"))
+            return File.ReadAllLines(Path.Combine(home, ".local", "share", "applications", "vidshrink-player.desktop"))
                 .SingleOrDefault(line => line.StartsWith("Icon=", StringComparison.Ordinal));
         }
 
@@ -431,7 +431,7 @@ public sealed class DosyaIliskiTests : IDisposable
     {
         var home = Path.Combine(_work, "ev-ozel");
         Directory.CreateDirectory(home);
-        var entry = Path.Combine(home, ".local", "share", "applications", "vidshrink.desktop");
+        var entry = Path.Combine(home, ".local", "share", "applications", "vidshrink-player.desktop");
 
         const string executable = "/opt/$var \"quote\" `cmd` back\\slash 100% dir/VidShrink";
 
@@ -458,10 +458,10 @@ public sealed class DosyaIliskiTests : IDisposable
         var sandbox = Path.Combine(_work, "paket");
         var payload = Path.Combine(sandbox, "yuk");
         Directory.CreateDirectory(payload);
-        File.WriteAllText(Path.Combine(payload, "VidShrink"), "#!/bin/sh\nexit 0\n");
-        var bundle = Path.Combine(sandbox, "VidShrink.app");
+        File.WriteAllText(Path.Combine(payload, AppIdentity.MacHostName), "#!/bin/sh\nexit 0\n");
+        var bundle = Path.Combine(sandbox, AppIdentity.MacBundleName);
 
-        var run = Sh(sandbox, "macos-app-bundle.sh", payload.Replace('\\', '/'), "VidShrink", "0.0.0", bundle.Replace('\\', '/'));
+        var run = Sh(sandbox, "macos-app-bundle.sh", payload.Replace('\\', '/'), AppIdentity.MacHostName, "0.0.0", bundle.Replace('\\', '/'));
         Assert.True(run.Code == 0, run.Output);
 
         using var reader = XmlReader.Create(Path.Combine(bundle, "Contents", "Info.plist"),

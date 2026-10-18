@@ -339,7 +339,7 @@ public sealed class TekOrnekTests : IDisposable
         if (!OperatingSystem.IsWindows()) return;
         Assert.True(ToolLocator.IsAvailable(out var missing), $"{missing} yok; kabul ölçüsü gerçek video ister.");
 
-        var executable = Path.Combine(AppContext.BaseDirectory, "VidShrink.App.exe");
+        var executable = Path.Combine(AppContext.BaseDirectory, AppIdentity.AppExecutable);
         Assert.True(File.Exists(executable), executable);
 
         var video = Path.Combine(_work, "çift tıklanan video.mp4");

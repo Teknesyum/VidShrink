@@ -14,7 +14,7 @@ namespace VidShrink.Tests;
 /// </summary>
 public sealed class KabukEntegrasyonTests
 {
-    private const string Executable = @"C:\Programs\VidShrink\VidShrink.exe";
+    private const string Executable = @"C:\Programs\VidShrink\VidShrinkPlayer.exe";
 
     private static IReadOnlyList<(string Key, string Name, string? Value)> Plan()
         => FileAssociation.Plan(Executable);
@@ -45,7 +45,7 @@ public sealed class KabukEntegrasyonTests
         var title = typeof(VidShrink.App.App).Assembly
             .GetCustomAttributes(typeof(System.Reflection.AssemblyTitleAttribute), false)
             .Cast<System.Reflection.AssemblyTitleAttribute>().Single().Title;
-        Assert.Equal("VidShrink", title);
+        Assert.Equal(AppIdentity.Name, title);
     }
 
     [Fact]
@@ -58,31 +58,31 @@ public sealed class KabukEntegrasyonTests
 
     /// <summary>
     /// Uygulama ile kurucu tek planı yazıyor. Eskiden uygulama kendi adıyla
-    /// <c>Applications\VidShrink.App.exe</c> açıyordu; Varsayılan uygulamalar sayfasında
+    /// <c>Applications\VidShrinkPlayer.App.exe</c> açıyordu; Varsayılan uygulamalar sayfasında
     /// iki VidShrink görünüyordu, biri derleme çıktısını gösteriyordu.
     /// </summary>
     [Fact]
     public void UygulamaIleKurucuAyniKayitPlaniniYaziyor()
     {
-        const string App = @"C:\Programs\VidShrink\app\VidShrink.App.exe";
+        const string App = @"C:\Programs\VidShrink\app\VidShrinkPlayer.App.exe";
         Assert.Equal(VidShrink.Core.Setup.ShellRegistration.ClassesPlan(@"Software\Classes", Executable), Plan());
         Assert.Equal(VidShrink.Core.Setup.ShellRegistration.ClassesPlan(@"Software\Classes", App), FileAssociation.Plan(App));
 
         foreach (var executable in new[] { Executable, App })
         {
             var plan = FileAssociation.Plan(executable);
-            Assert.DoesNotContain(plan, entry => entry.Key.Contains(@"Applications\VidShrink.App.exe", StringComparison.OrdinalIgnoreCase));
+            Assert.DoesNotContain(plan, entry => entry.Key.Contains(@"Applications\VidShrinkPlayer.App.exe", StringComparison.OrdinalIgnoreCase));
             var application = plan.Where(entry => entry.Key.StartsWith(@"Software\Classes\Applications\", StringComparison.Ordinal)).ToList();
-            Assert.All(application, entry => Assert.StartsWith(@"Software\Classes\Applications\VidShrink.exe", entry.Key, StringComparison.Ordinal));
-            Assert.Equal("VidShrink", application.Single(entry => entry.Name == "FriendlyAppName").Value);
+            Assert.All(application, entry => Assert.StartsWith(@"Software\Classes\Applications\VidShrinkPlayer.exe", entry.Key, StringComparison.Ordinal));
+            Assert.Equal(AppIdentity.Name, application.Single(entry => entry.Name == "FriendlyAppName").Value);
             Assert.Equal(ShellIntegration.MediaExtensions.Select(extension => "." + extension),
                 application.Where(entry => entry.Key.EndsWith(@"\SupportedTypes", StringComparison.Ordinal)).Select(entry => entry.Name));
         }
     }
 
     [Theory]
-    [InlineData(@"""C:\Programs\VidShrink\app\VidShrink.App.exe"" ""%1""", @"C:\Programs\VidShrink\app\VidShrink.App.exe")]
-    [InlineData(@"C:\x\VidShrink.App.exe %1", @"C:\x\VidShrink.App.exe")]
+    [InlineData(@"""C:\Programs\VidShrink\app\VidShrinkPlayer.App.exe"" ""%1""", @"C:\Programs\VidShrink\app\VidShrinkPlayer.App.exe")]
+    [InlineData(@"C:\x\VidShrinkPlayer.App.exe %1", @"C:\x\VidShrinkPlayer.App.exe")]
     [InlineData(@"""""", null)]
     [InlineData("", null)]
     [InlineData(null, null)]
@@ -158,7 +158,7 @@ public sealed class KabukEntegrasyonTests
         var address = DefaultApp.SettingsPageForThisApp();
 
         Assert.StartsWith(DefaultApp.SettingsPage + "?", address, StringComparison.Ordinal);
-        Assert.Contains("registeredAppUser=" + DefaultApp.RegisteredName, address, StringComparison.Ordinal);
+        Assert.Contains("registeredAppUser=" + Uri.EscapeDataString(DefaultApp.RegisteredName), address, StringComparison.Ordinal);
 
         var installer = File.ReadAllText(Path.Combine(TipSources.Root, "Install-VidShrink.ps1"));
         Assert.Contains($"$fileAssociationName = '{DefaultApp.RegisteredName}'", installer, StringComparison.Ordinal);
@@ -184,8 +184,8 @@ public sealed class KabukEntegrasyonTests
     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
     public void ProgIdBizimseGelistirmeBuildiDeVarsayilanSayilir()
     {
-        const string Installed = @"C:\Programs\VidShrink\app\VidShrink.App.exe";
-        const string Dev = @"D:\kaynak\src\VidShrink.App\bin\Debug\net8.0\VidShrink.App.exe";
+        const string Installed = @"C:\Programs\VidShrink\app\VidShrinkPlayer.App.exe";
+        const string Dev = @"D:\kaynak\src\VidShrink.App\bin\Debug\net8.0\VidShrinkPlayer.App.exe";
 
         Assert.True(DefaultApp.IsOurs(FileAssociation.ProgId, Installed, Dev, Dev));
         Assert.True(DefaultApp.IsOurs(null, Installed, Installed, Installed));
@@ -195,23 +195,23 @@ public sealed class KabukEntegrasyonTests
     }
 
     /// <summary>
-    /// G2: çift tık başlatıcıyı atlıyor. ProgID komutu ve <c>Applications\VidShrink.exe</c>
-    /// komutu yanındaki <c>app\VidShrink.App.exe</c>'yi çalıştırıyor; anahtarın adı başlatıcıda
+    /// G2: çift tık başlatıcıyı atlıyor. ProgID komutu ve <c>Applications\VidShrinkPlayer.exe</c>
+    /// komutu yanındaki <c>app\VidShrinkPlayer.App.exe</c>'yi çalıştırıyor; anahtarın adı başlatıcıda
     /// kalıyor. Negatif kontrol: başlatıcı olmayan ikili kendi yolunu yazıyor.
     /// </summary>
     [WindowsFact("Windows yolu ve kayıt defteri komutu")]
     public void ProgIdKomutuSecilenDosyayiUygulamayaVeriyor()
     {
-        const string App = @"C:\Programs\VidShrink\app\VidShrink.App.exe";
+        const string App = @"C:\Programs\VidShrink\app\VidShrinkPlayer.App.exe";
         var command = Plan().Single(entry =>
             entry.Key == $@"Software\Classes\{FileAssociation.ProgId}\shell\open\command" && entry.Name.Length == 0);
         var application = Plan().Single(entry =>
-            entry.Key == @"Software\Classes\Applications\VidShrink.exe\shell\open\command");
+            entry.Key == @"Software\Classes\Applications\VidShrinkPlayer.exe\shell\open\command");
 
         Assert.Equal($"\"{App}\" \"%1\"", command.Value);
         Assert.Equal($"\"{App}\" \"%1\"", application.Value);
 
-        const string Loose = @"D:\Tasinabilir\VidShrink.App.exe";
+        const string Loose = @"D:\Tasinabilir\VidShrinkPlayer.App.exe";
         var looseCommand = FileAssociation.Plan(Loose).Single(entry =>
             entry.Key == $@"Software\Classes\{FileAssociation.ProgId}\shell\open\command");
         Assert.Equal($"\"{Loose}\" \"%1\"", looseCommand.Value);
@@ -220,9 +220,9 @@ public sealed class KabukEntegrasyonTests
     [WindowsFact("Windows yolu ayrıştırması")]
     public void AcmaKomutununHedefiYalnizBaslaticidaDegisiyor()
     {
-        Assert.Equal(@"C:\Programs\VidShrink\app\VidShrink.App.exe", ShellIntegration.OpenCommandTarget(Executable));
-        Assert.Equal(@"C:\Programs\VidShrink\app\VidShrink.App.exe", ShellIntegration.OpenCommandTarget(@"C:\Programs\VidShrink\vidshrink.EXE"));
-        Assert.Equal(@"C:\Programs\VidShrink\app\VidShrink.App.exe", ShellIntegration.OpenCommandTarget(@"C:\Programs\VidShrink\app\VidShrink.App.exe"));
+        Assert.Equal(@"C:\Programs\VidShrink\app\VidShrinkPlayer.App.exe", ShellIntegration.OpenCommandTarget(Executable));
+        Assert.Equal(@"C:\Programs\VidShrink\app\VidShrinkPlayer.App.exe", ShellIntegration.OpenCommandTarget(@"C:\Programs\VidShrink\vidshrinkplayer.EXE"));
+        Assert.Equal(@"C:\Programs\VidShrink\app\VidShrinkPlayer.App.exe", ShellIntegration.OpenCommandTarget(@"C:\Programs\VidShrink\app\VidShrinkPlayer.App.exe"));
         Assert.Equal(@"C:\Programs\VidShrink\VidShrinkX.exe", ShellIntegration.OpenCommandTarget(@"C:\Programs\VidShrink\VidShrinkX.exe"));
     }
 
@@ -241,7 +241,7 @@ public sealed class KabukEntegrasyonTests
 
         Assert.True(FileAssociationSetup.Ensure(Executable, file, path => { yazilan.Add(path); return Array.Empty<string>(); }));
         Assert.Equal(new[] { Executable }, yazilan);
-        Assert.Equal(@"C:\Programs\VidShrink\app\VidShrink.App.exe", FileAssociationSetup.Recorded(file));
+        Assert.Equal(@"C:\Programs\VidShrink\app\VidShrinkPlayer.App.exe", FileAssociationSetup.Recorded(file));
 
         Assert.False(FileAssociationSetup.Ensure(Executable, file, path => { yazilan.Add(path); return Array.Empty<string>(); }));
         Assert.Single(yazilan);
@@ -396,7 +396,7 @@ public sealed class KabukEntegrasyonTests
 
         Assert.Equal(Executable, FileAssociationSetup.Recorded(file));
         Assert.False(FileAssociationSetup.Needed(FileAssociationSetup.Recorded(file), Executable));
-        Assert.True(FileAssociationSetup.Needed(FileAssociationSetup.Recorded(file), @"D:\Baska\VidShrink.exe"));
+        Assert.True(FileAssociationSetup.Needed(FileAssociationSetup.Recorded(file), @"D:\Baska\VidShrinkPlayer.exe"));
 
         Directory.Delete(folder, recursive: true);
     }

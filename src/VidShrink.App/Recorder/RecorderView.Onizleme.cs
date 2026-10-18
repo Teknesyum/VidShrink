@@ -13,7 +13,7 @@ internal partial class RecorderView
     private Bitmap? _previewImage;
 
     internal Func<string> PreviewLocation { get; set; } = () => Path.Combine(
-        Path.GetTempPath(), "VidShrink", "recorder-preview-" + Environment.ProcessId.ToString(System.Globalization.CultureInfo.InvariantCulture) + ".jpg");
+        Path.GetTempPath(), AppIdentity.FolderName, "recorder-preview-" + Environment.ProcessId.ToString(System.Globalization.CultureInfo.InvariantCulture) + ".jpg");
 
     internal bool PreviewVisible => ImgPreview.IsVisible;
 

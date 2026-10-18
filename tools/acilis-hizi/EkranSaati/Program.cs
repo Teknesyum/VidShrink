@@ -128,7 +128,7 @@ internal static class Program
     }
 
     private static string Giris(string kok, string tur)
-        => tur == "app" ? Path.Combine(kok, "app", "VidShrink.App.exe") : Path.Combine(kok, "VidShrink.exe");
+        => tur == "app" ? Path.Combine(kok, "app", "VidShrinkPlayer.App.exe") : Path.Combine(kok, "VidShrinkPlayer.exe");
 
     private static Dictionary<string, object?> Kosum(Taraf taraf, string kok, string kosumDizini, string klip, string bitis,
         TimeSpan sinir, JsonObject ayarSablonu, string kalkan, Masaustu masaustu)
@@ -182,7 +182,7 @@ internal static class Program
         sonuc["kalkan-surec"] = (double)kalkanlar.Length;
         foreach (var hata in Directory.Exists(kovanDizini) ? Directory.GetFiles(kovanDizini, "*.hata") : Array.Empty<string>())
             Console.Error.WriteLine("kalkan hatasi: " + File.ReadAllText(hata));
-        sonuc["kalkan"] = kalkanlar.Any(f => File.ReadAllText(f).EndsWith(@"\app\VidShrink.App.exe", StringComparison.OrdinalIgnoreCase));
+        sonuc["kalkan"] = kalkanlar.Any(f => File.ReadAllText(f).EndsWith(@"\app\VidShrinkPlayer.App.exe", StringComparison.OrdinalIgnoreCase));
 
         if (File.Exists(izYolu))
         {
@@ -252,7 +252,7 @@ internal static class Program
         for (var tur = 0; tur < 3; tur++)
         {
             var bulundu = false;
-            foreach (var p in Process.GetProcessesByName("VidShrink").Concat(Process.GetProcessesByName("VidShrink.App")))
+            foreach (var p in Process.GetProcessesByName("VidShrinkPlayer").Concat(Process.GetProcessesByName("VidShrinkPlayer.App")))
             {
                 var yol = Yerel.SurecYolu(p.Id);
                 if (yol is not null && yol.StartsWith(onek, StringComparison.OrdinalIgnoreCase))
@@ -385,8 +385,8 @@ internal sealed class KayitKorumasi
     {
         @"Software\Teknesyum\VidShrink\ShellLabels",
         @"Software\Classes\Teknesyum.VidShrink.Video",
-        @"Software\Classes\Applications\VidShrink.exe",
-        @"Software\Classes\Applications\VidShrink.App.exe",
+        @"Software\Classes\Applications\VidShrinkPlayer.exe",
+        @"Software\Classes\Applications\VidShrinkPlayer.App.exe",
     };
 
     private readonly Dictionary<(string Anahtar, string Ad), (object Deger, RegistryValueKind Tur)> _ilk = Oku();

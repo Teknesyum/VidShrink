@@ -5,7 +5,7 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyName>VidShrink-Setup</AssemblyName>
+    <AssemblyName>VidShrinkPlayer-Setup</AssemblyName>
     <RootNamespace>VidShrink.Setup</RootNamespace>
     <Description>VidShrink Setup</Description>
     <AssemblyTitle>VidShrink Setup</AssemblyTitle>

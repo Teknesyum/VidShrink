@@ -49,7 +49,7 @@ public sealed class TaniGunluguTests
             StringComparison.OrdinalIgnoreCase);
 
         var gercek = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VidShrink", Gunluk.KlasorAdi);
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), AppIdentity.FolderName, Gunluk.KlasorAdi);
         Assert.NotEqual(Path.GetFullPath(gercek), Path.GetFullPath(Gunluk.Klasor), StringComparer.OrdinalIgnoreCase);
     }
 

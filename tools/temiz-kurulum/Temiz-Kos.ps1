@@ -12,7 +12,7 @@ $ProgressPreference = 'SilentlyContinue'
 New-Item -ItemType Directory -Force -Path $Sonuc | Out-Null
 $gunluk = Join-Path $Sonuc 'gunluk.txt'
 $depo = 'Teknesyum/VidShrink'
-$tekSatirKomutu = '[Net.ServicePointManager]::SecurityProtocol=3072; Set-Variable ProgressPreference SilentlyContinue; Set-Location ([IO.Path]::GetTempPath()); irm https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe -OutFile VidShrink-Setup.exe; .\VidShrink-Setup.exe'
+$tekSatirKomutu = '[Net.ServicePointManager]::SecurityProtocol=3072; Set-Variable ProgressPreference SilentlyContinue; Set-Location ([IO.Path]::GetTempPath()); irm https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrinkPlayer-Setup.exe -OutFile VidShrinkPlayer-Setup.exe; .\VidShrinkPlayer-Setup.exe'
 
 function Yaz([string]$Metin) {
     $satir = '{0:HH:mm:ss} {1}' -f (Get-Date), $Metin
@@ -113,7 +113,7 @@ function Ekran([string]$Ad) {
 
 function Denetle-Kurulum([string]$Kok, [string]$Ad) {
     $d = [ordered]@{ kok = $Kok }
-    foreach ($parca in 'VidShrink.exe', 'app\VidShrink.App.exe', 'tools\ffmpeg\ffmpeg.exe', 'tools\ffmpeg\ffprobe.exe', 'tools\libmpv\libmpv-2.dll', 'tools\libmpv\vulkan-1.dll') {
+    foreach ($parca in 'VidShrinkPlayer.exe', 'app\VidShrinkPlayer.App.exe', 'tools\ffmpeg\ffmpeg.exe', 'tools\ffmpeg\ffprobe.exe', 'tools\libmpv\libmpv-2.dll', 'tools\libmpv\vulkan-1.dll') {
         $d[$parca] = Test-Path -LiteralPath (Join-Path $Kok $parca)
     }
 
@@ -144,14 +144,14 @@ function Denetle-Kurulum([string]$Kok, [string]$Ad) {
 }
 
 function Kapat-Uygulama {
-    Get-Process -Name 'VidShrink.App', 'VidShrink' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+    Get-Process -Name 'VidShrinkPlayer.App', 'VidShrinkPlayer' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
     Start-Sleep -Seconds 3
 }
 
 function Denetle-Acilis([string]$Ad, [datetime]$Once) {
     Start-Sleep -Seconds $AyaktaSaniye
     $r = [ordered]@{ bekleme = $AyaktaSaniye }
-    $uygulama = Get-Process -Name 'VidShrink.App' -ErrorAction SilentlyContinue | Select-Object -First 1
+    $uygulama = Get-Process -Name 'VidShrinkPlayer.App' -ErrorAction SilentlyContinue | Select-Object -First 1
     $r.ayakta = [bool]$uygulama
     $r.pencere = $false
     if ($uygulama) {
@@ -182,9 +182,9 @@ function Yol-Kurucu {
     $r = [ordered]@{ yol = 'kurucu' }
     $klasor = Join-Path $env:USERPROFILE 'Downloads'
     New-Item -ItemType Directory -Force -Path $klasor | Out-Null
-    $kurucu = Join-Path $klasor 'VidShrink-Setup.exe'
-    if ($Etiket) { $adres = "https://github.com/$depo/releases/download/$Etiket/VidShrink-Setup.exe" }
-    else { $adres = "https://github.com/$depo/releases/latest/download/VidShrink-Setup.exe" }
+    $kurucu = Join-Path $klasor 'VidShrinkPlayer-Setup.exe'
+    if ($Etiket) { $adres = "https://github.com/$depo/releases/download/$Etiket/VidShrinkPlayer-Setup.exe" }
+    else { $adres = "https://github.com/$depo/releases/latest/download/VidShrinkPlayer-Setup.exe" }
     Yaz "kurucu indiriliyor: $adres"
     $r.indirildi = Indir $adres $kurucu
     if (-not $r.indirildi) { $r.gecti = $false; return $r }
@@ -198,15 +198,15 @@ function Yol-Kurucu {
     $r.saniye = [math]::Round($saat.Elapsed.TotalSeconds)
     Yaz "kurucu çıkış kodu: $($r.cikisKodu) ($($r.saniye) sn)"
 
-    $kok = Join-Path $env:LOCALAPPDATA 'Programs\VidShrink'
+    $kok = Join-Path $env:LOCALAPPDATA 'Programs\VidShrink Player'
     $r.kurulum = Denetle-Kurulum $kok 'kurucu'
     $r.kisayollar = [ordered]@{
-        masaustu = Test-Path -LiteralPath (Join-Path ([Environment]::GetFolderPath('DesktopDirectory')) 'VidShrink.lnk')
-        baslat   = Test-Path -LiteralPath (Join-Path ([Environment]::GetFolderPath('Programs')) 'VidShrink\VidShrink.lnk')
+        masaustu = Test-Path -LiteralPath (Join-Path ([Environment]::GetFolderPath('DesktopDirectory')) 'VidShrink Player.lnk')
+        baslat   = Test-Path -LiteralPath (Join-Path ([Environment]::GetFolderPath('Programs')) 'VidShrink Player\VidShrink Player.lnk')
     }
     $once = Get-Date
-    if (Test-Path -LiteralPath (Join-Path $kok 'VidShrink.exe')) {
-        Start-Process -FilePath (Join-Path $kok 'VidShrink.exe') -WorkingDirectory $kok | Out-Null
+    if (Test-Path -LiteralPath (Join-Path $kok 'VidShrinkPlayer.exe')) {
+        Start-Process -FilePath (Join-Path $kok 'VidShrinkPlayer.exe') -WorkingDirectory $kok | Out-Null
         $r.acilis = Denetle-Acilis 'kurucu' $once
     }
     $r.gecti = ($r.cikisKodu -eq 0) -and (Gecti $r.kurulum $r.acilis)
@@ -241,7 +241,7 @@ function Yol-TekSatir {
         Start-Sleep -Seconds 2
     }
     $r.panelAcildi = $pencere -ne [IntPtr]::Zero
-    $r.indirilenKurucu = Test-Path -LiteralPath (Join-Path $temp 'VidShrink-Setup.exe')
+    $r.indirilenKurucu = Test-Path -LiteralPath (Join-Path $temp 'VidShrinkPlayer-Setup.exe')
     if (-not $r.panelAcildi) {
         if ($kabuk.HasExited) { $r.kabukCikisKodu = $kabuk.ExitCode }
         Ekran 'tek-satir-panel-yok'
@@ -254,7 +254,7 @@ function Yol-TekSatir {
     Yaz 'panel açıldı; Enter ile "Kur"'
     [void][TemizKurulum.Yerel]::PostMessageW($pencere, 0x0100, [IntPtr]0x0D, [IntPtr]::Zero)
 
-    $kok = Join-Path $yerel 'Programs\VidShrink'
+    $kok = Join-Path $yerel 'Programs\VidShrink Player'
     $isGorulen = $false
     $bitti = $false
     $saat = [Diagnostics.Stopwatch]::StartNew()
@@ -285,7 +285,7 @@ function Yol-TekSatir {
     }
     if ($kabuk.WaitForExit(60000)) { $r.kabukCikisKodu = $kabuk.ExitCode }
     else { $r.kabukCikisKodu = 'kapanmadi'; Stop-Process -Id $kabuk.Id -Force -ErrorAction SilentlyContinue }
-    Get-Process -Name 'VidShrink-Setup' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+    Get-Process -Name 'VidShrinkPlayer-Setup' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
     $r.gecti = $bitti -and ($r.kabukCikisKodu -eq 0) -and (Gecti $r.kurulum $r.acilis)
     return $r
 }

@@ -12,7 +12,7 @@ namespace VidShrink.Tests;
 
 /// <summary>
 /// Kurulu bir başlatıcı gösterilmediğinde açılış süresi ölçümleri atlanır.
-/// VIDSHRINK_LAUNCHER_EXE kurulu VidShrink.exe dosyasını göstermelidir.
+/// VIDSHRINK_LAUNCHER_EXE kurulu VidShrinkPlayer.exe dosyasını göstermelidir.
 /// </summary>
 public sealed class LiveLauncherFactAttribute : FactAttribute
 {
@@ -167,19 +167,19 @@ public sealed class UpdaterTests : IDisposable
     {
         var app = Folder("app");
         var stage = Folder("stage");
-        Write(app, "VidShrink.App.dll", "eski sürüm");
+        Write(app, AppIdentity.AppProcessName + ".dll", "eski sürüm");
         Write(app, "VidShrink.Core.dll", "eski çekirdek");
 
-        Write(stage, "VidShrink.App.dll", "yeni sürüm");
+        Write(stage, AppIdentity.AppProcessName + ".dll", "yeni sürüm");
         Write(stage, "VidShrink.Core.dll", "yeni çekirdek");
-        var files = new[] { Describe(stage, "VidShrink.App.dll"), Describe(stage, "VidShrink.Core.dll") };
+        var files = new[] { Describe(stage, AppIdentity.AppProcessName + ".dll"), Describe(stage, "VidShrink.Core.dll") };
 
         // Yarım inen dosyayı taklit et: içerik değişti, manifestteki özet duruyor.
         Write(stage, "VidShrink.Core.dll", "yeni çekir");
 
         Assert.Throws<InvalidDataException>(() => UpdateStage.Apply(stage, app, files));
 
-        Assert.Equal("eski sürüm", File.ReadAllText(Path.Combine(app, "VidShrink.App.dll")));
+        Assert.Equal("eski sürüm", File.ReadAllText(Path.Combine(app, AppIdentity.AppProcessName + ".dll")));
         Assert.Equal("eski çekirdek", File.ReadAllText(Path.Combine(app, "VidShrink.Core.dll")));
         Assert.False(Directory.Exists(stage));
         Assert.False(File.Exists(Path.Combine(app, UpdateStage.JournalName)));
@@ -190,14 +190,14 @@ public sealed class UpdaterTests : IDisposable
     {
         var app = Folder("app");
         var stage = Folder("stage");
-        Write(app, "VidShrink.App.dll", "eski");
-        Write(stage, "VidShrink.App.dll", "yeni");
+        Write(app, AppIdentity.AppProcessName + ".dll", "eski");
+        Write(stage, AppIdentity.AppProcessName + ".dll", "yeni");
         Write(stage, "runtimes/win-x64/native/new.dll", "yepyeni");
-        var files = new[] { Describe(stage, "VidShrink.App.dll"), Describe(stage, "runtimes/win-x64/native/new.dll") };
+        var files = new[] { Describe(stage, AppIdentity.AppProcessName + ".dll"), Describe(stage, "runtimes/win-x64/native/new.dll") };
 
         UpdateStage.Apply(stage, app, files);
 
-        Assert.Equal("yeni", File.ReadAllText(Path.Combine(app, "VidShrink.App.dll")));
+        Assert.Equal("yeni", File.ReadAllText(Path.Combine(app, AppIdentity.AppProcessName + ".dll")));
         Assert.Equal("yepyeni", File.ReadAllText(UpdateCheck.LocalPath(app, "runtimes/win-x64/native/new.dll")));
         Assert.False(Directory.Exists(stage));
         Assert.False(File.Exists(Path.Combine(app, UpdateStage.JournalName)));
@@ -243,7 +243,7 @@ public sealed class UpdaterTests : IDisposable
     {
         var publish = Folder("publish");
         // Sıkışmayan içerik: arşiv boyutu gerçek yayına benzesin, ölçüm anlamlı olsun.
-        WriteRandom(publish, "VidShrink.App.dll", 200_000);
+        WriteRandom(publish, AppIdentity.AppProcessName + ".dll", 200_000);
         WriteRandom(publish, "big-runtime.dll", 4_000_000);
         var wanted = WriteRandom(publish, "runtimes/win-x64/native/native.dll", 500_000);
         var archive = Path.Combine(_root, "vidshrink-win-x64.zip");
@@ -430,7 +430,7 @@ public sealed class UpdaterTests : IDisposable
     public async Task ACancelledDownloadLeavesNoPartialFileAndStartsAgain()
     {
         var publish = Folder("publish");
-        var names = new[] { "VidShrink.App.dll", "a.dll", "runtimes/win-x64/native/b.dll" };
+        var names = new[] { AppIdentity.AppProcessName + ".dll", "a.dll", "runtimes/win-x64/native/b.dll" };
         foreach (var name in names) WriteRandom(publish, name, 300_000);
         var source = Folder("source");
         ZipFile.CreateFromDirectory(publish, Path.Combine(source, UpdateCheck.ArchiveAssetName(UpdateCheck.Rid)));
@@ -476,10 +476,10 @@ public sealed class UpdaterTests : IDisposable
     public void TheSameVersionIsNotDownloadedASecondTime()
     {
         var app = Folder("app");
-        Write(app, "VidShrink.App.dll", "kurulu");
+        Write(app, AppIdentity.AppProcessName + ".dll", "kurulu");
         var manifest = new ReleaseManifest("1.4.0", "abc", DateTimeOffset.UtcNow, "win-x64", new[]
         {
-            Describe(app, "VidShrink.App.dll") with { Sha256 = new string('0', 64) }
+            Describe(app, AppIdentity.AppProcessName + ".dll") with { Sha256 = new string('0', 64) }
         });
 
         Assert.NotEmpty(UpdateCheck.Diff(app, manifest));
@@ -532,7 +532,7 @@ public sealed class UpdaterTests : IDisposable
             { "path": "VidShrink.App.dll", "sha256": "e3b0c442", "size": 123456 }
           ],
           "launcher": [
-            { "path": "VidShrink.exe", "sha256": "AB12", "size": 7788 }
+            { "path": "VidShrinkPlayer.exe", "sha256": "AB12", "size": 7788 }
           ]
         }
         """;
@@ -548,7 +548,7 @@ public sealed class UpdaterTests : IDisposable
         // eski başlatıcı o satırı uygulama arşivinde arar, bulamaz ve güncellemenin
         // tamamından vazgeçerdi. Bilinmeyen bir üst alan ise sessizce görünmez.
         Assert.Single(manifest.Files);
-        Assert.DoesNotContain(manifest.Files, file => file.Path.Contains("VidShrink.exe", StringComparison.Ordinal));
+        Assert.DoesNotContain(manifest.Files, file => file.Path.Contains(AppIdentity.LauncherExecutable, StringComparison.Ordinal));
     }
 
     [Fact]
@@ -601,7 +601,7 @@ public sealed class UpdaterTests : IDisposable
             { "path": "VidShrink.App.dll", "sha256": "e3b0c442", "size": 123456 }
           ],
           "launcher": [
-            { "path": "VidShrink.exe", "sha256": "AB12", "size": 7788 }
+            { "path": "VidShrinkPlayer.exe", "sha256": "AB12", "size": 7788 }
           ],
           "shell": [
             { "path": "shell/VidShrink.ShellExtension.dll", "sha256": "CD34", "size": 120832 }
@@ -625,7 +625,7 @@ public sealed class UpdaterTests : IDisposable
     {
         var manifest = UpdateCheck.ParseManifest("""
         { "version": "0.3.0", "rid": "win-x64", "files": [ { "path": "a.dll", "sha256": "aa", "size": 1 } ],
-          "launcher": [ { "path": "VidShrink.exe", "sha256": "bb", "size": 2 } ] }
+          "launcher": [ { "path": "VidShrinkPlayer.exe", "sha256": "bb", "size": 2 } ] }
         """);
 
         Assert.Empty(manifest.Shell);
@@ -649,8 +649,8 @@ public sealed class UpdaterTests : IDisposable
         WriteRandom(ShellStage(stage), extension, 4096);
         WriteRandom(ShellStage(stage), template, 512);
         var shellFiles = new[] { Describe(ShellStage(stage), extension), Describe(ShellStage(stage), template) };
-        WriteRandom(stage, "VidShrink.App.dll", 2048);
-        var staged = Describe(stage, "VidShrink.App.dll");
+        WriteRandom(stage, AppIdentity.AppProcessName + ".dll", 2048);
+        var staged = Describe(stage, AppIdentity.AppProcessName + ".dll");
 
         var manifest = new ReleaseManifest("0.3.1", "abc1234", DateTimeOffset.UtcNow, "win-x64", new[] { staged })
         {
@@ -754,8 +754,8 @@ public sealed class UpdaterTests : IDisposable
     {
         // Geçişi yapan süreç bu dosyanın kendisi olduğu için adın .exe kalması gerekiyor.
         var root = Folder("adlar");
-        Assert.Equal(Path.Combine(root, "VidShrink.new.exe"), LauncherUpdate.Incoming(root, LauncherUpdate.ExecutableName));
-        Assert.Equal(Path.Combine(root, "VidShrink.old.exe"), LauncherUpdate.Retired(root, LauncherUpdate.ExecutableName));
+        Assert.Equal(Path.Combine(root, AppIdentity.LauncherProcessName + ".new.exe"), LauncherUpdate.Incoming(root, LauncherUpdate.ExecutableName));
+        Assert.Equal(Path.Combine(root, AppIdentity.LauncherProcessName + ".old.exe"), LauncherUpdate.Retired(root, LauncherUpdate.ExecutableName));
     }
 
     [Fact]
@@ -775,10 +775,10 @@ public sealed class UpdaterTests : IDisposable
     /// <summary>
     /// Değişimin adımları, üretimde çağrıldıkları hâlleriyle. Ölçü ilk
     /// <paramref name="completedSteps"/> tanesini koşturur ve her adımdan sonra kurulum
-    /// kökünde açılabilir bir <c>VidShrink.exe</c> kaldığını doğrular.
+    /// kökünde açılabilir bir <c>VidShrinkPlayer.exe</c> kaldığını doğrular.
     ///
     /// <b>Burada kurtarma çağrılmıyor.</b> Bir önceki tur bu ölçüyü <c>Repair</c> çağırarak
-    /// yapıyordu; üretimde <c>Repair</c>'i çağıracak tek şey <c>VidShrink.exe</c>'nin kendisi
+    /// yapıyordu; üretimde <c>Repair</c>'i çağıracak tek şey <c>VidShrinkPlayer.exe</c>'nin kendisi
     /// olduğu için, adın boşaldığı bir adımda çağıracak kimse kalmıyordu. Adın hiç boşalmaması
     /// ancak kurtarma olmadan gösterilirse gösterilmiş sayılır.
     /// </summary>
@@ -931,10 +931,10 @@ public sealed class UpdaterTests : IDisposable
         // Manifest başlatıcıyı hiç saymıyorsa kurulu başlatıcının o sürüm olduğu bilinemez.
         var root = Folder("iddia");
         var app = Folder(Path.Combine("iddia", "app"));
-        Write(app, "VidShrink.App.dll", "uygulama");
+        Write(app, AppIdentity.AppProcessName + ".dll", "uygulama");
 
         var withoutLauncher = new ReleaseManifest("0.2.2", "abc", DateTimeOffset.UtcNow, "win-x64",
-            new[] { Describe(app, "VidShrink.App.dll") });
+            new[] { Describe(app, AppIdentity.AppProcessName + ".dll") });
 
         Assert.False(LauncherUpdate.MarkVerified(root, withoutLauncher));
         Assert.Null(LauncherUpdate.ReadVersionMarker(root));
@@ -955,7 +955,7 @@ public sealed class UpdaterTests : IDisposable
 
         Assert.True(UpdateRollout.Apply(stage, root, app, appFiles, launcherFiles, manifest));
 
-        Assert.Equal("yeni uygulama", File.ReadAllText(Path.Combine(app, "VidShrink.App.dll")));
+        Assert.Equal("yeni uygulama", File.ReadAllText(Path.Combine(app, AppIdentity.AppProcessName + ".dll")));
         Assert.True(File.Exists(Path.Combine(root, LauncherUpdate.JournalName)));
         Assert.Equal("0.2.2", UpdateCheck.ReadVersionMarker(app));
     }
@@ -966,14 +966,14 @@ public sealed class UpdaterTests : IDisposable
         // Sıranın davranıştaki karşılığı: uygulama adımı düşerse başlatıcı hiç kurulmaz.
         // Ters sırada olsaydı günlük yazılmış olur ve yeni başlatıcı eski uygulamayı açardı.
         var (root, app, stage, appFiles, launcherFiles, manifest) = Rollout("sirabozuk");
-        File.WriteAllText(UpdateCheck.LocalPath(stage, "VidShrink.App.dll"), "bozuk");
+        File.WriteAllText(UpdateCheck.LocalPath(stage, AppIdentity.AppProcessName + ".dll"), "bozuk");
 
         Assert.Throws<InvalidDataException>(
             () => UpdateRollout.Apply(stage, root, app, appFiles, launcherFiles, manifest));
 
         Assert.False(File.Exists(Path.Combine(root, LauncherUpdate.JournalName)));
         Assert.Null(LauncherUpdate.ReadVersionMarker(root));
-        Assert.Equal("eski uygulama", File.ReadAllText(Path.Combine(app, "VidShrink.App.dll")));
+        Assert.Equal("eski uygulama", File.ReadAllText(Path.Combine(app, AppIdentity.AppProcessName + ".dll")));
     }
 
     private (string Root, string App, string Stage, IReadOnlyList<ManifestFile> AppFiles,
@@ -982,10 +982,10 @@ public sealed class UpdaterTests : IDisposable
         var root = Folder(name);
         var app = Folder(Path.Combine(name, "app"));
         var stage = Path.Combine(root, "update-stage");
-        Write(app, "VidShrink.App.dll", "eski uygulama");
-        Write(stage, "VidShrink.App.dll", "yeni uygulama");
+        Write(app, AppIdentity.AppProcessName + ".dll", "eski uygulama");
+        Write(stage, AppIdentity.AppProcessName + ".dll", "yeni uygulama");
 
-        var appFile = Describe(stage, "VidShrink.App.dll");
+        var appFile = Describe(stage, AppIdentity.AppProcessName + ".dll");
         var launcherFile = Describe(WriteStagedLauncher(stage));
         LauncherUpdate.Stage(stage, root, new[] { launcherFile });
 
@@ -1653,14 +1653,14 @@ exit $code
     {
         var root = Folder("bosainen");
         var app = Folder(Path.Combine("bosainen", "app"));
-        Write(app, "VidShrink.App.dll", "uygulama");
+        Write(app, AppIdentity.AppProcessName + ".dll", "uygulama");
         File.WriteAllText(Path.Combine(root, LauncherUpdate.ExecutableName), OldLauncher);
 
         var launcherFile = ArmedSwap(root);
         UpdateCheck.WriteVersionMarker(app, "0.2.2");
 
         var manifest = new ReleaseManifest("0.2.2", "abc", DateTimeOffset.UtcNow, "win-x64",
-            new[] { Describe(app, "VidShrink.App.dll") })
+            new[] { Describe(app, AppIdentity.AppProcessName + ".dll") })
         {
             Launcher = new[] { launcherFile }
         };
@@ -1683,11 +1683,11 @@ exit $code
         var root = Folder("takili");
         var app = Folder(Path.Combine("takili", "app"));
         var stage = Path.Combine(root, "update-stage");
-        Write(app, "VidShrink.App.dll", "eski uygulama");
-        Write(stage, "VidShrink.App.dll", "yeni uygulama");
+        Write(app, AppIdentity.AppProcessName + ".dll", "eski uygulama");
+        Write(stage, AppIdentity.AppProcessName + ".dll", "yeni uygulama");
         File.WriteAllText(Path.Combine(root, LauncherUpdate.ExecutableName), OldLauncher);
 
-        var appFile = Describe(stage, "VidShrink.App.dll");
+        var appFile = Describe(stage, AppIdentity.AppProcessName + ".dll");
         var launcherFile = Describe(WriteStagedLauncher(stage));
 
         var incoming = LauncherUpdate.Incoming(root, LauncherUpdate.ExecutableName);
@@ -1702,7 +1702,7 @@ exit $code
         Assert.Empty(LauncherUpdate.Stage(stage, root, new[] { launcherFile }));
         Assert.False(UpdateRollout.Apply(stage, root, app, new[] { appFile }, new[] { launcherFile }, manifest));
 
-        Assert.Equal("yeni uygulama", File.ReadAllText(UpdateCheck.LocalPath(app, "VidShrink.App.dll")));
+        Assert.Equal("yeni uygulama", File.ReadAllText(UpdateCheck.LocalPath(app, AppIdentity.AppProcessName + ".dll")));
         Assert.Equal("0.2.2", UpdateCheck.ReadVersionMarker(app));
         Assert.False(File.Exists(Path.Combine(root, LauncherUpdate.JournalName)));
         Assert.Equal(OldLauncher, File.ReadAllText(Path.Combine(root, LauncherUpdate.ExecutableName)));

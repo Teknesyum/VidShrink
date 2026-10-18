@@ -17,7 +17,7 @@ using Xunit;
 namespace VidShrink.Tests;
 
 /// <summary>
-/// Windows 11 ilk sağ tık menüsündeki "VidShrink ile Küçült" üst girdisi (later 81). Kabuk
+/// Windows 11 ilk sağ tık menüsündeki "VidShrink Player ile Küçült" üst girdisi (later 81). Kabuk
 /// eklentisi ikinci bir sınıfla alt komutlu girdi sunar; paket bildirimi her video türüne
 /// iki fiil yazar; uygulama hedef etiketlerini <c>ShellLabels</c> anahtarına bırakır. Paket
 /// kaydı <see cref="IShellPackage"/> arkasında sahte paketle, etiketler test kökünde ölçülür;
@@ -124,7 +124,7 @@ public sealed class KabukEklentisiIlkMenuTests : IDisposable
             var verbs = type.Elements(Desktop5 + "Verb").Select(v => ((string?)v.Attribute("Id"), (string?)v.Attribute("Clsid"))).ToArray();
             Assert.Equal(new (string?, string?)[]
             {
-                ("VidShrink" + extension, ShellRegistration.CommandClsid),
+                (ShellRegistration.MenuKey + extension, ShellRegistration.CommandClsid),
                 (ShellRegistration.ShrinkMenuKey + extension, ShellRegistration.ShrinkCommandClsid)
             }, verbs);
             Assert.All(verbs, verb => Assert.Contains(verb.Item2, declared));
@@ -149,6 +149,7 @@ public sealed class KabukEklentisiIlkMenuTests : IDisposable
             Regex.Match(source, @"\$shellCommandClsid = '[^']+'").Value,
             Regex.Match(source, @"\$shellShrinkCommandClsid = '[^']+'").Value,
             Regex.Match(source, @"\$shellShrinkMenuKeyName = '[^']+'").Value,
+            Regex.Match(source, @"\$shellMenuKeyName = '[^']+'").Value,
             "function Get-Windows11ShellManifest([string]$template) " + FunctionBody(source, "Get-Windows11ShellManifest"),
             "[IO.File]::WriteAllText($args[1], (Get-Windows11ShellManifest ([IO.File]::ReadAllText($args[0]))), [Text.UTF8Encoding]::new($false))"
         };
@@ -246,7 +247,7 @@ public sealed class KabukEklentisiIlkMenuTests : IDisposable
     {
         if (!OperatingSystem.IsWindows()) return;
 
-        const string launcher = @"C:\sahte\VidShrink.exe";
+        const string launcher = @"C:\sahte\VidShrinkPlayer.exe";
         var labelPath = $@"{_testKey}\{ShellMenu.LabelKey}";
         var realBefore = Labels(ShellMenu.LabelKey);
         var before = Strings.Language;

@@ -68,8 +68,8 @@ public sealed class InstallerTests
 
         Assert.Contains("Join-Path $stageRoot 'app'", WindowsInstaller, StringComparison.Ordinal);
         Assert.Contains("Join-Path $stageRoot 'tools\\ffmpeg'", WindowsInstaller, StringComparison.Ordinal);
-        Assert.Contains("Join-Path $resolvedInstallRoot 'VidShrink.exe'", WindowsInstaller, StringComparison.Ordinal);
-        Assert.Contains("app\\VidShrink.App.exe", WindowsInstaller, StringComparison.Ordinal);
+        Assert.Contains("Join-Path $resolvedInstallRoot 'VidShrinkPlayer.exe'", WindowsInstaller, StringComparison.Ordinal);
+        Assert.Contains("app\\VidShrinkPlayer.App.exe", WindowsInstaller, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public sealed class InstallerTests
             Assert.Contains("$installedExe", line, StringComparison.Ordinal);
         }
 
-        Assert.Contains("$installedExe = Join-Path $resolvedInstallRoot 'VidShrink.exe'", WindowsInstaller, StringComparison.Ordinal);
+        Assert.Contains("$installedExe = Join-Path $resolvedInstallRoot 'VidShrinkPlayer.exe'", WindowsInstaller, StringComparison.Ordinal);
     }
 
     [Theory]

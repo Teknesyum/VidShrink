@@ -1,5 +1,5 @@
 param(
-    [string]$InstallRoot = (Join-Path $env:LOCALAPPDATA 'Programs\VidShrink'),
+    [string]$InstallRoot = (Join-Path $env:LOCALAPPDATA 'Programs\VidShrink Player'),
     [switch]$NoLaunch,
     [switch]$SkipShortcuts,
     [switch]$ShellMenuOnly,
@@ -28,11 +28,11 @@ $repository = 'Teknesyum/VidShrink'
 
 if ($Silent) { $NoLaunch = $true }
 
-$uninstallKeyName = 'Software\Microsoft\Windows\CurrentVersion\Uninstall\VidShrink'
+$uninstallKeyName = 'Software\Microsoft\Windows\CurrentVersion\Uninstall\VidShrinkPlayer'
 $commandShimFolder = 'bin'
 $commandShimFile = 'vidshrink.cmd'
 $commandShimLine = '@"%~dp0..\app\vidshrink.exe" %*'
-$setupExecutableName = 'VidShrink-Setup.exe'
+$setupExecutableName = 'VidShrinkPlayer-Setup.exe'
 
 $script:RemoveAttempts = 6
 $script:RemoveFirstDelayMilliseconds = 200
@@ -458,10 +458,10 @@ function Install-VulkanLoader([string]$WorkRoot, [string]$Destination, [string]$
     return 'downloaded'
 }
 
-$shellMenuKeyName = 'VidShrink'
-$shellShrinkMenuKeyName = 'VidShrinkKucult'
-$shellEnqueueMenuKeyName = 'VidShrinkSirayaEkle'
-$shellPackageName = 'Teknesyum.VidShrink.Shell'
+$shellMenuKeyName = 'VidShrinkPlayer'
+$shellShrinkMenuKeyName = 'VidShrinkPlayerKucult'
+$shellEnqueueMenuKeyName = 'VidShrinkPlayerSirayaEkle'
+$shellPackageName = 'Teknesyum.VidShrinkPlayer.Shell'
 $shellCommandClsid = '7B8B4A16-E3F5-4C4A-A8D2-26B2F895BE58'
 $shellShrinkCommandClsid = '565576F4-81A6-4FE2-B3E2-02E8072B334A'
 $shellShrinkTargets = @(
@@ -507,7 +507,7 @@ function Remove-Windows11ShellMenu([string]$Root) {
 
 function Get-Windows11ShellManifest([string]$template) {
     $verbs = foreach ($extension in $shellMenuExtensions) {
-        "            <desktop5:ItemType Type=`".$extension`"><desktop5:Verb Id=`"VidShrink$extension`" Clsid=`"$shellCommandClsid`" /><desktop5:Verb Id=`"$shellShrinkMenuKeyName$extension`" Clsid=`"$shellShrinkCommandClsid`" /></desktop5:ItemType>"
+        "            <desktop5:ItemType Type=`".$extension`"><desktop5:Verb Id=`"$shellMenuKeyName$extension`" Clsid=`"$shellCommandClsid`" /><desktop5:Verb Id=`"$shellShrinkMenuKeyName$extension`" Clsid=`"$shellShrinkCommandClsid`" /></desktop5:ItemType>"
     }
     return $template.Replace('__ITEM_TYPES__', ($verbs -join [Environment]::NewLine))
 }
@@ -576,8 +576,8 @@ function Get-LocalizedShellText([string]$Language, [string]$LocalesFolder, [stri
 function Get-ShellMenuLabel([string]$Language, [string]$LocalesFolder) {
     $metin = Get-LocalizedShellText $Language $LocalesFolder 'shell.menu.open'
     if ($metin) { return $metin }
-    if ($Language -eq 'tr') { return 'Bu Videoyu VidShrink ile A' + [char]0x00E7 }
-    return 'Open this video with VidShrink'
+    if ($Language -eq 'tr') { return 'Bu Videoyu VidShrink Player ile A' + [char]0x00E7 }
+    return 'Open this video with VidShrink Player'
 }
 
 function Get-ShellMenuAssociationRoot([string]$Root) {
@@ -587,15 +587,15 @@ function Get-ShellMenuAssociationRoot([string]$Root) {
 function Get-ShellShrinkMenuLabel([string]$Language, [string]$LocalesFolder) {
     $metin = Get-LocalizedShellText $Language $LocalesFolder 'shell.menu.shrink'
     if ($metin) { return $metin }
-    if ($Language -eq 'tr') { return 'VidShrink ile K' + [char]0x00FC + [char]0x00E7 + [char]0x00FC + 'lt' }
-    return 'Shrink with VidShrink'
+    if ($Language -eq 'tr') { return 'VidShrink Player ile K' + [char]0x00FC + [char]0x00E7 + [char]0x00FC + 'lt' }
+    return 'Shrink with VidShrink Player'
 }
 
 function Get-ShellEnqueueMenuLabel([string]$Language, [string]$LocalesFolder) {
     $metin = Get-LocalizedShellText $Language $LocalesFolder 'shell.menu.enqueue'
     if ($metin) { return $metin }
-    if ($Language -eq 'tr') { return 'VidShrink S' + [char]0x0131 + 'ras' + [char]0x0131 + 'na Ekle' }
-    return 'Add to VidShrink queue'
+    if ($Language -eq 'tr') { return 'VidShrink Player S' + [char]0x0131 + 'ras' + [char]0x0131 + 'na Ekle' }
+    return 'Add to VidShrink Player queue'
 }
 
 function Get-QuickShrinkLabel($Target, [string]$Language, [string]$LocalesFolder) {
@@ -692,9 +692,9 @@ function Update-ShellMenu([string]$Root, [string]$Executable, [string]$Language)
     Write-Host "Sağ tık menüsü $written uzantıya, küçültme alt menüsü $shrinkWritten girdiye yazıldı ($path menü)." -ForegroundColor Green
 }
 
-$fileAssociationProgId = 'Teknesyum.VidShrink.Video'
-$fileAssociationName = 'VidShrink'
-$fileAssociationCapabilities = 'Teknesyum\VidShrink\Capabilities'
+$fileAssociationProgId = 'Teknesyum.VidShrinkPlayer.Video'
+$fileAssociationName = 'VidShrink Player'
+$fileAssociationCapabilities = 'Teknesyum\VidShrinkPlayer\Capabilities'
 
 function Get-CurrentUserSubKey([string]$Path) {
     $trimmed = $Path.TrimEnd('\')
@@ -743,7 +743,7 @@ function Get-AppRegistrationKey([string]$Root, [string]$Name, [string]$Default) 
 }
 
 function Remove-UninstallEntry([string]$Root) {
-    $subKey = Get-AppRegistrationKey $Root 'Uninstall\VidShrink' $uninstallKeyName
+    $subKey = Get-AppRegistrationKey $Root 'Uninstall\VidShrinkPlayer'$uninstallKeyName
     $key = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey($subKey)
     if ($null -eq $key) { return $false }
     $key.Close()
@@ -828,15 +828,15 @@ function Write-CommandShim([string]$Root) {
 }
 
 function Remove-SetupCopy {
-    $copy = Join-Path $env:LOCALAPPDATA (Join-Path 'VidShrink' $setupExecutableName)
+    $copy = Join-Path $env:LOCALAPPDATA (Join-Path 'VidShrink Player' $setupExecutableName)
     if (-not (Test-Path -LiteralPath $copy)) { return }
     try { Remove-Item -LiteralPath $copy -Force -ErrorAction Stop }
     catch { }
 }
 
 function Get-OpenCommandTarget([string]$Executable) {
-    if ([IO.Path]::GetFileName($Executable) -ine 'VidShrink.exe') { return $Executable }
-    return [IO.Path]::Combine([IO.Path]::GetDirectoryName($Executable), 'app\VidShrink.App.exe')
+    if ([IO.Path]::GetFileName($Executable) -ine 'VidShrinkPlayer.exe') { return $Executable }
+    return [IO.Path]::Combine([IO.Path]::GetDirectoryName($Executable), 'app\VidShrinkPlayer.App.exe')
 }
 
 function Write-FileAssociation([string]$Root, [string]$Executable) {
@@ -894,10 +894,10 @@ function Remove-FileAssociation([string]$Root) {
     }
 
     $user.DeleteSubKeyTree("$classes\$fileAssociationProgId", $false)
-    $user.DeleteSubKeyTree("$classes\Applications\VidShrink.exe", $false)
+    $user.DeleteSubKeyTree("$classes\Applications\VidShrinkPlayer.exe", $false)
     Remove-EmptyCurrentUserKey "$classes\Applications"
     $user.DeleteSubKeyTree("$software\$fileAssociationCapabilities", $false)
-    Remove-EmptyCurrentUserKey "$software\Teknesyum\VidShrink"
+    Remove-EmptyCurrentUserKey "$software\Teknesyum\VidShrinkPlayer"
     Remove-EmptyCurrentUserKey "$software\Teknesyum"
 
     $registered = $user.OpenSubKey("$software\RegisteredApplications", $true)
@@ -928,7 +928,7 @@ function Test-ProgramsInstallRoot([string]$Root) {
 
 function Get-InstallRootHolder([string]$Root) {
     $holders = @()
-    foreach ($processName in 'VidShrink.App', 'VidShrink') {
+    foreach ($processName in 'VidShrinkPlayer.App', 'VidShrinkPlayer', 'VidShrink.App', 'VidShrink') {
         $holders += @(Get-Process $processName -ErrorAction SilentlyContinue |
             Where-Object { $_.Path -and $_.Path.StartsWith($Root, [StringComparison]::OrdinalIgnoreCase) })
     }
@@ -990,7 +990,7 @@ function Remove-InstallRoot([string]$Root) {
 
 if ($Uninstall) {
     $resolvedUninstallRoot = [IO.Path]::GetFullPath($InstallRoot)
-    foreach ($processName in 'VidShrink.App', 'VidShrink') {
+    foreach ($processName in 'VidShrinkPlayer.App', 'VidShrinkPlayer', 'VidShrink.App', 'VidShrink') {
         Get-Process $processName -ErrorAction SilentlyContinue |
             Where-Object { $_.Path -and $_.Path.StartsWith($resolvedUninstallRoot, [StringComparison]::OrdinalIgnoreCase) } |
             Stop-Process -Force
@@ -1010,9 +1010,9 @@ if ($Uninstall) {
     }
 
     if (-not $SkipShortcuts) {
-        Remove-Shortcut (Join-Path ([Environment]::GetFolderPath('Desktop')) 'VidShrink.lnk') $resolvedUninstallRoot | Out-Null
-        $startMenuDirectory = Join-Path ([Environment]::GetFolderPath('Programs')) 'VidShrink'
-        if (Remove-Shortcut (Join-Path $startMenuDirectory 'VidShrink.lnk') $resolvedUninstallRoot) {
+        Remove-Shortcut (Join-Path ([Environment]::GetFolderPath('Desktop')) 'VidShrink Player.lnk') $resolvedUninstallRoot | Out-Null
+        $startMenuDirectory = Join-Path ([Environment]::GetFolderPath('Programs')) 'VidShrink Player'
+        if (Remove-Shortcut (Join-Path $startMenuDirectory 'VidShrink Player.lnk') $resolvedUninstallRoot) {
             if (-not (Get-ChildItem -LiteralPath $startMenuDirectory -Force)) { Remove-Item -LiteralPath $startMenuDirectory -Force }
         }
     }
@@ -1026,7 +1026,7 @@ if ($Uninstall) {
     }
 
     if ($RemoveSettings) {
-        $settingsFolder = Join-Path ([Environment]::GetFolderPath('ApplicationData')) 'VidShrink'
+        $settingsFolder = Join-Path ([Environment]::GetFolderPath('ApplicationData')) 'VidShrink Player'
         if (Test-Path -LiteralPath $settingsFolder) {
             Remove-Item -LiteralPath $settingsFolder -Recurse -Force
             Write-Host "Ayar klasörü silindi: $settingsFolder" -ForegroundColor Green
@@ -1054,9 +1054,9 @@ if ($ShellMenuOnly) {
         Write-Host 'SkipShortcuts verildi; kabuğa dokunulmadı.' -ForegroundColor Yellow
         return
     }
-    $shellMenuExecutable = Join-Path $InstallRoot 'VidShrink.exe'
+    $shellMenuExecutable = Join-Path $InstallRoot 'VidShrinkPlayer.exe'
     if (-not (Test-Path -LiteralPath $shellMenuExecutable)) {
-        throw "Kurulu VidShrink.exe bulunamadı: $shellMenuExecutable. Önce kurulumu çalıştırın."
+        throw "Kurulu VidShrinkPlayer.exe bulunamadı: $shellMenuExecutable. Önce kurulumu çalıştırın."
     }
     Update-ShellMenu $RegistryRoot $shellMenuExecutable $MenuLanguage
     $associated = Write-FileAssociation $RegistryRoot $shellMenuExecutable
@@ -1200,7 +1200,7 @@ try {
     $vulkanSource = Install-VulkanLoader $workRoot $libMpvRoot (Join-Path $resolvedInstallRoot 'tools\libmpv')
     Write-Host "Vulkan yükleyicisi hazır ($vulkanSource, sha256 doğrulandı)." -ForegroundColor Cyan
 
-    foreach ($processName in 'VidShrink.App', 'VidShrink') {
+    foreach ($processName in 'VidShrinkPlayer.App', 'VidShrinkPlayer', 'VidShrink.App', 'VidShrink') {
         Get-Process $processName -ErrorAction SilentlyContinue |
             Where-Object { $_.Path -and $_.Path.StartsWith($resolvedInstallRoot, [StringComparison]::OrdinalIgnoreCase) } |
             Stop-Process -Force
@@ -1212,10 +1212,10 @@ try {
     Copy-Item -Path (Join-Path $stageRoot '*') -Destination $resolvedInstallRoot -Recurse -Force
 
     # Kısayollar başlatıcıyı gösterir; uygulamayı doğrudan gösterirlerse güncelleme hiç çalışmaz.
-    $installedExe = Join-Path $resolvedInstallRoot 'VidShrink.exe'
-    if (-not (Test-Path -LiteralPath $installedExe)) { throw 'Kurulan VidShrink.exe bulunamadı.' }
-    if (-not (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot 'app\VidShrink.App.exe'))) {
-        throw 'Kurulan app\VidShrink.App.exe bulunamadı.'
+    $installedExe = Join-Path $resolvedInstallRoot 'VidShrinkPlayer.exe'
+    if (-not (Test-Path -LiteralPath $installedExe)) { throw 'Kurulan VidShrinkPlayer.exe bulunamadı.' }
+    if (-not (Test-Path -LiteralPath (Join-Path $resolvedInstallRoot 'app\VidShrinkPlayer.App.exe'))) {
+        throw 'Kurulan app\VidShrinkPlayer.App.exe bulunamadı.'
     }
 
     $installShimFolder = Join-Path $resolvedInstallRoot $commandShimFolder
@@ -1228,15 +1228,15 @@ try {
 
     if (-not $SkipShortcuts) {
         $shell = New-Object -ComObject WScript.Shell
-        $desktopShortcut = $shell.CreateShortcut((Join-Path ([Environment]::GetFolderPath('Desktop')) 'VidShrink.lnk'))
+        $desktopShortcut = $shell.CreateShortcut((Join-Path ([Environment]::GetFolderPath('Desktop')) 'VidShrink Player.lnk'))
         $desktopShortcut.TargetPath = $installedExe
         $desktopShortcut.WorkingDirectory = $resolvedInstallRoot
         $desktopShortcut.IconLocation = "$installedExe,0"
         $desktopShortcut.Save()
 
-        $startMenuDirectory = Join-Path ([Environment]::GetFolderPath('Programs')) 'VidShrink'
+        $startMenuDirectory = Join-Path ([Environment]::GetFolderPath('Programs')) 'VidShrink Player'
         New-Item -ItemType Directory -Path $startMenuDirectory -Force | Out-Null
-        $startMenuShortcut = $shell.CreateShortcut((Join-Path $startMenuDirectory 'VidShrink.lnk'))
+        $startMenuShortcut = $shell.CreateShortcut((Join-Path $startMenuDirectory 'VidShrink Player.lnk'))
         $startMenuShortcut.TargetPath = $installedExe
         $startMenuShortcut.WorkingDirectory = $resolvedInstallRoot
         $startMenuShortcut.IconLocation = "$installedExe,0"

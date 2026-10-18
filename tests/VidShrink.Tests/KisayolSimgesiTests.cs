@@ -113,7 +113,7 @@ public sealed class KisayolSimgesiTests : IDisposable
         Assert.Equal(new[]
         {
             Path.Combine(klasor!, ShortcutIcons.ShortcutName),
-            Path.Combine(klasor!, "Programs", "VidShrink", ShortcutIcons.ShortcutName)
+            Path.Combine(klasor!, "Programs", AppIdentity.FolderName, ShortcutIcons.ShortcutName)
         }, konumlar);
     }
 

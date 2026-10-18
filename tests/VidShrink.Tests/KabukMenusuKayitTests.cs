@@ -94,7 +94,7 @@ public class KabukMenusuKayitTests
 
         WithTestRoot(root =>
         {
-            const string target = @"C:\sahte\VidShrink.exe";
+            const string target = @"C:\sahte\VidShrinkPlayer.exe";
             var extensions = ShellMenu.ExtensionsFor(ShellMenu.MenuKey);
             Assert.Equal(extensions.Count, ShellMenu.InstallOpen(target, "Ac"));
 
@@ -139,7 +139,7 @@ public class KabukMenusuKayitTests
 
         WithTestRoot(root =>
         {
-            const string target = @"C:\sahte\VidShrink.exe";
+            const string target = @"C:\sahte\VidShrinkPlayer.exe";
             Assert.Equal(ShellMenu.ExtensionsFor(ShellMenu.MenuKey).Count, ShellMenu.InstallOpen(target, "Ac"));
             ShellMenu.InstallShrink(target, "Kucult");
 

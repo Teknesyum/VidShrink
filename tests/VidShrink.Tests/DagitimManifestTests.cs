@@ -1,3 +1,4 @@
+using VidShrink.Core;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using VidShrink.Core.Setup;
@@ -78,7 +79,7 @@ public sealed class DagitimManifestTests
         }
 
         Assert.Equal($"--tag v{version}", Field(Installer, "Custom"));
-        Assert.Equal($"https://github.com/Teknesyum/VidShrink/releases/download/v{version}/VidShrink-Setup.exe", Field(Installer, "InstallerUrl"));
+        Assert.Equal($"https://github.com/Teknesyum/VidShrink/releases/download/v{version}/{AppIdentity.LegacySetupExecutable}", Field(Installer, "InstallerUrl"));
         Assert.Equal("user", Field(Installer, "Scope"));
         Assert.Matches("^[0-9A-Fa-f]{64}$", Field(Installer, "InstallerSha256"));
         Assert.Contains("Custom: --tag $tag", Job("winget"));
@@ -106,7 +107,7 @@ public sealed class DagitimManifestTests
         var cli = File.ReadAllText(Path.Combine(Root, "src", "VidShrink.Cli", "VidShrink.Cli.csproj"));
         var windowsName = Regex.Match(cli, @"<AssemblyName>([^<]+)</AssemblyName>").Groups[1].Value;
         Assert.Equal(windowsName + ".exe", root.GetProperty("bin").GetString());
-        Assert.Equal("VidShrink.App.exe", root.GetProperty("shortcuts")[0][0].GetString());
+        Assert.Equal(AppIdentity.AppExecutable, root.GetProperty("shortcuts")[0][0].GetString());
     }
 
     [Theory]

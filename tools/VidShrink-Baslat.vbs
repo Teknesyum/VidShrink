@@ -5,7 +5,7 @@ Set sh  = CreateObject("WScript.Shell")
 
 kok  = fso.GetParentFolderName(fso.GetParentFolderName(WScript.ScriptFullName))
 proj = kok & "\src\VidShrink.App\VidShrink.App.csproj"
-exe  = kok & "\src\VidShrink.App\bin\Release\net8.0\VidShrink.App.exe"
+exe  = kok & "\src\VidShrink.App\bin\Release\net8.0\VidShrinkPlayer.App.exe"
 
 dotnet = ""
 If fso.FileExists(sh.ExpandEnvironmentStrings("%LOCALAPPDATA%") & "\Microsoft\dotnet\dotnet.exe") Then

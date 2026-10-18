@@ -1,3 +1,4 @@
+using VidShrink.Core;
 using System.Diagnostics;
 using System.Text;
 using Avalonia.Controls;
@@ -169,7 +170,7 @@ public sealed class OynaticiKurtarmaTests
         var ayar = Environment.GetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH");
         Assert.False(string.IsNullOrWhiteSpace(ayar));
         var beklenenKlasor = Path.GetDirectoryName(Path.GetFullPath(ayar!))!;
-        var gercek = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VidShrink", TakilmaGunlugu.DosyaAdi);
+        var gercek = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), AppIdentity.FolderName, TakilmaGunlugu.DosyaAdi);
         var gercekOnce = File.Exists(gercek) ? File.GetLastWriteTimeUtc(gercek) : (DateTime?)null;
         if (File.Exists(TakilmaGunlugu.Dosya)) File.Delete(TakilmaGunlugu.Dosya);
 

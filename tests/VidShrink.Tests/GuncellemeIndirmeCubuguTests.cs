@@ -32,7 +32,7 @@ public sealed class GuncellemeIndirmeCubuguTests
             p.ShowUpdateProgress(new InstallProgress());
             p.UpdateReports.Enqueue(new UpdateStageReport(UpdateStagePhase.Found, 0.12, 0.20, "9.9.9", Total: 3));
             p.UpdateReports.Enqueue(new UpdateStageReport(UpdateStagePhase.Receiving, 0.50, 0.80, "9.9.9", "vidshrink-update-win-x64.zip", 100, 200));
-            p.UpdateReports.Enqueue(new UpdateStageReport(UpdateStagePhase.Downloaded, 0.85, 0.90, "9.9.9", "VidShrink.App.dll", 1, 3));
+            p.UpdateReports.Enqueue(new UpdateStageReport(UpdateStagePhase.Downloaded, 0.85, 0.90, "9.9.9", AppIdentity.AppProcessName + ".dll", 1, 3));
             Sur(p, TimeSpan.FromSeconds(2));
             var metinler = p.UpdateNotice.GetLogicalDescendants().OfType<TextBlock>().Where(t => t.IsVisible).Select(t => t.Text ?? "").ToList();
             return (satir: Satirlar(p).Count, alan: p.UpdateLogArea.IsVisible, cubuk: p.UpdateProgressRow.IsVisible,

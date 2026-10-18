@@ -77,7 +77,7 @@ internal static class YerindeGuncelleme
     {
         var start = new ProcessStartInfo
         {
-            FileName = Path.Combine(appDirectory, "VidShrink.App.exe"),
+            FileName = Path.Combine(appDirectory, AppIdentity.AppExecutable),
             WorkingDirectory = appDirectory,
             UseShellExecute = false
         };

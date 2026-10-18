@@ -95,7 +95,7 @@ public sealed class OynatRozetiPaletTests
                 VidShrink.App.Themes.PaletteCatalog.Use(ad);
                 var sozluk = new Avalonia.Markup.Xaml.Styling.ResourceInclude((Uri?)null)
                 {
-                    Source = new Uri($"avares://VidShrink.App/Themes/Palette/{ad}/Theme.axaml")
+                    Source = new Uri($"avares://VidShrinkPlayer.App/Themes/Palette/{ad}/Theme.axaml")
                 }.Loaded;
                 var takmaAdlar = VidShrink.PaletteGen.PaletteBuilder.RoleAliases.Select(a => a.Role).ToHashSet(StringComparer.Ordinal);
                 foreach (var anahtar in sozluk.Keys.OfType<string>().Where(k => k.EndsWith("Color", StringComparison.Ordinal) && !takmaAdlar.Contains(k)))

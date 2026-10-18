@@ -154,7 +154,7 @@ public sealed class KaydediciArayuzTests
     public void KaydediciAyariAnaAyarinKlasorundeDurur()
     {
         var ana = Environment.GetEnvironmentVariable("VIDSHRINK_SETTINGS_PATH");
-        var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VidShrink");
+        var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), AppIdentity.FolderName);
 
         Assert.False(string.IsNullOrWhiteSpace(ana));
         Assert.Equal(Path.GetDirectoryName(ana), RecorderSettings.Folder);

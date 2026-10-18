@@ -19,7 +19,7 @@ internal partial class RecorderView
         = async (request, folder, seconds) => await ReplayRecorder.StartAsync(request, folder, seconds);
 
     internal Func<string> ReplayFolder { get; set; } = () => Path.Combine(
-        Path.GetTempPath(), "VidShrink", $"replay-{Environment.ProcessId}");
+        Path.GetTempPath(), AppIdentity.FolderName, $"replay-{Environment.ProcessId}");
 
     internal bool ReplayRunning => _replay is not null;
 

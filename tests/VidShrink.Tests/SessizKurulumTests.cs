@@ -51,7 +51,7 @@ public sealed class SessizKurulumTests : IDisposable
             Assert.Equal(VidShrink.Core.AppIdentity.Name, key!.GetValue("DisplayName"));
             Assert.Equal("1.2.3", key.GetValue("DisplayVersion"));
             Assert.Equal("Teknesyum", key.GetValue("Publisher"));
-            Assert.Equal(Path.Combine(root, "VidShrink.exe") + ",0", key.GetValue("DisplayIcon"));
+            Assert.Equal(Path.Combine(root, AppIdentity.LauncherExecutable) + ",0", key.GetValue("DisplayIcon"));
             Assert.Equal(root, key.GetValue("InstallLocation"));
             var command = $"\"{copy}\" --uninstall --install-root \"{root}\"";
             Assert.Equal(command, key.GetValue("UninstallString"));
@@ -92,7 +92,7 @@ public sealed class SessizKurulumTests : IDisposable
 
         using (var key = Registry.CurrentUser.OpenSubKey(options.UninstallKey)) Assert.Null(key);
         Assert.Contains(SetupText.Get("setup.uninstall-entry.no-setup"), lines);
-        Assert.True(File.Exists(Path.Combine(options.InstallRoot!, "VidShrink.exe")));
+        Assert.True(File.Exists(Path.Combine(options.InstallRoot!, AppIdentity.LauncherExecutable)));
     }
 
     [Fact]
@@ -126,7 +126,7 @@ public sealed class SessizKurulumTests : IDisposable
             WorkRoot = Path.Combine(_work, "tmp")
         };
         var host = new SetupHost { SetupExecutable = Environment.ProcessPath };
-        Assert.Equal(@"Software\Microsoft\Windows\CurrentVersion\Uninstall\VidShrink", options.UninstallKey);
+        Assert.Equal(@"Software\Microsoft\Windows\CurrentVersion\Uninstall\VidShrinkPlayer", options.UninstallKey);
         Assert.Equal("Environment", options.EnvironmentKey);
         Assert.Throws<SetupException>(() => UninstallEntry.Write(options, host, Path.Combine(_work, "kok"), "1.2.3"));
         Assert.Throws<SetupException>(() => UninstallEntry.Remove(options));
@@ -137,7 +137,7 @@ public sealed class SessizKurulumTests : IDisposable
     {
         if (!OperatingSystem.IsWindows()) return;
         var (options, host) = Setup(FakeRelease());
-        var settings = Path.Combine(_work, "roaming", "VidShrink");
+        var settings = Path.Combine(_work, "roaming", AppIdentity.FolderName);
         Directory.CreateDirectory(settings);
         File.WriteAllText(Path.Combine(settings, "settings.json"), "{}");
         options = options with { SettingsFolder = settings };
@@ -297,12 +297,12 @@ public sealed class SessizKurulumTests : IDisposable
         var ffmpegZip = Path.Combine(release, "ffmpeg.zip");
         var libMpvZip = Path.Combine(release, "mpv-dev.zip");
         var vulkanZip = Path.Combine(release, "vulkan-1.zip");
-        var setupExe = Path.Combine(_work, "indirilen", "VidShrink-Setup.exe");
+        var setupExe = Path.Combine(_work, "indirilen", AppIdentity.SetupExecutable);
         Directory.CreateDirectory(Path.GetDirectoryName(setupExe)!);
         File.WriteAllText(setupExe, "kurucu");
         var options = new SetupOptions
         {
-            InstallRoot = Path.Combine(local, "Programs", "VidShrink"),
+            InstallRoot = Path.Combine(local, "Programs", AppIdentity.FolderName),
             LocalAppData = local,
             WorkRoot = Path.Combine(_work, "tmp"),
             ClassesRoot = $@"{_testKey}\Classes",
@@ -342,9 +342,9 @@ public sealed class SessizKurulumTests : IDisposable
         Directory.CreateDirectory(release);
 
         var app = Path.Combine(release, UpdateCheck.ArchiveAssetName(Rid));
-        Zip(app, ("VidShrink.App.exe", "uygulama"), ("alt/veri.txt", "veri"));
+        Zip(app, (AppIdentity.AppExecutable, "uygulama"), ("alt/veri.txt", "veri"));
         var launcher = Path.Combine(release, UpdateCheck.LauncherArchiveAssetName(Rid));
-        Zip(launcher, ("VidShrink.exe", "baslatici"));
+        Zip(launcher, (AppIdentity.LauncherExecutable, "baslatici"));
         File.WriteAllText(Path.Combine(release, $"checksums-{Rid}.txt"),
             $"{UpdateCheck.HashFile(app)}  {Path.GetFileName(app)}\n{UpdateCheck.HashFile(launcher)}  {Path.GetFileName(launcher)}\n");
 

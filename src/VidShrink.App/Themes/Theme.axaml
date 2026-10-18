@@ -369,6 +369,6 @@
   <x:String x:Key="LinkGitHub">https://github.com/Teknesyum</x:String>
   <x:String x:Key="LinkRepo">https://github.com/Teknesyum/vidshrink</x:String>
   <x:String x:Key="LinkSponsor">https://github.com/sponsors/Teknesyum</x:String>
-  <x:String x:Key="AppIconUri">avares://VidShrink.App/Assets/VidShrink.png</x:String>
+  <x:String x:Key="AppIconUri">avares://VidShrinkPlayer.App/Assets/VidShrink.png</x:String>
 
 </ResourceDictionary>

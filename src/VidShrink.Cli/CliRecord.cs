@@ -184,7 +184,7 @@ public sealed record CliRecordSettings
     {
         if (!string.IsNullOrWhiteSpace(OutputFolder)) return OutputFolder!;
         var videos = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
-        if (!string.IsNullOrEmpty(videos)) return Path.Combine(videos, "VidShrink");
+        if (!string.IsNullOrEmpty(videos)) return Path.Combine(videos, AppIdentity.FolderName);
         return Environment.CurrentDirectory;
     }
 

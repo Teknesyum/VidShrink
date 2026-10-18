@@ -67,7 +67,7 @@ function Kosum([string]$KosanExe, [string]$Iz, [string]$Etiketi, [int]$Sira, [st
     if (-not $surec.HasExited) { throw "Surec kapanmadi: pid $($surec.Id)" }
 
     $kok = Split-Path -Parent $KosanExe
-    $cocuklar = @(Get-Process -Name 'VidShrink', 'VidShrink.App' -ErrorAction SilentlyContinue |
+    $cocuklar = @(Get-Process -Name 'VidShrinkPlayer', 'VidShrinkPlayer.App' -ErrorAction SilentlyContinue |
                   Where-Object { $_.Path -and $_.Path.StartsWith($kok, [StringComparison]::OrdinalIgnoreCase) })
     foreach ($cocuk in $cocuklar) {
         try { Stop-Process -Id $cocuk.Id -Force -ErrorAction Stop } catch {}

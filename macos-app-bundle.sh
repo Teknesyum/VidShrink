@@ -23,10 +23,10 @@ bundle=$4
 [ -d "$payload" ] || { printf 'Yayın dizini yok: %s\n' "$payload" >&2; exit 1; }
 [ -f "$payload/$executable" ] || { printf 'Çalıştırılabilir yok: %s\n' "$payload/$executable" >&2; exit 1; }
 
-# Paketin içindeki ad her zaman VidShrink. Adı .App ile biten bir dosyayı çekirdek
+# Paketin içindeki ad her zaman VidShrinkPlayer. Adı .App ile biten bir dosyayı çekirdek
 # paket sanıp öldürüyor (docs/macos-ilk-kosum.md); yerel başlatıcı beklediği derleme
 # adını kendi içinde taşıdığı için yeniden adlandırma onu bozmuyor.
-host='VidShrink'
+host='VidShrinkPlayer'
 
 media_extensions='mp4 mkv mov avi webm wmv flv m4v mpg mpeg ts m2ts 3gp ogv vob asf rm rmvb divx mxf f4v mts dav gif'
 
@@ -60,11 +60,11 @@ cat > "$bundle/Contents/Info.plist" <<PLIST
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>VidShrink</string>
+    <string>VidShrink Player</string>
     <key>CFBundleDisplayName</key>
-    <string>VidShrink</string>
+    <string>VidShrink Player</string>
     <key>CFBundleIdentifier</key>
-    <string>com.teknesyum.vidshrink</string>
+    <string>com.teknesyum.vidshrinkplayer</string>
     <key>CFBundleExecutable</key>
     <string>$host</string>
     <key>CFBundleIconFile</key>

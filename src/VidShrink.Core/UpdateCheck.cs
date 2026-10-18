@@ -425,7 +425,7 @@ public static class UpdateCheck
 /// </summary>
 public sealed class UpdateSettings
 {
-    public const string FolderName = "VidShrink";
+    public const string FolderName = AppIdentity.FolderName;
     public static readonly string FileName = "settings.json";
 
     /// <summary>
@@ -920,7 +920,7 @@ public sealed record PendingLauncherSwap(string Version, IReadOnlyList<ManifestF
 ///
 /// Kazanılan şey şu: hedef ad <b>hiçbir adımda</b> boşalmaz. Eski yordam önce eski ikiliyi
 /// yana alıp sonra yenisini geçiriyordu; o iki çağrı arasında kurulum kökünde açılabilecek
-/// bir <c>VidShrink.exe</c> yoktu ve tam orada kesilen bir kurulum kendini toparlayamıyordu.
+/// bir <c>VidShrinkPlayer.exe</c> yoktu ve tam orada kesilen bir kurulum kendini toparlayamıyordu.
 /// Burada tek çağrı var: üstüne yazma kipindeki yeniden adlandırma aynı bölümde atomiktir,
 /// ad ya eskiyi ya yeniyi gösterir.
 ///
@@ -931,7 +931,7 @@ public sealed record PendingLauncherSwap(string Version, IReadOnlyList<ManifestF
 public static class LauncherUpdate
 {
     /// <summary>Kurulum kökündeki başlatıcı; kısayolların gösterdiği dosya.</summary>
-    public const string ExecutableName = "VidShrink.exe";
+    public const string ExecutableName = AppIdentity.LauncherExecutable;
 
     /// <summary>Yerini bırakmış eski ikilinin, eski yapılardan kalmışsa, aldığı ad.</summary>
     public const string RetiredSuffix = ".old";
@@ -1515,7 +1515,7 @@ public static class MacUpdate
     public const string BundleScriptName = "macos-app-bundle.sh";
 
     /// <summary>Paketin içindeki ana çalıştırılabilirin adı.</summary>
-    public const string HostName = "VidShrink";
+    public const string HostName = AppIdentity.MacHostName;
 
     /// <summary>Arşivin tamamının inmesi için tanınan süre.</summary>
     public static readonly TimeSpan DownloadTimeout = TimeSpan.FromMinutes(10);
@@ -1728,7 +1728,7 @@ public static class MacUpdate
     /// aynı iki adaya bakıyor.
     /// </summary>
     private static string HostExecutable(string payload) =>
-        File.Exists(Path.Combine(payload, HostName)) ? HostName : "VidShrink.App";
+        new[] { HostName, AppIdentity.AppProcessName, AppIdentity.LegacyMacHostName }.FirstOrDefault(name => File.Exists(Path.Combine(payload, name))) ?? AppIdentity.LegacyAppProcessName;
 
     private static async Task<string?> ReadManifestAsync(string rid, string? source, CancellationToken cancellationToken)
     {

@@ -5,7 +5,7 @@ using Xunit;
 namespace VidShrink.Tests;
 
 /// <summary>
-/// Hipersürüş G2: çift tık <c>app\VidShrink.App.exe</c>'yi doğrudan açıyor. Uygulama bakımı
+/// Hipersürüş G2: çift tık <c>app\VidShrinkPlayer.App.exe</c>'yi doğrudan açıyor. Uygulama bakımı
 /// başlatıcıya <c>--bakim</c> ile arkada yaptırıyor; kapılar, ffmpeg'in kökteki yeri ve
 /// "Yükle"den sonra rozetin ara metni burada.
 /// </summary>
@@ -19,7 +19,7 @@ public sealed class BaslaticisizCiftTikTests : IDisposable
     {
         _app = Path.Combine(_root, "kurulum", "app");
         Directory.CreateDirectory(_app);
-        _launcher = Path.Combine(_root, "kurulum", "VidShrink.exe");
+        _launcher = Path.Combine(_root, "kurulum", AppIdentity.LauncherExecutable);
         File.WriteAllText(_launcher, "baslatici");
     }
 
@@ -56,7 +56,7 @@ public sealed class BaslaticisizCiftTikTests : IDisposable
     {
         var gevsek = Path.Combine(_root, "gevsek");
         Directory.CreateDirectory(gevsek);
-        File.WriteAllText(Path.Combine(_root, "VidShrink.exe"), "baslatici");
+        File.WriteAllText(Path.Combine(_root, AppIdentity.LauncherExecutable), "baslatici");
         Assert.Null(Karar(gevsek, null, "0.8.5", "0.8.5"));
 
         File.Delete(_launcher);

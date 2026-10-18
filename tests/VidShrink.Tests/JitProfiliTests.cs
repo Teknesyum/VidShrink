@@ -1,3 +1,4 @@
+using VidShrink.Core;
 using System.Diagnostics;
 using VidShrink.App;
 
@@ -15,8 +16,8 @@ public sealed class JitProfiliTests
     [Fact]
     public void AyarYoluYoksaYerelVeriKlasorunuKullanir()
     {
-        Assert.Equal(Path.Combine("C:\\yerel", "VidShrink"), JitProfili.Klasor(null, "C:\\yerel"));
-        Assert.Equal(Path.Combine("C:\\yerel", "VidShrink"), JitProfili.Klasor(" ", "C:\\yerel"));
+        Assert.Equal(Path.Combine("C:\\yerel", AppIdentity.FolderName), JitProfili.Klasor(null, "C:\\yerel"));
+        Assert.Equal(Path.Combine("C:\\yerel", AppIdentity.FolderName), JitProfili.Klasor(" ", "C:\\yerel"));
         Assert.Null(JitProfili.Klasor(null, ""));
     }
 

@@ -19,15 +19,15 @@ namespace VidShrink.App;
 /// </summary>
 internal static class ShellMenu
 {
-    internal const string MenuKey = "VidShrink";
+    internal const string MenuKey = Core.Setup.ShellRegistration.MenuKey;
 
-    internal const string ShrinkMenuKey = "VidShrinkKucult";
+    internal const string ShrinkMenuKey = Core.Setup.ShellRegistration.ShrinkMenuKey;
 
-    internal const string EnqueueMenuKey = "VidShrinkSirayaEkle";
+    internal const string EnqueueMenuKey = Core.Setup.ShellRegistration.EnqueueMenuKey;
 
     internal const string EnqueueFlag = "--siraya-ekle";
 
-    internal const string PackageName = "Teknesyum.VidShrink.Shell";
+    internal const string PackageName = AppIdentity.ShellPackageName;
 
     internal const string ShrinkFlag = "--kucult";
 
@@ -61,7 +61,7 @@ internal static class ShellMenu
     /// süreçte, C++ tarafında çizilir ve uygulamanın dil ayarını göremez; açık kutu yazıldığı
     /// anda seçili dildeki etiket buraya da düşer, uzantı başlığı oradan okur.
     /// </summary>
-    internal const string LabelKey = "Software\\Teknesyum\\VidShrink\\ShellLabels";
+    internal const string LabelKey = "Software\\" + AppIdentity.RegistryVendorPath + "\\ShellLabels";
 
     /// <summary>
     /// Testlerin yazdığı kök; <c>HKEY_CURRENT_USER</c> altında görecelidir. Boşken yazma

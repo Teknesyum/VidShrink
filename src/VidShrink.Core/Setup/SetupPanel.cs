@@ -207,9 +207,9 @@ public static class SetupPanelLocation
     {
         if (string.IsNullOrWhiteSpace(picked)) return null;
         var full = Path.GetFullPath(picked).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-        var root = string.Equals(Path.GetFileName(full), "VidShrink", StringComparison.OrdinalIgnoreCase)
+        var root = string.Equals(Path.GetFileName(full), AppIdentity.FolderName, StringComparison.OrdinalIgnoreCase)
             ? full
-            : Path.Combine(full, "VidShrink");
+            : Path.Combine(full, AppIdentity.FolderName);
         return SetupRunner.UnderPrograms(root, localAppData) ? root : null;
     }
 
@@ -283,7 +283,7 @@ public static class SetupLaunch
     public static SetupOptions Rehearsal(SetupOptions options, string scratch) => options with
     {
         LocalAppData = scratch,
-        InstallRoot = Path.Combine(scratch, "Programs", "VidShrink"),
+        InstallRoot = Path.Combine(scratch, "Programs", AppIdentity.FolderName),
         ClassesRoot = @"Software\VidShrink-Prova\Classes",
         SkipShortcuts = true,
         NoLaunch = true,
@@ -293,5 +293,5 @@ public static class SetupLaunch
         RemoveSettings = false
     };
 
-    public static string LogPath(string localAppData) => Path.Combine(localAppData, "VidShrink", LogFileName);
+    public static string LogPath(string localAppData) => Path.Combine(localAppData, AppIdentity.FolderName, LogFileName);
 }

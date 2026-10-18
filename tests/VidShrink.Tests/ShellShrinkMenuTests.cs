@@ -20,7 +20,7 @@ public sealed record OpenEntry(string Extension, string Label, string Icon, stri
 /// T169 ölçüsünün tek düzeneği: kurulum betiği bir kez koşar, dökümler bir kez okunur,
 /// bütün kollar aynı çıktıyı okur. Gerçek <c>HKCU:\Software\Classes</c> ağacına
 /// dokunulmaz; betiğe <c>-RegistryRoot</c> ile geçici bir kök verilir ve sonunda silinir.
-/// Koşum başında, aynı desene uyan (<c>VidShrinkKucult-Test-&lt;pid&gt;-&lt;guid&gt;</c>) ve ölü
+/// Koşum başında, aynı desene uyan (<c>VidShrinkPlayerKucult-Test-&lt;pid&gt;-&lt;guid&gt;</c>) ve ölü
 /// bir PID taşıyan artık kökler toplanır: düşen bir koşumun bıraktığı kök bir sonrakinde
 /// silinir, canlı PID taşıyan kök ise dokunulmadan bırakılır.
 /// </summary>
@@ -34,7 +34,7 @@ $lines = @()
 $associations = Join-Path $Root 'SystemFileAssociations'
 if (Test-Path -LiteralPath $associations) {
     foreach ($association in Get-ChildItem -LiteralPath $associations) {
-        $verbKey = Join-Path $association.PSPath 'shell\VidShrinkKucult'
+        $verbKey = Join-Path $association.PSPath 'shell\VidShrinkPlayerKucult'
         if (-not (Test-Path -LiteralPath $verbKey)) { continue }
         $verb = Get-ItemProperty -LiteralPath $verbKey
         foreach ($child in Get-ChildItem -LiteralPath (Join-Path $verbKey 'shell')) {
@@ -52,7 +52,7 @@ $lines = @()
 $associations = Join-Path $Root 'SystemFileAssociations'
 if (Test-Path -LiteralPath $associations) {
     foreach ($association in Get-ChildItem -LiteralPath $associations) {
-        $key = Join-Path $association.PSPath 'shell\VidShrink'
+        $key = Join-Path $association.PSPath 'shell\VidShrinkPlayer'
         if (-not (Test-Path -LiteralPath $key)) { continue }
         $values = Get-ItemProperty -LiteralPath $key
         $command = (Get-ItemProperty -LiteralPath (Join-Path $key 'command')).'(default)'
@@ -76,7 +76,7 @@ foreach ($item in Get-ChildItem -LiteralPath 'HKCU:\Software' -ErrorAction Silen
 Set-Content -LiteralPath $Out -Value ($removed -join ""`n"") -Encoding UTF8
 ";
 
-    public const string RootPrefix = "VidShrinkKucult-Test-";
+    public const string RootPrefix = "VidShrinkPlayerKucult-Test-";
 
     private readonly string _work;
     private readonly string _shrinkProbe;
@@ -115,7 +115,7 @@ Set-Content -LiteralPath $Out -Value ($removed -join ""`n"") -Encoding UTF8
         var id = Guid.NewGuid().ToString("n");
         _work = Path.Combine(TestPaths.OutputRoot, "shell-shrink-menu", id);
         var installRoot = Path.Combine(_work, "kurulum");
-        Executable = Path.Combine(installRoot, "VidShrink.exe");
+        Executable = Path.Combine(installRoot, AppIdentity.LauncherExecutable);
         _shrinkProbe = Path.Combine(_work, "oku-kucult.ps1");
         _openProbe = Path.Combine(_work, "oku-ac.ps1");
         _reapProbe = Path.Combine(_work, "topla.ps1");
@@ -214,7 +214,7 @@ Set-Content -LiteralPath $Out -Value ($removed -join ""`n"") -Encoding UTF8
 
     private static void SeedRoot(string name)
         => PowerShell("-NoProfile", "-ExecutionPolicy", "Bypass", "-Command",
-            $@"New-Item -Path 'HKCU:\Software\{name}\SystemFileAssociations\.mp4\shell\VidShrinkKucult' -Force | Out-Null");
+            $@"New-Item -Path 'HKCU:\Software\{name}\SystemFileAssociations\.mp4\shell\VidShrinkPlayerKucult' -Force | Out-Null");
 
     private static void RemoveRoot(string name)
     {
@@ -297,14 +297,14 @@ Set-Content -LiteralPath $Out -Value ($removed -join ""`n"") -Encoding UTF8
 }
 
 /// <summary>
-/// T169: sağ tık menüsündeki "VidShrink ile Küçült" girdisi, hızlı hedef alt menüsü ve
+/// T169: sağ tık menüsündeki "VidShrink Player ile Küçült" girdisi, hızlı hedef alt menüsü ve
 /// geri almanın simetrisi. Bütün kollar <see cref="ShellShrinkMenuFixture"/>'ın tek
 /// koşumundan beslenir.
 /// </summary>
 public sealed class ShellShrinkMenuTests : IClassFixture<ShellShrinkMenuFixture>
 {
-    private const string TurkishOpenLabel = "Bu Videoyu VidShrink ile Aç";
-    private const string TurkishShrinkLabel = "VidShrink ile Küçült";
+    private const string TurkishOpenLabel = "Bu Videoyu VidShrink Player ile Aç";
+    private const string TurkishShrinkLabel = "VidShrink Player ile Küçült";
 
     private readonly ShellShrinkMenuFixture _fixture;
 

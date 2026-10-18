@@ -114,7 +114,7 @@
          Hyperlegible Next is the default and is EMBEDDED in the project, not
          assumed present on the system. setup.js copies the font into the app's
          Assets/Fonts and rewrites this line to an avares URI. -->
-    <FontFamily x:Key="FontSans">avares://VidShrink.App/Assets/Fonts#Atkinson Hyperlegible Next, Segoe UI</FontFamily>
+    <FontFamily x:Key="FontSans">avares://VidShrinkPlayer.App/Assets/Fonts#Atkinson Hyperlegible Next, Segoe UI</FontFamily>
     <FontFamily x:Key="FontMono">Cascadia Mono, Consolas</FontFamily>
 
     <!-- Avalonia has no Duration resource type; Transition.Duration and

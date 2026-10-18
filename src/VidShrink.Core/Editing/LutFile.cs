@@ -16,7 +16,7 @@ public static class LutFile
 
     internal static string? CacheFolderOverride { get; set; }
 
-    public static string CacheFolder => CacheFolderOverride ?? Path.Combine(Path.GetTempPath(), "VidShrink", "lut");
+    public static string CacheFolder => CacheFolderOverride ?? Path.Combine(Path.GetTempPath(), AppIdentity.FolderName, "lut");
 
     public static LutCube? Read(string? path)
     {

@@ -23,7 +23,7 @@ baktigi okunarak verilir. Ortanca sutunlari kaymayi tasir, hukum vermez.
 oncesi payi bu sayiya **girmez**. Kanca uretimde bedelsiz: degisken bosken
 `AcilisIzi.Yaz` tek bir ortam degiskeni okumasidir, `IlkKareyiBekle` hic kurulmaz.
 
-**Olculen sey `VidShrink.exe`, uygulama degil.** Baslatici uygulamayi doguruyor ve kendi
+**Olculen sey `VidShrinkPlayer.exe`, uygulama degil.** Baslatici uygulamayi doguruyor ve kendi
 cikiyor; bu yuzden surecin olmesi kosumun bittigi anlamina gelmez. Dongu izi bekler,
 oldurulen sey de baslatici degil olcum klasorunden kosan uygulamadir. Kullanicinin kurulu
 VidShrink'i ayni adi tasiyor; oldurmeden once yolun olcum klasorunun altinda oldugu
@@ -42,7 +42,7 @@ baslamaz, kosum sonrasi cpu 80 ustuyse olcum durur.
 
 EkranSaati secenekleri (G dalgasi): `--klip -` dosyasiz bos acilis; `--bitis <isaret>`
 beklenecek iz satiri (varsayilan `ilk-kare`); `--giris-a/--giris-b baslatici|app` tarafi
-`VidShrink.exe` ya da dogrudan `app\VidShrink.App.exe` ile dogurur; `--kayit-a/--kayit-b`
+`VidShrinkPlayer.exe` ya da dogrudan `app\VidShrinkPlayer.App.exe` ile dogurur; `--kayit-a/--kayit-b`
 ayar sablonundaki `fileAssociationRegisteredFor` yolunu secer (varsayilan giris). Uygulama
 `ilk-boya` isaretini ilk cizilen karede yazar. Cizim A/B: `--ortam-b VIDSHRINK_CIZIM=yazilim`
 yazilim cizimini secer; `VIDSHRINK_CIZIM_OLCUMU=oynatici:7` ya da `panel:7` ilk kareden

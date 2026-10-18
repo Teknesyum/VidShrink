@@ -589,7 +589,7 @@ public sealed class OluUyeTests
         new("RecorderWizardContent.Meeting", "yalniz-disarida", Legitimate,
             "Sihirbazin icerik sorusunun ucuncu karesi; General ile ayni yoldan uretilip ayni '_' kolunda tuketiliyor."),
         new("ArchitectureOutcome.Assumed", "varsayilan-kol", Legitimate,
-            "Iki uyeli turun olumsuz kolu. VidShrink-Setup.exe motoru (SetupRunner.RuntimeIdentifier) Read kolunu soruyor; Assumed o kosulun else'i ve kullaniciya varsayim mesajini orada yaziyor. Bicim bu yuzden hic-okunmayan-tur'den varsayilan-kol'a dondu; Read satirinin pimde isi kalmadi."),
+            "Iki uyeli turun olumsuz kolu. VidShrinkPlayer-Setup.exe motoru (SetupRunner.RuntimeIdentifier) Read kolunu soruyor; Assumed o kosulun else'i ve kullaniciya varsayim mesajini orada yaziyor. Bicim bu yuzden hic-okunmayan-tur'den varsayilan-kol'a dondu; Read satirinin pimde isi kalmadi."),
         new("FillPolicy.QualityCeiling", "varsayilan-kol", Legitimate,
             "Iki degerli siyasetin olumsuz kolu. Uc okuyan da (PlanCalculator.cs:342, MainWindow.axaml.cs:2284, EncodeRunner.cs:140) 'fillPolicy == FillPolicy.FillTarget' soruyor; tavan kolu o kosulun else'i."),
         new("PreviewQuality.Yaklasik", "varsayilan-kol", Legitimate,

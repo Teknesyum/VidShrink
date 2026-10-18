@@ -53,15 +53,15 @@ public class KurucuMenuDiliTests
     public void GomuluMetinAlmancaDegil()
     {
         var almanca = ShellRegistration.OpenLabel("de", Locales);
-        Assert.NotEqual("Open this video with VidShrink", almanca);
-        Assert.NotEqual("Bu Videoyu VidShrink ile Aç", almanca);
+        Assert.NotEqual("Open this video with VidShrink Player", almanca);
+        Assert.NotEqual("Bu Videoyu VidShrink Player ile Aç", almanca);
     }
 
     /// <summary>Klasör yoksa kurucu çakmaz, bugünkü iki dilli metne düşer.</summary>
     [Theory]
-    [InlineData("tr", "Bu Videoyu VidShrink ile Aç")]
-    [InlineData("en", "Open this video with VidShrink")]
-    [InlineData("de", "Open this video with VidShrink")]
+    [InlineData("tr", "Bu Videoyu VidShrink Player ile Aç")]
+    [InlineData("en", "Open this video with VidShrink Player")]
+    [InlineData("de", "Open this video with VidShrink Player")]
     public void KlasorYokkaGomuluMetneDusuyor(string dil, string beklenen)
     {
         var olmayan = Path.Combine(Path.GetTempPath(), "vidshrink-locales-yok-" + Guid.NewGuid().ToString("N"));
@@ -133,7 +133,7 @@ public class KurucuMenuDiliTests
         Assert.Contains("Resolve-ShellMenuLanguage", betik, StringComparison.Ordinal);
 
         var gomulu = betik.Split('\n')
-            .Where(s => s.Contains("Open this video with VidShrink", StringComparison.Ordinal))
+            .Where(s => s.Contains("Open this video with VidShrink Player", StringComparison.Ordinal))
             .ToArray();
         Assert.Single(gomulu);
     }

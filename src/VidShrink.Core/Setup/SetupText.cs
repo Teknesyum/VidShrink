@@ -4,7 +4,7 @@ namespace VidShrink.Core.Setup;
 
 /// <summary>
 /// Kurucunun konuştuğu tek yüzey. Uygulama kırk iki dil taşıyor ama kurucu onun çeviri
-/// katmanını göremiyor: <c>VidShrink-Setup.exe</c> kırpılmış, tek dosya, kendi kendine
+/// katmanını göremiyor: <c>VidShrinkPlayer-Setup.exe</c> kırpılmış, tek dosya, kendi kendine
 /// yeten bir ikili; <c>VidShrink.App</c>'e referansı yok ve <c>InvariantGlobalization</c>
 /// bilerek açık. Üstelik kurucu yayın paketini indirip açmadan <b>önce</b> de konuşuyor —
 /// o anda diskte hiç <c>Locales</c> klasörü yok.
@@ -76,11 +76,11 @@ public static class SetupText
             "indirildi",
             "downloaded"),
         ["setup.launcher.missing"] = (
-            "Kurulan VidShrink.exe bulunamadı.",
-            "The installed VidShrink.exe was not found."),
+            "Kurulan " + AppIdentity.LauncherExecutable + " bulunamadı.",
+            "The installed " + AppIdentity.LauncherExecutable + " was not found."),
         ["setup.app.missing"] = (
-            @"Kurulan app\VidShrink.App.exe bulunamadı.",
-            @"The installed app\VidShrink.App.exe was not found."),
+            @"Kurulan app\" + AppIdentity.AppExecutable + " bulunamadı.",
+            @"The installed app\" + AppIdentity.AppExecutable + " was not found."),
         ["setup.menu.modern-and-classic"] = (
             "Windows 11 birincil ve klasik",
             "Windows 11 primary and classic"),
@@ -317,7 +317,7 @@ public static class SetupText
             "Log · {0}"),
         ["setup.panel.open-app"] = (
             "Programı Aç",
-            "Open VidShrink"),
+            "Open " + AppIdentity.Name),
         ["setup.panel.open-log"] = (
             "Günlüğü Aç",
             "Open Log"),
@@ -328,25 +328,25 @@ public static class SetupText
             "Prova: geçici klasöre kurulur, kısayol ve menü yazılmaz, program açılmaz · {0}",
             "Rehearsal: installs into a temporary folder, writes no shortcut or menu, does not start the program · {0}"),
         ["shell.menu.open"] = (
-            "Bu Videoyu VidShrink ile Aç",
-            "Open this video with VidShrink"),
+            "Bu Videoyu " + AppIdentity.Name + " ile Aç",
+            "Open this video with " + AppIdentity.Name),
         ["shell.menu.shrink"] = (
-            "VidShrink ile Küçült",
-            "Shrink with VidShrink"),
+            AppIdentity.Name + " ile Küçült",
+            "Shrink with " + AppIdentity.Name),
         ["shell.menu.enqueue"] = (
-            "VidShrink Sırasına Ekle",
-            "Add to VidShrink queue"),
+            AppIdentity.Name + " Sırasına Ekle",
+            "Add to " + AppIdentity.Name + " queue"),
         ["setup.help"] = (
             """
-            VidShrink-Setup - VidShrink'i kurar, günceller ya da kaldırır.
+            VidShrinkPlayer-Setup - VidShrink'i kurar, günceller ya da kaldırır.
 
-            Kullanım: VidShrink-Setup.exe [seçenekler]
+            Kullanım: VidShrinkPlayer-Setup.exe [seçenekler]
 
               --uninstall             Kısayolları, sağ tık menüsünü, ilişkilendirmeyi, uygulama kaydını ve kurulumu kaldırır.
-              --remove-settings       Kaldırırken ayar klasörünü (%APPDATA%\VidShrink) de siler.
+              --remove-settings       Kaldırırken ayar klasörünü (%APPDATA%\VidShrink Player) de siler.
               --silent                Pencere açmaz, soru sormaz; hata olursa beklemeden 1 ile çıkar.
               --add-to-path           Kullanıcı PATH'ine <kurulum>\bin eklenir; vidshrink komutu her konsolda çalışır.
-              --install-root <yol>    Kurulum klasörü (varsayılan %LOCALAPPDATA%\Programs\VidShrink).
+              --install-root <yol>    Kurulum klasörü (varsayılan %LOCALAPPDATA%\Programs\VidShrink Player).
               --registry-root <kök>   Kayıt kökü (varsayılan HKCU:\Software\Classes).
               --menu-language <dil>   auto, tr ya da en.
               --skip-shortcuts        Kısayol, menü ve ilişkilendirme yazılmaz.
@@ -362,15 +362,15 @@ public static class SetupText
             Seçeneksiz açılınca grafik kurulum paneli gösterilir.
             """,
             """
-            VidShrink-Setup - installs, updates or removes VidShrink.
+            VidShrinkPlayer-Setup - installs, updates or removes VidShrink.
 
-            Usage: VidShrink-Setup.exe [options]
+            Usage: VidShrinkPlayer-Setup.exe [options]
 
               --uninstall             Removes the shortcuts, context menu, association, app entry and the installation.
-              --remove-settings       Also deletes the settings folder (%APPDATA%\VidShrink) on removal.
+              --remove-settings       Also deletes the settings folder (%APPDATA%\VidShrink Player) on removal.
               --silent                Opens no window and asks nothing; on error exits with 1 without waiting.
               --add-to-path           Adds <install>\bin to the user PATH so the vidshrink command works in any console.
-              --install-root <path>   Install folder (default %LOCALAPPDATA%\Programs\VidShrink).
+              --install-root <path>   Install folder (default %LOCALAPPDATA%\Programs\VidShrink Player).
               --registry-root <root>  Registry root (default HKCU:\Software\Classes).
               --menu-language <lang>  auto, tr or en.
               --skip-shortcuts        No shortcut, menu or association is written.

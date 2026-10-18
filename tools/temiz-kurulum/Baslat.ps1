@@ -63,7 +63,7 @@ foreach ($ad in 'kurucu', 'tekSatir') {
     if (-not $y) { continue }
     $cikis = if ($null -ne $y.cikisKodu) { $y.cikisKodu } else { $y.kabukCikisKodu }
     Write-Host ("{0,-9} gecti={1} cikis={2} sure={3}sn exe={4} ffmpeg={5} libmpv={6} ayakta={7} pencere={8}" -f $ad, $y.gecti, $cikis, $y.saniye,
-        $y.kurulum.'VidShrink.exe', $y.kurulum.ffmpegKodlama, $y.kurulum.libmpvYuklendi, $y.acilis.ayakta, $y.acilis.pencere)
+        $y.kurulum.'VidShrinkPlayer.exe', $y.kurulum.ffmpegKodlama, $y.kurulum.libmpvYuklendi, $y.acilis.ayakta, $y.acilis.pencere)
 }
 Write-Host "Ayrıntı: $bitti"
 

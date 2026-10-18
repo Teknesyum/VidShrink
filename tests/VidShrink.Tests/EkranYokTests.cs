@@ -121,7 +121,7 @@ public sealed class EkranYokTests
         }
     }
 
-    private static string UygulamaDll => Path.Combine(AppContext.BaseDirectory, "VidShrink.App.dll");
+    private static string UygulamaDll => Path.Combine(AppContext.BaseDirectory, AppIdentity.AppProcessName + ".dll");
 
     private sealed record Kosum(int Kod, string Cikti, string Hata, long Ms);
 

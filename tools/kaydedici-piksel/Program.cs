@@ -25,7 +25,7 @@ internal sealed class ProbeApp : Application
         foreach (var path in Dictionaries)
             Resources.MergedDictionaries.Add(new ResourceInclude(new Uri("avares://VidShrink.KaydediciPiksel/"))
             {
-                Source = new Uri("avares://VidShrink.App/" + path)
+                Source = new Uri("avares://VidShrinkPlayer.App/" + path)
             });
         Styles.Add(new FluentTheme());
     }

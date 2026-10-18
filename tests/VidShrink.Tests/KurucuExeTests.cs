@@ -40,7 +40,7 @@ public sealed class KurucuExeTests : IDisposable
 
         var install = Path.Combine(_work, "kurulum");
         Directory.CreateDirectory(install);
-        var launcher = Path.Combine(install, "VidShrink.exe");
+        var launcher = Path.Combine(install, AppIdentity.LauncherExecutable);
         File.WriteAllText(launcher, "baslatici");
 
         var scriptRoot = $@"{_testKey}\Betik\Classes";
@@ -55,9 +55,9 @@ public sealed class KurucuExeTests : IDisposable
         var scriptTree = Dump(scriptRoot);
         Assert.True(scriptTree.Count > 700, scriptTree.Count.ToString());
         Assert.Equal(scriptTree, Dump(engineRoot));
-        var appCommand = $"\"{Path.Combine(install, "app", "VidShrink.App.exe")}\" \"%1\"";
-        Assert.Equal(appCommand, Value($@"{scriptRoot}\Teknesyum.VidShrink.Video\shell\open\command"));
-        Assert.Equal(appCommand, Value($@"{engineRoot}\Applications\VidShrink.exe\shell\open\command"));
+        var appCommand = $"\"{Path.Combine(install, "app", AppIdentity.AppExecutable)}\" \"%1\"";
+        Assert.Equal(appCommand, Value($@"{scriptRoot}\Teknesyum.VidShrinkPlayer.Video\shell\open\command"));
+        Assert.Equal(appCommand, Value($@"{engineRoot}\Applications\VidShrinkPlayer.exe\shell\open\command"));
 
         var removed = Script("-RemoveShellMenu", "-RemoveFileAssociation", "-RegistryRoot", $@"HKCU:\{scriptRoot}");
         Assert.True(removed.Code == 0, removed.Output);
@@ -75,7 +75,7 @@ public sealed class KurucuExeTests : IDisposable
 
         var install = Path.Combine(_work, "kurulum");
         Directory.CreateDirectory(install);
-        var launcher = Path.Combine(install, "VidShrink.exe");
+        var launcher = Path.Combine(install, AppIdentity.LauncherExecutable);
         File.WriteAllText(launcher, "baslatici");
         var engineRoot = $@"{_testKey}\Eski\Classes";
         var associations = $@"{engineRoot}\{ShellRegistration.CapabilitiesPath}\FileAssociations";
@@ -119,12 +119,12 @@ public sealed class KurucuExeTests : IDisposable
         if (!OperatingSystem.IsWindows()) return;
 
         Assert.False(ShellRegistration.WriteAllowed(Environment.ProcessPath, @"Software\Classes"));
-        Assert.True(ShellRegistration.WriteAllowed(@"C:\x\VidShrink-Setup.exe", @"Software\Classes\"));
+        Assert.True(ShellRegistration.WriteAllowed(@"C:\x\VidShrinkPlayer-Setup.exe", @"Software\Classes\"));
         Assert.True(ShellRegistration.WriteAllowed(Environment.ProcessPath, $@"{_testKey}\Classes"));
-        Assert.False(ShellRegistration.WriteAllowed(@"C:\x\VidShrink.exe", @"Software\Classes"));
+        Assert.False(ShellRegistration.WriteAllowed(@"C:\x\VidShrinkPlayer.exe", @"Software\Classes"));
 
-        Assert.Throws<SetupException>(() => ShellRegistration.WriteMenus(@"Software\Classes", @"C:\x\VidShrink.exe", "tr"));
-        Assert.Throws<SetupException>(() => ShellRegistration.WriteFileAssociation(@"Software\Classes", @"C:\x\VidShrink.exe"));
+        Assert.Throws<SetupException>(() => ShellRegistration.WriteMenus(@"Software\Classes", @"C:\x\VidShrinkPlayer.exe", "tr"));
+        Assert.Throws<SetupException>(() => ShellRegistration.WriteFileAssociation(@"Software\Classes", @"C:\x\VidShrinkPlayer.exe"));
         Assert.Throws<SetupException>(() => ShellRegistration.RemoveMenus(@"Software\Classes"));
         Assert.Throws<SetupException>(() => ShellRegistration.RemoveFileAssociation(@"Software\Classes"));
     }
@@ -177,7 +177,7 @@ public sealed class KurucuExeTests : IDisposable
         await LockedFolder.RunAsync(_work, _ =>
         {
             calls++;
-            if (!holder.Exited) throw new IOException("VidShrink.App.exe acik");
+            if (!holder.Exited) throw new IOException("VidShrinkPlayer.App.exe acik");
         }, host, CancellationToken.None);
 
         Assert.Equal(1, holder.Kills);
@@ -217,7 +217,7 @@ public sealed class KurucuExeTests : IDisposable
         await SetupRunner.InstallAsync(options, host, CancellationToken.None);
 
         Assert.Equal(new[] { 2 }, haberAnindakiKisayol);
-        var exe = Path.Combine(options.InstallRoot, "VidShrink.exe");
+        var exe = Path.Combine(options.InstallRoot, AppIdentity.LauncherExecutable);
         Assert.All(shortcuts.Targets.Values, hedef => Assert.Equal(exe, hedef));
     }
 
@@ -237,8 +237,8 @@ public sealed class KurucuExeTests : IDisposable
         var root = options.InstallRoot;
         Assert.Equal("1.2.3", result.Version);
         Assert.False(File.Exists(old));
-        Assert.Equal("baslatici", File.ReadAllText(Path.Combine(root, "VidShrink.exe")));
-        Assert.Equal("uygulama", File.ReadAllText(Path.Combine(root, "app", "VidShrink.App.exe")));
+        Assert.Equal("baslatici", File.ReadAllText(Path.Combine(root, AppIdentity.LauncherExecutable)));
+        Assert.Equal("uygulama", File.ReadAllText(Path.Combine(root, "app", AppIdentity.AppExecutable)));
         Assert.Equal("veri", File.ReadAllText(Path.Combine(root, "app", "alt", "veri.txt")));
         Assert.Equal("1.2.3", File.ReadAllText(Path.Combine(root, "app", ".update-version")));
         Assert.Equal("1.2.3", File.ReadAllText(Path.Combine(root, ".launcher-version")));
@@ -251,11 +251,11 @@ public sealed class KurucuExeTests : IDisposable
         Assert.False(result.LibMpvReused);
         Assert.Empty(Directory.GetDirectories(Path.GetDirectoryName(root)!, "VidShrink.eski-*"));
 
-        var exe = Path.Combine(root, "VidShrink.exe");
+        var exe = Path.Combine(root, AppIdentity.LauncherExecutable);
         Assert.Equal(new[] { exe, exe }, shortcuts.Targets.Values);
-        Assert.Equal($"\"{exe}\" --kucult 100 \"%1\"", Value($@"{options.ClassesRoot}\SystemFileAssociations\.mp4\shell\VidShrinkKucult\shell\06-size-100\command"));
-        Assert.Equal($"\"{Path.Combine(root, "app", "VidShrink.App.exe")}\" \"%1\"", Value($@"{options.ClassesRoot}\Teknesyum.VidShrink.Video\shell\open\command"));
-        Assert.Equal($"{exe},0", Value($@"{options.ClassesRoot}\Teknesyum.VidShrink.Video\DefaultIcon"));
+        Assert.Equal($"\"{exe}\" --kucult 100 \"%1\"", Value($@"{options.ClassesRoot}\SystemFileAssociations\.mp4\shell\VidShrinkPlayerKucult\shell\06-size-100\command"));
+        Assert.Equal($"\"{Path.Combine(root, "app", AppIdentity.AppExecutable)}\" \"%1\"", Value($@"{options.ClassesRoot}\Teknesyum.VidShrinkPlayer.Video\shell\open\command"));
+        Assert.Equal($"{exe},0", Value($@"{options.ClassesRoot}\Teknesyum.VidShrinkPlayer.Video\DefaultIcon"));
 
         var again = await SetupRunner.InstallAsync(options, host, CancellationToken.None);
         Assert.True(again.LibMpvReused);
@@ -267,7 +267,7 @@ public sealed class KurucuExeTests : IDisposable
         Assert.False(Directory.Exists(root));
         Assert.DoesNotContain(shortcuts.Targets.Keys, File.Exists);
         Assert.Null(Value($@"{options.ClassesRoot}\SystemFileAssociations\.mp4\shell\VidShrink\command"));
-        Assert.Null(Value($@"{options.ClassesRoot}\Teknesyum.VidShrink.Video\shell\open\command"));
+        Assert.Null(Value($@"{options.ClassesRoot}\Teknesyum.VidShrinkPlayer.Video\shell\open\command"));
     }
 
     [Fact]
@@ -332,7 +332,7 @@ public sealed class KurucuExeTests : IDisposable
         File.WriteAllText(checksums, tampered);
 
         var (options, host, _) = Setup(release);
-        var old = Path.Combine(options.InstallRoot, "VidShrink.exe");
+        var old = Path.Combine(options.InstallRoot, AppIdentity.LauncherExecutable);
         Directory.CreateDirectory(options.InstallRoot);
         File.WriteAllText(old, "eski baslatici");
 
@@ -371,12 +371,12 @@ public sealed class KurucuExeTests : IDisposable
         var release = FakeRelease(launcherExecutable: "Baska.exe");
         var (options, host, _) = Setup(release);
         Directory.CreateDirectory(options.InstallRoot);
-        File.WriteAllText(Path.Combine(options.InstallRoot, "VidShrink.exe"), "eski baslatici");
+        File.WriteAllText(Path.Combine(options.InstallRoot, AppIdentity.LauncherExecutable), "eski baslatici");
 
         var failure = await Assert.ThrowsAsync<SetupException>(() => SetupRunner.InstallAsync(options, host, CancellationToken.None));
 
         Assert.Equal(SetupText.Get("setup.launcher.missing"), failure.Message);
-        Assert.Equal("eski baslatici", File.ReadAllText(Path.Combine(options.InstallRoot, "VidShrink.exe")));
+        Assert.Equal("eski baslatici", File.ReadAllText(Path.Combine(options.InstallRoot, AppIdentity.LauncherExecutable)));
         Assert.False(File.Exists(Path.Combine(options.InstallRoot, "Baska.exe")));
         Assert.Empty(Directory.GetDirectories(Path.GetDirectoryName(options.InstallRoot)!, "VidShrink.eski-*"));
     }
@@ -394,18 +394,18 @@ public sealed class KurucuExeTests : IDisposable
     {
         if (!OperatingSystem.IsWindows()) return;
 
-        var kok = Path.Combine(_work, "Programs", "VidShrink");
+        var kok = Path.Combine(_work, "Programs", AppIdentity.FolderName);
         var kenar = kok + SetupRunner.AsideSuffix + "abc12345";
         Directory.CreateDirectory(Path.Combine(kok, SetupRunner.AppFolder));
-        File.WriteAllText(Path.Combine(kok, SetupRunner.AppFolder, "VidShrink.App.exe"), "yarim");
+        File.WriteAllText(Path.Combine(kok, SetupRunner.AppFolder, AppIdentity.AppExecutable), "yarim");
         Directory.CreateDirectory(kenar);
-        File.WriteAllText(Path.Combine(kenar, "VidShrink.exe"), "eski baslatici");
+        File.WriteAllText(Path.Combine(kenar, AppIdentity.LauncherExecutable), "eski baslatici");
 
         var gunluk = new List<string>();
         var host = new SetupHost { Delay = (_, _) => Task.CompletedTask, Log = gunluk.Add };
 
         FileStream? tutamak = kilitli
-            ? new FileStream(Path.Combine(kok, SetupRunner.AppFolder, "VidShrink.App.exe"),
+            ? new FileStream(Path.Combine(kok, SetupRunner.AppFolder, AppIdentity.AppExecutable),
                 FileMode.Open, FileAccess.Read, FileShare.Read)
             : null;
         try
@@ -420,14 +420,14 @@ public sealed class KurucuExeTests : IDisposable
         if (kilitli)
         {
             Assert.True(Directory.Exists(kenar));
-            Assert.Equal("eski baslatici", File.ReadAllText(Path.Combine(kenar, "VidShrink.exe")));
+            Assert.Equal("eski baslatici", File.ReadAllText(Path.Combine(kenar, AppIdentity.LauncherExecutable)));
             var duyuru = Assert.Single(gunluk, satir => satir.Contains(kenar, StringComparison.Ordinal));
             Assert.Contains(kok, duyuru, StringComparison.Ordinal);
         }
         else
         {
             Assert.False(Directory.Exists(kenar));
-            Assert.Equal("eski baslatici", File.ReadAllText(Path.Combine(kok, "VidShrink.exe")));
+            Assert.Equal("eski baslatici", File.ReadAllText(Path.Combine(kok, AppIdentity.LauncherExecutable)));
             Assert.DoesNotContain(gunluk, satir => satir.Contains(SetupRunner.AsideSuffix, StringComparison.Ordinal));
         }
     }
@@ -495,14 +495,14 @@ public sealed class KurucuExeTests : IDisposable
         Assert.Throws<SetupException>(() => SetupDownloads.TagFromLocation(new Uri("https://github.com/Teknesyum/VidShrink/releases")));
 
         var hash = new string('a', 64);
-        var table = SetupDownloads.ParseChecksums($"{hash.ToUpperInvariant()}  vidshrink-win-x64.zip\r\n{new string('b', 64)} *VidShrink-Setup.exe\nbozuk satir\n");
+        var table = SetupDownloads.ParseChecksums($"{hash.ToUpperInvariant()}  vidshrink-win-x64.zip\r\n{new string('b', 64)} *VidShrinkPlayer-Setup.exe\nbozuk satir\n");
         Assert.Equal(2, table.Count);
         Assert.Equal(hash, table["vidshrink-win-x64.zip"]);
-        Assert.Equal(new string('b', 64), table["VidShrink-Setup.exe"]);
+        Assert.Equal(new string('b', 64), table[AppIdentity.SetupExecutable]);
 
         SetupDownloads.AssertChecksum(table, "vidshrink-win-x64.zip", hash.ToUpperInvariant());
         Assert.Equal(SetupText.Get("setup.checksum.missing", "yok.zip"), Assert.Throws<SetupException>(() => SetupDownloads.AssertChecksum(table, "yok.zip", hash)).Message);
-        Assert.Equal(SetupText.Get("setup.checksum.mismatch", "VidShrink-Setup.exe", new string('b', 64), hash), Assert.Throws<SetupException>(() => SetupDownloads.AssertChecksum(table, "VidShrink-Setup.exe", hash)).Message);
+        Assert.Equal(SetupText.Get("setup.checksum.mismatch", AppIdentity.SetupExecutable, new string('b', 64), hash), Assert.Throws<SetupException>(() => SetupDownloads.AssertChecksum(table, AppIdentity.SetupExecutable, hash)).Message);
 
         Assert.Equal(@"Software\Classes", SetupOptions.NormalizeRegistryRoot(@"HKCU:\Software\Classes\"));
         Assert.Throws<SetupException>(() => SetupOptions.NormalizeRegistryRoot(@"HKLM:\Software\Classes"));
@@ -640,7 +640,7 @@ public sealed class KurucuExeTests : IDisposable
         var shortcuts = new FakeShortcuts();
         var options = new SetupOptions
         {
-            InstallRoot = Path.Combine(local, "Programs", "VidShrink"),
+            InstallRoot = Path.Combine(local, "Programs", AppIdentity.FolderName),
             LocalAppData = local,
             WorkRoot = Path.Combine(_work, "tmp"),
             ClassesRoot = $@"{_testKey}\Classes",
@@ -672,13 +672,13 @@ public sealed class KurucuExeTests : IDisposable
         return (options, host, shortcuts);
     }
 
-    private string FakeRelease(string launcherExecutable = "VidShrink.exe")
+    private string FakeRelease(string launcherExecutable = AppIdentity.LauncherExecutable)
     {
         var release = Path.Combine(_work, "yayin-" + Guid.NewGuid().ToString("n")[..6]);
         Directory.CreateDirectory(release);
 
         var app = Path.Combine(release, UpdateCheck.ArchiveAssetName(Rid));
-        Zip(app, ("VidShrink.App.exe", "uygulama"), ("alt/veri.txt", "veri"));
+        Zip(app, (AppIdentity.AppExecutable, "uygulama"), ("alt/veri.txt", "veri"));
         var launcher = Path.Combine(release, UpdateCheck.LauncherArchiveAssetName(Rid));
         Zip(launcher, (launcherExecutable, "baslatici"));
         File.WriteAllText(Path.Combine(release, $"checksums-{Rid}.txt"),
@@ -777,7 +777,7 @@ public sealed class KurucuExeTests : IDisposable
 
         public TimeSpan Waited { get; private set; }
 
-        public string Name => "VidShrink.App";
+        public string Name => AppIdentity.AppProcessName;
 
         public int Id => 4242;
 

@@ -406,7 +406,7 @@ internal partial class PlayerView
     private async Task<bool> CopyFrameAsync(IPlaybackEngine engine)
     {
         var copied = false;
-        var folder = FrameScratchFolder ?? Path.Combine(Path.GetTempPath(), "VidShrink");
+        var folder = FrameScratchFolder ?? Path.Combine(Path.GetTempPath(), AppIdentity.FolderName);
         var scratch = Path.Combine(folder, "frame-" + Guid.NewGuid().ToString("N") + PlayerSettings.PngExtension);
         try
         {

@@ -7,9 +7,9 @@
          xmlns:desktop4="http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
          xmlns:desktop5="http://schemas.microsoft.com/appx/manifest/desktop/windows10/5"
          IgnorableNamespaces="uap uap10 rescap com desktop4 desktop5">
-  <Identity Name="Teknesyum.VidShrink.Shell" Publisher="CN=Teknesyum" Version="1.0.0.0" ProcessorArchitecture="x64" />
+  <Identity Name="Teknesyum.VidShrinkPlayer.Shell" Publisher="CN=Teknesyum" Version="1.0.0.0" ProcessorArchitecture="x64" />
   <Properties>
-    <DisplayName>VidShrink</DisplayName>
+    <DisplayName>VidShrink Player</DisplayName>
     <PublisherDisplayName>Teknesyum</PublisherDisplayName>
     <Logo>shell\Assets\StoreLogo.png</Logo>
     <uap10:AllowExternalContent>true</uap10:AllowExternalContent>
@@ -18,12 +18,12 @@
     <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.22000.0" MaxVersionTested="10.0.22631.0" />
   </Dependencies>
   <Applications>
-    <Application Id="VidShrink" Executable="VidShrink.exe" uap10:TrustLevel="mediumIL" uap10:RuntimeBehavior="win32App">
-      <uap:VisualElements AppListEntry="none" DisplayName="VidShrink" Description="VidShrink" BackgroundColor="transparent" Square150x150Logo="shell\Assets\Square150x150Logo.png" Square44x44Logo="shell\Assets\Square44x44Logo.png" />
+    <Application Id="VidShrinkPlayer" Executable="VidShrinkPlayer.exe" uap10:TrustLevel="mediumIL" uap10:RuntimeBehavior="win32App">
+      <uap:VisualElements AppListEntry="none" DisplayName="VidShrink Player" Description="VidShrink Player" BackgroundColor="transparent" Square150x150Logo="shell\Assets\Square150x150Logo.png" Square44x44Logo="shell\Assets\Square44x44Logo.png" />
       <Extensions>
         <com:Extension Category="windows.comServer">
           <com:ComServer>
-            <com:SurrogateServer DisplayName="VidShrink">
+            <com:SurrogateServer DisplayName="VidShrink Player">
               <com:Class Id="7B8B4A16-E3F5-4C4A-A8D2-26B2F895BE58" Path="shell\VidShrink.ShellExtension.dll" ThreadingModel="STA" />
               <com:Class Id="565576F4-81A6-4FE2-B3E2-02E8072B334A" Path="shell\VidShrink.ShellExtension.dll" ThreadingModel="STA" />
             </com:SurrogateServer>

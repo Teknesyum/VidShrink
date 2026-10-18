@@ -9,33 +9,33 @@ namespace VidShrink.Core.Setup;
 
 public static class ShellRegistration
 {
-    public const string MenuKey = "VidShrink";
+    public const string MenuKey = AppIdentity.CompactName;
 
-    public const string ShrinkMenuKey = "VidShrinkKucult";
+    public const string ShrinkMenuKey = AppIdentity.CompactName + "Kucult";
 
-    public const string EnqueueMenuKey = "VidShrinkSirayaEkle";
+    public const string EnqueueMenuKey = AppIdentity.CompactName + "SirayaEkle";
 
     /// <summary>"Aç" ve "sıraya ekle" fiillerinin yazıldığı uzantılar: video, ses ve çalma listesi.</summary>
     public static IReadOnlyList<string> OpenMenuExtensions { get; } =
         ShellIntegration.MediaExtensions.Concat(ShellIntegration.PlayerMenuExtensions).ToArray();
 
-    public const string PackageName = "Teknesyum.VidShrink.Shell";
+    public const string PackageName = AppIdentity.ShellPackageName;
 
     public const string CommandClsid = "7B8B4A16-E3F5-4C4A-A8D2-26B2F895BE58";
 
     public const string ShrinkCommandClsid = "565576F4-81A6-4FE2-B3E2-02E8072B334A";
 
-    public const string ProgId = "Teknesyum.VidShrink.Video";
+    public const string ProgId = AppIdentity.ProgId;
 
-    public const string AssociationName = "VidShrink";
+    public const string AssociationName = AppIdentity.Name;
 
-    public const string CapabilitiesPath = @"Teknesyum\VidShrink\Capabilities";
+    public const string CapabilitiesPath = AppIdentity.RegistryVendorPath + @"\Capabilities";
 
-    public const string SetupExecutableName = "VidShrink-Setup.exe";
+    public const string SetupExecutableName = AppIdentity.SetupExecutable;
 
-    public const string LauncherExecutableName = "VidShrink.exe";
+    public const string LauncherExecutableName = AppIdentity.LauncherExecutable;
 
-    public const string AppExecutableName = "VidShrink.App.exe";
+    public const string AppExecutableName = AppIdentity.AppExecutable;
 
     public static bool WriteAllowed(string? processPath, string classesRoot) =>
         !SetupOptions.IsDefaultClassesRoot(classesRoot) ||
@@ -149,7 +149,7 @@ public static class ShellRegistration
     public static string RenderPackageManifest(string template)
     {
         var verbs = ShellIntegration.MediaExtensions.Select(extension =>
-            $"            <desktop5:ItemType Type=\".{extension}\"><desktop5:Verb Id=\"VidShrink{extension}\" Clsid=\"{CommandClsid}\" /><desktop5:Verb Id=\"{ShrinkMenuKey}{extension}\" Clsid=\"{ShrinkCommandClsid}\" /></desktop5:ItemType>");
+            $"            <desktop5:ItemType Type=\".{extension}\"><desktop5:Verb Id=\"{MenuKey}{extension}\" Clsid=\"{CommandClsid}\" /><desktop5:Verb Id=\"{ShrinkMenuKey}{extension}\" Clsid=\"{ShrinkCommandClsid}\" /></desktop5:ItemType>");
         return template.Replace("__ITEM_TYPES__", string.Join(Environment.NewLine, verbs));
     }
 
@@ -408,7 +408,7 @@ public static class ShellRegistration
         user.DeleteSubKeyTree($@"{classes}\Applications\{LauncherExecutableName}", false);
         RemoveEmpty($@"{classes}\Applications");
         user.DeleteSubKeyTree($@"{software}\{CapabilitiesPath}", false);
-        RemoveEmpty($@"{software}\Teknesyum\VidShrink");
+        RemoveEmpty($@"{software}\{AppIdentity.RegistryVendorPath}");
         RemoveEmpty($@"{software}\Teknesyum");
 
         using (var registered = user.OpenSubKey($@"{software}\RegisteredApplications", true))

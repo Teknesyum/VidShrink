@@ -38,7 +38,7 @@ public sealed class KullaniciOnAyarTests
             Environment.SetEnvironmentVariable(SettingsVariable, settings);
             Assert.Equal(Path.Combine(folder, PresetLibrary.UserFileName), PresetLibrary.DefaultUserPath);
 
-            var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VidShrink");
+            var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), AppIdentity.FolderName);
             Assert.False(PresetLibrary.DefaultUserPath.StartsWith(appData, StringComparison.OrdinalIgnoreCase));
 
             PresetLibrary.SaveUser(Sample);

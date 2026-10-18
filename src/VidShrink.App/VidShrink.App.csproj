@@ -2,7 +2,9 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <AssemblyTitle>VidShrink</AssemblyTitle>
+    <AssemblyTitle>VidShrink Player</AssemblyTitle>
+    <AssemblyName>VidShrinkPlayer.App</AssemblyName>
+    <RootNamespace>VidShrink.App</RootNamespace>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -65,7 +67,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <MacHostName>VidShrink</MacHostName>
+    <MacHostName>VidShrinkPlayer</MacHostName>
   </PropertyGroup>
 
   <!-- macOS yayını iki dosya daha taşıyor: kurulum betiğinin uygulama paketini kurarken

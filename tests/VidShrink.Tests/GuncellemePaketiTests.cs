@@ -20,8 +20,8 @@ public sealed class GuncellemePaketiTests : IDisposable
         catch (IOException) { }
     }
 
-    private static readonly string[] AppNames = { "VidShrink.App.dll", "a.dll", "runtimes/win-x64/native/b.dll" };
-    private const string LauncherName = "VidShrink.exe";
+    private static readonly string[] AppNames = { AppIdentity.AppProcessName + ".dll", "a.dll", "runtimes/win-x64/native/b.dll" };
+    private const string LauncherName = AppIdentity.LauncherExecutable;
     private const string ShellName = "shell/kabuk.dll";
 
     private string Folder(string name)

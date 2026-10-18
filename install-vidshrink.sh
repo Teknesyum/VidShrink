@@ -2,9 +2,9 @@
 set -eu
 
 repository='Teknesyum/VidShrink'
-install_root=${VIDSHRINK_INSTALL_ROOT:-"$HOME/.local/share/vidshrink"}
+install_root=${VIDSHRINK_INSTALL_ROOT:-"$HOME/.local/share/vidshrink-player"}
 bin_directory="$HOME/.local/bin"
-bundle_path="$HOME/Applications/VidShrink.app"
+bundle_path="$HOME/Applications/VidShrink Player.app"
 
 say() {
     printf '%s\n' "$1"
@@ -27,9 +27,9 @@ require_command() {
 
 data_directory="$HOME/.local/share"
 applications_directory="$data_directory/applications"
-desktop_entry="$applications_directory/vidshrink.desktop"
+desktop_entry="$applications_directory/vidshrink-player.desktop"
 mime_directory="$data_directory/mime"
-mime_package="$mime_directory/packages/vidshrink.xml"
+mime_package="$mime_directory/packages/vidshrink-player.xml"
 
 media_types='mp4 video/mp4
 mkv video/x-matroska
@@ -100,7 +100,7 @@ MIME
     {
         printf '[Desktop Entry]\n'
         printf 'Type=Application\n'
-        printf 'Name=VidShrink\n'
+        printf 'Name=VidShrink Player\n'
         printf 'Comment=Play and shrink videos\n'
         printf 'Exec="%s" %%F\n' "$escaped_executable"
         [ -z "$icon_line" ] || printf '%s\n' "$icon_line"
@@ -434,7 +434,7 @@ printf '%s' "$version" > "$stage_root/.update-version"
 # Burada başlatıcı yok: kısayol doğrudan uygulamayı gösterir. macOS'ta güncellemeyi
 # uygulamanın kendisi yapıyor (paketin tamamını takas ederek), Windows'ta başlatıcı.
 staged_executable=''
-for candidate in VidShrink VidShrink.App; do
+for candidate in VidShrinkPlayer VidShrinkPlayer.App VidShrink VidShrink.App; do
     if [ -f "$stage_root/$candidate" ]; then
         staged_executable=$candidate
         break
@@ -443,6 +443,16 @@ done
 [ -n "$staged_executable" ] || fail 'Kurulan VidShrink çalıştırılabiliri bulunamadı.'
 
 mkdir -p "$bin_directory"
+
+if [ -z "${VIDSHRINK_INSTALL_ROOT:-}" ]; then
+    for legacy in "$HOME/Applications/VidShrink.app" "$data_directory/vidshrink" \
+        "$applications_directory/vidshrink.desktop" "$mime_directory/packages/vidshrink.xml"; do
+        if [ -e "$legacy" ]; then
+            rm -rf "$legacy"
+            note "Eski ad altındaki kurulum kaldırıldı: $legacy"
+        fi
+    done
+fi
 
 # macOS'ta kurulum uygulama paketinin kendisi; yük hem ~/.local/share hem paket içinde
 # tutulsa yayın iki kez saklanmış olurdu. Paket yerelde üretildiği için karantina
@@ -455,7 +465,7 @@ if [ "$(uname -s)" = 'Darwin' ] && [ -f "$stage_root/macos-app-bundle.sh" ]; the
     mkdir -p "$HOME/Applications"
     sh "$stage_root/macos-app-bundle.sh" "$stage_root" "$staged_executable" "$version" "$bundle_path" || \
         fail 'Uygulama paketi üretilemedi.'
-    installed_executable="$bundle_path/Contents/MacOS/VidShrink"
+    installed_executable="$bundle_path/Contents/MacOS/VidShrinkPlayer"
     say "VidShrink $version kuruldu: $bundle_path"
 else
     if [ "$(uname -s)" = 'Darwin' ]; then
@@ -478,7 +488,7 @@ ln -sf "$installed_executable" "$bin_directory/vidshrink"
 # değiştirmek imzayı bozacağı için birim paketin tamamı, yeni paket yanına hazırlanıp
 # çıkışta takas ediliyor. Paketsiz kurulumda ve Linux'ta güncelleme bu betiği yeniden
 # çalıştırmakla olur.
-if [ "$installed_executable" = "$bundle_path/Contents/MacOS/VidShrink" ]; then
+if [ "$installed_executable" = "$bundle_path/Contents/MacOS/VidShrinkPlayer" ]; then
     say 'Yeni sürümleri uygulama kendisi kuruyor; Ayarlar altından kapatabilirsiniz.'
 else
     say 'Güncellemek için bu komutu yeniden çalıştırın.'

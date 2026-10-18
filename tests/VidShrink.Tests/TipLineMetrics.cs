@@ -109,7 +109,7 @@ internal static class TipLineMetrics
         AppHost.Ensure();
 
         return new Typeface(new FontFamily(
-            "avares://VidShrink.App/Assets/Fonts#Atkinson Hyperlegible Next"));
+            "avares://VidShrinkPlayer.App/Assets/Fonts#Atkinson Hyperlegible Next"));
     }
 
     /// <summary>

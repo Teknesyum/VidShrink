@@ -226,9 +226,9 @@ public sealed class KurucuPanelTests
         var programs = SetupPanelLocation.ProgramsOf(yerel);
         Assert.Equal(Path.Combine(yerel, "Programs"), programs);
 
-        Assert.Equal(Path.Combine(programs, "VidShrink"), SetupPanelLocation.Resolve(programs, yerel));
-        Assert.Equal(Path.Combine(programs, "Araclar", "VidShrink"), SetupPanelLocation.Resolve(Path.Combine(programs, "Araclar"), yerel));
-        Assert.Equal(Path.Combine(programs, "vidshrink"), SetupPanelLocation.Resolve(Path.Combine(programs, "vidshrink") + Path.DirectorySeparatorChar, yerel));
+        Assert.Equal(Path.Combine(programs, AppIdentity.FolderName), SetupPanelLocation.Resolve(programs, yerel));
+        Assert.Equal(Path.Combine(programs, "Araclar", AppIdentity.FolderName), SetupPanelLocation.Resolve(Path.Combine(programs, "Araclar"), yerel));
+        Assert.Equal(Path.Combine(programs, AppIdentity.FolderName.ToLowerInvariant()), SetupPanelLocation.Resolve(Path.Combine(programs, AppIdentity.FolderName.ToLowerInvariant()) + Path.DirectorySeparatorChar, yerel));
 
         Assert.Null(SetupPanelLocation.Resolve(yerel, yerel));
         Assert.Null(SetupPanelLocation.Resolve(Path.Combine(yerel, "Baska"), yerel));
@@ -272,7 +272,7 @@ public sealed class KurucuPanelTests
         var prova = SetupLaunch.Rehearsal(options, scratch);
 
         Assert.Equal(scratch, prova.LocalAppData);
-        Assert.Equal(Path.Combine(scratch, "Programs", "VidShrink"), prova.InstallRoot);
+        Assert.Equal(Path.Combine(scratch, "Programs", AppIdentity.FolderName), prova.InstallRoot);
         Assert.True(SetupRunner.UnderPrograms(prova.InstallRoot, prova.LocalAppData));
         Assert.False(prova.DefaultRegistry);
         Assert.True(prova.SkipShortcuts);
@@ -284,7 +284,7 @@ public sealed class KurucuPanelTests
         Assert.False(SetupLaunch.RehearsalRequested(null));
         Assert.False(SetupLaunch.RehearsalRequested(" "));
         Assert.True(SetupLaunch.RehearsalRequested("1"));
-        Assert.Equal(Path.Combine(scratch, "VidShrink", "kurulum.log"), SetupLaunch.LogPath(scratch));
+        Assert.Equal(Path.Combine(scratch, AppIdentity.FolderName, "kurulum.log"), SetupLaunch.LogPath(scratch));
     }
 
     [Theory]

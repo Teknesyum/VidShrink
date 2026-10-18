@@ -21,8 +21,8 @@ internal static class KullaniciKlasoru
     private static string Sec(Environment.SpecialFolder sistem, string evAlti)
     {
         var klasor = Bul(sistem);
-        if (!string.IsNullOrEmpty(klasor)) return Path.Combine(klasor, "VidShrink");
+        if (!string.IsNullOrEmpty(klasor)) return Path.Combine(klasor, Core.AppIdentity.FolderName);
         var ev = Bul(Environment.SpecialFolder.UserProfile);
-        return string.IsNullOrEmpty(ev) ? Environment.CurrentDirectory : Path.Combine(ev, evAlti, "VidShrink");
+        return string.IsNullOrEmpty(ev) ? Environment.CurrentDirectory : Path.Combine(ev, evAlti, Core.AppIdentity.FolderName);
     }
 }

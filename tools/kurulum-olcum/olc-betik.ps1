@@ -7,7 +7,7 @@ $kok = Join-Path $cikti 'kok'
 $local = Join-Path $kok 'local'
 $tmp = Join-Path $kok 'tmp'
 New-Item -ItemType Directory -Force $local, $tmp | Out-Null
-$installRoot = Join-Path $local 'Programs\VidShrink'
+$installRoot = Join-Path $local 'Programs\VidShrink Player'
 $betik = (Resolve-Path (Join-Path $PSScriptRoot '..\..\Install-VidShrink.ps1')).Path
 
 $argumanlar = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $betik, '-InstallRoot', $installRoot, '-NoLaunch')

@@ -10,7 +10,7 @@
 public static class ShortcutIcons
 {
     public const string DirectoryVariable = "VIDSHRINK_SHORTCUT_DIR";
-    public const string ShortcutName = "VidShrink.lnk";
+    public const string ShortcutName = AppIdentity.ShortcutName;
     public const string MarkerName = ".shortcut-icon-version";
 
     public static IReadOnlyList<string> Locations()
@@ -20,12 +20,12 @@ public static class ShortcutIcons
             return new[]
             {
                 Path.Combine(overridden, ShortcutName),
-                Path.Combine(overridden, "Programs", "VidShrink", ShortcutName)
+                Path.Combine(overridden, "Programs", AppIdentity.FolderName, ShortcutName)
             };
         return new[]
         {
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), ShortcutName),
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs), "VidShrink", ShortcutName)
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs), AppIdentity.FolderName, ShortcutName)
         };
     }
 

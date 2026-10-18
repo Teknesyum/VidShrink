@@ -494,11 +494,11 @@ public sealed class KaydediciPencereTests
         try
         {
             KullaniciKlasoru.Bul = k => k == Environment.SpecialFolder.UserProfile ? "/home/ali" : "";
-            Assert.Equal(Path.Combine("/home/ali", "Videos", "VidShrink"), new RecorderSettings().ResolveFolder());
-            Assert.Equal(Path.Combine("/home/ali", "Pictures", "VidShrink"), KullaniciKlasoru.Resim());
+            Assert.Equal(Path.Combine("/home/ali", "Videos", AppIdentity.FolderName), new RecorderSettings().ResolveFolder());
+            Assert.Equal(Path.Combine("/home/ali", "Pictures", AppIdentity.FolderName), KullaniciKlasoru.Resim());
 
             KullaniciKlasoru.Bul = k => k == Environment.SpecialFolder.MyVideos ? "/home/ali/Filmler" : "/home/ali";
-            Assert.Equal(Path.Combine("/home/ali/Filmler", "VidShrink"), new RecorderSettings().ResolveFolder());
+            Assert.Equal(Path.Combine("/home/ali/Filmler", AppIdentity.FolderName), new RecorderSettings().ResolveFolder());
             Assert.Equal("/elle", new RecorderSettings { OutputFolder = "/elle" }.ResolveFolder());
         }
         finally

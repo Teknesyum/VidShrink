@@ -18,7 +18,7 @@ using VidShrink.Ffmpeg;
 namespace VidShrink.App.Recorder;
 
 /// <summary>
-/// <c>VidShrink.exe --recorder-selftest</c>: renk kartini (<see cref="RecorderColourCard"/>)
+/// <c>VidShrinkPlayer.exe --recorder-selftest</c>: renk kartini (<see cref="RecorderColourCard"/>)
 /// ekranin ortasinda bir saniye gosterir, ayni bolgeyi kaydin HDR'den SDR'ye ceviren yolundan ve
 /// 8 bit <c>bgra</c> yoldan birer kare yakalar, sonucu <c>recorder-last.log</c>'a yazar ve
 /// kapanir. Cikis kodu: 0 gecti, 1 esik asildi, 2 sinama kosamadi. Kullanicidan tek komut ister;

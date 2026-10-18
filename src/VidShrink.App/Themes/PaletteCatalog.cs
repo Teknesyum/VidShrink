@@ -33,7 +33,7 @@ namespace VidShrink.App.Themes;
 /// </summary>
 public static class PaletteCatalog
 {
-    private const string Folder = "avares://VidShrink.App/Themes/Palette";
+    private const string Folder = "avares://VidShrinkPlayer.App/Themes/Palette";
 
     /// <summary>Açık ve koyu paleti ayıran zemin parlaklığı.</summary>
     private const double LightThreshold = 0.5;

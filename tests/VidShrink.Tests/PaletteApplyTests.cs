@@ -154,7 +154,7 @@ public sealed class PaletteApplyTests
                 var merged = Application.Current!.Resources.MergedDictionaries;
                 var kurulmamis = new Avalonia.Markup.Xaml.Styling.ResourceInclude((Uri?)null)
                 {
-                    Source = new Uri("avares://VidShrink.App/Themes/Theme.axaml")
+                    Source = new Uri("avares://VidShrinkPlayer.App/Themes/Theme.axaml")
                 };
                 merged.Add(kurulmamis);
                 try
@@ -162,7 +162,7 @@ public sealed class PaletteApplyTests
                     PaletteCatalog.Use(name);
                     var sozluk = new Avalonia.Markup.Xaml.Styling.ResourceInclude((Uri?)null)
                     {
-                        Source = new Uri($"avares://VidShrink.App/Themes/Palette/{name}/Theme.axaml")
+                        Source = new Uri($"avares://VidShrinkPlayer.App/Themes/Palette/{name}/Theme.axaml")
                     }.Loaded;
                     var takmaAdlar = VidShrink.PaletteGen.PaletteBuilder.RoleAliases.Select(a => a.Role).ToHashSet(StringComparer.Ordinal);
                     foreach (var key in sozluk.Keys.OfType<string>().Where(k => k.EndsWith("Color", StringComparison.Ordinal) && !takmaAdlar.Contains(k)))
@@ -397,7 +397,7 @@ public sealed class PaletteApplyTests
     }
 
     private static string? PaletteDegeri(string palet, string anahtar)
-        => new Avalonia.Markup.Xaml.Styling.ResourceInclude((Uri?)null) { Source = new Uri($"avares://VidShrink.App/Themes/Palette/{palet}/Theme.axaml") }
+        => new Avalonia.Markup.Xaml.Styling.ResourceInclude((Uri?)null) { Source = new Uri($"avares://VidShrinkPlayer.App/Themes/Palette/{palet}/Theme.axaml") }
             .Loaded.TryGetValue(anahtar, out var deger) ? deger?.ToString() : null;
 
     private static string Kok => Path.Combine(TipSources.Root, ".calisma", "tema");

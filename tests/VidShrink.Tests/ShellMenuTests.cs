@@ -15,15 +15,15 @@ namespace VidShrink.Tests;
 /// </summary>
 public sealed class ShellMenuTests : IDisposable
 {
-    private const string TurkishLabel = "Bu Videoyu VidShrink ile Aç";
-    private const string EnglishLabel = "Open this video with VidShrink";
+    private const string TurkishLabel = "Bu Videoyu VidShrink Player ile Aç";
+    private const string EnglishLabel = "Open this video with VidShrink Player";
 
     private const string ProbeScript = @"param([string]$Root, [string]$Out)
 $lines = @()
 $associations = Join-Path $Root 'SystemFileAssociations'
 if (Test-Path -LiteralPath $associations) {
     foreach ($association in Get-ChildItem -LiteralPath $associations) {
-        $key = Join-Path $association.PSPath 'shell\VidShrink'
+        $key = Join-Path $association.PSPath 'shell\VidShrinkPlayer'
         if (-not (Test-Path -LiteralPath $key)) { continue }
         $values = Get-ItemProperty -LiteralPath $key
         $command = (Get-ItemProperty -LiteralPath (Join-Path $key 'command')).'(default)'
@@ -47,7 +47,7 @@ Set-Content -LiteralPath $Out -Value ($lines -join ""`n"") -Encoding UTF8
         var id = Guid.NewGuid().ToString("n");
         _work = Path.Combine(TestPaths.OutputRoot, "shell-menu", id);
         _installRoot = Path.Combine(_work, "kurulum");
-        _executable = Path.Combine(_installRoot, "VidShrink.exe");
+        _executable = Path.Combine(_installRoot, AppIdentity.LauncherExecutable);
         _probe = Path.Combine(_work, "oku.ps1");
         _registryRoot = $@"HKCU:\Software\VidShrink-Test-{Environment.ProcessId}-{id}";
 

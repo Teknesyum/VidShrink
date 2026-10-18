@@ -16,7 +16,7 @@ using Xunit;
 namespace VidShrink.Tests;
 
 /// <summary>
-/// "VidShrink ile Küçült" alt menüsü: ön ayar kütüphanesinden seçilmiş altı hedef, üç yazıcı
+/// "VidShrink Player ile Küçült" alt menüsü: ön ayar kütüphanesinden seçilmiş altı hedef, üç yazıcı
 /// (PowerShell kurucusu, kurucu exe, uygulama) aynı anahtarı, etiketi ve komutu yazıyor.
 /// Kayıt defterine yalnız test anahtarı altında yazılır; gerçek sağ tık dalının değeri her
 /// kayıt defteri testinin sonunda değişmemiş olmalı. Alt menü klasik kabuk yoludur ve
@@ -200,7 +200,7 @@ public sealed class KabukKucultAltMenuTests : IDisposable
 
     /// <summary>
     /// Kaldırma alt menüyü bütünüyle siler: üç yazıcıdan sonra hiçbir uzantıda
-    /// <c>VidShrinkKucult</c> kalmaz. Olumsuz kontrol: silmeden önce anahtar vardı.
+    /// <c>VidShrinkPlayerKucult</c> kalmaz. Olumsuz kontrol: silmeden önce anahtar vardı.
     /// </summary>
     [Fact]
     [SupportedOSPlatform("windows")]
@@ -251,7 +251,7 @@ public sealed class KabukKucultAltMenuTests : IDisposable
     {
         if (!OperatingSystem.IsWindows()) return;
 
-        const string launcher = @"C:\sahte\VidShrink.exe";
+        const string launcher = @"C:\sahte\VidShrinkPlayer.exe";
         var appRoot = $@"{_testKey}\Uygulama";
         var associations = appRoot + @"\Software\Classes\SystemFileAssociations";
         var realBefore = RealShrinkTree();
@@ -371,7 +371,7 @@ public sealed class KabukKucultAltMenuTests : IDisposable
             File.Copy(Path.Combine(LocalesSource, language, "main.json"), Path.Combine(folder, "main.json"));
         }
 
-        var launcher = Path.Combine(install, "VidShrink.exe");
+        var launcher = Path.Combine(install, AppIdentity.LauncherExecutable);
         File.WriteAllText(launcher, "baslatici");
         return (install, launcher);
     }

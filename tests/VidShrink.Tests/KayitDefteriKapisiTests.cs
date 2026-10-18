@@ -1,3 +1,4 @@
+using VidShrink.Core;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
 using VidShrink.App;
@@ -7,20 +8,20 @@ namespace VidShrink.Tests;
 
 /// <summary>
 /// Test konağı gerçek HKCU\Software\Classes'a yazdığında kullanıcının sağ tık menüsünün 312
-/// değeri testhost.exe'yi gösterdi. Yazma kökü süreç adına bağlı: yalnız VidShrink.App.exe
+/// değeri testhost.exe'yi gösterdi. Yazma kökü süreç adına bağlı: yalnız VidShrinkPlayer.App.exe
 /// gerçek kayda yazar, gerisi ya enjekte edilen test köküne yazar ya hiç yazmaz. Ad yetmez:
-/// derleme çıktısındaki VidShrink.App.exe de kayda yazıyordu; izin yalnız kurulu düzende,
-/// exe bir <c>app\</c> klasöründeyken ve bir üstte <c>VidShrink.exe</c> başlatıcısı varken.
+/// derleme çıktısındaki VidShrinkPlayer.App.exe de kayda yazıyordu; izin yalnız kurulu düzende,
+/// exe bir <c>app\</c> klasöründeyken ve bir üstte <c>VidShrinkPlayer.exe</c> başlatıcısı varken.
 /// </summary>
 public class KayitDefteriKapisiTests
 {
     [WindowsTheory("kayıt defteri kapısı Windows yolunu ayrıştırır")]
-    [InlineData(@"C:\Users\x\AppData\Local\Programs\VidShrink\app\VidShrink.App.exe", true)]
-    [InlineData(@"C:\repo\src\VidShrink.App\bin\Release\net8.0\VidShrink.App.exe", false)]
-    [InlineData(@"C:\Users\x\AppData\Local\Programs\VidShrink\VidShrink.App.exe", false)]
-    [InlineData(@"C:\Users\x\AppData\Local\Programs\VidShrink\app\VidShrink.exe", false)]
+    [InlineData(@"C:\Users\x\AppData\Local\Programs\VidShrink\app\VidShrinkPlayer.App.exe", true)]
+    [InlineData(@"C:\repo\src\VidShrink.App\bin\Release\net8.0\VidShrinkPlayer.App.exe", false)]
+    [InlineData(@"C:\Users\x\AppData\Local\Programs\VidShrink\VidShrinkPlayer.App.exe", false)]
+    [InlineData(@"C:\Users\x\AppData\Local\Programs\VidShrink\app\VidShrinkPlayer.exe", false)]
     [InlineData(@"C:\repo\tests\bin\Debug\net8.0\testhost.exe", false)]
-    [InlineData(@"C:\Users\x\AppData\Local\Programs\VidShrink\VidShrink.exe", false)]
+    [InlineData(@"C:\Users\x\AppData\Local\Programs\VidShrink\VidShrinkPlayer.exe", false)]
     [InlineData(@"C:\tools\VidShrink.Bench.exe", false)]
     [InlineData(@"C:\dotnet\dotnet.exe", false)]
     [InlineData("", false)]
@@ -40,10 +41,10 @@ public class KayitDefteriKapisiTests
     {
         var root = Path.Combine(TipSources.Root, ".calisma", "kayit-defteri-kapisi", Guid.NewGuid().ToString("N"));
         var install = Path.Combine(root, "Programs", "VidShrink");
-        var app = Path.Combine(install, "app", "VidShrink.App.exe");
-        var launcher = Path.Combine(install, "VidShrink.exe");
-        var build = Path.Combine(root, "src", "VidShrink.App", "bin", "Release", "net8.0", "VidShrink.App.exe");
-        var inside = Path.Combine(root, "tek", "app", "VidShrink.App.exe");
+        var app = Path.Combine(install, "app", AppIdentity.AppExecutable);
+        var launcher = Path.Combine(install, AppIdentity.LauncherExecutable);
+        var build = Path.Combine(root, "src", "VidShrink.App", "bin", "Release", "net8.0", AppIdentity.AppExecutable);
+        var inside = Path.Combine(root, "tek", "app", AppIdentity.AppExecutable);
         void Touch(string path)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
@@ -55,10 +56,10 @@ public class KayitDefteriKapisiTests
             Touch(app);
             Touch(launcher);
             Touch(build);
-            Touch(Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(build)!)!, "VidShrink.exe"));
-            Touch(Path.Combine(Path.GetDirectoryName(build)!, "VidShrink.exe"));
+            Touch(Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(build)!)!, AppIdentity.LauncherExecutable));
+            Touch(Path.Combine(Path.GetDirectoryName(build)!, AppIdentity.LauncherExecutable));
             Touch(inside);
-            Touch(Path.Combine(Path.GetDirectoryName(inside)!, "VidShrink.exe"));
+            Touch(Path.Combine(Path.GetDirectoryName(inside)!, AppIdentity.LauncherExecutable));
 
             Assert.True(RegistryWriteGate.Allows(app));
             Assert.Equal(string.Empty, ShellMenu.WriteRoot(app, null));
@@ -140,9 +141,9 @@ public class KayitDefteriKapisiTests
         ShellMenu.TestRoot = root;
         try
         {
-            Assert.Equal(ShellMenu.ExtensionsFor(ShellMenu.MenuKey).Count, ShellMenu.InstallOpen(@"C:\sahte\VidShrink.App.exe", "Ac"));
+            Assert.Equal(ShellMenu.ExtensionsFor(ShellMenu.MenuKey).Count, ShellMenu.InstallOpen(@"C:\sahte\VidShrinkPlayer.App.exe", "Ac"));
             using (var command = Registry.CurrentUser.OpenSubKey(root + @"\Software\Classes\SystemFileAssociations\.mp4\shell\" + ShellMenu.MenuKey + @"\command"))
-                Assert.Equal("\"C:\\sahte\\VidShrink.App.exe\" \"%1\"", command?.GetValue(string.Empty));
+                Assert.Equal("\"C:\\sahte\\VidShrinkPlayer.App.exe\" \"%1\"", command?.GetValue(string.Empty));
             Assert.Equal(before, Before());
         }
         finally

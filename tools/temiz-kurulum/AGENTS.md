@@ -2,7 +2,7 @@
 
 Kurulum yollarını hiçbir şey yüklü olmayan Windows'ta dener.
 
-- `Temiz-Kos.ps1` — konukta koşar. 2. yol: `VidShrink-Setup.exe --console --no-launch`, sonra `--uninstall`.
+- `Temiz-Kos.ps1` — konukta koşar. 2. yol: `VidShrinkPlayer-Setup.exe --console --no-launch`, sonra `--uninstall`.
   3. yol: README'deki tek satır birebir, TEMP ve LOCALAPPDATA boşluklu/Türkçe klasörde; panele `PostMessage`
   ile Enter ("Kur"), bitince yine Enter ("Programı Aç"). Her yolda kurulu exe, ffmpeg ile 1 sn kodlama,
   libmpv + vulkan-1 yüklemesi, uygulamanın `-AyaktaSaniye` sonra pencereyle ayakta olduğu, ekran görüntüsü.

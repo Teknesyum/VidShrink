@@ -12,7 +12,7 @@ public static class SetupRunner
 {
     public const string AppFolder = "app";
 
-    public const string AppExecutable = "VidShrink.App.exe";
+    public const string AppExecutable = AppIdentity.AppExecutable;
 
     public const string AsideSuffix = ".eski-";
 
@@ -230,8 +230,8 @@ public static class SetupRunner
         if (!options.SkipShortcuts && host.Shortcuts is { } shortcuts)
         {
             var (desktop, startMenu) = ShortcutPaths(options, host);
-            RemoveShortcut(shortcuts, Path.Combine(desktop, "VidShrink.lnk"), root);
-            if (RemoveShortcut(shortcuts, Path.Combine(startMenu, "VidShrink.lnk"), root) &&
+            RemoveShortcut(shortcuts, Path.Combine(desktop, AppIdentity.ShortcutName), root);
+            if (RemoveShortcut(shortcuts, Path.Combine(startMenu, AppIdentity.ShortcutName), root) &&
                 Directory.Exists(startMenu) && !Directory.EnumerateFileSystemEntries(startMenu).Any())
             {
                 Directory.Delete(startMenu);
@@ -331,8 +331,8 @@ public static class SetupRunner
 
     private static (string Desktop, string StartMenu) ShortcutPaths(SetupOptions options, SetupHost host) =>
         options.ShortcutDirectory is { } directory
-            ? (directory, Path.Combine(directory, "Programs", "VidShrink"))
-            : (host.DesktopDirectory, Path.Combine(host.ProgramsDirectory, "VidShrink"));
+            ? (directory, Path.Combine(directory, "Programs", AppIdentity.FolderName))
+            : (host.DesktopDirectory, Path.Combine(host.ProgramsDirectory, AppIdentity.FolderName));
 
     private static void WriteShortcuts(SetupOptions options, SetupHost host, string root, string installedExe)
     {
@@ -340,8 +340,8 @@ public static class SetupRunner
         var (desktop, startMenu) = ShortcutPaths(options, host);
         Directory.CreateDirectory(desktop);
         Directory.CreateDirectory(startMenu);
-        shortcuts.Write(Path.Combine(desktop, "VidShrink.lnk"), installedExe, root, installedExe + ",0");
-        shortcuts.Write(Path.Combine(startMenu, "VidShrink.lnk"), installedExe, root, installedExe + ",0");
+        shortcuts.Write(Path.Combine(desktop, AppIdentity.ShortcutName), installedExe, root, installedExe + ",0");
+        shortcuts.Write(Path.Combine(startMenu, AppIdentity.ShortcutName), installedExe, root, installedExe + ",0");
     }
 
     private static bool RemoveShortcut(IShortcutWriter shortcuts, string path, string root)

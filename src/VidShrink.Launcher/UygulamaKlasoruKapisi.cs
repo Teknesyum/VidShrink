@@ -16,7 +16,7 @@ internal static class UygulamaKlasoruKapisi
 
     internal const string GecikmeDegiskeni = "VIDSHRINK_BAKIM_GECIKMESI_MS";
 
-    internal const string UygulamaSurecAdi = "VidShrink.App";
+    internal const string UygulamaSurecAdi = VidShrink.Core.AppIdentity.AppProcessName;
 
     internal static string Ad(string appDirectory)
     {

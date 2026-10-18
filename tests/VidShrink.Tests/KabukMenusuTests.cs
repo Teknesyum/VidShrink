@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using VidShrink.App;
 using VidShrink.Core;
+using VidShrink.Core.Setup;
 using Xunit;
 
 namespace VidShrink.Tests;
@@ -22,16 +23,17 @@ public class KabukMenusuTests
 
     /// <summary>Anahtar adları ve paket adı iki tarafta birebir aynı.</summary>
     [Theory]
-    [InlineData("VidShrink", "shellMenuKeyName")]
-    [InlineData("VidShrinkKucult", "shellShrinkMenuKeyName")]
-    [InlineData("Teknesyum.VidShrink.Shell", "shellPackageName")]
+    [InlineData("VidShrinkPlayer", "shellMenuKeyName")]
+    [InlineData("VidShrinkPlayerKucult", "shellShrinkMenuKeyName")]
+    [InlineData("Teknesyum.VidShrinkPlayer.Shell", "shellPackageName")]
     [InlineData("--kucult", "shellShrinkFlag")]
-    [InlineData("VidShrinkSirayaEkle", "shellEnqueueMenuKeyName")]
+    [InlineData("VidShrinkPlayerSirayaEkle", "shellEnqueueMenuKeyName")]
     [InlineData("--siraya-ekle", "shellEnqueueFlag")]
     public void AnahtarAdlariIkiTaraftaAyni(string value, string scriptVariable)
     {
         Assert.Contains($"${scriptVariable} = '{value}'", Script());
-        Assert.Contains($"\"{value}\"", Code());
+        var bound = new[] { ShellRegistration.MenuKey, ShellRegistration.ShrinkMenuKey, ShellRegistration.EnqueueMenuKey, ShellRegistration.PackageName };
+        Assert.True(bound.Contains(value) || Code().Contains($"\"{value}\"", StringComparison.Ordinal), value);
     }
 
     /// <summary>Uzantı listesi iki tarafta aynı kümeyi taşıyor.</summary>

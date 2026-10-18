@@ -310,7 +310,7 @@ internal partial class RecorderView
 
         try
         {
-            var scratch = Path.Combine(Path.GetTempPath(), "VidShrink", "auto");
+            var scratch = Path.Combine(Path.GetTempPath(), AppIdentity.FolderName, "auto");
             var result = await RecorderAutoProbe.ChooseAsync(
                 request, scratch, candidates, RecorderAutoProbe.TrialSeconds, _autoStop.Token);
 

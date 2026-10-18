@@ -13,7 +13,7 @@ kullanılamaz. Bu yüzden her varlık adı hedef `rid` ile biter. Dört `rid` va
 | Varlık | Ad | İçerik |
 |---|---|---|
 | Arşiv | `vidshrink-<rid>.zip` | Yayın klasörünün tamamı, `manifest.json` dahil |
-| Başlatıcı arşivi | `vidshrink-launcher-<rid>.zip` | Yalnız `win-x64`; kurulum kökündeki `VidShrink.exe` |
+| Başlatıcı arşivi | `vidshrink-launcher-<rid>.zip` | Yalnız `win-x64`; kurulum kökündeki `VidShrinkPlayer.exe` |
 | Manifest | `manifest-<rid>.json` | Arşivin kökündeki `manifest.json` ile **birebir aynı baytlar** |
 | Sağlama | `checksums-<rid>.txt` | Yukarıdaki varlıkların SHA-256'sı |
 
@@ -59,7 +59,7 @@ UTF-8, BOM yok, iki boşluk girintili, sonunda tek satır sonu var.
     { "path": "VidShrink.App.dll", "sha256": "e3b0c442...", "size": 123456 }
   ],
   "launcher": [
-    { "path": "VidShrink.exe", "sha256": "7d865e95...", "size": 145408 }
+    { "path": "VidShrinkPlayer.exe", "sha256": "7d865e95...", "size": 145408 }
   ]
 }
 ```
@@ -93,7 +93,7 @@ Kurallar:
 
 ## launcher dizisi
 
-Kurulum iki katmanlıdır: kurulum kökünde kısayolun gösterdiği `VidShrink.exe` durur,
+Kurulum iki katmanlıdır: kurulum kökünde kısayolun gösterdiği `VidShrinkPlayer.exe` durur,
 uygulamanın kendisi onun altındaki `app\` klasöründedir. Güncellemeyi uygulayan da o
 başlatıcıdır, çünkü Windows çalışan bir `.exe`'nin üstüne yazdırmaz. Başlatıcının kendisi
 de güncellenmelidir ve `app\` klasörüne ait olmadığı için `files` içinde yeri yoktur;
@@ -104,7 +104,7 @@ uyarlar. Ayrıldıkları üç nokta:
 
 - **Yollar kurulum köküne görelidir**, yayın klasörüne değil. `files` içindeki
   `VidShrink.App.dll` kurulu düzende `app\VidShrink.App.dll` olur; `launcher` içindeki
-  `VidShrink.exe` doğrudan kurulum kökündeki `VidShrink.exe`'dir. İki dizi aynı adı
+  `VidShrinkPlayer.exe` doğrudan kurulum kökündeki `VidShrinkPlayer.exe`'dir. İki dizi aynı adı
   taşıyabilir ve aynı dosyayı göstermez.
 - **Satırlar `vidshrink-launcher-<rid>.zip` arşivinden iner**, `vidshrink-<rid>.zip`
   arşivinden değil. Güncelleyici `files` farkını uygulama arşivinden, `launcher` farkını

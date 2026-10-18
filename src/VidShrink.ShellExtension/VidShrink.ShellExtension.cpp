@@ -11,7 +11,9 @@ static const CLSID CLSID_VidShrinkCommand =
 static const CLSID CLSID_VidShrinkShrinkCommand =
 { 0x565576f4, 0x81a6, 0x4fe2, { 0xb3, 0xe2, 0x02, 0xe8, 0x07, 0x2b, 0x33, 0x4a } };
 
-static const wchar_t* const LabelKey = L"Software\\Teknesyum\\VidShrink\\ShellLabels";
+#define VIDSHRINK_APP_NAME L"VidShrink Player"
+
+static const wchar_t* const LabelKey = L"Software\\Teknesyum\\VidShrinkPlayer\\ShellLabels";
 
 static const wchar_t* const ShrinkFlag = L"--kucult";
 
@@ -47,7 +49,7 @@ static HRESULT LauncherPath(wchar_t* path, DWORD capacity)
 {
     if (!GetModuleFileNameW(moduleHandle, path, capacity)) return HRESULT_FROM_WIN32(GetLastError());
     if (!PathRemoveFileSpecW(path) || !PathRemoveFileSpecW(path)) return E_FAIL;
-    if (!PathAppendW(path, L"VidShrink.exe")) return E_FAIL;
+    if (!PathAppendW(path, L"VidShrinkPlayer.exe")) return E_FAIL;
     return S_OK;
 }
 
@@ -127,10 +129,10 @@ public:
         if (kind == CommandKind::Shrink)
         {
             if (SUCCEEDED(MenuLabel(L"shrink", label, ARRAYSIZE(label)))) return CopyText(label, title);
-            return CopyText(L"Shrink with VidShrink", title);
+            return CopyText(L"Shrink with " VIDSHRINK_APP_NAME, title);
         }
         if (SUCCEEDED(MenuLabel(L"open", label, ARRAYSIZE(label)))) return CopyText(label, title);
-        return CopyText(L"Open this video with VidShrink", title);
+        return CopyText(L"Open this video with " VIDSHRINK_APP_NAME, title);
     }
 
     IFACEMETHODIMP GetIcon(IShellItemArray*, PWSTR* icon) override

@@ -21,7 +21,7 @@ public sealed class VeriSifirlamaTests
     [Fact]
     public void TestlerGercekAppDataKlasorunuGormez()
     {
-        var real = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VidShrink");
+        var real = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), AppIdentity.FolderName);
         var folder = AppDataReset.DefaultFolder;
 
         Assert.NotNull(folder);

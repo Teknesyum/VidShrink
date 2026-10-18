@@ -172,6 +172,7 @@ internal static class Program
             return PencereyiAc(() => Build(path, files).StartWithClassicDesktopLifetime(args));
         }
 
+        EskiAdGocu.Calistir();
         JitProfili.Baslat(AcilisBitti.Task);
         instance.StartListening(files.Receive, ControlFor(args, Integration.ControlBridge.Shared));
         StartLauncherMaintenance();

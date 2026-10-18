@@ -24,7 +24,7 @@ internal static class DefaultApp
     /// (<c>Install-VidShrink.ps1</c>, <c>$fileAssociationName</c>). Windows'un derin
     /// bağlantısı bu adla VidShrink'in kendi sayfasını açar.
     /// </summary>
-    internal const string RegisteredName = "VidShrink";
+    internal const string RegisteredName = Core.Setup.ShellRegistration.AssociationName;
 
     /// <summary>
     /// Kullanıcı başına kurulmuş uygulamanın sayfasını açan sorgu anahtarı. Windows 11

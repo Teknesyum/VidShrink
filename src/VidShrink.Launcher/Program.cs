@@ -19,7 +19,7 @@ namespace VidShrink.Launcher;
 /// </summary>
 internal static class Program
 {
-    private const string AppExecutableName = "VidShrink.App.exe";
+    private const string AppExecutableName = VidShrink.Core.AppIdentity.AppExecutable;
     private const string Caption = VidShrink.Core.AppIdentity.Name;
 
     private static readonly TimeSpan KapiBeklemesi = TimeSpan.FromMinutes(2);

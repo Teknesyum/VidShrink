@@ -115,7 +115,7 @@ internal static partial class Program
 
         var options = new SetupOptions
         {
-            InstallRoot = installRoot ?? Path.Combine(localAppData, "Programs", "VidShrink"),
+            InstallRoot = installRoot ?? Path.Combine(localAppData, "Programs", AppIdentity.FolderName),
             LocalAppData = localAppData,
             WorkRoot = Path.GetTempPath(),
             ClassesRoot = SetupOptions.NormalizeRegistryRoot(registryRoot),

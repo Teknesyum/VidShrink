@@ -8,7 +8,7 @@ $local = Join-Path $kok 'local'
 $tmp = Join-Path $kok 'tmp'
 $kisayol = Join-Path $kok 'kisayol'
 New-Item -ItemType Directory -Force $local, $tmp, $kisayol | Out-Null
-$installRoot = Join-Path $local 'Programs\VidShrink'
+$installRoot = Join-Path $local 'Programs\VidShrink Player'
 
 $argumanlar = @('--install-root', $installRoot, '--no-launch', '--timings', '--registry-root', 'HKCU:\Software\VidShrinkOlcum\Classes')
 if ($Kip -eq 'kurulum') { $argumanlar += '--skip-shortcuts' }

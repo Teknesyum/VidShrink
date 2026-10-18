@@ -27,9 +27,9 @@ public sealed class BulletPaintingTests
 
     private static Styles LoadControls() => AppHost.Run(() =>
     {
-        var include = new StyleInclude(new Uri("avares://VidShrink.App/"))
+        var include = new StyleInclude(new Uri("avares://VidShrinkPlayer.App/"))
         {
-            Source = new Uri("avares://VidShrink.App/Themes/Controls.axaml")
+            Source = new Uri("avares://VidShrinkPlayer.App/Themes/Controls.axaml")
         };
 
         return (Styles)include.Loaded;

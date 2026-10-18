@@ -1,3 +1,4 @@
+using VidShrink.Core;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Xunit;
@@ -67,9 +68,9 @@ public sealed class MacOsBundleTests
         {
             var payload = Path.Combine(sandbox, "payload");
             Directory.CreateDirectory(payload);
-            File.WriteAllText(Path.Combine(payload, "VidShrink"), "#!/bin/sh\nexit 0\n");
+            File.WriteAllText(Path.Combine(payload, AppIdentity.MacHostName), "#!/bin/sh\nexit 0\n");
 
-            var bundle = Path.Combine(sandbox, "VidShrink.app");
+            var bundle = Path.Combine(sandbox, AppIdentity.MacBundleName);
             Assert.Equal(0, Shell($"macos-app-bundle.sh \"{payload}\" VidShrink {version} \"{bundle}\""));
 
             var plist = File.ReadAllText(Path.Combine(bundle, "Contents", "Info.plist"));
@@ -103,11 +104,11 @@ public sealed class MacOsBundleTests
             Directory.CreateDirectory(payload);
             File.WriteAllText(Path.Combine(payload, "VidShrink.App"), "#!/bin/sh\nexit 0\n");
 
-            var bundle = Path.Combine(sandbox, "VidShrink.app");
+            var bundle = Path.Combine(sandbox, AppIdentity.MacBundleName);
             Assert.Equal(0, Shell($"macos-app-bundle.sh \"{payload}\" VidShrink.App 0.0.0 \"{bundle}\""));
 
             var macOs = Path.Combine(bundle, "Contents", "MacOS");
-            Assert.True(File.Exists(Path.Combine(macOs, "VidShrink")));
+            Assert.True(File.Exists(Path.Combine(macOs, AppIdentity.MacHostName)));
             Assert.False(File.Exists(Path.Combine(macOs, "VidShrink.App")));
         }
         finally
@@ -129,16 +130,16 @@ public sealed class MacOsBundleTests
         var home = Sandbox();
         try
         {
-            var bundle = Path.Combine(home, "Applications", "VidShrink.app");
+            var bundle = Path.Combine(home, "Applications", AppIdentity.MacBundleName);
             var installRoot = Path.Combine(home, ".local", "share", "vidshrink");
             var binDirectory = Path.Combine(home, ".local", "bin");
             Directory.CreateDirectory(Path.Combine(bundle, "Contents", "MacOS"));
             Directory.CreateDirectory(installRoot);
             Directory.CreateDirectory(binDirectory);
-            File.WriteAllText(Path.Combine(bundle, "Contents", "MacOS", "VidShrink"), "");
+            File.WriteAllText(Path.Combine(bundle, "Contents", "MacOS", AppIdentity.MacHostName), "");
             File.CreateSymbolicLink(
                 Path.Combine(binDirectory, "vidshrink"),
-                Path.Combine(bundle, "Contents", "MacOS", "VidShrink"));
+                Path.Combine(bundle, "Contents", "MacOS", AppIdentity.MacHostName));
 
             Assert.Equal(0, Shell("install-vidshrink.sh --uninstall", home));
 

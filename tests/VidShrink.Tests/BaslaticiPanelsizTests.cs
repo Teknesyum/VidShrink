@@ -40,9 +40,9 @@ public sealed partial class BaslaticiPanelsizTests
 
     private static string Root => TipSources.Root;
 
-    public static string? LauncherPath => EnSon(Path.Combine(Root, "src", "VidShrink.Launcher", "bin"), "VidShrink.exe");
+    public static string? LauncherPath => EnSon(Path.Combine(Root, "src", "VidShrink.Launcher", "bin"), AppIdentity.LauncherExecutable);
 
-    public static string? SahteUygulamaPath => EnSon(Path.Combine(Root, "tools", "VidShrink.SahteUygulama", "bin"), "VidShrink.App.exe");
+    public static string? SahteUygulamaPath => EnSon(Path.Combine(Root, "tools", "VidShrink.SahteUygulama", "bin"), AppIdentity.AppExecutable);
 
     private static string? EnSon(string klasor, string ad) => !Directory.Exists(klasor)
         ? null
@@ -596,7 +596,7 @@ public sealed partial class BaslaticiPanelsizTests
     public void OkunamayanSurecBizimSayilmaz(string? klasorAdi, bool beklenen)
     {
         var klasor = Path.Combine(Root, ".calisma", "yol-d", "app");
-        var dosya = klasorAdi is null ? null : Path.Combine(Root, ".calisma", "yol-d", klasorAdi, "VidShrink.App.exe");
+        var dosya = klasorAdi is null ? null : Path.Combine(Root, ".calisma", "yol-d", klasorAdi, AppIdentity.AppExecutable);
         Assert.Equal(beklenen, UygulamaKlasoruKapisi.KlasordenMi(dosya, klasor));
     }
 
@@ -604,7 +604,7 @@ public sealed partial class BaslaticiPanelsizTests
     public void YoluFirlatanSurecBizimSayilmaz()
     {
         var klasor = Path.Combine(Root, ".calisma", "yol-d", "app");
-        var dosya = Path.Combine(klasor, "VidShrink.App.exe");
+        var dosya = Path.Combine(klasor, AppIdentity.AppExecutable);
         var baska = Environment.ProcessId + 1;
 
         Assert.True(UygulamaKlasoruKapisi.Bizim(baska, () => dosya, klasor));
@@ -908,10 +908,10 @@ public sealed partial class BaslaticiPanelsizTests
         internal Process Baslatici(
             int gecikme, int omur, string? kaynak = null, string? ayar = null, string[]? args = null,
             IReadOnlyDictionary<string, string>? ek = null)
-            => Baslat(Path.Combine(Kok, "VidShrink.exe"), gecikme, omur, baslaticidan: false, kaynak, ayar, args, ek);
+            => Baslat(Path.Combine(Kok, AppIdentity.LauncherExecutable), gecikme, omur, baslaticidan: false, kaynak, ayar, args, ek);
 
         internal Process UygulamaDogrudan(bool baslaticidan, int omur)
-            => Baslat(Path.Combine(App, "VidShrink.App.exe"), 0, omur, baslaticidan);
+            => Baslat(Path.Combine(App, AppIdentity.AppExecutable), 0, omur, baslaticidan);
 
         private Process Baslat(
             string dosya, int gecikme, int omur, bool baslaticidan,
@@ -964,7 +964,7 @@ public sealed partial class BaslaticiPanelsizTests
         private List<Process> Surecler()
         {
             var bulunan = new List<Process>();
-            foreach (var ad in new[] { "VidShrink", "VidShrink.App" })
+            foreach (var ad in new[] { AppIdentity.LauncherProcessName, AppIdentity.AppProcessName })
             {
                 foreach (var surec in Process.GetProcessesByName(ad))
                 {

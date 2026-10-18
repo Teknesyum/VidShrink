@@ -5,7 +5,7 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyName>VidShrink</AssemblyName>
+    <AssemblyName>VidShrinkPlayer</AssemblyName>
     <RootNamespace>VidShrink.Launcher</RootNamespace>
     <ApplicationIcon>..\VidShrink.App\Assets\VidShrink.ico</ApplicationIcon>
     <InvariantGlobalization>true</InvariantGlobalization>

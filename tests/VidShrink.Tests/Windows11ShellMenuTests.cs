@@ -1,3 +1,4 @@
+using VidShrink.Core;
 using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -77,7 +78,7 @@ public sealed class Windows11ShellMenuTests
         var id = Guid.NewGuid().ToString("n");
         var work = Path.Combine(TestPaths.OutputRoot, "shell-package-fallback", id);
         var install = Path.Combine(work, "install");
-        var executable = Path.Combine(install, "VidShrink.exe");
+        var executable = Path.Combine(install, AppIdentity.LauncherExecutable);
         var registry = @"HKCU:\Software\VidShrink-Fallback-Test-" + id;
         Directory.CreateDirectory(install);
         File.WriteAllText(executable, "launcher");
@@ -89,11 +90,11 @@ public sealed class Windows11ShellMenuTests
             Assert.True(run.Code == 0, run.Output);
             Assert.Contains("klasik", run.Output, StringComparison.OrdinalIgnoreCase);
 
-            var key = registry + @"\SystemFileAssociations\.mp4\shell\VidShrink";
+            var key = registry + @"\SystemFileAssociations\.mp4\shell\" + VidShrink.Core.Setup.ShellRegistration.MenuKey;
             var probe = PowerShell("-Command",
                 $"$v=Get-ItemProperty -LiteralPath '{key}'; $c=(Get-Item -LiteralPath '{key}\\command').GetValue(''); Write-Output ($v.MUIVerb+'|'+$c)");
             Assert.True(probe.Code == 0, probe.Output);
-            Assert.Contains("Open this video with VidShrink", probe.Output);
+            Assert.Contains("Open this video with VidShrink Player", probe.Output);
             Assert.Contains($"\"{executable}\" \"%1\"", probe.Output);
         }
         finally
@@ -126,11 +127,11 @@ public sealed class Windows11ShellMenuTests
         Assert.True(owned, "AppX test kilidi zaman aşımına uğradı.");
         try
         {
-        var before = PowerShell("-Command", "@(Get-AppxPackage -Name Teknesyum.VidShrink.Shell).Count");
+        var before = PowerShell("-Command", "@(Get-AppxPackage -Name Teknesyum.VidShrinkPlayer.Shell).Count");
         Assert.True(before.Code == 0, before.Output);
         if (before.Output.Trim() != "0")
         {
-            _output.WriteLine($"ATLANDI: Teknesyum.VidShrink.Shell zaten kayıtlı (sayı={before.Output.Trim()}); " +
+            _output.WriteLine($"ATLANDI: Teknesyum.VidShrinkPlayer.Shell zaten kayıtlı (sayı={before.Output.Trim()}); " +
                 "makinede kalıntı paket var, ölçü bu kaydı silmez.");
             return;
         }
@@ -150,7 +151,7 @@ public sealed class Windows11ShellMenuTests
             Assert.True(built.Code == 0, built.Output);
 
             File.Copy(Path.Combine(Environment.SystemDirectory, "WindowsPowerShell", "v1.0", "powershell.exe"),
-                Path.Combine(install, "VidShrink.exe"));
+                Path.Combine(install, AppIdentity.LauncherExecutable));
             var template = Read("src", "VidShrink.ShellExtension", "AppxManifest.template.xml");
             const string clsid = "7B8B4A16-E3F5-4C4A-A8D2-26B2F895BE58";
             var verbs = InstallerExtensions().Select(extension =>
@@ -167,18 +168,18 @@ public sealed class Windows11ShellMenuTests
             Assert.True(images.Code == 0, images.Output);
 
             var register = PowerShell("-Command",
-                $"Add-AppxPackage -Register '{manifest}' -ExternalLocation '{install}'; @(Get-AppxPackage -Name Teknesyum.VidShrink.Shell).Count");
+                $"Add-AppxPackage -Register '{manifest}' -ExternalLocation '{install}'; @(Get-AppxPackage -Name Teknesyum.VidShrinkPlayer.Shell).Count");
             Assert.True(register.Code == 0, register.Output);
             Assert.EndsWith("1", register.Output.Trim(), StringComparison.Ordinal);
 
             var remove = PowerShell("-Command",
-                "$p=Get-AppxPackage -Name Teknesyum.VidShrink.Shell; Remove-AppxPackage -Package $p.PackageFullName; @(Get-AppxPackage -Name Teknesyum.VidShrink.Shell).Count");
+                "$p=Get-AppxPackage -Name Teknesyum.VidShrinkPlayer.Shell; Remove-AppxPackage -Package $p.PackageFullName; @(Get-AppxPackage -Name Teknesyum.VidShrinkPlayer.Shell).Count");
             Assert.True(remove.Code == 0, remove.Output);
             Assert.EndsWith("0", remove.Output.Trim(), StringComparison.Ordinal);
         }
         finally
         {
-            PowerShell("-Command", "$p=Get-AppxPackage -Name Teknesyum.VidShrink.Shell -ErrorAction SilentlyContinue; if($p){Remove-AppxPackage -Package $p.PackageFullName}");
+            PowerShell("-Command", "$p=Get-AppxPackage -Name Teknesyum.VidShrinkPlayer.Shell -ErrorAction SilentlyContinue; if($p){Remove-AppxPackage -Package $p.PackageFullName}");
             try { Directory.Delete(work, true); } catch (IOException) { }
         }
         }
@@ -234,7 +235,7 @@ public sealed class Windows11ShellMenuTests
             "$shellMenuExtensions = @('mp4')",
             "$shellCommandClsid = '00000000-0000-0000-0000-000000000000'",
             "$shellShrinkCommandClsid = '00000000-0000-0000-0000-000000000001'",
-            "$shellShrinkMenuKeyName = 'VidShrinkKucult'",
+            "$shellShrinkMenuKeyName = 'VidShrinkPlayerKucult'",
             installer[manifestStart..manifestEnd],
             "function Write-Host { param([Parameter(Position = 0)]$Object, [string]$ForegroundColor) }",
             "function Test-Windows11 { $true }",

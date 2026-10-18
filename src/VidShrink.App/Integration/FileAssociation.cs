@@ -17,7 +17,7 @@ namespace VidShrink.App.Integration;
 internal static class FileAssociation
 {
     /// <summary>Kaydın adı. Yayıncı ve ürün adını taşır; başka bir programla çakışmaz.</summary>
-    internal const string ProgId = "Teknesyum.VidShrink.Video";
+    internal const string ProgId = AppIdentity.ProgId;
 
     /// <summary>Kaydın yazıldığı kök; <c>HKEY_CURRENT_USER</c> altında görecelidir.</summary>
     internal const string ClassesRoot = @"Software\Classes";

@@ -82,7 +82,7 @@ internal static class Program
             return;
         }
 
-        var start = new ProcessStartInfo { FileName = Path.Combine(baseDirectory, "VidShrink.exe"), UseShellExecute = false };
+        var start = new ProcessStartInfo { FileName = Path.Combine(baseDirectory, "VidShrinkPlayer.exe"), UseShellExecute = false };
         start.ArgumentList.Add(LauncherUpdate.UpdateNowArgument);
         start.ArgumentList.Add(Environment.ProcessId.ToString(CultureInfo.InvariantCulture));
         foreach (var (ad, deger) in ek) start.Environment[ad] = deger;

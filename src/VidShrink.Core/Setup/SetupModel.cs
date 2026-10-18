@@ -143,7 +143,9 @@ public sealed record SetupOptions
 
     public string? SettingsFolder { get; init; }
 
-    public const string DefaultUninstallKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\VidShrink";
+    public const string DefaultUninstallKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\" + AppIdentity.UninstallKeyName;
+
+    public const string LegacyUninstallKey = @"Software\Microsoft\Windows\CurrentVersion\Uninstall\" + AppIdentity.LegacyUninstallKeyName;
 
     public const string DefaultEnvironmentKey = "Environment";
 
@@ -151,7 +153,7 @@ public sealed record SetupOptions
     /// Ayarlar listesindeki kaldırma kaydı. Varsayılan kökte Windows'un yeri; test ya da
     /// prova kökünde sınıf kökünün kardeşi, ki gerçek listeye dokunulmasın.
     /// </summary>
-    public string UninstallKey => DefaultRegistry ? DefaultUninstallKey : Sibling(@"Uninstall\VidShrink");
+    public string UninstallKey => DefaultRegistry ? DefaultUninstallKey : Sibling(@"Uninstall\" + AppIdentity.UninstallKeyName);
 
     /// <summary>Kullanıcı PATH'inin durduğu anahtar; varsayılan dışında sınıf kökünün kardeşi.</summary>
     public string EnvironmentKey => DefaultRegistry ? DefaultEnvironmentKey : Sibling("Environment");

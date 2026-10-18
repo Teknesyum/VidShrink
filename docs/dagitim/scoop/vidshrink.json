@@ -17,8 +17,8 @@
     "bin": "vidshrink.exe",
     "shortcuts": [
         [
-            "VidShrink.App.exe",
-            "VidShrink"
+            "VidShrinkPlayer.App.exe",
+            "VidShrink Player"
         ]
     ],
     "checkver": {

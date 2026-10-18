@@ -255,7 +255,7 @@ public sealed class DuzenleyiciProjeTests
         Assert.True(EditProjectStore.Disabled);
         Assert.Null(EditProjectStore.Default);
         Assert.Equal(Path.Combine(Path.GetFullPath(TestAyarYolu.Klasor), EditProjectStore.FolderName), Path.GetFullPath(EditProjectStore.DefaultFolder), ignoreCase: true);
-        var gercek = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VidShrink");
+        var gercek = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), AppIdentity.FolderName);
         Assert.False(Path.GetFullPath(EditProjectStore.DefaultFolder).StartsWith(Path.GetFullPath(gercek), StringComparison.OrdinalIgnoreCase));
 
         EditProjectStore.Disabled = false;

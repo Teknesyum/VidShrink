@@ -102,7 +102,7 @@ public static class UninstallEntry
     public const string Publisher = "Teknesyum";
 
     public static string SetupCopy(string localAppData) =>
-        Path.Combine(localAppData, "VidShrink", ShellRegistration.SetupExecutableName);
+        Path.Combine(localAppData, AppIdentity.FolderName, ShellRegistration.SetupExecutableName);
 
     public static string UninstallCommand(string setupCopy, string root) =>
         $"\"{setupCopy}\" --uninstall --install-root \"{root}\"";
