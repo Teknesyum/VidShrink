@@ -491,8 +491,8 @@ public sealed class KurucuExeTests : IDisposable
     [Fact]
     public void EtiketVeSaglamaListesiOkunuyor()
     {
-        Assert.Equal("v0.8.2", SetupDownloads.TagFromLocation(new Uri("https://github.com/Teknesyum/VidShrink/releases/tag/v0.8.2")));
-        Assert.Throws<SetupException>(() => SetupDownloads.TagFromLocation(new Uri("https://github.com/Teknesyum/VidShrink/releases")));
+        Assert.Equal("v0.8.2", SetupDownloads.TagFromLocation(new Uri("https://github.com/Teknesyum/VidShrink-Player/releases/tag/v0.8.2")));
+        Assert.Throws<SetupException>(() => SetupDownloads.TagFromLocation(new Uri("https://github.com/Teknesyum/VidShrink-Player/releases")));
 
         var hash = new string('a', 64);
         var table = SetupDownloads.ParseChecksums($"{hash.ToUpperInvariant()}  vidshrink-win-x64.zip\r\n{new string('b', 64)} *VidShrinkPlayer-Setup.exe\nbozuk satir\n");

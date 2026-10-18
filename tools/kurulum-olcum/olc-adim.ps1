@@ -12,8 +12,8 @@ function Zaman([string]$ad, [scriptblock]$is) {
 }
 $app = Join-Path $d 'vidshrink-win-x64.zip'
 $lau = Join-Path $d 'vidshrink-launcher-win-x64.zip'
-Zaman 'indir app zip (IWR)' { Invoke-WebRequest -UseBasicParsing "https://github.com/Teknesyum/VidShrink/releases/download/$tag/vidshrink-win-x64.zip" -OutFile $app }
-Zaman 'indir launcher zip (IWR)' { Invoke-WebRequest -UseBasicParsing "https://github.com/Teknesyum/VidShrink/releases/download/$tag/vidshrink-launcher-win-x64.zip" -OutFile $lau }
+Zaman 'indir app zip (IWR)' { Invoke-WebRequest -UseBasicParsing "https://github.com/Teknesyum/VidShrink-Player/releases/download/$tag/vidshrink-win-x64.zip" -OutFile $app }
+Zaman 'indir launcher zip (IWR)' { Invoke-WebRequest -UseBasicParsing "https://github.com/Teknesyum/VidShrink-Player/releases/download/$tag/vidshrink-launcher-win-x64.zip" -OutFile $lau }
 Zaman 'Get-FileHash app+launcher' { Get-FileHash $app -Algorithm SHA256; Get-FileHash $lau -Algorithm SHA256 }
 Zaman 'Expand-Archive app' { Expand-Archive -LiteralPath $app -DestinationPath (Join-Path $d 'stage\app') -Force }
 Zaman 'Expand-Archive launcher' { Expand-Archive -LiteralPath $lau -DestinationPath (Join-Path $d 'stage') -Force }
@@ -30,4 +30,4 @@ Zaman 'Get-FileHash libmpv 7z' { Get-FileHash $mpv -Algorithm SHA256 }
 New-Item -ItemType Directory (Join-Path $d 'mpv') | Out-Null
 Zaman 'tar -x libmpv-2.dll' { & "$env:SystemRoot\System32\tar.exe" -xf $mpv -C (Join-Path $d 'mpv') libmpv-2.dll }
 Zaman 'indir libmpv 7z (curl.exe)' { & curl.exe -sL -o (Join-Path $d 'mpv2.7z') 'https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z' }
-Zaman 'indir app zip (curl.exe)' { & curl.exe -sL -o (Join-Path $d 'app2.zip') "https://github.com/Teknesyum/VidShrink/releases/download/$tag/vidshrink-win-x64.zip" }
+Zaman 'indir app zip (curl.exe)' { & curl.exe -sL -o (Join-Path $d 'app2.zip') "https://github.com/Teknesyum/VidShrink-Player/releases/download/$tag/vidshrink-win-x64.zip" }

@@ -136,7 +136,7 @@ jobs:
       - name: libmpv kur (deps-libmpv-20260903 surumu, yedek shinchiro, sabit sha256)
         run: |
           $ErrorActionPreference = 'Stop'
-          $url = 'https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
+          $url = 'https://github.com/Teknesyum/VidShrink-Player/releases/download/deps-libmpv-20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
           $expectedSha256 = 'FAC135C68A35B7639E39D72C0C365104EDBAEBDEA39A0DFDD8C36E8C8E80FAEF'
           $expectedDllSha256 = '673E6397920AB64A9C5B3A618F7F16D38854EFE72B58665F1F84E4E873B763A4'
           $fallbackUrl = 'https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
@@ -174,7 +174,7 @@ jobs:
             Write-Error "libmpv-2.dll sha256 uyusmuyor: beklenen=$expectedDllSha256 gelen=$dllActual"
             exit 1
           }
-          $vulkanUrl = 'https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/vulkan-1-x86_64-1.4.357.0.zip'
+          $vulkanUrl = 'https://github.com/Teknesyum/VidShrink-Player/releases/download/deps-libmpv-20260903/vulkan-1-x86_64-1.4.357.0.zip'
           $expectedVulkanZipSha256 = '38A05198C4BB467BF81DC17731A5A9F7F79147E80FDAE638A18DA23F4D9A8AE9'
           $expectedVulkanDllSha256 = 'CD862090370454630B31B174E3D4EB474FDA38EA034998D1FE1767B0C99A8696'
           $vulkanZip = Join-Path $env:RUNNER_TEMP 'vulkan-1.zip'

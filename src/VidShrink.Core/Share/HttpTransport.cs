@@ -45,7 +45,7 @@ public static class ShareIdentity
     public const string ProductName = "VidShrink";
 
     /// <summary>İletişim adresi. Şikâyet buraya gelsin.</summary>
-    public const string ContactUrl = "https://github.com/Teknesyum/VidShrink";
+    public const string ContactUrl = "https://github.com/Teknesyum/VidShrink-Player";
 
     private static string? _userAgent;
 

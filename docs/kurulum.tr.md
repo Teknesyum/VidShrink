@@ -4,9 +4,9 @@ Tam ayrıntı. Tek satırlık kurulum komutları [README](../README.tr.md) için
 
 ## Kurulum
 
-### Windows — VidShrink-Setup.exe
+### Windows — VidShrinkPlayer-Setup.exe
 
-Son sürümden (0.8.3 ve sonrası) [`VidShrink-Setup.exe`](https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe)
+Son sürümden (0.8.3 ve sonrası) [`VidShrinkPlayer-Setup.exe`](https://github.com/Teknesyum/VidShrink-Player/releases/latest/download/VidShrinkPlayer-Setup.exe)
 dosyasını indirip çalıştırın. Aşağıdaki betikle aynı düzeni, kısayolları, sağ tık girdilerini
 ve dosya ilişkilendirmelerini aynı kayıt anahtarlarına yazar; iki anahtar ağacını değer değer
 karşılaştıran bir test var. Farkı: üç dosyayı paralel indirir ve yazarken sağlamasını alır,
@@ -14,12 +14,12 @@ arşivleri ara klasöre değil doğrudan kurulum köküne açar, eski kurulumu k
 yarıda kalırsa geri koyar. `ffmpeg` bulunamazsa WinGet çağırmaz; sabitlenmiş GyanD 9.0
 arşivinden yalnız `ffmpeg.exe` ile `ffprobe.exe`'yi aralıklı okuyup her birini SHA-256'ya karşı
 doğrular. Kilitli klasör davranışı betiğinkiyle aynı. Kaldırmak için
-`VidShrink-Setup.exe --uninstall`, bütün seçenekler için `--help`.
+`VidShrinkPlayer-Setup.exe --uninstall`, bütün seçenekler için `--help`.
 
 ### Windows — tek satır
 
 ```powershell
-irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink.ps1 | iex
+irm https://raw.githubusercontent.com/Teknesyum/VidShrink-Player/main/Install-VidShrink.ps1 | iex
 ```
 
 Yönetici hakkı da .NET SDK'sı da gerekmez. Kurucu GitHub'dan son sürümü ister, `win-x64`
@@ -51,7 +51,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ([IO.File]::ReadAllT
 ### macOS / Linux — tek satır
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh
+curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink-Player/main/install-vidshrink.sh | sh
 ```
 
 Kök yetkisi de .NET SDK'sı da gerekmez. Hedef `uname` çıktısından seçilir — `osx-arm64`,

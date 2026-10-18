@@ -191,7 +191,7 @@ public sealed class TanilamaTests
             Destek.SurumNotlari(Surum),
             Destek.LisansAdresi,
             Destek.GizlilikAdresi,
-            "https://github.com/Teknesyum/VidShrink/releases/tag/v1.2.18",
+            "https://github.com/Teknesyum/VidShrink-Player/releases/tag/v1.2.18",
             Destek.HataBildir(Surum, Destek.Isletim(), Destek.GunlukYolu())
         }, acilan);
     }

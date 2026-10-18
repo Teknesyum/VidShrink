@@ -16,15 +16,15 @@ public sealed class DestekTests
     [Fact]
     public void SurumNotlariEtiketeGider()
     {
-        Assert.Equal("https://github.com/Teknesyum/VidShrink/releases/tag/v1.2.17", Destek.SurumNotlari("1.2.17+abc123"));
-        Assert.Equal("https://github.com/Teknesyum/VidShrink/releases/tag/v1.3.0-beta", Destek.SurumNotlari("v1.3.0-beta"));
+        Assert.Equal("https://github.com/Teknesyum/VidShrink-Player/releases/tag/v1.2.17", Destek.SurumNotlari("1.2.17+abc123"));
+        Assert.Equal("https://github.com/Teknesyum/VidShrink-Player/releases/tag/v1.3.0-beta", Destek.SurumNotlari("v1.3.0-beta"));
     }
 
     [Fact]
     public void LisansVeGizlilikAdresleri()
     {
-        Assert.Equal("https://github.com/Teknesyum/VidShrink/blob/main/THIRD-PARTY-NOTICES.md", Destek.LisansAdresi);
-        Assert.Equal("https://github.com/Teknesyum/VidShrink#privacy", Destek.GizlilikAdresi);
+        Assert.Equal("https://github.com/Teknesyum/VidShrink-Player/blob/main/THIRD-PARTY-NOTICES.md", Destek.LisansAdresi);
+        Assert.Equal("https://github.com/Teknesyum/VidShrink-Player#privacy", Destek.GizlilikAdresi);
         Assert.Contains("## Privacy", File.ReadAllText(Path.Combine(TipSources.Root, "README.md")));
         Assert.True(File.Exists(Path.Combine(TipSources.Root, "THIRD-PARTY-NOTICES.md")));
     }
@@ -35,7 +35,7 @@ public sealed class DestekTests
         var adres = Destek.HataBildir("1.2.17+abc", "Microsoft Windows 10.0.22631 (X64)", @"~\AppData\Roaming\VidShrink\gunluk\vidshrink.log");
 
         Assert.Equal(
-            "https://github.com/Teknesyum/VidShrink/issues/new?template=bug_report.yml" +
+            "https://github.com/Teknesyum/VidShrink-Player/issues/new?template=bug_report.yml" +
             "&version=1.2.17" +
             "&os=Microsoft%20Windows%2010.0.22631%20%28X64%29" +
             "&log-path=~%5CAppData%5CRoaming%5CVidShrink%5Cgunluk%5Cvidshrink.log",

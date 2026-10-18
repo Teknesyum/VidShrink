@@ -1,6 +1,6 @@
 # Code Signing And Antivirus False Positives
 
-`VidShrink-Setup.exe` and the app are unsigned. A new unsigned executable that downloads
+`VidShrinkPlayer-Setup.exe` and the app are unsigned. A new unsigned executable that downloads
 and extracts other executables is exactly what heuristic scanners flag, so SmartScreen
 warnings and Avast/AVG detections are expected until the binaries are signed and have
 built reputation. Nothing below has been submitted or bought; each step needs the maintainer.
@@ -32,9 +32,9 @@ on a self-hosted runner or a manual signing step after the build; that was not m
 
 1. Open https://www.avast.com/false-positive-file-form.php.
 2. Choose "File" for a detected executable or "Website" for a blocked download URL.
-3. Attach the exact released `VidShrink-Setup.exe` (or give the GitHub release URL), the
+3. Attach the exact released `VidShrinkPlayer-Setup.exe` (or give the GitHub release URL), the
    detection name Avast showed, and the sha256 from `checksums-win-x64.txt`.
-4. Describe it briefly: open-source installer from github.com/Teknesyum/VidShrink, built
+4. Describe it briefly: open-source installer from github.com/Teknesyum/VidShrink-Player, built
    by GitHub Actions, downloads only release assets verified by sha256.
 5. Each release is a new file, so report again if a new version is flagged. Microsoft
    (https://www.microsoft.com/wdsi/filesubmission) accepts the same kind of report.

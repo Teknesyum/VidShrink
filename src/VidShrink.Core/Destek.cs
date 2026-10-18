@@ -17,7 +17,7 @@ namespace VidShrink.Core;
 public static class Destek
 {
     /// <summary>Deponun adresi.</summary>
-    public const string DepoAdresi = "https://github.com/Teknesyum/VidShrink";
+    public const string DepoAdresi = "https://github.com/Teknesyum/VidShrink-Player";
 
     /// <summary>Hata bildiriminin issue şablonu: <c>.github/ISSUE_TEMPLATE/</c> altındaki dosya adı.</summary>
     public const string HataSablonu = "bug_report.yml";

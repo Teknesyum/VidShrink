@@ -4,9 +4,9 @@ The full detail. The one-line install commands are in the [README](../README.md)
 
 ## Install
 
-### Windows — VidShrink-Setup.exe
+### Windows — VidShrinkPlayer-Setup.exe
 
-Download [`VidShrink-Setup.exe`](https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrink-Setup.exe)
+Download [`VidShrinkPlayer-Setup.exe`](https://github.com/Teknesyum/VidShrink-Player/releases/latest/download/VidShrinkPlayer-Setup.exe)
 from the latest release (0.8.3 and later) and run it. It installs the same layout, shortcuts,
 right-click entries and file associations as the script below, under the same registry keys,
 and a test compares the two key trees value by value. What it does differently:
@@ -25,17 +25,17 @@ The locked-folder handling is the script's: six attempts from 200 ms doubling, a
 rounds in which VidShrink still holds the folder it closes it and waits up to 120 seconds.
 
 ```text
-VidShrink-Setup.exe                  install or update
-VidShrink-Setup.exe --uninstall      remove shortcuts, right-click entries, associations and the install
-VidShrink-Setup.exe --help           every switch
-VidShrink-Setup.exe --silent         no window, no question; on an error exit non-zero without waiting
-VidShrink-Setup.exe --add-to-path    also put <install root>\bin on the user PATH (off by default)
-VidShrink-Setup.exe --uninstall --remove-settings   also delete the settings folder (%APPDATA%\VidShrink)
+VidShrinkPlayer-Setup.exe                  install or update
+VidShrinkPlayer-Setup.exe --uninstall      remove shortcuts, right-click entries, associations and the install
+VidShrinkPlayer-Setup.exe --help           every switch
+VidShrinkPlayer-Setup.exe --silent         no window, no question; on an error exit non-zero without waiting
+VidShrinkPlayer-Setup.exe --add-to-path    also put <install root>\bin on the user PATH (off by default)
+VidShrinkPlayer-Setup.exe --uninstall --remove-settings   also delete the settings folder (%APPDATA%\VidShrink Player)
 ```
 
 The installer registers VidShrink under Windows Settings → Apps → Installed apps (per user,
-`HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\VidShrink`). The entry's uninstall
-command calls a copy of the installer kept at `%LOCALAPPDATA%\VidShrink\VidShrink-Setup.exe`,
+`HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\VidShrinkPlayer`). The entry's uninstall
+command calls a copy of the installer kept at `%LOCALAPPDATA%\VidShrink Player\VidShrinkPlayer-Setup.exe`,
 so removing the downloaded file does not break it; the quiet uninstall string adds `--silent`.
 Uninstalling deletes the entry. The entry's version is the one installed by the setup; an
 in-app update does not rewrite it.
@@ -45,12 +45,12 @@ in-app update does not rewrite it.
 (`app\vidshrink.exe`). The existing PATH entries and the value's type are kept, the folder is
 not added twice, and uninstalling takes it off PATH again. Open a new terminal to see the change.
 
-The release's `checksums-win-x64.txt` lists `VidShrink-Setup.exe` too.
+The release's `checksums-win-x64.txt` lists `VidShrinkPlayer-Setup.exe` too.
 
 ### Windows — one line
 
 ```powershell
-irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink.ps1 | iex
+irm https://raw.githubusercontent.com/Teknesyum/VidShrink-Player/main/Install-VidShrink.ps1 | iex
 ```
 
 No administrator rights and no .NET SDK. The installer asks GitHub for the latest release,
@@ -82,7 +82,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command "iex ([IO.File]::ReadAllT
 ### macOS / Linux — one line
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh
+curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink-Player/main/install-vidshrink.sh | sh
 ```
 
 No root and no .NET SDK. The target comes from `uname` — `osx-arm64`, `osx-x64` or

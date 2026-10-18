@@ -20,7 +20,7 @@ public sealed class DagitimManifestTests
 {
     private static readonly string Root = TipSources.Root;
     private static string Winget(string name) => File.ReadAllText(Path.Combine(Root, "packaging", "winget", name));
-    private static string Installer => Winget("Teknesyum.VidShrink.installer.yaml");
+    private static string Installer => Winget("Teknesyum.VidShrinkPlayer.installer.yaml");
     private static string ReleaseWorkflow => File.ReadAllText(Path.Combine(Root, ".github", "workflows", "release.yml"));
     private static string SetupProgram => File.ReadAllText(Path.Combine(Root, "src", "VidShrink.Setup", "Program.cs"));
 
@@ -71,15 +71,15 @@ public sealed class DagitimManifestTests
     {
         var version = ProductVersion;
         Assert.False(string.IsNullOrEmpty(version));
-        foreach (var name in new[] { "Teknesyum.VidShrink.yaml", "Teknesyum.VidShrink.installer.yaml", "Teknesyum.VidShrink.locale.en-US.yaml" })
+        foreach (var name in new[] { "Teknesyum.VidShrinkPlayer.yaml", "Teknesyum.VidShrinkPlayer.installer.yaml", "Teknesyum.VidShrinkPlayer.locale.en-US.yaml" })
         {
             var yaml = Winget(name);
-            Assert.Equal("Teknesyum.VidShrink", Field(yaml, "PackageIdentifier"));
+            Assert.Equal("Teknesyum.VidShrinkPlayer", Field(yaml, "PackageIdentifier"));
             Assert.Equal(version, Field(yaml, "PackageVersion"));
         }
 
         Assert.Equal($"--tag v{version}", Field(Installer, "Custom"));
-        Assert.Equal($"https://github.com/Teknesyum/VidShrink/releases/download/v{version}/{AppIdentity.LegacySetupExecutable}", Field(Installer, "InstallerUrl"));
+        Assert.Equal($"https://github.com/Teknesyum/VidShrink-Player/releases/download/v{version}/{AppIdentity.SetupExecutable}", Field(Installer, "InstallerUrl"));
         Assert.Equal("user", Field(Installer, "Scope"));
         Assert.Matches("^[0-9A-Fa-f]{64}$", Field(Installer, "InstallerSha256"));
         Assert.Contains("Custom: --tag $tag", Job("winget"));
@@ -88,15 +88,15 @@ public sealed class DagitimManifestTests
     [Fact]
     public void ScoopVarligiYayinlananArsivVeCliAdiyla()
     {
-        using var doc = JsonDocument.Parse(File.ReadAllText(Path.Combine(Root, "docs", "dagitim", "scoop", "vidshrink.json")));
+        using var doc = JsonDocument.Parse(File.ReadAllText(Path.Combine(Root, "docs", "dagitim", "scoop", "vidshrink-player.json")));
         var root = doc.RootElement;
         var version = ProductVersion;
         Assert.Equal(version, root.GetProperty("version").GetString());
 
         var url = root.GetProperty("architecture").GetProperty("64bit").GetProperty("url").GetString()!;
-        Assert.Equal($"https://github.com/Teknesyum/VidShrink/releases/download/v{version}/vidshrink-win-x64.zip", url);
+        Assert.Equal($"https://github.com/Teknesyum/VidShrink-Player/releases/download/v{version}/vidshrink-win-x64.zip", url);
         var auto = root.GetProperty("autoupdate").GetProperty("architecture").GetProperty("64bit");
-        Assert.Equal("https://github.com/Teknesyum/VidShrink/releases/download/v$version/vidshrink-win-x64.zip", auto.GetProperty("url").GetString());
+        Assert.Equal("https://github.com/Teknesyum/VidShrink-Player/releases/download/v$version/vidshrink-win-x64.zip", auto.GetProperty("url").GetString());
         Assert.Equal("$baseurl/checksums-win-x64.txt", auto.GetProperty("hash").GetProperty("url").GetString());
 
         var release = ReleaseWorkflow;

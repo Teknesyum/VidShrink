@@ -200,7 +200,7 @@ public static class UpdateCheck
     public static string ChecksumsAssetName(string rid) => $"checksums-{rid}.txt";
 
     public static string LatestAssetUrl(string asset) =>
-        $"https://github.com/Teknesyum/VidShrink/releases/latest/download/{asset}";
+        $"https://github.com/Teknesyum/VidShrink-Player/releases/latest/download/{asset}";
 
     /// <summary>
     /// Manifest çekmenin zaman aşımı. Eskiden 800 ms'ti, çünkü çağrı açılış yolundaydı;
@@ -251,14 +251,14 @@ public static class UpdateCheck
         && ShellUpdate.Installed(baseDirectory, manifest);
 
     /// <summary>Yayın sayfası. Kendini güncelleyemeyen kurulumda yükle düğmesi burayı açar.</summary>
-    public const string ReleasesPageUrl = "https://github.com/Teknesyum/VidShrink/releases/latest";
+    public const string ReleasesPageUrl = "https://github.com/Teknesyum/VidShrink-Player/releases/latest";
 
     /// <summary>Kendini güncelleyemeyen platformlarda kurucunun yazdığı komut.</summary>
     public static string UpdateInstruction()
     {
         if (OperatingSystem.IsWindows())
-            return "irm https://raw.githubusercontent.com/Teknesyum/VidShrink/main/Install-VidShrink.ps1 | iex";
-        return "curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh";
+            return "irm https://raw.githubusercontent.com/Teknesyum/VidShrink-Player/main/Install-VidShrink.ps1 | iex";
+        return "curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink-Player/main/install-vidshrink.sh | sh";
     }
 
     public static string CurrentVersion(Assembly? assembly = null)

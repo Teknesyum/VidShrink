@@ -39,7 +39,7 @@ Komut satırı ayrı bileşendir, yalnız İngilizce ve Türkçe var:
 
 ## Depo Bağlantısı
 
-- Kaynak depo: `https://github.com/Teknesyum/VidShrink.git`, dal `main`.
+- Kaynak depo: `https://github.com/Teknesyum/VidShrink-Player.git`, dal `main`.
 - Weblate değişikliği doğrudan `main`e itmez; "push branch" `weblate` olur ve çeviri
   oradan çekme isteğiyle gelir. CI yeşil olmadan birleşmez.
 - GitHub'da depo ayarına Weblate'in webhook adresi eklenir:

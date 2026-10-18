@@ -1,23 +1,23 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.9.0.schema.json
-PackageIdentifier: Teknesyum.VidShrink
-PackageVersion: 1.2.24
+PackageIdentifier: Teknesyum.VidShrinkPlayer
+PackageVersion: 0.0.1
 PackageLocale: en-US
 Publisher: Teknesyum
 PublisherUrl: https://github.com/Teknesyum
-PublisherSupportUrl: https://github.com/Teknesyum/VidShrink/issues
-PackageName: VidShrink
-PackageUrl: https://github.com/Teknesyum/VidShrink
+PublisherSupportUrl: https://github.com/Teknesyum/VidShrink-Player/issues
+PackageName: VidShrink Player
+PackageUrl: https://github.com/Teknesyum/VidShrink-Player
 License: AGPL-3.0-or-later
-LicenseUrl: https://github.com/Teknesyum/VidShrink/blob/main/LICENSE
+LicenseUrl: https://github.com/Teknesyum/VidShrink-Player/blob/main/LICENSE
 ShortDescription: Shrink a video to a target file size, then play, convert, record or trim it.
-Description: VidShrink compresses a video to a chosen file size with ffmpeg, and carries a player, a format converter, a screen recorder and a simple editor in 42 languages.
-Moniker: vidshrink
+Description: VidShrink Player compresses a video to a chosen file size with ffmpeg, and carries a player, a format converter, a screen recorder and a simple editor in 42 languages.
+Moniker: vidshrink-player
 Tags:
   - video
   - compress
   - ffmpeg
   - player
   - screen-recorder
-ReleaseNotesUrl: https://github.com/Teknesyum/VidShrink/blob/main/CHANGELOG.md
+ReleaseNotesUrl: https://github.com/Teknesyum/VidShrink-Player/blob/main/CHANGELOG.md
 ManifestType: defaultLocale
 ManifestVersion: 1.9.0

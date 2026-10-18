@@ -11,8 +11,8 @@ $ErrorActionPreference = 'Continue'
 $ProgressPreference = 'SilentlyContinue'
 New-Item -ItemType Directory -Force -Path $Sonuc | Out-Null
 $gunluk = Join-Path $Sonuc 'gunluk.txt'
-$depo = 'Teknesyum/VidShrink'
-$tekSatirKomutu = '[Net.ServicePointManager]::SecurityProtocol=3072; Set-Variable ProgressPreference SilentlyContinue; Set-Location ([IO.Path]::GetTempPath()); irm https://github.com/Teknesyum/VidShrink/releases/latest/download/VidShrinkPlayer-Setup.exe -OutFile VidShrinkPlayer-Setup.exe; .\VidShrinkPlayer-Setup.exe'
+$depo = 'Teknesyum/VidShrink-Player'
+$tekSatirKomutu = '[Net.ServicePointManager]::SecurityProtocol=3072; Set-Variable ProgressPreference SilentlyContinue; Set-Location ([IO.Path]::GetTempPath()); irm https://github.com/Teknesyum/VidShrink-Player/releases/latest/download/VidShrinkPlayer-Setup.exe -OutFile VidShrinkPlayer-Setup.exe; .\VidShrinkPlayer-Setup.exe'
 
 function Yaz([string]$Metin) {
     $satir = '{0:HH:mm:ss} {1}' -f (Get-Date), $Metin

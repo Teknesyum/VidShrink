@@ -190,7 +190,7 @@ jobs:
       - name: libmpv kur (deps-libmpv-20260903 surumu, yedek shinchiro, ci.yml ile ayni)
         run: |
           $ErrorActionPreference = 'Stop'
-          $url = 'https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
+          $url = 'https://github.com/Teknesyum/VidShrink-Player/releases/download/deps-libmpv-20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
           $expectedSha256 = 'FAC135C68A35B7639E39D72C0C365104EDBAEBDEA39A0DFDD8C36E8C8E80FAEF'
           $expectedDllSha256 = '673E6397920AB64A9C5B3A618F7F16D38854EFE72B58665F1F84E4E873B763A4'
           $fallbackUrl = 'https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/20260903/mpv-dev-x86_64-20260903-git-69e63f425a.7z'
@@ -228,7 +228,7 @@ jobs:
             Write-Error "libmpv-2.dll sha256 uyusmuyor: beklenen=$expectedDllSha256 gelen=$dllActual"
             exit 1
           }
-          $vulkanUrl = 'https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-20260903/vulkan-1-x86_64-1.4.357.0.zip'
+          $vulkanUrl = 'https://github.com/Teknesyum/VidShrink-Player/releases/download/deps-libmpv-20260903/vulkan-1-x86_64-1.4.357.0.zip'
           $expectedVulkanZipSha256 = '38A05198C4BB467BF81DC17731A5A9F7F79147E80FDAE638A18DA23F4D9A8AE9'
           $expectedVulkanDllSha256 = 'CD862090370454630B31B174E3D4EB474FDA38EA034998D1FE1767B0C99A8696'
           $vulkanZip = Join-Path $env:RUNNER_TEMP 'vulkan-1.zip'
@@ -544,7 +544,7 @@ jobs:
           ls -l downloaded
           gh release create "${{ needs.version.outputs.tag }}" \
             --draft \
-            --title "VidShrink ${{ needs.version.outputs.version }}" \
+            --title "VidShrink Player ${{ needs.version.outputs.version }}" \
             --notes "CHANGELOG.md içindeki ${{ needs.version.outputs.version }} bölümüne bakın." \
             downloaded/*
 
@@ -582,7 +582,7 @@ jobs:
         if: env.WINGET_TOKEN == ''
         run: echo "WINGET_TOKEN yok, winget guncellemesi atlandi."
 
-      - name: Update Teknesyum.VidShrink in winget-pkgs
+      - name: Update Teknesyum.VidShrinkPlayer in winget-pkgs
         if: env.WINGET_TOKEN != ''
         shell: pwsh
         run: |
@@ -592,15 +592,15 @@ jobs:
           $url = "https://github.com/${{ github.repository }}/releases/download/$tag/VidShrinkPlayer-Setup.exe"
           Invoke-WebRequest "https://github.com/microsoft/winget-create/releases/download/$env:WINGETCREATE_VERSION/wingetcreate.exe" -OutFile wingetcreate.exe
           "wingetcreate $env:WINGETCREATE_VERSION sha256 $((Get-FileHash wingetcreate.exe -Algorithm SHA256).Hash)"
-          .\wingetcreate.exe update Teknesyum.VidShrink --version $version --urls $url --out winget-out --token $env:WINGET_TOKEN
+          .\wingetcreate.exe update Teknesyum.VidShrinkPlayer --version $version --urls $url --out winget-out --token $env:WINGET_TOKEN
           if ($LASTEXITCODE -ne 0) { throw "wingetcreate update $LASTEXITCODE" }
-          $installer = Get-ChildItem winget-out -Recurse -Filter 'Teknesyum.VidShrink.installer.yaml' | Select-Object -First 1
+          $installer = Get-ChildItem winget-out -Recurse -Filter 'Teknesyum.VidShrinkPlayer.installer.yaml' | Select-Object -First 1
           if (-not $installer) { throw 'installer manifest yazilmadi' }
           $text = (Get-Content $installer.FullName -Raw) -replace '(?m)^(\s*Custom:\s*--tag\s+)v\S+', "`${1}$tag"
           Set-Content -Path $installer.FullName -Value $text -NoNewline
           if (-not (Select-String -Path $installer.FullName -SimpleMatch "Custom: --tag $tag" -Quiet)) { throw 'Custom --tag yeni surume cekilemedi' }
           Get-Content $installer.FullName
-          .\wingetcreate.exe submit --prtitle "New version: Teknesyum.VidShrink version $version" --token $env:WINGET_TOKEN $installer.DirectoryName
+          .\wingetcreate.exe submit --prtitle "New version: Teknesyum.VidShrinkPlayer version $version" --token $env:WINGET_TOKEN $installer.DirectoryName
           if ($LASTEXITCODE -ne 0) { throw "wingetcreate submit $LASTEXITCODE" }
 
   # Scoop: the bucket is a separate repository (vars.SCOOP_BUCKET_REPO, by default
@@ -632,7 +632,7 @@ jobs:
           token: ${{ secrets.SCOOP_BUCKET_TOKEN }}
           path: bucket
 
-      - name: Write and push bucket/vidshrink.json
+      - name: Write and push bucket/vidshrink-player.json
         if: env.SCOOP_TOKEN != ''
         env:
           GH_TOKEN: ${{ github.token }}
@@ -647,14 +647,14 @@ jobs:
           jq --arg v "$version" --arg h "$hash" \
              --arg u "https://github.com/${{ github.repository }}/releases/download/$tag/vidshrink-win-x64.zip" \
              '.version = $v | .architecture."64bit".url = $u | .architecture."64bit".hash = $h' \
-             source/docs/dagitim/scoop/vidshrink.json > bucket/bucket/vidshrink.json
-          cat bucket/bucket/vidshrink.json
+             source/docs/dagitim/scoop/vidshrink-player.json > bucket/bucket/vidshrink-player.json
+          cat bucket/bucket/vidshrink-player.json
           cd bucket
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add bucket/vidshrink.json
+          git add bucket/vidshrink-player.json
           if git diff --cached --quiet; then echo "kova zaten $version"; exit 0; fi
-          git commit -m "vidshrink: Update to version $version"
+          git commit -m "vidshrink-player: Update to version $version"
           git push
 
   # arm64 dogrulamasi: yalniz elle tetiklenir, etiket ve yayin olusturmaz. arm64 artik etiket
@@ -845,7 +845,7 @@ jobs:
         if: env.TOPIC != ''
         run: |
           curl -sS \
-            -H "Title: VidShrink ${{ github.ref_name }} yayinlanmadi" \
+            -H "Title: VidShrink Player ${{ github.ref_name }} yayinlanmadi" \
             -H "Priority: urgent" \
             -H "Tags: rotating_light" \
             -H "Click: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \

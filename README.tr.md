@@ -44,21 +44,21 @@ ya da komutunu söylüyor (ayrıntı aşağıda).
    güncellemeyi ve kaldırmayı da yapar. Base henüz imzalı değil; Windows SmartScreen ilk
    açılışta uyarabilir: *Ek bilgi*'yi, sonra *Yine de çalıştır*'ı seçin. Ayrıntı:
    [Teknesyum Base](https://github.com/Teknesyum/Teknesyum-Base).
-2. **VidShrink-Setup.exe.**
-   [`VidShrink-Setup.exe`](https://github.com/Teknesyum/VidShrink-Player/releases/latest/download/VidShrink-Setup.exe)
+2. **VidShrinkPlayer-Setup.exe.**
+   [`VidShrinkPlayer-Setup.exe`](https://github.com/Teknesyum/VidShrink-Player/releases/latest/download/VidShrinkPlayer-Setup.exe)
    dosyasını indirip çalıştırın. Kendi başına çalışan küçük bir program: PowerShell de WinGet
    de gerekmez.
 3. **Tek satır kod.** PowerShell'e ya da Komut İstemi'ne yapıştırın. Son
-   `VidShrink-Setup.exe`'yi geçici klasöre indirip çalıştırır — 2. yoldaki kurucunun aynısı.
+   `VidShrinkPlayer-Setup.exe`'yi geçici klasöre indirip çalıştırır — 2. yoldaki kurucunun aynısı.
 
    ```powershell
-   powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=3072; Set-Variable ProgressPreference SilentlyContinue; Set-Location ([IO.Path]::GetTempPath()); irm https://github.com/Teknesyum/VidShrink-Player/releases/latest/download/VidShrink-Setup.exe -OutFile VidShrink-Setup.exe; .\VidShrink-Setup.exe"
+   powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=3072; Set-Variable ProgressPreference SilentlyContinue; Set-Location ([IO.Path]::GetTempPath()); irm https://github.com/Teknesyum/VidShrink-Player/releases/latest/download/VidShrinkPlayer-Setup.exe -OutFile VidShrinkPlayer-Setup.exe; .\VidShrinkPlayer-Setup.exe"
    ```
 
 Sürümler kod imzalı değil; bu yüzden Akıllı Uygulama Denetimi açık olan bir bilgisayar
 VidShrink Player'ı hangi yolla kurulursa kurulsun engeller.
 
-**Kaldırma.** `VidShrink-Setup.exe --uninstall` kısayolları, sağ tık girdilerini, Birlikte aç
+**Kaldırma.** `VidShrinkPlayer-Setup.exe --uninstall` kısayolları, sağ tık girdilerini, Birlikte aç
 kaydını ve kurulum klasörünü siliyor.
 
 **Taşınabilir.** [Son sürümdeki](https://github.com/Teknesyum/VidShrink-Player/releases/latest)

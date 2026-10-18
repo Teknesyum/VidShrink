@@ -43,20 +43,20 @@ Three ways, in this order.
    find **VidShrink Player** in the list and install it. Base also updates and uninstalls it
    later. Base is not signed yet, so Windows SmartScreen may warn on first run: choose
    *More info*, then *Run anyway*. Details: [Teknesyum Base](https://github.com/Teknesyum/Teknesyum-Base).
-2. **VidShrink-Setup.exe.** Download and run
-   [`VidShrink-Setup.exe`](https://github.com/Teknesyum/VidShrink-Player/releases/latest/download/VidShrink-Setup.exe).
+2. **VidShrinkPlayer-Setup.exe.** Download and run
+   [`VidShrinkPlayer-Setup.exe`](https://github.com/Teknesyum/VidShrink-Player/releases/latest/download/VidShrinkPlayer-Setup.exe).
    It is a small self-contained program: no PowerShell, no WinGet.
 3. **One line of code.** Paste it into PowerShell or the Command Prompt. It downloads the
-   latest `VidShrink-Setup.exe` to the temp folder and runs it — the same installer as way 2.
+   latest `VidShrinkPlayer-Setup.exe` to the temp folder and runs it — the same installer as way 2.
 
    ```powershell
-   powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=3072; Set-Variable ProgressPreference SilentlyContinue; Set-Location ([IO.Path]::GetTempPath()); irm https://github.com/Teknesyum/VidShrink-Player/releases/latest/download/VidShrink-Setup.exe -OutFile VidShrink-Setup.exe; .\VidShrink-Setup.exe"
+   powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol=3072; Set-Variable ProgressPreference SilentlyContinue; Set-Location ([IO.Path]::GetTempPath()); irm https://github.com/Teknesyum/VidShrink-Player/releases/latest/download/VidShrinkPlayer-Setup.exe -OutFile VidShrinkPlayer-Setup.exe; .\VidShrinkPlayer-Setup.exe"
    ```
 
 Releases are not code-signed, so a PC with Smart App Control turned on blocks VidShrink
 Player whichever way it is installed.
 
-**Uninstall.** `VidShrink-Setup.exe --uninstall` removes the shortcuts, the right-click
+**Uninstall.** `VidShrinkPlayer-Setup.exe --uninstall` removes the shortcuts, the right-click
 entries, the Open With registration and the install folder.
 
 **Portable.** `VidShrink-Portable-win-x64.zip` (or `-win-arm64`) from the

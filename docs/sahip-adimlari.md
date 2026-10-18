@@ -14,7 +14,7 @@ variables** → **Actions** → **New repository secret**.
 ## 1. winget
 
 Önce koşul: winget kurulu sürümü Windows'un "Yüklü uygulamalar" kaydından tanır.
-`VidShrink-Setup.exe` bugün o kaydı yazmıyor ve sessiz kurulumda hata olursa Enter
+`VidShrinkPlayer-Setup.exe` bugün o kaydı yazmıyor ve sessiz kurulumda hata olursa Enter
 bekleyebilir. Bunlar `docs/later.md`'deki DAG-P1 paketinde (DAG-16, DAG-17); o paket
 bitmeden winget'e göndermek, kurulup "yüklü değil" görünen bir paket demek. Sıra: önce
 DAG-P1, sonra aşağısı.
@@ -23,8 +23,8 @@ DAG-P1, sonra aşağısı.
    (sağ üstte **Fork**). wingetcreate çekme isteğini bu çataldan açar.
 2. İlk gönderim elle yapılır, çünkü iş akışındaki `wingetcreate update` yalnız var olan
    paketi tazeler. Bir Windows makinede:
-   - Son sürümün `VidShrink-Setup.exe`'sinin sha256'sını `checksums-win-x64.txt`'den al.
-   - `packaging/winget/Teknesyum.VidShrink.installer.yaml` içindeki 64 sıfırı bu değerle
+   - Son sürümün `VidShrinkPlayer-Setup.exe`'sinin sha256'sını `checksums-win-x64.txt`'den al.
+   - `packaging/winget/Teknesyum.VidShrinkPlayer.installer.yaml` içindeki 64 sıfırı bu değerle
      değiştir; üç dosyadaki `PackageVersion` ve `Custom: --tag` o sürümle aynı olsun.
    - `winget validate --manifest packaging\winget` ile denetle.
    - `winget install --manifest packaging\winget` ile kendi makinende kurmayı dene.
@@ -32,7 +32,7 @@ DAG-P1, sonra aşağısı.
    - Gönder: `wingetcreate submit --token <PAT> packaging\winget`
      (wingetcreate: https://github.com/microsoft/winget-create/releases).
 3. winget-pkgs ekibi çekme isteğini inceler; birleşince paket `winget install
-   Teknesyum.VidShrink` ile kurulur.
+   Teknesyum.VidShrinkPlayer` ile kurulur.
 4. Sonraki sürümler için sır: https://github.com/settings/tokens → **Generate new token
    (classic)** → yalnız `public_repo` kutusu. Değeri depoya `WINGET_TOKEN` adıyla ekle.
    Bundan sonra her yayın winget-pkgs'e kendiliğinden çekme isteği açar.
@@ -46,8 +46,8 @@ DAG-P1, sonra aşağısı.
    → **Generate new token** → **Only select repositories** → kova deposu →
    **Repository permissions** → **Contents: Read and write**.
 3. Değeri VidShrink deposuna `SCOOP_BUCKET_TOKEN` adıyla ekle.
-4. Bir sonraki yayında iş, `docs/dagitim/scoop/vidshrink.json`'ı sürüm adresi ve gerçek
-   sha256 ile kovanın `bucket/vidshrink.json` dosyasına yazar.
+4. Bir sonraki yayında iş, `docs/dagitim/scoop/vidshrink-player.json`'ı sürüm adresi ve gerçek
+   sha256 ile kovanın `bucket/vidshrink-player.json` dosyasına yazar.
 5. Kullanıcının kuracağı komut:
    `scoop bucket add teknesyum https://github.com/Teknesyum/scoop-bucket` ve
    `scoop install teknesyum/vidshrink`.
@@ -60,7 +60,7 @@ kurulumdan sonra bakılmalı.
 
 1. https://hosted.weblate.org/ adresinde hesap aç (GitHub ile giriş olur).
 2. Ücretsiz Libre planına başvur: https://hosted.weblate.org/hosting/ → **Libre** →
-   proje adı `vidshrink`, depo `https://github.com/Teknesyum/VidShrink.git`, lisans
+   proje adı `vidshrink`, depo `https://github.com/Teknesyum/VidShrink-Player.git`, lisans
    AGPL-3.0-or-later. Libre yalnız açık kaynak ve herkese açık projeye verilir; onay
    Weblate ekibinden gelir.
 3. Onaydan sonra bileşenleri `docs/dagitim/weblate.md`'deki tablolarla kur: uygulama için

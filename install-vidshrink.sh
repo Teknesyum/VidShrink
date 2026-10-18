@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-repository='Teknesyum/VidShrink'
+repository='Teknesyum/VidShrink-Player'
 install_root=${VIDSHRINK_INSTALL_ROOT:-"$HOME/.local/share/vidshrink-player"}
 bin_directory="$HOME/.local/bin"
 bundle_path="$HOME/Applications/VidShrink Player.app"
@@ -205,7 +205,7 @@ runtime_identifier() {
             case "$machine" in
                 arm64|aarch64) printf 'osx-arm64\n' ;;
                 x86_64|amd64) printf 'osx-x64\n' ;;
-                "") fail "Mimari okunamadı: uname -m ve uname -p boş döndü. macOS'ta osx-arm64 ile osx-x64 arasında varsayım yapılamıyor; doğru arşivi https://github.com/Teknesyum/VidShrink/releases adresinden elle indirin." ;;
+                "") fail "Mimari okunamadı: uname -m ve uname -p boş döndü. macOS'ta osx-arm64 ile osx-x64 arasında varsayım yapılamıyor; doğru arşivi https://github.com/Teknesyum/VidShrink-Player/releases adresinden elle indirin." ;;
                 *) fail "Bu mimari için yayın yok: $machine. macOS'ta yalnız osx-arm64 ve osx-x64 yayımlanıyor." ;;
             esac
             ;;
@@ -214,7 +214,7 @@ runtime_identifier() {
                 x86_64|amd64) printf 'linux-x64\n' ;;
                 aarch64|arm64) printf 'linux-arm64\n' ;;
                 "")
-                    note 'Mimari okunamadı; 64 bit Linux kurulumlarının ezici çoğunluğu x86_64 olduğu için linux-x64 varsayıldı. Makine aarch64 ise linux-arm64 arşivini https://github.com/Teknesyum/VidShrink/releases adresinden elle indirin.'
+                    note 'Mimari okunamadı; 64 bit Linux kurulumlarının ezici çoğunluğu x86_64 olduğu için linux-x64 varsayıldı. Makine aarch64 ise linux-arm64 arşivini https://github.com/Teknesyum/VidShrink-Player/releases adresinden elle indirin.'
                     printf 'linux-x64\n'
                     ;;
                 *) fail "Bu mimari için yayın yok: $machine. Linux'ta yalnız linux-x64 ve linux-arm64 yayımlanıyor." ;;
@@ -295,7 +295,7 @@ has_libmpv() {
     return 1
 }
 
-mac_libmpv_url='https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-macos-mpvkit-1.0.0/libmpv.2-macos-universal-mpvkit-1.0.0.dylib'
+mac_libmpv_url='https://github.com/Teknesyum/VidShrink-Player/releases/download/deps-libmpv-macos-mpvkit-1.0.0/libmpv.2-macos-universal-mpvkit-1.0.0.dylib'
 mac_libmpv_sha256='4b2f896d93dbb82df7b8228597b2dfc3c8ac62e2b933455e6facbe4fdb069b11'
 mac_libmpv_file=''
 

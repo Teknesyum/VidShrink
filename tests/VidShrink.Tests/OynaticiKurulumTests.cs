@@ -110,7 +110,7 @@ public sealed class OynaticiKurulumTests
         var dll = Sabit(kurulum, "libMpvDllSha256");
         var arsivAdi = url[(url.LastIndexOf('/') + 1)..];
         var surum = Regex.Match(arsivAdi, @"^mpv-dev-x86_64-(\d{8})-").Groups[1].Value;
-        Assert.Equal($"https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-{surum}/{arsivAdi}", url);
+        Assert.Equal($"https://github.com/Teknesyum/VidShrink-Player/releases/download/deps-libmpv-{surum}/{arsivAdi}", url);
         Assert.StartsWith($"https://github.com/shinchiro/mpv-winbuild-cmake/releases/download/{surum}/", yedek, StringComparison.Ordinal);
         Assert.Equal(arsivAdi, yedek[(yedek.LastIndexOf('/') + 1)..]);
         Assert.Contains("foreach ($source in @($libMpvUrl, $libMpvFallbackUrl))", kurulum, StringComparison.Ordinal);
@@ -147,8 +147,8 @@ public sealed class OynaticiKurulumTests
         Assert.Same(x64, VidShrink.Core.Setup.LibMpvPin.X64.Vulkan);
         Assert.Same(arm64, VidShrink.Core.Setup.LibMpvPin.Arm64.Vulkan);
         var libmpvSurum = Regex.Match(Sabit(kurulum, "libMpvUrl"), @"/(deps-libmpv-\d{8})/").Groups[1].Value;
-        Assert.Equal($"https://github.com/Teknesyum/VidShrink/releases/download/{libmpvSurum}/vulkan-1-x86_64-1.4.357.0.zip", x64.Url);
-        Assert.Equal($"https://github.com/Teknesyum/VidShrink/releases/download/{libmpvSurum}/vulkan-1-aarch64-1.4.357.0.zip", arm64.Url);
+        Assert.Equal($"https://github.com/Teknesyum/VidShrink-Player/releases/download/{libmpvSurum}/vulkan-1-x86_64-1.4.357.0.zip", x64.Url);
+        Assert.Equal($"https://github.com/Teknesyum/VidShrink-Player/releases/download/{libmpvSurum}/vulkan-1-aarch64-1.4.357.0.zip", arm64.Url);
         Assert.NotEqual(x64.DllSha256, arm64.DllSha256);
 
         Assert.Equal(x64.Url, Sabit(kurulum, "vulkanLoaderZipUrl"));
@@ -234,7 +234,7 @@ public sealed class OynaticiKurulumTests
         var sha = cikti.Groups[2].Value;
         var url = cikti.Groups[3].Value;
 
-        Assert.Equal($"https://github.com/Teknesyum/VidShrink/releases/download/deps-libmpv-macos-mpvkit-1.0.0/{ad}", url);
+        Assert.Equal($"https://github.com/Teknesyum/VidShrink-Player/releases/download/deps-libmpv-macos-mpvkit-1.0.0/{ad}", url);
         Assert.Contains($"mac_libmpv_url='{url}'", kurulum, StringComparison.Ordinal);
         Assert.Contains($"mac_libmpv_sha256='{sha}'", kurulum, StringComparison.Ordinal);
         Assert.Contains("\"$stage_root/tools/libmpv/libmpv.2.dylib\"", kurulum, StringComparison.Ordinal);

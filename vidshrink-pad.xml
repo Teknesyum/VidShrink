@@ -83,22 +83,22 @@
   </Program_Descriptions>
   <Web_Info>
     <Application_URLs>
-      <Application_Info_URL>https://github.com/Teknesyum/VidShrink</Application_Info_URL>
+      <Application_Info_URL>https://github.com/Teknesyum/VidShrink-Player</Application_Info_URL>
       <Application_Order_URL />
-      <Application_Screenshot_URL>https://raw.githubusercontent.com/Teknesyum/VidShrink/v0.8.5/docs/gorseller/T191-kucult-en.png</Application_Screenshot_URL>
-      <Application_Icon_URL>https://raw.githubusercontent.com/Teknesyum/VidShrink/v0.8.5/src/VidShrink.App/Assets/VidShrink.png</Application_Icon_URL>
-      <Application_XML_File_URL>https://raw.githubusercontent.com/Teknesyum/VidShrink/main/vidshrink-pad.xml</Application_XML_File_URL>
+      <Application_Screenshot_URL>https://raw.githubusercontent.com/Teknesyum/VidShrink-Player/v0.8.5/docs/gorseller/T191-kucult-en.png</Application_Screenshot_URL>
+      <Application_Icon_URL>https://raw.githubusercontent.com/Teknesyum/VidShrink-Player/v0.8.5/src/VidShrink.App/Assets/VidShrink.png</Application_Icon_URL>
+      <Application_XML_File_URL>https://raw.githubusercontent.com/Teknesyum/VidShrink-Player/main/vidshrink-pad.xml</Application_XML_File_URL>
     </Application_URLs>
     <Download_URLs>
-      <Primary_Download_URL>https://github.com/Teknesyum/VidShrink/releases/download/v0.8.5/vidshrink-win-x64.zip</Primary_Download_URL>
-      <Secondary_Download_URL>https://github.com/Teknesyum/VidShrink/releases/tag/v0.8.5</Secondary_Download_URL>
+      <Primary_Download_URL>https://github.com/Teknesyum/VidShrink-Player/releases/download/v0.8.5/vidshrink-win-x64.zip</Primary_Download_URL>
+      <Secondary_Download_URL>https://github.com/Teknesyum/VidShrink-Player/releases/tag/v0.8.5</Secondary_Download_URL>
       <Additional_Download_URL_1 />
       <Additional_Download_URL_2 />
     </Download_URLs>
   </Web_Info>
   <Permissions>
     <Distribution_Permissions>VidShrink may be copied and redistributed under the GNU Affero General Public License version 3 or any later version. Distributors must preserve the license and corresponding source availability. FFmpeg and libmpv are separate programs and are not included in the VidShrink release archive.</Distribution_Permissions>
-    <EULA>https://github.com/Teknesyum/VidShrink/blob/v0.8.5/LICENSE</EULA>
+    <EULA>https://github.com/Teknesyum/VidShrink-Player/blob/v0.8.5/LICENSE</EULA>
   </Permissions>
   <ASP>
     <ASP_Member>N</ASP_Member>

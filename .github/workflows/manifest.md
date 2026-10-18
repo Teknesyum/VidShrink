@@ -24,17 +24,17 @@ dosyaların değiştiğine karar vermek için 95 MB'lık arşivi indirmeden yaln
 İndirme adresi kalıbı (yayın taslak değilken):
 
 ```
-https://github.com/Teknesyum/VidShrink/releases/download/<tag>/manifest-<rid>.json
-https://github.com/Teknesyum/VidShrink/releases/download/<tag>/vidshrink-<rid>.zip
-https://github.com/Teknesyum/VidShrink/releases/download/<tag>/vidshrink-launcher-<rid>.zip
-https://github.com/Teknesyum/VidShrink/releases/download/<tag>/checksums-<rid>.txt
+https://github.com/Teknesyum/VidShrink-Player/releases/download/<tag>/manifest-<rid>.json
+https://github.com/Teknesyum/VidShrink-Player/releases/download/<tag>/vidshrink-<rid>.zip
+https://github.com/Teknesyum/VidShrink-Player/releases/download/<tag>/vidshrink-launcher-<rid>.zip
+https://github.com/Teknesyum/VidShrink-Player/releases/download/<tag>/checksums-<rid>.txt
 ```
 
 `<tag>` her zaman `v` ile başlar ve `v` düşünce sürüm numarasını verir: `v1.2.0` →
 `1.2.0`. Aynı sürüm `Directory.Build.props` içindeki `<Version>` ile ve `CHANGELOG.md`
 içindeki `## [1.2.0]` başlığıyla aynıdır; `release.yml` üçü uyuşmazsa yayını yapmadan
 durur. En güncel sürümü öğrenmek için GitHub'ın
-`/repos/Teknesyum/VidShrink/releases/latest` uç noktası kullanılır — taslak yayınlar
+`/repos/Teknesyum/VidShrink-Player/releases/latest` uç noktası kullanılır — taslak yayınlar
 oraya düşmez.
 
 `checksums-<rid>.txt`, `sha256sum` çıktısı biçimindedir: küçük harf onaltılık özet, iki

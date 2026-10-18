@@ -1,16 +1,16 @@
 {
-    "version": "1.2.24",
+    "version": "0.0.1",
     "description": "Shrink a video to a target file size, then play, convert, record or trim it.",
-    "homepage": "https://github.com/Teknesyum/VidShrink",
+    "homepage": "https://github.com/Teknesyum/VidShrink-Player",
     "license": "AGPL-3.0-or-later",
     "depends": "ffmpeg",
     "notes": [
-        "This package carries no launcher: VidShrink does not update itself here, 'scoop update vidshrink' does.",
-        "The player and editor tabs need libmpv-2.dll beside VidShrink.App.exe or a path in VIDSHRINK_LIBMPV."
+        "This package carries no launcher: VidShrink Player does not update itself here, 'scoop update vidshrink-player' does.",
+        "The player and editor tabs need libmpv-2.dll beside VidShrinkPlayer.App.exe or a path in VIDSHRINK_LIBMPV."
     ],
     "architecture": {
         "64bit": {
-            "url": "https://github.com/Teknesyum/VidShrink/releases/download/v1.2.24/vidshrink-win-x64.zip",
+            "url": "https://github.com/Teknesyum/VidShrink-Player/releases/download/v0.0.1/vidshrink-win-x64.zip",
             "hash": "0000000000000000000000000000000000000000000000000000000000000000"
         }
     },
@@ -22,12 +22,12 @@
         ]
     ],
     "checkver": {
-        "github": "https://github.com/Teknesyum/VidShrink"
+        "github": "https://github.com/Teknesyum/VidShrink-Player"
     },
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/Teknesyum/VidShrink/releases/download/v$version/vidshrink-win-x64.zip",
+                "url": "https://github.com/Teknesyum/VidShrink-Player/releases/download/v$version/vidshrink-win-x64.zip",
                 "hash": {
                     "url": "$baseurl/checksums-win-x64.txt",
                     "regex": "$sha256\\s+$basename"

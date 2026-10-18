@@ -167,7 +167,7 @@ Silindi:
 /Users/serkan/Applications/VidShrink.app
 /Users/serkan/.local/bin/vidshrink
 
-$ curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink/main/install-vidshrink.sh | sh
+$ curl -fsSL https://raw.githubusercontent.com/Teknesyum/VidShrink-Player/main/install-vidshrink.sh | sh
 VidShrink kurulumu hazırlanıyor...
 Son yayın aranıyor...
 Kurulacak sürüm: 0.2.5
