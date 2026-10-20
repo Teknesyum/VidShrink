@@ -320,8 +320,8 @@ new release is out.
 
 ## What The Program Shows
 
-Screenshots of the renamed window are being retaken; each slot below says what it will
-show.
+Convert, Recorder and Settings are pictured below. The Player, Editor and Shrink shots need
+a real video and are still being retaken; each of those slots says what it will show.
 
 <!-- screenshot: player-en.png -->
 - **Player** — a video filling the window, the tab bar on top and the control strip below.
@@ -333,14 +333,17 @@ show.
 - **Shrink** — the before-and-after split panel, the plan spelled out, the predicted size
   and quality.
 
-<!-- screenshot: convert-en.png -->
 - **Convert** — container, codec and quality fields beside the FFmpeg command that will run.
 
-<!-- screenshot: recorder-en.png -->
+![The Convert tab with sample.mp4 loaded: container MP4, codec H.264, CRF 23, resolution and frame rate left at Source, AAC audio and start and end trim fields on the left; the audio and subtitle track panels, the FFmpeg command that will run and the idle progress bar on the right, with the Convert button below](docs/gorseller/T300-donustur-en.png)
+
 - **Recorder** — source, sound and webcam pickers, with the measured automatic encoder.
 
-<!-- screenshot: settings-en.png -->
+![The Recorder tab in the Advanced layout, idle: the whole screen chosen as the source with the privacy mask and countdown pickers, the program picking the recording settings with the cursor and click options below, the Advanced Encoding panel with container, audio and split fields, the Webcam panel, the Sound pickers and the Replay Buffer](docs/gorseller/T300-kaydedici-en.png)
+
 - **Settings** — language and theme pickers, right-click menu entries and the update switch.
+
+![The Settings tab: language and theme pickers with the general switches on the left, the diagnostic log, the right-click menu entries for VidShrink Player and the Update Automatically switch in the middle, the output folder, encoding and subtitle account settings on the right](docs/gorseller/T300-ayarlar-en.png)
 
 ## How Shrinking Works
 

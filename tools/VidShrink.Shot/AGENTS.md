@@ -16,7 +16,7 @@ açık) kurulur, `MainWindow` 1600x1000 görüş alanında ölçülüp yerleşti
 `RenderTargetBitmap` üzerine çizilir. Ekran kapısı gerekmez, masaüstü ölçeklemesi ve
 pencere yöneticisi sonucu değiştirmez.
 
-Ad kalıbı `docs/gorseller/T201-<konu>-<dil>.png`; diller `en` ve `tr`, konular
+Ad kalıbı `docs/gorseller/T300-<konu>-<dil>.png` (önek `Program.Contract`); diller `en` ve `tr`, konular
 `kucult-onizleme`, `kucult-yakin`, `donustur`, `kaydedici`, `ayarlar`, `gelismis`,
 `hakkinda`, `oynatici`, `duzenleyici`. Üçüncü argüman virgüllü konu süzgecidir; verilmezse hepsi.
 Bütün kareler tam pencere, 1600x1000.
@@ -33,7 +33,7 @@ dört çentik (%196) uygular (`PreviewZoomNotches`). Dosya adını gösteren kar
 gerçek bir video ikinci argüman olarak verilir — o zaman kare o videodan gelir.
 
 `kucult-onizleme`, `kucult-yakin`, `oynatici` ve `duzenleyici` libmpv ister: `VIDSHRINK_LIBMPV` kurulu
-kopyayı göstermeli (`%LOCALAPPDATA%\Programs\VidShrink\tools\libmpv\libmpv-2.dll`),
+kopyayı göstermeli (`%LOCALAPPDATA%\Programs\VidShrink Player\tools\libmpv\libmpv-2.dll`; depoda `tools\libmpv\libmpv-2.dll`),
 yoksa önizleme borusu 60 saniyede düşer. T200 klibi ffmpeg `mandelbrot` + `sine`
 kaynağından 12 sn 1920x1080 üretildi. T201'de her video ekranı için gerçek videonun rastgele bir anından
 12 sn 1280x720 30 fps kesit çıkarıldı (`ClipInfo` bu değerleri varsayar) ve araç kesit başına bir kez koşturuldu.

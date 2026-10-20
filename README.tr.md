@@ -323,7 +323,8 @@ kapatınca kuruyor; Ayarlar'dan kapatılır. Linux'ta yeni sürümü bir rozet h
 
 ## Program Ne Yaptığını Gösterir
 
-Yeni adlı pencerenin ekran görüntüleri yeniden çekiliyor; aşağıdaki her yer neyi
+Dönüştür, Kaydedici ve Ayarlar aşağıda görüntüleriyle duruyor. Oynatıcı, Düzenleyici ve
+Küçült kareleri gerçek bir video istiyor ve yeniden çekiliyor; o yerlerin her biri neyi
 göstereceğini söylüyor.
 
 <!-- ekran-goruntusu: player-tr.png -->
@@ -337,14 +338,17 @@ göstereceğini söylüyor.
 - **Küçült** — öncesi-sonrası bölmeli panel, açık açık yazılmış plan, öngörülen boyut ve
   kalite.
 
-<!-- ekran-goruntusu: convert-tr.png -->
 - **Dönüştür** — kapsayıcı, kodek ve kalite alanları, yanında koşacak FFmpeg komutu.
 
-<!-- ekran-goruntusu: recorder-tr.png -->
+![Dönüştür sekmesi sample.mp4 yüklüyken: solda kapsayıcı MP4, kodek H.264, CRF 23, Kaynak'ta bırakılmış çözünürlük ve kare hızı, AAC ses, başlangıç ve bitiş kırpma alanları; sağda ses ve altyazı izi panelleri, koşacak FFmpeg komutu ve boştaki ilerleme çubuğu, altında Dönüştür düğmesi](docs/gorseller/T300-donustur-tr.png)
+
 - **Kaydedici** — kaynak, ses ve kamera seçicileri, ölçülerek seçilen otomatik kodlayıcıyla.
 
-<!-- ekran-goruntusu: settings-tr.png -->
+![Kaydedici sekmesi Gelişmiş düzende, boştayken: kaynak olarak bütün ekran, gizlilik maskesi ve geri sayım seçicileri; ayarları program seçerken altında imleç ve tıklama seçenekleri; kapsayıcı, ses ve bölme alanlarıyla Gelişmiş Kodlama paneli, Kamera paneli, Ses seçicileri ve Kayıt Tamponu](docs/gorseller/T300-kaydedici-tr.png)
+
 - **Ayarlar** — dil ve tema seçicileri, sağ tık menüsü girdileri ve güncelleme anahtarı.
+
+![Ayarlar sekmesi: solda dil ve tema seçicileri ile genel anahtarlar, ortada tanı günlüğü, VidShrink Player sağ tık menüsü girdileri ve Kendiliğinden Güncelle anahtarı, sağda çıktı klasörü, kodlama ve altyazı hesabı ayarları](docs/gorseller/T300-ayarlar-tr.png)
 
 ## Küçültme Nasıl Çalışır
 
