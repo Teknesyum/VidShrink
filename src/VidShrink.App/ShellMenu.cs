@@ -98,9 +98,9 @@ internal static class ShellMenu
         if (Root is not { } root) return 0;
         Drop(MenuKey);
         Drop(EnqueueMenuKey);
-        WriteLabel("open", label);
+        WriteLabel(Core.Setup.ShellRegistration.OpenLabelName, label);
         var enqueueLabel = EnqueueLabel();
-        WriteLabel("enqueue", enqueueLabel);
+        WriteLabel(Core.Setup.ShellRegistration.EnqueueLabelName, enqueueLabel);
 
         var written = 0;
         foreach (var extension in OpenExtensions)
@@ -142,7 +142,7 @@ internal static class ShellMenu
     {
         if (Root is not { } root) return 0;
         RemoveShrink();
-        WriteLabel("shrink", label);
+        WriteLabel(Core.Setup.ShellRegistration.ShrinkLabelName, label);
         var entryLabels = EntryLabels();
         WriteEntryLabels(entryLabels);
 
@@ -177,27 +177,17 @@ internal static class ShellMenu
     }
 
     [SupportedOSPlatform("windows")]
-    private static void WriteLabel(string name, string label)
-    {
-        if (Root is not { } root) return;
-        using var key = Registry.CurrentUser.CreateSubKey(root + LabelKey);
-        key.SetValue(name, label, RegistryValueKind.String);
-    }
+    private static int WriteLabel(string name, string label, bool onlyChanged = false)
+        => Root is { } root ? Core.Setup.ShellRegistration.WriteShellLabels(root + LabelKey, [(name, label)], onlyChanged) : 0;
 
     [SupportedOSPlatform("windows")]
     internal static int Relabel(string menu, string label)
     {
         if (Root is not { } root) return 0;
-        var name = menu == MenuKey ? "open" : menu == EnqueueMenuKey ? "enqueue" : "shrink";
-        var written = 0;
-        using (var labels = Registry.CurrentUser.OpenSubKey(root + LabelKey))
-        {
-            if (labels?.GetValue(name) as string != label)
-            {
-                WriteLabel(name, label);
-                written++;
-            }
-        }
+        var name = menu == MenuKey ? Core.Setup.ShellRegistration.OpenLabelName
+            : menu == EnqueueMenuKey ? Core.Setup.ShellRegistration.EnqueueLabelName
+            : Core.Setup.ShellRegistration.ShrinkLabelName;
+        var written = WriteLabel(name, label, onlyChanged: true);
 
         var entryLabels = menu == ShrinkMenuKey ? EntryLabels() : null;
         if (entryLabels is not null) written += WriteEntryLabels(entryLabels, onlyChanged: true);
@@ -222,17 +212,8 @@ internal static class ShellMenu
     private static int WriteEntryLabels(IReadOnlyList<string> entryLabels, bool onlyChanged = false)
     {
         if (Root is not { } root) return 0;
-        using var key = Registry.CurrentUser.CreateSubKey(root + LabelKey);
-        var written = 0;
-        for (var i = 0; i < ShellIntegration.QuickShrinkMenu.Count; i++)
-        {
-            var name = ShellIntegration.QuickShrinkMenu[i].ShellLabelName;
-            if (onlyChanged && key.GetValue(name) as string == entryLabels[i]) continue;
-            key.SetValue(name, entryLabels[i], RegistryValueKind.String);
-            written++;
-        }
-
-        return written;
+        return Core.Setup.ShellRegistration.WriteShellLabels(
+            root + LabelKey, Core.Setup.ShellRegistration.TargetLabelValues(entryLabels), onlyChanged);
     }
 
     /// <summary>

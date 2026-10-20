@@ -7,6 +7,14 @@ All notable changes to VidShrink Player are recorded here. The format follows
 The history of the program under its old name, VidShrink, up to 1.2.24 and the changes
 made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md).
 
+## [Unreleased]
+
+### Fixed
+
+- The installers (setup program, silent install and `Install-VidShrink.ps1`) now write the
+  Windows 11 context menu labels in the install language, so the first menu no longer shows the
+  built-in English names until the app is opened once. Uninstall removes them.
+
 ## [0.0.1]
 
 ### Changed

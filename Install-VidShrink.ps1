@@ -604,8 +604,26 @@ function Get-QuickShrinkLabel($Target, [string]$Language, [string]$LocalesFolder
     return $Target.Fallback
 }
 
+function Get-ShellLabelsKey([string]$Root) {
+    return "$(Get-AssociationSoftwareRoot $Root)\Teknesyum\VidShrinkPlayer\ShellLabels"
+}
+
+function Write-ShellLabels([string]$Root, [string]$Language, [string]$LocalesFolder) {
+    $labels = [ordered]@{
+        'open' = Get-ShellMenuLabel $Language $LocalesFolder
+        'enqueue' = Get-ShellEnqueueMenuLabel $Language $LocalesFolder
+        'shrink' = Get-ShellShrinkMenuLabel $Language $LocalesFolder
+    }
+    foreach ($target in $shellShrinkTargets) { $labels['target.' + $target.Key] = Get-QuickShrinkLabel $target $Language $LocalesFolder }
+    $key = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey((Get-ShellLabelsKey $Root))
+    try {
+        foreach ($name in $labels.Keys) { $key.SetValue($name, $labels[$name], [Microsoft.Win32.RegistryValueKind]::String) }
+    } finally { $key.Dispose() }
+}
+
 function Remove-ShellMenu([string]$Root) {
     $associations = Get-ShellMenuAssociationRoot $Root
+    [Microsoft.Win32.Registry]::CurrentUser.DeleteSubKeyTree((Get-ShellLabelsKey $Root), $false)
     if (-not (Test-Path -LiteralPath $associations)) { return 0 }
 
     $removed = 0
@@ -687,6 +705,7 @@ function Update-ShellMenu([string]$Root, [string]$Executable, [string]$Language)
     $dil = Resolve-ShellMenuLanguage $Language $locales
     $written = Write-ShellMenu $Root $Executable (Get-ShellMenuLabel $dil $locales) (Get-ShellEnqueueMenuLabel $dil $locales)
     $shrinkWritten = Write-ShellShrinkMenu $Root $Executable (Get-ShellShrinkMenuLabel $dil $locales) $dil $locales
+    Write-ShellLabels $Root $dil $locales
     $modern = Write-Windows11ShellMenu $Root (Split-Path -Parent $Executable)
     $path = if ($modern) { 'Windows 11 birincil ve klasik' } else { 'Windows 10 klasik' }
     Write-Host "Sağ tık menüsü $written uzantıya, küçültme alt menüsü $shrinkWritten girdiye yazıldı ($path menü)." -ForegroundColor Green
