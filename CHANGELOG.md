@@ -7,6 +7,14 @@ All notable changes to VidShrink Player are recorded here. The format follows
 The history of the program under its old name, VidShrink, up to 1.2.24 and the changes
 made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md).
 
+## [Unreleased]
+
+### Fixed
+
+- Changing the colour matrix (Convert's BT.601/709/2020 choice and Shrink's colour space
+  filter) now resamples colour with Lanczos instead of bilinear, so sharp colour edges stay
+  cleaner.
+
 ## [0.0.1]
 
 ### Changed

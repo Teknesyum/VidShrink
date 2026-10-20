@@ -67,8 +67,65 @@ public static class RenkKaresi
         var e1 = Olc(kaynakRgb, Kare(etiket, OrtakRgb(yanlis)));
         var e2 = Olc(kaynakYuv, Kare(etiket, "yuv420p"));
         Console.WriteLine(Fmt($"kol=yalniz-etiket etiket={yanlis.ColorSpace}/{yanlis.ColorPrimaries}/{yanlis.ColorRange} rgb-ort-fark={e1.Ort:0.00} rgb-psnr={e1.Psnr:0.00} yuv-ort-fark={e2.Ort:0.00} yuv-psnr={e2.Psnr:0.00}"));
+        return await NedenAsync(klasor);
+    }
+
+    private const string Bt709Etiket = "-colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv";
+    private const string YalnizMatrisEtiket = "-colorspace bt709 -color_primaries smpte170m -color_trc smpte170m -color_range tv";
+    private const string Bt601Etiket = "-colorspace smpte170m -color_primaries smpte170m -color_trc smpte170m -color_range tv";
+    private const string YalnizMatrisParam = "setparams=color_primaries=smpte170m:color_trc=smpte170m";
+    private const string Donusum709 = "zscale=min=170m:tin=601:pin=170m:rin=limited:m=709:t=709:p=709:r=limited";
+
+    private static readonly (string Ad, string Suzgec, string Bicim, string Etiket)[] NedenKollari =
+    {
+        ("ayni-dosya", "null", "yuv420p", Bt601Etiket),
+        ("gidis-donus-bilinear", "zscale=filter=bilinear,format=yuv444p,zscale=filter=bilinear", "yuv420p", Bt601Etiket),
+        ("gidis-donus-spline36", "zscale=filter=spline36,format=yuv444p,zscale=filter=spline36", "yuv420p", Bt601Etiket),
+        ("gidis-donus-lanczos", "zscale=filter=lanczos,format=yuv444p,zscale=filter=lanczos", "yuv420p", Bt601Etiket),
+        ("bt709-444", Donusum709, "yuv444p", Bt709Etiket),
+        ("bt709-bilinear", Donusum709 + ":filter=bilinear", "yuv420p", Bt709Etiket),
+        ("bt709-bicubic", Donusum709 + ":filter=bicubic", "yuv420p", Bt709Etiket),
+        ("bt709-spline36", Donusum709 + ":filter=spline36", "yuv420p", Bt709Etiket),
+        ("bt709-lanczos", Donusum709 + ":filter=lanczos", "yuv420p", Bt709Etiket),
+        ("bt709-cekirdek", "", "yuv420p", Bt709Etiket),
+        ("matris-zscale", "zscale=min=170m:tin=601:pin=170m:rin=limited:m=709:t=601:p=170m:r=limited", "yuv420p", YalnizMatrisEtiket),
+        ("matris-zscale-lanczos", "zscale=min=170m:tin=601:pin=170m:rin=limited:m=709:t=601:p=170m:r=limited:filter=lanczos", "yuv420p", YalnizMatrisEtiket),
+        ("matris-sws-varsayilan", "scale=in_color_matrix=bt601:out_color_matrix=bt709:in_range=tv:out_range=tv," + YalnizMatrisParam, "yuv420p", YalnizMatrisEtiket),
+        ("matris-sws-dogru", "scale=in_color_matrix=bt601:out_color_matrix=bt709:in_range=tv:out_range=tv:flags=accurate_rnd+full_chroma_int+full_chroma_inp," + YalnizMatrisParam, "yuv420p", YalnizMatrisEtiket)
+    };
+
+    private static async Task<int> NedenAsync(string klasor)
+    {
+        var kaynak = Path.Combine(klasor, "kayipsiz.mp4");
+        var (kod, hata) = Kos(ToolLocator.Ffmpeg, Arglar(Fmt($"-hide_banner -nostdin -y -v error -f lavfi -i testsrc2=s={En}x{Boy}:r=24:d=2 -c:v libx264 -qp 0 -preset veryfast -pix_fmt yuv420p {Bt601Etiket} -threads 2"), kaynak));
+        if (kod != 0)
+        {
+            Console.WriteLine("kayipsiz kaynak uretilemedi: " + hata);
+            return 1;
+        }
+        var info = await FfprobeClient.ProbeAsync(kaynak);
+        var kaynakRgb = Kare(kaynak, OrtakRgb(info));
+        var cekirdek = VideoFilterChain.ConversionColorFilter(info, ColorMatrixTarget.Bt709, ColorRangeTarget.Keep)!;
+        Console.WriteLine("neden: kayipsiz (-qp 0) kodlama, kaynak testsrc2 BT.601 sinirli 4:2:0; cekirdek suzgeci: " + cekirdek);
+        foreach (var (ad, suzgec, bicim, etiket) in NedenKollari)
+        {
+            var cikti = Path.Combine(klasor, "neden-" + ad + ".mp4");
+            var vf = suzgec.Length == 0 ? cekirdek : suzgec;
+            (kod, hata) = Kos(ToolLocator.Ffmpeg, Arglar(Fmt($"-hide_banner -nostdin -y -v error -threads 2 -i"), kaynak, "-vf", vf,
+                "-c:v", "libx264", "-qp", "0", "-preset", "veryfast", "-pix_fmt", bicim, "-threads", "2").Concat(etiket.Split(' ')).Append(cikti).ToArray());
+            if (kod != 0)
+            {
+                Console.WriteLine(Fmt($"neden={ad} kodlanamadi: {hata}"));
+                return 1;
+            }
+            var sonuc = await FfprobeClient.ProbeAsync(cikti);
+            var rgb = Olc(kaynakRgb, Kare(cikti, OrtakRgb(sonuc)));
+            Console.WriteLine(Fmt($"neden={ad} bicim={bicim} etiket={sonuc.ColorSpace}/{sonuc.ColorPrimaries}/{sonuc.ColorTransfer}/{sonuc.ColorRange} rgb-ort-fark={rgb.Ort:0.00} rgb-psnr={rgb.Psnr:0.00}"));
+        }
         return 0;
     }
+
+    private static string[] Arglar(string bosluklu, params string[] ek) => bosluklu.Split(' ').Concat(ek).ToArray();
 
     private static string OrtakRgb(MediaInfo info)
     {
@@ -77,6 +134,13 @@ public static class RenkKaresi
             "bt709" => ("709", "709", "709"),
             "bt2020nc" => ("2020_ncl", "2020_10", "2020"),
             _ => ("170m", "601", "170m")
+        };
+        t = info.ColorTransfer?.ToLowerInvariant() switch
+        {
+            "bt709" => "709",
+            "smpte170m" or "bt470bg" => "601",
+            "bt2020-10" => "2020_10",
+            _ => t
         };
         p = info.ColorPrimaries?.ToLowerInvariant() switch
         {

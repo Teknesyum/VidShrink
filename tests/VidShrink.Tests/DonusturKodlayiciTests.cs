@@ -134,7 +134,7 @@ public sealed class DonusturKodlayiciTests
         };
         var args = Kur(Ornek(), plan);
 
-        Assert.Equal("zscale=min=170m:tin=601:pin=170m:rin=limited:m=2020_ncl:t=2020_10:p=2020:r=full", Sonraki(args, "-vf"));
+        Assert.Equal("zscale=min=170m:tin=601:pin=170m:rin=limited:m=2020_ncl:t=2020_10:p=2020:r=full:filter=lanczos", Sonraki(args, "-vf"));
         Assert.True(Ardisik(args, "-colorspace", "bt2020nc", "-color_primaries", "bt2020", "-color_trc", "bt2020-10"));
         Assert.True(Ardisik(args, "-color_range", "pc"));
     }
@@ -145,7 +145,7 @@ public sealed class DonusturKodlayiciTests
     {
         var info = Ornek();
         var plan709 = new ConversionPlan { Container = "mp4", Filters = ConversionPlan.DefaultFilters with { ColorMatrix = ColorMatrixTarget.Bt709 } };
-        Assert.Equal("zscale=min=170m:tin=601:pin=170m:rin=limited:m=709:t=709:p=709:r=limited", Sonraki(Kur(info, plan709), "-vf"));
+        Assert.Equal("zscale=min=170m:tin=601:pin=170m:rin=limited:m=709:t=709:p=709:r=limited:filter=lanczos", Sonraki(Kur(info, plan709), "-vf"));
 
         var ayni = Kur(info, plan709 with { Filters = plan709.Filters with { ColorMatrix = ColorMatrixTarget.Bt601 } });
         Assert.DoesNotContain("-vf", ayni);
@@ -153,7 +153,7 @@ public sealed class DonusturKodlayiciTests
 
         var tamKaynak = info with { ColorRange = "pc" };
         var sinirli = Kur(tamKaynak, new ConversionPlan { Container = "mp4", ColorRange = ColorRangeTarget.Limited });
-        Assert.Equal("zscale=min=170m:tin=601:pin=170m:rin=full:m=170m:t=601:p=170m:r=limited", Sonraki(sinirli, "-vf"));
+        Assert.Equal("zscale=min=170m:tin=601:pin=170m:rin=full:m=170m:t=601:p=170m:r=limited:filter=lanczos", Sonraki(sinirli, "-vf"));
         Assert.True(Ardisik(sinirli, "-color_range", "tv"));
     }
 
@@ -193,7 +193,7 @@ public sealed class DonusturKodlayiciTests
         var metin = VideoFilterChain.Format(options);
         Assert.Contains("colorspace=bt2020", metin);
         Assert.Equal(ColorMatrixTarget.Bt2020, VideoFilterChain.Parse(metin).ColorMatrix);
-        Assert.Equal("zscale=min=170m:tin=601:pin=170m:m=2020_ncl:t=2020_10:p=2020", VideoFilterChain.ColorMatrixFilter(Ornek(), ColorMatrixTarget.Bt2020));
+        Assert.Equal("zscale=min=170m:tin=601:pin=170m:m=2020_ncl:t=2020_10:p=2020:filter=lanczos", VideoFilterChain.ColorMatrixFilter(Ornek(), ColorMatrixTarget.Bt2020));
         Assert.Null(VideoFilterChain.ColorMatrixFilter(Ornek() with { ColorSpace = "bt2020nc" }, ColorMatrixTarget.Bt2020));
     }
 
@@ -241,6 +241,60 @@ public sealed class DonusturKodlayiciTests
             Assert.Equal("bt2020", sonuc.ColorPrimaries);
             Assert.Equal("pc", sonuc.ColorRange);
             Assert.DoesNotContain(Directory.EnumerateFiles(Path.GetTempPath(), "vidshrink_pass_*"), dosya => !onceki.Contains(dosya));
+        }
+        finally
+        {
+            try { Directory.Delete(klasor, true); }
+            catch (IOException) { }
+        }
+    }
+
+    /// <summary>
+    /// Matris değişince zscale kroma düzlemini 4:4:4'e açıp yeniden 4:2:0'a indirir; varsayılan bilinear süzgeç keskin
+    /// renk kenarında RGB PSNR'ı düşürür (<c>docs/olcumler/donustur-renk-kolu.md</c>). Kayıpsız kodlamayla kodlayıcı payı
+    /// dışarıda kalır: BT.601'den BT.709'a çevrilen kare, kaynağa ortak RGB'de 33.5 dB'den yakın kalmalı.
+    /// </summary>
+    [TonemapFact]
+    public async Task MatrisCevirisiKromaKenariniKorur()
+    {
+        var klasor = Path.Combine(Folder, "don-renk-kroma");
+        Directory.CreateDirectory(klasor);
+        var kaynak = Path.Combine(klasor, "kaynak.mp4");
+        var cikti = Path.Combine(klasor, "cikti.mp4");
+        try
+        {
+            var uret = await FfmpegRunner.RunAsync(new[]
+            {
+                "-nostdin", "-hide_banner", "-y", "-f", "lavfi", "-i", "testsrc2=s=320x240:r=24:d=0.25",
+                "-c:v", "libx264", "-qp", "0", "-preset", "ultrafast", "-pix_fmt", "yuv420p", "-colorspace", "smpte170m",
+                "-color_range", "tv", "-threads", "2", kaynak
+            });
+            Assert.True(uret.Ok, uret.StandardError);
+            var info = await FfprobeClient.ProbeAsync(kaynak);
+            var plan = new ConversionPlan
+            {
+                Container = "mp4",
+                AudioCodec = null,
+                EncoderPreset = "ultrafast",
+                Crf = 0,
+                Filters = ConversionPlan.DefaultFilters with { ColorMatrix = ColorMatrixTarget.Bt709 },
+                ExtraArgs = new[] { "-qp", "0", "-threads", "2" }
+            };
+            await new EncodeRunner().ConvertAsync(info, plan, cikti, null);
+            Assert.Equal("bt709", (await FfprobeClient.ProbeAsync(cikti)).ColorSpace);
+
+            var olcum = await FfmpegRunner.RunAsync(new[]
+            {
+                "-nostdin", "-hide_banner", "-threads", "2", "-i", kaynak, "-i", cikti, "-lavfi",
+                "[0]zscale=min=170m:tin=601:pin=170m:rin=limited:t=709:p=709,format=gbrp[a];"
+                + "[1]zscale=min=709:tin=709:pin=709:rin=limited:t=709:p=709,format=gbrp[b];[a][b]psnr",
+                "-f", "null", "-"
+            });
+            Assert.True(olcum.Ok, olcum.StandardError);
+            var eslesme = System.Text.RegularExpressions.Regex.Match(olcum.StandardError, @"average:([0-9.]+)");
+            Assert.True(eslesme.Success, olcum.StandardError);
+            var psnr = double.Parse(eslesme.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture);
+            Assert.True(psnr > 33.5, $"RGB PSNR {psnr:0.00} dB");
         }
         finally
         {
