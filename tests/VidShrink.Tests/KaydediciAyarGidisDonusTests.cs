@@ -24,6 +24,9 @@ namespace VidShrink.Tests;
 /// <para>
 /// 2026-10-17: <c>HdrToSdr</c> yaninda goc isareti <c>hdrToSdrDefaultOn</c> yazilir; iki anahtar sayilir.
 /// </para>
+/// <para>
+/// 2026-10-20: bes <c>Frame*</c> ayari tek <c>frame</c> nesnesine yazilir; bir anahtar sayilir, dolgu ve kose secenekten secilir.
+/// </para>
 /// </summary>
 public sealed class KaydediciAyarGidisDonusTests
 {
@@ -43,14 +46,22 @@ public sealed class KaydediciAyarGidisDonusTests
         ["Hotkeys"] = "2:F1,2:F2,2:F3,2:F4,2:F5,2:F6,2:F7,2:F8",
         ["PrompterStep"] = 5,
         ["PrompterLook"] = new PrompterLook(Mirror: true, Line: false, Size: 0),
-        ["ScheduleAt"] = new DateTime(2026, 10, 12, 14, 30, 0)
+        ["ScheduleAt"] = new DateTime(2026, 10, 12, 14, 30, 0),
+        ["FrameBackdrop"] = 3,
+        ["FramePadding"] = 128,
+        ["FrameCorner"] = 48
     };
 
     private static readonly Dictionary<string, int> CokAnahtarli = new()
     {
         ["KeyCaption"] = 3,
         ["PrompterLook"] = 3,
-        ["HdrToSdr"] = 2
+        ["HdrToSdr"] = 2,
+        ["FrameBackdrop"] = 1,
+        ["FramePadding"] = 0,
+        ["FrameCorner"] = 0,
+        ["FrameShadow"] = 0,
+        ["FrameImage"] = 0
     };
 
     internal static IReadOnlyList<PropertyInfo> Ozellikler() => typeof(RecorderSettings)

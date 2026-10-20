@@ -47,11 +47,23 @@ internal sealed class LoopbackFeed : IDisposable
     /// Okuyorsa jeton yerinde degistirilir; donen besleme surecle birlikte kapatilmalidir.
     /// </summary>
     public static LoopbackFeed? Bind(IList<string> arguments, Func<ISystemAudioCapture?> open)
+        => Bind(arguments, open, SystemAudioCapture.OpenApp);
+
+    public static LoopbackFeed? Bind(IList<string> arguments, Func<ISystemAudioCapture?> open, Func<string, ISystemAudioCapture?> openApp)
     {
         ArgumentNullException.ThrowIfNull(arguments);
         ArgumentNullException.ThrowIfNull(open);
+        ArgumentNullException.ThrowIfNull(openApp);
 
-        var index = arguments.IndexOf(LoopbackAudio.PipeToken);
+        var index = -1;
+        string? app = null;
+        for (var i = 0; i < arguments.Count; i++)
+        {
+            if (!AppAudio.TryReadToken(arguments[i], out app)) continue;
+            index = i;
+            break;
+        }
+
         if (index < 0) return null;
 
         var suffix = $"-{Environment.ProcessId}-{Guid.NewGuid():N}";
@@ -62,7 +74,7 @@ internal sealed class LoopbackFeed : IDisposable
         arguments[index] = path;
 
         ISystemAudioCapture? capture = null;
-        try { capture = open(); }
+        try { capture = app is null ? open() : openApp(app); }
         catch (Exception ex) when (ex is COMException or InvalidOperationException or IOException) { }
 
         return new LoopbackFeed(pipe, capture);

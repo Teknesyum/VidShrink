@@ -16,7 +16,7 @@ namespace VidShrink.App.Recorder;
 /// ve kalite motorun kendi sabitlerinden (<see cref="RecorderArguments"/>) geliyor. Böylece
 /// arayüzün açılışta gösterdiği değer motorun varsayılanıyla aynı kalıyor.</para>
 /// </summary>
-internal sealed class RecorderSettings
+internal sealed partial class RecorderSettings
 {
     internal const string FileName = "recorder-settings.json";
 
@@ -311,6 +311,7 @@ internal sealed class RecorderSettings
         {
             if (JsonNode.Parse(File.ReadAllText(file)) is not JsonObject root) return settings;
             settings.OutputFolder = (string?)root["outputFolder"];
+            settings.ReadFrame(root);
             settings.ManualMode = (bool?)root["manualMode"] ?? !((bool?)root["autoMode"] ?? true);
             settings.AdvancedMode = (bool?)root["advancedMode"] ?? settings.ManualMode;
             if ((int?)root["countdownSeconds"] is { } countdown && Array.IndexOf(CountdownChoices, countdown) >= 0) settings.CountdownSeconds = countdown;
@@ -451,6 +452,7 @@ internal sealed class RecorderSettings
                 writer.WriteStartObject();
                 if (OutputFolder is null) writer.WriteNull("outputFolder");
                 else writer.WriteString("outputFolder", OutputFolder);
+                WriteFrame(writer);
                 writer.WriteBoolean("manualMode", ManualMode);
                 writer.WriteBoolean("advancedMode", AdvancedMode);
                 writer.WriteNumber("countdownSeconds", CountdownSeconds);

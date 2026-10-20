@@ -7,6 +7,15 @@ All notable changes to VidShrink Player are recorded here. The format follows
 The history of the program under its old name, VidShrink, up to 1.2.24 and the changes
 made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md).
 
+## [Unreleased]
+
+### Added
+
+- Recorder: per-app audio. The audio list offers each program that is playing sound and records only that program
+  (Windows 10 2004 and later; on older systems and outside Windows the entry is shown disabled with the reason).
+- Recorder: "Frame" button on the result panel. Puts the finished recording on a solid color, one of four
+  gradients from the palette or an image of your own, with padding, rounded corners and a shadow.
+
 ## [0.0.1]
 
 ### Changed
