@@ -91,7 +91,7 @@ public sealed class LanguageTests : IDisposable
     /// </summary>
     private static readonly string[] XamlNamesThatStayAsWritten =
     {
-        "Vid", "Shrink",
+        "Vid", "Shrink", "Player",
         "MB", "CRF", "1280x720",
         "MP4", "MKV", "WebM", "MOV", "AVI", "GIF", "MP3", "M4A", "WAV", "FLAC", "WebP", "AVIF", "MXF",
         "H.264", "H.265", "VP9", "AV1", "AAC", "Opus", "PCM",
