@@ -38,9 +38,13 @@
                  TextWrapping="Wrap"
                  Foreground="{StaticResource TextBody}" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
-      <ProgressBar x:Name="Progress"
-                   Minimum="0" Maximum="1"
-                   Height="{StaticResource ProgressBarHeight}"/>
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+        <ProgressBar x:Name="Progress"
+                     Minimum="0" Maximum="1"
+                     VerticalAlignment="Center"
+                     Height="{StaticResource ProgressBarHeight}"/>
+        <SarilanMetin x:Name="TxtProgressPercent" Grid.Column="1" VerticalAlignment="Center" Theme="{StaticResource MonoValue}" IsVisible="False"/>
+      </Grid>
 
       <Grid ColumnDefinitions="Auto,*,Auto,Auto" x:Name="RowFacts">
         <SarilanMetin Grid.Column="0"

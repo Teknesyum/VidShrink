@@ -7,6 +7,13 @@ All notable changes to VidShrink Player are recorded here. The format follows
 The history of the program under its old name, VidShrink, up to 1.2.24 and the changes
 made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md).
 
+## [Unreleased]
+
+### Added
+
+- The quality check now also runs for jobs in the batch and shell queue window, shows a
+  percentage while it measures, and writes the score and band to the diagnostic log.
+
 ## [0.0.1]
 
 ### Changed

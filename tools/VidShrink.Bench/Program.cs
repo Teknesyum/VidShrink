@@ -42,6 +42,7 @@ try
         "smart-audio-drift" => await AkilliSesKaymasi.RunAsync(args),
         "smart-mpeg2" => await AkilliMpeg2.RunAsync(args),
         "color-frame" => await RenkKaresi.RunAsync(args),
+        "quality-bands" => await KaliteBandi.RunAsync(args),
         _ => Unknown(args[0])
     };
 }
@@ -71,6 +72,7 @@ static void PrintUsage()
     Console.WriteLine("  bench smart-audio-drift [--codecs aac,ac3,eac3,mp3,opus] [--containers mkv,mp4,mov,m4v] [--threshold-ms 41.7] [--out .calisma/akilli-ses-kaymasi]");
     Console.WriteLine("  bench smart-mpeg2 [--arms kapali-mkv,kapali-mp4,kapali-ts,taramali-tt-mkv,taramali-bb-ts,acik-mp4] [--min-psnr 30] [--out .calisma/akilli-mpeg2]");
     Console.WriteLine("  bench color-frame [klasor]");
+    Console.WriteLine("  bench quality-bands [klasor]");
     Console.WriteLine("  bench panel <klip,...> --only o1,o2,o3,o4,o5,o6 [--panel-width 960] [--zoom 4] [--samples 12] [--target 20]");
     Console.WriteLine("  bench play <klipA,klipB> --only k2,p1,p1b,k3,p2,p3,p5,p6,p8,p9,p10,p11,p12 [--seconds 10] [--fps 60] [--runs 3] [--target 20] [--matrix klip,...]");
 }

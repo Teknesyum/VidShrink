@@ -161,22 +161,24 @@ public sealed class OutputQualityCheckTests
             var pencere = new MainWindow();
             try
             {
-                pencere.KaliteOlcer = (_, _, _) => Task.FromResult<OutputQuality?>(new OutputQuality(OutputQualityMetric.Vmaf, 95.24, 1));
+                var gunluk = new List<string>();
+                pencere.KaliteGunlugu = gunluk.Add;
+                pencere.KaliteOlcer = (_, _, _, _) => Task.FromResult<OutputQuality?>(new OutputQuality(OutputQualityMetric.Vmaf, 95.24, 1));
                 var iyi = Bekle(pencere.KaliteSatiriAsync("a", "b", CancellationToken.None));
-                pencere.KaliteOlcer = (_, _, _) => Task.FromResult<OutputQuality?>(new OutputQuality(OutputQualityMetric.Ssim, 0.91234, 4));
+                pencere.KaliteOlcer = (_, _, _, _) => Task.FromResult<OutputQuality?>(new OutputQuality(OutputQualityMetric.Ssim, 0.91234, 4));
                 var ssim = Bekle(pencere.KaliteSatiriAsync("a", "b", CancellationToken.None));
-                pencere.KaliteOlcer = (_, _, _) => Task.FromResult<OutputQuality?>(null);
+                pencere.KaliteOlcer = (_, _, _, _) => Task.FromResult<OutputQuality?>(null);
                 var yok = Bekle(pencere.KaliteSatiriAsync("a", "b", CancellationToken.None));
-                pencere.KaliteOlcer = (_, _, _) => throw new InvalidOperationException("ffmpeg");
+                pencere.KaliteOlcer = (_, _, _, _) => throw new InvalidOperationException("ffmpeg");
                 var hata = Bekle(pencere.KaliteSatiriAsync("a", "b", CancellationToken.None));
                 using var iptal = new CancellationTokenSource();
                 iptal.Cancel();
-                pencere.KaliteOlcer = (_, _, ct) => Task.FromCanceled<OutputQuality?>(ct);
+                pencere.KaliteOlcer = (_, _, _, ct) => Task.FromCanceled<OutputQuality?>(ct);
                 var iptalde = Bekle(pencere.KaliteSatiriAsync("a", "b", iptal.Token));
                 var beklenenIyi = Beklenen("VMAF", MainWindow.Num(95.24, "0.0"), "main.run.quality.transparent");
                 var beklenenSsim = Beklenen("SSIM", MainWindow.Num(0.91234, "0.000"), "main.run.quality.visible");
                 var olculemedi = LanguageCatalog.Display(Strings.Get("main.run.quality.failed"));
-                return (iyi, ssim, yok, hata, iptalde, beklenenIyi, beklenenSsim, olculemedi);
+                return (iyi, ssim, yok, hata, iptalde, beklenenIyi, beklenenSsim, olculemedi, gunluk);
             }
             finally { pencere.Close(); }
         });
@@ -189,6 +191,9 @@ public sealed class OutputQualityCheckTests
         Assert.Equal(sonuc.olculemedi, sonuc.hata);
         Assert.NotEqual(sonuc.olculemedi, sonuc.iyi);
         Assert.Equal("", sonuc.iptalde);
+        Assert.Equal(4, sonuc.gunluk.Count);
+        Assert.Equal("kalite: b VMAF 95.24 bant=transparent alt-ornekleme=1", sonuc.gunluk[0]);
+        Assert.Equal("kalite: b olculemedi", sonuc.gunluk[3]);
     }
 
     private static string Beklenen(string olcut, string sayi, string bant)
