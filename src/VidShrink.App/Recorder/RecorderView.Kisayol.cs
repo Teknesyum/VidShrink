@@ -223,6 +223,7 @@ internal partial class RecorderView
         HotkeyAction.Chapter => Say("recorder.hotkeys.chapter"),
         HotkeyAction.PushToTalk => Say("recorder.audio.push-to-talk"),
         HotkeyAction.Draw => Say("recorder.hotkeys.draw"),
+        HotkeyAction.Ink => Say("recorder.hotkeys.ink"),
         _ => Say("recorder.hotkeys.replay-save")
     };
 
@@ -305,6 +306,7 @@ internal partial class RecorderView
         HotkeyAction.Chapter => CanMarkChapter,
         HotkeyAction.PushToTalk => false,
         HotkeyAction.Draw => HasSession,
+        HotkeyAction.Ink => SketchLayer.Visible,
         _ => action is not (HotkeyAction.Stop or HotkeyAction.Discard) || HasSession || CountingDown
     };
 
@@ -321,6 +323,7 @@ internal partial class RecorderView
             case HotkeyAction.ReplaySave: await SaveReplayAsync(); break;
             case HotkeyAction.Chapter: MarkChapter(); break;
             case HotkeyAction.Draw: ToggleSketch(); break;
+            case HotkeyAction.Ink: SketchLayer.NextInk(); break;
         }
 
         return true;

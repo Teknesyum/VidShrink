@@ -60,6 +60,13 @@ public sealed class ScreenSketch
         }
     }
 
+    public SketchInk NextInk()
+    {
+        var inks = Enum.GetValues<SketchInk>();
+        Ink = inks[(Array.IndexOf(inks, Ink) + 1) % inks.Length];
+        return Ink;
+    }
+
     /// <summary>Araç ya da mürekkep değişti; araç paneli seçimini buna göre gösterir.</summary>
     public event Action? Selected;
 

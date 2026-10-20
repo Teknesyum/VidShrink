@@ -7,6 +7,18 @@ All notable changes to VidShrink Player are recorded here. The format follows
 The history of the program under its old name, VidShrink, up to 1.2.24 and the changes
 made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md).
 
+## [Unreleased]
+
+### Added
+
+- Recorder: a reassignable hotkey (Ctrl+F3 by default) cycles the drawing ink while the drawing layer is open.
+
+### Fixed
+
+- Recorder: on several monitors the drawing layer opens on the right screen. Without a capture area it covers the
+  screen under the pointer instead of always the primary one; an area spanning monitors with different scaling is
+  trimmed to one monitor so the layer is not sized with the wrong scale.
+
 ## [0.0.1]
 
 ### Changed

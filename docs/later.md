@@ -20,7 +20,8 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Adım 2 (prompter) 16 Ekim 2026'da main'de: kaydedicide "Prompter" (`RecorderPrompter`, `PrompterScroll`); kayıttan çıkarılır, çıkarılamazsa pencerede uyarı; kayıt başlayınca akar, duraklayınca durur; yedi hız basamağı, metin ve hız ayarda (`PrompterTests`).
 - Prompter görünümü 16 Ekim 2026'da main'de: ayna, ortada okuma çizgisi, üç basamaklı yazı boyu (belirteçlerden), ayarda (`PrompterLook`, `PrompterTests.AynaCizgiVeYaziBoyuUygulanirAyaraYazilir`).
 - Plan: Çizim için ekranı kaplayan saydam bir pencere açılır; kısayolla çizim kipine girilir, kalem, ok, kutu, numara ve yazı çizilir, pencere kayda girer. Prompter (konuşma metnini akıtan pencere) ayrı penceredir ve `CaptureAffinity.Exclude` ile kayıttan çıkarılır; Windows 10 2004 öncesinde pencere kayıttan çıkmadığı için orada uyarı gösterilir (CaptureAffinity.cs:16-20). İki adımda teslim edilebilir: önce çizim, sonra prompter. Çizim araçları başsız pencere testiyle, kayıttan çıkarma bayrağı pencere başına ölçülür.
-- Durum (18 Ekim 2026, main): çizime araç paneli ve mürekkep rengi geldi (`yan/cizim-prompter`). Açık: çoklu ekranda yalnız kayıt bölgesi kaplanır, renk için kısayol yok, panelin görsel denetimi elle yapılacak.
+- Durum (20 Ekim 2026, `worktree-agent-later-42`): mürekkep kısayolu geldi (Ctrl+F3, yeniden atanabilir, `HotkeyAction.Ink`); çoklu ekranda katman alanı `SketchArea.Of` ile seçilir (bölge yoksa imlecin ekranı, ölçeği farklı iki ekrana taşan bölge tek ekrana kırpılır), saf hesapla ölçüldü (`EkranaCizimTests`).
+- Kalan: gerçek çoklu ekranda (ölçeği farklı iki monitör) elle deneme ve araç panelinin görsel denetimi; bu makinede tek ekran var, ikisi de ekran başında yapılır.
 
 ## 50. Mac Ortam Denetimi Bağlantısı
 

@@ -91,7 +91,7 @@ public sealed class EkranaCizimTests
     {
         var bag = RecorderHotkeys.Of(RecorderHotkeys.All, HotkeyAction.Draw);
         Assert.Equal((Key.F2, KeyModifiers.Control, 0x71u), (bag.Key, bag.Modifiers, bag.VirtualKey));
-        Assert.Equal(HotkeyAction.Draw, RecorderHotkeys.All[^1].Action);
+        Assert.Equal(HotkeyAction.Draw, RecorderHotkeys.All[^2].Action);
 
         var eski = RecorderHotkeys.Read("0:F7,0:F8,0:F9,0:F10,0:F11,0:F6,2:F5")!;
         Assert.Equal(bag, RecorderHotkeys.Of(eski, HotkeyAction.Draw));
@@ -126,7 +126,110 @@ public sealed class EkranaCizimTests
             Visible = true;
         }
 
+        public int Murekkep;
+
+        public void NextInk() => Murekkep++;
+
         public void Close() => Visible = false;
+    }
+
+    [Fact]
+    public void MurekkepKisayoluSiraylaDolasirYalnizAcikKatmandaKosar()
+    {
+        var cizim = new ScreenSketch();
+        var haber = 0;
+        cizim.Selected += () => haber++;
+        var sira = Enumerable.Range(0, 5).Select(_ => cizim.NextInk()).ToArray();
+        Assert.Equal(new[] { SketchInk.Blue, SketchInk.Pink, SketchInk.Green, SketchInk.Ember, SketchInk.Blue }, sira);
+        Assert.Equal(5, haber);
+
+        var bag = RecorderHotkeys.Of(RecorderHotkeys.All, HotkeyAction.Ink);
+        Assert.Equal((Key.F3, KeyModifiers.Control, 0x72u), (bag.Key, bag.Modifiers, bag.VirtualKey));
+        var eski = RecorderHotkeys.Read("0:F7,0:F8,0:F9,0:F10,0:F11,0:F6,2:F5,2:F2")!;
+        Assert.Equal(bag, RecorderHotkeys.Of(eski, HotkeyAction.Ink));
+        var cakisan = RecorderHotkeys.Read("0:F7,0:F8,0:F9,0:F10,0:F11,0:F6,2:F5,2:F3")!;
+        Assert.False(RecorderHotkeys.IsAssigned(RecorderHotkeys.Of(cakisan, HotkeyAction.Ink)));
+        Assert.Equal(Key.F3, RecorderHotkeys.Of(cakisan, HotkeyAction.Draw).Key);
+
+        using var ayar = new KaydediciAyarTests.OzelAyar();
+        var sonuc = AppHost.Run(() =>
+        {
+            var katman = new SahteKatman();
+            var view = new RecorderView(ayar.Yol) { SketchLayer = katman };
+            var kapaliyken = (Kostu: view.RunHotkeyAsync(HotkeyAction.Ink).GetAwaiter().GetResult(), katman.Murekkep);
+            katman.Toggle(default);
+            var acikken = (Kostu: view.RunHotkeyAsync(HotkeyAction.Ink).GetAwaiter().GetResult(), katman.Murekkep);
+            var atandi = view.AssignHotkey(HotkeyAction.Ink, Key.I, KeyModifiers.Control);
+            var dosya = File.ReadAllText(ayar.Yol);
+            var yeniden = RecorderHotkeys.Of(new RecorderView(ayar.Yol).Hotkeys, HotkeyAction.Ink);
+            return (kapaliyken, acikken, atandi, dosya, yeniden, Ad: view.HotkeyName(HotkeyAction.Ink));
+        });
+
+        Assert.Equal((false, 0), sonuc.kapaliyken);
+        Assert.Equal((true, 1), sonuc.acikken);
+        Assert.True(sonuc.atandi);
+        Assert.Contains("2:F2,2:I", sonuc.dosya);
+        Assert.Equal((Key.I, KeyModifiers.Control), (sonuc.yeniden.Key, sonuc.yeniden.Modifiers));
+        Assert.Contains("I", sonuc.Ad);
+    }
+
+    [Fact]
+    public void GercekKatmandaMurekkepKisayoluCizimiVePaneliGecirir()
+    {
+        var bos = new RecorderSketchHost();
+        bos.NextInk();
+        Assert.Null(bos.Window);
+        if (!OperatingSystem.IsWindows()) return;
+
+        var sonuc = AppHost.Run(() =>
+        {
+            var katman = new RecorderSketchHost();
+            katman.Toggle(new PixelRect(220, 320, 400, 300));
+            Bekle(200);
+            katman.NextInk();
+            var pencere = katman.Window!;
+            var panel = pencere.Tools!;
+            pencere.Down(N(10, 10));
+            pencere.Drag(N(40, 40));
+            pencere.Up();
+            var durum = (pencere.Sketch.Ink, Mavi: panel.ButtonOf(SketchInk.Blue).IsChecked, Kor: panel.ButtonOf(SketchInk.Ember).IsChecked,
+                Iz: pencere.Sketch.Strokes[^1].Ink);
+            katman.Close();
+            return durum;
+        });
+
+        Assert.Equal((SketchInk.Blue, (bool?)true, (bool?)false, SketchInk.Blue), sonuc);
+    }
+
+    private static readonly SketchScreen Sol = new(new PixelRect(0, 0, 1920, 1080), 1);
+    private static readonly SketchScreen SagAyni = new(new PixelRect(1920, 0, 1920, 1080), 1);
+    private static readonly SketchScreen SagYuksek = new(new PixelRect(1920, -200, 2880, 1620), 1.5);
+
+    [Fact]
+    public void CokluEkrandaKatmanTekOlcekliEkraniKaplar()
+    {
+        var ikiz = new[] { SagAyni, Sol };
+        Assert.Equal(SagAyni.Bounds, SketchArea.Of(null, ikiz, new PixelPoint(2500, 500)));
+        Assert.Equal(Sol.Bounds, SketchArea.Of(null, ikiz, null));
+        Assert.Equal(Sol.Bounds, SketchArea.Of(null, ikiz, new PixelPoint(-50, 5000)));
+
+        var tasan = new PixelRect(1500, 100, 1000, 600);
+        Assert.Equal(tasan, SketchArea.Of(tasan, ikiz, new PixelPoint(10, 10)));
+
+        var karisik = new[] { Sol, SagYuksek };
+        Assert.Equal(new PixelRect(1920, 100, 580, 600), SketchArea.Of(tasan, karisik, new PixelPoint(2000, 300)));
+        Assert.Equal(new PixelRect(1500, 100, 420, 600), SketchArea.Of(tasan, karisik, new PixelPoint(100, 300)));
+        Assert.Equal(new PixelRect(1920, 100, 580, 600), SketchArea.Of(tasan, karisik, new PixelPoint(100, 5000)));
+        Assert.Equal(new PixelRect(1920, 100, 580, 600), SketchArea.Of(tasan, karisik, null));
+
+        var tekEkranda = new PixelRect(100, 100, 400, 300);
+        Assert.Equal(tekEkranda, SketchArea.Of(tekEkranda, karisik, new PixelPoint(3000, 300)));
+
+        Assert.Equal(1.5, SketchArea.ScalingOf(new PixelRect(1920, 100, 580, 600), karisik));
+        Assert.Equal(1, SketchArea.ScalingOf(new PixelRect(1500, 100, 420, 600), karisik));
+        Assert.Equal(1.5, SketchArea.ScalingOf(new PixelRect(1800, 100, 700, 600), karisik));
+        Assert.Equal(1, SketchArea.ScalingOf(new PixelRect(-900, -900, 10, 10), karisik));
+        Assert.Equal(new PixelRect(5, 5, 10, 10), SketchArea.Of(new PixelRect(5, 5, 10, 10), [], null));
     }
 
     /// <summary>

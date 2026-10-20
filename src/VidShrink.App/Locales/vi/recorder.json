@@ -178,6 +178,7 @@
   "recorder.hotkeys.unsupported": "Phím này không thể làm phím tắt toàn cục. Hãy dùng phím chức năng, hoặc một chữ cái hay chữ số cùng với Ctrl hoặc Alt.",
   "recorder.hotkeys.chapter": "Đánh dấu chương",
   "recorder.hotkeys.draw": "Vẽ trên màn hình",
+  "recorder.hotkeys.ink": "Màu vẽ tiếp theo",
   "recorder.hotkeys.unassigned": "(chưa gán phím)",
   "recorder.sketch.tools": "Vẽ trên màn hình khi đang ghi. P bút, A mũi tên, B khung, N số, T văn bản; Ctrl+Z hoàn tác, Delete xóa hết, Esc xóa và đóng. Nhấn lại phím tắt để giữ hình vẽ trên màn hình và chuyển chuột cho ứng dụng bên dưới.",
   "recorder.sketch.toolbar": "Công cụ vẽ",

@@ -178,6 +178,7 @@
   "recorder.hotkeys.unsupported": "This key cannot be a global shortcut. Use a function key, or a letter or digit with Ctrl or Alt.",
   "recorder.hotkeys.chapter": "Mark a chapter",
   "recorder.hotkeys.draw": "Draw on screen",
+  "recorder.hotkeys.ink": "Next drawing color",
   "recorder.hotkeys.unassigned": "(no key assigned)",
   "recorder.sketch.tools": "Draws on the screen while recording. P pen, A arrow, B box, N number, T text; Ctrl+Z undoes, Delete clears, Esc erases and closes. Press the shortcut again to keep the drawing on screen and pass the mouse to the app underneath.",
   "recorder.sketch.toolbar": "Drawing Tools",

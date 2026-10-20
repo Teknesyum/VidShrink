@@ -178,6 +178,7 @@
   "recorder.hotkeys.unsupported": "Tombol ini tidak bisa menjadi pintasan global. Gunakan tombol fungsi, atau huruf atau angka bersama Ctrl atau Alt.",
   "recorder.hotkeys.chapter": "Tandai bab",
   "recorder.hotkeys.draw": "Gambar di layar",
+  "recorder.hotkeys.ink": "Warna gambar berikutnya",
   "recorder.hotkeys.unassigned": "(belum ada tombol)",
   "recorder.sketch.tools": "Menggambar di layar saat merekam. P pena, A panah, B kotak, N nomor, T teks; Ctrl+Z mengurungkan, Delete menghapus semua, Esc menghapus dan menutup. Tekan pintasan lagi untuk mempertahankan gambar di layar dan menyerahkan mouse ke aplikasi di bawahnya.",
   "recorder.sketch.toolbar": "Alat Gambar",

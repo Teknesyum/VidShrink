@@ -178,6 +178,7 @@
   "recorder.hotkeys.unsupported": "این کلید نمی‌تواند میان‌بر سراسری باشد. از یک کلید تابعی، یا یک حرف یا رقم همراه با Ctrl یا Alt استفاده کنید.",
   "recorder.hotkeys.chapter": "علامت‌گذاری فصل",
   "recorder.hotkeys.draw": "طراحی روی صفحه",
+  "recorder.hotkeys.ink": "رنگ بعدی طراحی",
   "recorder.hotkeys.unassigned": "(کلیدی تعیین نشده)",
   "recorder.sketch.tools": "هنگام ضبط روی صفحه نقاشی می‌کند. P قلم، A پیکان، B کادر، N شماره، T متن؛ Ctrl+Z بازگردانی می‌کند، Delete پاک می‌کند، Esc پاک کرده و می‌بندد. برای ماندن نقاشی روی صفحه و واگذاری ماوس به برنامهٔ زیرین، میان‌بر را دوباره بزنید.",
   "recorder.sketch.toolbar": "ابزارهای طراحی",

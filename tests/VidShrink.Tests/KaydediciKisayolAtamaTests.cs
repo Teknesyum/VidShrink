@@ -148,7 +148,7 @@ public sealed class KaydediciKisayolAtamaTests
         });
 
         Assert.True(kabul);
-        Assert.Equal("\"0:F7,0:F8,2:K,0:F10,0:F11,0:F6,2:F5,2:F2\"", dosyada);
+        Assert.Equal("\"0:F7,0:F8,2:K,0:F10,0:F11,0:F6,2:F5,2:F2,2:F3\"", dosyada);
         Assert.Equal(Key.K, okunan.Key);
         Assert.Equal(KeyModifiers.Control, okunan.Modifiers);
         Assert.Equal(0x4Bu, okunan.VirtualKey);
@@ -170,7 +170,7 @@ public sealed class KaydediciKisayolAtamaTests
         File.WriteAllText(ayar.Yol, icerik);
         var yazim = AppHost.Run(() => RecorderHotkeys.Write(new RecorderView(ayar.Yol).Hotkeys));
 
-        Assert.Equal("0:F7,0:F8,0:F9,0:F10,0:F11,0:F6,2:F5,2:F2", yazim);
+        Assert.Equal("0:F7,0:F8,0:F9,0:F10,0:F11,0:F6,2:F5,2:F2,2:F3", yazim);
     }
 
     [Fact]
@@ -180,7 +180,7 @@ public sealed class KaydediciKisayolAtamaTests
         File.WriteAllText(ayar.Yol, "{\"hotkeys\":\"0:F1,3:D5,0:F9,6:NumPad1,1:Home\"}");
         var yazim = AppHost.Run(() => RecorderHotkeys.Write(new RecorderView(ayar.Yol).Hotkeys));
 
-        Assert.Equal("0:F1,3:D5,0:F9,6:NumPad1,1:Home,0:F6,2:F5,2:F2", yazim);
+        Assert.Equal("0:F1,3:D5,0:F9,6:NumPad1,1:Home,0:F6,2:F5,2:F2,2:F3", yazim);
     }
 
     [Fact]
@@ -206,7 +206,7 @@ public sealed class KaydediciKisayolAtamaTests
         Assert.Contains(o.Ad, o.hata);
         Assert.Equal(string.Empty, o.oteki);
         Assert.Equal(Key.F8, o.kalan);
-        Assert.True(o.dosya is null or "\"0:F7,0:F8,0:F9,0:F10,0:F11,0:F6,2:F5,2:F2\"", o.dosya);
+        Assert.True(o.dosya is null or "\"0:F7,0:F8,0:F9,0:F10,0:F11,0:F6,2:F5,2:F2,2:F3\"", o.dosya);
         Assert.True(o.kabul);
         Assert.Equal(string.Empty, o.Sonra);
         Assert.Equal(Key.F4, o.Yeni);
@@ -240,7 +240,7 @@ public sealed class KaydediciKisayolAtamaTests
         Assert.Contains("F4", o.hata);
         Assert.Equal(Key.F8, o.kalan);
         Assert.Equal(Key.F8, o.kayitli);
-        Assert.True(o.dosya is null or "\"0:F7,0:F8,0:F9,0:F10,0:F11,0:F6,2:F5,2:F2\"", o.dosya);
+        Assert.True(o.dosya is null or "\"0:F7,0:F8,0:F9,0:F10,0:F11,0:F6,2:F5,2:F2,2:F3\"", o.dosya);
         Assert.True(o.kabul);
         Assert.Equal(string.Empty, o.sonra);
         Assert.Equal(Key.F5, o.yeniKayit);
@@ -464,22 +464,23 @@ public sealed class KaydediciKisayolAtamaTests
             RecorderHotkeys.Bind(HotkeyAction.ReplaySave, Key.Home, KeyModifiers.Alt)!,
             RecorderHotkeys.Bind(HotkeyAction.Chapter, Key.K, KeyModifiers.Control)!,
             RecorderHotkeys.Bind(HotkeyAction.PushToTalk, Key.F12, KeyModifiers.None)!,
-            RecorderHotkeys.Bind(HotkeyAction.Draw, Key.D, KeyModifiers.Alt)!
+            RecorderHotkeys.Bind(HotkeyAction.Draw, Key.D, KeyModifiers.Alt)!,
+            RecorderHotkeys.Bind(HotkeyAction.Ink, Key.PageUp, KeyModifiers.Alt)!
         };
 
         var yazim = RecorderHotkeys.Write(baglar);
         var okunan = RecorderHotkeys.Read(yazim);
 
-        Assert.Equal("0:F1,3:D5,4:F9,6:NumPad1,1:Home,2:K,0:F12,1:D", yazim);
+        Assert.Equal("0:F1,3:D5,4:F9,6:NumPad1,1:Home,2:K,0:F12,1:D,1:PageUp", yazim);
         Assert.NotNull(okunan);
         Assert.Equal<HotkeyBinding>(baglar, okunan!);
-        Assert.Equal("0:F7,0:F8,0:F9,0:F10,0:F11,0:F6,2:F5,2:F2", RecorderHotkeys.Write(RecorderHotkeys.All));
+        Assert.Equal("0:F7,0:F8,0:F9,0:F10,0:F11,0:F6,2:F5,2:F2,2:F3", RecorderHotkeys.Write(RecorderHotkeys.All));
         Assert.Equal<HotkeyBinding>(RecorderHotkeys.All, RecorderHotkeys.Read("0:F7,0:F8,0:F9,0:F10,0:F11")!);
         Assert.False(RecorderHotkeys.IsAssigned(RecorderHotkeys.Of(RecorderHotkeys.Read("0:F7,0:F6,0:F9,0:F10,0:F11")!, HotkeyAction.Chapter)));
         Assert.Equal(Key.F6, RecorderHotkeys.Of(RecorderHotkeys.Read("0:F7,0:F6,0:F9,0:F10,0:F11")!, HotkeyAction.Stop).Key);
         Assert.Equal<HotkeyBinding>(RecorderHotkeys.All, RecorderHotkeys.Read(RecorderHotkeys.Write(RecorderHotkeys.All))!);
         Assert.Null(RecorderHotkeys.Read(null));
-        Assert.Null(RecorderHotkeys.Read("0:F7,0:F8,0:F9,0:F10,0:F11,0:F6,2:F5,2:F2,0:F12"));
+        Assert.Null(RecorderHotkeys.Read("0:F7,0:F8,0:F9,0:F10,0:F11,0:F6,2:F5,2:F2,2:F3,0:F12"));
         Assert.Null(RecorderHotkeys.Read("0:F7,0:F8,0:F9,0:F10,8:F11"));
         Assert.Null(RecorderHotkeys.Read("0:F7,0:F8,0:F9,0:F10,0:999"));
     }

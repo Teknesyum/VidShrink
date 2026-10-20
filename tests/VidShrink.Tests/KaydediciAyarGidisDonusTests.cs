@@ -40,7 +40,7 @@ public sealed class KaydediciAyarGidisDonusTests
         ["Preset"] = "slow",
         ["ColorRange"] = "jpeg",
         ["AudioCodec"] = "libopus",
-        ["Hotkeys"] = "2:F1,2:F2,2:F3,2:F4,2:F5,2:F6,2:F7,2:F8",
+        ["Hotkeys"] = "2:F1,2:F2,2:F3,2:F4,2:F5,2:F6,2:F7,2:F8,2:F9",
         ["PrompterStep"] = 5,
         ["PrompterLook"] = new PrompterLook(Mirror: true, Line: false, Size: 0),
         ["ScheduleAt"] = new DateTime(2026, 10, 12, 14, 30, 0)

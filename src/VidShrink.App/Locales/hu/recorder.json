@@ -178,6 +178,7 @@
   "recorder.hotkeys.unsupported": "Ez a billentyű nem lehet globális billentyűparancs. Használjon funkcióbillentyűt, vagy betűt, illetve számjegyet a Ctrl vagy az Alt billentyűvel.",
   "recorder.hotkeys.chapter": "Fejezet megjelölése",
   "recorder.hotkeys.draw": "Rajzolás a képernyőre",
+  "recorder.hotkeys.ink": "Következő rajzszín",
   "recorder.hotkeys.unassigned": "(nincs hozzárendelt billentyű)",
   "recorder.sketch.tools": "Felvétel közben rajzol a képernyőre. P toll, A nyíl, B keret, N szám, T szöveg; Ctrl+Z visszavon, Delete töröl, Esc töröl és bezár. Nyomja meg újra a gyorsbillentyűt, hogy a rajz a képernyőn maradjon, az egér pedig az alatta lévő alkalmazásé legyen.",
   "recorder.sketch.toolbar": "Rajzeszközök",

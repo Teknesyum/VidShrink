@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace VidShrink.App.Recorder;
 
 internal partial class RecorderView
@@ -8,7 +10,9 @@ internal partial class RecorderView
     internal void ToggleSketch()
     {
         if (!HasSession) return;
-        SketchLayer.Toggle(_frameRegion ?? CaptionFallback());
+        var screens = Avalonia.Controls.TopLevel.GetTopLevel(this)?.Screens?.All
+            .Select(s => new SketchScreen(s.Bounds, s.Scaling)).ToList() ?? [];
+        SketchLayer.Toggle(SketchArea.Of(_frameRegion, screens, ScreenGrab.Cursor()));
     }
 
     private void SyncSketch(bool recording)

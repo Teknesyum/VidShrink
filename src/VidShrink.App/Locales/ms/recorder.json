@@ -178,6 +178,7 @@
   "recorder.hotkeys.unsupported": "Kekunci ini tidak boleh menjadi pintasan global. Gunakan kekunci fungsi, atau huruf atau digit bersama Ctrl atau Alt.",
   "recorder.hotkeys.chapter": "Tandakan bab",
   "recorder.hotkeys.draw": "Lukis pada skrin",
+  "recorder.hotkeys.ink": "Warna lukisan seterusnya",
   "recorder.hotkeys.unassigned": "(tiada kekunci ditetapkan)",
   "recorder.sketch.tools": "Melukis pada skrin semasa merakam. P pen, A anak panah, B kotak, N nombor, T teks; Ctrl+Z membuat asal, Delete mengosongkan, Esc memadam dan menutup. Tekan pintasan sekali lagi untuk mengekalkan lukisan pada skrin dan menyerahkan tetikus kepada aplikasi di bawahnya.",
   "recorder.sketch.toolbar": "Alat Lukisan",
