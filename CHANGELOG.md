@@ -7,6 +7,15 @@ All notable changes to VidShrink Player are recorded here. The format follows
 The history of the program under its old name, VidShrink, up to 1.2.24 and the changes
 made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md).
 
+## [Unreleased]
+
+### Added
+
+- Editor: transform (scale, position, angle) keyframes on a clip.
+- Editor: keyframes are mirrored when a clip is reversed, so each key stays on the same source frame.
+- Editor: color match sets one clip as reference and matches the mean and spread of the other clips to it.
+- Editor: a live rectangle shows the blur region while it is drawn on the monitor.
+
 ## [0.0.1]
 
 ### Changed

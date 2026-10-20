@@ -32,7 +32,8 @@ internal partial class EditorView
         };
         AddHandler(PointerPressedEvent, OnMonitorBlurPressed, RoutingStrategies.Tunnel);
         AddHandler(PointerReleasedEvent, OnMonitorBlurReleased, RoutingStrategies.Tunnel);
-        AddHandler(PointerCaptureLostEvent, (_, _) => _blurStart = null, RoutingStrategies.Direct | RoutingStrategies.Bubble, true);
+        AddHandler(PointerCaptureLostEvent, (_, _) => { _blurStart = null; EndBlurBox(); }, RoutingStrategies.Direct | RoutingStrategies.Bubble, true);
+        InitBlurBox();
     }
 
     private void ShowClipBlur(ClipEffects effects)
@@ -72,6 +73,7 @@ internal partial class EditorView
         if (e.Source is not Visual source || !(ReferenceEquals(source, Preview.Surface) || Preview.Surface.IsVisualAncestorOf(source))) return;
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed || !MonitorFraction(e, out var fx, out var fy)) return;
         _blurStart = new Point(fx, fy);
+        BeginBlurBox(e);
         e.Pointer.Capture(Preview.Surface);
         e.Handled = true;
     }
@@ -80,6 +82,7 @@ internal partial class EditorView
     {
         if (_blurStart is not { } start) return;
         _blurStart = null;
+        EndBlurBox();
         e.Pointer.Capture(null);
         if (MonitorFraction(e, out var fx, out var fy)) SetClipBlurRegion(start.X, start.Y, fx, fy);
         e.Handled = true;

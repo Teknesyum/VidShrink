@@ -108,13 +108,13 @@ public sealed partial record ClipEffects
 
     public double Angle { get; init; }
 
-    public bool HasTransform => Scale != 1 || OffsetX != 0 || OffsetY != 0 || Angle != 0;
+    public bool HasTransform => Scale != 1 || OffsetX != 0 || OffsetY != 0 || Angle != 0 || TransformKeys.Count > 0;
 
     public KeyframeTrack<VolumeKey> VolumeKeys { get; init; } = KeyframeTrack<VolumeKey>.Empty;
 
     public KeyframeTrack<CropKey> CropKeys { get; init; } = KeyframeTrack<CropKey>.Empty;
 
-    public bool HasKeyframes => VolumeKeys.Count > 0 || CropKeys.Count > 0;
+    public bool HasKeyframes => VolumeKeys.Count > 0 || CropKeys.Count > 0 || TransformKeys.Count > 0;
 
     public bool HasMovingCrop => CropKeys.Count > 1;
 
@@ -136,7 +136,7 @@ public sealed partial record ClipEffects
 
     public bool HasAudio => Muted || VolumeDb != 0 || VolumeKeys.Count > 0 || HasCleanup;
 
-    public bool HasColor => Brightness != 0 || Contrast != 1 || Saturation != 1 || Temperature != NeutralTemperature || HasGrade || HasLut;
+    public bool HasColor => Brightness != 0 || Contrast != 1 || Saturation != 1 || Temperature != NeutralTemperature || HasGrade || HasLut || HasMatch;
 
     public bool IsNeutral => !HasGeometry && !HasAudio && !HasColor && !HasBlur && Lut is null && FadeIn == 0 && FadeOut == 0;
 
@@ -177,16 +177,17 @@ public sealed partial record ClipEffects
             Angle = Turn(Angle),
             VolumeKeys = VolumeKeys.Map(k => k with { Db = double.IsFinite(k.Db) ? Math.Round(Math.Clamp(k.Db, MinVolumeDb, MaxVolumeDb), 1) : 0 }),
             CropKeys = FitOnly().HasFit ? KeyframeTrack<CropKey>.Empty : CropKeys.Map(CropEdges),
+            TransformKeys = TransformKeys.Map(TransformEdges),
             Lut = string.IsNullOrWhiteSpace(Lut) ? null : Lut.Trim(),
             LutMix = Math.Clamp(LutMix, MinLutMix, MaxLutMix),
-        }).GradeNormalized();
+        }).GradeNormalized().MatchNormalized();
     }
 
     public ClipEffects SlicedKeys(long from, long to)
-        => HasKeyframes ? this with { VolumeKeys = VolumeKeys.Slice(from, to), CropKeys = CropKeys.Slice(from, to) } : this;
+        => HasKeyframes ? this with { VolumeKeys = VolumeKeys.Slice(from, to), CropKeys = CropKeys.Slice(from, to), TransformKeys = TransformKeys.Slice(from, to) } : this;
 
     public ClipEffects ScaledKeys(double factor)
-        => HasKeyframes ? this with { VolumeKeys = VolumeKeys.Scaled(factor), CropKeys = CropKeys.Scaled(factor) } : this;
+        => HasKeyframes ? this with { VolumeKeys = VolumeKeys.Scaled(factor), CropKeys = CropKeys.Scaled(factor), TransformKeys = TransformKeys.Scaled(factor) } : this;
 
     private static CropKey CropEdges(CropKey key)
     {

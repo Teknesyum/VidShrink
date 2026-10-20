@@ -41,7 +41,8 @@ Hüküm: önizleme zamana bağlı ifadeyi taşıyor; ayrı bir önizleme yolu ge
 
 ## Açık Kalanlar
 
-- Ters klipte kareler aynalanmıyor; kare ofseti çizelge yönünde okunur.
-- Klibin ayrı bir konum ayarı yok; konum kırpma penceresinin kaymasıyla sağlanıyor.
+- 20 Ekim 2026: ters klipte kareler aynalanır (`EditClip.WithMotion`, `KeyframeTrack.Mirrored`), anahtar aynı
+  kaynak karesinde kalır; dönüşüm (ölçek, konum, açı) anahtar karesi geldi (`ClipMotion`). İkisi ffmpeg ile
+  sentetik klipte ağırlık merkezi ölçülerek doğrulandı (`DonusumKaresiTests`, ±1,5 px).
 - Bölmede eğri iki yana kesildiğinde kesim noktasına o anki değerden kare eklenir; kesilen parçanın
   içi doğrusal olmayan eğride yaklaşıktır.

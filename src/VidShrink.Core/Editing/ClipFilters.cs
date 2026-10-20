@@ -69,7 +69,8 @@ public static class ClipFilters
         }
 
         var size = effects.OutputSize(displayWidth, height);
-        if (effects.HasTransform) parts.AddRange(Transform(effects, size, target));
+        if (effects.HasMovingTransform) parts.AddRange(ClipMotion.Filters(effects.TransformKeys, size, target, time));
+        else if (effects.HasTransform) parts.AddRange(Transform(effects.StillTransform, size, target));
         else if (size != target)
         {
             var w = Int(target.Width);
@@ -82,7 +83,7 @@ public static class ClipFilters
         return string.Join(",", parts);
     }
 
-    private static IEnumerable<string> Transform(ClipEffects effects, (int Width, int Height) size, (int Width, int Height) target)
+    private static IEnumerable<string> Transform(TransformKey effects, (int Width, int Height) size, (int Width, int Height) target)
     {
         var fit = Math.Min((double)target.Width / size.Width, (double)target.Height / size.Height);
         var sw = Even(size.Width * fit * effects.Scale);
@@ -164,6 +165,8 @@ public static class ClipFilters
     public static IReadOnlyList<string> ColorParts(ClipEffects effects)
     {
         var parts = new List<string>();
+        var match = ClipMatch.Filter(effects);
+        if (match.Length > 0) parts.Add(match);
         var auto = ClipGrade.Auto(effects);
         if (auto.Length > 0) parts.Add(auto);
         var eq = new List<string>();

@@ -253,7 +253,7 @@ public sealed class AnahtarKareTests
                     view.Timeline.Playhead = S(6);
                     Assert.True(view.AddVolumeKey());
                     Assert.Equal(new[] { new VolumeKey(S(2), 0, KeyframeEase.EaseIn), new VolumeKey(S(6), -30, KeyframeEase.EaseIn) }, model.Clips[0].Effects.VolumeKeys.ToArray());
-                    Assert.Equal(string.Format(Strings.Culture, Strings.Get("editor.clip.keys.count"), 2, 0), view.TxtClipKeys.Text);
+                    Assert.Equal(string.Format(Strings.Culture, Strings.Get("editor.clip.keys.count"), 2, 0, 0), view.TxtClipKeys.Text);
                     Assert.True(view.BtnClipKeysClear.IsEnabled);
 
                     Assert.True(view.CropClip(1));
