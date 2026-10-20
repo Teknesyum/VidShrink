@@ -917,6 +917,7 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Izlaists: kodeks netiek atbalstīts",
   "main.preset.handbrake.dropped.structural": "Izlaists: HandBrake saraksta struktūra",
   "main.share.qr": "Kopīgošanas saites QR kods",
+  "main.share.link": "Kopīgošanas saite",
   "main.share.qr-hint": "Noskenējiet ar tālruni, lai atvērtu saiti.",
   "main.startup.no-display": "{app} nevarēja atvērt grafisko displeju. Palaidiet to no darbvirsmas sesijas; Wayland vidē jābūt pieejamam Xwayland.",
   "main.about.guide": "Lietošanas pamācība",

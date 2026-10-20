@@ -917,6 +917,7 @@
   "main.preset.handbrake.dropped.unsupported-codec": "چھوڑ دیا گیا: کوڈیک معاون نہیں",
   "main.preset.handbrake.dropped.structural": "نظرانداز: HandBrake فہرست کی ساخت",
   "main.share.qr": "شیئر لنک کا QR کوڈ",
+  "main.share.link": "شیئر لنک",
   "main.share.qr-hint": "لنک کھولنے کے لیے فون سے اسکین کریں۔",
   "main.startup.no-display": "{app} کوئی گرافیکل ڈسپلے نہیں کھول سکا۔ اسے ڈیسک ٹاپ سیشن سے چلائیں؛ Wayland پر Xwayland دستیاب ہونا ضروری ہے۔",
   "main.about.guide": "استعمال کی رہنمائی",

@@ -917,6 +917,7 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Elhagyva: a kodek nem támogatott",
   "main.preset.handbrake.dropped.structural": "Kihagyva: HandBrake listaszerkezet",
   "main.share.qr": "A megosztási hivatkozás QR-kódja",
+  "main.share.link": "Megosztási hivatkozás",
   "main.share.qr-hint": "Olvassa be a telefonjával a hivatkozás megnyitásához.",
   "main.startup.no-display": "A {app} nem tudott grafikus kijelzőt megnyitni. Indítsa asztali munkamenetből; Waylanden az Xwaylandnek elérhetőnek kell lennie.",
   "main.about.guide": "Felhasználói útmutató",

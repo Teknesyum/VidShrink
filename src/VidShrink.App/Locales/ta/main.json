@@ -917,6 +917,7 @@
   "main.preset.handbrake.dropped.unsupported-codec": "கைவிடப்பட்டது: கோடெக் ஆதரிக்கப்படவில்லை",
   "main.preset.handbrake.dropped.structural": "தவிர்க்கப்பட்டது: HandBrake பட்டியல் அமைப்பு",
   "main.share.qr": "பகிர்வு இணைப்பின் QR குறியீடு",
+  "main.share.link": "பகிர்வு இணைப்பு",
   "main.share.qr-hint": "இணைப்பைத் திறக்க உங்கள் தொலைபேசியால் ஸ்கேன் செய்யவும்.",
   "main.startup.no-display": "{app} வரைகலைத் திரையைத் திறக்க முடியவில்லை. அதை ஒரு மேசைக்கணினி அமர்விலிருந்து தொடங்கவும்; Wayland-இல் Xwayland கிடைக்க வேண்டும்.",
   "main.about.guide": "பயன்பாட்டு வழிகாட்டி",

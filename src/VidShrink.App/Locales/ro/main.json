@@ -917,6 +917,7 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Omis: codec neacceptat",
   "main.preset.handbrake.dropped.structural": "Sărit: structura listei HandBrake",
   "main.share.qr": "Cod QR pentru linkul de partajare",
+  "main.share.link": "Link de partajare",
   "main.share.qr-hint": "Scanați cu telefonul pentru a deschide linkul.",
   "main.startup.no-display": "{app} nu a putut deschide un afișaj grafic. Porniți-l dintr-o sesiune de desktop; în Wayland trebuie să fie disponibil Xwayland.",
   "main.about.guide": "Ghid de utilizare",

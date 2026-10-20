@@ -660,6 +660,8 @@
         <Setter Property="Width" Value="{StaticResource InfoBadgeSize}"/>
         <Setter Property="Height" Value="{StaticResource InfoBadgeSize}"/>
         <Setter Property="Margin" Value="{StaticResource InfoBadgeLabelMargin}"/>
+        <Setter Property="IsTabStop" Value="False"/>
+        <Setter Property="izi:AlanYardimi.EtiketRozeti" Value="True"/>
         <Setter Property="Padding" Value="0"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>

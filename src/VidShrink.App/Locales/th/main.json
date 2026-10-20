@@ -917,6 +917,7 @@
   "main.preset.handbrake.dropped.unsupported-codec": "ตัดออก: ไม่รองรับโคเดก",
   "main.preset.handbrake.dropped.structural": "ข้าม: โครงสร้างรายการของ HandBrake",
   "main.share.qr": "คิวอาร์โค้ดของลิงก์แชร์",
+  "main.share.link": "ลิงก์แชร์",
   "main.share.qr-hint": "สแกนด้วยโทรศัพท์เพื่อเปิดลิงก์",
   "main.startup.no-display": "{app} ไม่สามารถเปิดจอแสดงผลกราฟิกได้ ให้เริ่มจากเซสชันเดสก์ท็อป บน Wayland ต้องมี Xwayland",
   "main.about.guide": "คู่มือการใช้งาน",

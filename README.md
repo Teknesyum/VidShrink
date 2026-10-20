@@ -303,8 +303,8 @@ missing, or a translation reading badly?
 [Open an issue](https://github.com/Teknesyum/VidShrink-Player/issues/new).
 
 Settings has a search box in the title bar (Ctrl+F). Ctrl+1 to Ctrl+6 open the six tabs,
-F1 opens the user guide in the app language, and the player, editor and window shortcuts
-can each be reassigned.
+F1 opens the user guide in the app language (on a field with a "?" badge it opens that
+field's help instead), and the player, editor and window shortcuts can each be reassigned.
 
 **What it changes on your system, and nothing more.** On Windows the installer adds Start
 menu and desktop shortcuts, "Open this video with VidShrink Player" and "Shrink with

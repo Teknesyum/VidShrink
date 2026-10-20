@@ -917,6 +917,7 @@
   "main.preset.handbrake.dropped.unsupported-codec": "除外: 対応していないコーデックです",
   "main.preset.handbrake.dropped.structural": "スキップ: HandBrake のリスト構造",
   "main.share.qr": "共有リンクの QR コード",
+  "main.share.link": "共有リンク",
   "main.share.qr-hint": "スマートフォンでスキャンするとリンクが開きます。",
   "main.startup.no-display": "{app} はグラフィカルディスプレイを開けませんでした。デスクトップセッションから起動してください。Wayland では Xwayland が必要です。",
   "main.about.guide": "使い方ガイド",

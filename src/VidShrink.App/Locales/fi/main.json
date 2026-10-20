@@ -917,6 +917,7 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Pudotettu: koodekkia ei tueta",
   "main.preset.handbrake.dropped.structural": "Ohitettu: HandBraken luettelorakenne",
   "main.share.qr": "Jakolinkin QR-koodi",
+  "main.share.link": "Jakolinkki",
   "main.share.qr-hint": "Avaa linkki skannaamalla koodi puhelimella.",
   "main.startup.no-display": "{app} ei voinut avata graafista näyttöä. Käynnistä se työpöytäistunnosta; Waylandissa Xwaylandin on oltava käytettävissä.",
   "main.about.guide": "Käyttöopas",

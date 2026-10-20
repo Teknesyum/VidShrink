@@ -7,6 +7,16 @@ All notable changes to VidShrink Player are recorded here. The format follows
 The history of the program under its old name, VidShrink, up to 1.2.24 and the changes
 made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md).
 
+## [Unreleased]
+
+### Changed
+
+- Every labelled field is now a single Tab stop: the "?" badge beside a field label no
+  longer takes focus from the keyboard. Its help is read by screen readers as the field's
+  description, and F1 on the field opens it.
+- Screen readers read the target size chips with their unit ("8 MB") and the share link
+  boxes by name.
+
 ## [0.0.1]
 
 ### Changed

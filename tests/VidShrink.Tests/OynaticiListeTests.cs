@@ -38,11 +38,11 @@ public sealed class OynaticiListeTests
     internal static void Fareyle(TopLevel top, RawPointerEventType tur, Point nokta, RawInputModifiers tuslar)
         => Ham(top, (RawInputEventArgs)Yeni(typeof(RawPointerEventArgs), Fare, (ulong)Environment.TickCount64, Kok(top), tur, nokta, tuslar));
 
-    internal static void Tus(TopLevel top, Key key)
+    internal static void Tus(TopLevel top, Key key, RawInputModifiers degistirici = RawInputModifiers.None)
     {
         var klavye = typeof(KeyboardDevice).GetProperty("Instance", Her)!.GetValue(null)!;
         foreach (var tur in new[] { RawKeyEventType.KeyDown, RawKeyEventType.KeyUp })
-            Ham(top, (RawInputEventArgs)Yeni(typeof(RawKeyEventArgs), klavye, (ulong)Environment.TickCount64, Kok(top), tur, key, RawInputModifiers.None, PhysicalKey.None, null, KeyDeviceType.Keyboard));
+            Ham(top, (RawInputEventArgs)Yeni(typeof(RawKeyEventArgs), klavye, (ulong)Environment.TickCount64, Kok(top), tur, key, degistirici, PhysicalKey.None, null, KeyDeviceType.Keyboard));
     }
 
     internal static Point Merkez(TopLevel top, Visual control)

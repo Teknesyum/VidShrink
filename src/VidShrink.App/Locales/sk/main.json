@@ -917,6 +917,7 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Vynechané: kodek nie je podporovaný",
   "main.preset.handbrake.dropped.structural": "Preskočené: štruktúra zoznamu HandBrake",
   "main.share.qr": "QR kód odkazu na zdieľanie",
+  "main.share.link": "Odkaz na zdieľanie",
   "main.share.qr-hint": "Naskenujte telefónom a otvorte odkaz.",
   "main.startup.no-display": "{app} nemohol otvoriť grafický displej. Spustite ho z relácie pracovnej plochy; vo Waylande musí byť k dispozícii Xwayland.",
   "main.about.guide": "Používateľská príručka",
