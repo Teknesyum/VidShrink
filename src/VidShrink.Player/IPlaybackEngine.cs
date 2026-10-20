@@ -58,6 +58,8 @@ public sealed record PlaybackOptions
     public bool Video { get; init; } = true;
 
     public bool Loop { get; init; }
+
+    public bool MediaControls { get; init; }
 }
 
 public delegate void FrameCopy(IntPtr pixels, int width, int height, int stride);

@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Ondertiteling in de interfacetaal inschakelen",
   "player.view.pause-on-minimize": "Pauzeren bij minimaliseren",
   "player.view.topmost-while-playing": "Alleen tijdens afspelen bovenop houden",
+  "player.view.media-controls": "Tonen in Windows-mediabediening",
   "player.view.state-aspect": "beeldverhouding {0}",
   "player.view.state-rotate": "{0}° gedraaid",
   "player.view.state-mirror": "gespiegeld",

@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Arayüz Dilindeki Altyazıyı Aç",
   "player.view.pause-on-minimize": "Küçültünce Duraklat",
   "player.view.topmost-while-playing": "Yalnız Oynatırken Üstte Tut",
+  "player.view.media-controls": "Windows Ortam Denetimlerinde Göster",
   "player.view.state-aspect": "oran {0}",
   "player.view.state-rotate": "{0}° döndürüldü",
   "player.view.state-mirror": "aynalı",

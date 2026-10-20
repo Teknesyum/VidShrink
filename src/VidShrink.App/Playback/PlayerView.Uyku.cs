@@ -126,4 +126,13 @@ internal partial class PlayerView
         UstteTut(OynatmaSuruyor);
         AdvancedChanged?.Invoke(this, EventArgs.Empty);
     }
+
+    internal void ToggleMediaControls()
+    {
+        EnsureSettings();
+        _settings.MediaControls = !_settings.MediaControls;
+        SaveSettings();
+        _trace.Add("mediacontrols -> " + _settings.MediaControls);
+        AdvancedChanged?.Invoke(this, EventArgs.Empty);
+    }
 }

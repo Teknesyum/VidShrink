@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "ইন্টারফেসের ভাষায় সাবটাইটেল চালু করুন",
   "player.view.pause-on-minimize": "ছোট করলে বিরতি দিন",
   "player.view.topmost-while-playing": "শুধু চালানোর সময় সবার উপরে রাখুন",
+  "player.view.media-controls": "Windows মিডিয়া নিয়ন্ত্রণে দেখান",
   "player.view.state-aspect": "অনুপাত {0}",
   "player.view.state-rotate": "{0}° ঘোরানো হয়েছে",
   "player.view.state-mirror": "আয়না করা হয়েছে",

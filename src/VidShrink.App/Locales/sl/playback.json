@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Vklopi podnapise v jeziku vmesnika",
   "player.view.pause-on-minimize": "Začasno ustavi ob pomanjšanju",
   "player.view.topmost-while-playing": "Ohrani na vrhu samo med predvajanjem",
+  "player.view.media-controls": "Prikaži v kontrolnikih predstavnosti Windows",
   "player.view.state-aspect": "razmerje {0}",
   "player.view.state-rotate": "zavrteno za {0}°",
   "player.view.state-mirror": "zrcaljeno",

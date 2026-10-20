@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "인터페이스 언어의 자막 켜기",
   "player.view.pause-on-minimize": "최소화하면 일시 정지",
   "player.view.topmost-while-playing": "재생 중에만 항상 위에 표시",
+  "player.view.media-controls": "Windows 미디어 컨트롤에 표시",
   "player.view.state-aspect": "비율 {0}",
   "player.view.state-rotate": "{0}° 회전됨",
   "player.view.state-mirror": "미러링됨",

@@ -3,7 +3,7 @@ namespace VidShrink.Core.Editing;
 /// <summary>
 /// A2 muzik izi: tek ses dosyasi, cizelgede <see cref="Start"/> aninda baslar ve teslimin sonuna kadar calar (dosya kisaysa sessizlik
 /// gelir). Duzeyi dB olarak <see cref="MinLevelDb"/>-<see cref="MaxLevelDb"/> araliginda; teslimde kaynak sesiyle <c>amix</c> ile
-/// karisir ve yalniz Tam kipte kodlanir. Onizlemede calmaz.
+/// karisir ve yalniz Tam kipte kodlanir. Onizlemede ayri bir ses motoru cizelge konumuna kilitli calar; kisma onizlemede yok.
 /// </summary>
 public sealed record EditMusic
 {

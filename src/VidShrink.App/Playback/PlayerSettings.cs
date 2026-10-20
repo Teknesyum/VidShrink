@@ -87,6 +87,8 @@ internal sealed record SeekSteps(double Fine, double Small, double Medium, doubl
 internal sealed class PlayerSettings
 {
     internal const string FileName = "player-settings.json";
+
+    internal static string DefaultFile => Path.Combine(Path.GetDirectoryName(UpdateSettings.DefaultPath) ?? AppContext.BaseDirectory, FileName);
     internal const string DefaultPattern = "{name}_{time}";
     internal const string PngExtension = ".png";
     internal const string JpgExtension = ".jpg";
@@ -150,6 +152,8 @@ internal sealed class PlayerSettings
 
     internal bool TopmostWhilePlaying { get; set; }
 
+    internal bool MediaControls { get; set; } = true;
+
     internal SeekSteps SeekSteps { get; set; } = SeekSteps.Default;
 
     internal static PlayerSettings Load(string? file)
@@ -195,6 +199,7 @@ internal sealed class PlayerSettings
             settings.SubtitleInInterfaceLanguage = (bool?)root["subtitleInInterfaceLanguage"] ?? true;
             settings.PauseOnMinimize = (bool?)root["pauseOnMinimize"] ?? false;
             settings.TopmostWhilePlaying = (bool?)root["topmostWhilePlaying"] ?? false;
+            settings.MediaControls = (bool?)root["mediaControls"] ?? true;
             if (root["seekSteps"] is JsonObject steps) settings.SeekSteps = ReadSteps(steps);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or InvalidOperationException or FormatException)
@@ -247,6 +252,7 @@ internal sealed class PlayerSettings
                 writer.WriteBoolean("subtitleInInterfaceLanguage", SubtitleInInterfaceLanguage);
                 writer.WriteBoolean("pauseOnMinimize", PauseOnMinimize);
                 writer.WriteBoolean("topmostWhilePlaying", TopmostWhilePlaying);
+                writer.WriteBoolean("mediaControls", MediaControls);
                 writer.WriteStartObject("seekSteps");
                 writer.WriteNumber("fine", SeekSteps.Fine);
                 writer.WriteNumber("small", SeekSteps.Small);

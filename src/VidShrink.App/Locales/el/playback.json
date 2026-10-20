@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Ενεργοποίηση υποτίτλων στη γλώσσα της διεπαφής",
   "player.view.pause-on-minimize": "Παύση κατά την ελαχιστοποίηση",
   "player.view.topmost-while-playing": "Πάντα μπροστά μόνο κατά την αναπαραγωγή",
+  "player.view.media-controls": "Εμφάνιση στα στοιχεία ελέγχου πολυμέσων των Windows",
   "player.view.state-aspect": "αναλογία {0}",
   "player.view.state-rotate": "περιστροφή κατά {0}°",
   "player.view.state-mirror": "σε καθρέφτισμα",

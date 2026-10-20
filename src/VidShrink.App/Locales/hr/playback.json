@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Uključi titlove na jeziku sučelja",
   "player.view.pause-on-minimize": "Pauziraj pri minimiziranju",
   "player.view.topmost-while-playing": "Drži na vrhu samo tijekom reprodukcije",
+  "player.view.media-controls": "Prikaži u Windows kontrolama medija",
   "player.view.state-aspect": "format {0}",
   "player.view.state-rotate": "zarotirano za {0}°",
   "player.view.state-mirror": "zrcaljeno",

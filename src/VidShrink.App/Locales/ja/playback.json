@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "インターフェースの言語の字幕をオン",
   "player.view.pause-on-minimize": "最小化したら一時停止",
   "player.view.topmost-while-playing": "再生中のみ最前面に表示",
+  "player.view.media-controls": "Windows のメディア コントロールに表示",
   "player.view.state-aspect": "縦横比 {0}",
   "player.view.state-rotate": "{0}° 回転済み",
   "player.view.state-mirror": "ミラー中",

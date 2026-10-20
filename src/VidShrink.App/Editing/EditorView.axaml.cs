@@ -40,6 +40,7 @@ internal partial class EditorView : UserControl
     {
         InitializeComponent();
         Preview.KeyboardEnabled = false;
+        Preview.SystemMediaControls = false;
         _clock = new DispatcherTimer { Interval = EdlPreviewDriver.DefaultInterval };
         _clock.Tick += (_, _) => Follow();
 
@@ -118,6 +119,7 @@ internal partial class EditorView : UserControl
         _resumeClock = false;
         if (Preview.IsPlaying) Preview.TogglePlay();
         _driver?.Pause();
+        MusicPlayer.Pause();
         FlushProject();
     }
 
@@ -397,8 +399,14 @@ internal partial class EditorView : UserControl
 
     internal void Follow()
     {
-        if (_driver is not { } driver) return;
+        if (_driver is not { } driver)
+        {
+            MusicPlayer.Pause();
+            return;
+        }
+
         SyncDriver();
+        SyncMusic(driver);
         RefreshMeter();
         if (Timeline.Scrubbing) return;
         Timeline.Playhead = driver.TimelinePosition;

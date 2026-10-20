@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "打开界面语言的字幕",
   "player.view.pause-on-minimize": "最小化时暂停",
   "player.view.topmost-while-playing": "仅在播放时置顶",
+  "player.view.media-controls": "在 Windows 媒体控件中显示",
   "player.view.state-aspect": "宽高比 {0}",
   "player.view.state-rotate": "已旋转 {0}°",
   "player.view.state-mirror": "已镜像",

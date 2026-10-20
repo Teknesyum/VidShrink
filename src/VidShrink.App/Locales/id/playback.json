@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Aktifkan subtitle dalam bahasa antarmuka",
   "player.view.pause-on-minimize": "Jeda saat diminimalkan",
   "player.view.topmost-while-playing": "Tetap di atas hanya saat diputar",
+  "player.view.media-controls": "Tampilkan di kontrol media Windows",
   "player.view.state-aspect": "rasio {0}",
   "player.view.state-rotate": "diputar {0}°",
   "player.view.state-mirror": "dicerminkan",

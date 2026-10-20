@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "تشغيل الترجمة بلغة الواجهة",
   "player.view.pause-on-minimize": "إيقاف مؤقت عند التصغير",
   "player.view.topmost-while-playing": "الإبقاء في المقدمة أثناء التشغيل فقط",
+  "player.view.media-controls": "إظهار في عناصر التحكم بالوسائط في Windows",
   "player.view.state-aspect": "النسبة {0}",
   "player.view.state-rotate": "تم التدوير {0}°",
   "player.view.state-mirror": "معكوس",

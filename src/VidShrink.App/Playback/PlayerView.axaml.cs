@@ -128,7 +128,24 @@ internal partial class PlayerView : UserControl
 
     internal IPlaybackEngine? Engine => _engine;
 
-    internal Func<IPlaybackEngine> EngineFactory { get; set; } = () => new MpvEngine();
+    private Func<IPlaybackEngine>? _engineFactory;
+
+    internal Func<IPlaybackEngine> EngineFactory
+    {
+        get
+        {
+            if (_engineFactory is { } factory) return factory;
+            var options = new PlaybackOptions { MediaControls = MediaControlsOn };
+            return () => new MpvEngine(options);
+        }
+        set => _engineFactory = value;
+    }
+
+    internal bool SystemMediaControls { get; set; } = true;
+
+    internal static bool MediaControlsSupported => OperatingSystem.IsWindows();
+
+    internal bool MediaControlsOn => SystemMediaControls && MediaControlsSupported && Settings.MediaControls;
 
     internal Func<string>? HistoryPath { get; set; }
 
@@ -529,6 +546,7 @@ internal partial class PlayerView : UserControl
         items.Add(Switch(Strings.Get("player.view.subtitle-language"), Settings.SubtitleInInterfaceLanguage, ToggleSubtitleLanguage));
         items.Add(Switch(Strings.Get("player.view.pause-on-minimize"), Settings.PauseOnMinimize, TogglePauseOnMinimize));
         items.Add(Switch(Strings.Get("player.view.topmost-while-playing"), Settings.TopmostWhilePlaying, ToggleTopmostWhilePlaying));
+        if (SystemMediaControls && MediaControlsSupported) items.Add(Switch(Strings.Get("player.view.media-controls"), Settings.MediaControls, ToggleMediaControls));
         items.Add(SeekStepsMenu());
         items.Add(AdvancedMenu());
         items.Add(ShortcutsMenu());

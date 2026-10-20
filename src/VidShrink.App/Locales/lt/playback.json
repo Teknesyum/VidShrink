@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Įjungti subtitrus sąsajos kalba",
   "player.view.pause-on-minimize": "Pristabdyti sumažinus",
   "player.view.topmost-while-playing": "Laikyti viršuje tik grojant",
+  "player.view.media-controls": "Rodyti „Windows“ medijos valdikliuose",
   "player.view.state-aspect": "santykis {0}",
   "player.view.state-rotate": "pasukta {0}°",
   "player.view.state-mirror": "apverstas vaizdas",

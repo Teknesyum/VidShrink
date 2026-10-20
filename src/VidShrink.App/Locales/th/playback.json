@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "เปิดคำบรรยายในภาษาของอินเทอร์เฟซ",
   "player.view.pause-on-minimize": "หยุดชั่วคราวเมื่อย่อหน้าต่าง",
   "player.view.topmost-while-playing": "อยู่บนสุดเฉพาะขณะเล่น",
+  "player.view.media-controls": "แสดงในตัวควบคุมสื่อของ Windows",
   "player.view.state-aspect": "อัตราส่วน {0}",
   "player.view.state-rotate": "หมุนแล้ว {0}°",
   "player.view.state-mirror": "สลับกระจกแล้ว",

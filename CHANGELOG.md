@@ -7,6 +7,13 @@ All notable changes to VidShrink Player are recorded here. The format follows
 The history of the program under its old name, VidShrink, up to 1.2.24 and the changes
 made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md).
 
+## [Unreleased]
+
+### Added
+
+- The player shows in Windows media controls (title, play/pause); a Settings switch turns it off.
+- The editor preview plays the music track in time with the timeline.
+
 ## [0.0.1]
 
 ### Changed

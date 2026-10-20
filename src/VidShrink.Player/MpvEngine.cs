@@ -28,6 +28,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
     private const int LogCapacity = 64;
 
     private static readonly Stopwatch Clock = Stopwatch.StartNew();
+    public static readonly TimeSpan MediaControlsSettle = TimeSpan.FromMilliseconds(100);
     private static readonly IntPtr SwType = Marshal.StringToCoTaskMemUTF8("sw");
     private static readonly IntPtr BgraFormat = Marshal.StringToCoTaskMemUTF8("bgra");
 
@@ -76,6 +77,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
     private double _newFrameAt;
     private readonly object _handleGate = new();
     private string? _source;
+    private readonly TimeSpan _createdAt = Clock.Elapsed;
 
     public unsafe MpvEngine(PlaybackOptions? options = null)
     {
@@ -143,6 +145,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
         if (!options.Audio) list.Add(("aid", "no"));
         if (!options.Video) list.Add(("vid", "no"));
         if (options.Loop) list.Add(("loop-file", "inf"));
+        list.Add(("media-controls", options.MediaControls ? "yes" : "no"));
         return list;
     }
 
@@ -1129,9 +1132,10 @@ public sealed partial class MpvEngine : IPlaybackEngine
     /// <summary>
     /// Yalniz derlemede bulunmayan ozelligi kapatan secenekler. <c>ytdl</c> Lua betigi
     /// (ytdl_hook) ile gelir; Lua'siz libmpv'de secenek yok ve "option not found" motoru hic
-    /// actirmiyordu (kaynaktan derlenen 0.40'ta olculdu). Secenek yoksa kapattigi ozellik de yok.
+    /// actirmiyordu (kaynaktan derlenen 0.40'ta olculdu). <c>media-controls</c> eski libmpv'de
+    /// yok; orada sistem ortam denetimi de yok. Secenek yoksa kapattigi ozellik de yok.
     /// </summary>
-    internal static readonly IReadOnlySet<string> OptionalOptions = new HashSet<string>(StringComparer.Ordinal) { "ytdl" };
+    internal static readonly IReadOnlySet<string> OptionalOptions = new HashSet<string>(StringComparer.Ordinal) { "ytdl", "media-controls" };
 
     internal static bool Absent(string name, int rc) => rc == OptionNotFound && OptionalOptions.Contains(name);
 
@@ -1161,6 +1165,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
 
         pending?.TrySetResult(new SeekResult(SeekOutcome.Canceled, 0));
         _isOpen = false;
+        if (_options.MediaControls && MediaControlsSettle - (Clock.Elapsed - _createdAt) is { Ticks: > 0 } settle) Thread.Sleep(settle);
         Release();
     }
 
