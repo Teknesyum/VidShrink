@@ -154,6 +154,8 @@ internal sealed class RecorderSettings
     /// <summary>Ana kaynak hedefinde seçilen kamera ya da yakalama kartının DirectShow adı.</summary>
     internal string? DeviceName { get; set; }
 
+    internal string? DeviceMode { get; set; }
+
     internal WebcamShape WebcamShape { get; set; } = WebcamShape.Rectangle;
 
     internal bool WebcamMirror { get; set; }
@@ -365,6 +367,7 @@ internal sealed class RecorderSettings
             settings.SystemAudioName = (string?)root["systemAudioName"];
             settings.WebcamName = (string?)root["webcamName"];
             settings.DeviceName = (string?)root["deviceName"];
+            settings.DeviceMode = CameraMode.Parse((string?)root["deviceMode"])?.ToString();
             if (Enum.TryParse<WebcamCorner>((string?)root["webcamCorner"], true, out var corner) && Enum.IsDefined(corner))
             {
                 settings.WebcamX = corner is WebcamCorner.TopLeft or WebcamCorner.BottomLeft ? 0 : 1;
@@ -510,6 +513,8 @@ internal sealed class RecorderSettings
                 else writer.WriteString("webcamName", WebcamName);
                 if (DeviceName is null) writer.WriteNull("deviceName");
                 else writer.WriteString("deviceName", DeviceName);
+                if (DeviceMode is null) writer.WriteNull("deviceMode");
+                else writer.WriteString("deviceMode", DeviceMode);
                 writer.WriteString("webcamShape", WebcamShape.ToString());
                 writer.WriteBoolean("webcamMirror", WebcamMirror);
                 writer.WriteNumber("webcamX", WebcamX);

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Threading;
 using VidShrink.Core;
 using VidShrink.Ffmpeg;
 
@@ -91,10 +93,17 @@ internal partial class RecorderView
         {
             _deviceLoaded = true;
             _chosenDevice = _settings.DeviceName;
+            _chosenMode = CameraMode.Parse(_settings.DeviceMode);
             CmbDevice.SelectionChanged += (_, _) =>
             {
                 if (!_fillingDevice && CmbDevice.SelectedItem is string device) _chosenDevice = device;
+                RefreshDeviceModes();
             };
+            CmbDeviceMode.SelectionChanged += (_, _) =>
+            {
+                if (!_fillingMode && CmbDeviceMode.SelectedIndex >= 0) _chosenMode = ModeAt(CmbDeviceMode.SelectedIndex);
+            };
+            CmbTarget.SelectionChanged += (_, _) => RefreshDeviceModes();
         }
 
         var list = _cameras.ToList();
@@ -109,6 +118,82 @@ internal partial class RecorderView
         {
             _fillingDevice = false;
         }
+
+        RefreshDeviceModes();
+    }
+
+    internal Func<string, Task<IReadOnlyList<CameraMode>>> DeviceModeSource { get; set; }
+        = device => Task.Run(() => CaptureDevices.ModesOf(device));
+
+    private IReadOnlyList<CameraMode> _deviceModes = Array.Empty<CameraMode>();
+
+    private string? _modesFor;
+
+    private CameraMode? _chosenMode;
+
+    private bool _fillingMode;
+
+    private int _modeQuery;
+
+    private CameraMode? ModeAt(int index) => index > 0 && index <= _deviceModes.Count ? _deviceModes[index - 1] : null;
+
+    internal CameraMode? ChosenDeviceMode
+        => _modesFor is not null && string.Equals(_modesFor, ChosenDevice, StringComparison.OrdinalIgnoreCase)
+            ? ModeAt(CmbDeviceMode.SelectedIndex)
+            : null;
+
+    private void RefreshDeviceModes()
+    {
+        var query = ++_modeQuery;
+        var device = SelectedTarget == RecorderTargetKind.Device ? ChosenDevice : null;
+        if (device is null)
+        {
+            FillDeviceModes(null, Array.Empty<CameraMode>());
+            return;
+        }
+
+        Task<IReadOnlyList<CameraMode>> pending;
+        try { pending = DeviceModeSource(device); }
+        catch (Exception ex) when (ex is InvalidOperationException or System.IO.IOException or System.ComponentModel.Win32Exception)
+        {
+            FillDeviceModes(device, Array.Empty<CameraMode>());
+            return;
+        }
+
+        if (pending.IsCompleted)
+        {
+            ApplyDeviceModes(query, device, pending);
+            return;
+        }
+
+        pending.ContinueWith(done => Dispatcher.UIThread.Post(() => ApplyDeviceModes(query, device, done)), TaskScheduler.Default);
+    }
+
+    private void ApplyDeviceModes(int query, string device, Task<IReadOnlyList<CameraMode>> done)
+    {
+        if (query != _modeQuery) return;
+        FillDeviceModes(device, done.IsCompletedSuccessfully ? done.Result : Array.Empty<CameraMode>());
+    }
+
+    private void FillDeviceModes(string? device, IReadOnlyList<CameraMode> modes)
+    {
+        _deviceModes = modes;
+        _modesFor = device;
+        var items = new List<string> { Say("recorder.target.device-mode.auto") };
+        items.AddRange(modes.Select(m => Say("recorder.target.device-mode.item", m.Width, m.Height, m.Rate)));
+        var index = _chosenMode is null ? -1 : modes.ToList().IndexOf(_chosenMode);
+        _fillingMode = true;
+        try
+        {
+            CmbDeviceMode.ItemsSource = items;
+            CmbDeviceMode.SelectedIndex = index + 1;
+        }
+        finally
+        {
+            _fillingMode = false;
+        }
+
+        RowDeviceMode.IsVisible = device is not null && modes.Count > 0;
     }
 
     private bool _deviceLoaded;
@@ -122,6 +207,8 @@ internal partial class RecorderView
     private void CollectDevice()
     {
         if (CmbDevice.SelectedItem is string device) _settings.DeviceName = device;
+        if (_modesFor is not null && string.Equals(_modesFor, ChosenDevice, StringComparison.OrdinalIgnoreCase))
+            _settings.DeviceMode = ChosenDeviceMode?.ToString();
     }
 
     /// <summary>

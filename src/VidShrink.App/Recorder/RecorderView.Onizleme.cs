@@ -15,6 +15,11 @@ internal partial class RecorderView
     internal Func<string> PreviewLocation { get; set; } = () => Path.Combine(
         Path.GetTempPath(), AppIdentity.FolderName, "recorder-preview-" + Environment.ProcessId.ToString(System.Globalization.CultureInfo.InvariantCulture) + ".jpg");
 
+    internal Func<string> FrameLocation { get; set; } = () => Path.Combine(
+        Path.GetTempPath(), AppIdentity.FolderName, "recorder-frame-" + Environment.ProcessId.ToString(System.Globalization.CultureInfo.InvariantCulture) + ".png");
+
+    private string? _framePath;
+
     internal bool PreviewVisible => ImgPreview.IsVisible;
 
     internal Bitmap? PreviewImage => _previewImage;
@@ -25,6 +30,16 @@ internal partial class RecorderView
         => ChkLivePreview.IsChecked == true && request.MaxMegabytes is null
             ? request with { PreviewPath = PreviewLocation() }
             : request with { PreviewPath = null };
+
+    internal void PrepareFrame(string? path)
+    {
+        if (_framePath is { } old) TryDeletePreview(old);
+        _framePath = path;
+        if (path is null) return;
+        var folder = Path.GetDirectoryName(path);
+        if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
+        TryDeletePreview(path);
+    }
 
     internal void PreparePreview(string? path)
     {
@@ -82,6 +97,8 @@ internal partial class RecorderView
         _previewImage = null;
         if (_previewPath is { } path) TryDeletePreview(path);
         _previewPath = null;
+        if (_framePath is { } frame) TryDeletePreview(frame);
+        _framePath = null;
     }
 
     private static void TryDeletePreview(string path)

@@ -143,6 +143,7 @@ internal partial class RecorderView
         {
             Directory.CreateDirectory(Path.GetDirectoryName(path) ?? _settings.ResolveFolder());
             PreparePreview(request.PreviewPath);
+            PrepareFrame(request.FramePath);
             _audioShown = null;
             _session = await RecorderSession.StartAsync(
                 request, path, new Progress<RecordProgress>(ShowProgress));            WriteDiagnostic(request, _session.StartArguments, null);

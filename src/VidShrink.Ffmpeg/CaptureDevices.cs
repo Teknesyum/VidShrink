@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using VidShrink.Core;
 
@@ -65,6 +66,83 @@ public sealed class CaptureDevices
     private static readonly Regex QuotedDevice = new(@"^""(.+)""(?:\s*\((video|audio)\))?\s*$", RegexOptions.Compiled);
     private static readonly Regex AvSection = new(@"^AVFoundation (video|audio) devices", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     private static readonly Regex AvDevice = new(@"^\[(\d+)\]\s+(.+?)\s*$", RegexOptions.Compiled);
+    private static readonly Regex DirectShowOptions = new(@"^DirectShow (video|audio) device options", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex DirectShowMode = new(
+        @"min s=(\d+)x(\d+) fps=([0-9.]+)\s+max s=(\d+)x(\d+) fps=([0-9.]+)", RegexOptions.Compiled);
+
+    private static readonly object ModeGate = new();
+    private static readonly Dictionary<string, IReadOnlyList<CameraMode>> ModeCache = new(StringComparer.OrdinalIgnoreCase);
+
+    internal const double CommonCameraFps = 30;
+
+    internal static string[] DirectShowModeArguments(string device)
+        => new[] { "-hide_banner", "-f", "dshow", "-list_options", "true", "-i", "video=" + device };
+
+    public static IReadOnlyList<CameraMode> ModesOf(string device)
+    {
+        if (!OperatingSystem.IsWindows() || string.IsNullOrWhiteSpace(device) || device.Contains('"', StringComparison.Ordinal))
+            return Array.Empty<CameraMode>();
+        lock (ModeGate)
+        {
+            if (ModeCache.TryGetValue(device, out var known)) return known;
+        }
+
+        IReadOnlyList<CameraMode> modes;
+        try
+        {
+            modes = ParseDirectShowModes(RunCapture(ToolLocator.Ffmpeg, DirectShowModeArguments(device)));
+        }
+        catch
+        {
+            return Array.Empty<CameraMode>();
+        }
+
+        lock (ModeGate) ModeCache[device] = modes;
+        return modes;
+    }
+
+    internal static IReadOnlyList<CameraMode> ParseDirectShowModes(string text)
+    {
+        var ranges = new List<(int Width, int Height, double Min, double Max)>();
+        string? section = null;
+
+        foreach (var raw in Lines(text))
+        {
+            var line = LinePrefix.Replace(raw, "").Trim();
+            var header = DirectShowOptions.Match(line);
+            if (header.Success)
+            {
+                section = header.Groups[1].Value.ToLowerInvariant();
+                continue;
+            }
+
+            if (section != "video") continue;
+            var mode = DirectShowMode.Match(line);
+            if (!mode.Success) continue;
+            if (!int.TryParse(mode.Groups[4].Value, NumberStyles.None, CultureInfo.InvariantCulture, out var width)) continue;
+            if (!int.TryParse(mode.Groups[5].Value, NumberStyles.None, CultureInfo.InvariantCulture, out var height)) continue;
+            if (!double.TryParse(mode.Groups[3].Value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var min)) continue;
+            if (!double.TryParse(mode.Groups[6].Value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var max)) continue;
+            if (width <= 0 || height <= 0 || max <= 0) continue;
+            ranges.Add((width, height, Math.Min(min, max), max));
+        }
+
+        var modes = new List<CameraMode>();
+        foreach (var size in ranges.GroupBy(r => (r.Width, r.Height)))
+        {
+            var top = size.Max(r => r.Max);
+            modes.Add(new CameraMode(size.Key.Width, size.Key.Height, top));
+            if (top > CommonCameraFps && size.Any(r => r.Min <= CommonCameraFps && CommonCameraFps <= r.Max))
+                modes.Add(new CameraMode(size.Key.Width, size.Key.Height, CommonCameraFps));
+        }
+
+        return modes
+            .Distinct()
+            .OrderByDescending(m => (long)m.Width * m.Height)
+            .ThenByDescending(m => m.Width)
+            .ThenByDescending(m => m.Fps)
+            .ToList();
+    }
 
     /// <summary>
     /// Liste bir kez okunur. Okuma <b>basarisizsa</b> sonuc kalici degildir: gecici bir
@@ -100,6 +178,8 @@ public sealed class CaptureDevices
             _instance = null;
             _lastLoadTicks = 0;
         }
+
+        lock (ModeGate) ModeCache.Clear();
     }
 
     /// <summary>Icinde bulunulan isletim sisteminin girdi katmani.</summary>

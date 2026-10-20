@@ -83,6 +83,11 @@
   aygıt dosyası olmayan ad, boş ad, aynı aygıtı katman yapmak, ddagrab ve gizlilik maskesi reddedilir; anlık kare aynı
   aygıttan. Hedef kutusu her sistemde `Device`'ı sunar. Sahte `CameraSource` ile kutu → istek → json → sonraki görünüm,
   kayıtlı ayardan CLI isteği. Gerçek kamera açılmaz.
+- `KaydediciAygitKipiTests.cs` — later 69 kalanı: ffmpeg 9 ve eski dshow `-list_options` metninden boyut başına kip
+  (aralık 30'u kapsıyorsa 30 da), kare hızı argümanının dshow aralık denetimini tutturması, `-video_size`/`-framerate`
+  `-i`'den önce, kip ve son kare dosyası doğrulaması, saniyede bir yenilenen ikinci PNG çıktısı, `DeviceFrame` yarım
+  PNG'yi almaz ve yeniden dener. Sahte kip kaynağıyla kutu → istek → json → sonraki görünüm, CLI. `[KameraFact]`:
+  OBS Virtual Camera'dan seçili kiple kayıt ve kayıt sürerken anlık kare. Geçici dosyalar `.calisma/aygit-kipi/`.
 - `KaydediciKameraSistemTests.cs` — later 70, kamera Windows dışında: `CameraInput` Windows'ta dshow, macOS'ta
   `-f avfoundation -framerate 30 -i <ad>:none`, Linux'ta `-f v4l2 -i /dev/...`; katman ekran girdisinin, ana kaynak
   ses girdilerinin önünde, anlık kare aynı aygıttan, Mac CLI isteği. macOS'ta `:`'lı, Linux'ta `/dev/` dışı ad reddedilir.

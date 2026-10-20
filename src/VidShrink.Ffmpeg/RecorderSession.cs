@@ -244,9 +244,13 @@ public sealed class RecorderSession : IAsyncDisposable
     /// Kayit surerken tek karelik bir ekran goruntusu alir. Kaydi kesmiyor: yakalama
     /// girdisinden ikinci, kisa omurlu bir ffmpeg surecine okunuyor. Kare kayit
     /// dosyasindan degil ekrandan geliyor: canli ekranin dosyasi yok, dosyadan kare kesen bir
-    /// yol buraya uymaz.
+    /// yol buraya uymaz. Kamera ana kaynakken (<see cref="RecorderRequest.FramePath"/>) aygit
+    /// kayittaki surecte acik oldugu icin ikinci surec acilmaz; kaydin yazdigi son kare kopyalanir.
     /// </summary>
-    public Task<bool> SnapshotAsync(string imagePath, CancellationToken ct = default) => CaptureAsync(_request, imagePath, ct);
+    public Task<bool> SnapshotAsync(string imagePath, CancellationToken ct = default)
+        => string.IsNullOrWhiteSpace(_request.FramePath)
+            ? CaptureAsync(_request, imagePath, ct)
+            : DeviceFrame.CopyAsync(_request.FramePath, imagePath, ct);
 
     public static async Task<bool> CaptureAsync(RecorderRequest request, string imagePath, CancellationToken ct = default)
     {
