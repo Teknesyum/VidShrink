@@ -285,8 +285,11 @@ public sealed class DosyaIliskiTests : IDisposable
 
         using var root = Registry.CurrentUser.OpenSubKey(_testKey);
         Assert.NotNull(root);
-        Assert.Equal(new[] { "SystemFileAssociations" }, root!.GetSubKeyNames());
+        Assert.Equal(new[] { "SystemFileAssociations", "Teknesyum" }, root!.GetSubKeyNames().Order().ToArray());
         Assert.Equal(0, root.ValueCount);
+        using var vendor = Registry.CurrentUser.OpenSubKey($@"{_testKey}\{AppIdentity.RegistryVendorPath}");
+        Assert.Equal(new[] { "ShellLabels" }, vendor!.GetSubKeyNames());
+        Assert.Equal(0, vendor.ValueCount);
     }
 
     [Fact]

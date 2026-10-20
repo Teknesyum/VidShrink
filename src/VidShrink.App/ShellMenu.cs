@@ -178,7 +178,10 @@ internal static class ShellMenu
 
     [SupportedOSPlatform("windows")]
     private static int WriteLabel(string name, string label, bool onlyChanged = false)
-        => Root is { } root ? Core.Setup.ShellRegistration.WriteShellLabels(root + LabelKey, [(name, label)], onlyChanged) : 0;
+    {
+        if (Root is not { } root) return 0;
+        return Core.Setup.ShellRegistration.WriteShellLabels(root + LabelKey, [(name, label)], onlyChanged);
+    }
 
     [SupportedOSPlatform("windows")]
     internal static int Relabel(string menu, string label)
