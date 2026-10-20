@@ -705,7 +705,7 @@ public sealed class OynaticiKisayolTests
                 o.Bekle(0.3);
                 var sonra = (Durum: o.Window.WindowState, Pause: o.Oku("pause"));
                 o.Not($"cift tik: WindowState {once.Durum} -> {sonra.Durum}, pause {once.Pause} -> ilk birakista oynatma {ara} -> {sonra.Pause}");
-                return sonra.Durum != WindowState.FullScreen && ara && sonra.Pause == once.Pause ? null : "cift tik tam ekrana gecti ya da iki kez cevirmedi";
+                return sonra.Durum == WindowState.FullScreen && ara && sonra.Pause == once.Pause ? null : "cift tik tam ekrana gecmedi ya da oynatmayi geri almadi";
             }
             case "F":
             case "OrtaTik":

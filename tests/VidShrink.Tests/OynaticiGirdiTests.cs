@@ -1019,49 +1019,143 @@ internal static class FareKanit
 public sealed class OynaticiFareTests
 {
     [Fact]
-    public void TekTikBirakistaAnindaCevirirCiftTikTamEkranaGecmez()
+    public void TekTikDuraklatirCiftTikTamEkranVeOynatmayiKorur()
     {
         var rapor = AppHost.Run(() =>
         {
             var view = GirdiSurucu.Kur(out var window);
             var body = new FareKanit.Defter("f1-tik-ayrimi.txt");
+            var saat = 100.0;
+            view.FareSaati = () => saat;
+            var cift = view.Sol.CiftSn;
 
             var once = view.IsPlaying;
             view.FarePress(10, 10);
             var basiliken = view.IsPlaying;
-            view.FareRelease();
+            saat += 0.05;
+            var tek = view.FareRelease();
             var birakista = view.IsPlaying;
+            body.Satir($"tek tik   : oynatma {once} -> basili {basiliken} -> birakis {birakista} ({tek})");
 
-            body.Satir($"tek tik   : oynatma {once} -> basili {basiliken} -> birakis {birakista}");
-
+            saat += cift + 0.05;
             var tamOnce = view.Fullscreen.IsFullscreen;
             var oynatmaOnce = view.IsPlaying;
             var izOnce = view.Trace.Count;
             view.FarePress(10, 10);
-            view.FareRelease();
+            saat += 0.05;
+            var ilk = view.FareRelease();
             var ilkBirakis = view.IsPlaying;
+            saat += 0.05;
             view.FarePress(10, 10);
-            view.FareRelease();
+            saat += 0.05;
+            var ikinci = view.FareRelease();
             var uretilen = view.Trace.Skip(izOnce).ToList();
-
-            body.Satir($"cift tik  : tam ekran {tamOnce} -> {view.Fullscreen.IsFullscreen}, oynatma {oynatmaOnce} -> {ilkBirakis} -> {view.IsPlaying}");
+            var tamSonra = view.Fullscreen.IsFullscreen;
+            var oynatmaSonra = view.IsPlaying;
+            body.Satir($"cift tik  : {ilk} + {ikinci}, tam ekran {tamOnce} -> {tamSonra}, oynatma {oynatmaOnce} -> {ilkBirakis} -> {oynatmaSonra} (sure {cift:0.###} sn)");
             body.Satir($"cift tikin urettigi iz: {string.Join(" | ", uretilen)}");
+
+            saat += cift + 0.05;
+            view.FarePress(10, 10);
+            saat += 0.05;
+            view.FareRelease();
+            saat += 0.05;
+            view.FarePress(10, 10);
+            saat += 0.05;
+            view.FareRelease();
+            body.Satir($"ikinci cift tik: tam ekran {tamSonra} -> {view.Fullscreen.IsFullscreen}, oynatma {view.IsPlaying}");
+
+            saat += cift + 0.05;
+            var yavasOnce = view.IsPlaying;
+            view.FarePress(10, 10);
+            saat += 0.05;
+            view.FareRelease();
+            saat += cift + 0.01;
+            view.FarePress(10, 10);
+            saat += 0.05;
+            var yavas = view.FareRelease();
+            body.Satir($"yavas iki tik: {yavas}, tam ekran {view.Fullscreen.IsFullscreen}, oynatma {yavasOnce} -> {view.IsPlaying}");
 
             Assert.False(once);
             Assert.False(basiliken);
+            Assert.Equal(SolTikSonucu.Tik, tek);
             Assert.True(birakista);
             Assert.False(tamOnce);
-            Assert.False(view.Fullscreen.IsFullscreen);
+            Assert.Equal(SolTikSonucu.Tik, ilk);
+            Assert.Equal(SolTikSonucu.CiftTik, ikinci);
             Assert.NotEqual(oynatmaOnce, ilkBirakis);
-            Assert.Equal(oynatmaOnce, view.IsPlaying);
-            Assert.DoesNotContain(uretilen, satir => satir.StartsWith("fullscreen", StringComparison.Ordinal));
+            Assert.True(tamSonra);
+            Assert.Equal(oynatmaOnce, oynatmaSonra);
+            Assert.Contains(uretilen, satir => satir.StartsWith("fullscreen", StringComparison.Ordinal));
+            Assert.Equal(SolTikSonucu.Tik, yavas);
+            Assert.False(view.Fullscreen.IsFullscreen);
+            Assert.Equal(yavasOnce, view.IsPlaying);
 
             window.Close();
             return body.Metin;
         });
 
-        Assert.Contains("tam ekran False -> False", rapor);
+        Assert.Contains("tam ekran False -> True", rapor);
         FareKanit.Kapat("f1-tik-ayrimi.txt");
+    }
+
+    [Fact]
+    public void BasiliTutmaHiziIkiKatinaCikarirBirakisEskiHizaDonerTikSayilmaz()
+    {
+        var rapor = AppHost.Run(() =>
+        {
+            var view = GirdiSurucu.Kur(out var window);
+            var body = new FareKanit.Defter("f7-basili-tutma.txt");
+            var saat = 50.0;
+            view.FareSaati = () => saat;
+            var belirtec = Application.Current!.TryFindResource("PlayerHoldFastDelay", out var deger) ? deger : null;
+            var esik = view.Sol.TutmaSn;
+
+            var oynatmaOnce = view.IsPlaying;
+            var hizOnce = view.SpeedFactor;
+            view.FarePress(20, 20);
+            saat += esik - 0.01;
+            var erken = view.FareZaman();
+            var erkenHiz = view.OynayanHiz;
+            saat += 0.01;
+            var gecti = view.FareZaman();
+            var tutarkenHiz = view.OynayanHiz;
+            var tutarkenAyar = view.SpeedFactor;
+            var kip = view.FareMove(20 + 3 * ClickArbiter.DragThresholdDip, 20);
+            saat += 1;
+            var birakis = view.FareRelease();
+            var oynatmaBirakista = view.IsPlaying;
+            body.Satir($"belirtec {belirtec} esik {esik:0.###} sn: erken {erken} hiz {erkenHiz}, esikte {gecti} hiz {tutarkenHiz} (ayar {tutarkenAyar}), surukleme [{kip}]");
+            body.Satir($"birakis {birakis}: hiz {view.OynayanHiz} ayar {view.SpeedFactor}, oynatma {oynatmaOnce} -> {view.IsPlaying}, tutuluyor {view.HizliTutuluyor}");
+            body.Satir("iz: " + string.Join(" | ", view.Trace.Where(s => s.StartsWith("hold", StringComparison.Ordinal))));
+
+            saat += 0.05;
+            view.FarePress(20, 20);
+            saat += 0.05;
+            var sonrakiTik = view.FareRelease();
+            body.Satir($"tutmadan sonra hemen tik: {sonrakiTik}, oynatma {view.IsPlaying}, tam ekran {view.Fullscreen.IsFullscreen}");
+
+            Assert.Equal(TimeSpan.FromSeconds(esik), belirtec);
+            Assert.False(erken);
+            Assert.Equal(hizOnce, erkenHiz);
+            Assert.True(gecti);
+            Assert.Equal(Keymap.HoldSpeed, tutarkenHiz);
+            Assert.Equal(hizOnce, tutarkenAyar);
+            Assert.Equal("", kip);
+            Assert.Equal(SolTikSonucu.TutmaBitti, birakis);
+            Assert.Equal(hizOnce, view.OynayanHiz);
+            Assert.False(view.HizliTutuluyor);
+            Assert.Equal(oynatmaOnce, oynatmaBirakista);
+            Assert.Equal(SolTikSonucu.Tik, sonrakiTik);
+            Assert.NotEqual(oynatmaOnce, view.IsPlaying);
+            Assert.False(view.Fullscreen.IsFullscreen);
+
+            window.Close();
+            return body.Metin;
+        });
+
+        Assert.Contains("birakis TutmaBitti", rapor);
+        FareKanit.Kapat("f7-basili-tutma.txt");
     }
 
     [Fact]
@@ -1085,11 +1179,11 @@ public sealed class OynaticiFareTests
             body.Satir($"esik ustu ({ClickArbiter.DragThresholdDip} dip): kip [{uzunKip}] birakis {uzunBirakis} oynatma {oynatmaOnce} -> {view.IsPlaying}");
 
             Assert.Equal("", kisaKip);
-            Assert.Equal(ReleaseOutcome.Click, kisaBirakis);
+            Assert.Equal(SolTikSonucu.Tik, kisaBirakis);
             Assert.True(kisaSonrasi);
 
             Assert.Equal("window", uzunKip);
-            Assert.Equal(ReleaseOutcome.Drag, uzunBirakis);
+            Assert.Equal(SolTikSonucu.Surukleme, uzunBirakis);
             Assert.Equal(oynatmaOnce, view.IsPlaying);
 
             window.Close();

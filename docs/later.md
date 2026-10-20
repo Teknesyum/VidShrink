@@ -129,8 +129,8 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 - Satırlar (OYA-P6): OYA-02 Çift tıkla tam ekran; OYA-38 Basılı tutarak geçici hızlandırma. [Tablo](piyasa/2026-10-13/oynatici-cekirdek-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.App/Playback/PlayerView.Fare.cs, src/VidShrink.App/Playback/Keymap.cs, src/VidShrink.App/Playback/PlayerInputMap.cs, src/VidShrink.App/Playback/PlayerShortcutsPanel.axaml.cs
-- Sahibin kararı: sol tık üç anlam taşısın mı: tek tık oynat ya da duraklat (bugünkü), çift tık tam ekran, basılı tutunca bırakana dek hızlı oynatma
-- Plan: Bugün sol tık işini bırakışta yapıyor ve çift tık bilerek ayrı hareket sayılmıyor (PlayerView.Fare.cs:45, 88–94). `PlayerInputKind`'e çift basış ve basılı tutma türleri eklenir: ikinci tık ilk tıkın etkisini geri alıp tam ekrana geçer; basış bekleme eşiğini aşarsa hız geçici olarak yükselir, bırakınca eski hıza döner ve tık sayılmaz. Eşik süresi tema belirtecinden okunur, sürükleme eşiği korunur. Doğrulama: `FarePress` ve `FareRelease` üstünden zamanlı görünüm testleri; kararsız `SolTikOynatmayiDegistirmez` testi bu paketle birlikte ele alınır.
+- Sahibin kararı (verildi: üçü de evet, tek tıka gecikme eklenmez): sol tık üç anlam taşısın mı: tek tık oynat ya da duraklat (bugünkü), çift tık tam ekran, basılı tutunca bırakana dek hızlı oynatma
+- Durum (20 Ekim 2026, `worktree-agent-later-95`): yüzeyde tek tık bırakışta duraklat/oynat (gecikme yok), çift tık tam ekranı çevirip ilk tıkın duraklatmasını geri alır, basılı tutma `PlayerHoldFastDelay` (0,5 sn) eşiğini aşınca hız 2x, bırakınca eski hıza döner ve tık sayılmaz. Mantık saf `SolTikHareketi` (zaman girdili), sürükleme ayrımı `ClickArbiter`da kaldı; çift tık süresi platformun `GetDoubleTapTime`ından. Kalan: kısayol panelinde çift tık ve basılı tutma satırı yok (yeni metin anahtarı ister); 2x sırasında hız göstergesi çıkmıyor; karşılaştırma paneli eski tek tık davranışında.
 
 ## 96. HDR Ton Eşleme
 

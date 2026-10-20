@@ -7,6 +7,13 @@ All notable changes to VidShrink Player are recorded here. The format follows
 The history of the program under its old name, VidShrink, up to 1.2.24 and the changes
 made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md).
 
+## [Unreleased]
+
+### Added
+
+- Player: double-click the picture to toggle full screen; the pause from the first click is
+  undone. Hold the left button on the picture to play at 2x until you let go.
+
 ## [0.0.1]
 
 ### Changed
