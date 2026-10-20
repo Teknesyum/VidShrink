@@ -50,6 +50,11 @@ public static class PaletteCatalog
     /// </summary>
     public const string DefaultLight = "Buz";
 
+    public const string HighContrast = "HighContrast";
+
+    public static string Pick(string? chosen, bool chosenByUser, bool follow, bool? systemLight, string? light, string? dark, bool highContrast)
+        => highContrast && (follow || !chosenByUser) ? HighContrast : Pick(chosen, follow, systemLight, light, dark);
+
     /// <summary>
     /// AYR-P4: uygulanacak paletin adı. İzleme kapalıysa ya da sistemin teması okunamıyorsa
     /// kullanıcının seçtiği palet; açıkken sistemin açık ya da koyu oluşuna göre iki seçimden biri.
@@ -68,7 +73,7 @@ public static class PaletteCatalog
         "TokyoNight", "Catppuccin", "OneDark", "Monokai",
         "Solarized", "Everforest", "RosePine", "Ayu",
         "NightOwl", "Synthwave", "Cobalt", "MaterialOcean",
-        "Github", "Kanagawa", "Horizon", "Moonlight",
+        "Github", "Kanagawa", "Horizon", "Moonlight", "HighContrast",
         "Gece", "Grafit", "Kadife", "Kor",
         "SolarizedLight", "GithubLight", "CatppuccinLatte",
         "RosePineDawn", "AyuLight", "GruvboxLight",

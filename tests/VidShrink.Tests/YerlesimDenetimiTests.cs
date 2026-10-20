@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
@@ -359,6 +359,11 @@ public sealed class YerlesimDenetimiTests
         }, zorla: boyut);
     }
 
+    [Theory]
+    [MemberData(nameof(DilKollari))]
+    public void YuzdeElliYazidaVarsayilanBoyuttaKesikCakismaTasmaYok(string dil) =>
+        Denetle(dil, false, "-yazi150", null, yazi: 150);
+
     internal static Size KucukKipBoyutu(double olcek)
     {
         var pay = AppHost.Run(() => (double)Application.Current!.FindResource("WindowCompactAreaShare")!);
@@ -399,9 +404,9 @@ public sealed class YerlesimDenetimiTests
         return kollar;
     }
 
-    private void Denetle(string dil, bool dar, string durum, Action<MainWindow>? hazirla, bool yukle = true, Size? zorla = null)
+    private void Denetle(string dil, bool dar, string durum, Action<MainWindow>? hazirla, bool yukle = true, Size? zorla = null, int yazi = 100)
     {
-        var (denetim, boyut) = Ac(dil, dar, null, zorla, hazirla: hazirla, yukle: yukle);
+        var (denetim, boyut) = Ac(dil, dar, null, zorla, hazirla: hazirla, yukle: yukle, yazi: yazi);
         var klasor = Path.Combine(TipSources.Root, ".calisma", "yerlesim-denetimi");
         var ad = $"{dil}-{(dar ? "taban" : "varsayilan")}{durum}.txt";
         Directory.CreateDirectory(klasor);
@@ -867,10 +872,11 @@ public sealed class YerlesimDenetimiTests
         Tasmalar(pencere, durum, denetim);
     }
 
-    private static (Denetim, Size) Ac(string dil, bool dar, Action<MainWindow>? boz, Size? zorla = null, Action<MainWindow>? hazirla = null, bool yukle = true) =>
+    private static (Denetim, Size) Ac(string dil, bool dar, Action<MainWindow>? boz, Size? zorla = null, Action<MainWindow>? hazirla = null, bool yukle = true, int yazi = 100) =>
         AppHost.Run(() =>
         {
             Strings.Use(dil);
+            if (yazi != 100) VidShrink.App.Themes.FontScale.Apply(yazi);
             var pencere = new MainWindow();
             try
             {
@@ -892,6 +898,7 @@ public sealed class YerlesimDenetimiTests
             {
                 pencere.Close();
                 Strings.Use("en");
+                if (yazi != 100) VidShrink.App.Themes.FontScale.Apply(100);
             }
         });
 

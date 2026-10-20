@@ -122,6 +122,12 @@ public sealed class AppSettings
     /// <summary>Ayarlar'daki "canlandırmaları kapat" anahtarı; sistem ayarına ek olarak hareketi azaltır.</summary>
     public bool ReduceMotion { get; set; }
 
+    public bool ThemeChosen { get; set; }
+
+    public static IReadOnlyList<int> FontScales { get; } = new[] { 100, 125, 150 };
+
+    public int FontScale { get; set; } = 100;
+
     /// <summary>
     /// Varsayılanın Teknesyum olduğu sürümden sonra yazılmış dosyanın işareti. İşaretsiz dosyada
     /// kayıtlı <see cref="LegacyDefaultTheme"/> eski varsayılandır, kullanıcının seçimi değil;
@@ -203,6 +209,9 @@ public sealed class AppSettings
             ReadString(root, "lightTheme", value => settings.LightTheme = value);
             ReadString(root, "darkTheme", value => settings.DarkTheme = value);
             ReadBool(root, "reduceMotion", value => settings.ReduceMotion = value);
+            settings.ThemeChosen = settings.Theme.Length > 0 && !string.Equals(settings.Theme, Themes.PaletteCatalog.Default, StringComparison.Ordinal);
+            ReadBool(root, "themeChosen", value => settings.ThemeChosen = value);
+            ReadInt(root, "fontScale", value => settings.FontScale = FontScales.Contains(value) ? value : 100);
             ReadBool(root, "advancedDefaultOpen", value => settings.AdvancedDefaultOpen = value);
             ReadBool(root, "followRecording", value => settings.FollowRecording = value);
             ReadBool(root, "notifyWhenDone", value => settings.NotifyWhenDone = value);
@@ -224,7 +233,10 @@ public sealed class AppSettings
             if (!root.TryGetProperty(ThemeMigrationMarker, out _))
             {
                 if (string.Equals(settings.Theme, LegacyDefaultTheme, StringComparison.Ordinal))
+                {
                     settings.Theme = Themes.PaletteCatalog.Default;
+                    settings.ThemeChosen = false;
+                }
                 migrate = true;
             }
         }
@@ -304,6 +316,8 @@ public sealed class AppSettings
         root["lightTheme"] = LightTheme;
         root["darkTheme"] = DarkTheme;
         root["reduceMotion"] = ReduceMotion;
+        root["themeChosen"] = ThemeChosen;
+        root["fontScale"] = FontScale;
         root["outputFolderMode"] = OutputFolderMode;
         root["outputFolder"] = OutputFolder;
         root["outputNamePattern"] = OutputNamePattern;

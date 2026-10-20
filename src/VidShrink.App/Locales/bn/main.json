@@ -755,6 +755,8 @@
   "settings-tab.theme.dark": "গাঢ়",
   "settings-tab.reduce-motion.label": "অ্যানিমেশন বন্ধ করুন",
   "settings-tab.reduce-motion.hint": "প্যানেলের সরে যাওয়া ও অন্যান্য নড়াচড়া বন্ধ করে। সিস্টেম আগেই কম নড়াচড়া চাইলে অ্যানিমেশন এমনিতেই বন্ধ থাকে।",
+  "settings-tab.text-size.label": "লেখার আকার",
+  "settings-tab.text-size.hint": "• প্রোগ্রামের সব লেখা বড় করে।\n• প্রোগ্রাম আবার চালু করার পরে প্রযোজ্য হয়।",
   "settings-tab.language.hint": "ইন্টারফেসের ভাষা বদলায় এবং পরের চালুতে মনে রাখা হয়।",
   "settings-tab.default-target.label": "ডিফল্ট লক্ষ্য আকার",
   "settings-tab.default-target.hint": "সংকোচন ট্যাব যে লক্ষ্য আকারে খোলে তা ঠিক করে।",

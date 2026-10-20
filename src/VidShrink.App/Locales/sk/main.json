@@ -755,6 +755,8 @@
   "settings-tab.theme.dark": "Tmavý",
   "settings-tab.reduce-motion.label": "Vypnúť animácie",
   "settings-tab.reduce-motion.hint": "Vypne posúvanie panelov a ďalší pohyb. Ak systém už žiada menej pohybu, animácie zostanú vypnuté tak či tak.",
+  "settings-tab.text-size.label": "Veľkosť textu",
+  "settings-tab.text-size.hint": "• Zväčší všetok text v programe.\n• Prejaví sa po reštartovaní programu.",
   "settings-tab.language.hint": "Zmení jazyk rozhrania a zapamätá sa pri ďalšom spustení.",
   "settings-tab.default-target.label": "Predvolená cieľová veľkosť",
   "settings-tab.default-target.hint": "Nastaví cieľovú veľkosť, s ktorou sa karta Zmenšiť otvára.",

@@ -755,6 +755,8 @@
   "settings-tab.theme.dark": "มืด",
   "settings-tab.reduce-motion.label": "ปิดภาพเคลื่อนไหว",
   "settings-tab.reduce-motion.hint": "ปิดการเลื่อนของแผงและการเคลื่อนไหวอื่น หากระบบขอให้ลดการเคลื่อนไหวอยู่แล้ว ภาพเคลื่อนไหวจะยังปิดอยู่",
+  "settings-tab.text-size.label": "ขนาดข้อความ",
+  "settings-tab.text-size.hint": "• ขยายข้อความทั้งหมดในโปรแกรม\n• มีผลหลังจากเริ่มโปรแกรมใหม่",
   "settings-tab.language.hint": "เปลี่ยนภาษาอินเทอร์เฟซและจดจำไว้ในการเปิดครั้งถัดไป",
   "settings-tab.default-target.label": "ขนาดเป้าหมายเริ่มต้น",
   "settings-tab.default-target.hint": "กำหนดขนาดเป้าหมายที่แท็บย่อเปิดมาพร้อมกัน",

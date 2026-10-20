@@ -7,6 +7,14 @@ All notable changes to VidShrink Player are recorded here. The format follows
 The history of the program under its old name, VidShrink, up to 1.2.24 and the changes
 made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md).
 
+## [Unreleased]
+
+### Added
+
+- A High Contrast palette, picked on its own when Windows asks for high contrast and you
+  have not chosen a palette yourself; every text colour in it passes 7:1.
+- Text Size in Settings: 100%, 125% or 150%, applied after a restart.
+
 ## [0.0.1]
 
 ### Changed

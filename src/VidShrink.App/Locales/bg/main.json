@@ -755,6 +755,8 @@
   "settings-tab.theme.dark": "Тъмна",
   "settings-tab.reduce-motion.label": "Изключи анимациите",
   "settings-tab.reduce-motion.hint": "Изключва плъзгането на панели и други движения. Ако системата вече иска по-малко движение, анимациите остават изключени.",
+  "settings-tab.text-size.label": "Размер на текста",
+  "settings-tab.text-size.hint": "• Уголемява целия текст в програмата.\n• Прилага се след рестартиране на програмата.",
   "settings-tab.language.hint": "Променя езика на интерфейса и се запомня при следващо стартиране.",
   "settings-tab.default-target.label": "Целеви размер по подразбиране",
   "settings-tab.default-target.hint": "Задава целевия размер, с който се отваря разделът „Свиване“.",

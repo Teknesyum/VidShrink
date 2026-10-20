@@ -755,6 +755,8 @@
   "settings-tab.theme.dark": "Nyeusi",
   "settings-tab.reduce-motion.label": "Zima uhuishaji",
   "settings-tab.reduce-motion.hint": "Huzima utelezaji wa paneli na mwendo mwingine. Ikiwa mfumo tayari unaomba mwendo mdogo, uhuishaji hubaki umezimwa.",
+  "settings-tab.text-size.label": "Ukubwa wa maandishi",
+  "settings-tab.text-size.hint": "• Hukuza maandishi yote ya programu.\n• Hutumika baada ya kuanzisha upya programu.",
   "settings-tab.language.hint": "Hubadilisha lugha ya kiolesura na hukumbukwa uzinduzi ujao.",
   "settings-tab.default-target.label": "Ukubwa lengwa chaguomsingi",
   "settings-tab.default-target.hint": "Huweka ukubwa lengwa ambao kichupo cha Finyaza hufunguka nao.",

@@ -755,6 +755,8 @@
   "settings-tab.theme.dark": "Ciemny",
   "settings-tab.reduce-motion.label": "Wyłącz animacje",
   "settings-tab.reduce-motion.hint": "Wyłącza przesuwanie paneli i inny ruch. Jeśli system już prosi o mniej ruchu, animacje i tak pozostają wyłączone.",
+  "settings-tab.text-size.label": "Rozmiar tekstu",
+  "settings-tab.text-size.hint": "• Powiększa cały tekst w programie.\n• Działa po ponownym uruchomieniu programu.",
   "settings-tab.language.hint": "Zmienia język interfejsu i jest zapamiętywany przy następnym uruchomieniu.",
   "settings-tab.default-target.label": "Domyślny rozmiar docelowy",
   "settings-tab.default-target.hint": "Ustala rozmiar docelowy, z którym otwiera się zakładka Zmniejsz.",

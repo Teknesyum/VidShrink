@@ -755,6 +755,8 @@
   "settings-tab.theme.dark": "Tamna",
   "settings-tab.reduce-motion.label": "Isključi animacije",
   "settings-tab.reduce-motion.hint": "Isključuje klizanje ploča i druge pokrete. Ako sustav već traži manje pokreta, animacije ionako ostaju isključene.",
+  "settings-tab.text-size.label": "Veličina teksta",
+  "settings-tab.text-size.hint": "• Povećava sav tekst u programu.\n• Primjenjuje se nakon ponovnog pokretanja programa.",
   "settings-tab.language.hint": "Mijenja jezik sučelja i pamti se pri sljedećem pokretanju.",
   "settings-tab.default-target.label": "Zadana ciljana veličina",
   "settings-tab.default-target.hint": "Postavlja ciljanu veličinu s kojom se otvara kartica Smanji.",

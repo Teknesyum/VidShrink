@@ -755,6 +755,8 @@
   "settings-tab.theme.dark": "Temna",
   "settings-tab.reduce-motion.label": "Izklopi animacije",
   "settings-tab.reduce-motion.hint": "Izklopi drsenje plošč in drugo gibanje. Če sistem že zahteva manj gibanja, animacije ostanejo izklopljene.",
+  "settings-tab.text-size.label": "Velikost besedila",
+  "settings-tab.text-size.hint": "• Poveča vse besedilo v programu.\n• Uveljavi se po ponovnem zagonu programa.",
   "settings-tab.language.hint": "Spremeni jezik vmesnika in se zapomni ob naslednjem zagonu.",
   "settings-tab.default-target.label": "Privzeta ciljna velikost",
   "settings-tab.default-target.hint": "Določa ciljno velikost, s katero se odpre zavihek Skrči.",

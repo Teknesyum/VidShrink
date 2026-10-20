@@ -13,6 +13,8 @@ internal interface ISystemThemeSource
     /// <summary>Sistem açık temada mı; okunamıyorsa <c>null</c>.</summary>
     bool? IsLight { get; }
 
+    bool IsHighContrast => false;
+
     event EventHandler? Changed;
 }
 
@@ -43,6 +45,21 @@ internal sealed class PlatformThemeSource : ISystemThemeSource, IDisposable
             catch (Exception)
             {
                 return null;
+            }
+        }
+    }
+
+    public bool IsHighContrast
+    {
+        get
+        {
+            try
+            {
+                return _settings?.GetColorValues().ContrastPreference == ColorContrastPreference.High;
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
     }
@@ -79,6 +96,8 @@ internal sealed class SystemThemeFollower : IDisposable
 
     public string? Chosen { get; set; }
 
+    public bool ChosenByUser { get; set; } = true;
+
     public string? Light { get; set; }
 
     public string? Dark { get; set; }
@@ -100,7 +119,7 @@ internal sealed class SystemThemeFollower : IDisposable
 
     public string Apply()
     {
-        var name = PaletteCatalog.Use(PaletteCatalog.Pick(Chosen, _enabled, _source.IsLight, Light, Dark));
+        var name = PaletteCatalog.Use(PaletteCatalog.Pick(Chosen, ChosenByUser, _enabled, _enabled ? _source.IsLight : null, Light, Dark, _source.IsHighContrast));
         Applied?.Invoke(this, name);
         return name;
     }
@@ -111,10 +130,12 @@ internal sealed class SystemThemeFollower : IDisposable
         if (_source is IDisposable disposable) disposable.Dispose();
     }
 
+    private bool Reacts => _enabled || !ChosenByUser;
+
     private void OnSourceChanged(object? sender, EventArgs e)
     {
-        if (!_enabled) return;
+        if (!Reacts) return;
         if (Dispatcher.UIThread.CheckAccess()) Apply();
-        else Dispatcher.UIThread.Post(() => { if (_enabled) Apply(); });
+        else Dispatcher.UIThread.Post(() => { if (Reacts) Apply(); });
     }
 }

@@ -755,6 +755,8 @@
   "settings-tab.theme.dark": "Tume",
   "settings-tab.reduce-motion.label": "Lülita animatsioonid välja",
   "settings-tab.reduce-motion.hint": "Lülitab välja paneelide libisemise ja muu liikumise. Kui süsteem juba palub vähem liikumist, jäävad animatsioonid igal juhul välja.",
+  "settings-tab.text-size.label": "Teksti suurus",
+  "settings-tab.text-size.hint": "• Suurendab kogu programmi teksti.\n• Rakendub pärast programmi taaskäivitamist.",
   "settings-tab.language.hint": "Muudab liidese keelt ja jäetakse järgmiseks käivituseks meelde.",
   "settings-tab.default-target.label": "Vaikimisi sihtsuurus",
   "settings-tab.default-target.hint": "Määrab sihtsuuruse, millega Tihenda-vahekaart avaneb.",

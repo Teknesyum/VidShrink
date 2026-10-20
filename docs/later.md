@@ -453,8 +453,9 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 - Satırlar (AYR-P11): AYR-12 Arayüz Ölçeği Ya Da Yazı Boyutu; AYR-13 Yüksek Karşıtlık Desteği. [Tablo](piyasa/2026-10-13/ayarlar-kabuk-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.App/Themes/Theme.axaml, src/VidShrink.App/Themes/PaletteCatalog.cs, src/VidShrink.App/Themes/Palette/, src/VidShrink.App/MainWindow.axaml
-- Sahibin kararı: "Renk yalnız paletten, ölçü yalnız belirteçten" kuralına sistemin karşıtlık ve yazı boyutu ayarları için istisna açılsın mı?
-- Plan: Önce AYR-13: sistem yüksek karşıtlık istediğinde seçilecek bir yüksek karşıtlıklı palet eklenir ve geçiş `PaletteCatalog.Use` üstünden yapılır. Sonra AYR-12: yazı boyutu belirteçlerine tek bir ölçek çarpanı bağlanır, Ayarlar'a yazı boyutu seçimi konur ve en küçük pencere boyutunda taşma her sekmede ölçülür. Doğrulama: karşıtlık oranı ölçümü ve pinli yerleşim ölçülerinin her ölçekte yeniden koşulması.
+- Yapılan: `HighContrast` paleti (AAA testi `YuksekKarsitlikVeYaziOlcegiTests`), Ayarlar'da yazı boyutu %100/%125/%150 (`FontScale`), %150 varsayılan boyutta beş dilde kusursuz (`YuzdeElliYazidaVarsayilanBoyuttaKesikCakismaTasmaYok`). Kural istisnası açılmadı.
+- Kalan: %150 küçük kipte ve en dar pencerede, %125 hiçbir boyutta ölçülmedi; yazı boyutu yeniden başlatınca uygulanıyor, çalışırken değil.
+- Plan: `YerlesimDenetimiTests`'in küçük kip ve en dar kollarına `yazi: 150` kolu eklenir, çıkan kusurlar belirteç ve yerleşimle düzeltilir. Çalışırken uygulama için `FontScale.Apply` sonrası açık pencerelerin yeniden ölçülmesi denenir.
 
 ## 149. Tam Paket Ve Çevrimdışı Kurucu
 

@@ -755,6 +755,8 @@
   "settings-tab.theme.dark": "ダーク",
   "settings-tab.reduce-motion.label": "アニメーションをオフ",
   "settings-tab.reduce-motion.hint": "パネルのスライドなどの動きをオフにします。システムがすでに動きを減らす設定なら、アニメーションは常にオフのままです。",
+  "settings-tab.text-size.label": "文字サイズ",
+  "settings-tab.text-size.hint": "• プログラム内のすべての文字を大きくします。\n• プログラムの再起動後に反映されます。",
   "settings-tab.language.hint": "インターフェースの言語を変更し、次回起動時にも記憶されます。",
   "settings-tab.default-target.label": "既定の目標サイズ",
   "settings-tab.default-target.hint": "圧縮タブを開いたときの目標サイズを設定します。",

@@ -755,6 +755,8 @@
   "settings-tab.theme.dark": "Donker",
   "settings-tab.reduce-motion.label": "Animaties uitschakelen",
   "settings-tab.reduce-motion.hint": "Schakelt schuivende panelen en andere beweging uit. Vraagt het systeem al om minder beweging, dan blijven animaties sowieso uit.",
+  "settings-tab.text-size.label": "Tekstgrootte",
+  "settings-tab.text-size.hint": "• Vergroot alle tekst in het programma.\n• Wordt toegepast na het herstarten van het programma.",
   "settings-tab.language.hint": "Wijzigt de taal van de interface en wordt onthouden bij de volgende start.",
   "settings-tab.default-target.label": "Standaard doelgrootte",
   "settings-tab.default-target.hint": "Bepaalt de doelgrootte waarmee het tabblad Verkleinen opent.",

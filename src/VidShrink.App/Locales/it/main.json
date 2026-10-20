@@ -755,6 +755,8 @@
   "settings-tab.theme.dark": "Scuro",
   "settings-tab.reduce-motion.label": "Disattiva animazioni",
   "settings-tab.reduce-motion.hint": "Disattiva gli scorrimenti dei pannelli e gli altri movimenti. Se il sistema chiede già meno movimento, le animazioni restano comunque disattivate.",
+  "settings-tab.text-size.label": "Dimensione del testo",
+  "settings-tab.text-size.hint": "• Ingrandisce tutto il testo del programma.\n• Si applica al riavvio del programma.",
   "settings-tab.language.hint": "Cambia la lingua dell'interfaccia e viene ricordata al prossimo avvio.",
   "settings-tab.default-target.label": "Dimensione obiettivo predefinita",
   "settings-tab.default-target.hint": "Imposta la dimensione obiettivo con cui si apre la scheda Riduci.",

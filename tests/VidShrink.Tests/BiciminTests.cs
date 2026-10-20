@@ -1330,6 +1330,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-18, kamera ana kaynak (later 69): iki yeni anahtar (<c>recorder.target.device</c>, <c>.device-pick</c>); yalniz <c>recorder.target.device</c> 6 dilde kola giriyor (en, nl, pt, ro, sw, tr), KOL dokumunden ve SAYIM satirindan olculdu: toplam 3948 + 6 = 3954, en 381 + 1 = 382, tr 127 + 1 = 128.</para>
     /// <para>2026-10-18, akis kalite secimi (later 83): iki yeni anahtar (<c>player.tracks.quality</c>, <c>.rate</c>); yalniz <c>player.tracks.quality</c> es ve pt dillerinde kola giriyor, KOL dokumunden ve SAYIM satirindan olculdu, en ve tr girmiyor: toplam 3970 + 2 = 3972, en 383, tr 129.</para>
     /// <para>2026-10-18, ad VidShrink Player oldu: <c>{app}</c> iki sozcuge acilinca ja ve th dillerinde bes anahtar kola giriyor (<c>main.preset.handbrake.dropped.engine-decides</c>, <c>.no-equivalent</c> ikiser, ja <c>settings.update.portable-effect</c>), cs <c>shell.menu.open</c> cikiyor; KOL dokumu main ile karsilastirildi, en ve tr degismedi; testin olctugu toplam 4069'dan 4074'e cikti.</para>
+    /// <para>2026-10-20, yazi boyutu (later 147): iki yeni anahtar (<c>settings-tab.text-size.label</c>, <c>.hint</c>); yalniz <c>settings-tab.text-size.label</c> pt dilinde kola giriyor ("Tamanho do texto"), KOL dokumunden ve SAYIM satirindan olculdu, en ve tr girmiyor: toplam 4074 + 1 = 4075, en 393, tr 132.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1355,7 +1356,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(4074, toplam);
+        Assert.Equal(4075, toplam);
         Assert.Equal(393, dilBasina["en"]);
         Assert.Equal(132, dilBasina["tr"]);
     }

@@ -755,6 +755,8 @@
   "settings-tab.theme.dark": "Gelap",
   "settings-tab.reduce-motion.label": "Matikan animasi",
   "settings-tab.reduce-motion.hint": "Mematikan geseran panel dan gerakan lain. Jika sistem sudah meminta lebih sedikit gerakan, animasi tetap mati.",
+  "settings-tab.text-size.label": "Ukuran teks",
+  "settings-tab.text-size.hint": "• Memperbesar semua teks di program.\n• Berlaku setelah program dimulai ulang.",
   "settings-tab.language.hint": "Mengubah bahasa antarmuka dan diingat saat dibuka berikutnya.",
   "settings-tab.default-target.label": "Ukuran target bawaan",
   "settings-tab.default-target.hint": "Menentukan ukuran target saat tab Perkecil dibuka.",

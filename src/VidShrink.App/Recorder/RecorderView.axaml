@@ -110,7 +110,8 @@
 
         <Button Grid.Column="3"
                 x:Name="BtnStart"
-                Height="{StaticResource RecorderButtonSize}"
+                MinHeight="{StaticResource RecorderButtonSize}"
+                VerticalAlignment="Center"
                 Padding="{StaticResource ButtonPaddingSm}"
                 Theme="{StaticResource PrimaryButton}"
                 Content="{loc:Text recorder.strip.start}"
@@ -119,7 +120,8 @@
 
         <Button Grid.Column="3"
                 x:Name="BtnCountdownCancel"
-                Height="{StaticResource RecorderButtonSize}"
+                MinHeight="{StaticResource RecorderButtonSize}"
+                VerticalAlignment="Center"
                 Theme="{StaticResource GhostButton}"
                 Content="{loc:Text recorder.countdown.cancel}"
                 IsVisible="False"
@@ -128,7 +130,8 @@
 
         <Button Grid.Column="4"
                 x:Name="BtnAutoWizard"
-                Height="{StaticResource RecorderButtonSize}"
+                MinHeight="{StaticResource RecorderButtonSize}"
+                VerticalAlignment="Center"
                 Padding="{StaticResource ButtonPaddingSm}"
                 Theme="{StaticResource GhostButton}"
                 Content="{loc:Text recorder.wizard.open}"
@@ -138,7 +141,8 @@
 
         <Button Grid.Column="4"
                 x:Name="BtnPause"
-                Height="{StaticResource RecorderButtonSize}"
+                MinHeight="{StaticResource RecorderButtonSize}"
+                VerticalAlignment="Center"
                 Theme="{StaticResource GhostButton}"
                 Content="{loc:Text recorder.strip.pause}"
                 IsVisible="False"
@@ -147,7 +151,8 @@
 
         <Button Grid.Column="5"
                 x:Name="BtnResume"
-                Height="{StaticResource RecorderButtonSize}"
+                MinHeight="{StaticResource RecorderButtonSize}"
+                VerticalAlignment="Center"
                 Theme="{StaticResource GhostButton}"
                 Content="{loc:Text recorder.strip.resume}"
                 IsVisible="False"
@@ -156,7 +161,8 @@
 
         <Button Grid.Column="6"
                 x:Name="BtnSnapshot"
-                Height="{StaticResource RecorderButtonSize}"
+                MinHeight="{StaticResource RecorderButtonSize}"
+                VerticalAlignment="Center"
                 Theme="{StaticResource GhostButton}"
                 Content="{loc:Text recorder.strip.snapshot}"
                 IsVisible="False"
@@ -165,7 +171,8 @@
 
         <Button Grid.Column="7"
                 x:Name="BtnStop"
-                Height="{StaticResource RecorderButtonSize}"
+                MinHeight="{StaticResource RecorderButtonSize}"
+                VerticalAlignment="Center"
                 Padding="{StaticResource ButtonPaddingSm}"
                 Theme="{StaticResource PrimaryButton}"
                 Content="{loc:Text recorder.strip.stop}"
@@ -176,7 +183,8 @@
         <!-- Geçiş ayar kutusunda değil şeritte: bulunamayan bir kip hiç kullanılmıyor. -->
         <Button Grid.Column="8"
                 x:Name="BtnMini"
-                Height="{StaticResource RecorderButtonSize}"
+                MinHeight="{StaticResource RecorderButtonSize}"
+                VerticalAlignment="Center"
                 Padding="{StaticResource ButtonPaddingSm}"
                 Theme="{StaticResource AccentButton}"
                 auto:AutomationProperties.Name="{loc:Text recorder.mini.offer}"

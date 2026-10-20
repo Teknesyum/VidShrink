@@ -755,6 +755,8 @@
   "settings-tab.theme.dark": "Tamsi",
   "settings-tab.reduce-motion.label": "Išjungti animacijas",
   "settings-tab.reduce-motion.hint": "Išjungia skydelių slinkimą ir kitą judesį. Jei sistema jau prašo mažiau judesio, animacijos vis tiek lieka išjungtos.",
+  "settings-tab.text-size.label": "Teksto dydis",
+  "settings-tab.text-size.hint": "• Padidina visą programos tekstą.\n• Įsigalioja iš naujo paleidus programą.",
   "settings-tab.language.hint": "Keičia sąsajos kalbą ir įsimenama kitam paleidimui.",
   "settings-tab.default-target.label": "Numatytasis tikslinis dydis",
   "settings-tab.default-target.hint": "Nustato tikslinį dydį, su kuriuo atsidaro skirtukas Mažinti.",

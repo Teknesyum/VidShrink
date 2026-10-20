@@ -755,6 +755,8 @@
   "settings-tab.theme.dark": "Dunkel",
   "settings-tab.reduce-motion.label": "Animationen ausschalten",
   "settings-tab.reduce-motion.hint": "Schaltet Panel-Übergänge und andere Bewegungen ab. Verlangt das System bereits weniger Bewegung, bleiben Animationen ohnehin aus.",
+  "settings-tab.text-size.label": "Textgröße",
+  "settings-tab.text-size.hint": "• Vergrößert den gesamten Text im Programm.\n• Wird nach einem Neustart des Programms wirksam.",
   "settings-tab.language.hint": "Ändert die Sprache der Oberfläche und wird beim nächsten Start gemerkt.",
   "settings-tab.default-target.label": "Standard-Zielgröße",
   "settings-tab.default-target.hint": "Legt die Zielgröße fest, mit der der Tab Verkleinern öffnet.",

@@ -1071,6 +1071,7 @@ public partial class MainWindow : Window
             CmbTheme.ItemsSource = labels;
             MarkChosenTheme();
             FillThemePairLists(labels);
+            FillTextSizeList();
         }
         finally
         {
@@ -1098,6 +1099,7 @@ public partial class MainWindow : Window
         if (chosen < 0 || chosen >= _themeOrder.Count) return;
 
         _theme = PaletteCatalog.Pick(_themeOrder[chosen], false, null, null, null);
+        _themeChosen = true;
         ApplyTheme();
         SaveAppSettings();
     }
@@ -1658,6 +1660,8 @@ public partial class MainWindow : Window
             OpenSubtitlesApiKey = (TxtOpenSubtitlesKey.Text ?? "").Trim(),
             OpenSubtitlesUser = (TxtOpenSubtitlesUser.Text ?? "").Trim(),
             Theme = _theme,
+            ThemeChosen = _themeChosen,
+            FontScale = _fontScale,
             FollowSystemTheme = ChkFollowSystemTheme.IsChecked == true,
             LightTheme = _lightTheme,
             DarkTheme = _darkTheme,
