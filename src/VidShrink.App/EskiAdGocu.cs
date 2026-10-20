@@ -59,7 +59,32 @@ internal static class EskiAdGocu
             AcquireUpdateLock = KilidiAl,
             Run = KaldiriciyiCalistir
         };
-        _ = Task.Run(() => LegacyMigration.RemoveLegacyInstallAsync(install, host, null, () => DateTimeOffset.UtcNow));
+        var leftover = new LegacyLeftoverHost
+        {
+            LocalAppData = localAppData,
+            AppDirectory = appDirectory,
+            MovedMarker = LegacyMigration.MovedMarker(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)),
+            LegacyKeyExists = EskiKayitVar,
+            OldProcessesRunning = EskiSurecVar
+        };
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await LegacyMigration.CleanUpLegacyAsync(install, host, leftover, null, () => DateTimeOffset.UtcNow);
+            }
+            catch (Exception exception)
+            {
+                UpdateHealth.RecordFailure(null, DateTimeOffset.UtcNow, LegacyMigration.CleanupCrashed + "=" + exception.GetType().Name);
+            }
+        });
+    }
+
+    [SupportedOSPlatform("windows")]
+    private static bool EskiKayitVar()
+    {
+        using var legacy = Registry.CurrentUser.OpenSubKey(SetupOptions.LegacyUninstallKey);
+        return legacy is not null;
     }
 
     private static bool EskiSurecVar()

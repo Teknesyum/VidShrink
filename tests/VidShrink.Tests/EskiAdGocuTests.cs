@@ -267,6 +267,191 @@ public sealed class EskiAdGocuTests : IDisposable
         Assert.Equal(LegacyMigration.UninstallerMissing, UpdateHealth.Load(_settings).LastError);
     }
 
+    [WindowsFact]
+    public void KilitliDosyaAtlanirKalaniSilinirSonrakiAcilistaBiter()
+    {
+        var (install, leftover) = Artik();
+        var locked = Path.Combine(install.Root, "shell", "VidShrink.ShellExtension.dll");
+
+        bool first;
+        using (new FileStream(locked, FileMode.Open, FileAccess.Read, FileShare.None))
+        {
+            first = LegacyMigration.RemoveLeftover(install, leftover, _settings, Now);
+        }
+
+        Assert.False(first);
+        Assert.True(File.Exists(locked));
+        Assert.False(Directory.Exists(Path.Combine(install.Root, "tools")));
+        Assert.False(File.Exists(Path.Combine(install.Root, "app", "Avalonia.dll")));
+        Assert.All(LegacyMigration.IdentityFiles(install.Root), file => Assert.True(File.Exists(file)));
+        var health = UpdateHealth.Load(_settings);
+        Assert.Equal(1, health.Failures);
+        Assert.Equal(LegacyMigration.LeftoverLocked + "=1", health.LastError);
+
+        var later = false;
+        for (var launch = 0; launch < 5 && !later; launch++)
+        {
+            if (launch > 0) Thread.Sleep(200);
+            later = LegacyMigration.RemoveLeftover(install, leftover, _settings, Now);
+        }
+        Assert.True(later);
+        Assert.False(Directory.Exists(install.Root));
+    }
+
+    [Fact]
+    public void EskiKayitDururkenArtikSilinmez()
+    {
+        var (install, leftover) = Artik(keyExists: true);
+
+        Assert.True(LegacyMigration.RemoveLeftover(install, leftover, _settings, Now));
+
+        Assert.True(File.Exists(Path.Combine(install.Root, "tools", "ffmpeg.exe")));
+        Assert.Equal(0, UpdateHealth.Load(_settings).Failures);
+    }
+
+    [Fact]
+    public void GocIsaretiYoksaArtikSilinmez()
+    {
+        var (install, leftover) = Artik();
+        File.Delete(leftover.MovedMarker);
+
+        Assert.True(LegacyMigration.RemoveLeftover(install, leftover, _settings, Now));
+
+        Assert.True(File.Exists(Path.Combine(install.Root, "tools", "ffmpeg.exe")));
+    }
+
+    [Fact]
+    public void EskiExeYoksaKlasorSilinmez()
+    {
+        var (install, leftover) = Artik();
+        foreach (var file in LegacyMigration.IdentityFiles(install.Root)) File.Delete(file);
+
+        Assert.True(LegacyMigration.RemoveLeftover(install, leftover, _settings, Now));
+
+        Assert.True(File.Exists(Path.Combine(install.Root, "tools", "ffmpeg.exe")));
+    }
+
+    [Fact]
+    public void ProgramsDisindakiKayitliKokSilinmez()
+    {
+        var outside = Path.Combine(_work, "Baska", AppIdentity.LegacyFolderName);
+        var (_, leftover) = Artik();
+        Agac(outside);
+        var install = new LegacyInstall(outside, Path.Combine(_work, "u.exe"), outside);
+
+        Assert.Null(LegacyMigration.LeftoverRoot(install, leftover));
+        Assert.True(LegacyMigration.RemoveLeftover(install, leftover, _settings, Now));
+        Assert.True(File.Exists(Path.Combine(outside, "tools", "ffmpeg.exe")));
+    }
+
+    [Fact]
+    public void KayitsizVeVarsayilanOlmayanKokSilinmez()
+    {
+        var other = Path.Combine(_work, "Local", "Programs", "Baska");
+        var (_, leftover) = Artik();
+        Agac(other);
+        var install = new LegacyInstall(other, Path.Combine(_work, "u.exe"));
+
+        Assert.Null(LegacyMigration.LeftoverRoot(install, leftover));
+        Assert.True(LegacyMigration.RemoveLeftover(install, leftover, _settings, Now));
+        Assert.True(File.Exists(Path.Combine(other, "tools", "ffmpeg.exe")));
+    }
+
+    [Fact]
+    public void YeniUygulamaninKendiKlasoruSilinmez()
+    {
+        var (_, leftover) = Artik();
+        var own = Path.GetDirectoryName(leftover.AppDirectory)!;
+        Agac(own);
+        var install = new LegacyInstall(own, Path.Combine(_work, "u.exe"), own);
+        var inside = new LegacyInstall(leftover.AppDirectory, Path.Combine(_work, "u.exe"), leftover.AppDirectory);
+
+        Assert.Null(LegacyMigration.LeftoverRoot(install, leftover));
+        Assert.Null(LegacyMigration.LeftoverRoot(inside, leftover));
+        Assert.True(LegacyMigration.RemoveLeftover(install, leftover, _settings, Now));
+        Assert.True(File.Exists(Path.Combine(own, "tools", "ffmpeg.exe")));
+    }
+
+    [Fact]
+    public void EskiSurecAcikkenArtikSilinmezVeSayilir()
+    {
+        var (install, leftover) = Artik(running: true);
+
+        Assert.False(LegacyMigration.RemoveLeftover(install, leftover, _settings, Now));
+
+        Assert.True(File.Exists(Path.Combine(install.Root, "tools", "ffmpeg.exe")));
+        Assert.Equal(LegacyMigration.LeftoverProcessRunning, UpdateHealth.Load(_settings).LastError);
+    }
+
+    [Fact]
+    public async Task KayitVeKaldiriciYoksaArtikKendiSilinirVeDususSayilmaz()
+    {
+        var (install, leftover) = Artik();
+        var fake = new SahteEv { UninstallerExists = false };
+
+        var result = await LegacyMigration.CleanUpLegacyAsync(install, fake.Host(), leftover, _settings, () => Now);
+
+        Assert.True(result);
+        Assert.Null(fake.Arguments);
+        Assert.False(Directory.Exists(install.Root));
+        Assert.Equal(0, UpdateHealth.Load(_settings).Failures);
+    }
+
+    [Fact]
+    public async Task KaldiriciKokuBirakirsaArtikSilinir()
+    {
+        var (install, leftover) = Artik();
+        var fake = new SahteEv();
+
+        var result = await LegacyMigration.CleanUpLegacyAsync(install, fake.Host(), leftover, _settings, () => Now);
+
+        Assert.True(result);
+        Assert.NotNull(fake.Arguments);
+        Assert.False(Directory.Exists(install.Root));
+    }
+
+    [Fact]
+    public async Task KayitDururkenKaldiriciYoksaSayilirVeArtikSilinmez()
+    {
+        var (install, leftover) = Artik(keyExists: true);
+        var fake = new SahteEv { UninstallerExists = false };
+
+        var result = await LegacyMigration.CleanUpLegacyAsync(install, fake.Host(), leftover, _settings, () => Now);
+
+        Assert.False(result);
+        Assert.Equal(LegacyMigration.UninstallerMissing, UpdateHealth.Load(_settings).LastError);
+        Assert.True(Directory.Exists(install.Root));
+    }
+
+    private (LegacyInstall Install, LegacyLeftoverHost Host) Artik(bool keyExists = false, bool running = false)
+    {
+        var local = Path.Combine(_work, "Local");
+        var root = LegacyMigration.LegacyDefaultRoot(local);
+        Agac(root);
+        var marker = LegacyMigration.MovedMarker(Path.Combine(_work, "Roaming"));
+        Write(Path.GetDirectoryName(marker)!, LegacyMigration.MovedMarkerName, "tasindi");
+        var host = new LegacyLeftoverHost
+        {
+            LocalAppData = local,
+            AppDirectory = Path.Combine(local, "Programs", AppIdentity.FolderName, "app") + Path.DirectorySeparatorChar,
+            MovedMarker = marker,
+            LegacyKeyExists = () => keyExists,
+            OldProcessesRunning = () => running
+        };
+        return (LegacyMigration.FindLegacyInstall(false, null, local, Directory.Exists)!, host);
+    }
+
+    private static void Agac(string root)
+    {
+        Write(root, AppIdentity.LegacyLauncherExecutable, "exe");
+        Write(root, ".launcher-version", "1.2.24");
+        Write(Path.Combine(root, "app"), AppIdentity.LegacyAppExecutable, "exe");
+        Write(Path.Combine(root, "app"), "Avalonia.dll", "dll");
+        Write(Path.Combine(root, "shell"), "VidShrink.ShellExtension.dll", "dll");
+        Write(Path.Combine(root, "tools"), "ffmpeg.exe", "exe");
+        Write(Path.Combine(root, "update-stage", "app"), "x.dll", "dll");
+    }
+
     private LegacyDataFolder Pair() =>
         new(Path.Combine(_work, "Roaming", AppIdentity.LegacyFolderName), Path.Combine(_work, "Roaming", AppIdentity.FolderName));
 

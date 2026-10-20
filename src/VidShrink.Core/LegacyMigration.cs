@@ -1,10 +1,42 @@
 using System.ComponentModel;
+using VidShrink.Core.Setup;
 
 namespace VidShrink.Core;
 
 public sealed record LegacyDataFolder(string Old, string New);
 
-public sealed record LegacyInstall(string Root, string Uninstaller);
+public sealed record LegacyInstall(string Root, string Uninstaller, string? Registered = null);
+
+public sealed class LegacyLeftoverHost
+{
+    public required string LocalAppData { get; init; }
+
+    public required string AppDirectory { get; init; }
+
+    public required string MovedMarker { get; init; }
+
+    public required Func<bool> LegacyKeyExists { get; init; }
+
+    public required Func<bool> OldProcessesRunning { get; init; }
+
+    public Func<string, bool> FileExists { get; init; } = File.Exists;
+
+    public Func<string, bool> DirectoryExists { get; init; } = Directory.Exists;
+
+    public Func<string, IEnumerable<string>> Files { get; init; } = Directory.EnumerateFiles;
+
+    public Func<string, IEnumerable<string>> Directories { get; init; } = Directory.EnumerateDirectories;
+
+    public Func<string, bool> IsLink { get; init; } = path => File.GetAttributes(path).HasFlag(FileAttributes.ReparsePoint);
+
+    public Action<string> DeleteFile { get; init; } = path =>
+    {
+        File.SetAttributes(path, FileAttributes.Normal);
+        File.Delete(path);
+    };
+
+    public Action<string> DeleteDirectory { get; init; } = path => Directory.Delete(path, recursive: false);
+}
 
 public sealed class LegacyCleanupHost
 {
@@ -38,6 +70,15 @@ public static class LegacyMigration
     public const string UpdateLockBusy = "goc-kilit-alinamadi";
 
     public const string UninstallFailed = "goc-kaldirma-dustu";
+
+    public const string LeftoverProcessRunning = "goc-artik-eski-surec-acik";
+
+    public const string LeftoverLocked = "goc-artik-kilitli";
+
+    public const string CleanupCrashed = "goc-temizlik-coktu";
+
+    public static string MovedMarker(string roamingAppData) =>
+        Path.Combine(roamingAppData, AppIdentity.LegacyFolderName, MovedMarkerName);
 
     public static IReadOnlyList<LegacyDataFolder> DataFolders(Func<Environment.SpecialFolder, string> folderPath)
     {
@@ -110,7 +151,7 @@ public static class LegacyMigration
         var fallback = LegacyDefaultRoot(localAppData);
         var registered = string.IsNullOrWhiteSpace(registeredLocation) ? null : registeredLocation.Trim().Trim('"');
         if (!legacyKeyExists && !directoryExists(fallback)) return null;
-        return new LegacyInstall(registered ?? fallback, LegacyUninstaller(localAppData));
+        return new LegacyInstall(registered ?? fallback, LegacyUninstaller(localAppData), registered);
     }
 
     public static bool RunsFrom(LegacyInstall install, string appDirectory)
@@ -157,6 +198,124 @@ public static class LegacyMigration
             UpdateHealth.RecordFailure(healthSettingsPath, now(), reason);
             return false;
         }
+    }
+
+    public static async Task<bool> CleanUpLegacyAsync(
+        LegacyInstall install, LegacyCleanupHost host, LegacyLeftoverHost leftover, string? healthSettingsPath, Func<DateTimeOffset> now, CancellationToken cancellationToken = default)
+    {
+        var uninstalled = true;
+        if (leftover.LegacyKeyExists() || host.FileExists(install.Uninstaller))
+            uninstalled = await RemoveLegacyInstallAsync(install, host, healthSettingsPath, now, cancellationToken).ConfigureAwait(false);
+        var cleared = RemoveLeftover(install, leftover, healthSettingsPath, now());
+        return uninstalled && cleared;
+    }
+
+    public static IReadOnlyList<string> IdentityFiles(string root) => new[]
+    {
+        Path.Combine(root, AppIdentity.LegacyLauncherExecutable),
+        Path.Combine(root, "app", AppIdentity.LegacyAppExecutable)
+    };
+
+    public static string? LeftoverRoot(LegacyInstall install, LegacyLeftoverHost host)
+    {
+        var root = Normalize(install.Root);
+        var known = SamePath(root, LegacyDefaultRoot(host.LocalAppData))
+            || (!string.IsNullOrWhiteSpace(install.Registered) && SamePath(root, install.Registered));
+        if (!known) return null;
+        if (!SetupRunner.UnderPrograms(root, host.LocalAppData)) return null;
+        if (RunsFrom(install, host.AppDirectory)) return null;
+        var app = Normalize(host.AppDirectory);
+        if (Within(root, app) || (Path.GetDirectoryName(app) is { } own && Within(root, own))) return null;
+        if (host.LegacyKeyExists()) return null;
+        if (!host.FileExists(host.MovedMarker)) return null;
+        if (!IdentityFiles(root).Any(host.FileExists)) return null;
+        return root;
+    }
+
+    public static bool RemoveLeftover(LegacyInstall install, LegacyLeftoverHost host, string? healthSettingsPath, DateTimeOffset now)
+    {
+        if (!host.DirectoryExists(install.Root)) return true;
+        if (LeftoverRoot(install, host) is not { } root) return true;
+        if (host.OldProcessesRunning()) return Fail(LeftoverProcessRunning);
+
+        var keep = new HashSet<string>(IdentityFiles(root).Where(host.FileExists), StringComparer.OrdinalIgnoreCase);
+        var failed = Sweep(root, keep, host);
+        if (failed == 0)
+        {
+            foreach (var file in keep) failed += Attempt(() => host.DeleteFile(file));
+            if (failed == 0) failed += Sweep(root, new HashSet<string>(StringComparer.OrdinalIgnoreCase), host);
+        }
+        return failed == 0 || Fail(LeftoverLocked + "=" + failed.ToString(System.Globalization.CultureInfo.InvariantCulture));
+
+        bool Fail(string reason)
+        {
+            UpdateHealth.RecordFailure(healthSettingsPath, now, reason);
+            return false;
+        }
+    }
+
+    private static int Sweep(string directory, HashSet<string> keep, LegacyLeftoverHost host)
+    {
+        string[] directories;
+        string[] files;
+        try
+        {
+            directories = host.Directories(directory).ToArray();
+            files = host.Files(directory).ToArray();
+        }
+        catch (Exception exception) when (exception is DirectoryNotFoundException)
+        {
+            return 0;
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            return 1;
+        }
+
+        var failed = 0;
+        foreach (var child in directories)
+        {
+            bool link;
+            try { link = host.IsLink(child); }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+            {
+                failed++;
+                continue;
+            }
+            failed += link ? Attempt(() => host.DeleteDirectory(child)) : Sweep(child, keep, host);
+        }
+        foreach (var file in files)
+        {
+            if (keep.Contains(file)) continue;
+            failed += Attempt(() => host.DeleteFile(file));
+        }
+        if (failed == 0 && !keep.Any(file => Within(file, directory))) failed += Attempt(() => host.DeleteDirectory(directory));
+        return failed;
+    }
+
+    private static int Attempt(Action action)
+    {
+        try
+        {
+            action();
+            return 0;
+        }
+        catch (Exception exception) when (exception is FileNotFoundException or DirectoryNotFoundException)
+        {
+            return 0;
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            return 1;
+        }
+    }
+
+    private static bool Within(string path, string folder)
+    {
+        var inner = Normalize(path);
+        var outer = Normalize(folder);
+        return string.Equals(inner, outer, StringComparison.OrdinalIgnoreCase)
+            || inner.StartsWith(outer + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool SamePath(string left, string right) =>
