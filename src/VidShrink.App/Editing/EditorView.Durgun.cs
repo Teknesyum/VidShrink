@@ -31,11 +31,36 @@ internal partial class EditorView
         set => _stillRoot = value;
     }
 
+    private double _imageSeconds = StillClip.ImageSeconds;
+    private double _freezeSeconds = StillClip.FreezeSeconds;
+
+    internal double ImageSeconds
+    {
+        get => _imageSeconds;
+        set
+        {
+            _imageSeconds = StillClip.ClampSeconds(value);
+            ShowStillSeconds();
+        }
+    }
+
+    internal double FreezeSeconds
+    {
+        get => _freezeSeconds;
+        set
+        {
+            _freezeSeconds = StillClip.ClampSeconds(value);
+            ShowStillSeconds();
+        }
+    }
+
     private void InitStills()
     {
         MnuColorBlack.Click += (_, _) => _ = AddColorClipAsync(StillClip.Black);
         MnuColorWhite.Click += (_, _) => _ = AddColorClipAsync(StillClip.White);
         MnuFreeze.Click += (_, _) => _ = FreezeFrameAsync();
+        InitStillPanel();
+        InitSlides();
         TimelineMenu.Opening += (_, _) =>
         {
             MnuColorClip.IsEnabled = _model is not null && !Exporting;
@@ -43,34 +68,50 @@ internal partial class EditorView
         };
     }
 
-    /// <summary>Resmi <see cref="StillClip.ImageSeconds"/> sureli ara videoya cevirip cizelgenin sonuna ekler.</summary>
+    /// <summary>Resmi <see cref="ImageSeconds"/> sureli ara videoya cevirip cizelgenin sonuna ekler.</summary>
     internal async Task<bool> AddImageAsync(string path)
     {
         if (_model is not { } model || _source is null || Exporting) return false;
+        var length = ImageSeconds;
         var (width, height, fps) = await StillFrameAsync().ConfigureAwait(true);
         var stamp = SourceStamp.Of(path);
-        var name = StillClip.OutputName("resim", Path.GetFullPath(path), stamp?.Size ?? 0, stamp?.ModifiedUtcTicks ?? 0, width, height, fps, StillClip.ImageSeconds);
-        var clip = stamp is null ? null : await MakeStillAsync(name, output => StillClip.FromImage(path, output, width, height, fps, StillClip.ImageSeconds)).ConfigureAwait(true);
+        var name = StillClip.OutputName("resim", Path.GetFullPath(path), stamp?.Size ?? 0, stamp?.ModifiedUtcTicks ?? 0, width, height, fps, length);
+        var clip = stamp is null ? null : await MakeStillAsync(name, output => StillClip.FromImage(path, output, width, height, fps, length)).ConfigureAwait(true);
         if (!ReferenceEquals(model, _model) || Exporting) return false;
         if (clip is null) return StillFailed(Path.GetFileName(path));
         var index = Remember(clip, SourceStamp.Of(clip));
-        return Apply(m => m.AddSource(EditTime.FromSeconds(StillClip.ImageSeconds)) == index, model.Clips.Count, reload: true);
+        return Apply(m => m.AddSource(EditTime.FromSeconds(length)) == index, model.Clips.Count, reload: true);
+    }
+
+    internal async Task<bool> OpenImageAsync(string path)
+    {
+        if (Exporting || SourceStamp.Of(path) is not { } stamp) return false;
+        var length = ImageSeconds;
+        var (width, height) = StillClip.ImageFrame(await ProbeSourceAsync(path).ConfigureAwait(true));
+        var fps = StillClip.FallbackFps;
+        var name = StillClip.OutputName("resim", Path.GetFullPath(path), stamp.Size, stamp.ModifiedUtcTicks, width, height, fps, length);
+        var clip = await MakeStillAsync(name, output => StillClip.FromImage(path, output, width, height, fps, length)).ConfigureAwait(true);
+        if (Exporting) return false;
+        if (clip is null) return StillFailed(Path.GetFileName(path));
+        await OpenSourceAsync(clip).ConfigureAwait(true);
+        return _model is not null && CurrentMedia.SamePath(clip, _source);
     }
 
     /// <summary>Duz renk klibini oynatma basina araya ekler.</summary>
     internal async Task<bool> AddColorClipAsync(string color)
     {
         if (_model is not { } model || _source is null || Exporting || !StillClip.TryColor(color, out var value)) return false;
+        var length = ImageSeconds;
         var (width, height, fps) = await StillFrameAsync().ConfigureAwait(true);
-        var name = StillClip.OutputName("renk", value, width, height, fps, StillClip.ImageSeconds);
-        var clip = await MakeStillAsync(name, output => StillClip.FromColor(color, output, width, height, fps, StillClip.ImageSeconds)).ConfigureAwait(true);
+        var name = StillClip.OutputName("renk", value, width, height, fps, length);
+        var clip = await MakeStillAsync(name, output => StillClip.FromColor(color, output, width, height, fps, length)).ConfigureAwait(true);
         if (!ReferenceEquals(model, _model) || Exporting) return false;
         if (clip is null) return StillFailed(color);
-        return InsertStill(clip, StillClip.ImageSeconds);
+        return InsertStill(clip, length);
     }
 
     /// <summary>
-    /// Oynatma basinda gorunen kareyi resme cikarir, <see cref="StillClip.FreezeSeconds"/> sureli klip yapar ve o ana
+    /// Oynatma basinda gorunen kareyi resme cikarir, <see cref="FreezeSeconds"/> sureli klip yapar ve o ana
     /// araya ekler; oynatma basindaki klip ikiye bolunur.
     /// </summary>
     internal async Task<bool> FreezeFrameAsync()
@@ -83,16 +124,17 @@ internal partial class EditorView
         if (source < 0 || source >= SourcePaths.Count) return false;
         var path = SourcePaths[source];
         var seconds = EditTime.ToSeconds(model.ToSource(at));
+        var length = FreezeSeconds;
         var (width, height, fps) = await StillFrameAsync().ConfigureAwait(true);
         var stamp = SourceStamp.Of(path);
-        var name = StillClip.OutputName("kare", Path.GetFullPath(path), stamp?.Size ?? 0, stamp?.ModifiedUtcTicks ?? 0, seconds, width, height, fps, StillClip.FreezeSeconds);
+        var name = StillClip.OutputName("kare", Path.GetFullPath(path), stamp?.Size ?? 0, stamp?.ModifiedUtcTicks ?? 0, seconds, width, height, fps, length);
         var frame = Path.Combine(StillRoot, Path.ChangeExtension(name, ".png"));
-        var clip = await MakeStillAsync(name, output => StillClip.FromImage(frame, output, width, height, fps, StillClip.FreezeSeconds),
+        var clip = await MakeStillAsync(name, output => StillClip.FromImage(frame, output, width, height, fps, length),
             () => RunStillAsync(StillClip.GrabFrame(path, seconds, frame))).ConfigureAwait(true);
         TryDelete(frame);
         if (!ReferenceEquals(model, _model) || Exporting) return false;
         if (clip is null) return StillFailed(Path.GetFileName(path));
-        return InsertStill(clip, StillClip.FreezeSeconds, at);
+        return InsertStill(clip, length, at);
     }
 
     private bool InsertStill(string clip, double seconds, long? at = null)

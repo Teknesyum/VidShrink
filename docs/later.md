@@ -85,15 +85,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Plan: İki adımda teslim edilir ve adımlar ayrı işçilere verilebilir. Önce akış kalitesi (orta): uyarlamalı yayının katmanlarının motorun iz listesinde nasıl göründüğü ölçülür, sonra iz menüsüne kalite seçimi eklenir (video izi değiştirme ya da `hls-bitrate` seçeneği); OYB-P1 bitmeden başlamaz. Sonra kesintisiz çalma (büyük): sıradaki dosyayı önden yükleme (`prefetch-playlist`, `gapless-audio`) kuyruğun motora verilmemesi kararına dokunur, bu yüzden önce o kararın gerekçesi (`PlayerView.Kuyruk.cs:13`) yeniden ölçülür. İki katmanlı yerel bir HLS yayını ve ardışık iki ses dosyasıyla doğrulanır.
 - Durum (18 Ekim 2026, main): akış kalite seçimi ve kesintisiz çalma (`yan/akis-kesintisiz`). Açık: gerçek aygıtta dosyalar arası boşluk ölçülemedi.
 
-## 87. Resim Klibi, Tuval Ve Dönüşüm
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DZB-P10 · Düzenleyici · iş büyük · öncelik 2 · karar gerekmez
-
-- Satırlar (DZB-P10): DZB-04 Resim klibi; DZB-05 Düz renk klibi; DZB-03 Klip dönüşümü; DZB-56 Proje oranı ve tuval; DZB-49 Kare dondurma. [Tablo](piyasa/2026-10-13/duzenleyici-kurgu-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Editing/EditorView.Kaynak.cs, src/VidShrink.App/Editing/EditorView.Klip.cs, src/VidShrink.Core/Editing/EditTimeline.cs, src/VidShrink.Core/Editing/ClipEffects.cs, src/VidShrink.Core/Editing/ClipFilters.cs, src/VidShrink.Core/Editing/EditLook.cs, src/VidShrink.Core/Editing/EditExport.cs, src/VidShrink.Core/Editing/EditProject.cs, tests/VidShrink.Tests/
-- Plan: Resim ve düz renk, eklenirken kısa bir ara videoya çevrilir ve bildik kaynak gibi çizelgeye girer; önizleme yolu değişmez. Kare dondurma aynı yoldan gelir: oynatma başındaki kare resme çıkarılıp klip yapılır. Klibe serbest ölçek, konum ve açı, projeye de çıktı çerçevesi (9:16, 1:1, 16:9) eklenir; ikisi de ClipFilters'ın geometri zincirinden (ClipFilters.cs:38) geçer. Paket ikiye bölünebilir: resim, renk ve dondurma (DZB-04, DZB-05, DZB-49) ile dönüşüm ve tuval (DZB-03, DZB-56); doğrulama argüman testleri ve kare karşılaştırması.
-- Durum (18 Ekim 2026, main): DZB-04, DZB-05, DZB-49 ve DZB-03, DZB-56 bitti; resim, düz renk ve kare dondurma ara videoyla çizelgeye girer (`StillClip`, `DuzenleyiciResimKlibiTests`), klibe ölçek, konum ve açı, projeye çerçeve (Kaynak, 16:9, 9:16, 1:1) geldi (`DuzenleyiciDonusumTuvalTests`). Açık: renk seçici, sabit klip süreleri, boş çizelgede tek resim, `ara-klipler/` budanmıyor, monitörde sürükleyerek konumlama.
-
 ## 88. İleri Renk Ve Bulanıklık
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · DZB-P13 · Düzenleyici · iş büyük · öncelik 2 · karar gerekmez
@@ -111,15 +102,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.Core/Editing/ClipEffects.cs, src/VidShrink.Core/Editing/ClipFilters.cs, src/VidShrink.Core/Editing/EditLook.cs, src/VidShrink.Core/Editing/EditTimeline.cs, src/VidShrink.Core/Editing/EditExport.cs, src/VidShrink.Core/Editing/EditProject.cs, src/VidShrink.App/Editing/EditorView.Klip.cs, src/VidShrink.App/Editing/EditorTimeline.cs, tests/VidShrink.Tests/
 - Plan: Klip ayarları (ses düzeyi, kırpma, konum) klip içinde zamanla değişebilsin diye değerlere anahtar kare eklenir; süzgeç zinciri sabit sayı yerine zamana bağlı ifade yazar, yumuşatma eğrisi iki kare arasındaki geçişin biçimidir. Hız rampası klibi hız dilimlerine böler (`setpts`), akıcı ağır çekim ara kareyi `minterpolate` süzgeciyle üretir. Önizleme zinciri bugün sabit değer taşıyor; zamana bağlı ifadeyi taşıyıp taşımadığı ilk iş ölçülür. Paket ikiye bölünebilir: anahtar kare (DZB-25, DZB-26) ile hız (DZB-48, DZB-50); doğrulama argüman testleri ve çıktı süresinin ölçümü.
 - Durum (18 Ekim 2026, main): hız rampası ve akıcı ağır çekim (`yan/hiz-rampasi`), anahtar kare (DZB-25, DZB-26) bitti: ses düzeyi ve kırpma kareleri, dört yumuşatma eğrisi, zamana bağlı ifade teslimde ve önizlemede ([ölçüm](olcumler/anahtar-kare-onizleme.md)). Açık: ters klipte kareler aynalanmıyor; dönüşümün (ölçek, konum, açı) anahtar karesi yok.
-
-## 90. Slayt Gösterisi Ve Sesten Video
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · ARC-P10 · Bizde Olmayan Araçlar · iş büyük · öncelik 2 · karar gerekmez
-
-- Satırlar (ARC-P10): ARC-10 Slayt gösterisi yapıcı; ARC-20 Sesten video. [Tablo](piyasa/2026-10-13/eksik-araclar-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/Editing/, src/VidShrink.App/Editing/, src/VidShrink.Core/ConversionArguments.cs
-- Plan: İkisi de video olmayan malzemeden video üretir. Sesten video ARC-P3'ün üstüne gelir: ses kaynağında Dönüştür'e "görüntü" seçeneği eklenir, kapak resmi ya da dalga biçimi (showwaves süzgeci). Slayt gösterisi düzenleyicinin üç parçasına bağlıdır: resim klibi (DZB-04), müzik izi (DZB-01) ve çapraz geçiş (DZB-16); onlar bitince kalan iş fotoğrafları seçip süre vererek çizelgeye dizen kısa bir sihirbazdır ve iş orta'ya iner. Doğrulama: çıktının süresi ses süresine ya da fotoğraf sayısı çarpı süreye eşit.
-- Durum (18 Ekim 2026, main): sesten video bitti, Dönüştür'de ses kaynağına kapak ya da dalga biçimi (`yan/slayt-gosterisi`). Açık: slayt sihirbazı; resim klibine (later 87) bağlı.
 
 **Sahibin Kararını Bekleyenler**
 

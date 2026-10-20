@@ -693,6 +693,7 @@ public sealed class EditProjectStore
         ArgumentNullException.ThrowIfNull(project);
         if (!project.Write(PathFor(project.Source.Path))) return false;
         Prune();
+        StillClip.Prune(this);
         return true;
     }
 
