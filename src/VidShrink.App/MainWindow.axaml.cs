@@ -339,6 +339,7 @@ public partial class MainWindow : Window
         Watch(ChkAdvKeepTracks, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkAdvDropMetadata, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkAdvMeasureQuality, ToggleButton.IsCheckedProperty, SaveAppSettings);
+        Watch(ChkAdvSearchByMeasure, ToggleButton.IsCheckedProperty, SaveAppSettings);
         Watch(ChkConvertDropMetadata, ToggleButton.IsCheckedProperty, SaveAppSettings);
         foreach (var box in new[] { CmbConvertGifLoop, CmbConvertGifColors, CmbConvertGifDither })
             Watch(box, SelectingItemsControl.SelectedIndexProperty, SaveAppSettings);
@@ -1632,6 +1633,7 @@ public partial class MainWindow : Window
             AdvKeepTracks = ChkAdvKeepTracks.IsChecked == true,
             AdvDropMetadata = ChkAdvDropMetadata.IsChecked == true,
             AdvMeasureQuality = ChkAdvMeasureQuality.IsChecked == true,
+            AdvSearchByMeasure = ChkAdvSearchByMeasure.IsChecked == true,
             ConvertDropMetadata = ChkConvertDropMetadata.IsChecked == true,
             ConvertGifLoop = SelectedTag(CmbConvertGifLoop) ?? "",
             ConvertGifColors = SelectedTag(CmbConvertGifColors) ?? "",
@@ -1691,6 +1693,7 @@ public partial class MainWindow : Window
             ChkAdvKeepTracks.IsChecked = settings.AdvKeepTracks;
             ChkAdvDropMetadata.IsChecked = settings.AdvDropMetadata;
             ChkAdvMeasureQuality.IsChecked = settings.AdvMeasureQuality;
+            ChkAdvSearchByMeasure.IsChecked = settings.AdvSearchByMeasure;
             ChkConvertDropMetadata.IsChecked = settings.ConvertDropMetadata;
             SelectByTag(CmbConvertGifLoop, settings.ConvertGifLoop);
             SelectByTag(CmbConvertGifColors, settings.ConvertGifColors);
@@ -4212,7 +4215,7 @@ public partial class MainWindow : Window
         _syncing = false;
         if (!_targetIsDerived) _savedTargetMb = ParseTargetMb();
         RestoreSizeCap();
-        if (!_targetIsDerived) DeriveQualityFromTarget();
+        if (!_targetIsDerived) { _kaliteSurer = false; DeriveQualityFromTarget(); }
         ScheduleRecalculate();
     }
 
@@ -4226,7 +4229,7 @@ public partial class MainWindow : Window
         _syncing = false;
         if (!_targetIsDerived) _savedTargetMb = mb;
         RestoreSizeCap();
-        if (!_targetIsDerived) DeriveQualityFromTarget();
+        if (!_targetIsDerived) { _kaliteSurer = false; DeriveQualityFromTarget(); }
         ScheduleRecalculate();
     }
 
@@ -4300,6 +4303,7 @@ public partial class MainWindow : Window
         if (_info is null) { RefreshQualityTargetAvailability(); return; }
 
         QualityDerivedTargets++;
+        _kaliteSurer = true;
         var result = PlanCalculator.TargetMbForQuality(_info, CurrentOptions(), ParseQualityTarget(), _profile, _planEncoders);
         var mb = Math.Round(result.TargetMb, 1);
 
@@ -4615,7 +4619,8 @@ public partial class MainWindow : Window
             HideRetryAsk();
             var progress = new Progress<EncodeProgress>(ShowEncodeProgress);
 
-            var plan = ActivePlan;
+            var (searchedMb, plan) = await BaslangicPlaniAsync(targetMb, ActivePlan!, cts.Token);
+            targetMb = searchedMb;
             var source = _info.FilePath;
             var result = await ShrinkEngine.EncodeAsync(_info, plan, output, targetMb, progress, cts.Token, CurrentOptions().FillPolicy, _profile, AskBeforeRetryAsync, _sceneMap?.Map, RunPause, ChkKeepDates.IsChecked == true);
             _lastOutput = result.OutputPath;
@@ -4633,6 +4638,7 @@ public partial class MainWindow : Window
                     TxtResult.Text += " " + Say("main.run.trimmed", Num(trim.RemovedSeconds, "0.#"), Clock(trim.DurationSeconds), Clock(trim.KeptSeconds));
                 TxtResult.Text += SaturatedSuffix(result, targetMb);
                 TxtResult.Text += WhatsAppDocumentHint(targetMb);
+                TxtResult.Text += AramaOzeti();
                 if (Hdr10PlusMissed(result) is { } hdr10Plus)
                 {
                     TxtResult.Text += " " + Say("main.run.hdr10plus-short", hdr10Plus.OutputFrames, hdr10Plus.SourceFrames);

@@ -14,6 +14,7 @@ try
         "parcala" => await CutAsync(args.Skip(1).ToList()),
         "sapma" => Deviation(args.Skip(1).ToList()),
         "denetle" => await InspectAsync(args.Skip(1).ToList()),
+        "ara" => await QualitySearchRun.RunAsync(args.Skip(1).ToList()),
         _ => Unknown(args[0])
     };
 }
@@ -32,6 +33,7 @@ static void Usage()
     Console.WriteLine("  ab parcala --kaynak <yol> [--parca-dizin <klasör>]");
     Console.WriteLine("  ab sapma <tam.json> <parca.json>");
     Console.WriteLine("  ab denetle <referans> <aday>");
+    Console.WriteLine("  ab ara --kaynak <yol> --kalite <puan> [--threads 2]");
     Console.WriteLine("Yarışmacılar: " + string.Join(", ", AbSettings.KnownCompetitors));
 }
 
