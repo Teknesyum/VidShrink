@@ -1554,6 +1554,7 @@ public partial class MainWindow : Window
         try
         {
             var settingsFile = SettingsPathOverride ?? UpdateSettings.DefaultPath;
+            _recorderPane?.RestoreDesktopIcons();
             AppDataReset.Run(Path.GetDirectoryName(settingsFile), settingsFile);
             Playback.ShortcutBindings.Load();
             if (File.Exists(DismissedNoticePath)) File.Delete(DismissedNoticePath);

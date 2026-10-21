@@ -776,7 +776,7 @@
 
             <izi:SutunIzgara MaxColumns="2" Uniform="True"
                              ColumnSpacing="{StaticResource SpaceMd}"
-                             RowSpacing="{StaticResource SpaceSm}">
+                             RowSpacing="{StaticResource SpaceXs}">
               <CheckBox x:Name="ChkCursor"
                         Theme="{StaticResource CheckStyle}"
                         Content="{loc:Text recorder.option.cursor}"
@@ -1080,10 +1080,9 @@
                         auto:AutomationProperties.Name="{loc:Text recorder.replay.seconds}"/>
             </StackPanel>
 
-            <WrapPanel>
+            <WrapPanel ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
               <Button x:Name="BtnReplay"
                       MinHeight="{StaticResource RecorderButtonSize}"
-                      Margin="{StaticResource WrapItemMargin}"
                       Theme="{StaticResource GhostButton}"
                       Content="{loc:Text recorder.replay.start}"
                       auto:AutomationProperties.Name="{loc:Text recorder.replay.start}"
@@ -1091,7 +1090,6 @@
 
               <Button x:Name="BtnReplaySave"
                       MinHeight="{StaticResource RecorderButtonSize}"
-                      Margin="{StaticResource WrapItemMargin}"
                       Theme="{StaticResource GhostButton}"
                       IsVisible="False"
                       auto:AutomationProperties.Name="{loc:Text recorder.replay.save}"

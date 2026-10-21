@@ -29,6 +29,7 @@ internal static class AppDataReset
         ShareLedgerFileName,
         Subtitles.SessionStore.FileName,
         Playback.ShortcutBindings.FileName,
+        DesktopIconGuard.StateFileName,
     };
 
     internal const string ShareLedgerFileName = "paylasimlar.json";

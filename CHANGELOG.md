@@ -15,7 +15,10 @@ made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md
   back when the recording ends or is discarded, and on the next start if the program closed
   unexpectedly. Icons that were already hidden are left alone. On macOS and Linux the option is
   shown disabled with a hint. Muting notifications during recording is not offered: Windows has no
-  documented way to do it.
+  documented way to do it. "Reset all data" brings hidden icons back first and then removes the
+  saved state; the state is never part of a settings backup. To keep the recorder page free of
+  scrolling at 1024 px, the cursor options sit closer together and the replay button lost its
+  trailing gap.
 
 ## [0.0.1]
 

@@ -211,7 +211,8 @@ public sealed class AyarYedegiTests
     public void PaketYalnizSifirlamaListesindenUretilir()
     {
         Assert.All(AppDataArchive.EntryNames, name => Assert.Contains(name, AppDataReset.FileNames));
-        Assert.Equal(AppDataReset.FileNames.Count - AppDataArchive.SecretFiles.Count, AppDataArchive.EntryNames.Count);
+        Assert.Equal(AppDataReset.FileNames.Count - AppDataArchive.SecretFiles.Count - AppDataArchive.MachineStateFiles.Count, AppDataArchive.EntryNames.Count);
+        Assert.DoesNotContain("masaustu-simgeleri.gizlendi", AppDataArchive.EntryNames);
         Assert.DoesNotContain("opensubtitles-session.dat", AppDataArchive.EntryNames);
         Assert.DoesNotContain("paylasimlar.json", AppDataArchive.EntryNames);
     }
