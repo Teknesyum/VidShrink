@@ -107,6 +107,7 @@
   "recorder.output.mp4-failed": "MP4-tallennus epäonnistui.",
   "recorder.output.copy-file": "Kopioi tiedosto",
   "recorder.output.to-gif": "Muunna GIF-muotoon",
+  "recorder.output.more": "Lisää",
   "recorder.output.gif-running": "Muunnetaan GIF-muotoon…",
   "recorder.output.gif-saved": "GIF tallennettu: {0}",
   "recorder.output.gif-convert-failed": "GIF-muunnos epäonnistui.",

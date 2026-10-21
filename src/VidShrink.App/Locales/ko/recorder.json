@@ -107,6 +107,7 @@
   "recorder.output.mp4-failed": "MP4로 저장할 수 없습니다.",
   "recorder.output.copy-file": "파일 복사",
   "recorder.output.to-gif": "GIF로 변환",
+  "recorder.output.more": "더 보기",
   "recorder.output.gif-running": "GIF로 변환하는 중…",
   "recorder.output.gif-saved": "GIF 저장됨: {0}",
   "recorder.output.gif-convert-failed": "GIF로 변환하지 못했습니다.",

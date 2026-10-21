@@ -107,6 +107,7 @@
   "recorder.output.mp4-failed": "Tidak dapat menyimpan sebagai MP4.",
   "recorder.output.copy-file": "Salin fail",
   "recorder.output.to-gif": "Tukar kepada GIF",
+  "recorder.output.more": "Lagi",
   "recorder.output.gif-running": "Menukar kepada GIF…",
   "recorder.output.gif-saved": "GIF disimpan: {0}",
   "recorder.output.gif-convert-failed": "Tidak dapat menukar kepada GIF.",

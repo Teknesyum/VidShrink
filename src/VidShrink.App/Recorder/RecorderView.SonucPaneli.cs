@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -22,6 +23,10 @@ internal partial class RecorderView
     internal bool CopyFileVisible => BtnCopyFile.IsVisible && BtnCopyFile.IsEnabled;
 
     internal bool GifVisible => BtnToGif.IsVisible;
+
+    internal bool MoreVisible => BtnResultMore.IsVisible;
+
+    internal IReadOnlyList<MenuItem> MoreItems => ((MenuFlyout)BtnResultMore.Flyout!).Items.OfType<MenuItem>().ToList();
 
     internal string NamePreviewText => TxtNamePreview.Text ?? string.Empty;
 
@@ -47,6 +52,7 @@ internal partial class RecorderView
         BtnCopyFile.IsEnabled = !result.Partial || result.Playable != false;
         BtnToGif.IsVisible = result.Ok && !result.Partial
                              && RecorderArguments.ContainerOf(result.OutputPath) != RecorderContainer.Gif;
+        BtnResultMore.IsVisible = BtnToMp4.IsVisible || BtnToGif.IsVisible;
         ResetCercevele(result);
     }
 

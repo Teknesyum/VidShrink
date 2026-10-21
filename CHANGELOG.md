@@ -9,6 +9,12 @@ made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md
 
 ## [Unreleased]
 
+### Changed
+
+- The recorder result panel no longer lists "Save as MP4" and "Convert to GIF" as separate
+  buttons; they now sit in a "More" menu at the end of the action row, which is hidden when
+  neither conversion applies.
+
 ## [0.0.2] - 2026-10-21
 
 ### Added

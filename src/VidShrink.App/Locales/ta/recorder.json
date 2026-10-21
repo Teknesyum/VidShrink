@@ -107,6 +107,7 @@
   "recorder.output.mp4-failed": "MP4 ஆக சேமிக்க முடியவில்லை.",
   "recorder.output.copy-file": "கோப்பை நகலெடு",
   "recorder.output.to-gif": "GIF ஆக மாற்று",
+  "recorder.output.more": "மேலும்",
   "recorder.output.gif-running": "GIF ஆக மாற்றப்படுகிறது…",
   "recorder.output.gif-saved": "GIF சேமிக்கப்பட்டது: {0}",
   "recorder.output.gif-convert-failed": "GIF ஆக மாற்ற முடியவில்லை.",

@@ -107,6 +107,7 @@
   "recorder.output.mp4-failed": "לא ניתן לשמור כ-MP4.",
   "recorder.output.copy-file": "העתק קובץ",
   "recorder.output.to-gif": "המר ל-GIF",
+  "recorder.output.more": "עוד",
   "recorder.output.gif-running": "ממיר ל-GIF…",
   "recorder.output.gif-saved": "GIF נשמר: {0}",
   "recorder.output.gif-convert-failed": "ההמרה ל-GIF נכשלה.",

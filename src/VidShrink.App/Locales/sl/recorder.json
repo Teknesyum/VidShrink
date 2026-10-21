@@ -107,6 +107,7 @@
   "recorder.output.mp4-failed": "Shranjevanje kot MP4 ni uspelo.",
   "recorder.output.copy-file": "Kopiraj datoteko",
   "recorder.output.to-gif": "Pretvori v GIF",
+  "recorder.output.more": "Več",
   "recorder.output.gif-running": "Pretvarjanje v GIF…",
   "recorder.output.gif-saved": "GIF shranjen: {0}",
   "recorder.output.gif-convert-failed": "Pretvorba v GIF ni uspela.",

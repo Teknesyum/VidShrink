@@ -107,6 +107,7 @@
   "recorder.output.mp4-failed": "MP4 হিসেবে সংরক্ষণ করা যায়নি।",
   "recorder.output.copy-file": "ফাইল কপি করুন",
   "recorder.output.to-gif": "GIF-এ রূপান্তর",
+  "recorder.output.more": "আরও",
   "recorder.output.gif-running": "GIF-এ রূপান্তর হচ্ছে…",
   "recorder.output.gif-saved": "GIF সংরক্ষিত: {0}",
   "recorder.output.gif-convert-failed": "GIF-এ রূপান্তর করা যায়নি।",
