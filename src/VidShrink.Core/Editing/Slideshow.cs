@@ -1,9 +1,6 @@
 namespace VidShrink.Core.Editing;
 
-public sealed record SlidePlan(IReadOnlyList<double> Seconds, double TransitionSeconds)
-{
-    public double ExportSeconds => Seconds.Sum() - Math.Max(0, Seconds.Count - 1) * TransitionSeconds;
-}
+public sealed record SlidePlan(IReadOnlyList<double> Seconds, double TransitionSeconds);
 
 public static class Slideshow
 {

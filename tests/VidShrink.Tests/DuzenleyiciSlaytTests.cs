@@ -18,6 +18,8 @@ public sealed class DuzenleyiciSlaytTests
 
     private static long S(double saniye) => EditTime.FromSeconds(saniye);
 
+    private static double Teslim(SlidePlan plan) => plan.Seconds.Sum() - Math.Max(0, plan.Seconds.Count - 1) * plan.TransitionSeconds;
+
     private static string Klasor(string ad)
     {
         var klasor = Path.Combine(Kok, "slayt-" + ad);
@@ -56,7 +58,7 @@ public sealed class DuzenleyiciSlaytTests
             Assert.Equal(adet, plan.Seconds.Count);
             Assert.True(plan.TransitionSeconds > 0);
             Assert.True(plan.TransitionSeconds <= slayt / 2 + 1.0 / fps, "gecis slaytin yarisini asti");
-            Assert.InRange(plan.ExportSeconds, adet * slayt - 1.0 / fps, adet * slayt + 1.0 / fps);
+            Assert.InRange(Teslim(plan), adet * slayt - 1.0 / fps, adet * slayt + 1.0 / fps);
             Assert.All(plan.Seconds, s => Assert.True(s >= plan.TransitionSeconds));
         }
 
@@ -66,7 +68,7 @@ public sealed class DuzenleyiciSlaytTests
 
         var gecissiz = Slideshow.Plan(3, 2.5, 0, 30);
         Assert.Equal(new[] { 2.5, 2.5, 2.5 }, gecissiz.Seconds);
-        Assert.Equal(7.5, gecissiz.ExportSeconds);
+        Assert.Equal(7.5, Teslim(gecissiz));
 
         Assert.Equal(new[] { 3.0 }, Slideshow.Plan(1, 3, 1, 30).Seconds);
         Assert.Empty(Slideshow.Plan(0, 3, 1, 30).Seconds);
