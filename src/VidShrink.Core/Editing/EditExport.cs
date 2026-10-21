@@ -67,6 +67,8 @@ public sealed record ExportPlan(
     /// <summary>Cizelgede muzik izi oldugu icin <c>-c copy</c> yolu birakilip Tam'a gecildi.</summary>
     public bool MusicForcedFull { get; init; }
 
+    public bool LayersForcedFull { get; init; }
+
     /// <summary>Metin varsa <c>ass=</c> suzgecinin okudugu belge; kosucu calismadan once BOM'lu yazar.</summary>
     public string? SubtitlePath { get; init; }
 
@@ -311,7 +313,10 @@ public static class EditExport
             && timeline.HasTransitions;
         var musicForced = mode != ExportMode.Full && effective != ExportMode.Full && !timeline.HasText && !timeline.HasEffects && settings.IsDefault
             && !timeline.HasTransitions && timeline.HasMusic;
-        if (timeline.HasText || timeline.HasEffects || !settings.IsDefault || timeline.HasTransitions || timeline.HasMusic) effective = ExportMode.Full;
+        var layersForced = mode != ExportMode.Full && effective != ExportMode.Full && !timeline.HasText && !timeline.HasEffects && settings.IsDefault
+            && !timeline.HasTransitions && !timeline.HasMusic && timeline.HasLayers;
+        if (timeline.HasText || timeline.HasEffects || !settings.IsDefault || timeline.HasTransitions || timeline.HasMusic || timeline.HasLayers)
+            effective = ExportMode.Full;
 
         var limit = ReverseLimitSeconds(info, memoryBudgetBytes);
         var over = ReverseOverLimit(timeline, info, memoryBudgetBytes);
@@ -342,7 +347,8 @@ public static class EditExport
             AudioForcedFull = audioForced,
             SettingsForcedFull = settingsForced,
             TransitionsForcedFull = transitionsForced,
-            MusicForcedFull = musicForced
+            MusicForcedFull = musicForced,
+            LayersForcedFull = layersForced
         };
     }
 
@@ -693,11 +699,14 @@ public static class EditExport
             joins.Append("[a").Append(i).Append(']');
         }
 
+        var placed = PlacedLayers(timeline);
+        var videoEnd = placed.Count > 0 ? LayerBase : timeline.HasText ? "[vcat]" : "[vout]";
         if (transitions)
-            graph.Append(TransitionChain(timeline, audio ? 1 : 0, timeline.HasText ? "[vcat]" : "[vout]"));
+            graph.Append(TransitionChain(timeline, audio ? 1 : 0, videoEnd));
         else
             graph.Append(joins).Append("concat=n=").Append(timeline.Clips.Count).Append(":v=1:a=").Append(audio ? 1 : 0)
-                .Append(timeline.HasText ? "[vcat]" : "[vout]").Append(audio ? "[aout]" : string.Empty);
+                .Append(videoEnd).Append(audio ? "[aout]" : string.Empty);
+        graph.Append(LayerGraph(placed.Select(p => p.Layer).ToArray(), used.Count, canvas.Width, timeline.HasText ? "[vcat]" : "[vout]"));
 
         string? subtitle = null;
         string? fonts = null;
@@ -710,6 +719,7 @@ public static class EditExport
 
         var args = new List<string> { "-hide_banner", "-nostdin", "-y" };
         foreach (var s in used) args.AddRange(new[] { "-i", SourceOf(sources, s).Info.FilePath });
+        args.AddRange(LayerInputs(placed));
         args.AddRange(new[] { "-filter_complex", graph.ToString(), "-map", "[vout]" });
         if (audio) args.AddRange(new[] { "-map", "[aout]" });
         args.AddRange(VideoEncode(settings));
@@ -974,16 +984,20 @@ public static class EditExport
             }
         }
 
+        var placed = PlacedLayers(timeline);
+        var videoEnd = placed.Count > 0 ? LayerBase : timeline.HasText ? "[vcat]" : "[vout]";
         if (transitions)
         {
-            graph.Append(TransitionChain(timeline, audio, timeline.HasText ? "[vcat]" : "[vout]"));
+            graph.Append(TransitionChain(timeline, audio, videoEnd));
         }
         else
         {
             graph.Append(joins).Append("concat=n=").Append(timeline.Clips.Count).Append(":v=1:a=").Append(audio)
-                .Append(timeline.HasText ? "[vcat]" : "[vout]");
+                .Append(videoEnd);
             for (var p = 0; p < audio; p++) graph.Append(AudioOutput(p));
         }
+
+        graph.Append(LayerGraph(placed.Select(p => p.Layer).ToArray(), 1, canvas?.Width ?? info.Width, timeline.HasText ? "[vcat]" : "[vout]"));
 
         string? subtitle = null;
         string? fonts = null;
@@ -994,7 +1008,9 @@ public static class EditExport
             graph.Append(";[vcat]").Append(AssFilter(subtitle, fonts)).Append("[vout]");
         }
 
-        var args = new List<string> { "-hide_banner", "-nostdin", "-y", "-i", info.FilePath, "-filter_complex", graph.ToString(), "-map", "[vout]" };
+        var args = new List<string> { "-hide_banner", "-nostdin", "-y", "-i", info.FilePath };
+        args.AddRange(LayerInputs(placed));
+        args.AddRange(new[] { "-filter_complex", graph.ToString(), "-map", "[vout]" });
         for (var p = 0; p < audio; p++) args.AddRange(new[] { "-map", AudioOutput(p) });
         args.AddRange(VideoEncode(settings));
         if (audio > 0) args.AddRange(new[] { "-c:a", AudioCodec, "-b:a", settings.AudioBitrate });
@@ -1010,6 +1026,60 @@ public static class EditExport
             FontsDirectory = fonts,
             FontFamilies = timeline.Texts.Select(t => t.FontName).Distinct(StringComparer.OrdinalIgnoreCase).ToArray()
         };
+    }
+
+    public const string LayerBase = "[vbase]";
+
+    public static IReadOnlyList<(VideoLayer Layer, long Delay, long Length)> PlacedLayers(EditTimeline timeline)
+    {
+        var total = timeline.Duration - timeline.TransitionOverlap;
+        var placed = new List<(VideoLayer Layer, long Delay, long Length)>();
+        foreach (var layer in timeline.Layers)
+        {
+            var delay = timeline.ToOutput(layer.Start);
+            var length = Math.Min(layer.Length, total - delay);
+            if (length > 0) placed.Add((layer, delay, length));
+        }
+
+        return placed;
+    }
+
+    public static IReadOnlyList<string> LayerInputs(IReadOnlyList<(VideoLayer Layer, long Delay, long Length)> placed)
+    {
+        var args = new List<string>();
+        foreach (var (layer, delay, length) in placed)
+            args.AddRange(LayerInput(layer, layer.SourceStart, length, EditTime.ToSeconds(delay)));
+        return args;
+    }
+
+    public static IReadOnlyList<string> LayerInput(VideoLayer layer, long from, long length, double delaySeconds)
+        => new[]
+        {
+            "-ss", Number(EditTime.ToSeconds(from)), "-t", Number(EditTime.ToSeconds(length)),
+            "-itsoffset", Number(Math.Max(0, delaySeconds)), "-i", layer.Path,
+        };
+
+    public static int LayerWidth(VideoLayer layer, int canvasWidth) => Math.Max(2, (int)Math.Round(canvasWidth * layer.Scale / 2) * 2);
+
+    public static string LayerGraph(IReadOnlyList<VideoLayer> layers, int firstInput, int canvasWidth, string output, string input = LayerBase)
+    {
+        if (layers.Count == 0) return string.Empty;
+        var graph = new StringBuilder();
+        var from = input;
+        for (var j = 0; j < layers.Count; j++)
+        {
+            var layer = layers[j];
+            var label = "[lay" + j.ToString(CultureInfo.InvariantCulture) + "]";
+            var to = j == layers.Count - 1 ? output : "[ovl" + j.ToString(CultureInfo.InvariantCulture) + "]";
+            graph.Append(";[").Append((firstInput + j).ToString(CultureInfo.InvariantCulture)).Append(":v]scale=w=")
+                .Append(LayerWidth(layer, canvasWidth).ToString(CultureInfo.InvariantCulture)).Append(":h=-2,format=yuva420p")
+                .Append(layer.ChromaKey ? "," + RecorderArguments.GreenScreenKey : string.Empty).Append(label)
+                .Append(';').Append(from).Append(label).Append("overlay=x=(W-w)*").Append(Number(layer.X)).Append(":y=(H-h)*").Append(Number(layer.Y))
+                .Append(":eof_action=pass").Append(to);
+            from = to;
+        }
+
+        return graph.ToString();
     }
 
     /// <summary>

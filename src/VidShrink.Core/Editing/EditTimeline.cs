@@ -14,9 +14,11 @@ public sealed partial class EditTimeline
     private readonly Stack<IEditCommand> _redo = new();
 
     public EditTimeline(IEnumerable<EditClip> clips, long? sourceDuration = null, IEnumerable<TextLayer>? texts = null, IEnumerable<long>? extraSources = null,
-        EditFrame frame = default)
+        EditFrame frame = default, IEnumerable<VideoLayer>? layers = null)
     {
         Frame = frame.Normalized();
+        Layers = layers?.ToArray() ?? Array.Empty<VideoLayer>();
+        foreach (var layer in Layers) layer.Validate();
         ArgumentNullException.ThrowIfNull(clips);
         _clips = clips.ToList();
         _texts = texts?.ToList() ?? new List<TextLayer>();
@@ -840,6 +842,69 @@ public sealed partial class EditTimeline
         return true;
     }
 
+    public IReadOnlyList<VideoLayer> Layers { get; private set; }
+
+    public bool HasLayers => Layers.Count > 0;
+
+    public bool SetLayers(IReadOnlyList<VideoLayer> layers)
+    {
+        ArgumentNullException.ThrowIfNull(layers);
+        var next = layers.ToArray();
+        foreach (var layer in next) layer.Validate();
+        if (next.SequenceEqual(Layers)) return false;
+        Execute(new LayersCommand(l => Layers = l, Layers, next));
+        return true;
+    }
+
+    public int AddLayer(VideoLayer layer)
+    {
+        ArgumentNullException.ThrowIfNull(layer);
+        SetLayers(Layers.Append(layer).ToArray());
+        return Layers.Count - 1;
+    }
+
+    public bool UpdateLayer(int index, VideoLayer after)
+    {
+        CheckLayer(index);
+        ArgumentNullException.ThrowIfNull(after);
+        var next = Layers.ToArray();
+        next[index] = after;
+        return SetLayers(next);
+    }
+
+    public bool MoveLayer(int index, long start)
+    {
+        CheckLayer(index);
+        if (start < 0) throw new ArgumentOutOfRangeException(nameof(start), start, "Katman cizelgenin basindan once baslayamaz");
+        return UpdateLayer(index, Layers[index] with { Start = start });
+    }
+
+    public void DeleteLayer(int index)
+    {
+        CheckLayer(index);
+        SetLayers(Layers.Where((_, i) => i != index).ToArray());
+    }
+
+    public long ToOutput(long time)
+    {
+        var output = Math.Max(0, time);
+        long start = 0;
+        for (var i = 0; i < _clips.Count; i++)
+        {
+            var overlap = TransitionLength(i);
+            if (overlap > 0)
+            {
+                var into = time - (start - overlap);
+                if (time >= start + overlap) output -= overlap;
+                else if (into > 0) output -= into - into / 2;
+            }
+
+            start += _clips[i].TimelineLength;
+        }
+
+        return Math.Max(0, output);
+    }
+
     /// <summary>Metni sona ekler ve sirasini dondurur. Tek adimda geri alinir.</summary>
     public int AddText(TextLayer text)
     {
@@ -938,6 +1003,27 @@ public sealed partial class EditTimeline
         return true;
     }
 
+    public bool Restore(IEnumerable<EditClip> clips, IEnumerable<TextLayer> texts, EditMusic? music, EditFrame frame, IEnumerable<VideoLayer> layers)
+    {
+        ArgumentNullException.ThrowIfNull(layers);
+        var next = layers.ToArray();
+        foreach (var layer in next) layer.Validate();
+        if (next.SequenceEqual(Layers)) return Restore(clips, texts, music, frame);
+        var before = Layers;
+        var body = Restore(clips, texts, music, frame);
+        var step = new LayersCommand(l => Layers = l, before, next);
+        if (!body)
+        {
+            Execute(step);
+            return true;
+        }
+
+        var last = _undo.Pop();
+        step.Apply(_clips);
+        Record(new CompositeCommand(new[] { last, step }));
+        return true;
+    }
+
     public bool Undo()
     {
         if (!CanUndo) return false;
@@ -1016,6 +1102,12 @@ public sealed partial class EditTimeline
         if (after == before) return false;
         Execute(new TextCommand(_texts, index, before, after));
         return true;
+    }
+
+    private void CheckLayer(int index)
+    {
+        if (index < 0 || index >= Layers.Count)
+            throw new ArgumentOutOfRangeException(nameof(index), index, "Katman sirasi listenin disinda");
     }
 
     private void CheckText(int index)

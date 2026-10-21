@@ -167,7 +167,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
 
     internal double RulerHeight => Metric("EditorRulerHeight");
 
-    internal double VideoTop => TextTop + TextHeight + Metric("EditorTrackGap");
+    internal double VideoTop => LayerTop + (LayerHeight > 0 ? LayerHeight + Metric("EditorTrackGap") : 0);
 
     internal double VideoHeight => Metric("EditorVideoTrackHeight");
 
@@ -362,6 +362,8 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         _model = model;
         ResetTexts();
         EndMusic();
+        EndLayer();
+        SelectedLayer = -1;
         _selected = -1;
         _all = false;
         _set.Clear();
@@ -393,6 +395,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         Playhead = _playhead;
         PixelsPerTick = _ppt;
         RefreshTexts();
+        RefreshLayerLane();
         SelectionChanged?.Invoke();
     }
 
@@ -546,6 +549,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         context.DrawRectangle(Paint("PanelSurface"), null, new Rect(0, AudioTop, width, AudioHeight));
         context.DrawRectangle(Paint("PanelSurface"), null, new Rect(0, MusicTop, width, MusicHeight));
         context.DrawRectangle(Paint("PanelSurface"), null, new Rect(0, StripTop, width, StripHeight));
+        DrawLayerLane(context, width);
 
         var line = new Pen(Paint("HeaderRestBorder"), Metric("EditorClipBorder"));
         context.DrawLine(line, new Point(header, 0), new Point(header, StripBottom));
@@ -567,6 +571,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         DrawRuler(context);
         DrawTexts(context);
         DrawMusic(context);
+        DrawLayers(context);
         if (_peaks is { IsEmpty: false } || _extraPeaks.Values.Any(p => !p.IsEmpty)) DrawWaveform(context);
         else DrawAudioMirror(context);
     }
@@ -585,6 +590,13 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
             if (OnTextRow(position))
             {
                 SelectedText = TextAt(position.X);
+                return;
+            }
+
+            if (OnLayerRow(position))
+            {
+                SelectedLayer = LayerAt(position.X);
+                _canvas.InvalidateVisual();
                 return;
             }
 
@@ -615,6 +627,13 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         }
 
         if (PressMusic(position))
+        {
+            _pressIndex = -1;
+            SelectedText = -1;
+            return;
+        }
+
+        if (PressLayer(position))
         {
             _pressIndex = -1;
             SelectedText = -1;
@@ -692,6 +711,13 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
             return;
         }
 
+        if (_layerPress >= 0)
+        {
+            AutoScroll(position.X);
+            DragLayer(position.X);
+            return;
+        }
+
         if (_pressIndex < 0)
         {
             UpdateCursor(position);
@@ -734,6 +760,11 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
             DragMusic(position.X);
             CommitMusic();
         }
+        else if (_layerPress >= 0)
+        {
+            DragLayer(position.X);
+            CommitLayer();
+        }
         else if (_dragging && _pressIndex >= 0 && _dropIndex >= 0 && _dropIndex != _pressIndex)
         {
             var from = _pressIndex;
@@ -753,6 +784,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         EndTrim();
         EndText();
         EndMusic();
+        EndLayer();
         EndDrag();
     }
 
@@ -787,6 +819,12 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         if (_model is not null && position.X >= HeaderWidth && OnMusicRow(position))
         {
             UpdateMusicCursor(position);
+            return;
+        }
+
+        if (_model is not null && position.X >= HeaderWidth && OnLayerRow(position))
+        {
+            UpdateLayerCursor(position);
             return;
         }
 

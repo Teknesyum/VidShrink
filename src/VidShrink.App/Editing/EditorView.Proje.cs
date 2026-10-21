@@ -137,7 +137,7 @@ internal partial class EditorView
         }
 
         UseAudioTrack(project.AudioTrack);
-        if (!model.Restore(project.Clips, project.Texts, project.Music, project.Frame) && project.Markers.Count == 0) return model;
+        if (!model.Restore(project.Clips, project.Texts, project.Music, project.Frame, project.Layers) && project.Markers.Count == 0) return model;
         _pendingMarkers = project.Markers;
         UseExportMode(project.ExportMode);
         ShowProjectStatus("StatusSuccess", Strings.Get("editor.project.restored"));
@@ -223,7 +223,7 @@ internal partial class EditorView
 
             _stamp = stamp;
             UseAudioTrack(project.AudioTrack);
-            if (Apply(m => m.Restore(project.Clips, project.Texts, project.Music, project.Frame), -1, reload: true)) AfterTextEdit(-1);
+            if (Apply(m => m.Restore(project.Clips, project.Texts, project.Music, project.Frame, project.Layers), -1, reload: true)) AfterTextEdit(-1);
             Timeline.SetMarkers(project.Markers);
             UseExportMode(project.ExportMode);
             ShowProjectStatus("StatusSuccess", Strings.Get("editor.project.restored"));

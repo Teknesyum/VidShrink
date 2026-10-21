@@ -578,6 +578,7 @@
                   <MenuItem x:Name="MnuSpeed" Header="{loc:Text editor.speed}"/>
                   <MenuItem x:Name="MnuReverse" Header="{loc:Text editor.reverse}"/>
                   <MenuItem x:Name="MnuMusic" Header="{loc:Text editor.music}"/>
+                  <MenuItem x:Name="MnuLayer" Header="{loc:Text editor.layer}"/>
                   <Separator/>
                   <MenuItem x:Name="MnuAddSource" Header="{loc:Text editor.source.add}"/>
                   <MenuItem x:Name="MnuColorClip" Header="{loc:Text editor.still.color}">

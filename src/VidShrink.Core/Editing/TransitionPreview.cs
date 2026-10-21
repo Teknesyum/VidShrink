@@ -111,45 +111,7 @@ public static class TransitionPreview
         for (var n = 0; n < sides.Length; n++)
         {
             var (clip, part, from) = sides[n];
-            var info = sources[clip.Source];
-            args.AddRange(new[]
-            {
-                "-threads", "2",
-                "-ss", Number(EditTime.ToSeconds(part.SourceFrom)),
-                "-t", Number(EditTime.ToSeconds(part.EdlLength)),
-                "-i", sourcePaths[clip.Source],
-            });
-            var input = n.ToString(CultureInfo.InvariantCulture);
-            var shift = Number(EditTime.ToSeconds(part.HeadConsumed) / (double)clip.Speed);
-            var start = Number(EditTime.ToSeconds(from));
-            graph.Append('[').Append(input).Append(":v]setpts=PTS-STARTPTS")
-                .Append(EditExport.VideoMotion(clip, info))
-                .Append(",setpts=PTS+").Append(shift).Append("/TB")
-                .Append(Link(ClipFilters.Geometry(clip.Effects, info.Width, info.Height, info.ParNum, info.ParDen, canvas)))
-                .Append(Link(EditExport.BlurChain(clip.Effects, info, canvas, n)))
-                .Append(Link(ClipFilters.Color(clip.Effects)))
-                .Append(",fps=").Append(rate).Append(",format=yuv420p")
-                .Append(Link(ClipFilters.VideoFades(clip.Effects, clip.TimelineLength)))
-                .Append(",trim=start=").Append(start)
-                .Append(n == 0 ? ",setpts=PTS-STARTPTS+" + offset + "/TB" : ",setpts=PTS-STARTPTS")
-                .Append(",tpad=stop_mode=clone:stop_duration=").Append(length)
-                .Append(",trim=duration=").Append(length).Append(",settb=AVTB[v").Append(input).Append("];");
-            if (!audio) continue;
-            if (info.HasAudio)
-            {
-                var stream = clip.Source == 0 ? Math.Max(track, 0) : EditAudioTrack.First;
-                graph.Append('[').Append(input).Append(":a:").Append(stream.ToString(CultureInfo.InvariantCulture)).Append("]asetpts=PTS-STARTPTS")
-                    .Append(EditExport.AudioMotion(clip))
-                    .Append(",asetpts=PTS+").Append(shift).Append("/TB")
-                    .Append(Link(ClipFilters.Audio(clip.Effects, clip.TimelineLength)))
-                    .Append(",atrim=start=").Append(start).Append(",asetpts=PTS-STARTPTS,").Append(EditExport.MergeAudioFormat);
-            }
-            else
-            {
-                graph.Append(EditExport.MergeSilence);
-            }
-
-            graph.Append(",apad,atrim=duration=").Append(length).Append("[a").Append(input).Append("];");
+            AppendSide(args, graph, clip, part, from, n, sources[clip.Source], sourcePaths[clip.Source], canvas, rate, length, n == 0 ? offset : null, audio, track);
         }
 
         graph.Append("[v0][v1]xfade=transition=").Append(ClipTransition.XfadeName(incoming.Transition!.Kind))
@@ -157,6 +119,57 @@ public static class TransitionPreview
         if (audio) graph.Append(";[a0][a1]acrossfade=d=").Append(length).Append("[aout]");
 
         args.AddRange(new[] { "-filter_complex", graph.ToString(), "-map", "[vout]" });
+        args.AddRange(OutputArguments(rate, audio, output));
+        return args;
+    }
+
+    internal static void AppendSide(
+        List<string> args, StringBuilder graph, EditClip clip, EdlPart part, long from, int n, MediaInfo info, string sourcePath,
+        (int Width, int Height) canvas, string rate, string length, string? offset, bool audio, int track)
+    {
+        args.AddRange(new[]
+        {
+            "-threads", "2",
+            "-ss", Number(EditTime.ToSeconds(part.SourceFrom)),
+            "-t", Number(EditTime.ToSeconds(part.EdlLength)),
+            "-i", sourcePath,
+        });
+        var input = n.ToString(CultureInfo.InvariantCulture);
+        var shift = Number(EditTime.ToSeconds(part.HeadConsumed) / (double)clip.Speed);
+        var start = Number(EditTime.ToSeconds(from));
+        graph.Append('[').Append(input).Append(":v]setpts=PTS-STARTPTS")
+            .Append(EditExport.VideoMotion(clip, info))
+            .Append(",setpts=PTS+").Append(shift).Append("/TB")
+            .Append(Link(ClipFilters.Geometry(clip.Effects, info.Width, info.Height, info.ParNum, info.ParDen, canvas)))
+            .Append(Link(EditExport.BlurChain(clip.Effects, info, canvas, n)))
+            .Append(Link(ClipFilters.Color(clip.Effects)))
+            .Append(",fps=").Append(rate).Append(",format=yuv420p")
+            .Append(Link(ClipFilters.VideoFades(clip.Effects, clip.TimelineLength)))
+            .Append(",trim=start=").Append(start)
+            .Append(offset is not null ? ",setpts=PTS-STARTPTS+" + offset + "/TB" : ",setpts=PTS-STARTPTS")
+            .Append(",tpad=stop_mode=clone:stop_duration=").Append(length)
+            .Append(",trim=duration=").Append(length).Append(",settb=AVTB[v").Append(input).Append("];");
+        if (!audio) return;
+        if (info.HasAudio)
+        {
+            var stream = clip.Source == 0 ? Math.Max(track, 0) : EditAudioTrack.First;
+            graph.Append('[').Append(input).Append(":a:").Append(stream.ToString(CultureInfo.InvariantCulture)).Append("]asetpts=PTS-STARTPTS")
+                .Append(EditExport.AudioMotion(clip))
+                .Append(",asetpts=PTS+").Append(shift).Append("/TB")
+                .Append(Link(ClipFilters.Audio(clip.Effects, clip.TimelineLength)))
+                .Append(",atrim=start=").Append(start).Append(",asetpts=PTS-STARTPTS,").Append(EditExport.MergeAudioFormat);
+        }
+        else
+        {
+            graph.Append(EditExport.MergeSilence);
+        }
+
+        graph.Append(",apad,atrim=duration=").Append(length).Append("[a").Append(input).Append("];");
+    }
+
+    internal static IReadOnlyList<string> OutputArguments(string rate, bool audio, string output)
+    {
+        var args = new List<string>();
         if (audio) args.AddRange(new[] { "-map", "[aout]", "-c:a", "pcm_s16le" });
         else args.Add("-an");
         args.AddRange(new[]
@@ -167,7 +180,8 @@ public static class TransitionPreview
         return args;
     }
 
-    private static string Link(string chain) => chain.Length == 0 ? string.Empty : "," + chain;
 
-    private static string Number(double value) => value.ToString("0.######", CultureInfo.InvariantCulture);
+    internal static string Link(string chain) => chain.Length == 0 ? string.Empty : "," + chain;
+
+    internal static string Number(double value) => value.ToString("0.######", CultureInfo.InvariantCulture);
 }

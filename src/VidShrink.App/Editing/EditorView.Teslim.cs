@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -226,7 +226,7 @@ internal partial class EditorView
     {
         if (_model is not { Clips.Count: > 0 } model || _source is null || Exporting) return false;
         var sources = SourcePaths;
-        var snapshot = new EditTimeline(model.Clips.ToArray(), texts: model.Texts.ToArray(), frame: model.Frame);
+        var snapshot = new EditTimeline(model.Clips.ToArray(), texts: model.Texts.ToArray(), frame: model.Frame, layers: model.Layers.ToArray());
         snapshot.SetMusic(model.Music);
         var key = SaveKey(snapshot);
         _pendingPlan = null;
@@ -445,6 +445,7 @@ internal partial class EditorView
         else if (plan.SettingsForcedFull) lines.Add(Strings.Get("editor.export.settings-full"));
         else if (plan.TransitionsForcedFull) lines.Add(Strings.Get("editor.export.transitions-full"));
         else if (plan.MusicForcedFull) lines.Add(Strings.Get("editor.export.music-full"));
+        else if (plan.LayersForcedFull) lines.Add(Strings.Get("editor.export.layers-full"));
         else if (plan.FellBackToFull) lines.Add(Strings.Get("editor.export.fallback"));
         else if (plans.Any(p => p.Effective != ExportMode.Full) && motion.Length > 0)
             lines.Add(string.Format(Strings.Culture, Strings.Get("editor.export.reencoded"), ClipNumbers(motion)));
@@ -462,7 +463,7 @@ internal partial class EditorView
         => string.Join(";", model.Clips.Select(c => $"{c.Source}:{c.SourceStart}-{c.SourceEnd}-{c.Speed}-{c.Reversed}-{c.Effects}-{c.Transition}-{c.Smooth}"))
            + "|" + string.Join(";", model.Texts.Select(t => $"{t.Start}-{t.End}-{t.Size}-{t.Color}-{t.Bold}-{t.Italic}-{t.FontName}-{t.FadeIn}-{t.FadeOut}-{t.MotionIn}:{t.MotionInLength}-{t.MotionOut}:{t.MotionOutLength}-{t.Outline}:{t.Shadow}:{t.Box}-"
                + string.Join(",", t.Keyframes.Select(k => $"{k.Offset}:{k.X}:{k.Y}")) + "-" + t.Text.Length + ":" + t.Text))
-           + "|" + model.Music + "|" + model.Frame;
+           + "|" + model.Music + "|" + model.Frame + "|" + string.Join(";", model.Layers);
 
     private async Task<string?> PickOutputAsync()
     {
