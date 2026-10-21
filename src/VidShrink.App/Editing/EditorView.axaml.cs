@@ -143,6 +143,7 @@ internal partial class EditorView : UserControl
         ForgetProject();
         CloseDriver();
         ForgetOverlay();
+        ForgetBlends();
         ForgetSaved();
         ForgetSilence();
         ForgetSources();
@@ -376,7 +377,7 @@ internal partial class EditorView : UserControl
 
         var playing = Preview.IsPlaying;
         _driver?.Dispose();
-        var preview = new EdlPreview(SourcePaths, model);
+        var preview = PreviewFor(model);
         var driver = new EdlPreviewDriver(engine, preview, look: LookFor(preview, engine));
         _driver = driver;
         _reloads++;
@@ -389,6 +390,7 @@ internal partial class EditorView : UserControl
             Preview.RefreshDuration();
             await driver.SeekAsync(Math.Clamp(at, 0, model.Duration)).ConfigureAwait(true);
             if (playing) driver.Play();
+            QueueBlends(model);
         }
         catch (Exception ex) when (ex is IOException or InvalidOperationException or ObjectDisposedException)
         {

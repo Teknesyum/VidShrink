@@ -11,8 +11,8 @@ public enum TransitionKind
 
 /// <summary>
 /// Onceki klipten bu klibe gecis: tur ve istenen sure (tick). Iki klip gecis suresi kadar ust uste biner, teslim o kadar
-/// kisalir. Sure klip uzunluklarinin yarisina kirpilir (<see cref="EditTimeline.TransitionLength"/>). Onizlemede gosterilmez;
-/// gecis yalniz Tam kipte kodlanir.
+/// kisalir. Sure klip uzunluklarinin yarisina kirpilir (<see cref="EditTimeline.TransitionLength"/>). Onizlemede kisa bir on
+/// cizimle (<see cref="TransitionPreview"/>) gosterilir; teslimde gecis yalniz Tam kipte kodlanir.
 /// </summary>
 public sealed record ClipTransition
 {

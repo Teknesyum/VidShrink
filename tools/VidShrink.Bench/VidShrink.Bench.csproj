@@ -10,6 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\VidShrink.Core\VidShrink.Core.csproj" />
     <ProjectReference Include="..\..\src\VidShrink.Ffmpeg\VidShrink.Ffmpeg.csproj" />
+    <ProjectReference Include="..\..\src\VidShrink.Player\VidShrink.Player.csproj" />
   </ItemGroup>
 
 </Project>

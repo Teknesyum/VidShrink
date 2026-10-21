@@ -1359,7 +1359,7 @@ public static class EditExport
         return new ExportStep(args, length);
     }
 
-    private static string VideoMotion(EditClip clip, MediaInfo info)
+    internal static string VideoMotion(EditClip clip, MediaInfo info)
     {
         var text = new StringBuilder();
         if (clip.Reversed) text.Append(",reverse");
@@ -1369,7 +1369,7 @@ public static class EditExport
         return text.ToString();
     }
 
-    private static string AudioMotion(EditClip clip)
+    internal static string AudioMotion(EditClip clip)
     {
         var text = new StringBuilder();
         if (clip.Reversed) text.Append(",areverse");
@@ -1377,7 +1377,7 @@ public static class EditExport
         return text.ToString();
     }
 
-    private static string BlurChain(ClipEffects effects, MediaInfo info, (int Width, int Height)? canvas, int index)
+    internal static string BlurChain(ClipEffects effects, MediaInfo info, (int Width, int Height)? canvas, int index)
     {
         var (width, height) = ClipFilters.Frame(info.Width, info.Height, canvas);
         return ClipFilters.Blur(effects, width, height, "b" + index.ToString(CultureInfo.InvariantCulture));

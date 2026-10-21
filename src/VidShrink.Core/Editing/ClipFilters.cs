@@ -141,9 +141,9 @@ public static class ClipFilters
     public static string PartTime(EdlPart part)
     {
         var speed = Number((double)part.Clip.Speed);
-        return part.Clip.Reversed
-            ? "(" + Number(EditTime.ToSeconds(part.EdlEnd)) + "-t)/" + speed
-            : "(t-" + Number(EditTime.ToSeconds(part.EdlStart)) + ")/" + speed;
+        if (part.Clip.Reversed) return "(" + Number(EditTime.ToSeconds(part.EdlEnd + part.HeadConsumed)) + "-t)/" + speed;
+        var origin = EditTime.ToSeconds(part.EdlStart - part.HeadConsumed);
+        return (origin < 0 ? "(t+" + Number(-origin) : "(t-" + Number(origin)) + ")/" + speed;
     }
 
     /// <summary>Klip basinda sifirdan baslayan zamanla goruntu solmasi; <paramref name="length"/> cizelge tick'i.</summary>
@@ -246,7 +246,7 @@ public static class ClipFilters
         foreach (var part in preview.Parts)
         {
             var effects = part.Clip.Effects;
-            if (effects.IsNeutral) continue;
+            if (effects.IsNeutral || part.IsBlend) continue;
 
             var start = EditTime.ToSeconds(part.EdlStart);
             var end = EditTime.ToSeconds(part.EdlEnd);
@@ -268,7 +268,24 @@ public static class ClipFilters
                 if (effects.Limiter) audio.Add(LimiterFilter + window);
             }
 
-            if (part.Clip.Reversed)
+            if (part.Head > 0 || part.Tail > 0)
+            {
+                var before = EditTime.ToSeconds(part.HeadConsumed);
+                var after = EditTime.ToSeconds(part.Clip.SourceLength - part.TailConsumed);
+                var fadeHead = EditTime.ToSeconds(fadeIn) * speed;
+                var fadeTail = EditTime.ToSeconds(fadeOut) * speed;
+                if (part.Clip.Reversed)
+                {
+                    if (fadeTail > 0) Window(video, audio, "in", start - after, fadeTail, start, end);
+                    if (fadeHead > 0) Window(video, audio, "out", end + before - fadeHead, fadeHead, start, end);
+                }
+                else
+                {
+                    if (fadeHead > 0) Window(video, audio, "in", start - before, fadeHead, start, end);
+                    if (fadeTail > 0) Window(video, audio, "out", end + after - fadeTail, fadeTail, start, end);
+                }
+            }
+            else if (part.Clip.Reversed)
             {
                 if (tail > 0) Window(video, audio, "in", start, tail);
                 if (head > 0) Window(video, audio, "out", end - head, head);
@@ -282,6 +299,16 @@ public static class ClipFilters
 
         video.InsertRange(0, color);
         return (video.Count == 0 ? null : string.Join(",", video), audio.Count == 0 ? null : string.Join(",", audio));
+    }
+
+    private static void Window(List<string> video, List<string> audio, string type, double start, double length, double from, double to)
+    {
+        var a = Math.Max(start, from);
+        var b = Math.Min(start + length, to);
+        if (b <= a) return;
+        var fade = "=t=" + type + ":st=" + Number(start) + ":d=" + Number(length) + ":enable='" + Between(a, b) + "'";
+        video.Add("fade" + fade);
+        audio.Add("afade" + fade);
     }
 
     private static void Window(List<string> video, List<string> audio, string type, double start, double length)

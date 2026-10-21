@@ -29,7 +29,7 @@ public static class AssWriter
     public static string WritePreview(IReadOnlyList<TextLayer> texts, int width, int height, EdlPreview preview)
     {
         ArgumentNullException.ThrowIfNull(preview);
-        var identity = preview.Parts.All(p => p.Clip.Speed == 1m && !p.Clip.Reversed);
+        var identity = !preview.HasBlends && preview.Parts.All(p => p.Clip.Speed == 1m && !p.Clip.Reversed);
         return Document(texts, width, height, identity ? null : preview);
     }
 
@@ -183,7 +183,7 @@ public static class AssWriter
 
     private static long EdlAt(EdlPart part, long time)
     {
-        var fraction = (double)(time - part.TimelineStart) / part.Clip.TimelineLength;
+        var fraction = (double)(time - part.TimelineStart) / part.TimelineLength;
         var offset = (long)Math.Round(fraction * part.EdlLength, MidpointRounding.AwayFromZero);
         return part.Clip.Reversed ? part.EdlEnd - offset : part.EdlStart + offset;
     }

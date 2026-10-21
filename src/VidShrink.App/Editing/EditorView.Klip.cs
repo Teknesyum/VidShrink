@@ -486,9 +486,16 @@ internal partial class EditorView
         if (_model is not { } model || _source is not { } source || _driver is not { } driver || Preview.Engine is not { } engine) return;
         try
         {
-            var preview = new EdlPreview(SourcePaths, model);
+            var preview = PreviewFor(model);
+            if (preview.Uri != driver.Preview.Uri)
+            {
+                await ReloadAsync(Timeline.Playhead).ConfigureAwait(true);
+                return;
+            }
+
             await driver.RestyleAsync(preview, LookFor(preview, engine)).ConfigureAwait(true);
             _restyles++;
+            QueueBlends(model);
         }
         catch (Exception ex) when (ex is ArgumentException or InvalidOperationException or ObjectDisposedException)
         {
