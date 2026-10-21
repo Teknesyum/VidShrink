@@ -590,7 +590,7 @@
 
       <ControlTheme x:Key="TitleBarVersionButton" TargetType="Button">
         <Setter Property="FocusAdorner" Value="{StaticResource DuzenOdakHalkasi}"/>
-        <Setter Property="Foreground" Value="{StaticResource TextDisabled}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
         <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
         <Setter Property="FontSize" Value="{StaticResource VersionButtonFontSize}"/>
         <Setter Property="Cursor" Value="Hand"/>

@@ -547,6 +547,8 @@ public sealed class YerlesimDenetimiTests
     [InlineData("en", "OpenSubtitles account (needed for downloads)", true)]
     [InlineData("en", "OpenSubtitles Account (Needed for Downloads)", false)]
     [InlineData("tr", "Arayüz dilini değiştirir.", false)]
+    [InlineData("en", "v0.0.2", false)]
+    [InlineData("en", "version", true)]
     public void BaslikKuraliKucukSozcuguYakalar(string dil, string metin, bool kusurlu)
         => Assert.Equal(kusurlu, KucukSozcuk(metin, dil) is not null);
 
@@ -1383,7 +1385,7 @@ public sealed class YerlesimDenetimiTests
 
     /// <summary>
     /// Başlık kuralını bozan ilk sözcük; yoksa <c>null</c>. Cümle işaretli metin gövdedir, sorulmaz.
-    /// Rakamla başlayan parça (<c>50.3s</c>, <c>1080p</c>) sözcük değil sayıdır; <see cref="LanguageCatalog.Title"/>
+    /// Rakamla başlayan parça (<c>50.3s</c>, <c>1080p</c>) ve sürüm (<c>v0.0.2</c>) sözcük değil sayıdır;<see cref="LanguageCatalog.Title"/>
     /// de harfle başlamayanı olduğu gibi bırakıyor.
     /// Sayının hemen ardındaki birim (<c>50,3 sn</c>) de öyle: <see cref="LanguageCatalog.IsUnitAfterNumber"/>
     /// onu büyütmüyor. Parantezli birim (<c>(s)</c>) de: <see cref="LanguageCatalog.IsBracketedUnit"/>.
@@ -1402,7 +1404,7 @@ public sealed class YerlesimDenetimiTests
         {
             var once = onceki;
             onceki = parca;
-            if (char.IsDigit(parca[0])) { ilk = false; continue; }
+            if (char.IsDigit(parca[0]) || parca.Length > 1 && parca[0] == 'v' && char.IsDigit(parca[1])) { ilk = false; continue; }
             if (LanguageCatalog.IsUnitAfterNumber(parca, once) || LanguageCatalog.IsBracketedUnit(parca)) continue;
             var bas = 0;
             while (bas < parca.Length && !char.IsLetter(parca[bas])) bas++;
