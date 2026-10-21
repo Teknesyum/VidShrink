@@ -1338,6 +1338,8 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-20, durgun klip ayarlari ve slayt sihirbazi (later 87, 90): yirmi yeni anahtar (<c>editor.still.*</c> dokuz, <c>editor.clip.move</c>, <c>.tip</c>, <c>editor.slides.*</c> dokuz) 42 dilde; 43 kol (en 5: <c>editor.clip.move</c>, <c>editor.slides.build</c>, <c>.fit</c>, <c>.working</c>, <c>editor.still.image-seconds</c>; tr 1: <c>editor.still.image-seconds</c>; es 7, pt 7, sw 4, da 3, nb 3, de 2, fr 2, ro 2; cs, hu, lt, nl, pl, sk, sl birer), KOL dokumunden ve SAYIM satirindan olculdu: toplam 4074 + 43 = 4117, en 393 + 5 = 398, tr 132 + 1 = 133.</para>
     /// <para>2026-10-20, olcerek arama (later 141): alti yeni anahtardan <c>main.run.search-round-done</c> 40 dilde (hu ve zh-Hans haric) ve en <c>main.advanced.search-by-measure.label</c> kola giriyor, KOL dokumunden ve SAYIM satirindan olculdu: toplam 4074 + 41 = 4115, en 393 + 2 = 395, tr 132 + 1 = 133.</para>
     /// <para>2026-10-21, birlesme turu (later 42, 69, 78, 87+90, 88+89, 105+106, 141): dallarin farklari toplandi ve birlesik agacta olculdu: toplam 4074 + 175 = 4249, en 393 + 15 = 408, tr 132 + 5 = 137.</para>
+    /// <para>2026-10-21, later 140 birlesmesi: dokuz <c>editor.proxy.*</c> anahtari; toplam 4249 + 5 = 4254, en 408 + 1 = 409, tr 137.</para>
+    /// <para>2026-10-21, later 140 vekil kopya: dokuz <c>editor.proxy.*</c> anahtari 42 dile eklendi; <c>editor.proxy.failed</c> en, fr, hu, nl ve ro dillerinde kola giriyor: olculen toplam 4079, en 394, tr 132.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1363,8 +1365,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(4249, toplam);
-        Assert.Equal(408, dilBasina["en"]);
+        Assert.Equal(4254, toplam);
+        Assert.Equal(409, dilBasina["en"]);
         Assert.Equal(137, dilBasina["tr"]);
     }
 
@@ -1681,6 +1683,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-20, later 105 ve 106: 21 kaydedici anahtari x 43 = 903; gezilen 89698 + 903 = 90601.</para>
     /// <para>2026-10-20, durgun klip ayarlari ve slayt sihirbazi (later 87, 90): yirmi yeni anahtar 42 dilde, dusen yok; olculen gezilen 89698 + 20 x 43 = 90558. <c>kayip</c> 0.</para>
     /// <para>2026-10-20, olcerek arama (later 141): alti yeni anahtar 42 dilde, dusen yok; olculen gezilen 89698 + 6 x 43 = 89956. <c>kayip</c> 0.</para>
+    /// <para>2026-10-21, later 140 vekil kopya: dokuz <c>editor.proxy.*</c> anahtari 42 dile eklendi; gezilen 90085.</para>
     /// <para>2026-10-18, ad yer tutucusu: uygulama adi cevirilerde {app} oldu, ekli adlar tur adiyla kuruldu; cs shell.menu.open "ve VidShrinku" yerine "v aplikaci {app}" oldugu icin kol sayimindan dustu: olculen toplam 4069, en 393, tr 132.</para>
     /// <para>2026-10-16, later 44 (etiket ve Onar): on sekiz yeni anahtar; olculen toplam 3781 + 2 = 3783 (lt main.convert.tags.cover.none, ro main.convert.tags.year), en 364, tr 123, gezilen 80453 + 774 = 81227.</para>
     /// <para>2026-10-15, uzun iste oncelik ve bitis sesi (later 76): dort yeni anahtar (<c>settings-tab.encode-priority.above-normal</c>, <c>settings-tab.finish-sound-file.choose</c>, <c>.hint</c>, <c>.reset</c>) 42 dilde, dusen yok; olculen gezilen 78604 + 172 = 78776.</para>
@@ -1721,7 +1724,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(92235, gezilen);
+        Assert.Equal(92622, gezilen);
         Assert.Empty(kayip);
     }
 

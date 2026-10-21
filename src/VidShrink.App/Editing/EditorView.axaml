@@ -398,6 +398,15 @@
                 <ComboBoxItem Content="{loc:Text editor.media.overwrite}"/>
               </ComboBox>
             </StackPanel>
+            <StackPanel x:Name="ProxyPanel" Spacing="{StaticResource SpaceSm}" VerticalAlignment="Top" MaxWidth="{StaticResource FieldWidth}">
+              <WrapPanel Orientation="Horizontal" ItemSpacing="{StaticResource SpaceSm}" LineSpacing="{StaticResource SpaceSm}">
+                <Button x:Name="BtnProxyCreate" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.proxy.create}" AutomationProperties.Name="{loc:Text editor.proxy.create}" ToolTip.Tip="{loc:Text editor.proxy.tip}" IsEnabled="False"/>
+                <Button x:Name="BtnProxyCancel" Theme="{StaticResource GhostButton}" Content="{loc:Text main.action.cancel}" IsVisible="False"/>
+                <Button x:Name="BtnProxyDelete" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.proxy.delete}" AutomationProperties.Name="{loc:Text editor.proxy.delete}" IsEnabled="False"/>
+              </WrapPanel>
+              <ProgressBar x:Name="ProxyProgress" Maximum="1" IsVisible="False"/>
+              <SarilanMetin x:Name="TxtProxyStatus" Theme="{StaticResource Hint}" TextWrapping="Wrap" IsVisible="{Binding $self.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+            </StackPanel>
           </WrapPanel>
           <WrapPanel x:Name="StillPanel" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.still.panel}">
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">

@@ -44,6 +44,7 @@ try
         "color-frame" => await RenkKaresi.RunAsync(args),
         "quality-bands" => await KaliteBandi.RunAsync(args),
         "transition-preview" => await GecisOnizleme.RunAsync(args),
+        "proxy-seek" => await VekilSarma.RunAsync(args),
         _ => Unknown(args[0])
     };
 }

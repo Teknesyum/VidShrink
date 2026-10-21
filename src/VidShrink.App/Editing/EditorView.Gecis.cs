@@ -42,7 +42,7 @@ internal partial class EditorView
         var ready = new Dictionary<int, string>();
         foreach (var index in TransitionPreview.Pending(model))
             if (BlendJob(model, index) is { } job && _blends.TryGetValue(job.Key, out var path) && File.Exists(path)) ready[index] = path;
-        return new EdlPreview(SourcePaths, model, ready.Count == 0 ? null : ready);
+        return new EdlPreview(PreviewPaths, model, ready.Count == 0 ? null : ready);
     }
 
     private (string Key, IReadOnlyList<string> Arguments)? BlendJob(EditTimeline model, int index)
