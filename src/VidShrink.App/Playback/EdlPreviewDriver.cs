@@ -20,6 +20,9 @@ public sealed class EdlPreviewDriver : IDisposable
     private double _rate = 1;
     private bool _backward;
     private long _backCursor;
+    private long _seekTicket;
+    private int _seeksPending;
+    private long _seekTarget;
 
     public const double MinRate = 0.01;
 
@@ -45,7 +48,9 @@ public sealed class EdlPreviewDriver : IDisposable
 
     public long EdlPosition => _reverse is not null ? _cursor : Clamp(EditTime.FromSeconds(Finite(_engine.PositionSeconds)));
 
-    public long TimelinePosition => _backward ? _backCursor : _preview.ToTimeline(EdlPosition);
+    public long TimelinePosition => Volatile.Read(ref _seeksPending) > 0
+        ? Interlocked.Read(ref _seekTarget)
+        : _backward ? _backCursor : _preview.ToTimeline(EdlPosition);
 
     public double Rate => _rate;
 
@@ -144,9 +149,22 @@ public sealed class EdlPreviewDriver : IDisposable
 
     public async Task SeekAsync(long timelineTime, SeekPrecision precision, CancellationToken ct = default)
     {
-        await _gate.WaitAsync(ct).ConfigureAwait(false);
+        var ticket = Interlocked.Increment(ref _seekTicket);
+        Interlocked.Exchange(ref _seekTarget, Math.Clamp(timelineTime, 0, _preview.TimelineDuration));
+        Interlocked.Increment(ref _seeksPending);
         try
         {
+            await _gate.WaitAsync(ct).ConfigureAwait(false);
+        }
+        catch
+        {
+            Interlocked.Decrement(ref _seeksPending);
+            throw;
+        }
+
+        try
+        {
+            if (ticket != Interlocked.Read(ref _seekTicket)) return;
             _reverse = null;
             if (_backward)
             {
@@ -165,6 +183,7 @@ public sealed class EdlPreviewDriver : IDisposable
         }
         finally
         {
+            Interlocked.Decrement(ref _seeksPending);
             _gate.Release();
         }
     }
