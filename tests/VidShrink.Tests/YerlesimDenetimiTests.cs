@@ -1385,7 +1385,7 @@ public sealed class YerlesimDenetimiTests
 
     /// <summary>
     /// Başlık kuralını bozan ilk sözcük; yoksa <c>null</c>. Cümle işaretli metin gövdedir, sorulmaz.
-    /// Rakamla başlayan parça (<c>50.3s</c>, <c>1080p</c>) ve sürüm (<c>v0.0.2</c>) sözcük değil sayıdır;<see cref="LanguageCatalog.Title"/>
+    /// Rakamla başlayan parça (<c>50.3s</c>, <c>1080p</c>) ve sürüm (<c>v0.0.2</c>) sözcük değil sayıdır; <see cref="LanguageCatalog.Title"/>
     /// de harfle başlamayanı olduğu gibi bırakıyor.
     /// Sayının hemen ardındaki birim (<c>50,3 sn</c>) de öyle: <see cref="LanguageCatalog.IsUnitAfterNumber"/>
     /// onu büyütmüyor. Parantezli birim (<c>(s)</c>) de: <see cref="LanguageCatalog.IsBracketedUnit"/>.
