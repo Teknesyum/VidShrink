@@ -761,6 +761,8 @@
   "settings-tab.theme.dark": "Tmavý",
   "settings-tab.reduce-motion.label": "Vypnout animace",
   "settings-tab.reduce-motion.hint": "Vypne posouvání panelů a další pohyb. Pokud systém už žádá méně pohybu, animace zůstanou vypnuté tak jako tak.",
+  "settings-tab.text-size.label": "Velikost textu",
+  "settings-tab.text-size.hint": "• Zvětší veškerý text v programu.\n• Projeví se po restartu programu.",
   "settings-tab.language.hint": "Změní jazyk rozhraní a zapamatuje se pro příští spuštění.",
   "settings-tab.default-target.label": "Výchozí cílová velikost",
   "settings-tab.default-target.hint": "Nastaví cílovou velikost, se kterou se otevře záložka Zmenšit.",

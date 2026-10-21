@@ -761,6 +761,8 @@
   "settings-tab.theme.dark": "Темна",
   "settings-tab.reduce-motion.label": "Вимкнути анімації",
   "settings-tab.reduce-motion.hint": "Вимикає висування панелей та інший рух. Якщо система вже просить менше руху, анімації все одно лишаються вимкненими.",
+  "settings-tab.text-size.label": "Розмір тексту",
+  "settings-tab.text-size.hint": "• Збільшує весь текст у програмі.\n• Застосовується після перезапуску програми.",
   "settings-tab.language.hint": "Змінює мову інтерфейсу й запам'ятовується до наступного запуску.",
   "settings-tab.default-target.label": "Типовий цільовий розмір",
   "settings-tab.default-target.hint": "Задає цільовий розмір, з яким відкривається вкладка «Стиснути».",

@@ -91,9 +91,11 @@ public partial class App : Application
             var ayar = LoadStartupSettings();
             AcilisIzi.Yaz("ayar-okundu");
             MotionPreference.UserReduced = ayar.ReduceMotion;
-            PaletteCatalog.Use(PaletteCatalog.Pick(ayar.Theme, ayar.FollowSystemTheme,
-                ayar.FollowSystemTheme ? new PlatformThemeSource(PlatformSettings).IsLight : null,
-                ayar.LightTheme, ayar.DarkTheme));
+            FontScale.Apply(ayar.FontScale);
+            using var sistem = new PlatformThemeSource(PlatformSettings);
+            PaletteCatalog.Use(PaletteCatalog.Pick(ayar.Theme, ayar.ThemeChosen, ayar.FollowSystemTheme,
+                ayar.FollowSystemTheme ? sistem.IsLight : null,
+                ayar.LightTheme, ayar.DarkTheme, sistem.IsHighContrast));
         }
         catch { }
         AcilisIzi.Yaz("palet");

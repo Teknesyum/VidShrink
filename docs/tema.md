@@ -9,9 +9,19 @@ src/VidShrink.App/Themes/Palette/seeds.json
 Her tema burada Teknesyum UI standardının **rolleriyle** duruyor. Ölçüler (boşluk, yuvarlaklık,
 yazı boyu) `Themes/Theme.axaml` içinde ve palete dokunmuyor — renk değiştirince yerleşim yerinde kalır.
 
-Bugün **36 palet** var: projenin 26'sı, standardın 9 teması ve varsayılan `Teknesyum`
+Bugün **37 palet** var: projenin 27'si, standardın 9 teması ve varsayılan `Teknesyum`
 (birleşimin kararları `docs/netlestirme/027-palet-birlesimi.md`). Ayarlardan seçilen palet
 **çalışırken** yürürlüğe girer, yeniden başlatma istemez (`PaletteCatalog.Use`).
+
+`HighContrast` sistemin yüksek karşıtlık kipinin karşılığı: saf siyah zemin, beyaz yazı, her
+metin ve dolgu üstü yazı 7:1'i geçer (`YuksekKarsitlikVeYaziOlcegiTests`). Windows yüksek
+karşıtlık isterse açılışta ve çalışırken kendiliğinden seçilir; kullanıcı Ayarlar'dan bir
+palet seçtiyse (`themeChosen`) onun seçimi kalır, sistem temasını izliyorsa yine geçilir.
+
+Yazı boyutu Ayarlar'dan %100, %125 ya da %150 seçilir (`fontScale`). Çarpan açılışta, pencere
+kurulmadan `FontScale.Apply` ile `FontSize1-5`, takma adları, `LineHeightBody` ve biçemlerdeki
+`FontSize`/`LineHeight` değerlerine bir kez uygulanır; değişiklik yeniden başlatınca görünür.
+Kaydedicinin videoya yazılan tuş ve çizim yazıları ölçeğe girmez.
 
 Açık/koyu ayrımı elle tutulmuyor: zemin renginin sRGB parlaklığı 0,5'in üstündeyse palet
 açık sayılır. Bunun iki sonucu var — Fluent'in kendi açılır listeleri ve kaydırma

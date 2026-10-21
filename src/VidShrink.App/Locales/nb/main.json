@@ -761,6 +761,8 @@
   "settings-tab.theme.dark": "Mørk",
   "settings-tab.reduce-motion.label": "Slå av animasjoner",
   "settings-tab.reduce-motion.hint": "Slår av glidende paneler og annen bevegelse. Hvis systemet allerede ber om mindre bevegelse, forblir animasjonene av.",
+  "settings-tab.text-size.label": "Tekststørrelse",
+  "settings-tab.text-size.hint": "• Gjør all tekst i programmet større.\n• Trer i kraft når programmet startes på nytt.",
   "settings-tab.language.hint": "Endrer grensesnittspråket og huskes ved neste oppstart.",
   "settings-tab.default-target.label": "Standard målstørrelse",
   "settings-tab.default-target.hint": "Angir målstørrelsen Krymp-fanen åpner med.",

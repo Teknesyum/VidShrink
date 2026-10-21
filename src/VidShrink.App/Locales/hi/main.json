@@ -761,6 +761,8 @@
   "settings-tab.theme.dark": "गहरा",
   "settings-tab.reduce-motion.label": "एनिमेशन बंद करें",
   "settings-tab.reduce-motion.hint": "पैनल का खिसकना और अन्य हलचल बंद करता है। अगर सिस्टम पहले से कम हलचल माँगता है, तो एनिमेशन वैसे भी बंद रहते हैं।",
+  "settings-tab.text-size.label": "टेक्स्ट का आकार",
+  "settings-tab.text-size.hint": "• प्रोग्राम का सारा टेक्स्ट बड़ा करता है।\n• प्रोग्राम दोबारा शुरू करने पर लागू होता है।",
   "settings-tab.language.hint": "इंटरफ़ेस भाषा बदलता है और अगली बार खोलने पर याद रहता है।",
   "settings-tab.default-target.label": "डिफ़ॉल्ट लक्ष्य आकार",
   "settings-tab.default-target.hint": "सिकोड़ें टैब जिस लक्ष्य आकार से खुलता है, उसे तय करता है।",

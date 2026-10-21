@@ -761,6 +761,8 @@
   "settings-tab.theme.dark": "Тёмная",
   "settings-tab.reduce-motion.label": "Отключить анимации",
   "settings-tab.reduce-motion.hint": "Отключает выдвижение панелей и другое движение. Если система уже просит меньше движения, анимации всё равно остаются выключенными.",
+  "settings-tab.text-size.label": "Размер текста",
+  "settings-tab.text-size.hint": "• Увеличивает весь текст в программе.\n• Применяется после перезапуска программы.",
   "settings-tab.language.hint": "Меняет язык интерфейса и запоминается при следующем запуске.",
   "settings-tab.default-target.label": "Целевой размер по умолчанию",
   "settings-tab.default-target.hint": "Задаёт целевой размер, с которым открывается вкладка «Сжать».",

@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using VidShrink.App.Localization;
 using VidShrink.App.Themes;
 
 namespace VidShrink.App;
@@ -14,6 +15,8 @@ public partial class MainWindow
     private SystemThemeFollower? _themeFollower;
     private string _lightTheme = PaletteCatalog.DefaultLight;
     private string _darkTheme = PaletteCatalog.Default;
+    private bool _themeChosen;
+    private int _fontScale = 100;
 
     private void WatchSystemThemeAndMotion()
     {
@@ -21,6 +24,7 @@ public partial class MainWindow
         Watch(ChkFollowSystemTheme, ToggleButton.IsCheckedProperty, OnFollowSystemThemeChanged);
         Watch(CmbThemeLight, SelectingItemsControl.SelectedIndexProperty, OnThemePairChosen);
         Watch(CmbThemeDark, SelectingItemsControl.SelectedIndexProperty, OnThemePairChosen);
+        Watch(CmbTextSize, SelectingItemsControl.SelectedIndexProperty, OnTextSizeChosen);
         MotionPreference.Changed += OnMotionPreferenceChanged;
     }
 
@@ -82,7 +86,7 @@ public partial class MainWindow
         var follow = FollowingSystemTheme;
         SystemThemePairRow.IsVisible = follow;
         CmbTheme.IsEnabled = !follow;
-        if (!follow && _themeFollower is null)
+        if (!follow && _themeChosen && _themeFollower is null)
         {
             PaletteCatalog.Use(_theme);
             return;
@@ -90,6 +94,7 @@ public partial class MainWindow
 
         _themeFollower ??= new SystemThemeFollower(SystemThemeFollower.CreateSource());
         _themeFollower.Chosen = _theme;
+        _themeFollower.ChosenByUser = _themeChosen;
         _themeFollower.Light = _lightTheme;
         _themeFollower.Dark = _darkTheme;
         _themeFollower.Enabled = follow;
@@ -100,6 +105,7 @@ public partial class MainWindow
         _theme = PaletteCatalog.Pick(settings.Theme, false, null, null, null);
         _lightTheme = PaletteCatalog.Pick(settings.LightTheme, false, null, null, null);
         _darkTheme = PaletteCatalog.Pick(settings.DarkTheme, false, null, null, null);
+        _themeChosen = settings.ThemeChosen;
         ChkFollowSystemTheme.IsChecked = settings.FollowSystemTheme;
         MarkChosenTheme();
         ApplyTheme();
@@ -107,6 +113,23 @@ public partial class MainWindow
         ChkReduceMotion.IsChecked = settings.ReduceMotion;
         MotionPreference.UserReduced = settings.ReduceMotion;
         ApplyMotion();
+
+        _fontScale = settings.FontScale;
+        FillTextSizeList();
+    }
+
+    private void FillTextSizeList()
+    {
+        CmbTextSize.ItemsSource = AppSettings.FontScales.Select(scale => (scale / 100.0).ToString("P0", Strings.Culture)).ToArray();
+        CmbTextSize.SelectedIndex = Math.Max(0, AppSettings.FontScales.ToList().IndexOf(_fontScale));
+    }
+
+    private void OnTextSizeChosen()
+    {
+        if (_syncing) return;
+        if (CmbTextSize.SelectedIndex is var at && at >= 0 && at < AppSettings.FontScales.Count)
+            _fontScale = AppSettings.FontScales[at];
+        SaveAppSettings();
     }
 
     private void FillThemePairLists(string[] labels)

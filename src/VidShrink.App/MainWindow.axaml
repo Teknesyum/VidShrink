@@ -1124,7 +1124,7 @@
                                 <ComboBox x:Name="CmbFltSharpen" SelectedIndex="0" auto:AutomationProperties.Name="{loc:Text main.advanced.filters.sharpen}"/>
                               </StackPanel>
                               <StackPanel Spacing="{StaticResource SpaceXs}">
-                                <SarilanMetin Text="{loc:Text main.advanced.filters.rotate}" Theme="{StaticResource Hint}"/>
+                                <SarilanMetin Text="{loc:Text main.advanced.filters.rotate}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                                 <ComboBox x:Name="CmbFltRotate" SelectedIndex="0" auto:AutomationProperties.Name="{loc:Text main.advanced.filters.rotate}"/>
                               </StackPanel>
                               <StackPanel Spacing="{StaticResource SpaceXs}">
@@ -1152,7 +1152,7 @@
                               <SarilanMetin Text="{loc:Text main.advanced.filters.spec}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                               <TextBox x:Name="TxtAdvFilters" VerticalAlignment="Center"
                                        auto:AutomationProperties.Name="{loc:Text main.advanced.filters.label}"/>
-                              <SarilanMetin x:Name="TxtAdvFiltersNow" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
+                              <SarilanMetin x:Name="TxtAdvFiltersNow" Theme="{StaticResource Hint}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding $self.Text}"/>
                             </StackPanel>
                             <SarilanMetin Text="{loc:Text main.advanced.filters.hint}" Theme="{StaticResource Hint}" TextWrapping="Wrap"/>
                           </StackPanel>
@@ -2083,14 +2083,33 @@
                     </StackPanel>
                   </Grid>
 
-                  <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <SarilanMetin Text="{loc:Text settings-tab.default-target.label}" Theme="{StaticResource Label}"/>
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                      <TextBox x:Name="TxtDefaultTargetMb" auto:AutomationProperties.Name="{loc:Text settings-tab.default-target.label}" Width="{StaticResource FieldWidthSm}" TextAlignment="Center"/>
-                      <SarilanMetin Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                  <WrapPanel x:Name="TargetTextSizeRow" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
+                    <StackPanel Spacing="{StaticResource SpaceSm}">
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                        <SarilanMetin Text="{loc:Text settings-tab.default-target.label}" Theme="{StaticResource Label}"/>
+                        <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.default-target.label}">
+                          <ToolTip.Tip>
+                            <SarilanMetin Theme="{StaticResource TipText}" Text="{loc:Text settings-tab.default-target.hint}"/>
+                          </ToolTip.Tip>
+                        </Button>
+                      </Grid>
+                      <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                        <TextBox x:Name="TxtDefaultTargetMb" auto:AutomationProperties.Name="{loc:Text settings-tab.default-target.label}" Width="{StaticResource FieldWidthSm}" TextAlignment="Center"/>
+                        <SarilanMetin Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                      </StackPanel>
                     </StackPanel>
-                    <SarilanMetin Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.default-target.hint}"/>
-                  </StackPanel>
+                    <StackPanel MinWidth="{StaticResource FieldWidthSm}" Spacing="{StaticResource SpaceSm}">
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                        <SarilanMetin Text="{loc:Text settings-tab.text-size.label}" Theme="{StaticResource Label}"/>
+                        <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.text-size.label}">
+                          <ToolTip.Tip>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.text-size.hint}"/>
+                          </ToolTip.Tip>
+                        </Button>
+                      </Grid>
+                      <ComboBox x:Name="CmbTextSize" auto:AutomationProperties.Name="{loc:Text settings-tab.text-size.label}" HorizontalAlignment="Stretch"/>
+                    </StackPanel>
+                  </WrapPanel>
 
                   <CheckBox x:Name="ChkAdvancedDefaultOpen" Theme="{StaticResource CheckStyle}" HorizontalAlignment="Left" Content="{loc:Text settings-tab.advanced-default-open.label}">
                     <ToolTip.Tip>
@@ -2480,6 +2499,7 @@
                          VerticalAlignment="Center"
                          VerticalContentAlignment="Center"
                          MinHeight="0"
+                         FontSize="{StaticResource TitleBarSearchFontSize}"
                          Padding="{StaticResource HeaderButtonPadding}"
                          Width="{StaticResource TitleBarSearchWidth}"
                          Margin="{StaticResource WindowButtonMargin}"

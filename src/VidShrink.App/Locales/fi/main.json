@@ -761,6 +761,8 @@
   "settings-tab.theme.dark": "Tumma",
   "settings-tab.reduce-motion.label": "Poista animaatiot käytöstä",
   "settings-tab.reduce-motion.hint": "Poistaa paneelien liu'ut ja muun liikkeen. Jos järjestelmä pyytää jo vähemmän liikettä, animaatiot pysyvät joka tapauksessa poissa.",
+  "settings-tab.text-size.label": "Tekstin koko",
+  "settings-tab.text-size.hint": "• Suurentaa kaiken ohjelman tekstin.\n• Tulee voimaan, kun ohjelma käynnistetään uudelleen.",
   "settings-tab.language.hint": "Muuttaa käyttöliittymän kielen ja muistetaan seuraavalla käynnistyksellä.",
   "settings-tab.default-target.label": "Oletuskohdekoko",
   "settings-tab.default-target.hint": "Asettaa kohdekoon, jolla Pakkaa-välilehti avautuu.",

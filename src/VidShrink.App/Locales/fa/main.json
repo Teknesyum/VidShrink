@@ -761,6 +761,8 @@
   "settings-tab.theme.dark": "تیره",
   "settings-tab.reduce-motion.label": "خاموش کردن پویانمایی‌ها",
   "settings-tab.reduce-motion.hint": "لغزش پنل‌ها و دیگر حرکت‌ها را خاموش می‌کند. اگر سیستم از قبل حرکت کمتر خواسته باشد، پویانمایی‌ها در هر حال خاموش می‌مانند.",
+  "settings-tab.text-size.label": "اندازهٔ متن",
+  "settings-tab.text-size.hint": "• همهٔ متن‌های برنامه را بزرگ‌تر می‌کند.\n• پس از راه‌اندازی دوبارهٔ برنامه اعمال می‌شود.",
   "settings-tab.language.hint": "زبان رابط را تغییر می‌دهد و در اجرای بعدی به خاطر می‌ماند.",
   "settings-tab.default-target.label": "اندازهٔ هدف پیش‌فرض",
   "settings-tab.default-target.hint": "اندازهٔ هدفی را تعیین می‌کند که زبانهٔ فشرده‌سازی با آن باز می‌شود.",

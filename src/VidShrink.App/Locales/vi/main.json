@@ -761,6 +761,8 @@
   "settings-tab.theme.dark": "Tối",
   "settings-tab.reduce-motion.label": "Tắt hiệu ứng chuyển động",
   "settings-tab.reduce-motion.hint": "Tắt hiệu ứng trượt bảng và các chuyển động khác. Nếu hệ thống đã yêu cầu giảm chuyển động, hiệu ứng vẫn luôn tắt.",
+  "settings-tab.text-size.label": "Cỡ chữ",
+  "settings-tab.text-size.hint": "• Phóng to toàn bộ chữ trong chương trình.\n• Có hiệu lực sau khi khởi động lại chương trình.",
   "settings-tab.language.hint": "Đổi ngôn ngữ giao diện và được ghi nhớ ở lần mở sau.",
   "settings-tab.default-target.label": "Dung lượng mục tiêu mặc định",
   "settings-tab.default-target.hint": "Đặt dung lượng mục tiêu khi tab Nén mở ra.",

@@ -761,6 +761,8 @@
   "settings-tab.theme.dark": "Tumšs",
   "settings-tab.reduce-motion.label": "Izslēgt animācijas",
   "settings-tab.reduce-motion.hint": "Izslēdz paneļu slīdēšanu un citas kustības. Ja sistēma jau prasa mazāk kustību, animācijas tik un tā paliek izslēgtas.",
+  "settings-tab.text-size.label": "Teksta lielums",
+  "settings-tab.text-size.hint": "• Palielina visu programmas tekstu.\n• Stājas spēkā pēc programmas restartēšanas.",
   "settings-tab.language.hint": "Maina saskarnes valodu un tiek atcerēta nākamajā palaišanā.",
   "settings-tab.default-target.label": "Noklusējuma mērķa izmērs",
   "settings-tab.default-target.hint": "Nosaka mērķa izmēru, ar kuru atveras cilne Saspiest.",

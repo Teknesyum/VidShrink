@@ -761,6 +761,8 @@
   "settings-tab.theme.dark": "深色",
   "settings-tab.reduce-motion.label": "关闭动画",
   "settings-tab.reduce-motion.hint": "关闭面板滑动和其他动效。如果系统已要求减少动态效果，动画也会保持关闭。",
+  "settings-tab.text-size.label": "文字大小",
+  "settings-tab.text-size.hint": "• 放大程序中的所有文字。\n• 重新启动程序后生效。",
   "settings-tab.language.hint": "更改界面语言，并在下次启动时保留。",
   "settings-tab.default-target.label": "默认目标大小",
   "settings-tab.default-target.hint": "设置“压缩”标签页打开时的目标大小。",

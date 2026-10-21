@@ -761,6 +761,8 @@
   "settings-tab.theme.dark": "Oscuro",
   "settings-tab.reduce-motion.label": "Desactivar animaciones",
   "settings-tab.reduce-motion.hint": "Desactiva los deslizamientos de paneles y otros movimientos. Si el sistema ya pide menos movimiento, las animaciones siguen desactivadas.",
+  "settings-tab.text-size.label": "Tamaño del texto",
+  "settings-tab.text-size.hint": "• Amplía todo el texto del programa.\n• Se aplica al reiniciar el programa.",
   "settings-tab.language.hint": "Cambia el idioma de la interfaz y se recuerda en el próximo inicio.",
   "settings-tab.default-target.label": "Tamaño de destino por defecto",
   "settings-tab.default-target.hint": "Fija el tamaño de destino con el que abre la pestaña Reducir.",

@@ -1,0 +1,75 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Sistemin yüksek karşıtlık kipinin karşılığı: saf siyah üstünde beyaz yazı, camgöbeği ve sarı vurgu; her metin 7:1'i geçer. -->
+  <!-- Elle yazılmadı: Themes/Palette/seeds.json içindeki standart rollerden
+       (renk-1 … warning) üretildi. Değiştirmek için tohumu düzenle ve
+       VidShrink.PaletteGen aracını çalıştır; komut docs/tema.md içinde. -->
+
+  <Color x:Key="NeonBlueColor">#FF1AEBFF</Color>
+  <Color x:Key="NeonPinkColor">#FFFFFF00</Color>
+  <Color x:Key="NeonPurpleColor">#FFC8A8FF</Color>
+  <Color x:Key="NeonSuccessColor">#FF5CFF5C</Color>
+  <Color x:Key="SurfaceToneColor">#FF0A0A0A</Color>
+  <Color x:Key="AppBgColor">#FF000000</Color>
+  <Color x:Key="TextBodyColor">#FFFFFFFF</Color>
+  <Color x:Key="TextDisabledColor">#FFA6A6A6</Color>
+  <Color x:Key="OnNeonColor">#FF000001</Color>
+  <Color x:Key="PinkTextColor">#FFFF8F8F</Color>
+
+  <Color x:Key="NeonBlueFillColor">#1A1AEBFF</Color>
+  <Color x:Key="NeonBlueHoverColor">#331AEBFF</Color>
+  <Color x:Key="NeonBlueActiveColor">#4D1AEBFF</Color>
+  <Color x:Key="NeonBlueBorderColor">#4D1AEBFE</Color>
+  <Color x:Key="NeonBlueBorderStrongColor">#801AEBFF</Color>
+  <Color x:Key="NeonPinkFillColor">#1AFFFF00</Color>
+  <Color x:Key="NeonPurpleBorderColor">#80C8A8FF</Color>
+
+  <Color x:Key="NeonEmberColor">#FFFF4D4D</Color>
+  <Color x:Key="EmberFlameColor">#FFFF8C1A</Color>
+  <Color x:Key="EmberBlazeColor">#FFFFD24D</Color>
+  <Color x:Key="AtmosHotColor">#FFFFD24E</Color>
+  <Color x:Key="AtmosMidColor">#FFFF8C1B</Color>
+  <Color x:Key="AtmosEdgeColor">#FFFF4D4E</Color>
+  <Color x:Key="EmberDeepColor">#FF040202</Color>
+  <Color x:Key="EmberMidColor">#FF070202</Color>
+  <Color x:Key="EmberEdgeColor">#FF0A0303</Color>
+  <Color x:Key="EmberBarDeepColor">#FF0D0909</Color>
+  <Color x:Key="EmberBarMidColor">#FF110A0A</Color>
+  <Color x:Key="EmberBarEdgeColor">#FF150C0C</Color>
+  <Color x:Key="EmberFlameGlyphColor">#FFFF9E27</Color>
+
+  <Color x:Key="PlaybackScrimColor">#CC000000</Color>
+  <Color x:Key="PlaybackScrimEdgeColor">#00000000</Color>
+  <Color x:Key="PlaybackTitleScrimColor">#E6000000</Color>
+  <Color x:Key="PauseGlossColor">#FFFFFFFE</Color>
+  <Color x:Key="PauseGlossFadeColor">#00FFFFFF</Color>
+
+  <BoxShadows x:Key="GlowBlue">0 0 20 0 #401AEBFF</BoxShadows>
+  <BoxShadows x:Key="GlowPink">0 0 20 0 #40FFFF00</BoxShadows>
+  <BoxShadows x:Key="GlowPurple">0 0 20 0 #40C8A8FF</BoxShadows>
+  <BoxShadows x:Key="GlowNone">0 0 0 0 #00000000</BoxShadows>
+
+  <!-- Standardın rol adları. Themes/Theme.axaml fırçaları bu adlara bağlanır;
+       değer yukarıdaki tek anahtardan gelir, ikinci bir renk yazılmaz. -->
+  <StaticResource x:Key="Renk1Color" ResourceKey="NeonBlueColor"/>
+  <StaticResource x:Key="Renk2Color" ResourceKey="NeonPinkColor"/>
+  <StaticResource x:Key="Renk3Color" ResourceKey="NeonPurpleColor"/>
+  <StaticResource x:Key="Renk2TextColor" ResourceKey="PinkTextColor"/>
+  <StaticResource x:Key="SuccessColor" ResourceKey="NeonSuccessColor"/>
+  <StaticResource x:Key="SurfaceColor" ResourceKey="SurfaceToneColor"/>
+  <StaticResource x:Key="DisabledColor" ResourceKey="TextDisabledColor"/>
+  <StaticResource x:Key="OnRenk1Color" ResourceKey="OnNeonColor"/>
+  <StaticResource x:Key="OnRenk2Color" ResourceKey="OnNeonColor"/>
+  <StaticResource x:Key="OnRenk3Color" ResourceKey="OnNeonColor"/>
+  <StaticResource x:Key="Renk1x10Color" ResourceKey="NeonBlueFillColor"/>
+  <StaticResource x:Key="Renk1x20Color" ResourceKey="NeonBlueHoverColor"/>
+  <StaticResource x:Key="Renk1x30Color" ResourceKey="NeonBlueActiveColor"/>
+  <StaticResource x:Key="Renk2x10Color" ResourceKey="NeonPinkFillColor"/>
+  <StaticResource x:Key="Renk3x50Color" ResourceKey="NeonPurpleBorderColor"/>
+  <StaticResource x:Key="BorderDefaultColor" ResourceKey="NeonBlueBorderColor"/>
+  <StaticResource x:Key="BorderStrongColor" ResourceKey="NeonBlueBorderStrongColor"/>
+  <StaticResource x:Key="DangerColor" ResourceKey="NeonEmberColor"/>
+  <StaticResource x:Key="WarningColor" ResourceKey="EmberBlazeColor"/>
+
+</ResourceDictionary>

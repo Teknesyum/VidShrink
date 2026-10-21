@@ -761,6 +761,8 @@
   "settings-tab.theme.dark": "Dark",
   "settings-tab.reduce-motion.label": "Turn Off Animations",
   "settings-tab.reduce-motion.hint": "• Turns off panel slides and other movement.\n• If the system already asks for less motion, animations stay off anyway.",
+  "settings-tab.text-size.label": "Text Size",
+  "settings-tab.text-size.hint": "• Enlarges all text in the program.\n• Takes effect after the program restarts.",
   "settings-tab.language.hint": "Changes the interface language and is remembered on next launch.",
   "settings-tab.default-target.label": "Default target size",
   "settings-tab.default-target.hint": "Sets the target size the Shrink tab opens with.",

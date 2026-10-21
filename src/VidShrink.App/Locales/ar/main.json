@@ -761,6 +761,8 @@
   "settings-tab.theme.dark": "داكن",
   "settings-tab.reduce-motion.label": "إيقاف الحركات",
   "settings-tab.reduce-motion.hint": "يوقف انزلاق اللوحات والحركات الأخرى. إذا كان النظام يطلب حركة أقل أصلًا، تبقى الحركات متوقفة على أي حال.",
+  "settings-tab.text-size.label": "حجم النص",
+  "settings-tab.text-size.hint": "• يكبّر كل النصوص في البرنامج.\n• يُطبَّق بعد إعادة تشغيل البرنامج.",
   "settings-tab.language.hint": "يغيّر لغة الواجهة ويُحفظ للتشغيل التالي.",
   "settings-tab.default-target.label": "الحجم المستهدف الافتراضي",
   "settings-tab.default-target.hint": "يحدد الحجم المستهدف الذي يفتح به تبويب التقليص.",

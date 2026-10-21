@@ -466,7 +466,7 @@
         <Setter Property="FontSize" Value="{StaticResource FontSizeSm}"/>
         <Setter Property="Padding" Value="{StaticResource HeaderButtonPadding}"/>
         <Setter Property="Margin" Value="{StaticResource WindowButtonMargin}"/>
-        <Setter Property="Height" Value="{StaticResource TargetMinSize}"/>
+        <Setter Property="MinHeight" Value="{StaticResource TargetMinSize}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="CornerRadius" Value="{StaticResource RadiusSquare}"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
@@ -599,7 +599,6 @@
         <Setter Property="BorderBrush" Value="{StaticResource NeonBlue}"/>
         <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
         <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
-        <Setter Property="FontSize" Value="{StaticResource InfoBadgeGlyphSize}"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Cursor" Value="Help"/>
         <Setter Property="Focusable" Value="True"/>
@@ -631,6 +630,7 @@
                 <ContentPresenter Name="PART_ContentPresenter"
                                   Content="{TemplateBinding Content}"
                                   Foreground="{TemplateBinding Foreground}"
+                                  FontSize="{StaticResource InfoBadgeGlyphSize}"
                                   HorizontalContentAlignment="Center"
                                   VerticalContentAlignment="Center"/>
               </Border>
@@ -668,7 +668,6 @@
         <Setter Property="BorderBrush" Value="{StaticResource NeonBlue}"/>
         <Setter Property="BorderThickness" Value="{StaticResource BorderThin}"/>
         <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
-        <Setter Property="FontSize" Value="{StaticResource InfoBadgeGlyphSize}"/>
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Cursor" Value="Help"/>
         <Setter Property="Focusable" Value="True"/>
@@ -700,6 +699,7 @@
                 <ContentPresenter Name="PART_ContentPresenter"
                                   Content="{TemplateBinding Content}"
                                   Foreground="{TemplateBinding Foreground}"
+                                  FontSize="{StaticResource InfoBadgeGlyphSize}"
                                   HorizontalContentAlignment="Center"
                                   VerticalContentAlignment="Center"/>
               </Border>
@@ -1029,7 +1029,7 @@
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="Padding" Value="{StaticResource NavTabPadding}"/>
         <Setter Property="Margin" Value="{StaticResource TabMargin}"/>
-        <Setter Property="Height" Value="{StaticResource TargetMinSize}"/>
+        <Setter Property="MinHeight" Value="{StaticResource TargetMinSize}"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="Transparent"/>

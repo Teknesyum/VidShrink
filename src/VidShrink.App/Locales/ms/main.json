@@ -761,6 +761,8 @@
   "settings-tab.theme.dark": "Gelap",
   "settings-tab.reduce-motion.label": "Matikan animasi",
   "settings-tab.reduce-motion.hint": "Mematikan gelongsor panel dan pergerakan lain. Jika sistem sudah meminta kurang pergerakan, animasi tetap dimatikan.",
+  "settings-tab.text-size.label": "Saiz teks",
+  "settings-tab.text-size.hint": "• Membesarkan semua teks dalam program.\n• Berkuat kuasa selepas program dimulakan semula.",
   "settings-tab.language.hint": "Mengubah bahasa antara muka dan diingati pada pelancaran seterusnya.",
   "settings-tab.default-target.label": "Saiz sasaran lalai",
   "settings-tab.default-target.hint": "Menetapkan saiz sasaran yang tab Kecilkan buka dengannya.",

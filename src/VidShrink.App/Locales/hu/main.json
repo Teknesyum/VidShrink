@@ -761,6 +761,8 @@
   "settings-tab.theme.dark": "Sötét",
   "settings-tab.reduce-motion.label": "Animációk kikapcsolása",
   "settings-tab.reduce-motion.hint": "Kikapcsolja a panelek csúszását és más mozgást. Ha a rendszer már kevesebb mozgást kér, az animációk így is kikapcsolva maradnak.",
+  "settings-tab.text-size.label": "Szövegméret",
+  "settings-tab.text-size.hint": "• Felnagyítja a program összes szövegét.\n• A program újraindítása után lép életbe.",
   "settings-tab.language.hint": "Megváltoztatja a felület nyelvét, és a következő indításkor megmarad.",
   "settings-tab.default-target.label": "Alapértelmezett célméret",
   "settings-tab.default-target.hint": "Beállítja, milyen célmérettel nyílik a Tömörítés lap.",

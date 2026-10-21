@@ -761,6 +761,8 @@
   "settings-tab.theme.dark": "Escuro",
   "settings-tab.reduce-motion.label": "Desativar animações",
   "settings-tab.reduce-motion.hint": "Desativa os deslizes de painéis e outros movimentos. Se o sistema já pede menos movimento, as animações ficam desativadas de qualquer forma.",
+  "settings-tab.text-size.label": "Tamanho do texto",
+  "settings-tab.text-size.hint": "• Aumenta todo o texto do programa.\n• Aplica-se ao reiniciar o programa.",
   "settings-tab.language.hint": "Muda o idioma da interface e é lembrado na próxima abertura.",
   "settings-tab.default-target.label": "Tamanho alvo padrão",
   "settings-tab.default-target.hint": "Define o tamanho alvo com que a aba Reduzir abre.",

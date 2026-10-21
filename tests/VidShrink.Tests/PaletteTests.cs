@@ -128,7 +128,7 @@ public sealed class PaletteTests
     public void PaletDosyalariTohumdanYenidenUretilir()
     {
         var seeds = Seeds();
-        Assert.Equal(36, seeds.Count);
+        Assert.Equal(37, seeds.Count);
 
         var drift = seeds
             .Where(seed => File.ReadAllText(Address(seed.Name)).Replace("\r\n", "\n", StringComparison.Ordinal)
@@ -142,7 +142,7 @@ public sealed class PaletteTests
     }
 
     /// <summary>
-    /// 36 paletin kaynağı: 26'sı projenin, 9'u standardın tema kalıpları, biri standardın kendi
+    /// 37 paletin kaynağı: 27'si projenin, 9'u standardın tema kalıpları, biri standardın kendi
     /// teması. Hiçbiri silinmedi; kaynak kayarsa ya da bir palet düşerse sayım kırmızı yanar.
     /// </summary>
     [Fact]
@@ -153,7 +153,7 @@ public sealed class PaletteTests
                 : seed.Source)
             .ToDictionary(group => group.Key, group => group.Select(seed => seed.Name).ToArray());
 
-        Assert.Equal(26, bySource[PaletteSeed.ProjectSource].Length);
+        Assert.Equal(27, bySource[PaletteSeed.ProjectSource].Length);
         Assert.Equal(new[] { "Gece", "Grafit", "Kadife", "Kor", "Buz", "Kagit", "Kar", "Keskin", "Kirik" },
             bySource["temalar"]);
         Assert.Equal(new[] { PaletteCatalog.Default }, bySource[PaletteSeed.OwnSource]);

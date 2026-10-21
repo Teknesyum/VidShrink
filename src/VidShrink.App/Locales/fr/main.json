@@ -761,6 +761,8 @@
   "settings-tab.theme.dark": "Sombre",
   "settings-tab.reduce-motion.label": "Désactiver les animations",
   "settings-tab.reduce-motion.hint": "Désactive les glissements de panneaux et les autres mouvements. Si le système demande déjà moins de mouvement, les animations restent désactivées.",
+  "settings-tab.text-size.label": "Taille du texte",
+  "settings-tab.text-size.hint": "• Agrandit tout le texte du programme.\n• Prend effet au redémarrage du programme.",
   "settings-tab.language.hint": "Change la langue de l'interface et est mémorisée au prochain lancement.",
   "settings-tab.default-target.label": "Taille cible par défaut",
   "settings-tab.default-target.hint": "Définit la taille cible avec laquelle l'onglet Réduire s'ouvre.",

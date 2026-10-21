@@ -761,6 +761,8 @@
   "settings-tab.theme.dark": "இருள்",
   "settings-tab.reduce-motion.label": "அசைவுகளை நிறுத்து",
   "settings-tab.reduce-motion.hint": "பலக நகர்வுகளையும் பிற அசைவுகளையும் முடக்கும். கணினி ஏற்கனவே குறைந்த அசைவைக் கேட்டால், அசைவூட்டங்கள் எப்படியும் முடக்கத்தில் இருக்கும்.",
+  "settings-tab.text-size.label": "உரை அளவு",
+  "settings-tab.text-size.hint": "• நிரலில் உள்ள எல்லா உரையையும் பெரிதாக்கும்.\n• நிரலை மீண்டும் தொடங்கிய பிறகு நடைமுறைக்கு வரும்.",
   "settings-tab.language.hint": "இடைமுக மொழியை மாற்றும், அடுத்த தொடக்கத்தில் நினைவில் இருக்கும்.",
   "settings-tab.default-target.label": "இயல்பு இலக்கு அளவு",
   "settings-tab.default-target.hint": "சுருக்கு தாவல் திறக்கும் இலக்கு அளவை அமைக்கும்.",
