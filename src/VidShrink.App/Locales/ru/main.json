@@ -917,6 +917,7 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Отброшено: кодек не поддерживается",
   "main.preset.handbrake.dropped.structural": "Пропущено: структура списка HandBrake",
   "main.share.qr": "QR-код ссылки для общего доступа",
+  "main.share.link": "Ссылка для общего доступа",
   "main.share.qr-hint": "Отсканируйте телефоном, чтобы открыть ссылку.",
   "main.startup.no-display": "{app} не удалось открыть графический дисплей. Запустите его из сеанса рабочего стола; в Wayland необходим Xwayland.",
   "main.about.guide": "Руководство пользователя",

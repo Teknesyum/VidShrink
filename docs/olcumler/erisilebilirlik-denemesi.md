@@ -77,20 +77,71 @@ etiket anahtarlarından, yeni metin anahtarı yok. Kapalı bölümlerdeki girdil
 ayar adı, özel çözünürlük) Tab yürüyüşüne girmediği için ayrıca biçimlemeden pimleniyor
 (`AnaPenceredeAdsizGirdiAlaniKalmaz`).
 
+## İkinci Tur (2026-10-20)
+
+Later 78'in kalanı. Ölçü aynı dosyada; dört yeni ölçü eklendi.
+
+### Shift+Tab Yönü
+
+Yedi kolun hepsinde Shift+Tab ileri yürüyüşün duraklarını tam ters sırayla dolaşıyor ve
+seçili sekme düğmesine dönüyor; takılma yok (`ShiftTabAyniDuraklariTersSirayaYurur`).
+Şerit düzeltmesi (`SekmeSeridiniSabitle`) bozulunca Shift+Tab da tuzağa düşüyor: yedi kolun
+altısında `BtnMinimize`, Ayarlar'da `TxtSettingsSearch` üstünde kalıyor.
+
+### Alan Başına Tek Tab Durağı
+
+Alan etiketinin yanındaki "?" rozeti (`InfoButtonBesideLabel`) artık Tab durağı değil
+(`Themes/Controls.axaml`, `IsTabStop=False`). Rozetin ipucu kaybolmasın
+diye `src/VidShrink.App/AlanYardimi.cs` her rozeti etiketten sonraki ilk odaklanabilir alanla
+eşler:
+
+- İpucu metni alanın `AutomationProperties.HelpText`'ine yazılır, UIA'da alanın açıklaması
+  olur (sesli okunuşu dinlenmedi). Madde imleri atılır, dil değişince yeniden yazılır.
+- Alan odaktayken F1 rozetin ipucunu açar; odak alandan çıkınca kapanır. F1 o alanda yardım
+  sayfasını açmaz. Başka yerde F1 eskisi gibi yardım sayfası.
+
+Etiketsiz duran tek başına rozetler (`InfoButton`: tahmini süre, tahmini çıktı, paylaşım
+hedefi) alana bağlı değil, Tab durağı olarak kaldı.
+
+Durak sayıları (sekme düğmesi hariç):
+
+| Sekme | Önce | Şimdi |
+|---|---|---|
+| Oynatıcı | 16 | 15 |
+| Düzenleyici | 17 | 16 |
+| Küçült (boş) | 28 | 27 |
+| Küçült (kaynak yüklü) | 33 | 32 |
+| Dönüştür | 40 | 28 |
+| Kaydedici | 25 | 24 |
+| Ayarlar | 63 | 53 |
+
+Rozeti olmayan beş kolda da bir durak eksildi. Bu dalın değişikliği o sekmelere dokunmuyor;
+farkın kaynağı ayrıca ölçülmedi.
+
+Kaydedicinin ad deseni açılır panelindeki rozet de aynı temayı kullanıyor, ölçü yürüyüşüne
+girmiyor (panel kapalı).
+
+### Hedef Çiplerinde Birim
+
+Sayı çipleri (8, 16, 25, 100, 134, 180) artık "8 MB" diye okunuyor. Mevcut
+`main.unit.mb-value` anahtarı kullanıldı, yeni anahtar gerekmedi; Fransızca "8 Mo"
+(`HedefYongalariBirimleOkunur`). "Arşiv" ve "Yarısı" zaten sözcük.
+
+### Paylaşım Bağlantısı Kutuları
+
+Dört kutu (`MainWindow`, `ShrinkJobWindow`, düzenleyici, kaydedici) `main.share.link`
+("Paylaşım bağlantısı") adını taşıyor. Anahtar 42 dilin hepsine çevrildi.
+`AnaPenceredeAdsizGirdiAlaniKalmaz` artık hiçbir istisna kabul etmiyor.
+
 ## Açık Kalanlar
 
-- **Etiket düğmeleri fazla durak:** alan etiketleri ("Kapsayıcı" vb.) yardım ipucu açan
-  odaklanabilir düğmeler. Her alan iki Tab durağı oluyor. Büyük iş, ayrı başlık ister.
-- **Çiplerde birim okunmuyor:** Küçült hedef çipleri yalnız sayıyı okutuyor ("8", "16").
-  Yeni metin anahtarı ister.
-- **Paylaşım bağlantısı kutuları adsız:** `TxtShareLink` (ana pencere, `ShrinkJobWindow`),
-  düzenleyici ve kaydedicideki eşleri. Ekran okuyucu adresi değer olarak okuyor, uygun anahtar
-  yok.
-- **Shift+Tab yönü ölçülmedi.**
-- **Sesli deneme yapılmadı:** Anlatıcı'nın konuşması bu oturumda dinlenemedi, NVDA kurulu
-  değil. Okunacak ad UIA ağacından ölçüldü. Sesli deneme bir kişiyle yapılmalı.
+- **Sesli deneme yapılmadı:** Anlatıcı'nın konuşması dinlenemiyor, NVDA kurulu değil.
+  Okunacak ad ve açıklama UIA'dan ölçüldü. Bir kişinin dinlemesi gerekiyor: özellikle
+  `HelpText`'in Anlatıcı'da ve NVDA'da ne zaman okunduğu.
 - **macOS VoiceOver:** o makinede ayrıca yapılacak.
 
 ## Mutasyon
 
 Altı python mutasyonunun altısı kırmızı (8 kol): şerit öğesini geri yazmamak 7, işleyiciyi bağlamamak 7, `CmbContainer` adını kaldırmak 2, ses adını ham anahtarla yazmak 1, `Player` adını kaldırmak 1, `TxtQualityTarget` adını kaldırmak 2.
+
+İkinci tur, iki mutasyon turu, elle geri yazıldı. A turu (rozet `IsTabStop` setter'ı silindi, dil değişiminde çip adı yazılmadı, ana penceredeki `TxtShareLink` adı silindi): beş kırmızı (Dönüştür ve Ayarlar yürüyüşü, çip, adsız girdi, rozet ölçüsü). B turu (alanın `HelpText`'i yazılmadı, şerit sabitlemesi kapatıldı): 8/8 kırmızı (yedi Shift+Tab kolu, rozet ölçüsü).

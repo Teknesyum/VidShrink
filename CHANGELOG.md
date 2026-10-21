@@ -9,7 +9,13 @@ made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md
 
 ## [Unreleased]
 
-### Added
+### Changed
+
+- Every labelled field is now a single Tab stop: the "?" badge beside a field label no
+  longer takes focus from the keyboard. Its help is read by screen readers as the field's
+  description, and F1 on the field opens it.
+- Screen readers read the target size chips with their unit ("8 MB") and the share link
+  boxes by name.
 
 ### Fixed
 

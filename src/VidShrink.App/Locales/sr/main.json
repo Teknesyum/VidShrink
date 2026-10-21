@@ -917,6 +917,7 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Izostavljeno: kodek nije podržan",
   "main.preset.handbrake.dropped.structural": "Preskočeno: struktura liste HandBrake-a",
   "main.share.qr": "QR kod linka za deljenje",
+  "main.share.link": "Link za deljenje",
   "main.share.qr-hint": "Skenirajte telefonom da biste otvorili link.",
   "main.startup.no-display": "{app} nije mogao da otvori grafički ekran. Pokrenite ga iz sesije radne površine; na Waylandu mora biti dostupan Xwayland.",
   "main.about.guide": "Упутство за употребу",

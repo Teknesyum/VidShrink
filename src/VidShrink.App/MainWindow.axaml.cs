@@ -202,6 +202,7 @@ public partial class MainWindow : Window
         BuildThemeList();
         Strings.Changed += OnLanguageChanged;
         ShowSourceName();
+        YongalariAdlandir();
         RefreshOutputNamePreview();
         RefreshPlatforms();
 
@@ -1239,6 +1240,7 @@ public partial class MainWindow : Window
         ShowSourceName();
         ApplyFlowDirection();
         RefreshChoiceLabels();
+        YongalariAdlandir();
         ApplyFastGpuTip();
         _preview?.SetLanguage(Strings.Language);
         if (_activeRetryPrompt is { } pendingPrompt) ShowRetryAsk(pendingPrompt);

@@ -917,6 +917,7 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Düştü: kodek desteklenmiyor",
   "main.preset.handbrake.dropped.structural": "Atlandı: HandBrake liste yapısı",
   "main.share.qr": "Paylaşım bağlantısının QR kodu",
+  "main.share.link": "Paylaşım bağlantısı",
   "main.share.qr-hint": "Bağlantıyı telefonda açmak için okutun.",
   "main.startup.no-display": "{app} grafik ekranı açamadı. Bir masaüstü oturumundan başlatın; Wayland'de Xwayland kurulu olmalı.",
   "main.about.guide": "Kullanım kılavuzu",

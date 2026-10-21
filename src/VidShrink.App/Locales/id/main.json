@@ -917,6 +917,7 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Dibuang: codec tidak didukung",
   "main.preset.handbrake.dropped.structural": "Dilewati: struktur daftar HandBrake",
   "main.share.qr": "Kode QR untuk tautan berbagi",
+  "main.share.link": "Tautan berbagi",
   "main.share.qr-hint": "Pindai dengan ponsel untuk membuka tautan.",
   "main.startup.no-display": "{app} tidak dapat membuka tampilan grafis. Jalankan dari sesi desktop; di Wayland, Xwayland harus tersedia.",
   "main.about.guide": "Panduan penggunaan",

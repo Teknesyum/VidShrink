@@ -917,6 +917,7 @@
   "main.preset.handbrake.dropped.unsupported-codec": "Borttagen: codec stöds inte",
   "main.preset.handbrake.dropped.structural": "Hoppades över: HandBrakes liststruktur",
   "main.share.qr": "QR-kod för delningslänken",
+  "main.share.link": "Delningslänk",
   "main.share.qr-hint": "Skanna med telefonen för att öppna länken.",
   "main.startup.no-display": "{app} kunde inte öppna en grafisk skärm. Starta programmet från en skrivbordssession; under Wayland måste Xwayland finnas.",
   "main.about.guide": "Användarguide",

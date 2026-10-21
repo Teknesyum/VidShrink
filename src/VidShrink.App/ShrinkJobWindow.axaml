@@ -281,6 +281,7 @@
             RowSpacing="{StaticResource SpaceMd}">
         <TextBox Grid.Column="0"
                  x:Name="TxtShareLink"
+                 auto:AutomationProperties.Name="{loc:Text main.share.link}"
                  IsReadOnly="True"
                  FontFamily="{StaticResource FontMono}"
                  VerticalAlignment="Center"/>
