@@ -22,9 +22,12 @@ internal static class AppDataArchive
 
     internal static readonly IReadOnlyList<string> SecretKeys = new[] { "openSubtitlesApiKey" };
 
+    internal static readonly IReadOnlyList<string> MachineStateFiles = new[] { Recorder.DesktopIconGuard.StateFileName };
+
     /// <summary>Pakete girebilen dosya adları.</summary>
     internal static IReadOnlyList<string> EntryNames { get; } = AppDataReset.FileNames
-        .Where(name => !SecretFiles.Contains(name, StringComparer.OrdinalIgnoreCase))
+        .Where(name => !SecretFiles.Contains(name, StringComparer.OrdinalIgnoreCase)
+            && !MachineStateFiles.Contains(name, StringComparer.OrdinalIgnoreCase))
         .ToList();
 
     /// <summary>Var olan dosyaları zip'e yazar; pakete giren adlar döner.</summary>

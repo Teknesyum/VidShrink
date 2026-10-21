@@ -131,6 +131,8 @@ public partial class App : Application
                 {
                     try { main.PencereKonumunuGeriYukle(); }
                     catch (Exception) { }
+                    RestoreDesktopIcons();
+                    desktop.Exit += (_, _) => RestoreDesktopIcons();
                     desktop.Exit += (_, _) =>
                     {
                         try { main.KapanistaGuncelle(); }
@@ -149,6 +151,13 @@ public partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private static void RestoreDesktopIcons()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        try { Recorder.DesktopIconGuard.ForSettings(Recorder.RecorderSettings.FilePath).Restore(); }
+        catch (Exception) { }
     }
 
     /// <summary>

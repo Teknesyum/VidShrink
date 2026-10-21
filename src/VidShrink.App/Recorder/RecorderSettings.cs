@@ -117,6 +117,8 @@ internal sealed partial class RecorderSettings
 
     internal bool LivePreview { get; set; }
 
+    internal bool HideDesktopIcons { get; set; }
+
     internal int ReplaySeconds { get; set; } = ReplayBuffer.DefaultSeconds;
 
     /// <summary>
@@ -355,6 +357,7 @@ internal sealed partial class RecorderSettings
             if (Enum.TryParse<PointerColor>((string?)root["leftClickColor"], true, out var leftClickColor) && Enum.IsDefined(leftClickColor)) settings.LeftClickColor = leftClickColor;
             if (Enum.TryParse<PointerColor>((string?)root["rightClickColor"], true, out var rightClickColor) && Enum.IsDefined(rightClickColor)) settings.RightClickColor = rightClickColor;
             settings.LivePreview = (bool?)root["livePreview"] ?? false;
+            settings.HideDesktopIcons = (bool?)root["hideDesktopIcons"] ?? false;
             if ((int?)root["replaySeconds"] is { } replay && Array.IndexOf(ReplayBuffer.SecondsChoices, replay) >= 0) settings.ReplaySeconds = replay;
             if (RecorderHotkeys.Read((string?)root["hotkeys"]) is { } hotkeys) settings.Hotkeys = RecorderHotkeys.Write(hotkeys);
             if (Enum.TryParse<RecorderTargetKind>((string?)root["target"], true, out var target)) settings.Target = target;
@@ -497,6 +500,7 @@ internal sealed partial class RecorderSettings
                 writer.WriteString("leftClickColor", LeftClickColor.ToString());
                 writer.WriteString("rightClickColor", RightClickColor.ToString());
                 writer.WriteBoolean("livePreview", LivePreview);
+                writer.WriteBoolean("hideDesktopIcons", HideDesktopIcons);
                 writer.WriteNumber("replaySeconds", ReplaySeconds);
                 writer.WriteString("hotkeys", Hotkeys);
                 writer.WriteString("target", Target.ToString());

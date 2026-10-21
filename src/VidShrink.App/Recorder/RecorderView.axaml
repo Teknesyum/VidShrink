@@ -792,7 +792,7 @@
 
             <izi:SutunIzgara MaxColumns="2" Uniform="True"
                              ColumnSpacing="{StaticResource SpaceMd}"
-                             RowSpacing="{StaticResource SpaceSm}">
+                             RowSpacing="{StaticResource SpaceXs}">
               <CheckBox x:Name="ChkCursor"
                         Theme="{StaticResource CheckStyle}"
                         Content="{loc:Text recorder.option.cursor}"
@@ -826,6 +826,12 @@
                         Content="{loc:Text recorder.option.live-preview}"
                         ToolTip.Tip="{loc:Text recorder.option.live-preview-hint}"
                         auto:AutomationProperties.Name="{loc:Text recorder.option.live-preview}"/>
+              <CheckBox x:Name="ChkHideIcons"
+                        Theme="{StaticResource CheckStyle}"
+                        Content="{loc:Text recorder.option.hide-desktop-icons}"
+                        ToolTip.Tip="{loc:Text recorder.option.hide-desktop-icons-hint}"
+                        ToolTip.ShowOnDisabled="True"
+                        auto:AutomationProperties.Name="{loc:Text recorder.option.hide-desktop-icons}"/>
             </izi:SutunIzgara>
 
             <SarilanMetin Text="{loc:Text recorder.pointer.title}"
@@ -1090,10 +1096,9 @@
                         auto:AutomationProperties.Name="{loc:Text recorder.replay.seconds}"/>
             </StackPanel>
 
-            <WrapPanel>
+            <WrapPanel ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
               <Button x:Name="BtnReplay"
                       MinHeight="{StaticResource RecorderButtonSize}"
-                      Margin="{StaticResource WrapItemMargin}"
                       Theme="{StaticResource GhostButton}"
                       Content="{loc:Text recorder.replay.start}"
                       auto:AutomationProperties.Name="{loc:Text recorder.replay.start}"
@@ -1101,7 +1106,6 @@
 
               <Button x:Name="BtnReplaySave"
                       MinHeight="{StaticResource RecorderButtonSize}"
-                      Margin="{StaticResource WrapItemMargin}"
                       Theme="{StaticResource GhostButton}"
                       IsVisible="False"
                       auto:AutomationProperties.Name="{loc:Text recorder.replay.save}"

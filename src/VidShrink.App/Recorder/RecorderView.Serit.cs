@@ -138,6 +138,7 @@ internal partial class RecorderView
 
         if (!await CountdownAsync() || _session is not null) return;
 
+        HideDesktopIconsForRecording();
         PauseLevels();
         try
         {
@@ -155,6 +156,7 @@ internal partial class RecorderView
         catch (Exception ex) when (ex is InvalidOperationException or IOException or UnauthorizedAccessException or ArgumentException)
         {
             _session = null;
+            RestoreDesktopIcons();
             WriteDiagnostic(request, null, ex.Message);
             ShowError(Say("recorder.error.start", ex.Message));
         }
@@ -216,6 +218,7 @@ internal partial class RecorderView
             _frameRegion = null;
             _stopping = false;
             FrameHiddenByUser = false;
+            RestoreDesktopIcons();
             RestartLevels();
             RefreshSerit();
         }
@@ -279,6 +282,7 @@ internal partial class RecorderView
             _frameRegion = null;
             _stopping = false;
             FrameHiddenByUser = false;
+            RestoreDesktopIcons();
             RestartLevels();
             RefreshSerit();
         }
