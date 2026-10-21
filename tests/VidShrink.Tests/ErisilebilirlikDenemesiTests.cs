@@ -163,6 +163,8 @@ public sealed class ErisilebilirlikDenemesiTests
             {
                 w.Show();
                 Dongu(() => w.IsLoaded, 10);
+                VidShrink.App.Localization.Strings.Use("tr");
+                Dongu(() => false, 0.3);
                 var rozetler = new HashSet<Button>();
                 for (var sekme = 0; sekme < w.Tabs.ItemCount; sekme++)
                 {

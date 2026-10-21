@@ -1329,6 +1329,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-18, OTIO aktarimi (yan/otio): sekiz yeni <c>editor.otio.*</c> anahtarindan 12 kol (en 4, ro 4, fr, nl, pt, tr birer), KOL dokumunden ve SAYIM satirindan olculdu: toplam 3970 + 12 = 3982, en 383 + 4 = 387, tr 129 + 1 = 130.</para>
     /// <para>2026-10-18, kamera ana kaynak (later 69): iki yeni anahtar (<c>recorder.target.device</c>, <c>.device-pick</c>); yalniz <c>recorder.target.device</c> 6 dilde kola giriyor (en, nl, pt, ro, sw, tr), KOL dokumunden ve SAYIM satirindan olculdu: toplam 3948 + 6 = 3954, en 381 + 1 = 382, tr 127 + 1 = 128.</para>
     /// <para>2026-10-18, akis kalite secimi (later 83): iki yeni anahtar (<c>player.tracks.quality</c>, <c>.rate</c>); yalniz <c>player.tracks.quality</c> es ve pt dillerinde kola giriyor, KOL dokumunden ve SAYIM satirindan olculdu, en ve tr girmiyor: toplam 3970 + 2 = 3972, en 383, tr 129.</para>
+    /// <para>2026-10-20, later 78: <c>main.share.link</c> 42 dilde; fr, pt, ro kola giriyor (KOL dokumu), en ve tr degismedi: toplam 4074 + 3 = 4077.</para>
     /// <para>2026-10-18, ad VidShrink Player oldu: <c>{app}</c> iki sozcuge acilinca ja ve th dillerinde bes anahtar kola giriyor (<c>main.preset.handbrake.dropped.engine-decides</c>, <c>.no-equivalent</c> ikiser, ja <c>settings.update.portable-effect</c>), cs <c>shell.menu.open</c> cikiyor; KOL dokumu main ile karsilastirildi, en ve tr degismedi; testin olctugu toplam 4069'dan 4074'e cikti.</para>
     /// </summary>
     [Fact]
@@ -1355,7 +1356,7 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(4074, toplam);
+        Assert.Equal(4077, toplam);
         Assert.Equal(393, dilBasina["en"]);
         Assert.Equal(132, dilBasina["tr"]);
     }
@@ -1666,6 +1667,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-18, ve 60: toplam 3987 + 14 = 4001, en 384, tr 130; gezilen 87505 + 387 = 87892.</para>
     /// <para>2026-10-18, LUT (yedi <c>editor.clip.lut.*</c> anahtari 42 dilde, dusen yok): en, fr, hu, ro <c>.unreadable</c>, lt <c>.none</c>, sv <c>.load</c> kola giriyor (KOL dokumu): toplam 3970 + 6 = 3976, en 384, tr 129; gezilen 86645 + 7 x 43 = 86946.</para>
     /// <para>2026-10-18, 87, 88, 89, ses kisma, OTIO ve LUT main'de birlikte: olculen toplam 4044, en 393, tr 132; gezilen 89249.</para>
+    /// <para>2026-10-20, later 78: <c>main.share.link</c> 42 dilde: gezilen 89698 + 43 = 89741.</para>
     /// <para>2026-10-18, main CI duzeltmesi: 87 ve 88'in on iki duzenleyici anahtari 40 dile cevrildi, player.tracks.quality.rate dustu (birim main.unit.kbps-value'dan): olculen toplam 4070, en 393, tr 132; gezilen 89698.</para>
     /// <para>2026-10-18, ad yer tutucusu: uygulama adi cevirilerde {app} oldu, ekli adlar tur adiyla kuruldu; cs shell.menu.open "ve VidShrinku" yerine "v aplikaci {app}" oldugu icin kol sayimindan dustu: olculen toplam 4069, en 393, tr 132.</para>
     /// <para>2026-10-16, later 44 (etiket ve Onar): on sekiz yeni anahtar; olculen toplam 3781 + 2 = 3783 (lt main.convert.tags.cover.none, ro main.convert.tags.year), en 364, tr 123, gezilen 80453 + 774 = 81227.</para>
@@ -1706,7 +1708,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(89698, gezilen);
+        Assert.Equal(89741, gezilen);
         Assert.Empty(kayip);
     }
 
