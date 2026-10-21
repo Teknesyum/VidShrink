@@ -810,6 +810,12 @@
                         Content="{loc:Text recorder.option.live-preview}"
                         ToolTip.Tip="{loc:Text recorder.option.live-preview-hint}"
                         auto:AutomationProperties.Name="{loc:Text recorder.option.live-preview}"/>
+              <CheckBox x:Name="ChkHideIcons"
+                        Theme="{StaticResource CheckStyle}"
+                        Content="{loc:Text recorder.option.hide-desktop-icons}"
+                        ToolTip.Tip="{loc:Text recorder.option.hide-desktop-icons-hint}"
+                        ToolTip.ShowOnDisabled="True"
+                        auto:AutomationProperties.Name="{loc:Text recorder.option.hide-desktop-icons}"/>
             </izi:SutunIzgara>
 
             <SarilanMetin Text="{loc:Text recorder.pointer.title}"

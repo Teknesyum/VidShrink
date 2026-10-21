@@ -7,6 +7,16 @@ All notable changes to VidShrink Player are recorded here. The format follows
 The history of the program under its old name, VidShrink, up to 1.2.24 and the changes
 made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md).
 
+## [Unreleased]
+
+### Added
+
+- The recorder can hide the desktop icons while recording (Windows, off by default). The icons come
+  back when the recording ends or is discarded, and on the next start if the program closed
+  unexpectedly. Icons that were already hidden are left alone. On macOS and Linux the option is
+  shown disabled with a hint. Muting notifications during recording is not offered: Windows has no
+  documented way to do it.
+
 ## [0.0.1]
 
 ### Changed

@@ -59,6 +59,7 @@ internal partial class RecorderView : UserControl
         InitializeComponent();
         HideUnavailableInputOptions();
         _settings = RecorderSettings.Load(_settingsPath);
+        ApplyDesktopIconsSupport(OperatingSystem.IsWindows());
         InitHedef();
         InitSecici();
         InitDuzenleyici();

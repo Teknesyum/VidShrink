@@ -308,6 +308,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P15 · Kaydedici · iş orta · öncelik 2 · karar sahibin
 
 - Satırlar (EKB-P15): EKB-20 Bildirim susturma; EKB-21 Masaüstü simgelerini gizleme. [Tablo](piyasa/2026-10-13/kaydedici-sunum-dogrulanmis.md)
+- Durum (21 Ekim 2026, `worktree-agent-later-126`): EKB-21 bitti — kaydedicide "Masaüstü simgelerini gizle" seçeneği, varsayılan kapalı; kayıt başlarken simgeler gizlenir, bitince, iptalde ve çökmeden sonraki açılışta geri gelir (durum `masaustu-simgeleri.gizlendi` dosyasında), kullanıcı zaten gizlediyse dokunulmaz, Windows dışında kutu kapalı ve ipuçlu (`KaydediciMasaustuSimgeTests`). EKB-20 bildirim susturma — karar: hayır; Windows'ta belgeli yolu yok, yapılmayacak. Açık: gerçek Windows masaüstünde (Windows 10 ve 11) bir kayıtla elle deneme.
 - Dokunacağı yer: src/VidShrink.App/Recorder/, src/VidShrink.App/Recorder/RecorderSettings.cs, src/VidShrink.App/Recorder/RecorderView.axaml, src/VidShrink.App/Locales/
 - Sahibin kararı: Uygulama kayıt sırasında sistemin bildirim ayarına ve masaüstü simgelerine dokunsun mu.
 - Plan: Kayıt başlarken bildirimler susturulur ve masaüstü simgeleri gizlenir, bitince eski durum geri yüklenir; eski durum diske yazılır ki çökmeden sonra açılışta geri alınsın. Windows'ta bildirim susturmanın belgeli yolu doğrulanmadı; bulunamazsa EKB-20 yapılmaz, yalnız simge gizleme teslim edilir. EKB-20 kardeş tablodaki EKA-27 ile aynı iştir. Geri yükleme sahte sistem katmanıyla, çökme senaryosu dahil ölçülür.
