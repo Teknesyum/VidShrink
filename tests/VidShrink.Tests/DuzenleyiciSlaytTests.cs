@@ -28,11 +28,7 @@ public sealed class DuzenleyiciSlaytTests
         return klasor;
     }
 
-    private static void Kapat(string klasor)
-    {
-        if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
-        KanitKapanisi.Kapat(Kok);
-    }
+    private static void Kapat(string klasor) => KanitKapanisi.Kapat(Kok, Path.GetFileName(klasor));
 
     private static string Sahte(string klasor, string ad)
     {
