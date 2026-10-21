@@ -158,8 +158,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 - Satırlar (EKA-P2): EKA-01 Uygulama başına ses. [Tablo](piyasa/2026-10-13/kaydedici-yakalama-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Ffmpeg/WasapiLoopbackCapture.cs, src/VidShrink.Ffmpeg/SystemAudioCapture.cs, src/VidShrink.Ffmpeg/LoopbackFeed.cs, src/VidShrink.App/Recorder/RecorderView.Ses.cs
-- Sahibin kararı: Uygulama başına ses yeni bir Windows ses arabirimi ister ve eski Windows 10 yapılarında çalışmaz; orada ve Windows dışında seçenek gizlensin mi, kapalı mı görünsün.
-- Plan: Bugünkü sistem sesi kaynağının yanına süreç geri döngüsü kaynağı eklenir: `ActivateAudioInterfaceAsync` çağrısı `AUDIOCLIENT_PROCESS_LOOPBACK_PARAMS` ile seçilen programın sesini verir, ham ses aynı adlandırılmış borudan ffmpeg'e gider. Ses panelinde ses çalan programların listesi çıkar; Windows sürümü yetmiyorsa seçenek sahibin kararına göre gizlenir ya da kapalı görünür. Ölçü `ISystemAudioCapture` (`SystemAudioCapture.cs:24`) için sahte kaynakla yazılır; gerçek deneme iki program aynı anda ses çalarken elle yapılır.
+- Durum (20 Ekim 2026, `worktree-agent-later-105-106`): yapıldı. Ses kutusunda "Uygulama: <ad>" öğeleri (`AppAudioSessions`, ses oturumu açık programlar); kaynak `ProcessLoopbackCapture` (`ActivateAudioInterfaceAsync` + `VAD\Process_Loopback`), aynı boru yolu. Windows 10 2004 (yapı 19041) altında ve Windows dışında öğe kapalı görünür, ipucu `recorder.audio.app.requires`. Sürüm kapısı ve argüman üretimi `UygulamaSesiTests`te. Açık: iki program aynı anda ses çalarken elle deneme; program yeniden açılıp pid değişince yeniden bağlanma gerçekte denenmedi.
 
 ## 106. Kayıt Çerçevesi
 
@@ -167,8 +166,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 - Satırlar (EKB-P8): EKB-02 Kayıt çerçevesi. [Tablo](piyasa/2026-10-13/kaydedici-sunum-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Core/, src/VidShrink.App/Recorder/RecorderView.axaml, src/VidShrink.App/Recorder/RecorderView.axaml.cs, src/VidShrink.App/Recorder/RecorderSettings.cs, src/VidShrink.App/Locales/
-- Sahibin kararı: Hazır arka plan görselleri pakete girsin mi, yoksa düz renk ve renk geçişiyle mi yetinilsin.
-- Plan: Biten kayıt ikinci bir ffmpeg geçişiyle arka planın üstüne oturtulur: `color` ya da `gradients` kaynağı, `scale`, yuvarlak köşe maskesi, gölge için bulanık kopya ve `overlay`. Sonuç panelinde "Çerçevele" düğmesi ile dolgu, köşe ve arka plan seçimi olur. Çıktının boyutu ve köşe pikselinin arka plan renginde olduğu lavfi ile ölçülür.
+- Durum (20 Ekim 2026, `worktree-agent-later-105-106`): yapıldı. Sonuç panelinde "Çerçevele" düğmesi; düz renk (`SurfaceToneColor`), palet belirteçlerinden dört `gradients` geçişi ve dosyadan görsel; dolgu, köşe, gölge seçimi `recorder-settings.json` `frame` nesnesinde. Grafik `Core/RecordingFrame.cs`, çıktı boyutu ve köşe/merkez pikseli lavfi klibiyle ölçülüyor (`KayitCercevesiTests`). Açık: gerçek bir kaydın elle görsel denetimi.
 
 ## 107. Winget, Scoop Ve Chocolatey Paketleri
 

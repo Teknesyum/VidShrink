@@ -65,7 +65,7 @@ public static class LoopbackAudio
 
     /// <summary>Verilen arguman dizisi loopback borusundan okuyor mu.</summary>
     public static bool Uses(IEnumerable<string>? arguments)
-        => arguments is not null && arguments.Contains(PipeToken, StringComparer.Ordinal);
+        => arguments is not null && arguments.Any(a => AppAudio.TryReadToken(a, out _));
 }
 
 /// <summary>Pompanin bir turda yapacagi duzeltme: once yazilacak sessizlik ve atilacak kare sayisi.</summary>

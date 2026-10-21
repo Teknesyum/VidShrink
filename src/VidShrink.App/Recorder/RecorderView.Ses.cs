@@ -24,6 +24,7 @@ internal partial class RecorderView
     private void InitSes()
     {
         CmbWebcam.SelectionChanged += (_, _) => KameraSecenekleri();
+        InitUygulamaSesi();
         RefreshAudioBoxes();
     }
 
@@ -57,7 +58,13 @@ internal partial class RecorderView
     private bool _fillingAudio;
 
     /// <summary>Ses cihazı listesinin kapısı; ölçüm sabit liste verir.</summary>
-    internal Func<IReadOnlyList<AudioCaptureDevice>> ListAudioDevices { get; set; } = () => CaptureDevices.Instance.Audio;
+    internal Func<IReadOnlyList<AudioCaptureDevice>> ListAudioDevices
+    {
+        get => _listAudioDevices ?? DefaultAudioDevices;
+        set => _listAudioDevices = value;
+    }
+
+    private Func<IReadOnlyList<AudioCaptureDevice>>? _listAudioDevices;
 
     private void FillAudioBox(ComboBox box, AudioSourceRole role, string? remembered)
     {
@@ -75,7 +82,7 @@ internal partial class RecorderView
         {
             for (var i = 1; i < names.Count; i++)
             {
-                if (!string.Equals(names[i], wanted, StringComparison.OrdinalIgnoreCase)) continue;
+                if (!string.Equals(names[i], wanted, StringComparison.OrdinalIgnoreCase) || names[i] == AppAudio.PlaceholderName) continue;
                 index = i;
                 break;
             }
@@ -86,7 +93,7 @@ internal partial class RecorderView
 
     /// <summary>Kutuda görünen yazı: uygulamanın yakaladığı sistem sesi çevrilir, cihaz adları olduğu gibi kalır.</summary>
     internal static string AudioLabel(string name)
-        => string.Equals(name, LoopbackAudio.LoopbackName, StringComparison.Ordinal) ? Say("recorder.audio.loopback") : name;
+        => string.Equals(name, LoopbackAudio.LoopbackName, StringComparison.Ordinal) ? Say("recorder.audio.loopback") : AppAudioLabel(name) ?? name;
 
     private static string? SelectedName(ComboBox box)
         => box.SelectedIndex > 0 && box.Tag is IReadOnlyList<string> names && box.SelectedIndex < names.Count
@@ -100,6 +107,7 @@ internal partial class RecorderView
         if (SelectedName(box) is not { } name) return null;
 
         return _devices.FirstOrDefault(d => d.Role == role
+            && !AppAudio.IsPlaceholder(d)
             && string.Equals(d.Name, name, StringComparison.Ordinal));
     }
 

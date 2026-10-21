@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using VidShrink.Core;
 
 namespace VidShrink.Ffmpeg;
 
@@ -37,6 +38,18 @@ public static class SystemAudioCapture
 
         try { return WasapiLoopbackCapture.Start(); }
         catch (Exception ex) when (ex is COMException or InvalidOperationException or OutOfMemoryException)
+        {
+            return null;
+        }
+    }
+
+    public static ISystemAudioCapture? OpenApp(string processName)
+    {
+        if (string.IsNullOrWhiteSpace(processName)) return null;
+        if (!OperatingSystem.IsWindowsVersionAtLeast(10, 0, AppAudio.MinimumBuild)) return null;
+
+        try { return ProcessLoopbackCapture.Start(() => AppAudio.PickProcess(processName, AppAudioSessions.Candidates(processName))); }
+        catch (Exception ex) when (ex is COMException or InvalidOperationException or OutOfMemoryException or DllNotFoundException or EntryPointNotFoundException)
         {
             return null;
         }

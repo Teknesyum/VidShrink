@@ -1334,6 +1334,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-20, murekkep kisayolu (later 42): yeni <c>recorder.hotkeys.ink</c> 42 dilde, dusen yok; es, fr, pt, ro, sw kola giriyor (KOL dokumu): toplam 4074 + 5 = 4079, en 393, tr 132 degismedi.</para>
     /// <para>2026-10-20, kamera kipi (later 69): uc yeni anahtardan (<c>recorder.target.device-mode</c>, <c>.auto</c>, <c>.item</c>) 12 kol (<c>device-mode</c>: cs, en, es, ms, pt, ro, sk, sl, sw, tr; <c>.auto</c>: fr, pt), KOL dokumunden ve SAYIM satirindan olculdu: toplam 4074 + 12 = 4086, en 393 + 1 = 394, tr 132 + 1 = 133.</para>
     /// <para>2026-10-20, later 88 ve 89 kalani: yedi yeni anahtar (<c>editor.clip.keys.add-transform</c>, alti <c>editor.clip.match.*</c>) 42 dilde, <c>editor.clip.keys.count</c> ucuncu sayiyi aldi; SAYIM satirindan olculdu: toplam 4074 + 53 = 4127, en 393 + 4 = 397, tr 132 + 1 = 133.</para>
+    /// <para>2026-10-20, uygulama basina ses ve kayit cercevesi (later 105, 106): 21 yeni kaydedici anahtari 43 dilde; KOL dokumunden olculdu: toplam 4074 + 18 = 4092; en 393 + 3 = 396 (recorder.audio.app.requires, .output.frame-image, .frame-running), tr 132 + 1 = 133 (recorder.audio.app.requires).</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1674,6 +1675,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-18, main CI duzeltmesi: 87 ve 88'in on iki duzenleyici anahtari 40 dile cevrildi, player.tracks.quality.rate dustu (birim main.unit.kbps-value'dan): olculen toplam 4070, en 393, tr 132; gezilen 89698.</para>
     /// <para>2026-10-20, kamera kipi (later 69): uc yeni <c>recorder.target.device-mode*</c> anahtari 43 dilde, dusen yok; gezilen 89698 + 3 x 43 = 89827.</para>
     /// <para>2026-10-20, later 88 ve 89 kalani: yedi yeni anahtar 42 dilde, <c>editor.clip.keys.count</c> uzadi; olculen gezilen 89698 + 301 = 89999.</para>
+    /// <para>2026-10-20, later 105 ve 106: 21 kaydedici anahtari x 43 = 903; gezilen 89698 + 903 = 90601.</para>
     /// <para>2026-10-18, ad yer tutucusu: uygulama adi cevirilerde {app} oldu, ekli adlar tur adiyla kuruldu; cs shell.menu.open "ve VidShrinku" yerine "v aplikaci {app}" oldugu icin kol sayimindan dustu: olculen toplam 4069, en 393, tr 132.</para>
     /// <para>2026-10-16, later 44 (etiket ve Onar): on sekiz yeni anahtar; olculen toplam 3781 + 2 = 3783 (lt main.convert.tags.cover.none, ro main.convert.tags.year), en 364, tr 123, gezilen 80453 + 774 = 81227.</para>
     /// <para>2026-10-15, uzun iste oncelik ve bitis sesi (later 76): dort yeni anahtar (<c>settings-tab.encode-priority.above-normal</c>, <c>settings-tab.finish-sound-file.choose</c>, <c>.hint</c>, <c>.reset</c>) 42 dilde, dusen yok; olculen gezilen 78604 + 172 = 78776.</para>

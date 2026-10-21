@@ -38,6 +38,7 @@ internal partial class RecorderView
         TxtNamePattern.Text = _settings.NamePattern ?? AdlandirmaDeseni.KayitVarsayilan;
         RefreshNamePreview();
         TxtNamePattern.TextChanged += (_, _) => OnNamePatternChanged();
+        InitCercevele();
     }
 
     private void ResetSonucPaneli(RecordResult result)
@@ -46,6 +47,7 @@ internal partial class RecorderView
         BtnCopyFile.IsEnabled = !result.Partial || result.Playable != false;
         BtnToGif.IsVisible = result.Ok && !result.Partial
                              && RecorderArguments.ContainerOf(result.OutputPath) != RecorderContainer.Gif;
+        ResetCercevele(result);
     }
 
     private async void OnCopyFile(object? sender, RoutedEventArgs e) => await CopyResultFileAsync();

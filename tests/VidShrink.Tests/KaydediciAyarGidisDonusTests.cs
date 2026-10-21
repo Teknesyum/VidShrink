@@ -26,6 +26,7 @@ namespace VidShrink.Tests;
 /// </para>
 /// <para>
 /// 2026-10-20: <c>DeviceMode</c> <c>CameraMode</c> bicimiyle okunur, gecersiz metin bos doner; sabit kip <c>Kisitli</c>'da.
+/// 2026-10-20: bes <c>Frame*</c> ayari tek <c>frame</c> nesnesine yazilir; bir anahtar sayilir, dolgu ve kose secenekten secilir.
 /// </para>
 /// </summary>
 public sealed class KaydediciAyarGidisDonusTests
@@ -47,14 +48,22 @@ public sealed class KaydediciAyarGidisDonusTests
         ["PrompterStep"] = 5,
         ["PrompterLook"] = new PrompterLook(Mirror: true, Line: false, Size: 0),
         ["ScheduleAt"] = new DateTime(2026, 10, 12, 14, 30, 0),
-        ["DeviceMode"] = "1280x720@29.97"
+        ["DeviceMode"] = "1280x720@29.97",
+        ["FrameBackdrop"] = 3,
+        ["FramePadding"] = 128,
+        ["FrameCorner"] = 48
     };
 
     private static readonly Dictionary<string, int> CokAnahtarli = new()
     {
         ["KeyCaption"] = 3,
         ["PrompterLook"] = 3,
-        ["HdrToSdr"] = 2
+        ["HdrToSdr"] = 2,
+        ["FrameBackdrop"] = 1,
+        ["FramePadding"] = 0,
+        ["FrameCorner"] = 0,
+        ["FrameShadow"] = 0,
+        ["FrameImage"] = 0
     };
 
     internal static IReadOnlyList<PropertyInfo> Ozellikler() => typeof(RecorderSettings)
