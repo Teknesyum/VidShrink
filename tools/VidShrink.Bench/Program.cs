@@ -42,6 +42,7 @@ try
         "smart-audio-drift" => await AkilliSesKaymasi.RunAsync(args),
         "smart-mpeg2" => await AkilliMpeg2.RunAsync(args),
         "color-frame" => await RenkKaresi.RunAsync(args),
+        "proxy-seek" => await VekilSarma.RunAsync(args),
         _ => Unknown(args[0])
     };
 }

@@ -476,7 +476,10 @@ internal partial class EditorView
     {
         if (preview.Frame.IsSource && !preview.Parts.Any(p => !p.Clip.Effects.IsNeutral)) return null;
         if (_source is { } source && KnownInfo?.Invoke(source) is { Width: > 0, Height: > 0 } info)
-            return new EditLook(preview, info.Width, info.Height, info.ParNum, info.ParDen);
+        {
+            var (frameWidth, frameHeight) = PreviewSize(preview, source, info.Width, info.Height);
+            return new EditLook(preview, frameWidth, frameHeight, info.ParNum, info.ParDen);
+        }
         var (width, height) = FrameSize(engine);
         return new EditLook(preview, width, height);
     }
@@ -486,7 +489,7 @@ internal partial class EditorView
         if (_model is not { } model || _source is not { } source || _driver is not { } driver || Preview.Engine is not { } engine) return;
         try
         {
-            var preview = new EdlPreview(SourcePaths, model);
+            var preview = new EdlPreview(PreviewPaths, model);
             await driver.RestyleAsync(preview, LookFor(preview, engine)).ConfigureAwait(true);
             _restyles++;
         }

@@ -68,6 +68,7 @@ internal partial class EditorView : UserControl
         InitMusic();
         InitStills();
         InitClipboard();
+        InitProxy();
 
         MnuSplit.Click += (_, _) => Split();
         MnuDelete.Click += (_, _) => DeleteSelected();
@@ -148,6 +149,7 @@ internal partial class EditorView : UserControl
         ForgetSources();
         ForgetClipboard();
         ForgetAudioTracks();
+        CancelProxy();
         _source = path;
         _model = null;
         Timeline.Show(null);
@@ -195,6 +197,7 @@ internal partial class EditorView : UserControl
         _peaks?.Cancel();
         _keyframes?.Cancel();
         foreach (var scan in _extraScans) scan.Cancel();
+        _proxyCts?.Cancel();
     }
 
     private async Task LoadPeaksAsync(string path, int index, CancellationToken ct)
@@ -376,7 +379,7 @@ internal partial class EditorView : UserControl
 
         var playing = Preview.IsPlaying;
         _driver?.Dispose();
-        var preview = new EdlPreview(SourcePaths, model);
+        var preview = new EdlPreview(PreviewPaths, model);
         var driver = new EdlPreviewDriver(engine, preview, look: LookFor(preview, engine));
         _driver = driver;
         _reloads++;
@@ -536,6 +539,7 @@ internal partial class EditorView : UserControl
         }
 
         RefreshExport();
+        RefreshProxy();
         RefreshMonitor();
     }
 
