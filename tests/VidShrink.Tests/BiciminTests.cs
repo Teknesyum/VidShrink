@@ -1337,6 +1337,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-20, uygulama basina ses ve kayit cercevesi (later 105, 106): 21 yeni kaydedici anahtari 43 dilde; KOL dokumunden olculdu: toplam 4074 + 18 = 4092; en 393 + 3 = 396 (recorder.audio.app.requires, .output.frame-image, .frame-running), tr 132 + 1 = 133 (recorder.audio.app.requires).</para>
     /// <para>2026-10-20, durgun klip ayarlari ve slayt sihirbazi (later 87, 90): yirmi yeni anahtar (<c>editor.still.*</c> dokuz, <c>editor.clip.move</c>, <c>.tip</c>, <c>editor.slides.*</c> dokuz) 42 dilde; 43 kol (en 5: <c>editor.clip.move</c>, <c>editor.slides.build</c>, <c>.fit</c>, <c>.working</c>, <c>editor.still.image-seconds</c>; tr 1: <c>editor.still.image-seconds</c>; es 7, pt 7, sw 4, da 3, nb 3, de 2, fr 2, ro 2; cs, hu, lt, nl, pl, sk, sl birer), KOL dokumunden ve SAYIM satirindan olculdu: toplam 4074 + 43 = 4117, en 393 + 5 = 398, tr 132 + 1 = 133.</para>
     /// <para>2026-10-20, olcerek arama (later 141): alti yeni anahtardan <c>main.run.search-round-done</c> 40 dilde (hu ve zh-Hans haric) ve en <c>main.advanced.search-by-measure.label</c> kola giriyor, KOL dokumunden ve SAYIM satirindan olculdu: toplam 4074 + 41 = 4115, en 393 + 2 = 395, tr 132 + 1 = 133.</para>
+    /// <para>2026-10-21, birlesme turu (later 42, 69, 78, 87+90, 88+89, 105+106, 141): dallarin farklari toplandi ve birlesik agacta olculdu: toplam 4074 + 175 = 4249, en 393 + 15 = 408, tr 132 + 5 = 137.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1362,9 +1363,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(4079, toplam);
-        Assert.Equal(393, dilBasina["en"]);
-        Assert.Equal(132, dilBasina["tr"]);
+        Assert.Equal(4249, toplam);
+        Assert.Equal(408, dilBasina["en"]);
+        Assert.Equal(137, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1720,7 +1721,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(89741, gezilen);
+        Assert.Equal(92235, gezilen);
         Assert.Empty(kayip);
     }
 
