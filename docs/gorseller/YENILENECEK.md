@@ -9,16 +9,18 @@ Shows" / "Program Ne Yaptığını Gösterir" bölümü bunlara bağlı. Dönü�
 
 T201 takımından `donustur`, `kaydedici`, `gelismis` ve `kucult-onizleme` kareleri
 `docs/kullanim.md` ve `docs/kullanim.tr.md` bağlı olduğu için `docs/gorseller/` altında
-duruyor; başlıklarında eski "VidShrink" adı var. README'den düşen `ayarlar`, `hakkinda`,
-`oynatici`, `duzenleyici` ve `kucult-yakin` kareleri `trash/gorseller-T201/` altında.
+duruyor; başlıklarında eski "VidShrink" adı var. Sahibin kararıyla README'nin Player, Editor ve
+Shrink yerleri de şimdilik eski T201 karelerine bağlı: `oynatici`, `duzenleyici`,
+`kucult-yakin`; üçü yeni adla yeniden çekilecek. README'den düşen `ayarlar` ve `hakkinda`
+kareleri `trash/gorseller-T201/` altında.
 
 ## Bekleyen kareler
 
 | Eksik | Neden bekliyor | Ne çekilmeli |
 |---|---|---|
-| **Oynatıcı** (`oynatici`) | Gerçek video gerekiyor; hangi video kullanıcının kararı. | Pencereyi dolduran video, üstte sekme çubuğu, altta kontrol şeridi. TR ve EN. |
-| **Düzenleyici** (`duzenleyici`) | Aynı. | Kliplere bölünmüş zaman çizelgesi, üstünde monitör, dışa aktarma kipi seçicisi. TR ve EN. |
-| **Küçült** (`kucult-onizleme`) | Aynı. | Öncesi-sonrası bölmeli panel, plan, öngörülen boyut. TR ve EN. |
+| **Oynatıcı** (`oynatici`) | README şimdilik eski adlı `T201-oynatici-*.png`'ye bağlı; yeni adla yeniden çekilecek, video kullanıcının kararı. | Pencereyi dolduran video, üstte sekme çubuğu, altta kontrol şeridi. TR ve EN. |
+| **Düzenleyici** (`duzenleyici`) | README şimdilik `T201-duzenleyici-*.png`'ye bağlı; yeni adla yeniden çekilecek. | Kliplere bölünmüş zaman çizelgesi, üstünde monitör, dışa aktarma kipi seçicisi. TR ve EN. |
+| **Küçült** (`kucult-yakin`) | README şimdilik `T201-kucult-yakin-*.png`'ye bağlı; yeni adla yeniden çekilecek. | Öncesi-sonrası bölmeli panel, plan, öngörülen boyut. TR ve EN. |
 | **Kullanım belgesi kareleri** | `docs/kullanim*.md` hâlâ eski adlı T201 karelerine bağlı. | `donustur`, `kaydedici`, `gelismis` için T300 kareleri `tools/VidShrink.Shot` ile çekilip bağlantılar çevrilir; `kucult-onizleme` video kararını bekler. |
 | **Oynatıcı karşılaştırma paneli** | Hiç görüntüsü yok. | Karşılaştırma paneli açık, iki kaynak yüklü hâlde. TR ve EN. |
 | **Sağ tık menüsü** | Windows 11 birincil menüsündeki girdi hiç belgelenmemiş. | Explorer'da bir videoya sağ tık, "Bu Videoyu VidShrink Player ile Aç" birincil menüde görünür hâlde. |

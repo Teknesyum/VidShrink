@@ -320,18 +320,21 @@ new release is out.
 
 ## What The Program Shows
 
-Convert, Recorder and Settings are pictured below. The Player, Editor and Shrink shots need
-a real video and are still being retaken; each of those slots says what it will show.
+The Player, Editor and Shrink shots are from the previous release and still show the old
+title; they will be retaken under the new name.
 
-<!-- screenshot: player-en.png -->
 - **Player** — a video filling the window, the tab bar on top and the control strip below.
 
-<!-- screenshot: editor-en.png -->
+![The Player tab playing a presentation video edge to edge, the tab bar on top and the control strip below with elapsed and remaining time, volume, ten-second skip buttons, play and pause, speed and full screen](docs/gorseller/T201-oynatici-en.png)
+
 - **Editor** — the monitor over a timeline cut into clips, with the export mode picker.
 
-<!-- screenshot: shrink-en.png -->
+![The Editor tab: the monitor showing the video above a timeline cut into three clips on the video and audio tracks, with Split, Delete, Speed, Undo, Redo, zoom, Save, Save As and Share the File buttons and the Smart export mode picker](docs/gorseller/T201-duzenleyici-en.png)
+
 - **Shrink** — the before-and-after split panel, the plan spelled out, the predicted size
   and quality.
+
+![The Shrink tab with a 3.0 MB clip and a 0.15 MB target: source details and the target and quality sliders on the left, the Original and Processed split panel zoomed to 196% in the middle with the What It Will Do plan below it (libsvtav1, two-pass 72 kbit/s, 666x374), and the estimated output with predicted quality 65.1/100 on the right](docs/gorseller/T201-kucult-yakin-en.png)
 
 - **Convert** — container, codec and quality fields beside the FFmpeg command that will run.
 

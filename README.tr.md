@@ -323,20 +323,22 @@ kapatınca kuruyor; Ayarlar'dan kapatılır. Linux'ta yeni sürümü bir rozet h
 
 ## Program Ne Yaptığını Gösterir
 
-Dönüştür, Kaydedici ve Ayarlar aşağıda görüntüleriyle duruyor. Oynatıcı, Düzenleyici ve
-Küçült kareleri gerçek bir video istiyor ve yeniden çekiliyor; o yerlerin her biri neyi
-göstereceğini söylüyor.
+Oynatıcı, Düzenleyici ve Küçült kareleri önceki sürümden ve başlıkta eski adı taşıyor; yeni
+adla yeniden çekilecek.
 
-<!-- ekran-goruntusu: player-tr.png -->
 - **Oynatıcı** — pencereyi dolduran bir video, üstte sekme çubuğu, altta kontrol şeridi.
 
-<!-- ekran-goruntusu: editor-tr.png -->
+![Oynatıcı sekmesi bir sunum videosunu kenardan kenara oynatırken: üstte sekme çubuğu, altta geçen ve kalan süre, ses, on saniyelik atlama düğmeleri, oynat-duraklat, hız ve tam ekranla kontrol şeridi](docs/gorseller/T201-oynatici-tr.png)
+
 - **Düzenleyici** — kliplere bölünmüş zaman çizelgesinin üstünde monitör, dışa aktarma kipi
   seçicisiyle.
 
-<!-- ekran-goruntusu: shrink-tr.png -->
+![Düzenleyici sekmesi: videoyu gösteren monitörün altında görüntü ve ses izlerinde üç klibe bölünmüş zaman çizelgesi, bölme, silme, hız, geri alma, yakınlaştırma, kaydetme ve paylaşma düğmeleriyle dışa aktarma kipi seçicisi](docs/gorseller/T201-duzenleyici-tr.png)
+
 - **Küçült** — öncesi-sonrası bölmeli panel, açık açık yazılmış plan, öngörülen boyut ve
   kalite.
+
+![Küçült sekmesi 3,0 MB'lık klip ve 0,15 MB hedefle: solda kaynak bilgileri, hedef ve kalite kaydırıcıları; ortada %196 yakınlaştırılmış Orijinal ve İşlenmiş bölmeli panel, altında plan (libsvtav1, iki geçişli 72 kbit/sn, 666x374); sağda tahmini çıktı ve öngörülen kalite 65,1/100](docs/gorseller/T201-kucult-yakin-tr.png)
 
 - **Dönüştür** — kapsayıcı, kodek ve kalite alanları, yanında koşacak FFmpeg komutu.
 
