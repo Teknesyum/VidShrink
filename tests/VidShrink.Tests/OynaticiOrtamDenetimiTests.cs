@@ -341,6 +341,7 @@ public sealed class OynaticiOrtamDenetimiTests
             await motor.OpenAsync(klip);
             var yeniden = motor.GetProperty("playlist-count");
             motor.SetNeighbors(onceki, sonraki);
+            await Task.Delay(300);
             motor.SetProperty("playlist-pos", "0");
             await Bekle(() => { lock (istekler) return istekler.Count > 1; });
             await Task.Delay(300);
