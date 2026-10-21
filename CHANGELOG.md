@@ -7,6 +7,14 @@ All notable changes to VidShrink Player are recorded here. The format follows
 The history of the program under its old name, VidShrink, up to 1.2.24 and the changes
 made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md).
 
+## [Unreleased]
+
+### Added
+
+- Editor preview now shows transitions. The few seconds where two clips overlap are rendered
+  in the background into a small file in the app's cache folder; until it is ready the preview
+  plays a plain cut as before. The files are removed when the editor closes or the app exits.
+
 ## [0.0.1]
 
 ### Changed

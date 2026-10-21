@@ -5,13 +5,31 @@ namespace VidShrink.Core.Editing;
 
 public sealed record EdlPart(int Index, EditClip Clip, long TimelineStart, long EdlStart)
 {
-    public long EdlLength => Clip.SourceLength;
+    public long Head { get; init; }
+
+    public long Tail { get; init; }
+
+    public string? Blend { get; init; }
+
+    public bool IsBlend => Blend is not null;
+
+    public long HeadConsumed => Consumed(Head);
+
+    public long TailConsumed => Tail == 0 ? Clip.SourceLength : Consumed(Clip.TimelineLength - Tail);
+
+    public long EdlLength => IsBlend ? Clip.SourceLength : TailConsumed - HeadConsumed;
 
     public long EdlEnd => EdlStart + EdlLength;
 
-    public long TimelineEnd => TimelineStart + Clip.TimelineLength;
+    public long TimelineLength => IsBlend ? 2 * Clip.TimelineLength : Clip.TimelineLength - Head - Tail;
+
+    public long TimelineEnd => TimelineStart + TimelineLength;
+
+    public long SourceFrom => IsBlend ? 0 : Clip.Reversed ? Clip.SourceEnd - TailConsumed : Clip.SourceStart + HeadConsumed;
 
     public bool Contains(long edlTime) => edlTime >= EdlStart && edlTime < EdlEnd;
+
+    private long Consumed(long offset) => offset * (long)(Clip.Speed * 100) / 100;
 }
 
 public sealed class EdlPreview
@@ -26,7 +44,7 @@ public sealed class EdlPreview
     }
 
     /// <summary>Cok kaynakli onizleme: her parca kendi kaynaginin yolundan okunur; yollar kaynak sirasiyla verilir.</summary>
-    public EdlPreview(IReadOnlyList<string> sourcePaths, EditTimeline timeline)
+    public EdlPreview(IReadOnlyList<string> sourcePaths, EditTimeline timeline, IReadOnlyDictionary<int, string>? blends = null)
     {
         ArgumentNullException.ThrowIfNull(sourcePaths);
         ArgumentNullException.ThrowIfNull(timeline);
@@ -45,9 +63,23 @@ public sealed class EdlPreview
         for (var i = 0; i < timeline.Clips.Count; i++)
         {
             var clip = timeline.Clips[i];
-            parts.Add(new EdlPart(i, clip, timelineStart, edlStart));
+            var head = BlendLength(timeline, blends, i);
+            var tail = i + 1 < timeline.Clips.Count ? BlendLength(timeline, blends, i + 1) : 0;
+            if (head > 0)
+            {
+                var blend = new EdlPart(parts.Count, new EditClip(0, head), timelineStart - head, edlStart) { Blend = blends![i] };
+                parts.Add(blend);
+                edlStart += blend.EdlLength;
+            }
+
+            var part = new EdlPart(parts.Count, clip, timelineStart + head, edlStart) { Head = head, Tail = tail };
+            if (part.EdlLength > 0 && part.TimelineLength > 0)
+            {
+                parts.Add(part);
+                edlStart += part.EdlLength;
+            }
+
             timelineStart += clip.TimelineLength;
-            edlStart += clip.SourceLength;
         }
 
         Parts = parts.AsReadOnly();
@@ -60,6 +92,8 @@ public sealed class EdlPreview
     public EditFrame Frame { get; }
 
     public IReadOnlyList<EdlPart> Parts { get; }
+
+    public bool HasBlends => Parts.Any(p => p.IsBlend);
 
     public long TimelineDuration { get; }
 
@@ -109,8 +143,10 @@ public sealed class EdlPreview
         if (time == TimelineDuration && time >= 0) return EdlDuration;
 
         var part = PartAtTimeline(time);
-        var source = part.Clip.ToSource(time - part.TimelineStart);
-        return part.EdlStart + (source - part.Clip.SourceStart);
+        var offset = Math.Clamp(time - part.TimelineStart, 0, part.TimelineLength - 1);
+        if (part.IsBlend) return part.EdlStart + offset / 2;
+        var source = part.Clip.ToSource(part.Head + offset);
+        return Math.Clamp(part.EdlStart + (source - part.SourceFrom), part.EdlStart, part.EdlEnd - 1);
     }
 
     public long ToTimeline(long edlTime)
@@ -118,10 +154,15 @@ public sealed class EdlPreview
         if (edlTime == EdlDuration && edlTime >= 0) return TimelineDuration;
 
         var part = PartAtEdl(edlTime);
-        var source = part.Clip.SourceStart + (edlTime - part.EdlStart);
-        return part.TimelineStart + part.Clip.ToOffset(source);
+        var within = Math.Clamp(edlTime - part.EdlStart, 0, part.EdlLength - 1);
+        if (part.IsBlend) return part.TimelineStart + 2 * within;
+        var source = part.SourceFrom + within;
+        return part.TimelineStart + Math.Clamp(part.Clip.ToOffset(source) - part.Head, 0, part.TimelineLength - 1);
     }
 
     private string Entry(EdlPart part)
-        => Escape(SourcePaths[part.Clip.Source]) + "," + Seconds(part.Clip.SourceStart) + "," + Seconds(part.EdlLength);
+        => Escape(part.Blend ?? SourcePaths[part.Clip.Source]) + "," + Seconds(part.SourceFrom) + "," + Seconds(part.EdlLength);
+
+    private static long BlendLength(EditTimeline timeline, IReadOnlyDictionary<int, string>? blends, int index)
+        => blends is not null && blends.TryGetValue(index, out var path) && !string.IsNullOrEmpty(path) ? timeline.TransitionLength(index) : 0;
 }

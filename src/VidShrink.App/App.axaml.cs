@@ -111,6 +111,7 @@ public partial class App : Application
             RegisterFileTypes();
             MacUpdate.Begin();
             desktop.Exit += (_, _) => MacUpdate.Finish();
+            desktop.Exit += (_, _) => VidShrink.Core.Editing.TransitionPreview.Remove(VidShrink.Core.Editing.TransitionPreview.ProcessFolder(VidShrink.Core.Editing.TransitionPreview.CacheRoot));
 
             if (_shrink is not null) desktop.ShutdownMode = ShutdownMode.OnLastWindowClose;
 

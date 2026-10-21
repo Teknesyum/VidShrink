@@ -205,6 +205,7 @@ internal partial class EditorView
         _clock.Stop();
         FlushProject();
         DetachProject();
+        ForgetBlends();
         Timeline.PauseStrip();
         Strings.Changed -= OnLanguageChanged;
         ShortcutBindings.Changed -= OnLanguageChanged;

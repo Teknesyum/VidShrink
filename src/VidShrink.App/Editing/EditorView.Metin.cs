@@ -42,7 +42,11 @@ internal partial class EditorView
     internal string OverlayRoot
     {
         get => _overlayRoot ??= Path.Combine(Path.GetTempPath(), "vidshrink_text_" + Environment.ProcessId.ToString(CultureInfo.InvariantCulture));
-        set => _overlayRoot = value;
+        set
+        {
+            _overlayRoot = value;
+            _blendRoot ??= Path.Combine(value, "gecis");
+        }
     }
 
     internal string OverlayPath => Path.Combine(OverlayRoot, OverlayFileName);

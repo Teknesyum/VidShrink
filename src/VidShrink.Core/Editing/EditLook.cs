@@ -19,7 +19,7 @@ public sealed class EditLook
         _height = Math.Max(2, height);
         _parNum = parNum;
         _parDen = parDen;
-        _canvas = ClipFilters.Canvas(preview.Parts.Select(p => p.Clip).ToList(), _width, _height, parNum, parDen, preview.Frame);
+        _canvas = ClipFilters.Canvas(preview.Parts.Where(p => !p.IsBlend).Select(p => p.Clip).ToList(), _width, _height, parNum, parDen, preview.Frame);
         (TimedVideo, TimedAudio) = ClipFilters.Timed(preview);
     }
 
@@ -33,6 +33,7 @@ public sealed class EditLook
 
     public string? Geometry(EdlPart part)
     {
+        if (part.IsBlend) return null;
         var effects = part.Clip.Effects;
         var (frameWidth, frameHeight) = ClipFilters.Frame(_width, _height, _canvas);
         var chain = string.Join(",", new[]
