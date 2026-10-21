@@ -301,6 +301,37 @@
               </Flyout>
             </Button.Flyout>
           </Button>
+          <Button x:Name="BtnAutoZoom"
+                  Theme="{StaticResource GhostButton}"
+                  Margin="{StaticResource WrapItemMargin}"
+                  IsVisible="False"
+                  Content="{loc:Text recorder.output.zoom}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.output.zoom}">
+            <Button.Flyout>
+              <Flyout>
+                <StackPanel Spacing="{StaticResource SpaceSm}" Width="{StaticResource RecorderQuickTrimWidth}">
+                  <SarilanMetin Text="{loc:Text recorder.output.zoom-level}" Theme="{StaticResource Label}"/>
+                  <ComboBox x:Name="CmbZoomLevel"
+                            HorizontalAlignment="Stretch"
+                            auto:AutomationProperties.Name="{loc:Text recorder.output.zoom-level}"/>
+                  <SarilanMetin Text="{loc:Text recorder.output.zoom-regions}" Theme="{StaticResource Label}"/>
+                  <ScrollViewer MaxHeight="{StaticResource DropDownMaxHeight}">
+                    <StackPanel x:Name="ZoomRegionList" Spacing="{StaticResource SpaceXs}"/>
+                  </ScrollViewer>
+                  <SarilanMetin x:Name="TxtZoomEmpty"
+                                IsVisible="False"
+                                TextWrapping="Wrap"
+                                Theme="{StaticResource Hint}"
+                                Text="{loc:Text recorder.output.zoom-none}"/>
+                  <Button x:Name="BtnZoomApply"
+                          Theme="{StaticResource PrimaryButton}"
+                          IsEnabled="False"
+                          Content="{loc:Text recorder.output.zoom-apply}"
+                          auto:AutomationProperties.Name="{loc:Text recorder.output.zoom-apply}"/>
+                </StackPanel>
+              </Flyout>
+            </Button.Flyout>
+          </Button>
           <ComboBox x:Name="CmbRecShareTarget"
                     Margin="{StaticResource WrapItemMargin}"
                     VerticalAlignment="Center"
@@ -801,10 +832,33 @@
                         Theme="{StaticResource CheckStyle}"
                         Content="{loc:Text recorder.option.show-keys}"
                         auto:AutomationProperties.Name="{loc:Text recorder.option.show-keys}"/>
-              <CheckBox x:Name="ChkMagnifier"
-                        Theme="{StaticResource CheckStyle}"
-                        Content="{loc:Text recorder.option.magnifier}"
-                        auto:AutomationProperties.Name="{loc:Text recorder.option.magnifier}"/>
+              <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceXs}" HorizontalAlignment="Left">
+                <CheckBox x:Name="ChkMagnifier"
+                          Theme="{StaticResource CheckStyle}"
+                          Content="{loc:Text recorder.option.magnifier}"
+                          auto:AutomationProperties.Name="{loc:Text recorder.option.magnifier}"/>
+                <Button x:Name="BtnZoomTrack" Grid.Column="1" Theme="{StaticResource GhostButton}"
+                        Width="{StaticResource InfoBadgeSize}" Height="{StaticResource InfoBadgeSize}"
+                        MinHeight="0" Padding="0"
+                        CornerRadius="{StaticResource RadiusChip}" VerticalAlignment="Center"
+                        auto:AutomationProperties.Name="{loc:Text recorder.option.zoom-track}">
+                  <ToolTip.Tip>
+                    <SarilanMetin Theme="{StaticResource TipText}" Text="{loc:Text recorder.option.zoom-track}"/>
+                  </ToolTip.Tip>
+                  <Path Width="{StaticResource InfoBadgeGlyphSize}" Height="{StaticResource InfoBadgeGlyphSize}" Stretch="Uniform" Data="{StaticResource IconChevronDown}" Fill="{Binding $parent[Button].Foreground}"/>
+                  <Button.Flyout>
+                    <Flyout>
+                      <StackPanel Spacing="{StaticResource SpaceSm}" Width="{StaticResource FieldWidth}">
+                        <CheckBox x:Name="ChkZoomTrack"
+                                  Theme="{StaticResource CheckStyle}"
+                                  Content="{loc:Text recorder.option.zoom-track}"
+                                  auto:AutomationProperties.Name="{loc:Text recorder.option.zoom-track}"/>
+                        <SarilanMetin Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text recorder.option.zoom-track-hint}"/>
+                      </StackPanel>
+                    </Flyout>
+                  </Button.Flyout>
+                </Button>
+              </Grid>
               <CheckBox x:Name="ChkLivePreview"
                         Theme="{StaticResource CheckStyle}"
                         Content="{loc:Text recorder.option.live-preview}"

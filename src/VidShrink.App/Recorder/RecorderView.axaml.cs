@@ -74,6 +74,7 @@ internal partial class RecorderView : UserControl
         InitPaylas();
         InitSonucKarti();
         InitHizliKirpma();
+        InitYakinlastirma();
         InitSonucPaneli();
         InitTampon();
         InitMini();
@@ -197,6 +198,7 @@ internal partial class RecorderView : UserControl
         BtnTrimIdle.IsVisible = result.Ok && !result.Partial
                                 && VidShrink.Core.RecorderArguments.ContainerOf(result.OutputPath) != VidShrink.Core.RecorderContainer.Gif;
         ResetQuickTrim(result);
+        ResetAutoZoom(result);
         ResetSonucPaneli(result);
         ResetShare();
         HideFinish();

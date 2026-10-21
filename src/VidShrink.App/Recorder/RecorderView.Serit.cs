@@ -149,6 +149,7 @@ internal partial class RecorderView
 
             _session.TitleChapters(LanguageCatalog.Display(Strings.Get("recorder.chapter.title")));
             _frameRegion = RegionOf(request);
+            BeginTrack();
             _ = FollowEndAsync(_session.Ended, _session);
         }
         catch (Exception ex) when (ex is InvalidOperationException or IOException or UnauthorizedAccessException or ArgumentException)
@@ -213,6 +214,7 @@ internal partial class RecorderView
         {
             _session = null;
             _frameRegion = null;
+            EndTrack(null);
             _stopping = false;
             FrameHiddenByUser = false;
             RestartLevels();
@@ -261,6 +263,7 @@ internal partial class RecorderView
         try
         {
             session.DropMarks();
+            EndTrack(null);
             var kalan = DeleteRecording(await session.StopAsync());
             ClearMessages();
             ExpandFromMini();
@@ -276,6 +279,7 @@ internal partial class RecorderView
         {
             _session = null;
             _frameRegion = null;
+            EndTrack(null);
             _stopping = false;
             FrameHiddenByUser = false;
             RestartLevels();
@@ -303,6 +307,7 @@ internal partial class RecorderView
 
     internal void Deliver(RecordResult result)
     {
+        EndTrack(result);
         ExpandFromMini();
         ShowResult(result);
         if (_settings.OpenFolderWhenDone && Delivered() is { } done) RevealSafely(done);
@@ -330,6 +335,7 @@ internal partial class RecorderView
         TxtElapsed.Text = Clock(progress.Elapsed);
         TxtFrames.Text = progress.Frames.ToString("N0", Strings.Culture);
         TxtDropped.Text = progress.DroppedFrames.ToString("N0", Strings.Culture);
+        _track?.Sync(progress.Captured);
         ShowSystemAudio(_session?.SystemAudio);
         CheckDiskWhileRecording();
         RefreshMini();
@@ -368,6 +374,7 @@ internal partial class RecorderView
         SyncFrame();
         SyncRegionEditor();
         SyncPreview(running);
+        SyncTrack(running);
         SyncInput(_session is not null);
         SyncSketch(_session is not null);
         SyncPrompter(running);

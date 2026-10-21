@@ -95,6 +95,7 @@ internal partial class RecorderView
         ChkClickSound.IsChecked = _settings.ClickSound;
         ChkShowKeys.IsChecked = _settings.ShowKeys;
         ChkMagnifier.IsChecked = _settings.ShowMagnifier;
+        ChkZoomTrack.IsChecked = _settings.ZoomTrack;
         ChkLivePreview.IsChecked = _settings.LivePreview;
         TxtWindowTitle.Text = _settings.WindowTitle ?? string.Empty;
         TxtRegionX.Text = _settings.RegionX.ToString(CultureInfo.InvariantCulture);
@@ -372,6 +373,7 @@ internal partial class RecorderView
         _settings.ClickSound = ChkClickSound.IsChecked ?? false;
         _settings.ShowKeys = ChkShowKeys.IsChecked ?? false;
         _settings.ShowMagnifier = ChkMagnifier.IsChecked ?? false;
+        _settings.ZoomTrack = ChkZoomTrack.IsChecked ?? false;
         _settings.LivePreview = ChkLivePreview.IsChecked ?? false;
         _settings.WindowTitle = string.IsNullOrWhiteSpace(TxtWindowTitle.Text) ? null : TxtWindowTitle.Text;
         _settings.MicrophoneName = DeviceChoice(CmbMicrophone, AudioSourceRole.Microphone, _settings.MicrophoneName);
