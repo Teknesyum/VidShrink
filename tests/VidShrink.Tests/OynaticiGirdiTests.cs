@@ -499,7 +499,8 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
         Strings.Get("player.tools.menu"),
         Strings.Get("player.menu.open-folder"),
         Strings.Get("player.list.recent"),
-        Strings.Get("player.favorites.title")
+        Strings.Get("player.favorites.title"),
+        Strings.Get("player.playlists.menu")
     };
 
     internal static string[] UstSatirlar() => new[]
@@ -521,6 +522,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
         Strings.Get("player.menu.open-folder"),
         Strings.Get("player.list.recent"),
         Strings.Get("player.favorites.title"),
+        Strings.Get("player.playlists.menu"),
         Strings.Get(Keymap.Settings.LabelKey)
     };
 
@@ -528,7 +530,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
         => Hepsi(view.BuildMenu().Items).First(item => ReferenceEquals(item.Tag, eylem));
 
     [Fact]
-    public void UstMenuOnAltiSatirVeIkiAyiriciTasir()
+    public void UstMenuOnYediSatirVeIkiAyiriciTasir()
     {
         var rapor = AppHost.Run(() =>
         {
@@ -543,7 +545,7 @@ public sealed class OynaticiGirdiTestsMenuSatirlari
                 var ust = menu.Items.Select(item => item is Separator ? "-" : (item as MenuItem)?.Header?.ToString() ?? "").ToList();
                 body.AppendLine($"[{dil}] {string.Join(" | ", ust)}");
                 Assert.Equal(UstSatirlar(), ust);
-                Assert.Equal(16, menu.Items.OfType<MenuItem>().Count());
+                Assert.Equal(17, menu.Items.OfType<MenuItem>().Count());
                 Assert.Equal(2, menu.Items.OfType<Separator>().Count());
                 var tumu = Hepsi(menu.Items).ToList();
                 Assert.DoesNotContain(tumu, item => ReferenceEquals(item.Tag, Keymap.Stop));

@@ -15,14 +15,14 @@ namespace VidShrink.Tests;
 
 public sealed class OynaticiListeMenusuTests
 {
-    private static readonly string[] Sira = { "play", "enqueue", "play-next", "move-up", "move-down", "reveal", "copy-path", "remove", "sort", "save" };
+    private static readonly string[] Sira = { "play", "enqueue", "play-next", "move-up", "move-down", "reveal", "copy-path", "remove", "sort", "save", "playlists" };
 
     private static readonly string[] Anahtarlar =
     {
         "player.list.item.play", "player.list.item.enqueue", "player.list.item.play-next",
         "player.list.item.move-up", "player.list.item.move-down",
         "player.menu.reveal", "player.list.item.copy-path", "player.list.item.remove",
-        "player.list.sort", "player.list.save",
+        "player.list.sort", "player.list.save", "player.playlists.menu",
     };
 
     private static int Say(PlayerView view, string iz) => view.Trace.Count(t => t == iz);
@@ -198,7 +198,8 @@ public sealed class OynaticiListeMenusuTests
             var ogeler = view.ItemMenu!.Items.OfType<MenuItem>().ToArray();
             Assert.Equal(Sira, ogeler.Select(i => (string)i.Tag!).ToArray());
             Assert.Equal(Anahtarlar.Select(Strings.Get).ToArray(), ogeler.Select(i => (string)i.Header!).ToArray());
-            Assert.All(ogeler, i => Assert.True(i.IsEnabled, (string)i.Tag! + " kapali"));
+            Assert.All(ogeler.SkipLast(1), i => Assert.True(i.IsEnabled, (string)i.Tag! + " kapali"));
+            Assert.Equal(view.PlaylistStore() is not null, ogeler[^1].IsEnabled);
             Assert.All(Anahtarlar, k => Assert.NotEqual(k, Strings.Get(k)));
 
             SatiraSagTik(view, 0);

@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:auto="using:Avalonia.Automation"
+        xmlns:loc="using:VidShrink.App.Localization"
+        x:Class="VidShrink.App.Playback.PlaylistsWindow"
+        Title="{loc:Text player.playlists.title}"
+        FontSize="{StaticResource FontSizeMd}" FontFamily="{StaticResource FontSans}"
+        Width="{StaticResource HistoryWindowWidth}" Height="{StaticResource HistoryWindowHeight}"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="{DynamicResource AppBg}"
+        auto:AutomationProperties.Name="{loc:Text player.playlists.title}">
+  <Grid RowDefinitions="*,*,Auto,Auto,Auto,Auto" RowSpacing="{StaticResource SpaceSm}" Margin="{StaticResource WorkspaceMargin}">
+    <ListBox x:Name="Rows" SelectionMode="Single" auto:AutomationProperties.Name="{loc:Text player.playlists.title}"/>
+    <SarilanMetin x:Name="TxtEmpty" Text="{loc:Text player.playlists.empty}" Theme="{StaticResource Hint}"
+               HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="False"/>
+    <ListBox Grid.Row="1" x:Name="Items" SelectionMode="Single" auto:AutomationProperties.Name="{loc:Text player.playlists.items}"/>
+    <SarilanMetin Grid.Row="2" Text="{loc:Text player.playlists.name}" Theme="{StaticResource Hint}"/>
+    <TextBox Grid.Row="3" x:Name="NameBox" auto:AutomationProperties.Name="{loc:Text player.playlists.name}"/>
+    <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" HorizontalAlignment="Left">
+      <Button x:Name="BtnImport" Content="{loc:Text player.playlists.import}" Theme="{StaticResource GhostButton}" Click="OnImport"/>
+      <Button x:Name="BtnExport" Content="{loc:Text player.playlists.export}" Theme="{StaticResource GhostButton}" Click="OnExport"/>
+      <Button x:Name="BtnDelete" Content="{loc:Text player.playlists.delete}" Theme="{StaticResource GhostButton}" Click="OnDelete"/>
+    </StackPanel>
+    <StackPanel Grid.Row="5" Orientation="Horizontal" Spacing="{StaticResource SpaceSm}" HorizontalAlignment="Right">
+      <Button x:Name="BtnRename" Content="{loc:Text player.playlists.rename}" Theme="{StaticResource GhostButton}" Click="OnRename"/>
+      <Button x:Name="BtnSave" Content="{loc:Text player.playlists.save}" Theme="{StaticResource GhostButton}" Click="OnSave"/>
+      <Button x:Name="BtnOpen" Content="{loc:Text player.playlists.open}" Theme="{StaticResource PrimaryButton}" Click="OnOpen"/>
+    </StackPanel>
+  </Grid>
+</Window>

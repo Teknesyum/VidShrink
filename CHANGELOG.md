@@ -7,6 +7,16 @@ All notable changes to VidShrink Player are recorded here. The format follows
 The history of the program under its old name, VidShrink, up to 1.2.24 and the changes
 made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md).
 
+## [Unreleased]
+
+### Added
+
+- Named playlists in the player. Save the current queue under a name, then open, rename
+  or delete it from **Playlists…** in the player menu or the list menu. Lists live in the
+  settings folder (`oynatma-listeleri`), so they move with your settings. Import and export
+  `.m3u` / `.m3u8` files. A file that has gone missing stays in the list, marked as missing,
+  and the list is not rewritten; opening the list plays the files that are still there.
+
 ## [0.0.1]
 
 ### Changed

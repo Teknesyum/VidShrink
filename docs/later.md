@@ -386,12 +386,13 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 ## 138. Kitaplık Ve Ağ Kaynakları
 
-13 Ekim 2026 · "bulduklarını later a eklersin" · OYB-P12 · Oynatıcı · iş büyük · öncelik 2 · karar sahibin
+13 Ekim 2026 · "bulduklarını later a eklersin" · OYB-P12 · Oynatıcı · karar verildi, 21 Ekim 2026
 
-- Satırlar (OYB-P12): OYB-09 Adlı kalıcı listeler; OYB-17 Yerel kitaplık görünümü; OYB-22 Site bağlantısı çözme; OYB-24 Ağ paylaşımı gezme. [Tablo](piyasa/2026-10-13/oynatici-kitaplik-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Playback/, src/VidShrink.Core/PlaylistFile.cs, src/VidShrink.Core/MediaAddress.cs, src/VidShrink.Player/MpvEngine.cs
-- Sahibin kararı: oynatıcı kitaplık ve ağ kaynağı yönüne büyüsün mü (adlı listeler, klasör tarayan kitaplık, site bağlantısı çözme, ağ paylaşımında gezme)
-- Plan: Bu da bir karar paketidir; dört satır dört ayrı iştir ve her biri ayrı "evet" ister. En küçük adım adlı listelerdir (OYB-09): bugünkü m3u8 yazma yolu, uygulamanın kendi klasöründe tutulan adlı listelere genişler. Site bağlantısı çözme (OYB-22) kapalı K1 kararıyla aynı aracı kullanır ve bilerek yazılmış `ytdl=no` seçeneğini geri açar; ağ paylaşımı (OYB-24) parola saklama, kitaplık (OYB-17) yeni bir sekme demektir.
+- Durum: OYB-09 adlı listeler yapıldı (`Core/NamedPlaylists`, `App/Playback/PlaylistsWindow`; ayar klasöründe `oynatma-listeleri/`, m3u/m3u8 içe ve dışa aktarım, eksik dosya işaretli kalır). Kalan üç satır sahibin kararıyla kapandı.
+- OYB-17 Yerel kitaplık görünümü — karar: hayır. Klasör tarayan kitaplık yeni bir sekme ister; oynatıcı tek pencere ve klasör gezintisiyle kalır.
+- OYB-22 Site bağlantısı çözme — karar: hayır. Kapalı K1 kararının aracını getirir ve bilerek yazılmış `ytdl=no` seçeneğini geri açar.
+- OYB-24 Ağ paylaşımında gezme — karar: hayır. Paylaşıma giriş parola saklamak demektir; bu yön istenmedi.
+- [Tablo](piyasa/2026-10-13/oynatici-kitaplik-dogrulanmis.md)
 
 ## 139. Çok İz Üstüne Gelenler
 
