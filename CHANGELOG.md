@@ -11,7 +11,7 @@ made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md
 
 ### Changed
 
-- Recorder mini strip: the start/pause button is now a filled primary button and the stop button an accent one, so both stand out; the strip can be moved by pressing anywhere outside its buttons; its tooltips now wait 1 second longer (1.4 s in total) before appearing.
+- Recorder mini strip: the start/pause button is now a filled primary button and the stop button an accent one, so both stand out; the strip can be moved by pressing anywhere outside its buttons.
 
 ## [0.0.2] - 2026-10-21
 
