@@ -28,11 +28,6 @@
           MinWidth="{StaticResource RecorderMiniMinWidth}"
           Height="{StaticResource RecorderMiniHeight}"
           PointerPressed="OnDrag">
-    <Border.Styles>
-      <Style Selector="Button, SarilanMetin">
-        <Setter Property="ToolTip.ShowDelay" Value="{StaticResource RecorderMiniTipDelay}"/>
-      </Style>
-    </Border.Styles>
     <Grid ColumnDefinitions="Auto,Auto,*"
           ColumnSpacing="{StaticResource RecorderMiniGroupGap}">
 
