@@ -114,8 +114,10 @@ public static class AutoZoom
             var r = Number(ramp);
             envelope.Append($"+(st(0,clip((it-{s})/{r},0,1)*clip(({e}-it)/{r},0,1));ld(0)*ld(0)*(3-2*ld(0)))");
             var inside = $"gte(it,{s})*lt(it,{e})";
-            centreX.Append($"+{inside}*({Number(Math.Clamp(region.CenterX, 0, 1) - 0.5)})");
-            centreY.Append($"+{inside}*({Number(Math.Clamp(region.CenterY, 0, 1) - 0.5)})");
+            var dx = Number(Math.Clamp(region.CenterX, 0, 1) - 0.5);
+            var dy = Number(Math.Clamp(region.CenterY, 0, 1) - 0.5);
+            centreX.Append($"+{inside}*({dx})");
+            centreY.Append($"+{inside}*({dy})");
         }
 
         return $"zoompan=z='1+{Number(amount)}*({envelope})'"

@@ -832,7 +832,7 @@
                         Theme="{StaticResource CheckStyle}"
                         Content="{loc:Text recorder.option.show-keys}"
                         auto:AutomationProperties.Name="{loc:Text recorder.option.show-keys}"/>
-              <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="{StaticResource SpaceXs}" HorizontalAlignment="Left">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceXs}">
                 <CheckBox x:Name="ChkMagnifier"
                           Theme="{StaticResource CheckStyle}"
                           Content="{loc:Text recorder.option.magnifier}"

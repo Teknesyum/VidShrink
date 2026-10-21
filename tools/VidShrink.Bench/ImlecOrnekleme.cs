@@ -67,7 +67,8 @@ public static class ImlecOrnekleme
     {
         using var kendi = Process.GetCurrentProcess();
         var kayit = new PointerTrackRecorder(0, 0, 1920, 1080, () => Stopwatch.GetTimestamp() * 1000 / Stopwatch.Frequency);
-        using var ornekleyici = hz is { } h ? new PointerSampler(PointerSampler.ReadSystem, kayit.Move, h) : null;
+        long okuma = 0;
+        using var ornekleyici = hz is { } h ? new PointerSampler(Sayan(() => okuma++), kayit.Move, h) : null;
         kendi.Refresh();
         var once = kendi.TotalProcessorTime;
         ornekleyici?.Start();
@@ -75,7 +76,7 @@ public static class ImlecOrnekleme
         ornekleyici?.Stop();
         kendi.Refresh();
         var sonra = kendi.TotalProcessorTime;
-        return new OrnekleyiciOlcu((sonra - once).TotalMilliseconds, ornekleyici?.Reads ?? 0, kayit.MoveCount);
+        return new OrnekleyiciOlcu((sonra - once).TotalMilliseconds, Interlocked.Read(ref okuma), kayit.Build().Moves.Count);
     }
 
     private sealed record KayitOlcu(int Kare, int Dusen, int Kopya, double FfmpegCpuMs, double TezgahCpuMs, long Okuma, int Cikis);
@@ -101,7 +102,8 @@ public static class ImlecOrnekleme
 
         using var kendi = Process.GetCurrentProcess();
         var kayit = new PointerTrackRecorder(0, 0, 1280, 720, () => Stopwatch.GetTimestamp() * 1000 / Stopwatch.Frequency);
-        using var ornekleyici = ornekleyiciAcik ? new PointerSampler(PointerSampler.ReadSystem, kayit.Move) : null;
+        long okuma = 0;
+        using var ornekleyici = ornekleyiciAcik ? new PointerSampler(Sayan(() => okuma++), kayit.Move) : null;
         kendi.Refresh();
         var tezgahOnce = kendi.TotalProcessorTime;
 
@@ -128,7 +130,7 @@ public static class ImlecOrnekleme
 
         try { File.Delete(hedef); }
         catch (IOException) { }
-        return new KayitOlcu(kare, dusen, kopya, ffmpegCpu, tezgah, ornekleyici?.Reads ?? 0, surec.ExitCode);
+        return new KayitOlcu(kare, dusen, kopya, ffmpegCpu, tezgah, Interlocked.Read(ref okuma), surec.ExitCode);
     }
 
     private static int? Sayi(string satir, string ad)
@@ -138,6 +140,12 @@ public static class ImlecOrnekleme
         var m = Regex.Match(satir[(at + ad.Length)..], @"^\s*(\d+)");
         return m.Success ? int.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture) : null;
     }
+
+    private static Func<(int X, int Y)?> Sayan(Action say) => () =>
+    {
+        say();
+        return PointerSampler.ReadSystem();
+    };
 
     private static string Fmt(FormattableString metin) => metin.ToString(CultureInfo.InvariantCulture);
 }

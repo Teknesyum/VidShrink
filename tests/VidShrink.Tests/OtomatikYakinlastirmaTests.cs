@@ -486,8 +486,18 @@ public sealed class OtomatikYakinlastirmaTests
         }
         finally
         {
-            if (Directory.Exists(acik)) Directory.Delete(acik, true);
-            if (Directory.Exists(kapali)) Directory.Delete(kapali, true);
+            Sil(acik);
+            Sil(kapali);
+        }
+    }
+
+    private static void Sil(string klasor)
+    {
+        for (var deneme = 0; deneme < 20 && Directory.Exists(klasor); deneme++)
+        {
+            try { Directory.Delete(klasor, true); }
+            catch (IOException) { Thread.Sleep(150); }
+            catch (UnauthorizedAccessException) { Thread.Sleep(150); }
         }
     }
 }

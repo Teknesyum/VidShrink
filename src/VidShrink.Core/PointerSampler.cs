@@ -10,7 +10,6 @@ public sealed class PointerSampler : IDisposable
     private readonly int _periodMs;
     private Thread? _thread;
     private volatile bool _stop;
-    private long _reads;
 
     public PointerSampler(Func<(int X, int Y)?> read, Action<int, int> sink, int hz = PointerTrackRecorder.SampleHz)
     {
@@ -19,8 +18,6 @@ public sealed class PointerSampler : IDisposable
         if (hz <= 0 || hz > 1000) throw new ArgumentOutOfRangeException(nameof(hz));
         _periodMs = Math.Max(1, 1000 / hz);
     }
-
-    public long Reads => Interlocked.Read(ref _reads);
 
     public bool Running => _thread is not null;
 
@@ -49,7 +46,6 @@ public sealed class PointerSampler : IDisposable
         while (!_stop)
         {
             if (_read() is { } at) _sink(at.X, at.Y);
-            Interlocked.Increment(ref _reads);
             next += _periodMs;
             var wait = next - clock.ElapsedMilliseconds;
             if (wait < -_periodMs) next = clock.ElapsedMilliseconds;

@@ -164,11 +164,6 @@ public sealed class PointerTrackRecorder
         get { lock (_gate) return _running; }
     }
 
-    public int MoveCount
-    {
-        get { lock (_gate) return _moves.Count; }
-    }
-
     public void Pause()
     {
         lock (_gate)
