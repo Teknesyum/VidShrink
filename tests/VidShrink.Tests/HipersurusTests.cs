@@ -180,7 +180,9 @@ public sealed class HipersurusTests
     public void OynaticiYazilimsalCozuyor_DonanimOlculdu_GeriAlindi()
     {
         var oynatici = Oku("src", "VidShrink.App", "Playback", "PlayerView.axaml.cs");
-        Assert.Contains("EngineFactory { get; set; } = () => new MpvEngine();", oynatici, StringComparison.Ordinal);
+        Assert.Contains("var options = new PlaybackOptions { MediaControls = MediaControlsOn };", oynatici, StringComparison.Ordinal);
+        Assert.Contains("return () => new MpvEngine(options);", oynatici, StringComparison.Ordinal);
+        Assert.DoesNotContain("Hardware =", oynatici, StringComparison.Ordinal);
         Assert.DoesNotContain("HardwareDecoding.AutoCopy", oynatici, StringComparison.Ordinal);
 
         var karsilastirma = Oku("src", "VidShrink.App", "Playback", "EngineComparisonFrameSource.cs");
