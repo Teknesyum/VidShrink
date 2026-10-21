@@ -565,6 +565,8 @@ public sealed class OluUyeTests
     /// okunuyor ve pimden dustu; yukarida ona "ayni kalip" diye yapilan atif o gunun halidir.
     /// Kumeyi 35'ten 36'ya cikaran Paket 2b, kamera arka plani: <c>WebcamBackground.Keep</c>
     /// <c>RecorderArguments.WebcamKey</c> ve <c>RecorderView.BackgroundKey</c>'de '_' kolu, iki kardesi adiyla okunuyor.
+    /// Kumeyi iki satir buyuten olcerek arama (later 141): kiskac cekirdegi tools/VidShrink.Ab'den Core'a
+    /// tasindi, <c>TargetStepKind.Bisect</c> ve <c>.Multiplicative</c> uretimde yalniz Exhausted'in else'i olarak okunuyor.
     /// T165 turunda kume 31'den 51'e cikmisti. Bundan onceki degisim T150 tur 2'deydi: sifir
     /// tuketici 27'den 26'ya, kume 32 satirdan 31'e inmisti. O turda cikan uye
     /// <c>EncoderProbeState.NotWorking</c>:
@@ -622,6 +624,10 @@ public sealed class OluUyeTests
             "Iki degerli kipin olumsuz kolu ve varsayilani. On okuma yerinin hepsi 'speed == SpeedMode.Fast' kalibinda soruyor (dokuzu ==, CalibrationProbe.cs:148 !=); Quality o kosulun else'i."),
         new("StreamNote.LosslessAudioNotPassedThrough", "varsayilan-kol", Legitimate,
             "Plan notlarinin son kolu. PlanCalculator.AddStreamNotes yedi notu adiyla yaziyor, TrueHD/DTS cumlesi '_' kolunda; ayri bir kol ayni cumleyi verirdi."),
+        new("TargetStepKind.Bisect", "varsayilan-kol", Legitimate,
+            "Kiskac adiminin turu. BracketSearch.Next onu uretiyor; uretimdeki iki okuyucu (MeasuredQualitySearch, tools/VidShrink.Ab AbRunner) yalniz Exhausted'i adiyla soruyor, Bisect ile Multiplicative o kosulun else'i ve ayni sekilde ilerliyor. Ayrimi AbTests TargetSearch adimlarinda adiyla pimliyor (later 141, 20 Ekim 2026)."),
+        new("TargetStepKind.Multiplicative", "varsayilan-kol", Legitimate,
+            "Kiskac adiminin turu. BracketSearch.Next onu uretiyor; uretimdeki iki okuyucu (MeasuredQualitySearch, tools/VidShrink.Ab AbRunner) yalniz Exhausted'i adiyla soruyor, Bisect ile Multiplicative o kosulun else'i ve ayni sekilde ilerliyor. Ayrimi AbTests TargetSearch adimlarinda adiyla pimliyor (later 141, 20 Ekim 2026)."),
         new("TrackAction.Encode", "varsayilan-kol", Legitimate,
             "Iki degerli iz eyleminin varsayilani. Argumanlar 'action == TrackAction.Copy' diye soruyor; Encode o kosulun else'i."),
         new("TransitionKind.Dissolve", "varsayilan-kol", Legitimate,
@@ -808,6 +814,7 @@ public sealed class OluUyeTests
     /// ForwardedRequest.Paths uretimde okunuyor, RemoteZip.Paths hala okunmuyor. QualityScore.Ssim
     /// later 122 ile dustu: OutputQualityCheck SSIM kolunda uretimde okuyor. ShareLink.TargetId 18 Ekim 2026 (later 72, EKB-27) ile dustu: ShareSession.DeleteAsync kaydedicinin Sil dugmesinde baglantinin hedefini ondan buluyor. Kosum (18 Ekim 2026): 1643 ozellik, 68 isaretli.
     /// later 69 ile dustu: UnknownCaptureDeviceException.DeviceName kamera hata metninde okunuyor.
+    /// later 141 ile iki satir girdi: QualitySearchResult.Converged ve .Deviation olcerek aramanin raporu, okuyanlari tools/VidShrink.Ab ara komutu ve testler.
     /// </summary>
     private static readonly string[] PinnedOzellik =
     {
@@ -850,6 +857,8 @@ public sealed class OluUyeTests
         "QualityScore.ColorNormalization  yalniz-disarida",
         "QualityScore.TonemappedReference  yalniz-disarida",
         "QualityScore.Xpsnr  yalniz-disarida",
+        "QualitySearchResult.Converged  yalniz-disarida",
+        "QualitySearchResult.Deviation  yalniz-disarida",
         "QualityTargetResult.Evaluations  yalniz-disarida",
         "QualityTargetResult.QualityError  yalniz-disarida",
         "RecordResult.DroppedAnOption  yalniz-disarida",

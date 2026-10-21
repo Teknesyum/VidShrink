@@ -1162,6 +1162,11 @@
                             <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.advanced.quality-check.tip}"/>
                           </ToolTip.Tip>
                         </CheckBox>
+                        <CheckBox x:Name="ChkAdvSearchByMeasure" Theme="{StaticResource CheckStyle}" IsChecked="False" HorizontalAlignment="Left" Content="{loc:Text main.advanced.search-by-measure.label}">
+                          <ToolTip.Tip>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text main.advanced.search-by-measure.tip}"/>
+                          </ToolTip.Tip>
+                        </CheckBox>
                         <SarilanMetin x:Name="TxtAdvancedError" Classes="reveal" Theme="{StaticResource Hint}" Foreground="{StaticResource EmberBlaze}" TextWrapping="Wrap" IsVisible="False"/>
                       </StackPanel>
                     </StackPanel>

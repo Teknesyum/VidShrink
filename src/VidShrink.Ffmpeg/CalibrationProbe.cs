@@ -285,7 +285,7 @@ public static class CalibrationProbe
         try { if (!process.HasExited) process.Kill(entireProcessTree: true); } catch { }
     }
 
-    private static string? BuildFilter(MediaInfo info, EncodePlan draft)
+    internal static string? BuildFilter(MediaInfo info, EncodePlan draft)
     {
         var parts = new List<string>();
         if (!string.IsNullOrWhiteSpace(draft.HdrVideoFilter)) parts.Add(draft.HdrVideoFilter!);

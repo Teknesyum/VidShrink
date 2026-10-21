@@ -366,14 +366,14 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Sahibin kararı: Uygulama kullanıcının diskine büyük ek dosya (vekil kopya, hazır içerik paketi, yapay zekâ modeli) üretsin ya da indirsin mi; hangisi istekle, hangisi hiç?
 - Plan: Bu paket bir karar demetidir, tek seferde teslim edilmez: sahip hangi satırı açarsa o satır kendi paketi olur. Vekil dosya (ağır kaynağın kurgu sırasında kullanılan küçük kopyası; DZB-51) indirme istemez, yalnız disk yeri ister ve en bağımsız parçadır. Hazır içerik (DZB-22, DZB-52, DZB-53) lisans ve paket boyutu, modelli işler (DZB-44, DZB-69, DZB-70, DZB-71, DZB-72) indirme ve çalışma zamanı sorusudur. Doğrulama her satır için ayrı kurulur.
 
-## 141. Ölçümle Hedef Kalite Araması
+## 141. Ölçümle Hedef Kalite Araması — Kalanlar
 
-13 Ekim 2026 · "bulduklarını later a eklersin" · SIK-P11 · Küçült · iş büyük · öncelik 2 · karar sahibin
+13 Ekim 2026 · SIK-P11 · Küçült · iş orta · öncelik 3
 
-- Satırlar (SIK-P11): SIK-15 Ölçümle hedef kalite araması. [Tablo](piyasa/2026-10-13/kucult-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/PlanCalculator.cs, src/VidShrink.Ffmpeg/QualityMeter.cs, src/VidShrink.Ffmpeg/EncodeRunner.cs, src/VidShrink.App/MainWindow.axaml.cs, src/VidShrink.Cli/CliApp.cs, tools/VidShrink.Bench/
-- Sahibin kararı: Arama her turda ek kodlama ve ölçüm süresi getirir; hedef kalite kipine isteğe bağlı bir seçenek olarak eklensin mi?
-- Plan: Hedef kalite bugün örnek ölçümünden çıkan tahminle çözülüyor (`src/VidShrink.Core/PlanCalculator.cs:1170`); bu pakette kısa örnekler aday ayarla kodlanıp ölçülür ve hedef puan tutana dek ayar aralığı ikiye bölünerek aranır. Tur sayısı sınırlanır, her tur ilerlemede görünür, arama kapalıyken bugünkü yol değişmez. Doğrulama: ölçüm aracıyla sabit bir dosya kümesinde tahmin yolu ile arama yolunun hedef puandan sapması ve harcadığı süre yan yana ölçülür.
+- Yapıldı (20 Ekim 2026): Gelişmiş'te "Ölçerek ara" (varsayılan kapalı, en çok 4 tur, tur ilerlemede); çekirdek `src/VidShrink.Core/BracketSearch.cs` ve `MeasuredQualitySearch.cs`, örnekleyici `src/VidShrink.Ffmpeg/QualitySearchSampler.cs`, ölçüm `docs/olcumler/olcerek-arama.md`.
+- Kalan 1: CLI'a bağlanmadı (`src/VidShrink.Cli/CliApp.cs`); ShrinkJobWindow kuyruğu da aramayı koşturmuyor.
+- Kalan 2: Sabit dosya kümesinde tahmin yolu ile arama yolu yan yana ölçülmedi; tek sentetik klip, iki puan var. Küçük hedefte puan MB ile tekdüze değil (70 hedefinde 4 turda yakınsamadı), kıskaç tekdüzelik varsayıyor.
+- Kalan 3: Örnek kodlama tek geçişli; iki geçişli gerçek kodlamayla farkı ölçülmedi.
 
 ## 142. Donanım Kodlayıcıda Dolby Vision
 
