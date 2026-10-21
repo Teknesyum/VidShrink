@@ -579,7 +579,7 @@ public static class CliApp
         QualityScore? vmaf = null;
         if (request.MeasureVmaf && result.Success && File.Exists(result.OutputPath) && QualityMeasurement.Instance.IsAvailable)
         {
-            try { vmaf = await QualityMeter.MeasureAsync(decision.Info.FilePath, result.OutputPath, decision.Scenes?.Map, ct); }
+            try { vmaf = await MeasureVmafAsync(decision.Info.FilePath, result.OutputPath, decision.Scenes?.Map, ct); }
             catch (Exception ex) when (ex is not OperationCanceledException) { stderr.WriteLine(text.Format("error.failed", ex.Message)); }
         }
 
@@ -591,6 +591,14 @@ public static class CliApp
             stderr.WriteLine(text.Format("error.failed", error));
         return new FileRun(exit, result.Success ? result.OutputPath : null, result.Success ? null : result.Error);
     }
+
+    public static Task<QualityScore> MeasureVmafAsync(string source, string output, SceneMap? scenes, CancellationToken ct)
+        => QualityMeter.MeasureAsync(source, output, scenes, ct);
+
+    public static string VmafLine(QualityScore? vmaf, CliText text)
+        => vmaf?.VmafNegMean is { } score
+            ? text.Format("result.vmaf", Num(score, "0.0", text))
+            : text["result.vmaf-none"];
 
     public static string PlanText(CliRequest request, CliDecision decision, CliText text)
     {
@@ -776,9 +784,7 @@ public static class CliApp
         foreach (var note in EncoderNotes(decision.Plan, text)) builder.AppendLine(note);
         foreach (var note in AudioOptionNotes(decision, text)) builder.AppendLine(note);
         if (result.Success && PassThroughNote(decision, text) is { } kept) builder.AppendLine(kept);
-        builder.AppendLine(vmaf?.VmafNegMean is { } score
-            ? text.Format("result.vmaf", Num(score, "0.0", text))
-            : text["result.vmaf-none"]);
+        builder.AppendLine(VmafLine(vmaf, text));
         builder.AppendLine(text.Format("result.predicted", Num(decision.Result.PredictedQuality, "0.0", text), Basis(decision.Result.Estimate.Measured, text)));
         if (vmaf?.Alignment is { } alignment && alignment.Shifted)
             builder.AppendLine(text.Format("result.alignment", Num(alignment.ShiftMilliseconds, "0.###", text), Num(alignment.ShiftFrames, "0.###", text)));

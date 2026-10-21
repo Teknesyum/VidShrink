@@ -611,7 +611,10 @@
                 <Border x:Name="OutputPanel" Theme="{StaticResource Panel}">
                   <StackPanel Spacing="{StaticResource SpaceMd}">
                     <SarilanMetin Text="{loc:Text main.output.title}" Theme="{StaticResource H2}"/>
-                    <ProgressBar x:Name="Progress" Maximum="1"/>
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource SpaceMd}">
+                      <ProgressBar x:Name="Progress" Maximum="1" VerticalAlignment="Center"/>
+                      <SarilanMetin x:Name="TxtProgressPercent" Grid.Column="1" VerticalAlignment="Center" Theme="{StaticResource MonoValue}" IsVisible="False"/>
+                    </Grid>
                     <StackPanel Spacing="{StaticResource SpaceMd}">
                     <izi:SutunIzgara x:Name="OutputFacts" MaxColumns="2" ColumnSpacing="{StaticResource SpaceMd}" RowSpacing="{StaticResource SpaceMd}">
 

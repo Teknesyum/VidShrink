@@ -9,6 +9,11 @@ made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md
 
 ## [Unreleased]
 
+### Added
+
+- The quality check now also runs for jobs in the batch and shell queue window, shows a
+  percentage while it measures, and writes the score and band to the diagnostic log.
+
 ### Fixed
 
 - Changing the colour matrix (Convert's BT.601/709/2020 choice and Shrink's colour space

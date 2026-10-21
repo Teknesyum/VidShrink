@@ -31,7 +31,9 @@ public static class OutputQualityCheck
         return null;
     }
 
-    public static bool IsAvailable => Pick(EncoderCapabilities.Instance.HasFilter) is not null;
+    public static OutputQualityMetric? Available => Pick(EncoderCapabilities.Instance.HasFilter);
+
+    public static bool IsAvailable => Available is not null;
 
     public static int Subsample(double durationSeconds, double fps)
     {
@@ -94,10 +96,14 @@ public static class OutputQualityCheck
     }
 
     public static async Task<OutputQuality?> MeasureAsync(string referencePath, string testPath, CancellationToken ct = default)
-        => await MeasureAsync(referencePath, testPath, Pick(EncoderCapabilities.Instance.HasFilter), ct);
+        => await MeasureAsync(referencePath, testPath, Available, ct);
+
+    public static Task<OutputQuality?> MeasureAsync(
+        string referencePath, string testPath, OutputQualityMetric? metric, CancellationToken ct = default)
+        => MeasureAsync(referencePath, testPath, metric, null, ct);
 
     public static async Task<OutputQuality?> MeasureAsync(
-        string referencePath, string testPath, OutputQualityMetric? metric, CancellationToken ct = default)
+        string referencePath, string testPath, OutputQualityMetric? metric, IProgress<double>? progress, CancellationToken ct = default)
     {
         if (metric is not { } chosen) return null;
         var reference = await FfprobeClient.ProbeAsync(referencePath, ct);
@@ -111,19 +117,42 @@ public static class OutputQualityCheck
             QualityMeter.ColorFilter(reference, reference, reference.Width, reference.Height),
             chosen, subsample);
 
-        var stderr = await RunAsync(args, ct);
+        var stderr = await RunAsync(args, reference.DurationSeconds, progress, ct);
         var score = ParseScore(chosen, stderr);
         if (score is null)
             throw new QualityMeasurementFailedException("Kalite ölçümü puan üretmedi.");
         return new OutputQuality(chosen, score.Value, subsample);
     }
 
-    private static async Task<string> RunAsync(IReadOnlyList<string> args, CancellationToken ct)
+    public static double? ProgressFraction(string? line, double durationSeconds)
     {
-        using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, args) };
+        if (line is null || !(durationSeconds > 0)) return null;
+        var match = ProgressLine.Match(line);
+        if (!match.Success) return null;
+        if (!long.TryParse(match.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out var micros)) return null;
+        return Math.Clamp(micros / 1_000_000.0 / durationSeconds, 0, 1);
+    }
+
+    public static string LogLine(string outputPath, OutputQuality? quality)
+    {
+        var name = Path.GetFileName(outputPath);
+        if (quality is null) return $"kalite: {name} olculemedi";
+        var metric = quality.Metric.ToString().ToUpperInvariant();
+        var score = quality.Score.ToString(quality.Metric == OutputQualityMetric.Ssim ? "0.0000" : "0.00", CultureInfo.InvariantCulture);
+        var band = quality.Band.ToString().ToLowerInvariant();
+        return $"kalite: {name} {metric} {score} bant={band} alt-ornekleme={quality.Subsample.ToString(CultureInfo.InvariantCulture)}";
+    }
+
+    private static readonly Regex ProgressLine = new(@"^out_time_(?:us|ms)=(\d+)\s*$", RegexOptions.Compiled);
+
+    private static async Task<string> RunAsync(IReadOnlyList<string> args, double durationSeconds, IProgress<double>? progress, CancellationToken ct)
+    {
+        var withProgress = new List<string> { "-progress", "pipe:1", "-nostats" };
+        withProgress.AddRange(args);
+        using var process = new Process { StartInfo = ToolLocator.StartInfo(ToolLocator.Ffmpeg, withProgress) };
         process.Start();
         using var registration = ct.Register(() => Kill(process));
-        var stdout = process.StandardOutput.ReadToEndAsync(CancellationToken.None);
+        var stdout = PumpProgressAsync(process.StandardOutput, durationSeconds, progress);
         var stderr = process.StandardError.ReadToEndAsync(CancellationToken.None);
         await Task.WhenAll(stdout, stderr);
         await process.WaitForExitAsync(CancellationToken.None);
@@ -132,6 +161,12 @@ public static class OutputQualityCheck
         if (process.ExitCode != 0)
             throw new QualityMeasurementFailedException($"ffmpeg ({process.ExitCode}): {Tail(text)}");
         return text;
+    }
+
+    private static async Task PumpProgressAsync(StreamReader reader, double durationSeconds, IProgress<double>? progress)
+    {
+        while (await reader.ReadLineAsync() is { } line)
+            if (ProgressFraction(line, durationSeconds) is { } fraction) progress?.Report(fraction);
     }
 
     private static string Tail(string text)

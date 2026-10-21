@@ -1,57 +1,44 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using VidShrink.App.Localization;
 using VidShrink.Ffmpeg;
 
 namespace VidShrink.App;
 
 public partial class MainWindow
 {
-    internal Func<string, string, CancellationToken, Task<OutputQuality?>> KaliteOlcer { get; set; }
-        = (kaynak, cikti, ct) => OutputQualityCheck.MeasureAsync(kaynak, cikti, ct);
+    internal KaliteOlcer KaliteOlcer { get; set; } = KaliteSatiri.Varsayilan;
+
+    internal Action<string> KaliteGunlugu { get; set; } = KaliteSatiri.GunlugeYaz;
+
+    internal string KaliteYuzdesi => TxtProgressPercent.IsVisible ? TxtProgressPercent.Text ?? "" : "";
 
     internal async Task<string> KaliteSatiriAsync(string kaynak, string cikti, CancellationToken ct)
     {
         SetRunning(true);
         SetStage(TxtStage, Say("main.output.quality-check"));
         TxtRemaining.Text = "-";
-        Progress.IsIndeterminate = true;
+        Progress.IsIndeterminate = false;
+        KaliteIlerlemesi(0);
+        TxtProgressPercent.IsVisible = true;
         try
         {
-            var olcum = await KaliteOlcer(kaynak, cikti, ct);
-            return olcum is null ? Say("main.run.quality.failed") : KaliteMetni(olcum);
-        }
-        catch (OperationCanceledException) when (ct.IsCancellationRequested)
-        {
-            return "";
-        }
-        catch (Exception)
-        {
-            return Say("main.run.quality.failed");
+            return await KaliteSatiri.OlcAsync(KaliteOlcer, kaynak, cikti, new ArayuzIlerlemesi(KaliteIlerlemesi),
+                KaliteMetni, Say("main.run.quality.failed"), KaliteGunlugu, ct);
         }
         finally
         {
-            Progress.IsIndeterminate = false;
+            TxtProgressPercent.IsVisible = false;
         }
     }
 
+    private void KaliteIlerlemesi(double kesir)
+    {
+        Progress.Value = kesir;
+        TxtProgressPercent.Text = KaliteSatiri.Yuzde(kesir, Strings.Culture);
+    }
+
     internal static string KaliteMetni(OutputQuality olcum)
-        => Say("main.run.quality", OlcutAdi(olcum.Metric),
-            Num(olcum.Score, olcum.Metric == OutputQualityMetric.Ssim ? "0.000" : "0.0"),
-            Say(BantAnahtari(olcum.Band)));
-
-    internal static string OlcutAdi(OutputQualityMetric olcut) => olcut switch
-    {
-        OutputQualityMetric.Vmaf => "VMAF",
-        OutputQualityMetric.Ssim => "SSIM",
-        _ => "PSNR"
-    };
-
-    internal static string BantAnahtari(OutputQualityBand bant) => bant switch
-    {
-        OutputQualityBand.Transparent => "main.run.quality.transparent",
-        OutputQualityBand.Good => "main.run.quality.good",
-        OutputQualityBand.Visible => "main.run.quality.visible",
-        _ => "main.run.quality.poor"
-    };
+        => KaliteSatiri.Metin(olcum, Say, Strings.Culture);
 }

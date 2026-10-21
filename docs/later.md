@@ -278,14 +278,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Sahibin kararı: Flathub'a uygulama başvurusu yapılsın mı (sahibin hesabından; ffmpeg ve libmpv paketin içinde gelir) ve yayına AppImage eklensin mi.
 - Plan: Flatpak bildirimi (uygulamanın nasıl derleneceğini ve hangi izinlerle çalışacağını söyleyen dosya) yazılır; ffmpeg ve libmpv Flathub çalışma ortamından ya da bildirimde kaynaktan derlenerek gelir, uygulama kimliği, tanıtım dosyası ve simge eklenir. Paketin içinde kendini güncelleme kapatılır, güncellemeyi Flathub yapar. AppImage aynı yayın çıktısından `release.yml` içinde üretilir ve sha256 listesine girer. Doğrulama: CI'da paketi kurup küçültme ve oynatma denemesi; AppImage için temiz bir Ubuntu koşucusunda açılış.
 
-## 122. Kalite Ölçümü: Toplu İş Ve Kayıt
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · SIK-P10 · Küçült · iş küçük · öncelik 2
-
-- Satırlar (SIK-P10): SIK-14 Çıktının gerçek kalite puanı. [Tablo](piyasa/2026-10-13/kucult-dogrulanmis.md)
-- Yapıldı (18 Ekim 2026): Gelişmiş'te varsayılan kapalı "kaliteyi ölç" kutusu; iş bitince `Ffmpeg/OutputQualityCheck` VMAF, yoksa SSIM, yoksa PSNR ölçüp puanı ve bandı sonuç satırına yazıyor, iptal edilebilir.
-- Kalan: toplu iş ve kabuk kuyruğu penceresi (`ShrinkJobWindow`) ölçmüyor, puan iş kaydına yazılmıyor; ölçüm çubuğu yüzde göstermiyor; bant eşikleri (VMAF 93/85/70) `tools/VidShrink.Bench` ile ölçülmedi; arayüz puanının CLI `--vmaf` puanıyla aynı olduğunu ölçen test yok.
-
 ## 123. VVC Kodlama Desteği
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · SIK-P12 · Küçült · iş orta · öncelik 2 · karar sahibin

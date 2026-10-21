@@ -174,6 +174,61 @@ public partial class ShrinkJobWindow : Window
         public Grid? Row { get; set; }
         public ProgressBar? Bar { get; set; }
         public TextBlock? Kalan { get; set; }
+        public string? Yuzde { get; set; }
+    }
+
+    internal KaliteOlcer KaliteOlcer { get; set; } = KaliteSatiri.Varsayilan;
+
+    internal Action<string> KaliteGunlugu { get; set; } = KaliteSatiri.GunlugeYaz;
+
+    private bool? _kaliteyiOlc;
+
+    internal bool KaliteyiOlc
+    {
+        get => _kaliteyiOlc ?? _appSettings.AdvMeasureQuality;
+        set => _kaliteyiOlc = value;
+    }
+
+    internal string KaliteYuzdesi => TxtProgressPercent.IsVisible ? TxtProgressPercent.Text ?? "" : "";
+
+    internal async Task<string> KaliteEkiAsync(ShrinkRequest request, string cikti, CancellationToken ct)
+    {
+        var job = new AktifIs(request);
+        _aktif.Add(job);
+        RefreshActive(true);
+        try
+        {
+            return await KaliteEkiAsync(job, request.Path, cikti, ct);
+        }
+        finally
+        {
+            _aktif.Remove(job);
+            RefreshActive(true);
+        }
+    }
+
+    private async Task<string> KaliteEkiAsync(AktifIs job, string kaynak, string cikti, CancellationToken ct)
+    {
+        var kultur = Strings.CultureOf(_language);
+        void Yaz(double kesir)
+        {
+            if (!_aktif.Contains(job)) return;
+            job.Fraction = kesir;
+            job.Yuzde = KaliteSatiri.Yuzde(kesir, kultur);
+            RefreshActive(false);
+        }
+        job.Stage = Say("main.output.quality-check");
+        job.Remaining = "-";
+        Yaz(0);
+        try
+        {
+            return await KaliteSatiri.OlcAsync(KaliteOlcer, kaynak, cikti, new ArayuzIlerlemesi(Yaz),
+                olcum => KaliteSatiri.Metin(olcum, Say, kultur), Say("main.run.quality.failed"), KaliteGunlugu, ct);
+        }
+        finally
+        {
+            job.Yuzde = null;
+        }
     }
 
     /// <summary>Bir işin sonucunu sıra sonundaki habere yazar.</summary>
@@ -727,17 +782,23 @@ public partial class ShrinkJobWindow : Window
             if (rows)
                 foreach (var job in _aktif) ActiveList.Children.Add(job.Row ??= ActiveRow(job));
         }
-        if (_aktif.Count == 0) return;
+        if (_aktif.Count == 0)
+        {
+            TxtProgressPercent.IsVisible = false;
+            return;
+        }
 
         foreach (var job in _aktif)
         {
             if (job.Bar is { } bar) bar.Value = job.Fraction;
-            if (job.Kalan is { } kalan) kalan.Text = job.Remaining;
+            if (job.Kalan is { } kalan) kalan.Text = job.Yuzde ?? job.Remaining;
         }
 
         var many = _aktif.Count > 1;
         Progress.IsVisible = true;
         RowFacts.IsVisible = !many;
+        TxtProgressPercent.IsVisible = !many && _aktif[0].Yuzde is not null;
+        TxtProgressPercent.Text = many ? "" : _aktif[0].Yuzde ?? "";
         if (many)
         {
             TxtHeadline.Text = Say("main.shrink-job.running", _aktif.Count);
@@ -909,6 +970,8 @@ public partial class ShrinkJobWindow : Window
                 son = ShrinkJobState.Bitti;
                 sonuc = IsSonucu.Basarili;
                 mesaj = BittiSatiri(result, targetMb, plan);
+                if (KaliteyiOlc && await KaliteEkiAsync(job, request.Path, result.OutputPath, ct) is { Length: > 0 } kalite)
+                    mesaj += " " + kalite;
             }
             else
             {
