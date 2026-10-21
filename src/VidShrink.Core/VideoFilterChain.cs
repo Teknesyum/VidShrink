@@ -548,7 +548,7 @@ public static class VideoFilterChain
             _ => sourceRange
         };
         if (wanted.Matrix == source.Matrix && wantedRange == sourceRange) return null;
-        return $"zscale=min={source.Matrix}:tin={source.Transfer}:pin={source.Primaries}:rin={sourceRange}:m={wanted.Matrix}:t={wanted.Transfer}:p={wanted.Primaries}:r={wantedRange}";
+        return $"zscale=min={source.Matrix}:tin={source.Transfer}:pin={source.Primaries}:rin={sourceRange}:m={wanted.Matrix}:t={wanted.Transfer}:p={wanted.Primaries}:r={wantedRange}:filter=lanczos";
     }
 
     /// <summary>DON-26: <see cref="ConversionColorFilter"/>'ın yazdığı matris ve aralığın çıktı etiketleri.</summary>
@@ -614,7 +614,7 @@ public static class VideoFilterChain
         var source = SourceMatrix(info);
         var wanted = TargetMatrix(target);
         if (source.Matrix == wanted.Matrix) return null;
-        return $"zscale=min={source.Matrix}:tin={source.Transfer}:pin={source.Primaries}:m={wanted.Matrix}:t={wanted.Transfer}:p={wanted.Primaries}";
+        return $"zscale=min={source.Matrix}:tin={source.Transfer}:pin={source.Primaries}:m={wanted.Matrix}:t={wanted.Transfer}:p={wanted.Primaries}:filter=lanczos";
     }
 
     private static (string Matrix, string Transfer, string Primaries) TargetMatrix(ColorMatrixTarget target) => target switch

@@ -190,10 +190,10 @@ public sealed class VideoFilterChainTests
     {
         var bt709 = new VideoFilterOptions { ColorMatrix = ColorMatrixTarget.Bt709 };
         var sd = Kaynak(720, 576, renk: "bt470bg");
-        Assert.Equal(new[] { "zscale=min=470bg:tin=601:pin=470bg:m=709:t=709:p=709" }, Zincir(bt709, sd, 720, 576));
+        Assert.Equal(new[] { "zscale=min=470bg:tin=601:pin=470bg:m=709:t=709:p=709:filter=lanczos" }, Zincir(bt709, sd, 720, 576));
         Assert.Empty(Zincir(bt709, Kaynak(renk: "bt709")));
         Assert.Empty(Zincir(bt709, Kaynak()));
-        Assert.Equal(new[] { "zscale=min=709:tin=709:pin=709:m=170m:t=601:p=170m" },
+        Assert.Equal(new[] { "zscale=min=709:tin=709:pin=709:m=170m:t=601:p=170m:filter=lanczos" },
             Zincir(new VideoFilterOptions { ColorMatrix = ColorMatrixTarget.Bt601 }));
         Assert.Equal(new[] { "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709" },
             VideoFilterChain.ColorArgs(Plan(bt709)));
@@ -230,7 +230,7 @@ public sealed class VideoFilterChainTests
         {
             VideoFilterChain.DeinterlaceChain, "crop=1920:800:0:140", "deblock=filter=strong:block=8", "hqdn3d=3:2:2:3",
             "deband", "hflip", "scale=1280:534:flags=lanczos", "unsharp=5:5:0.5:3:3:0.0",
-            "zscale=min=709:tin=709:pin=709:m=170m:t=601:p=170m", "hue=s=0", "pad=w=iw+0:h=ih+4:x=0:y=2:color=black", "fps=24"
+            "zscale=min=709:tin=709:pin=709:m=170m:t=601:p=170m:filter=lanczos", "hue=s=0", "pad=w=iw+0:h=ih+4:x=0:y=2:color=black", "fps=24"
         }, Zincir(filtre, w: 1280, h: 534, fps: 24));
     }
 
@@ -241,7 +241,7 @@ public sealed class VideoFilterChainTests
         var args = FfmpegArguments.Build(Kaynak(720, 480, renk: "smpte170m"), plan, "out.mp4", 0, null).ToList();
         var vf = args.IndexOf("-vf");
         Assert.True(vf >= 0, string.Join(' ', args));
-        Assert.Equal("scale=1280:720:flags=lanczos,zscale=min=170m:tin=601:pin=170m:m=709:t=709:p=709,hue=s=0", args[vf + 1]);
+        Assert.Equal("scale=1280:720:flags=lanczos,zscale=min=170m:tin=601:pin=170m:m=709:t=709:p=709:filter=lanczos,hue=s=0", args[vf + 1]);
         Assert.Equal("bt709", args[args.IndexOf("-colorspace") + 1]);
 
         var sade = FfmpegArguments.Build(Kaynak(), Plan(VideoFilterOptions.Default), "out.mp4", 0, null).ToList();
