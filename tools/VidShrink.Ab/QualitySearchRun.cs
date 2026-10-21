@@ -51,7 +51,7 @@ internal static class QualitySearchRun
             options.SpeedMode, null, progress, CancellationToken.None, threads);
 
         Console.WriteLine(string.Create(CultureInfo.InvariantCulture,
-            $"istenen {requested:0.0}  model {modelMb:0.000} MB  seçilen {result.TargetMb:0.000} MB  ölçülen {result.MeasuredQuality:0.00}  sapma {result.Deviation:+0.00;-0.00}  tur {result.Rounds.Count}  yakınsadı {result.Converged}  süre {watch.Elapsed.TotalSeconds:0.0} sn"));
+            $"istenen {requested:0.0}  model {modelMb:0.000} MB  seçilen {result.TargetMb:0.000} MB  ölçülen {result.MeasuredQuality:0.00}  sapma {result.Deviation:+0.00;-0.00}  tur {result.SearchRounds.Count}  yakınsadı {result.Converged}  süre {watch.Elapsed.TotalSeconds:0.0} sn"));
         return result.MeasuredQuality is null ? 2 : 0;
     }
 

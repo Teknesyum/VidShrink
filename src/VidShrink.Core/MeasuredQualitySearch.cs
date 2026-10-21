@@ -6,7 +6,7 @@ public sealed record QualitySearchResult(
     double TargetMb,
     double? MeasuredQuality,
     double RequestedQuality,
-    IReadOnlyList<QualitySearchRound> Rounds,
+    IReadOnlyList<QualitySearchRound> SearchRounds,
     bool Converged)
 {
     public double? Deviation => MeasuredQuality - RequestedQuality;

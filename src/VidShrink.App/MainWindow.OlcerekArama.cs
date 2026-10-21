@@ -69,7 +69,7 @@ public partial class MainWindow
     {
         if (_sonArama is not { } arama) return "";
         return arama.MeasuredQuality is { } measured
-            ? " " + Say("main.run.search-result", Num(arama.TargetMb, "0.0"), arama.Rounds.Count, Num(measured, "0.0"), Num(arama.RequestedQuality, "0.#"))
+            ? " " + Say("main.run.search-result", Num(arama.TargetMb, "0.0"), arama.SearchRounds.Count, Num(measured, "0.0"), Num(arama.RequestedQuality, "0.#"))
             : " " + Say("main.run.search-failed");
     }
 

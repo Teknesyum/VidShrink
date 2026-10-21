@@ -1330,6 +1330,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-18, kamera ana kaynak (later 69): iki yeni anahtar (<c>recorder.target.device</c>, <c>.device-pick</c>); yalniz <c>recorder.target.device</c> 6 dilde kola giriyor (en, nl, pt, ro, sw, tr), KOL dokumunden ve SAYIM satirindan olculdu: toplam 3948 + 6 = 3954, en 381 + 1 = 382, tr 127 + 1 = 128.</para>
     /// <para>2026-10-18, akis kalite secimi (later 83): iki yeni anahtar (<c>player.tracks.quality</c>, <c>.rate</c>); yalniz <c>player.tracks.quality</c> es ve pt dillerinde kola giriyor, KOL dokumunden ve SAYIM satirindan olculdu, en ve tr girmiyor: toplam 3970 + 2 = 3972, en 383, tr 129.</para>
     /// <para>2026-10-18, ad VidShrink Player oldu: <c>{app}</c> iki sozcuge acilinca ja ve th dillerinde bes anahtar kola giriyor (<c>main.preset.handbrake.dropped.engine-decides</c>, <c>.no-equivalent</c> ikiser, ja <c>settings.update.portable-effect</c>), cs <c>shell.menu.open</c> cikiyor; KOL dokumu main ile karsilastirildi, en ve tr degismedi; testin olctugu toplam 4069'dan 4074'e cikti.</para>
+    /// <para>2026-10-20, olcerek arama (later 141): alti yeni anahtardan <c>main.run.search-round-done</c> 40 dilde (hu ve zh-Hans haric) ve en <c>main.advanced.search-by-measure.label</c> kola giriyor, KOL dokumunden ve SAYIM satirindan olculdu: toplam 4074 + 41 = 4115, en 393 + 2 = 395, tr 132 + 1 = 133.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1355,9 +1356,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(4074, toplam);
-        Assert.Equal(393, dilBasina["en"]);
-        Assert.Equal(132, dilBasina["tr"]);
+        Assert.Equal(4115, toplam);
+        Assert.Equal(395, dilBasina["en"]);
+        Assert.Equal(133, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1667,6 +1668,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-18, LUT (yedi <c>editor.clip.lut.*</c> anahtari 42 dilde, dusen yok): en, fr, hu, ro <c>.unreadable</c>, lt <c>.none</c>, sv <c>.load</c> kola giriyor (KOL dokumu): toplam 3970 + 6 = 3976, en 384, tr 129; gezilen 86645 + 7 x 43 = 86946.</para>
     /// <para>2026-10-18, 87, 88, 89, ses kisma, OTIO ve LUT main'de birlikte: olculen toplam 4044, en 393, tr 132; gezilen 89249.</para>
     /// <para>2026-10-18, main CI duzeltmesi: 87 ve 88'in on iki duzenleyici anahtari 40 dile cevrildi, player.tracks.quality.rate dustu (birim main.unit.kbps-value'dan): olculen toplam 4070, en 393, tr 132; gezilen 89698.</para>
+    /// <para>2026-10-20, olcerek arama (later 141): alti yeni anahtar 42 dilde, dusen yok; olculen gezilen 89698 + 6 x 43 = 89956. <c>kayip</c> 0.</para>
     /// <para>2026-10-18, ad yer tutucusu: uygulama adi cevirilerde {app} oldu, ekli adlar tur adiyla kuruldu; cs shell.menu.open "ve VidShrinku" yerine "v aplikaci {app}" oldugu icin kol sayimindan dustu: olculen toplam 4069, en 393, tr 132.</para>
     /// <para>2026-10-16, later 44 (etiket ve Onar): on sekiz yeni anahtar; olculen toplam 3781 + 2 = 3783 (lt main.convert.tags.cover.none, ro main.convert.tags.year), en 364, tr 123, gezilen 80453 + 774 = 81227.</para>
     /// <para>2026-10-15, uzun iste oncelik ve bitis sesi (later 76): dort yeni anahtar (<c>settings-tab.encode-priority.above-normal</c>, <c>settings-tab.finish-sound-file.choose</c>, <c>.hint</c>, <c>.reset</c>) 42 dilde, dusen yok; olculen gezilen 78604 + 172 = 78776.</para>
@@ -1706,7 +1708,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(89698, gezilen);
+        Assert.Equal(89956, gezilen);
         Assert.Empty(kayip);
     }
 

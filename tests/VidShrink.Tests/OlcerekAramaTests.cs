@@ -57,7 +57,7 @@ public sealed class OlcerekAramaTests
         var result = Run(encoder, startMb, Offset(5));
 
         Assert.True(result.Converged);
-        Assert.Equal(2, result.Rounds.Count);
+        Assert.Equal(2, result.SearchRounds.Count);
         Assert.Equal(2, encoder.Calls.Count);
         Assert.InRange(result.MeasuredQuality!.Value, Requested - 1, Requested + 1);
         Assert.Equal(TrueTarget(Requested), result.TargetMb, 3);
@@ -83,7 +83,7 @@ public sealed class OlcerekAramaTests
 
         Assert.Equal(4, MeasuredQualitySearch.MaxRounds);
         Assert.Equal(MeasuredQualitySearch.MaxRounds, encoder.Calls.Count);
-        Assert.Equal(MeasuredQualitySearch.MaxRounds, result.Rounds.Count);
+        Assert.Equal(MeasuredQualitySearch.MaxRounds, result.SearchRounds.Count);
         Assert.False(result.Converged);
     }
 
@@ -109,8 +109,8 @@ public sealed class OlcerekAramaTests
 
         var result = Run(encoder, TrueTarget(Requested - 5), Offset(5), progress);
 
-        Assert.Equal(result.Rounds.Count * 2, progress.Seen.Count);
-        for (var i = 0; i < result.Rounds.Count; i++)
+        Assert.Equal(result.SearchRounds.Count * 2, progress.Seen.Count);
+        for (var i = 0; i < result.SearchRounds.Count; i++)
         {
             Assert.Equal(i + 1, progress.Seen[2 * i].Round);
             Assert.Null(progress.Seen[2 * i].MeasuredQuality);
