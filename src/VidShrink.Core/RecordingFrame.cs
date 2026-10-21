@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace VidShrink.Core;
 
-public enum FrameBackdropKind { Solid, Gradient, Image }
+public enum FrameBackdropKind { Solid, Gradient, Picture }
 
 public sealed record FrameBackdrop(FrameBackdropKind Kind, string Color0, string? Color1 = null, string? ImagePath = null)
 {
@@ -10,7 +10,7 @@ public sealed record FrameBackdrop(FrameBackdropKind Kind, string Color0, string
 
     public static FrameBackdrop Gradient(string from, string to) => new(FrameBackdropKind.Gradient, from, to);
 
-    public static FrameBackdrop Image(string path) => new(FrameBackdropKind.Image, "0x000000", null, path);
+    public static FrameBackdrop Picture(string path) => new(FrameBackdropKind.Picture, "0x000000", null, path);
 }
 
 public sealed record FrameOptions(int Padding, int Corner, bool Shadow, FrameBackdrop Backdrop);
@@ -74,13 +74,15 @@ public static class RecordingFrame
     {
         ArgumentNullException.ThrowIfNull(backdrop);
         var size = $"{width}x{height}";
+        var first = Color(backdrop.Color0);
+        var second = Color(backdrop.Color1 ?? backdrop.Color0);
         return backdrop.Kind switch
         {
-            FrameBackdropKind.Solid => ["-f", "lavfi", "-i", $"color=c={Color(backdrop.Color0)}:s={size}:r=1:d=1"],
+            FrameBackdropKind.Solid => ["-f", "lavfi", "-i", $"color=c={first}:s={size}:r=1:d=1"],
             FrameBackdropKind.Gradient => ["-f", "lavfi", "-i",
-                $"gradients=s={size}:c0={Color(backdrop.Color0)}:c1={Color(backdrop.Color1 ?? backdrop.Color0)}:nb_colors=2:x0=0:y0=0:x1={width - 1}:y1={height - 1}:speed=0:r=1:d=1"],
-            FrameBackdropKind.Image when !string.IsNullOrWhiteSpace(backdrop.ImagePath) => ["-i", backdrop.ImagePath],
-            FrameBackdropKind.Image => throw new ArgumentException("gorsel arka plan icin dosya secilmedi.", nameof(backdrop)),
+                $"gradients=s={size}:c0={first}:c1={second}:nb_colors=2:x0=0:y0=0:x1={width - 1}:y1={height - 1}:speed=0:r=1:d=1"],
+            FrameBackdropKind.Picture when !string.IsNullOrWhiteSpace(backdrop.ImagePath) => ["-i", backdrop.ImagePath],
+            FrameBackdropKind.Picture => throw new ArgumentException("gorsel arka plan icin dosya secilmedi.", nameof(backdrop)),
             _ => throw new ArgumentOutOfRangeException(nameof(backdrop), backdrop.Kind, "tanimsiz arka plan.")
         };
     }
@@ -91,7 +93,7 @@ public static class RecordingFrame
         var (w, h) = OutputSize(width, height, options.Padding);
         var p = options.Padding;
 
-        var background = options.Backdrop.Kind == FrameBackdropKind.Image
+        var background = options.Backdrop.Kind == FrameBackdropKind.Picture
             ? $"[1:v]scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},setsar=1,format=yuva444p[bg]"
             : "[1:v]format=yuva444p[bg]";
 

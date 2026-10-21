@@ -178,7 +178,7 @@ internal partial class RecorderView
         if (index == FrameImageIndex)
         {
             if (string.IsNullOrWhiteSpace(_settings.FrameImage) || !File.Exists(_settings.FrameImage)) return null;
-            backdrop = FrameBackdrop.Image(_settings.FrameImage);
+            backdrop = FrameBackdrop.Picture(_settings.FrameImage);
         }
         else if (index == FrameSolidIndex)
         {

@@ -83,7 +83,7 @@ public sealed class KayitCercevesiTests
     {
         var duz = RecordingFrame.Arguments("k.mp4", "c.mp4", 160, 90, new FrameOptions(32, 24, false, FrameBackdrop.Solid("#FF102030")), 2).ToList();
         var gecis = RecordingFrame.Arguments("k.mp4", "c.webm", 160, 90, new FrameOptions(32, 24, true, FrameBackdrop.Gradient("#FF0000", "#0000FF"))).ToList();
-        var gorsel = RecordingFrame.Arguments("k.mp4", "c.mkv", 160, 90, new FrameOptions(64, 0, false, FrameBackdrop.Image("arka.png"))).ToList();
+        var gorsel = RecordingFrame.Arguments("k.mp4", "c.mkv", 160, 90, new FrameOptions(64, 0, false, FrameBackdrop.Picture("arka.png"))).ToList();
 
         Assert.Contains("color=c=0x102030:s=224x154:r=1:d=1", duz);
         Assert.Equal("2", duz[duz.IndexOf("-threads") + 1]);
@@ -100,7 +100,7 @@ public sealed class KayitCercevesiTests
         Assert.Equal("arka.png", gorsel[gorsel.IndexOf("k.mp4") + 2]);
         Assert.Contains("scale=288:218:force_original_aspect_ratio=increase,crop=288:218", gorsel[gorsel.IndexOf("-filter_complex") + 1]);
         Assert.Equal("0:a?", gorsel[gorsel.LastIndexOf("-map") + 1]);
-        Assert.Throws<ArgumentException>(() => RecordingFrame.BackdropInput(new FrameBackdrop(FrameBackdropKind.Image, "0x000000"), 10, 10));
+        Assert.Throws<ArgumentException>(() => RecordingFrame.BackdropInput(new FrameBackdrop(FrameBackdropKind.Picture, "0x000000"), 10, 10));
     }
 
     [Fact]
@@ -173,7 +173,7 @@ public sealed class KayitCercevesiTests
             var uret = await FfmpegRunner.RunAsync(["-hide_banner", "-y", "-nostdin", "-f", "lavfi", "-i", "color=c=0x00C000:s=50x30:d=1", "-frames:v", "1", "-threads", "2", resim]);
             Assert.True(uret.Ok, uret.StandardError);
             var gorsel = Path.Combine(klasor, "gorsel.mp4");
-            await Calistir(RecordingFrame.Arguments(kaynak, gorsel, 160, 90, new FrameOptions(32, 0, false, FrameBackdrop.Image(resim)), 2));
+            await Calistir(RecordingFrame.Arguments(kaynak, gorsel, 160, 90, new FrameOptions(32, 0, false, FrameBackdrop.Picture(resim)), 2));
             var bilgi = await FfprobeClient.ProbeAsync(gorsel);
             var r = await Kare(gorsel, 224, 154);
             _output.WriteLine($"gorsel (0,0)={Piksel(r, 224, 0, 0)}");
