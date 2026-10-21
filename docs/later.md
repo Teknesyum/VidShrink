@@ -327,13 +327,8 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 Karar (21 Ekim 2026, sahip): evet; 109 ölçümünden sonra başlar. 139'da ses ekleri ve iz denetimleri evet, boşluklu çizelge hayır.
 
-- Satırlar (DZB-P15): DZB-10 Sesi videodan ayırma; DZB-46 Otomatik müzik kısma; DZB-47 Seslendirme kaydı; DZB-06 İz denetimleri; DZB-07 Boşluklu çizelge. [Tablo](piyasa/2026-10-13/duzenleyici-kurgu-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/Editing/EditTimeline.cs, src/VidShrink.Core/Editing/EditExport.cs, src/VidShrink.Core/Editing/EditProject.cs, src/VidShrink.Core/AudioCaptureArguments.cs, src/VidShrink.App/Editing/EditorTimeline.cs, src/VidShrink.App/Editing/EditorView.axaml, tests/VidShrink.Tests/
-- Sahibin kararı: Çok iz açıldıktan sonra üstüne gelen işler (sesi ayırma, otomatik müzik kısma, seslendirme kaydı, iz denetimleri, boşluklu çizelge) kapsama girsin mi?
-- Plan: DZB-P7 ve DZB-P12 bitmeden açılmaz ve üç parçaya bölünebilir. Ses ekleri (DZB-10, DZB-46, DZB-47): klibin sesi ikinci ize ayrı parça olarak iner, müzik konuşma başlayınca `sidechaincompress` süzgeciyle kısılır, anlatım kaydedicinin hazır mikrofon yoluyla kaydedilip ize konur. İz denetimleri (DZB-06) izi susturma, gizleme ve kilitlemedir; boşluklu çizelge (DZB-07) sıralı listeyi konumlu modele çevirdiği için en ağır parçadır. Doğrulama: her parça için EditTimeline birim testleri ve teslim dosyasında ses düzeyi ölçümü.
-- Karar (21 Ekim 2026, sahip): ses ekleri (DZB-10, DZB-46, DZB-47) ve iz denetimleri (DZB-06) yapılacak.
-- Karar (21 Ekim 2026, sahip): boşluklar yapılmayacak. DZB-07 kapandı; çizelge sıralı liste kalır.
-- Durum (21 Ekim 2026, `worktree-agent-later-139`): DZB-46 önceden teslim edilmişti (`DuzenleyiciMuzikKismaTests`). DZB-10: seçili klibin sesi A3 izine ayrı parça olarak iner (`EditTimeline.DetachAudio`), klip susturulur, hız değişmiş klipte reddedilir; A3 parçası taşınır, kırpılır, düzeyi değişir, silinir, hepsi tek geri alma adımı. Teslimde A3 parçaları `amix` ile kaynak sesin üstüne katılır, A3 varken kip Tam'a geçer. DZB-47: Ses menüsünden seslendirme kaydı kaydedicinin mikrofon yolundan (`NarrationArguments`, `NarrationRecorder`) proje klasöründeki `seslendirme/`ye yazılır ve oynatma başına A3'e konur. DZB-06: V1 (A1 başlığı V1'in sesidir), T1, A2 ve A3 başlığına tıklayınca susturma, yalnız bu (solo), gizleme (metin) ve kilit; durum proje dosyasında, kilitli izde düzenleme reddedilir, teslim kopyası duyulmayan ve gizli izleri düşürür. Testler `DuzenleyiciSesEkleriTests`. Açık: A3 önizlemede çalmıyor (yalnız teslimde duyulur); V1 gizleme sunulmuyor; kilit simgesi yok, kilitli başlık sönük renkle ayrılıyor; seslendirme arayüz akışı başsız testte koşmadı.
+- Yapıldı (21 Ekim 2026, main): sesi A3 izine ayırma (DZB-10), otomatik müzik kısma (DZB-46), seslendirme kaydı (DZB-47), V1/T1/A2/A3 iz denetimleri (DZB-06); testler `DuzenleyiciSesEkleriTests`. DZB-07 kapandı.
+- Kalan: A3 önizlemede çalmıyor (yalnız teslimde duyulur), V1 gizleme yok, kilit simgesi yok, seslendirme akışı elle denenmedi.
 
 ## 140. Vekil, Hazır İçerik Ve Model
 
