@@ -10,7 +10,7 @@
   konum geri okunur; cp1254 .srt `sub-text`'te bozulmaz, cp1252 negatif kontrolü bozar. Kısayol, menü ve
   altyazı bırakma PlayerView üstünden. Kanıt `.calisma/dalga2/`.
 - `OynaticiKurulumTests.cs` — libmpv konum sırası, kurucu sabitleri CI ile aynı, açılamayan motor atılır.
-- `OynaticiOrtamDenetimiTests.cs` — Windows ortam denetimi (`media-controls`): açık motor başlıklı SMTC oturumu açar, oynat/duraklat çağrısı motoru duraklatır, kapalı motor açmaz (PowerShell 5.1 WinRT sondası, `ao=null`, CI'da atlanır); ayar anahtarı motora geçer ve saklanır, düzenleyici önizlemesi kapalı; hemen kapatılan açık motor kilitlenmez.
+- `OynaticiOrtamDenetimiTests.cs` — Windows ortam denetimi (`media-controls`): açık motor başlıklı SMTC oturumu açar, oynat/duraklat çağrısı motoru duraklatır, kapalı motor açmaz (PowerShell 5.1 WinRT sondası, `ao=null`, CI'da atlanır); ayar anahtarı motora geçer ve saklanır, düzenleyici önizlemesi kapalı; hemen kapatılan açık motor kilitlenmez; kapatılan motorun oturumu birikmez; sonraki/önceki düğmesi komşuyu bir kez ister, tek dosyada kapalı, tek komşuda eksik yöne basış istek atmaz; ses dosyasında sanatçı geçer; mpv liste konumu değişimi tek istek atar; kuyruk komşuları motora gider, istek kuyruğu bir adım ilerletir (sahte motor).
   Vulkan yükleyici sabitleri Core/betik/CI'da aynı; eksik giriş noktalı kitaplık (yamalı `msimg32.dll` kopyası)
   kutu açmadan 0x7F döner ve iş parçacığının hata kipi geri gelir (geri yüklemeyi kaldırmak kırmızı).
   Kurduğu sahte kurulumlar (`konum-*`) son asertten sonra kapanır; kanıt kapanışı kuralı bu sınıfa,

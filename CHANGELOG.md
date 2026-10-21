@@ -13,6 +13,11 @@ made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md
 
 - The player shows in Windows media controls (title, play/pause); a Settings switch turns it off.
 - The editor preview plays the music track in time with the timeline.
+- Next and previous in Windows media controls follow the player's queue; audio files show their artist.
+
+### Fixed
+
+- Closing the player ends its Windows media controls session; pressing a stale one could crash the app.
 
 ## [0.0.1]
 

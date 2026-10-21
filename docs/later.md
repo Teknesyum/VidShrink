@@ -150,7 +150,8 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.Player/MpvEngine.cs, src/VidShrink.App/Playback/Keymap.cs, src/VidShrink.App/Playback/PlayerView.axaml.cs
 - Sahibin kararı: libmpv'nin kendi ortam denetimi anahtarı yetmezse Windows SDK bağı eklensin mi
 - Yapıldı (20 Ekim 2026): oynatıcı motoru `media-controls=yes` ile kuruluyor (Ayarlar menüsünde "Windows Ortam Denetimlerinde Göster", varsayılan açık, yalnız Windows; düzenleyici önizlemesi kapalı). Ölçüldü: Windows ses kutucuğunda oturum açılıyor, başlık dosyanın başlığı, oynat/duraklat düğmesi motoru duraklatıyor. Seçenek açıkken hemen kapatılan motor libmpv'de kilitleniyordu; kapanış kurulumdan sonra en az 100 ms bekliyor. [Ölçüm](olcumler/oynatici-ortam-denetimi-ve-muzik-onizleme.md)
-- Kalan: sonraki ve önceki düğmesi kapalı, çünkü kuyruk mpv'ye verilmiyor; bunları uygulamanın kuyruğuna bağlamak Windows SDK bağı ister ve sahibin kararıdır. Fiziksel ortam tuşu pencere arkadayken elle denenmedi (ölçülen yol SMTC'nin oynat/duraklat çağrısı). Sanatçı alanı boş geliyor.
+- Yapıldı (21 Ekim 2026): SMTC'nin sonraki/önceki düğmesi uygulamanın kuyruğunu izliyor, SDK eklenmedi. mpv düğmeyi tuş olayı olarak atmıyor (`keybind NEXT` denendi, olay gelmedi); kuyruğun iki komşusu mpv listesine yansıyor, `playlist-pos` değişimi tek istek. Ses dosyasında sanatçı etiketi geçiyor. Kapanışta `stop` oturumu kapatıyor (kapatılmayan oturuma basmak süreci düşürüyordu).
+- Kalan: videoda sanatçı alanı SDK'sız yazılamıyor (mpv videoya yalnız başlık yazıyor). Bölümlü dosyada düğme önce bölüm atlıyor (mpv'nin davranışı). Fiziksel ortam tuşu pencere arkadayken elle denenmedi. Kapanışta oturum yaklaşık 60 kapanıştan birinde kalıyor (mpv'nin küçük resim üretimi pencere iş parçacığını tutuyor).
 
 ## 100. Kayıpsız Birleştirme Ölçümü
 

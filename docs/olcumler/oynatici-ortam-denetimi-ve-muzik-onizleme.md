@@ -28,6 +28,37 @@ Kilitlenme: `media-controls=yes` ile motor kurulup **hemen** kapatılınca `mpv_
 Düzeltme: `MpvEngine.Dispose` seçenek açıkken kurulumdan sonra en az `MediaControlsSettle` (100 ms) bekler. Düzeltmeden
 sonra aynı sonda 0 ms beklemeyle 120/120 aç-kapa bitirdi. Test: `OynaticiOrtamDenetimiTests.AcikMotorHemenKapatilincaKilitlenmez`.
 
+## Sonraki ve Önceki Düğmesi (21 Ekim 2026)
+
+mpv 0.41.0-1023 `smtc.cpp`: sonraki düğmesi bölüm kaldıysa `add chapter 1`, yoksa `playlist-next` çalıştırır; önceki
+`add chapter -1` ya da `playlist-prev`. Düğme tuş olayına dönmüyor.
+
+- Basamak 1 düştü: `keybind NEXT "script-message vidshrink-next"` rc 0 döndü, sonda `TrySkipNextAsync` çağırdı,
+  `MPV_EVENT_CLIENT_MESSAGE` gelmedi; `playlist-pos` kendiliğinden 0'dan 1'e geçti.
+- Basamak 2 işledi: `SetNeighbors` listeyi `önceki, çalan, sonraki` kurar (`loadfile append` + `playlist-move`),
+  `keep-open=always` mpv'nin kendi ilerlemesini keser. `playlist-pos` değişimi `_neighborHome` CAS'ıyla tek
+  `NeighborRequested` atar, arayüz kuyruğu `StepFile` ile ilerletir. Ölçüm: sonraki → `[true]`, önceki → `[false]`.
+- Düğmeler mpv'de `playlist-count > 1` iken ikisi birden açık: tek komşuda eksik yöne basış hiçbir şey yapmaz
+  (istek yok, konum 0). Tek dosyada ikisi kapalı.
+- Sanatçı: mpv yalnız müzik türünde (`metadata/by-key/Artist`) yazıyor. Etiketli `.m4a`'da sondanın okuduğu sanatçı
+  etiketle aynı; videoda alan SDK'sız yazılamıyor.
+
+## Kapanışta Kalan Oturum
+
+Kapatılan motorun oturumu `Playing` durumunda kalıyordu; o oturuma oynat/duraklat basmak süreci düşürdü (mpv'nin
+düğme işleyicisi serbest bırakılmış tutamağı yakalıyor). Düzeltme: `Dispose` önce `stop` gönderir, `idle-active`'i
+en çok 100 ms bekler, sonra 100 ms daha bekler.
+
+| Durum | Sonuç |
+| --- | --- |
+| Ek bekleme yok | 10 koşumun 4'ünde oturum kaldı |
+| Ek 100 ms | 20 koşumdan 19'u temiz (koşum başına 3 kapanış) |
+| Ek 200 ms, boşta bekleme 1 sn | 20'de 18 temiz; iyileşme yok, geri alındı |
+| Mutasyon: `CloseMediaSession` çağrısı silindi | kalan oturum 1, 2, 3 (birikiyor) |
+
+Kalan oturum bir kez kalınca süreç sonuna kadar duruyor: mpv'nin pencere iş parçacığı küçük resim üretirken
+(`GetFileFromPathAsync(..).get()`) bloke kalıyor, boşta güncellemesi ve kapanış iletisi işlenmiyor. Test
+(`KapatilanMotorSmtcOturumuBirakmaz`) bu yüzden birikmeyi ölçer: kapanıştan sonra en çok bir oturum.
 ## Müzik İzinin Önizlemede Çalınması
 
 Denenen yol 1, `lavfi-complex` + `audio-files` + `edl://`:

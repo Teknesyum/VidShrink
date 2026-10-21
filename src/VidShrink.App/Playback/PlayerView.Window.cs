@@ -265,6 +265,7 @@ internal partial class PlayerView
                 _settings.Shuffle = !_settings.Shuffle;
                 SaveSettings();
                 _trace.Add("shuffle -> " + _settings.Shuffle);
+                SyncMediaNeighbors();
                 return true;
             case PlayerCommandKind.RepeatCycle:
                 EnsureSettings();
@@ -277,6 +278,7 @@ internal partial class PlayerView
                 _engine?.SetRepeatFile(_settings.Repeat == RepeatMode.One);
                 SaveSettings();
                 _trace.Add("repeat -> " + _settings.Repeat);
+                SyncMediaNeighbors();
                 return true;
             default:
                 return false;
@@ -299,6 +301,7 @@ internal partial class PlayerView
         _mirrored = false;
         _notice = null;
         if (_settings.Repeat == RepeatMode.One) engine.SetRepeatFile(true);
+        SyncMediaNeighbors();
         RefreshInfo();
     }
 

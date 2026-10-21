@@ -243,6 +243,10 @@ public interface IPlaybackEngine : IDisposable
 
     void SetRepeatFile(bool repeat) { }
 
+    void SetNeighbors(string? previous, string? next) { }
+
+    event EventHandler<bool>? NeighborRequested { add { } remove { } }
+
     HardwareDecoding Hardware => HardwareDecoding.Off;
 
     /// <summary>Donanim cozmeyi calan dosyada da degistirir; motor desteklemiyorsa yok sayilir.</summary>

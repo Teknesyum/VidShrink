@@ -810,6 +810,7 @@ internal partial class PlayerView : UserControl
 
         _engine = engine;
         _path = path;
+        engine.NeighborRequested += OnNeighborRequested;
         _seek.Duration = engine.DurationSeconds > 0 ? engine.DurationSeconds : double.PositiveInfinity;
         _loopStart = double.NaN;
         _loopEnd = double.NaN;
@@ -996,6 +997,7 @@ internal partial class PlayerView : UserControl
         if (_engine is { } engine)
         {
             engine.Faulted -= OnFaulted;
+            engine.NeighborRequested -= OnNeighborRequested;
             engine.Dispose();
         }
 

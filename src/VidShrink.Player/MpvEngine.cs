@@ -25,11 +25,11 @@ public sealed partial class MpvEngine : IPlaybackEngine
     private const ulong EofId = 1;
     private const ulong TimeId = 2;
     private const ulong PauseId = 3;
+    private const ulong PlaylistPosId = 4;
     private const int LogCapacity = 64;
 
     private static readonly Stopwatch Clock = Stopwatch.StartNew();
-    public static readonly TimeSpan MediaControlsSettle = TimeSpan.FromMilliseconds(100);
-    private static readonly IntPtr SwType = Marshal.StringToCoTaskMemUTF8("sw");
+    public static readonly TimeSpan MediaControlsSettle = TimeSpan.FromMilliseconds(100);    private static readonly IntPtr SwType = Marshal.StringToCoTaskMemUTF8("sw");
     private static readonly IntPtr BgraFormat = Marshal.StringToCoTaskMemUTF8("bgra");
 
     private readonly PlaybackOptions _options;
@@ -78,6 +78,8 @@ public sealed partial class MpvEngine : IPlaybackEngine
     private readonly object _handleGate = new();
     private string? _source;
     private readonly TimeSpan _createdAt = Clock.Elapsed;
+    private long _neighborHome = -1;
+    private (string? Previous, string? Next) _neighbors;
 
     public unsafe MpvEngine(PlaybackOptions? options = null)
     {
@@ -100,6 +102,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
             Check(mpv_observe_property(_mpv, EofId, "eof-reached", MPV_FORMAT_FLAG), "observe eof-reached");
             Check(mpv_observe_property(_mpv, TimeId, "time-pos", MPV_FORMAT_DOUBLE), "observe time-pos");
             Check(mpv_observe_property(_mpv, PauseId, "pause", MPV_FORMAT_FLAG), "observe pause");
+            if (_options.MediaControls) Check(mpv_observe_property(_mpv, PlaylistPosId, "playlist-pos", MPV_FORMAT_INT64), "observe playlist-pos");
 
             var parameters = stackalloc MpvRenderParam[2];
             parameters[0] = new MpvRenderParam(MPV_RENDER_PARAM_API_TYPE, SwType);
@@ -168,7 +171,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
     {
         ("vo", "libmpv"),
         ("hwdec", HardwareValue(options.Hardware)),
-        ("keep-open", "yes"),
+        ("keep-open", "always"),
         ("idle", "yes"),
         ("pause", "yes"),
         ("terminal", "no"),
@@ -185,6 +188,8 @@ public sealed partial class MpvEngine : IPlaybackEngine
     };
 
     public event EventHandler<PlaybackFault>? Faulted;
+
+    public event EventHandler<bool>? NeighborRequested;
 
     internal Action<int>? BeforeEvent { get; set; }
 
@@ -270,6 +275,8 @@ public sealed partial class MpvEngine : IPlaybackEngine
         Volatile.Write(ref _open, open);
         var target = Target(path);
         Volatile.Write(ref _source, target);
+        Interlocked.Exchange(ref _neighborHome, -1);
+        _neighbors = default;
         Command(OpenTag, "loadfile", target);
 
         var timeout = Task.Delay(_options.OpenTimeout, ct);
@@ -583,6 +590,44 @@ public sealed partial class MpvEngine : IPlaybackEngine
 
     public void SetRepeatFile(bool repeat) => TrySet("loop-file", repeat ? "inf" : "no");
 
+    public void SetNeighbors(string? previous, string? next)
+    {
+        if (!_options.MediaControls) return;
+        _neighbors = (previous, next);
+        ApplyNeighbors();
+    }
+
+    private void ApplyNeighbors()
+    {
+        if (!_options.MediaControls || !_isOpen) return;
+        lock (_handleGate)
+        {
+            if (!HandleAlive) return;
+            Interlocked.Exchange(ref _neighborHome, -1);
+            if (CommandSync("playlist-clear") < 0) return;
+            var (previous, next) = _neighbors;
+            var home = 0;
+            if (previous is not null && CommandSync("loadfile", Target(previous), "append") >= 0)
+            {
+                if (CommandSync("playlist-move", "1", "0") >= 0) home = 1;
+                else CommandSync("playlist-remove", "1");
+            }
+
+            if (next is not null) CommandSync("loadfile", Target(next), "append");
+            Interlocked.Exchange(ref _neighborHome, home);
+        }
+    }
+
+    internal void OnPlaylistPos(long position)
+    {
+        var home = Interlocked.Read(ref _neighborHome);
+        if (home < 0 || position < 0 || position == home) return;
+        position = ReadInt("playlist-pos");
+        if (position < 0 || position == home) return;
+        if (Interlocked.CompareExchange(ref _neighborHome, -1, home) != home) return;
+        NeighborRequested?.Invoke(this, position > home);
+    }
+
     public Task<bool> SaveScreenshotAsync(string path, CancellationToken ct = default) => SaveScreenshotAsync(path, false, ct);
 
     public async Task<bool> SaveScreenshotAsync(string path, bool withSubtitles, CancellationToken ct = default)
@@ -687,6 +732,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
         var open = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         Volatile.Write(ref _open, open);
         var start = "start=" + Number(Math.Max(0, double.IsFinite(atSeconds) ? atSeconds : 0));
+        Interlocked.Exchange(ref _neighborHome, -1);
         // mpv 0.38 loadfile'a <index> argumanini ekledi; 0.37 (Ubuntu 24.04, Debian 12'nin
         // sistem libmpv'si) ucuncu argumani secenek sayip "-1"i reddediyor ve takilma kurtarmasinin
         // yeniden acmasi Linux'ta hic calismiyordu. Ret eszamanli doner; eski bicimle bir kez daha denenir.
@@ -705,6 +751,7 @@ public sealed partial class MpvEngine : IPlaybackEngine
         }
 
         foreach (var file in external) CommandSync("sub-add", file, "auto");
+        ApplyNeighbors();
         if (!restoreTracks) return true;
         if (audio > 0 && AudioTrack != audio) SetAudioTrack(audio);
         if (SubtitleTrack != subtitle) SetSubtitleTrack(subtitle);
@@ -966,6 +1013,9 @@ public sealed partial class MpvEngine : IPlaybackEngine
             case EofId when property->Format == MPV_FORMAT_FLAG:
                 _eof = *(int*)property->Data != 0;
                 break;
+            case PlaylistPosId when property->Format == MPV_FORMAT_INT64:
+                OnPlaylistPos(*(long*)property->Data);
+                break;
             case PauseId when property->Format == MPV_FORMAT_FLAG:
                 _paused = *(int*)property->Data != 0;
                 break;
@@ -1165,8 +1215,35 @@ public sealed partial class MpvEngine : IPlaybackEngine
 
         pending?.TrySetResult(new SeekResult(SeekOutcome.Canceled, 0));
         _isOpen = false;
+        if (_options.MediaControls) CloseMediaSession();
         if (_options.MediaControls && MediaControlsSettle - (Clock.Elapsed - _createdAt) is { Ticks: > 0 } settle) Thread.Sleep(settle);
         Release();
+    }
+
+    private unsafe void CloseMediaSession()
+    {
+        var pointers = new[] { Marshal.StringToCoTaskMemUTF8("stop"), IntPtr.Zero };
+        try
+        {
+            lock (_handleGate)
+            {
+                if (_mpv == IntPtr.Zero) return;
+                fixed (IntPtr* p = pointers) mpv_command(_mpv, p);
+                var waited = Stopwatch.StartNew();
+                while (waited.Elapsed < MediaControlsSettle && !IdleActive()) Thread.Sleep(1);
+                Thread.Sleep(MediaControlsSettle);
+            }
+        }
+        finally
+        {
+            Marshal.FreeCoTaskMem(pointers[0]);
+        }
+    }
+
+    private unsafe bool IdleActive()
+    {
+        int idle;
+        return mpv_get_property(_mpv, "idle-active", MPV_FORMAT_FLAG, &idle) >= 0 && idle != 0;
     }
 
     private void Release()
