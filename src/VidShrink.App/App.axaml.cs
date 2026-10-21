@@ -110,9 +110,12 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            RegisterFileTypes();
-            MacUpdate.Begin();
-            desktop.Exit += (_, _) => MacUpdate.Finish();
+            if (!NewWindow.Active)
+            {
+                RegisterFileTypes();
+                MacUpdate.Begin();
+                desktop.Exit += (_, _) => MacUpdate.Finish();
+            }
             desktop.Exit += (_, _) => VidShrink.Core.Editing.TransitionPreview.Remove(VidShrink.Core.Editing.TransitionPreview.ProcessFolder(VidShrink.Core.Editing.TransitionPreview.CacheRoot));
 
             if (_shrink is not null) desktop.ShutdownMode = ShutdownMode.OnLastWindowClose;
@@ -124,17 +127,22 @@ public partial class App : Application
 
             if (window is MainWindow main)
             {
-                try { main.PencereKonumunuGeriYukle(); }
-                catch (Exception) { }
-                desktop.Exit += (_, _) =>
+                if (!NewWindow.Active)
                 {
-                    try { main.KapanistaGuncelle(); }
+                    try { main.PencereKonumunuGeriYukle(); }
                     catch (Exception) { }
-                };
+                    desktop.Exit += (_, _) =>
+                    {
+                        try { main.KapanistaGuncelle(); }
+                        catch (Exception) { }
+                    };
+                }
                 var files = _files ?? new Integration.ForwardedFiles();
                 main.AcceptForwardedFiles(files);
                 main.AcceptControl(Integration.ControlBridge.Shared);
                 main.Opened += (_, _) => RestoreQueue();
+                main.Opened += (_, _) => StartMpris();
+                desktop.Exit += (_, _) => _mpris?.Dispose();
                 if (this.TryGetFeature<IActivatableLifetime>() is { } activatable)
                     activatable.Activated += (_, activation) => OpenActivatedFiles(files, activation);
             }
@@ -203,6 +211,16 @@ public partial class App : Application
     }
 
     private bool _kuyrukGeriGeldi;
+
+    private Integration.MprisServer? _mpris;
+
+    /// <summary>OYB-137: Linux masaüstünün medya denetimi. Veriyolu yoksa ya da ad alınamazsa sessizce açılmaz.</summary>
+    private void StartMpris()
+    {
+        if (_mpris is not null || !Mpris.Enabled(OperatingSystem.IsLinux(), Environment.GetEnvironmentVariable(Mpris.SwitchVariable))) return;
+        _mpris = new Integration.MprisServer(Integration.ControlBridge.Shared.ExecuteAsync, Integration.MprisServer.RaiseMainWindow);
+        _ = _mpris.StartAsync(Tmds.DBus.Protocol.DBusAddress.Session, NewWindow.Active);
+    }
 
     internal static WindowIcon? LoadAppIcon()
     {

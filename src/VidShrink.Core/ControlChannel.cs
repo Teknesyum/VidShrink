@@ -64,7 +64,11 @@ public sealed record ControlStatus(
     string? PlayerPath,
     bool Playing,
     double PositionSeconds,
-    bool Encoding);
+    bool Encoding)
+{
+    public double? DurationSeconds { get; init; }
+    public string? Title { get; init; }
+}
 
 /// <summary>Tek satırlık yanıt. <see cref="Ok"/> yanlışsa <see cref="Error"/> doludur.</summary>
 public sealed record ControlReply(bool Ok, string? Error = null, string? Detail = null, ControlStatus? Status = null)
@@ -187,7 +191,9 @@ public static class ControlProtocol
                 ["playerPath"] = status.PlayerPath,
                 ["playing"] = status.Playing,
                 ["positionSeconds"] = Math.Round(status.PositionSeconds, 3),
-                ["encoding"] = status.Encoding
+                ["encoding"] = status.Encoding,
+                ["durationSeconds"] = status.DurationSeconds is { } duration ? Math.Round(duration, 3) : null,
+                ["title"] = status.Title
             };
         return root.ToJsonString(Options);
     }
@@ -210,7 +216,11 @@ public static class ControlProtocol
                     Text(s["playerPath"]),
                     s["playing"] is JsonValue p && p.TryGetValue<bool>(out var playing) && playing,
                     Number(s["positionSeconds"]) ?? 0,
-                    s["encoding"] is JsonValue e && e.TryGetValue<bool>(out var encoding) && encoding);
+                    s["encoding"] is JsonValue e && e.TryGetValue<bool>(out var encoding) && encoding)
+                {
+                    DurationSeconds = Number(s["durationSeconds"]),
+                    Title = Text(s["title"])
+                };
 
             return new ControlReply(ok, Text(root["error"]), Text(root["detail"]), status) { Id = Text(root["id"]) };
         }

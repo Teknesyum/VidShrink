@@ -95,6 +95,24 @@ public sealed class DenetimKanaliTests : IDisposable
         => Assert.Equal(ControlErrors.Unsupported, ControlProtocol.ParseReply(SingleInstanceChannel.Nack).Error);
 
     [Fact]
+    public void Durum_sure_ve_basligi_tasir_bossa_null_yazar()
+    {
+        var dolu = new ControlStatus(ControlProtocol.RecorderIdle, null, "/a.mp4", true, 3, false) { DurationSeconds = 61.23456, Title = "Başlık" };
+        var satir = ControlProtocol.SerializeReply(ControlReply.Success(dolu));
+        Assert.Contains("\"durationSeconds\":61.235", satir);
+        var geri = ControlProtocol.ParseReply(satir).Status!;
+        Assert.Equal(61.235, geri.DurationSeconds!.Value, 6);
+        Assert.Equal("Başlık", geri.Title);
+
+        var bos = ControlProtocol.SerializeReply(ControlReply.Success(dolu with { DurationSeconds = null, Title = null }));
+        Assert.Contains("\"durationSeconds\":null", bos);
+        Assert.Contains("\"title\":null", bos);
+        var bosGeri = ControlProtocol.ParseReply(bos).Status!;
+        Assert.Null(bosGeri.DurationSeconds);
+        Assert.Null(bosGeri.Title);
+    }
+
+    [Fact]
     public void Kanal_acikken_boru_ustunden_komut_ve_yanit_geliyor()
     {
         var channel = NewChannel();

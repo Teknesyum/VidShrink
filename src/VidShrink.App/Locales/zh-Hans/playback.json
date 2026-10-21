@@ -105,6 +105,7 @@
   "playback.zoom.out": "缩小",
   "playback.zoom.in": "放大",
   "player.menu.reveal": "打开文件所在位置",
+  "player.menu.new-window": "在新窗口中打开",
   "player.menu.open-folder": "打开文件夹",
   "player.menu.edit": "编辑",
   "player.menu.view": "画面",

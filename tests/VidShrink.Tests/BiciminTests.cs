@@ -1340,8 +1340,10 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-21, birlesme turu (later 42, 69, 78, 87+90, 88+89, 105+106, 141): dallarin farklari toplandi ve birlesik agacta olculdu: toplam 4074 + 175 = 4249, en 393 + 15 = 408, tr 132 + 5 = 137.</para>
     /// <para>2026-10-21, later 140 birlesmesi: dokuz <c>editor.proxy.*</c> anahtari; toplam 4249 + 5 = 4254, en 408 + 1 = 409, tr 137.</para>
     /// <para>2026-10-21, later 147 birlesmesi: yazi boyutu anahtarlari; toplam 4254 + 1 = 4255 (pt), gezilen 92622 + 86 = 92708.</para>
+    /// <para>2026-10-21, later 137 birlesmesi: <c>player.menu.new-window</c>; toplam 4255 + 4 = 4259, en 409 + 1 = 410, gezilen 92708 + 43 = 92751.</para>
     /// <para>2026-10-21, later 140 vekil kopya: dokuz <c>editor.proxy.*</c> anahtari 42 dile eklendi; <c>editor.proxy.failed</c> en, fr, hu, nl ve ro dillerinde kola giriyor: olculen toplam 4079, en 394, tr 132.</para>
     /// <para>2026-10-20, yazi boyutu (later 147): iki yeni anahtar (<c>settings-tab.text-size.label</c>, <c>.hint</c>); yalniz <c>settings-tab.text-size.label</c> pt dilinde kola giriyor ("Tamanho do texto"), KOL dokumunden ve SAYIM satirindan olculdu, en ve tr girmiyor: toplam 4074 + 1 = 4075, en 393, tr 132.</para>
+    /// <para>2026-10-21, yeni pencerede ac (later 137): yeni <c>player.menu.new-window</c> 4 dilde kola giriyor (de, en, it, nl), KOL dokumunden ve SAYIM satirindan olculdu, tr girmiyor: toplam 4074 + 4 = 4078, en 393 + 1 = 394, tr 132.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1367,8 +1369,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(4255, toplam);
-        Assert.Equal(409, dilBasina["en"]);
+        Assert.Equal(4259, toplam);
+        Assert.Equal(410, dilBasina["en"]);
         Assert.Equal(137, dilBasina["tr"]);
     }
 
@@ -1700,6 +1702,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-18, oynatici HDR ton esleme (later 96): tek yeni anahtar (<c>player.advanced.tone-mapping</c>), dusen yok: 84280 + 43 = 84323. <c>kayip</c> 0.</para>
     /// <para>2026-10-18, bulaniklik ve bolge gizleme (later 88, DZB-28): bes yeni anahtar yalniz en ve tr'de, dusen yok: 86645 + 5 x 2 = 86655. <c>kayip</c> 0.</para>
     /// <para>2026-10-20, murekkep kisayolu (later 42): yeni <c>recorder.hotkeys.ink</c> 42 dilde, dusen yok: 89698 + 43 = 89741. <c>kayip</c> 0.</para>
+    /// <para>2026-10-21, yeni pencerede ac (later 137): tek yeni anahtar (<c>player.menu.new-window</c>) 42 dilde ve zh_Hans takma adinda, dusen yok: 89698 + 43 = 89741. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1727,7 +1730,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(92708, gezilen);
+        Assert.Equal(92751, gezilen);
         Assert.Empty(kayip);
     }
 

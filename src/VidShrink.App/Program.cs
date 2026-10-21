@@ -156,6 +156,7 @@ internal static class Program
 
     private static int RunMain(string[] args)
     {
+        if (NewWindow.Requested(args)) return RunNewWindow(NewWindow.Without(args));
         AcilisIzi.Yaz("main");
         var request = Integration.ForwardedRequest.FromArguments(args, StartupTarget(args));
         var path = request.Single ? request.First : null;
@@ -177,6 +178,30 @@ internal static class Program
         instance.StartListening(files.Receive, ControlFor(args, Integration.ControlBridge.Shared));
         StartLauncherMaintenance();
         return PencereyiAc(() => Build(path, files).StartWithClassicDesktopLifetime(args));
+    }
+
+    /// <summary>
+    /// OYB-137 ikinci pencere: tek örnek borusu, denetim kanalı, ad göçü, JIT profili ve başlatıcı bakımı
+    /// sahibin işi, burada hiçbiri yok. Ayar <see cref="NewWindow.Enter"/> ile kendi kopyasına alınır, kuyruk
+    /// defteri kapanır; kopya çıkışta silinir.
+    /// </summary>
+    private static int RunNewWindow(string[] args)
+    {
+        AcilisIzi.Yaz("yeni-pencere");
+        var snapshot = NewWindow.Enter(UpdateSettings.DefaultPath, Environment.ProcessId, new[] { Playback.PlayerQueue.FileName }, QueueJournal.IsAlive);
+        QueueJournal.Disabled = true;
+        var request = Integration.ForwardedRequest.FromArguments(args, StartupTarget(args));
+        var path = request.Single ? request.First : null;
+        var files = new Integration.ForwardedFiles();
+        if (!request.Single && request.Paths.Count > 0) files.Receive(request.Encode());
+        try
+        {
+            return PencereyiAc(() => Build(path, files).StartWithClassicDesktopLifetime(args));
+        }
+        finally
+        {
+            if (snapshot is not null) NewWindow.Remove(snapshot);
+        }
     }
 
     /// <summary>

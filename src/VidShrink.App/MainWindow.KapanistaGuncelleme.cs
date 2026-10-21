@@ -121,6 +121,7 @@ public partial class MainWindow
     private bool OtomatikAcik()
     {
         if (OtomatikGuncellemeAcik is { } karar) return karar();
+        if (NewWindow.Active) return false;
         return OperatingSystem.IsWindows() && !Tasinabilir && UpdateCheck.AutoUpdateEnabled(UpdateSettings.Load(SettingsPathOverride));
     }
 

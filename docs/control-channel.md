@@ -56,7 +56,8 @@ Every command may carry an `id` string; the reply echoes it.
 | `status` | Status object, on success of `status`, player and record commands. |
 
 Status object: `recorder` (`idle`, `countdown`, `running`, `paused`), `lastRecordingPath`, `playerPath`,
-`playing`, `positionSeconds`, `encoding`.
+`playing`, `positionSeconds`, `encoding`, `durationSeconds` (seconds, `null` when nothing is loaded or the
+length is unknown), `title` (the media title, `null` when nothing is loaded).
 
 ## Error codes
 
@@ -83,3 +84,31 @@ vidshrink control record-start | record-stop | status [--json]
 
 Exit code 0 on success, 1 when the app refuses (with the reason on stderr), 64 on a usage error.
 `--json` prints the raw reply line.
+
+## Linux media controls (MPRIS)
+
+On Linux the player publishes `org.mpris.MediaPlayer2.vidshrinkplayer` on the session bus, so the desktop's
+media keys, the GNOME and KDE media widgets and `playerctl` can drive it. It does not need
+`--denetim-kanali`. Set `VIDSHRINK_MPRIS=0` to turn it off.
+
+- libmpv's `media-controls` option does not cover Linux (it is Windows SMTC only, and the library carries no
+  MPRIS name); mpv's MPRIS comes from an outside script, which `load-scripts=no` keeps out. The object is ours,
+  served with Tmds.DBus.Protocol, the package Avalonia's Linux backend already brings.
+- `Play`, `Pause`, `PlayPause`, `Stop` (pauses), `Seek`, `SetPosition` and `OpenUri` run the matching control
+  command (`play`, `pause`, `seek`, `open`) on the same path as the pipe. `Next` and `Previous` do nothing.
+- Properties: `PlaybackStatus`, `Metadata` (`mpris:trackid`, `mpris:length`, `xesam:title`, `xesam:url`),
+  `Position`, `CanPlay`, `CanPause`, `CanSeek`. Changes are announced with `PropertiesChanged` and `Seeked`.
+- `Raise` brings the window to the front. `Quit` does nothing (`CanQuit` is `false`).
+- A second window takes `org.mpris.MediaPlayer2.vidshrinkplayer.instance<pid>`.
+
+## New window
+
+`--yeni-pencere` (or `--new-window`), optionally followed by a file or media address, starts a second,
+independent player window. The player's right-click menu has the same entry ("Open in new window").
+
+The second window does not take the single-instance pipe, so it has no control channel and paths are not
+forwarded to it. It does not touch the queue journal, updates or file associations; those stay
+with the first window. It reads a copy of the settings folder (`pencereler/<pid>/` next to the settings
+file), without the player queue, and writes only to that copy, so two windows never write the same file. The
+copy is deleted when the window closes; a copy left by a crashed window is removed the next time a second
+window starts.

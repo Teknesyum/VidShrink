@@ -105,6 +105,7 @@
   "playback.zoom.out": "Alejar",
   "playback.zoom.in": "Acercar",
   "player.menu.reveal": "Abrir ubicación del archivo",
+  "player.menu.new-window": "Abrir en una ventana nueva",
   "player.menu.open-folder": "Abrir carpeta",
   "player.menu.edit": "Editar",
   "player.menu.view": "Imagen",
