@@ -323,28 +323,34 @@ kapatınca kuruyor; Ayarlar'dan kapatılır. Linux'ta yeni sürümü bir rozet h
 
 ## Program Ne Yaptığını Gösterir
 
-Yeni adlı pencerenin ekran görüntüleri yeniden çekiliyor; aşağıdaki her yer neyi
-göstereceğini söylüyor.
+Oynatıcı, Düzenleyici ve Küçült kareleri önceki sürümden ve başlıkta eski adı taşıyor; yeni
+adla yeniden çekilecek.
 
-<!-- ekran-goruntusu: player-tr.png -->
 - **Oynatıcı** — pencereyi dolduran bir video, üstte sekme çubuğu, altta kontrol şeridi.
 
-<!-- ekran-goruntusu: editor-tr.png -->
+![Oynatıcı sekmesi bir sunum videosunu kenardan kenara oynatırken: üstte sekme çubuğu, altta geçen ve kalan süre, ses, on saniyelik atlama düğmeleri, oynat-duraklat, hız ve tam ekranla kontrol şeridi](docs/gorseller/T201-oynatici-tr.png)
+
 - **Düzenleyici** — kliplere bölünmüş zaman çizelgesinin üstünde monitör, dışa aktarma kipi
   seçicisiyle.
 
-<!-- ekran-goruntusu: shrink-tr.png -->
+![Düzenleyici sekmesi: videoyu gösteren monitörün altında görüntü ve ses izlerinde üç klibe bölünmüş zaman çizelgesi, bölme, silme, hız, geri alma, yakınlaştırma, kaydetme ve paylaşma düğmeleriyle dışa aktarma kipi seçicisi](docs/gorseller/T201-duzenleyici-tr.png)
+
 - **Küçült** — öncesi-sonrası bölmeli panel, açık açık yazılmış plan, öngörülen boyut ve
   kalite.
 
-<!-- ekran-goruntusu: convert-tr.png -->
+![Küçült sekmesi 3,0 MB'lık klip ve 0,15 MB hedefle: solda kaynak bilgileri, hedef ve kalite kaydırıcıları; ortada %196 yakınlaştırılmış Orijinal ve İşlenmiş bölmeli panel, altında plan (libsvtav1, iki geçişli 72 kbit/sn, 666x374); sağda tahmini çıktı ve öngörülen kalite 65,1/100](docs/gorseller/T201-kucult-yakin-tr.png)
+
 - **Dönüştür** — kapsayıcı, kodek ve kalite alanları, yanında koşacak FFmpeg komutu.
 
-<!-- ekran-goruntusu: recorder-tr.png -->
+![Dönüştür sekmesi sample.mp4 yüklüyken: solda kapsayıcı MP4, kodek H.264, CRF 23, Kaynak'ta bırakılmış çözünürlük ve kare hızı, AAC ses, başlangıç ve bitiş kırpma alanları; sağda ses ve altyazı izi panelleri, koşacak FFmpeg komutu ve boştaki ilerleme çubuğu, altında Dönüştür düğmesi](docs/gorseller/T300-donustur-tr.png)
+
 - **Kaydedici** — kaynak, ses ve kamera seçicileri, ölçülerek seçilen otomatik kodlayıcıyla.
 
-<!-- ekran-goruntusu: settings-tr.png -->
+![Kaydedici sekmesi Gelişmiş düzende, boştayken: kaynak olarak bütün ekran, gizlilik maskesi ve geri sayım seçicileri; ayarları program seçerken altında imleç ve tıklama seçenekleri; kapsayıcı, ses ve bölme alanlarıyla Gelişmiş Kodlama paneli, Kamera paneli, Ses seçicileri ve Kayıt Tamponu](docs/gorseller/T300-kaydedici-tr.png)
+
 - **Ayarlar** — dil ve tema seçicileri, sağ tık menüsü girdileri ve güncelleme anahtarı.
+
+![Ayarlar sekmesi: solda dil ve tema seçicileri ile genel anahtarlar, ortada tanı günlüğü, VidShrink Player sağ tık menüsü girdileri ve Kendiliğinden Güncelle anahtarı, sağda çıktı klasörü, kodlama ve altyazı hesabı ayarları](docs/gorseller/T300-ayarlar-tr.png)
 
 ## Küçültme Nasıl Çalışır
 

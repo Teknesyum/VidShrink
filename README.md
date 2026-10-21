@@ -320,27 +320,33 @@ new release is out.
 
 ## What The Program Shows
 
-Screenshots of the renamed window are being retaken; each slot below says what it will
-show.
+The Player, Editor and Shrink shots are from the previous release and still show the old
+title; they will be retaken under the new name.
 
-<!-- screenshot: player-en.png -->
 - **Player** — a video filling the window, the tab bar on top and the control strip below.
 
-<!-- screenshot: editor-en.png -->
+![The Player tab playing a presentation video edge to edge, the tab bar on top and the control strip below with elapsed and remaining time, volume, ten-second skip buttons, play and pause, speed and full screen](docs/gorseller/T201-oynatici-en.png)
+
 - **Editor** — the monitor over a timeline cut into clips, with the export mode picker.
 
-<!-- screenshot: shrink-en.png -->
+![The Editor tab: the monitor showing the video above a timeline cut into three clips on the video and audio tracks, with Split, Delete, Speed, Undo, Redo, zoom, Save, Save As and Share the File buttons and the Smart export mode picker](docs/gorseller/T201-duzenleyici-en.png)
+
 - **Shrink** — the before-and-after split panel, the plan spelled out, the predicted size
   and quality.
 
-<!-- screenshot: convert-en.png -->
+![The Shrink tab with a 3.0 MB clip and a 0.15 MB target: source details and the target and quality sliders on the left, the Original and Processed split panel zoomed to 196% in the middle with the What It Will Do plan below it (libsvtav1, two-pass 72 kbit/s, 666x374), and the estimated output with predicted quality 65.1/100 on the right](docs/gorseller/T201-kucult-yakin-en.png)
+
 - **Convert** — container, codec and quality fields beside the FFmpeg command that will run.
 
-<!-- screenshot: recorder-en.png -->
+![The Convert tab with sample.mp4 loaded: container MP4, codec H.264, CRF 23, resolution and frame rate left at Source, AAC audio and start and end trim fields on the left; the audio and subtitle track panels, the FFmpeg command that will run and the idle progress bar on the right, with the Convert button below](docs/gorseller/T300-donustur-en.png)
+
 - **Recorder** — source, sound and webcam pickers, with the measured automatic encoder.
 
-<!-- screenshot: settings-en.png -->
+![The Recorder tab in the Advanced layout, idle: the whole screen chosen as the source with the privacy mask and countdown pickers, the program picking the recording settings with the cursor and click options below, the Advanced Encoding panel with container, audio and split fields, the Webcam panel, the Sound pickers and the Replay Buffer](docs/gorseller/T300-kaydedici-en.png)
+
 - **Settings** — language and theme pickers, right-click menu entries and the update switch.
+
+![The Settings tab: language and theme pickers with the general switches on the left, the diagnostic log, the right-click menu entries for VidShrink Player and the Update Automatically switch in the middle, the output folder, encoding and subtitle account settings on the right](docs/gorseller/T300-ayarlar-en.png)
 
 ## How Shrinking Works
 
