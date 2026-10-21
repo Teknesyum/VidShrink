@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
@@ -233,6 +233,7 @@ public partial class MainWindow : Window
                 strip.SizeChanged += (_, _) => AlignTabsToTitle();
         });
         LoadTitleBarLogo();
+        SurumDugmesiniKur();
         AlignTabsToTitle();
         TrackChrome();
         TrackNoticeLayer();
