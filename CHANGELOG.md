@@ -9,6 +9,12 @@ made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md
 
 ## [Unreleased]
 
+## [0.0.3] - 2026-10-22
+
+### Added
+
+- The title bar shows the app version to the right of the name; clicking it checks for updates and reports whether the app is up to date, an update is ready, or the check failed.
+
 ### Changed
 
 - The recorder microphone and system audio level bars now redraw on every display frame (about 60 updates per second instead of 20), with the peak rising fast and easing down slowly. The level source reports 25 ms windows instead of 50 ms, and the frame loop runs only while a bar is visible and moving.
@@ -20,6 +26,7 @@ made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md
 ### Fixed
 
 - Editor: dragging the playhead along the ruler no longer leaves it sliding backward on its own after you stop or release; queued preview seeks are coalesced so only the latest one runs, and the playhead reports the requested position while a seek is in flight.
+- The default-app suggestion banner no longer appears twice after the window is restored from the tray; restoring no longer reruns the startup path.
 
 ## [0.0.2] - 2026-10-21
 
