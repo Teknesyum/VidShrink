@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -12,6 +13,9 @@ namespace VidShrink.App.Playback;
 internal partial class PlayerView
 {
     private readonly ClickArbiter _click = new();
+    private SolTikHareketi? _sol;
+    private DispatcherTimer? _tutmaSaati;
+    private bool _hizliTutma;
 
     private SurfacePan? _pan;
     private PointerPressedEventArgs? _pressArgs;
@@ -26,6 +30,14 @@ internal partial class PlayerView
 
     internal ClickArbiter Click => _click;
 
+    internal SolTikHareketi Sol => _sol ??= new SolTikHareketi(_click, TutmaEsigi().TotalSeconds, CiftTikSuresi().TotalSeconds);
+
+    internal Func<double> FareSaati { get; set; } = () => Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+
+    internal bool HizliTutuluyor => _hizliTutma;
+
+    internal double OynayanHiz => _hizliTutma ? Keymap.HoldSpeed : _speed;
+
     internal SurfacePan Pan => _pan ??= new SurfacePan(SnapDip());
 
     /// <summary>Menu son kez neye yaslandi: fare konumuna mi, ust satirdaki dugmeye mi.</summary>
@@ -39,11 +51,11 @@ internal partial class PlayerView
     {
         AddHandler(PointerMovedEvent, OnFarePointerMoved, Avalonia.Interactivity.RoutingStrategies.Tunnel);
         AddHandler(PointerReleasedEvent, OnFarePointerReleased, Avalonia.Interactivity.RoutingStrategies.Tunnel);
-        AddHandler(PointerCaptureLostEvent, (_, e) => { if (ReferenceEquals(e.Source, this)) EndWindowDrag("capturelost"); }, Avalonia.Interactivity.RoutingStrategies.Direct | Avalonia.Interactivity.RoutingStrategies.Bubble, true);
+        AddHandler(PointerCaptureLostEvent, (_, e) => { if (ReferenceEquals(e.Source, this)) EndWindowDrag("capturelost"); TutmaKoptu(); }, Avalonia.Interactivity.RoutingStrategies.Direct | Avalonia.Interactivity.RoutingStrategies.Bubble, true);
     }
 
     /// <summary>
-    /// Sol basis yalniz kurulur; isini birakista yapar. Cift tik ayri bir hareket degil.
+    /// Sol basis yalniz kurulur; isini birakista yapar. Basili kalirsa tutma saati kurulur.
     /// </summary>
     internal void FarePress(PointerPressedEventArgs e, double x, double y)
     {
@@ -56,9 +68,65 @@ internal partial class PlayerView
         _windowDrag = false;
         _leftClicks++;
         _dragMode = "";
-        _click.Press(x, y);
+        TutmaBitir();
+        Sol.Bas(x, y, FareSaati());
         _lastDrag = new Point(x, y);
+        TutmaSaatiKur(Sol.TutmaSn);
     }
+
+    internal bool FareZaman()
+    {
+        var an = FareSaati();
+        if (!Sol.Zaman(an))
+        {
+            if (_click.Down && !_click.Dragging && !Sol.Tutuyor) TutmaSaatiKur(Sol.Kalan(an));
+            return false;
+        }
+
+        _hizliTutma = true;
+        _engine?.SetSpeed(Keymap.HoldSpeed);
+        _trace.Add("hold -> " + Saat.Tani.Konum(Keymap.HoldSpeed));
+        return true;
+    }
+
+    private void TutmaSaatiKur(double saniye)
+    {
+        if (_tutmaSaati is null)
+        {
+            _tutmaSaati = new DispatcherTimer();
+            _tutmaSaati.Tick += (_, _) =>
+            {
+                _tutmaSaati.Stop();
+                FareZaman();
+            };
+        }
+
+        _tutmaSaati.Stop();
+        _tutmaSaati.Interval = TimeSpan.FromSeconds(Math.Max(saniye, 0.001));
+        _tutmaSaati.Start();
+    }
+
+    private void TutmaKoptu()
+    {
+        if (!_hizliTutma) return;
+        _tutmaSaati?.Stop();
+        Sol.Iptal();
+        TutmaBitir();
+    }
+
+    private void TutmaBitir()
+    {
+        if (!_hizliTutma) return;
+        _hizliTutma = false;
+        _engine?.SetSpeed(_speed);
+        _trace.Add("hold -> " + Saat.Tani.Konum(_speed));
+    }
+
+    private TimeSpan TutmaEsigi()
+        => this.TryFindResource("PlayerHoldFastDelay", out var value) && value is TimeSpan esik && esik > TimeSpan.Zero ? esik : PauseGlyphHold;
+
+    private static TimeSpan CiftTikSuresi()
+        => Application.Current?.PlatformSettings?.GetDoubleTapTime(PointerType.Mouse) ?? TimeSpan.FromMilliseconds(500);
 
     /// <summary>
     /// Fare oynadi. Esik gecilmeden once bos doner; gecilince kip secilir: normal pencerede
@@ -66,7 +134,7 @@ internal partial class PlayerView
     /// </summary>
     internal string FareMove(double x, double y)
     {
-        if (!_click.Move(x, y)) return "";
+        if (!Sol.Oyna(x, y)) return "";
 
         if (_dragMode.Length == 0)
         {
@@ -85,13 +153,30 @@ internal partial class PlayerView
         return _dragMode;
     }
 
-    /// <summary>Birakis. Surukleme olmadan biten basis o anda duraklat/baslat olur.</summary>
-    internal ReleaseOutcome FareRelease()
+    /// <summary>
+    /// Birakis. Tik o anda duraklat/baslat olur; ikinci tik tam ekrani cevirip ilk tikin
+    /// duraklatmasini geri alir; tutma hizi eski hiza dondurur ve tik sayilmaz.
+    /// </summary>
+    internal SolTikSonucu FareRelease()
     {
-        var outcome = _click.Release();
+        _tutmaSaati?.Stop();
+        var sonuc = Sol.Birak(FareSaati());
         _dragMode = "";
-        if (outcome == ReleaseOutcome.Click) Apply(Keymap.ForPress(PlayerButton.Left));
-        return outcome;
+        switch (sonuc)
+        {
+            case SolTikSonucu.Tik:
+                Apply(Keymap.ForPress(PlayerButton.Left));
+                break;
+            case SolTikSonucu.CiftTik:
+                Apply(Keymap.ForPress(PlayerButton.Left));
+                Apply(Keymap.Fullscreen.ToCommand());
+                break;
+            case SolTikSonucu.TutmaBitti:
+                TutmaBitir();
+                break;
+        }
+
+        return sonuc;
     }
 
     internal void ResetPan()
@@ -154,12 +239,12 @@ internal partial class PlayerView
         if (TopLevel.GetTopLevel(this) is not Window window) return;
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
         {
-            _click.Cancel();
+            Sol.Iptal();
             _dragMode = "";
             return;
         }
 
-        _click.Cancel();
+        Sol.Iptal();
         if (NativeMoveDrag)
         {
             _dragMode = "";
@@ -188,7 +273,7 @@ internal partial class PlayerView
         if (!_windowDrag && _dragMode != "window") return;
         _windowDrag = false;
         _dragMode = "";
-        _click.Cancel();
+        Sol.Iptal();
         _trace.Add("dragend -> " + reason);
     }
 

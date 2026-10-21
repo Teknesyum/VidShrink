@@ -53,6 +53,7 @@ internal static class Keymap
     internal const double SpeedStep = 0.05;
     internal const double MinimumSpeed = 0.25;
     internal const double MaximumSpeed = 4;
+    internal const double HoldSpeed = 2;
     internal const double SeekSmall = 10;
     internal const double SeekMedium = 60;
     internal const double SeekLarge = 300;

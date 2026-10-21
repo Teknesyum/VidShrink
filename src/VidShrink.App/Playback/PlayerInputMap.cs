@@ -294,8 +294,8 @@ internal enum ReleaseOutcome
 
 /// <summary>
 /// Sol basistan iki is dogar: tiklama duraklat/baslat, basili tutup surukleme pencere tasima
-/// ya da pan. Tiklama birakista hemen islenir; cift tik beklenmez, ikinci tik yine
-/// duraklat/baslat olur. Oynatici ve karsilastirma paneli bu sinifi paylasir.
+/// ya da pan. Tiklama birakista hemen islenir. Oynatici ve karsilastirma paneli bu sinifi
+/// paylasir; oynaticida cift tik ve basili tutma <see cref="SolTikHareketi"/> ile ustune eklenir.
 ///
 /// Esik uydurulmadi: <see cref="DragThresholdDip"/> Windows'un kendi surukleme esigi
 /// (SM_CXDRAG/SM_CYDRAG varsayilani 4 piksel). Bu kadar oynamayan bir basis tiklamadir.
@@ -312,6 +312,8 @@ internal sealed class ClickArbiter
 
     /// <summary>Basis surukleme esigini gecti mi.</summary>
     internal bool Dragging => _dragging;
+
+    internal bool Down => _down;
 
     internal double TravelX { get; private set; }
 
