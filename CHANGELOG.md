@@ -9,16 +9,17 @@ made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md
 
 ## [Unreleased]
 
-### Fixed
-
-- Editor: dragging the playhead along the ruler no longer leaves it sliding backward on its own after you stop or release; queued preview seeks are coalesced so only the latest one runs, and the playhead reports the requested position while a seek is in flight.
-
 ### Changed
 
 - The recorder microphone and system audio level bars now redraw on every display frame (about 60 updates per second instead of 20), with the peak rising fast and easing down slowly. The level source reports 25 ms windows instead of 50 ms, and the frame loop runs only while a bar is visible and moving.
 - The recorder result panel no longer lists "Save as MP4" and "Convert to GIF" as separate
   buttons; they now sit in a "More" menu at the end of the action row, which is hidden when
   neither conversion applies.
+- Recorder mini strip: the start/pause button is now a filled primary button and the stop button an accent one, so both stand out; the strip can be moved by pressing anywhere outside its buttons; its tooltips now wait 1 second longer (1.4 s in total) before appearing.
+
+### Fixed
+
+- Editor: dragging the playhead along the ruler no longer leaves it sliding backward on its own after you stop or release; queued preview seeks are coalesced so only the latest one runs, and the playhead reports the requested position while a seek is in flight.
 
 ## [0.0.2] - 2026-10-21
 

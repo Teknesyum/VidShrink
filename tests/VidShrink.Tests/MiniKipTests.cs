@@ -74,7 +74,7 @@ public class MiniKipTests
         Assert.DoesNotContain("Topmost=\"True\"", Oku("src", "VidShrink.App", "Recorder", "RecorderMini.axaml"));
     }
 
-    /// <summary>Sayacın kendisi tutamak: ayrı bir tutamak sütunu yer yiyordu.</summary>
+    /// <summary>Şeridin düğme dışındaki her yeri tutamak; sayaç taşıma imlecini gösterir.</summary>
     [Fact]
     public void SayacTutamak()
     {
@@ -83,9 +83,10 @@ public class MiniKipTests
 
         var sayac = mini[mini.IndexOf("x:Name=\"TxtElapsed\"", StringComparison.Ordinal)..];
         var kapanis = sayac.IndexOf("/>", StringComparison.Ordinal);
+        var serit = mini[mini.IndexOf("x:Name=\"MiniStrip\"", StringComparison.Ordinal)..];
 
         Assert.Contains("Cursor=\"SizeAll\"", sayac[..kapanis]);
-        Assert.Contains("PointerPressed=\"OnDrag\"", sayac[..kapanis]);
+        Assert.Contains("PointerPressed=\"OnDrag\"", serit[..serit.IndexOf('>', StringComparison.Ordinal)]);
         Assert.Contains("BeginMoveDrag(e)", kod);
     }
 
