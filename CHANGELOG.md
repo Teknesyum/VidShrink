@@ -9,6 +9,10 @@ made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md
 
 ## [Unreleased]
 
+### Changed
+
+- The recorder microphone and system audio level bars now redraw on every display frame (about 60 updates per second instead of 20), with the peak rising fast and easing down slowly. The level source reports 25 ms windows instead of 50 ms, and the frame loop runs only while a bar is visible and moving.
+
 ## [0.0.2] - 2026-10-21
 
 ### Added
