@@ -105,6 +105,7 @@
   "playback.zoom.out": "Zoom out",
   "playback.zoom.in": "Zoom in",
   "player.menu.reveal": "Open file location",
+  "player.menu.new-window": "Open in new window",
   "player.menu.open-folder": "Open folder",
   "player.menu.edit": "Edit",
   "player.menu.view": "Video",

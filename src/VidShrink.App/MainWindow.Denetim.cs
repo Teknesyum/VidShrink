@@ -35,7 +35,11 @@ public partial class MainWindow : IControlHost
         };
         var last = recorder?.ResultPathText;
         return new ControlStatus(state, string.IsNullOrWhiteSpace(last) ? null : last,
-            Player.LoadedPath, Player.IsPlaying, Player.PositionSeconds, _cts is not null);
+            Player.LoadedPath, Player.IsPlaying, Player.PositionSeconds, _cts is not null)
+        {
+            DurationSeconds = Player.DurationSeconds,
+            Title = Player.LoadedPath is null ? null : Player.MediaTitleText
+        };
     }
 
     bool IControlHost.Play()
@@ -87,12 +91,34 @@ public partial class MainWindow : IControlHost
 
     bool IControlHost.SubmitShrink(ShrinkRequest request) => ShrinkSubmitter(request);
 
+    /// <summary>OYB-137 "yeni pencerede aç": varsayılanı aynı uygulamayı <see cref="NewWindow.Flag"/> ile yeni bir süreçte açar.</summary>
+    internal Func<string, bool> NewWindowStarter { get; set; } = StartNewWindowProcess;
+
+    internal static bool StartNewWindowProcess(string target)
+    {
+        var executable = Environment.ProcessPath;
+        if (string.IsNullOrEmpty(executable)) return false;
+        var start = new ProcessStartInfo { FileName = executable, UseShellExecute = false };
+        foreach (var argument in NewWindow.Arguments(target)) start.ArgumentList.Add(argument);
+        NewWindow.RestoreFor(start);
+        try
+        {
+            using var process = Process.Start(start);
+            return process is not null;
+        }
+        catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or InvalidOperationException or PlatformNotSupportedException)
+        {
+            return false;
+        }
+    }
+
     private static bool StartShrinkProcess(ShrinkRequest request)
     {
         var executable = Environment.ProcessPath;
         if (string.IsNullOrEmpty(executable)) return false;
         var start = new ProcessStartInfo { FileName = executable, UseShellExecute = false };
         foreach (var argument in ShrinkRequestResolver.ShellArguments(request)) start.ArgumentList.Add(argument);
+        NewWindow.RestoreFor(start);
         try
         {
             using var process = Process.Start(start);

@@ -289,3 +289,25 @@ jobs:
             .calisma/dalga8a/**
           if-no-files-found: ignore
           retention-days: 7
+
+  # MPRIS (later 137): libmpv'nin media-controls'u Linux'ta MPRIS yayinlamaz; oynatici kendi
+  # org.mpris.MediaPlayer2 nesnesini oturum veriyolunda acar. Bu is dbus-run-session icinde
+  # sunucuyu gercek bir istemciyle sorar ve libmpv'nin veriyolunda ad acmadigini olcer.
+  mpris-linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: libmpv ve D-Bus
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libmpv2 dbus
+          ls -l /usr/lib/x86_64-linux-gnu/libmpv.so*
+      - name: MPRIS testleri (canli D-Bus kolu dahil)
+        env:
+          VIDSHRINK_MPRIS_CANLI: '1'
+          VIDSHRINK_LIBMPV: /usr/lib/x86_64-linux-gnu/libmpv.so.2
+        run: dbus-run-session -- dotnet test tests/VidShrink.Tests/VidShrink.Tests.csproj -c Release --filter "FullyQualifiedName~MprisTests" --logger "console;verbosity=normal"

@@ -18,6 +18,7 @@ internal partial class PlayerView
         var flyout = new MenuFlyout();
         foreach (var action in Keymap.MenuTop) flyout.Items.Add(ActionRow(action));
         flyout.Items.Add(RevealRow());
+        flyout.Items.Add(NewWindowRow());
         AddEditRow(flyout);
         flyout.Items.Add(new Separator());
         flyout.Items.Add(AudioMenu());
@@ -79,6 +80,20 @@ internal partial class PlayerView
         if (OnAddress) ExplainAddress(item);
         return item;
     }
+
+    internal const string NewWindowKey = "player.menu.new-window";
+
+    /// <summary>OYB-137: açık dosyayı ya da adresi ikinci, bağımsız bir pencerede açar; ana pencere bağlar.</summary>
+    internal Func<string, bool>? OpenInNewWindow { get; set; }
+
+    private MenuItem NewWindowRow()
+    {
+        var item = new MenuItem { Header = Strings.Get(NewWindowKey), IsEnabled = _path is not null && OpenInNewWindow is not null };
+        item.Click += (_, _) => OpenCurrentInNewWindow();
+        return item;
+    }
+
+    internal bool OpenCurrentInNewWindow() => _path is { } path && OpenInNewWindow is { } open && open(path);
 
     private MenuItem OpenFolderRow()
     {

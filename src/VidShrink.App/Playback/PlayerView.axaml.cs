@@ -106,6 +106,8 @@ internal partial class PlayerView : UserControl
 
     internal double PositionSeconds => _seek.Target;
 
+    internal double? DurationSeconds => _path is not null && double.IsFinite(_seek.Duration) && _seek.Duration > 0 ? _seek.Duration : null;
+
     internal double ZoomScale => _zoom.PanelScale;
 
     internal bool FillMode => _zoom.Fill;

@@ -194,6 +194,7 @@ public partial class MainWindow : Window
         Player.AppSettingsItems = PlayerSettingsItems;
         PlayerAdvancedPanel.Player = Player;
 
+        Player.OpenInNewWindow = target => NewWindowStarter(target);
         Player.HistoryPath = () => Path.Combine(
             Path.GetDirectoryName(SettingsPathOverride ?? UpdateSettings.DefaultPath) ?? AppContext.BaseDirectory,
             PlayerHistoryFileName);
@@ -694,11 +695,14 @@ public partial class MainWindow : Window
             // yolunda arayuz is parcaciginda durur (oneri uzanti basina bir
             // AssocQueryString, surum sorusu bir HttpClient kurulumu). Sirayi degistirmek
             // gorunurlerini degistirmez: serit de bildirim de ayni acilista belirir.
-            ShowDefaultAppSuggestion();
-            AcilisIzi.Yaz("varsayilan-oneri");
-            if (UpdateCheck.AutoUpdateEnabled(settings)) _ = OtomatikGuncellemeyiBaslatAsync();
-            else _ = CheckForUpdateAsync();
-            _ = KisayolSimgesiniTazeleAsync();
+            if (!NewWindow.Active)
+            {
+                ShowDefaultAppSuggestion();
+                AcilisIzi.Yaz("varsayilan-oneri");
+                if (UpdateCheck.AutoUpdateEnabled(settings)) _ = OtomatikGuncellemeyiBaslatAsync();
+                else _ = CheckForUpdateAsync();
+                _ = KisayolSimgesiniTazeleAsync();
+            }
             await LoadFfmpegVersionAsync();
             await ProbeHardwareEncodersAsync();
         }

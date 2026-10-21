@@ -7,6 +7,18 @@ All notable changes to VidShrink Player are recorded here. The format follows
 The history of the program under its old name, VidShrink, up to 1.2.24 and the changes
 made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md).
 
+## [Unreleased]
+
+### Added
+
+- Linux media controls. The player shows up on the session bus as an MPRIS player, so media keys, the
+  desktop's media widget and `playerctl` can play, pause, seek and open files. `VIDSHRINK_MPRIS=0` turns it
+  off.
+- Open in new window. The player's right-click menu and `--yeni-pencere` (`--new-window`) open a second,
+  independent player window. It works on its own copy of the settings, so the two windows never write the
+  same file; the queue and updates stay with the first window.
+- The control channel's status reply carries `durationSeconds` and `title`.
+
 ## [0.0.1]
 
 ### Changed
