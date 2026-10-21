@@ -2074,7 +2074,7 @@
                     </StackPanel>
                   </Grid>
 
-                  <Grid x:Name="TargetTextSizeRow" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}">
+                  <WrapPanel x:Name="TargetTextSizeRow" ItemSpacing="{StaticResource SpaceLg}" LineSpacing="{StaticResource SpaceSm}">
                     <StackPanel Spacing="{StaticResource SpaceSm}">
                       <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
                         <SarilanMetin Text="{loc:Text settings-tab.default-target.label}" Theme="{StaticResource Label}"/>
@@ -2089,7 +2089,7 @@
                         <SarilanMetin Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
                       </StackPanel>
                     </StackPanel>
-                    <StackPanel Grid.Column="1" Spacing="{StaticResource SpaceSm}">
+                    <StackPanel MinWidth="{StaticResource FieldWidthSm}" Spacing="{StaticResource SpaceSm}">
                       <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
                         <SarilanMetin Text="{loc:Text settings-tab.text-size.label}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.text-size.label}">
@@ -2100,7 +2100,7 @@
                       </Grid>
                       <ComboBox x:Name="CmbTextSize" auto:AutomationProperties.Name="{loc:Text settings-tab.text-size.label}" HorizontalAlignment="Stretch"/>
                     </StackPanel>
-                  </Grid>
+                  </WrapPanel>
 
                   <CheckBox x:Name="ChkAdvancedDefaultOpen" Theme="{StaticResource CheckStyle}" HorizontalAlignment="Left" Content="{loc:Text settings-tab.advanced-default-open.label}">
                     <ToolTip.Tip>
