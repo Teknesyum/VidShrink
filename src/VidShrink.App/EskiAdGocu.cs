@@ -65,7 +65,11 @@ internal static class EskiAdGocu
             AppDirectory = appDirectory,
             MovedMarker = LegacyMigration.MovedMarker(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)),
             LegacyKeyExists = EskiKayitVar,
-            OldProcessesRunning = EskiSurecVar
+            OldProcessesRunning = EskiSurecVar,
+            Shortcuts = LegacyMigration.LegacyShortcuts(
+                Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                Environment.GetFolderPath(Environment.SpecialFolder.Programs)),
+            ReadTarget = new ShellShortcuts().ReadTarget
         };
         _ = Task.Run(async () =>
         {

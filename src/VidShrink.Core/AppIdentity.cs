@@ -60,5 +60,7 @@ public static class AppIdentity
 
     public const string ShortcutName = Name + ".lnk";
 
+    public const string LegacyShortcutName = LegacyFolderName + ".lnk";
+
     public const string RegistryVendorPath = @"Teknesyum\" + CompactName;
 }

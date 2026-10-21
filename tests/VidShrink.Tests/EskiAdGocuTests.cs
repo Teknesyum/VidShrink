@@ -423,6 +423,74 @@ public sealed class EskiAdGocuTests : IDisposable
         Assert.True(Directory.Exists(install.Root));
     }
 
+    [Fact]
+    public void EskiKokeGidenKisayollarVeBosBaslatKlasoruSilinir()
+    {
+        var (install, baseHost) = Artik();
+        var (desktop, programs) = (Path.Combine(_work, "Desktop"), Path.Combine(_work, "StartPrograms"));
+        var shortcuts = LegacyMigration.LegacyShortcuts(desktop, programs);
+        var foreign = Path.Combine(desktop, "Baska.lnk");
+        var targets = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            [shortcuts[0]] = Path.Combine(install.Root, AppIdentity.LegacyLauncherExecutable),
+            [shortcuts[1]] = Path.Combine(install.Root, AppIdentity.LegacyLauncherExecutable),
+            [foreign] = Path.Combine(_work, "Local", "Programs", AppIdentity.FolderName, AppIdentity.LegacyLauncherExecutable)
+        };
+        foreach (var path in targets.Keys) Write(Path.GetDirectoryName(path)!, Path.GetFileName(path), "lnk");
+        var host = Kisayollu(baseHost, shortcuts.Append(foreign).ToArray(), targets);
+
+        Assert.True(LegacyMigration.RemoveLeftover(install, host, _settings, Now));
+
+        Assert.False(File.Exists(shortcuts[0]));
+        Assert.False(Directory.Exists(Path.GetDirectoryName(shortcuts[1])));
+        Assert.True(File.Exists(foreign));
+    }
+
+    [Fact]
+    public void BaskaHedefliKisayolVeDoluKlasorKalir()
+    {
+        var (install, baseHost) = Artik();
+        var shortcuts = LegacyMigration.LegacyShortcuts(Path.Combine(_work, "Desktop"), Path.Combine(_work, "StartPrograms"));
+        var targets = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            [shortcuts[0]] = Path.Combine(_work, "Local", "Programs", AppIdentity.FolderName, "x.exe"),
+            [shortcuts[1]] = Path.Combine(install.Root, "app", AppIdentity.LegacyAppExecutable)
+        };
+        foreach (var path in targets.Keys) Write(Path.GetDirectoryName(path)!, Path.GetFileName(path), "lnk");
+        var other = Path.Combine(Path.GetDirectoryName(shortcuts[1])!, "Kullanici.lnk");
+        File.WriteAllText(other, "lnk");
+
+        Assert.True(LegacyMigration.RemoveLeftover(install, Kisayollu(baseHost, shortcuts, targets), _settings, Now));
+
+        Assert.True(File.Exists(shortcuts[0]));
+        Assert.False(File.Exists(shortcuts[1]));
+        Assert.True(File.Exists(other));
+    }
+
+    [Fact]
+    public void EskiKayitDururkenKisayolSilinmez()
+    {
+        var (install, baseHost) = Artik(keyExists: true);
+        var shortcuts = LegacyMigration.LegacyShortcuts(Path.Combine(_work, "Desktop"), Path.Combine(_work, "StartPrograms"));
+        var targets = shortcuts.ToDictionary(path => path, _ => Path.Combine(install.Root, AppIdentity.LegacyLauncherExecutable), StringComparer.OrdinalIgnoreCase);
+        foreach (var path in shortcuts) Write(Path.GetDirectoryName(path)!, Path.GetFileName(path), "lnk");
+
+        Assert.True(LegacyMigration.RemoveLeftover(install, Kisayollu(baseHost, shortcuts, targets), _settings, Now));
+
+        Assert.All(shortcuts, path => Assert.True(File.Exists(path)));
+    }
+
+    private static LegacyLeftoverHost Kisayollu(LegacyLeftoverHost host, IReadOnlyList<string> shortcuts, IReadOnlyDictionary<string, string> targets) => new()
+    {
+        LocalAppData = host.LocalAppData,
+        AppDirectory = host.AppDirectory,
+        MovedMarker = host.MovedMarker,
+        LegacyKeyExists = host.LegacyKeyExists,
+        OldProcessesRunning = host.OldProcessesRunning,
+        Shortcuts = shortcuts,
+        ReadTarget = path => targets.TryGetValue(path, out var target) ? target : null
+    };
+
     private (LegacyInstall Install, LegacyLeftoverHost Host) Artik(bool keyExists = false, bool running = false)
     {
         var local = Path.Combine(_work, "Local");

@@ -36,6 +36,10 @@ public sealed class LegacyLeftoverHost
     };
 
     public Action<string> DeleteDirectory { get; init; } = path => Directory.Delete(path, recursive: false);
+
+    public IReadOnlyList<string> Shortcuts { get; init; } = Array.Empty<string>();
+
+    public Func<string, string?> ReadTarget { get; init; } = _ => null;
 }
 
 public sealed class LegacyCleanupHost
@@ -238,8 +242,9 @@ public static class LegacyMigration
         if (LeftoverRoot(install, host) is not { } root) return true;
         if (host.OldProcessesRunning()) return Fail(LeftoverProcessRunning);
 
+        var failed = RemoveShortcuts(root, host);
         var keep = new HashSet<string>(IdentityFiles(root).Where(host.FileExists), StringComparer.OrdinalIgnoreCase);
-        var failed = Sweep(root, keep, host);
+        failed += Sweep(root, keep, host);
         if (failed == 0)
         {
             foreach (var file in keep) failed += Attempt(() => host.DeleteFile(file));
@@ -252,6 +257,43 @@ public static class LegacyMigration
             UpdateHealth.RecordFailure(healthSettingsPath, now, reason);
             return false;
         }
+    }
+
+    public static IReadOnlyList<string> LegacyShortcuts(string desktop, string programs) => new[]
+    {
+        Path.Combine(desktop, AppIdentity.LegacyShortcutName),
+        Path.Combine(programs, AppIdentity.LegacyFolderName, AppIdentity.LegacyShortcutName)
+    };
+
+    private static int RemoveShortcuts(string root, LegacyLeftoverHost host)
+    {
+        var failed = 0;
+        foreach (var shortcut in host.Shortcuts)
+        {
+            if (!host.FileExists(shortcut)) continue;
+            string? target;
+            try { target = host.ReadTarget(shortcut); }
+            catch (Exception exception) when (exception is not OutOfMemoryException)
+            {
+                failed++;
+                continue;
+            }
+            if (string.IsNullOrWhiteSpace(target) || !Within(target, root)) continue;
+            var removed = Attempt(() => host.DeleteFile(shortcut));
+            failed += removed;
+            if (removed != 0) continue;
+            var folder = Path.GetDirectoryName(shortcut);
+            if (folder is null || !string.Equals(Path.GetFileName(folder), AppIdentity.LegacyFolderName, StringComparison.OrdinalIgnoreCase)) continue;
+            try
+            {
+                if (!host.Files(folder).Any() && !host.Directories(folder).Any()) failed += Attempt(() => host.DeleteDirectory(folder));
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+            {
+                failed++;
+            }
+        }
+        return failed;
     }
 
     private static int Sweep(string directory, HashSet<string> keep, LegacyLeftoverHost host)
