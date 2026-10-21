@@ -6,6 +6,7 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Automation;
 using Avalonia.Media;
+using Avalonia.VisualTree;
 using VidShrink.App.Localization;
 using VidShrink.Ffmpeg;
 
@@ -195,9 +196,16 @@ internal partial class RecorderMini : Window
         Position = new PixelPoint(left, top);
     }
 
+    internal static bool StartsDrag(object? source)
+    {
+        for (var node = source as Visual; node is not null; node = node.GetVisualParent())
+            if (node is Button) return false;
+        return true;
+    }
+
     private void OnDrag(object? sender, PointerPressedEventArgs e)
     {
-        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) BeginMoveDrag(e);
+        if (!e.Handled && e.GetCurrentPoint(this).Properties.IsLeftButtonPressed && StartsDrag(e.Source)) BeginMoveDrag(e);
     }
 
     private void OnToggle(object? sender, RoutedEventArgs e) => ToggleRequested?.Invoke(this, EventArgs.Empty);
