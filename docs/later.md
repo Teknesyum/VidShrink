@@ -172,27 +172,12 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Sahibin kararı: SignPath Foundation'a başvurulsun mu (ücretsiz; başvuruyu ve her imza onayını sahip yapar), yoksa ücretli sertifika mı alınsın.
 - Plan: Başvurunun onayı dışarıda beklediği için karar erken verilmeli; öteki paketler bu sırada yürür. Onaydan sonra `release.yml`'e imza adımı girer: kurucu, başlatıcı, uygulama, komut satırı aracı ve kabuk eklentisi, x64 ve ARM64 için; sha256 listeleri imzadan sonra üretilir. README'deki "başvuru sürüyor" cümlesi gerçek duruma çekilir. Doğrulama: yayın dosyalarında imza denetimi geçerli döner; temiz makinede SmartScreen ve Akıllı Uygulama Denetimi davranışı elle bakılır.
 
-## 109. Geçiş Önizleme Yolu
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DZB-P8 · Düzenleyici · iş büyük · öncelik 1 · karar sahibin
-
-- Satırlar (DZB-P8): DZB-17 Geçiş önizlemesi. [Tablo](piyasa/2026-10-13/duzenleyici-kurgu-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/Editing/EdlPreview.cs, src/VidShrink.Core/Editing/EditLook.cs, src/VidShrink.App/Editing/EditorView.Monitor.cs, src/VidShrink.Player/MpvEngine.cs, tools/VidShrink.Bench
-- Sahibin kararı: Geçişin ve bindirmenin canlı önizlemesi hangi yoldan yapılsın: libmpv süzgeç grafiği, geçiş bölgesini kısa ön-işleme, yoksa ayrı bir bileşim motoru (MLT)?
-- Plan: Önerilen yol kısa ön-işleme: iki klibin bindiği birkaç saniye arka planda küçük bir ara dosyaya işlenir ve önizleme listesine ayrı parça olarak girer; var olan `edl://` önizlemesi bozulmaz, yeni bağımlılık gelmez. Karardan önce iki ölçüm yapılır: 1080p'de bir saniyelik geçişin hazırlanma süresi ve `lavfi-complex` ile `edl://` birlikteliği. MLT (Shotcut ve Kdenlive'ın kullandığı açık kaynak bileşim motoru) yeni ikili dosya dağıtımı demektir, o yüzden son seçenek. Doğrulama: aynı andaki önizleme karesi ile teslim karesinin karşılaştırması.
-- Durum: yapıldı, dal `worktree-agent-later-109`. Kısa ön-işleme seçildi (`Core/Editing/TransitionPreview`, `EdlPreview` geçiş parçası, `EditorView.Gecis`). Ölçümler ve açık kalanlar: [gecis-onizleme](olcumler/gecis-onizleme.md). Birleşince madde silinir.
-
 ## 110. İkinci Video İzi Ve Yeşil Perde
 
-13 Ekim 2026 · "bulduklarını later a eklersin" · DZB-P12 · Düzenleyici · iş büyük · öncelik 1 · karar sahibin
+13 Ekim 2026 · "bulduklarını later a eklersin" · DZB-P12 · Düzenleyici · iş büyük · öncelik 1 · karar verildi
 
-Karar (21 Ekim 2026, sahip): evet; 109 ölçümünden sonra başlar.
-
-- Satırlar (DZB-P12): DZB-02 İkinci video izi; DZB-29 Yeşil perde. [Tablo](piyasa/2026-10-13/duzenleyici-kurgu-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/Editing/EditTimeline.cs, src/VidShrink.Core/Editing/EditExport.cs, src/VidShrink.Core/Editing/EdlPreview.cs, src/VidShrink.Core/Editing/EditProject.cs, src/VidShrink.App/Editing/EditorTimeline.cs, src/VidShrink.App/Editing/EditorView.Klip.cs, tests/VidShrink.Tests/
-- Sahibin kararı: Düzenleyici tek şeritten çıkıp üstte ikinci bir video izi (resim içinde resim) alsın mı?
-- Plan: Çizelgeye V2 izi eklenir; üstteki klip başlangıç anı, boyutu ve konumuyla tutulur, teslimde ffmpeg `overlay` süzgeciyle bindirilir. Yeşil perde aynı klibe tek seçenektir: bindirmeden önce `chromakey` uygulanır (kaydedicideki hazır sabit: src/VidShrink.Core/RecorderArguments.cs:928). Canlı önizleme DZB-P8'de seçilen yoldan gelir; o karar verilmeden bu paket açılmaz. Doğrulama: argüman testi ve bindirilen bölgenin teslim karesinde ölçülmesi.
-- Durum (21 Ekim 2026): yapıldı, dal `worktree-agent-later-110`. V2 izi, boy ve yer seçimi, yeşil perde, önizleme yaması (`docs/olcumler/v2-izi.md`). Açık: geçiş bölgesinde önizleme, katman sesi, OTIO. Birleşince madde silinir.
+- Yapıldı (21 Ekim 2026, main): V2 izi, boy ve yer seçimi, yeşil perde, önizleme yaması (`docs/olcumler/v2-izi.md`).
+- Kalan: geçiş bölgesinde katman önizlemesi, katman sesi, OTIO dışa aktarımı.
 
 ## 111. Mac Sistem Sesi Yardımcısı
 
@@ -285,6 +270,7 @@ Karar (21 Ekim 2026, sahip): evet; 109 ölçümünden sonra başlar.
 - Dokunacağı yer: src/VidShrink.App/MainWindow.KapanistaGuncelleme.cs, src/VidShrink.Core/UpdateCheck.cs, src/VidShrink.Core/UpdateHealth.cs
 - Sahibin kararı: macOS'ta otomatik güncelleme varsayılan olarak açılsın mı
 - Plan: Elle Yükle'nin kullandığı paket takası, `MacUpdate.CanSwap` doğruysa kapanış yoluna da bağlanır: sahne açılış bittikten sonra sessiz iner, çıkışta takas edilir. Her düşüş `UpdateHealth` sayacına yazılır; sayılmayan sessiz yol eklenmez. Düz kurulumda ve salt okunur yola taşınmış pakette kapalı kalır; Sparkle eklenmez. Birim testleri ve gerçek Mac'te bir sürüm atlamasıyla doğrulanır.
+- Yapıldı (21 Ekim 2026, main): macOS'ta otomatik güncelleme varsayılan açık (`UpdateSettings.DefaultOn`), eski kapalı ayar bir kez açılır; `MacUpdate` açılıştan sonra sessiz iner, çıkışta takas eder, düşüş `UpdateHealth`'e sayılır. Kalan: gerçek Mac'te bir sürüm atlamasıyla elle deneme.
 
 ## 134. VideoToolbox Hızlı Kip Kapısı
 
