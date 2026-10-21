@@ -30,6 +30,7 @@ made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md
 - The installers (setup program, silent install and `Install-VidShrink.ps1`) now write the
   Windows 11 context menu labels in the install language, so the first menu no longer shows the
   built-in English names until the app is opened once. Uninstall removes them.
+- Closing the player ends its Windows media controls session; pressing a stale one could crash the app.
 
 ## [0.0.1]
 

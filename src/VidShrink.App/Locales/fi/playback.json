@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Ota tekstitys käyttöön käyttöliittymän kielellä",
   "player.view.pause-on-minimize": "Keskeytä pienennettäessä",
   "player.view.topmost-while-playing": "Pidä päällimmäisenä vain toiston aikana",
+  "player.view.media-controls": "Näytä Windowsin mediaohjaimissa",
   "player.view.state-aspect": "kuvasuhde {0}",
   "player.view.state-rotate": "kierretty {0}°",
   "player.view.state-mirror": "peilattu",

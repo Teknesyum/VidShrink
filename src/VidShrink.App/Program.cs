@@ -354,7 +354,10 @@ internal static class Program
     /// </summary>
     private static void WarmStartupFile(string path)
         => _ = WarmPlayback().ContinueWith(
-            _ => Playback.AcilisMotoru.Isit(path, () => new MpvEngine()),
+            _ => Playback.AcilisMotoru.Isit(path, () => new MpvEngine(new PlaybackOptions
+            {
+                MediaControls = Playback.PlayerView.MediaControlsSupported && Playback.PlayerSettings.Load(Playback.PlayerSettings.DefaultFile).MediaControls
+            })),
             TaskScheduler.Default);
 
     private static void AllowForeground()

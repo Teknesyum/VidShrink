@@ -1343,11 +1343,13 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-21, later 137 birlesmesi: <c>player.menu.new-window</c>; toplam 4255 + 4 = 4259, en 409 + 1 = 410, gezilen 92708 + 43 = 92751.</para>
     /// <para>2026-10-21, later 126 birlesmesi: masaustu simgesi anahtarlari; toplam 4259 + 2 = 4261, gezilen 92751 + 129 = 92880.</para>
     /// <para>2026-10-21, later 110 birlesmesi: V2 izi anahtarlari; toplam 4261 + 32 = 4293, en 410 + 3 = 413, gezilen 92880 + 645 = 93525.</para>
+    /// <para>2026-10-21, later 99+103 birlesmesi: medya denetimi anahtari; toplam 4293 + 7 = 4300, en 413 + 1 = 414, gezilen 93525 + 43 = 93568.</para>
     /// <para>2026-10-21, later 140 vekil kopya: dokuz <c>editor.proxy.*</c> anahtari 42 dile eklendi; <c>editor.proxy.failed</c> en, fr, hu, nl ve ro dillerinde kola giriyor: olculen toplam 4079, en 394, tr 132.</para>
     /// <para>2026-10-20, yazi boyutu (later 147): iki yeni anahtar (<c>settings-tab.text-size.label</c>, <c>.hint</c>); yalniz <c>settings-tab.text-size.label</c> pt dilinde kola giriyor ("Tamanho do texto"), KOL dokumunden ve SAYIM satirindan olculdu, en ve tr girmiyor: toplam 4074 + 1 = 4075, en 393, tr 132.</para>
     /// <para>2026-10-21, yeni pencerede ac (later 137): yeni <c>player.menu.new-window</c> 4 dilde kola giriyor (de, en, it, nl), KOL dokumunden ve SAYIM satirindan olculdu, tr girmiyor: toplam 4074 + 4 = 4078, en 393 + 1 = 394, tr 132.</para>
     /// <para>2026-10-21, kayitta masaustu simgelerini gizleme (later 126): uc yeni <c>recorder.option.hide-desktop-icons*</c> anahtarindan yalniz etiket pt ve ro dillerinde kola giriyor, KOL dokumunden ve SAYIM satirindan olculdu, en ve tr girmiyor: toplam 4074 + 2 = 4076, en 393, tr 132.</para>
     /// <para>2026-10-21, V2 izi (later 110): on bes yeni <c>editor.layer*</c> ve <c>editor.export.layers-full</c> anahtari 42 dilde; 32 kol (en 3: <c>.add</c>, <c>.remove</c>, <c>.to-playhead</c>; tr girmiyor), KOL dokumunden ve SAYIM satirindan olculdu: toplam 4074 + 32 = 4106, en 393 + 3 = 396, tr 132.</para>
+    /// <para>2026-10-20, Windows ortam denetimi anahtari (later 99): bir yeni anahtar (<c>player.view.media-controls</c>) 42 dilde; de, en, es, fr, hu, nl, pt kola giriyor (KOL dokumu), tr girmiyor: toplam 4074 + 7 = 4081, en 393 + 1 = 394, tr 132.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1373,8 +1375,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(4293, toplam);
-        Assert.Equal(413, dilBasina["en"]);
+        Assert.Equal(4300, toplam);
+        Assert.Equal(414, dilBasina["en"]);
         Assert.Equal(137, dilBasina["tr"]);
     }
 
@@ -1695,6 +1697,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-21, 147 yazi boyutu (iki <c>settings-tab.text-size.*</c> anahtari 43 dilde): gezilen 89698 + 2 x 43 = 89784.</para>
     /// <para>2026-10-21, later 126: uc yeni <c>recorder.option.hide-desktop-icons*</c> anahtari, gezilen 89698 + 43 x 3 = 89827.</para>
     /// <para>2026-10-21, V2 izi (later 110): on bes yeni anahtar 42 dilde, dusen yok: 89698 + 15 x 43 = 90343. <c>kayip</c> 0.</para>
+    /// <para>2026-10-20, later 99: <c>player.view.media-controls</c> 42 dilde, dusen yok; olculen gezilen 89698 + 43 = 89741.</para>
     /// <para>2026-10-18, ad yer tutucusu: uygulama adi cevirilerde {app} oldu, ekli adlar tur adiyla kuruldu; cs shell.menu.open "ve VidShrinku" yerine "v aplikaci {app}" oldugu icin kol sayimindan dustu: olculen toplam 4069, en 393, tr 132.</para>
     /// <para>2026-10-16, later 44 (etiket ve Onar): on sekiz yeni anahtar; olculen toplam 3781 + 2 = 3783 (lt main.convert.tags.cover.none, ro main.convert.tags.year), en 364, tr 123, gezilen 80453 + 774 = 81227.</para>
     /// <para>2026-10-15, uzun iste oncelik ve bitis sesi (later 76): dort yeni anahtar (<c>settings-tab.encode-priority.above-normal</c>, <c>settings-tab.finish-sound-file.choose</c>, <c>.hint</c>, <c>.reset</c>) 42 dilde, dusen yok; olculen gezilen 78604 + 172 = 78776.</para>
@@ -1736,7 +1739,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(93525, gezilen);
+        Assert.Equal(93568, gezilen);
         Assert.Empty(kayip);
     }
 

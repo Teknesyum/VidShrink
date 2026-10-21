@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "הפעלת כתוביות בשפת הממשק",
   "player.view.pause-on-minimize": "השהה בעת מזעור",
   "player.view.topmost-while-playing": "השאר מעל רק בזמן ניגון",
+  "player.view.media-controls": "הצג בפקדי המדיה של Windows",
   "player.view.state-aspect": "יחס {0}",
   "player.view.state-rotate": "סובב ב-{0}°",
   "player.view.state-mirror": "משוקף",

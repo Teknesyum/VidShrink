@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "روشن کردن زیرنویس به زبان رابط",
   "player.view.pause-on-minimize": "توقف هنگام کوچک‌کردن",
   "player.view.topmost-while-playing": "فقط هنگام پخش در بالا نگه دار",
+  "player.view.media-controls": "نمایش در کنترل‌های رسانه Windows",
   "player.view.state-aspect": "نسبت {0}",
   "player.view.state-rotate": "چرخانده‌شده {0}°",
   "player.view.state-mirror": "قرینه‌شده",

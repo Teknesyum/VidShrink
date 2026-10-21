@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Lülita sisse subtiitrid liidese keeles",
   "player.view.pause-on-minimize": "Peata minimeerimisel",
   "player.view.topmost-while-playing": "Hoia pealmisena ainult esitamise ajal",
+  "player.view.media-controls": "Näita Windowsi meediumijuhtimises",
   "player.view.state-aspect": "kuvasuhe {0}",
   "player.view.state-rotate": "pööratud {0}°",
   "player.view.state-mirror": "peegeldatud",

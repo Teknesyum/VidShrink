@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Włączaj napisy w języku interfejsu",
   "player.view.pause-on-minimize": "Wstrzymaj po zminimalizowaniu",
   "player.view.topmost-while-playing": "Zawsze na wierzchu tylko podczas odtwarzania",
+  "player.view.media-controls": "Pokazuj w sterowaniu multimediami systemu Windows",
   "player.view.state-aspect": "format {0}",
   "player.view.state-rotate": "obrócono o {0}°",
   "player.view.state-mirror": "odbite",

@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "इंटरफ़ेस की भाषा में उपशीर्षक चालू करें",
   "player.view.pause-on-minimize": "छोटा करने पर रोकें",
   "player.view.topmost-while-playing": "केवल चलाते समय सबसे ऊपर रखें",
+  "player.view.media-controls": "Windows मीडिया नियंत्रणों में दिखाएँ",
   "player.view.state-aspect": "अनुपात {0}",
   "player.view.state-rotate": "{0}° घुमाया गया",
   "player.view.state-mirror": "मिरर किया गया",

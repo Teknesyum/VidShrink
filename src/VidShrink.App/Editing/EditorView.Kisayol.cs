@@ -203,6 +203,7 @@ internal partial class EditorView
     {
         _resumeClock = _clock.IsEnabled;
         _clock.Stop();
+        MusicPlayer.Close();
         FlushProject();
         DetachProject();
         ForgetBlends();

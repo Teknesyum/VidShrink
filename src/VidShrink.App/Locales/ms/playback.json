@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Hidupkan sari kata dalam bahasa antara muka",
   "player.view.pause-on-minimize": "Jeda apabila diminimumkan",
   "player.view.topmost-while-playing": "Kekal di atas hanya semasa dimainkan",
+  "player.view.media-controls": "Tunjukkan dalam kawalan media Windows",
   "player.view.state-aspect": "nisbah {0}",
   "player.view.state-rotate": "diputar {0}°",
   "player.view.state-mirror": "dicerminkan",

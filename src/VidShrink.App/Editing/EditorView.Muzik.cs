@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using VidShrink.App.Localization;
+using VidShrink.App.Playback;
 using VidShrink.Core;
 using VidShrink.Core.Editing;
 
@@ -24,6 +25,16 @@ internal partial class EditorView
         ("editor.music.duck.medium", EditMusic.DefaultDuckReleaseMs),
         ("editor.music.duck.slow", 1000)
     };
+
+    internal MusicPreview MusicPlayer { get; set; } = new();
+
+    private void SyncMusic(EdlPreviewDriver driver)
+    {
+        var engine = Preview.Engine;
+        var at = driver.TimelinePosition;
+        var playing = Preview.IsPlaying && driver.Playing && !driver.Backward && driver.ReversingPart is null && _model is { } model && at < model.Duration;
+        MusicPlayer.Sync(_model?.Music, at, playing, driver.Rate, engine?.Volume ?? 100, engine?.Muted ?? false);
+    }
 
     private void InitMusic()
     {

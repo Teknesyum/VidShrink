@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Zapnout titulky v jazyce rozhraní",
   "player.view.pause-on-minimize": "Pozastavit při minimalizaci",
   "player.view.topmost-while-playing": "Držet navrchu jen při přehrávání",
+  "player.view.media-controls": "Zobrazit v ovládání médií Windows",
   "player.view.state-aspect": "poměr {0}",
   "player.view.state-rotate": "otočeno o {0}°",
   "player.view.state-mirror": "zrcadleno",

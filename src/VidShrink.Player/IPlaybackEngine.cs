@@ -58,6 +58,8 @@ public sealed record PlaybackOptions
     public bool Video { get; init; } = true;
 
     public bool Loop { get; init; }
+
+    public bool MediaControls { get; init; }
 }
 
 public delegate void FrameCopy(IntPtr pixels, int width, int height, int stride);
@@ -240,6 +242,10 @@ public interface IPlaybackEngine : IDisposable
     void SetAspectOverride(string ratio) { }
 
     void SetRepeatFile(bool repeat) { }
+
+    void SetNeighbors(string? previous, string? next) { }
+
+    event EventHandler<bool>? NeighborRequested { add { } remove { } }
 
     HardwareDecoding Hardware => HardwareDecoding.Off;
 

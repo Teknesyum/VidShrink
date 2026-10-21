@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Felirat bekapcsolása a felület nyelvén",
   "player.view.pause-on-minimize": "Szüneteltetés kis méretre állításkor",
   "player.view.topmost-while-playing": "Felül tartás csak lejátszás közben",
+  "player.view.media-controls": "Megjelenítés a Windows médiavezérlőiben",
   "player.view.state-aspect": "képarány {0}",
   "player.view.state-rotate": "{0}°-kal elforgatva",
   "player.view.state-mirror": "tükrözve",

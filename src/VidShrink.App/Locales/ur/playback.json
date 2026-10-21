@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "انٹرفیس کی زبان میں سب ٹائٹل آن کریں",
   "player.view.pause-on-minimize": "چھوٹا کرنے پر روکیں",
   "player.view.topmost-while-playing": "صرف چلاتے وقت اوپر رکھیں",
+  "player.view.media-controls": "Windows میڈیا کنٹرولز میں دکھائیں",
   "player.view.state-aspect": "تناسب {0}",
   "player.view.state-rotate": "{0}° گھمایا گیا",
   "player.view.state-mirror": "آئینہ شدہ",

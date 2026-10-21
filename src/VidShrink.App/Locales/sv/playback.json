@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Slå på undertexter på gränssnittets språk",
   "player.view.pause-on-minimize": "Pausa vid minimering",
   "player.view.topmost-while-playing": "Håll överst bara under uppspelning",
+  "player.view.media-controls": "Visa i Windows mediekontroller",
   "player.view.state-aspect": "förhållande {0}",
   "player.view.state-rotate": "roterad {0}°",
   "player.view.state-mirror": "speglad",

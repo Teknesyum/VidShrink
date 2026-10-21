@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Untertitel in der Oberflächensprache einschalten",
   "player.view.pause-on-minimize": "Bei Minimieren pausieren",
   "player.view.topmost-while-playing": "Nur während der Wiedergabe im Vordergrund",
+  "player.view.media-controls": "In der Windows-Mediensteuerung anzeigen",
   "player.view.state-aspect": "Seitenverhältnis {0}",
   "player.view.state-rotate": "um {0}° gedreht",
   "player.view.state-mirror": "gespiegelt",

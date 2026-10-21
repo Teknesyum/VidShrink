@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Вмикати субтитри мовою інтерфейсу",
   "player.view.pause-on-minimize": "Пауза під час згортання",
   "player.view.topmost-while-playing": "Поверх вікон лише під час відтворення",
+  "player.view.media-controls": "Показувати в елементах керування мультимедіа Windows",
   "player.view.state-aspect": "співвідношення {0}",
   "player.view.state-rotate": "повернуто на {0}°",
   "player.view.state-mirror": "відображено",

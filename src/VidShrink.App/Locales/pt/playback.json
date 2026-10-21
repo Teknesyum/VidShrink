@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Ativar legendas no idioma da interface",
   "player.view.pause-on-minimize": "Pausar ao minimizar",
   "player.view.topmost-while-playing": "Manter no topo apenas durante a reprodução",
+  "player.view.media-controls": "Mostrar nos controles de mídia do Windows",
   "player.view.state-aspect": "proporção {0}",
   "player.view.state-rotate": "girado {0}°",
   "player.view.state-mirror": "espelhado",

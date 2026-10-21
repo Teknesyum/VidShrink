@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Bật phụ đề theo ngôn ngữ giao diện",
   "player.view.pause-on-minimize": "Tạm dừng khi thu nhỏ",
   "player.view.topmost-while-playing": "Chỉ giữ trên cùng khi đang phát",
+  "player.view.media-controls": "Hiển thị trong điều khiển phương tiện của Windows",
   "player.view.state-aspect": "tỷ lệ {0}",
   "player.view.state-rotate": "đã xoay {0}°",
   "player.view.state-mirror": "đã lật gương",

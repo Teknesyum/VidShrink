@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Activar subtítulos en el idioma de la interfaz",
   "player.view.pause-on-minimize": "Pausar al minimizar",
   "player.view.topmost-while-playing": "Mantener encima solo durante la reproducción",
+  "player.view.media-controls": "Mostrar en los controles multimedia de Windows",
   "player.view.state-aspect": "relación {0}",
   "player.view.state-rotate": "girado {0}°",
   "player.view.state-mirror": "reflejado",

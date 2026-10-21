@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Avalonia.Threading;
 using VidShrink.Core;
 using VidShrink.Player;
 
@@ -12,6 +13,9 @@ namespace VidShrink.App.Playback;
 /// çalar; sonraki/önceki, sonda otomatik geçiş ve açılır liste klasör yerine kuyruğu izler.
 /// Kuyrukta olmayan bir dosya açılınca kuyruk düşer, oynatıcı klasör gezintisine döner.
 /// Liste mpv'ye verilmez: mpv'nin kendi listesi arayüzün yolunu ve kartını güncellemiyor.
+/// Tek istisna Windows medya tuşları: mpv SMTC'nin sonraki/önceki düğmesini <c>playlist-next/prev</c>
+/// olarak işliyor, bu yüzden motora yalnız iki komşu (<see cref="SyncMediaNeighbors"/>) yansır; mpv o
+/// girdiye kaydığında motor <c>NeighborRequested</c> atar ve geçişi yine kuyruk yapar.
 /// 2026-10-18 yeniden ölçüldü (later 83): <c>loadfile append</c> geçişinden sonra motor ikinci
 /// dosyadayken arayüz ilkinde kaldı; <c>ao=pcm</c> ile dört yolun hiçbirinde örnek kaybı yok, ses
 /// çalınmadan aygıt boşluğu ölçülemiyor. Karar korundu: <c>docs/olcumler/akis-kalitesi-kesintisiz.md</c>.
@@ -79,6 +83,7 @@ internal partial class PlayerView
         QueueSource = null;
         _trace.Add("shell -> " + files.Count);
         _trace.Add("queue " + files.Count);
+        SyncMediaNeighbors();
         return true;
     }
 
@@ -136,11 +141,25 @@ internal partial class PlayerView
         _queue = next;
         _queueArranged = true;
         _trace.Add(trace + Path.GetFileName(file));
+        SyncMediaNeighbors();
         return true;
     }
 
     private string? StepFrom(string path, bool forward)
         => FolderNavigator.Step(NavigationList(path), path, forward, _settings.Repeat);
+
+    private void SyncMediaNeighbors()
+    {
+        if (_engine is not { } engine || _path is not { } path || MediaAddress.IsAddress(path)) return;
+        engine.SetNeighbors(StepFrom(path, false), StepFrom(path, true));
+    }
+
+    private void OnNeighborRequested(object? sender, bool forward)
+        => Dispatcher.UIThread.Post(() =>
+        {
+            if (!ReferenceEquals(sender, _engine)) return;
+            _trace.Add("media-key -> " + StepFile(forward));
+        });
 }
 
 internal enum PlaylistSort

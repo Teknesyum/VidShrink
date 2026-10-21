@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Ieslēgt subtitrus saskarnes valodā",
   "player.view.pause-on-minimize": "Pauzēt, minimizējot",
   "player.view.topmost-while-playing": "Turēt virspusē tikai atskaņošanas laikā",
+  "player.view.media-controls": "Rādīt Windows multivides vadīklās",
   "player.view.state-aspect": "attiecība {0}",
   "player.view.state-rotate": "pagriezts par {0}°",
   "player.view.state-mirror": "spoguļattēls",

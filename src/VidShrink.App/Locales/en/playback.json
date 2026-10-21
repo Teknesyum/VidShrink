@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Turn On Subtitles in the Interface Language",
   "player.view.pause-on-minimize": "Pause When Minimized",
   "player.view.topmost-while-playing": "Keep On Top Only While Playing",
+  "player.view.media-controls": "Show In Windows Media Controls",
   "player.view.state-aspect": "aspect {0}",
   "player.view.state-rotate": "rotated {0}°",
   "player.view.state-mirror": "mirrored",

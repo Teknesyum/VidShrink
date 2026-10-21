@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Washa manukuu kwa lugha ya kiolesura",
   "player.view.pause-on-minimize": "Sitisha ukipunguza dirisha",
   "player.view.topmost-while-playing": "Weka juu wakati wa kucheza tu",
+  "player.view.media-controls": "Onyesha kwenye vidhibiti vya midia vya Windows",
   "player.view.state-aspect": "uwiano {0}",
   "player.view.state-rotate": "imezungushwa {0}°",
   "player.view.state-mirror": "kioo",

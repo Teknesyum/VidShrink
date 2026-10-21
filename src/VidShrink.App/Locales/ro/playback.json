@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Activează subtitrările în limba interfeței",
   "player.view.pause-on-minimize": "Pauză la minimizare",
   "player.view.topmost-while-playing": "Păstrează deasupra doar în timpul redării",
+  "player.view.media-controls": "Afișează în controalele media Windows",
   "player.view.state-aspect": "raport {0}",
   "player.view.state-rotate": "rotit cu {0}°",
   "player.view.state-mirror": "oglindit",

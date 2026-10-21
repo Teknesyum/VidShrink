@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "இடைமுக மொழியில் வசனங்களை இயக்கு",
   "player.view.pause-on-minimize": "சிறிதாக்கும்போது இடைநிறுத்து",
   "player.view.topmost-while-playing": "இயக்கும்போது மட்டும் மேலே வைத்திரு",
+  "player.view.media-controls": "Windows ஊடகக் கட்டுப்பாடுகளில் காட்டு",
   "player.view.state-aspect": "விகிதம் {0}",
   "player.view.state-rotate": "{0}° சுழற்றப்பட்டது",
   "player.view.state-mirror": "பிரதிபலிக்கப்பட்டது",

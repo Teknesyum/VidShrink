@@ -40,6 +40,7 @@
   "player.view.subtitle-language": "Включване на субтитри на езика на интерфейса",
   "player.view.pause-on-minimize": "Пауза при минимизиране",
   "player.view.topmost-while-playing": "Най-отгоре само по време на възпроизвеждане",
+  "player.view.media-controls": "Показване в контролите за мултимедия на Windows",
   "player.view.state-aspect": "съотношение {0}",
   "player.view.state-rotate": "завъртяно на {0}°",
   "player.view.state-mirror": "огледално",
