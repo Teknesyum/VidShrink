@@ -144,6 +144,77 @@ public sealed class KaydediciSonucPaneliTests
     }
 
     [Fact]
+    public void DigerMenusuDonusumEylemlerinideTasirVeCalistirir()
+    {
+        var klasor = Klasor();
+        try
+        {
+            var dosya = Path.Combine(klasor, "kayit.mp4");
+            File.WriteAllBytes(dosya, new byte[] { 1 });
+            var mkv = Path.Combine(klasor, "kayit.mkv");
+            File.WriteAllBytes(mkv, new byte[] { 1 });
+            var gif = Path.Combine(klasor, "eski.gif");
+            File.WriteAllBytes(gif, new byte[] { 1 });
+            var ayar = Path.Combine(klasor, "recorder-settings.json");
+
+            var olcu = AppHost.Run(() =>
+            {
+                IReadOnlyList<string>? verilen = null;
+                var view = new RecorderView(ayar)
+                {
+                    ResultGifRun = args => { verilen = args; File.WriteAllBytes(args[^1], new byte[] { 1 }); return Task.FromResult(true); }
+                };
+
+                view.ShowResult(Tam(gif));
+                var gifdenDiger = view.MoreVisible;
+                view.ShowResult(Tam(dosya));
+                var mp4tenDiger = view.MoreVisible;
+                var mp4tenOgeler = view.MoreItems.Select(m => (m.Name, m.IsVisible)).ToList();
+                var duzDugmeler = Avalonia.VisualTree.VisualExtensions.GetVisualDescendants(view)
+                    .OfType<Avalonia.Controls.Button>().Select(b => b.Name).ToList();
+                view.ShowResult(Tam(mkv));
+                var mkvOgeler = view.MoreItems.Select(m => (m.Name, m.IsVisible)).ToList();
+
+                var gifOgesi = view.MoreItems.Single(m => m.Name == "BtnToGif");
+                var oge = (gifOgesi.Header, Avalonia.Automation.AutomationProperties.GetName(gifOgesi));
+                view.ShowResult(Tam(dosya));
+                gifOgesi.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Avalonia.Controls.MenuItem.ClickEvent));
+                var bildirim = view.NoticeText;
+                var dugme = Avalonia.Controls.ControlExtensions.FindControl<Avalonia.Controls.Button>(view, "BtnResultMore")!;
+                return (gifdenDiger, mp4tenDiger, mp4tenOgeler, duzDugmeler, mkvOgeler, oge, verilen, bildirim,
+                    ad: Avalonia.Automation.AutomationProperties.GetName(dugme), icerik: dugme.Content, bayrak: dugme.Flyout is Avalonia.Controls.MenuFlyout);
+            });
+
+            Assert.False(olcu.gifdenDiger);
+            Assert.True(olcu.mp4tenDiger);
+            Assert.Contains(("BtnToGif", true), olcu.mp4tenOgeler);
+            Assert.Contains(("BtnToMp4", false), olcu.mp4tenOgeler);
+            Assert.DoesNotContain("BtnToGif", olcu.duzDugmeler);
+            Assert.DoesNotContain("BtnToMp4", olcu.duzDugmeler);
+            Assert.Contains(("BtnToMp4", true), olcu.mkvOgeler);
+            Assert.Equal(LanguageCatalogText("recorder.output.to-gif"), olcu.oge.Header);
+            Assert.Equal(LanguageCatalogText("recorder.output.to-gif"), olcu.oge.Item2);
+            Assert.NotNull(olcu.verilen);
+            Assert.Equal(Path.Combine(klasor, "kayit.gif"), olcu.verilen![^1]);
+            Assert.Contains("kayit.gif", olcu.bildirim);
+            Assert.Equal(LanguageCatalogText("recorder.output.more"), olcu.ad);
+            Assert.Equal(LanguageCatalogText("recorder.output.more"), olcu.icerik);
+            Assert.True(olcu.bayrak);
+        }
+        finally
+        {
+            Directory.Delete(klasor, true);
+        }
+    }
+
+    [Fact]
+    public void DigerAnahtariButunDillerdeVar()
+    {
+        foreach (var dil in Locales.Languages)
+            Assert.False(string.IsNullOrWhiteSpace(Locales.Values(dil).GetValueOrDefault("recorder.output.more")), $"{dil} dilinde recorder.output.more yok.");
+    }
+
+    [Fact]
     public void AdDeseniKutusuOnizlerVeAyaraYazar()
     {
         var klasor = Klasor();

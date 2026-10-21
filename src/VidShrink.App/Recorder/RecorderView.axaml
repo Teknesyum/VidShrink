@@ -259,20 +259,27 @@
                   Content="{loc:Text recorder.output.to-editor}"
                   auto:AutomationProperties.Name="{loc:Text recorder.output.to-editor}"
                   Click="OnToEditor"/>
-          <Button x:Name="BtnToMp4"
+          <Button x:Name="BtnResultMore"
                   Theme="{StaticResource GhostButton}"
                   Margin="{StaticResource WrapItemMargin}"
                   IsVisible="False"
-                  Content="{loc:Text recorder.output.to-mp4}"
-                  auto:AutomationProperties.Name="{loc:Text recorder.output.to-mp4}"
-                  Click="OnToMp4"/>
-          <Button x:Name="BtnToGif"
-                  Theme="{StaticResource GhostButton}"
-                  Margin="{StaticResource WrapItemMargin}"
-                  IsVisible="False"
-                  Content="{loc:Text recorder.output.to-gif}"
-                  auto:AutomationProperties.Name="{loc:Text recorder.output.to-gif}"
-                  Click="OnToGif"/>
+                  Content="{loc:Text recorder.output.more}"
+                  auto:AutomationProperties.Name="{loc:Text recorder.output.more}">
+            <Button.Flyout>
+              <MenuFlyout>
+                <MenuItem x:Name="BtnToMp4"
+                          IsVisible="False"
+                          Header="{loc:Text recorder.output.to-mp4}"
+                          auto:AutomationProperties.Name="{loc:Text recorder.output.to-mp4}"
+                          Click="OnToMp4"/>
+                <MenuItem x:Name="BtnToGif"
+                          IsVisible="False"
+                          Header="{loc:Text recorder.output.to-gif}"
+                          auto:AutomationProperties.Name="{loc:Text recorder.output.to-gif}"
+                          Click="OnToGif"/>
+              </MenuFlyout>
+            </Button.Flyout>
+          </Button>
           <Button x:Name="BtnTrimIdle"
                   Theme="{StaticResource GhostButton}"
                   Margin="{StaticResource WrapItemMargin}"

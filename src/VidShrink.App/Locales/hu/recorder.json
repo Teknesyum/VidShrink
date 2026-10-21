@@ -107,6 +107,7 @@
   "recorder.output.mp4-failed": "Nem sikerült MP4-ként menteni.",
   "recorder.output.copy-file": "Fájl másolása",
   "recorder.output.to-gif": "Átalakítás GIF-be",
+  "recorder.output.more": "Több",
   "recorder.output.gif-running": "Átalakítás GIF-be…",
   "recorder.output.gif-saved": "GIF mentve: {0}",
   "recorder.output.gif-convert-failed": "Nem sikerült GIF-be alakítani.",

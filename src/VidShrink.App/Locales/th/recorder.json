@@ -107,6 +107,7 @@
   "recorder.output.mp4-failed": "บันทึกเป็น MP4 ไม่สำเร็จ",
   "recorder.output.copy-file": "คัดลอกไฟล์",
   "recorder.output.to-gif": "แปลงเป็น GIF",
+  "recorder.output.more": "เพิ่มเติม",
   "recorder.output.gif-running": "กำลังแปลงเป็น GIF…",
   "recorder.output.gif-saved": "บันทึก GIF แล้ว: {0}",
   "recorder.output.gif-convert-failed": "แปลงเป็น GIF ไม่ได้",

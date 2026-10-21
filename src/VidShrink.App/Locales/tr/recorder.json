@@ -107,6 +107,7 @@
   "recorder.output.mp4-failed": "MP4'e çevrilemedi.",
   "recorder.output.copy-file": "Dosyayı kopyala",
   "recorder.output.to-gif": "GIF'e çevir",
+  "recorder.output.more": "Diğer",
   "recorder.output.gif-running": "GIF'e çevriliyor…",
   "recorder.output.gif-saved": "GIF kaydedildi: {0}",
   "recorder.output.gif-convert-failed": "GIF'e çevrilemedi.",

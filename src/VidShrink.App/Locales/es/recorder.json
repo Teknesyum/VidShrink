@@ -107,6 +107,7 @@
   "recorder.output.mp4-failed": "No se pudo guardar como MP4.",
   "recorder.output.copy-file": "Copiar archivo",
   "recorder.output.to-gif": "Convertir a GIF",
+  "recorder.output.more": "Más",
   "recorder.output.gif-running": "Convirtiendo a GIF…",
   "recorder.output.gif-saved": "GIF guardado: {0}",
   "recorder.output.gif-convert-failed": "No se pudo convertir a GIF.",

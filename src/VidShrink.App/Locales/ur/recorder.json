@@ -107,6 +107,7 @@
   "recorder.output.mp4-failed": "MP4 کے طور پر محفوظ نہیں ہو سکا۔",
   "recorder.output.copy-file": "فائل کاپی کریں",
   "recorder.output.to-gif": "GIF میں بدلیں",
+  "recorder.output.more": "مزید",
   "recorder.output.gif-running": "GIF میں بدلا جا رہا ہے…",
   "recorder.output.gif-saved": "GIF محفوظ ہو گیا: {0}",
   "recorder.output.gif-convert-failed": "GIF میں نہیں بدلا جا سکا۔",

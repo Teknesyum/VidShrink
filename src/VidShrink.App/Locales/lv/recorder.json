@@ -107,6 +107,7 @@
   "recorder.output.mp4-failed": "Neizdevās saglabāt kā MP4.",
   "recorder.output.copy-file": "Kopēt failu",
   "recorder.output.to-gif": "Pārvērst GIF",
+  "recorder.output.more": "Vairāk",
   "recorder.output.gif-running": "Pārvērš GIF…",
   "recorder.output.gif-saved": "GIF saglabāts: {0}",
   "recorder.output.gif-convert-failed": "Neizdevās pārvērst GIF.",

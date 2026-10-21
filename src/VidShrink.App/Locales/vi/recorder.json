@@ -107,6 +107,7 @@
   "recorder.output.mp4-failed": "Không thể lưu dưới dạng MP4.",
   "recorder.output.copy-file": "Sao chép tệp",
   "recorder.output.to-gif": "Chuyển sang GIF",
+  "recorder.output.more": "Thêm",
   "recorder.output.gif-running": "Đang chuyển sang GIF…",
   "recorder.output.gif-saved": "Đã lưu GIF: {0}",
   "recorder.output.gif-convert-failed": "Không thể chuyển sang GIF.",

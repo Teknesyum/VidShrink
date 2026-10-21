@@ -107,6 +107,7 @@
   "recorder.output.mp4-failed": "Kan niet opslaan als MP4.",
   "recorder.output.copy-file": "Bestand kopiëren",
   "recorder.output.to-gif": "Omzetten naar GIF",
+  "recorder.output.more": "Meer",
   "recorder.output.gif-running": "Omzetten naar GIF…",
   "recorder.output.gif-saved": "GIF opgeslagen: {0}",
   "recorder.output.gif-convert-failed": "Omzetten naar GIF mislukt.",

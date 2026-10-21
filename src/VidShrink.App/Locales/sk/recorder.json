@@ -107,6 +107,7 @@
   "recorder.output.mp4-failed": "Nepodarilo sa uložiť ako MP4.",
   "recorder.output.copy-file": "Kopírovať súbor",
   "recorder.output.to-gif": "Previesť na GIF",
+  "recorder.output.more": "Viac",
   "recorder.output.gif-running": "Prevádza sa na GIF…",
   "recorder.output.gif-saved": "GIF uložený: {0}",
   "recorder.output.gif-convert-failed": "Prevod na GIF zlyhal.",

@@ -107,6 +107,7 @@
   "recorder.output.mp4-failed": "Imeshindwa kuhifadhi kama MP4.",
   "recorder.output.copy-file": "Nakili faili",
   "recorder.output.to-gif": "Geuza kuwa GIF",
+  "recorder.output.more": "Zaidi",
   "recorder.output.gif-running": "Inageuzwa kuwa GIF…",
   "recorder.output.gif-saved": "GIF imehifadhiwa: {0}",
   "recorder.output.gif-convert-failed": "Imeshindwa kugeuza kuwa GIF.",

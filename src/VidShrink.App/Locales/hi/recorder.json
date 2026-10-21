@@ -107,6 +107,7 @@
   "recorder.output.mp4-failed": "MP4 के रूप में सहेजा नहीं जा सका।",
   "recorder.output.copy-file": "फ़ाइल कॉपी करें",
   "recorder.output.to-gif": "GIF में बदलें",
+  "recorder.output.more": "और",
   "recorder.output.gif-running": "GIF में बदला जा रहा है…",
   "recorder.output.gif-saved": "GIF सहेजा गया: {0}",
   "recorder.output.gif-convert-failed": "GIF में नहीं बदला जा सका।",

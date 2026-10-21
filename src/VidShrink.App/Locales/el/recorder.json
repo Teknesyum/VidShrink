@@ -107,6 +107,7 @@
   "recorder.output.mp4-failed": "Δεν ήταν δυνατή η αποθήκευση ως MP4.",
   "recorder.output.copy-file": "Αντιγραφή αρχείου",
   "recorder.output.to-gif": "Μετατροπή σε GIF",
+  "recorder.output.more": "Περισσότερα",
   "recorder.output.gif-running": "Μετατροπή σε GIF…",
   "recorder.output.gif-saved": "Το GIF αποθηκεύτηκε: {0}",
   "recorder.output.gif-convert-failed": "Η μετατροπή σε GIF απέτυχε.",
