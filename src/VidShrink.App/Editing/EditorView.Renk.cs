@@ -14,6 +14,7 @@ internal partial class EditorView
     private void InitClipGrade()
     {
         BtnClipAutoColor.Click += (_, _) => { if (_showingClip) SetClipEffects(e => e with { AutoColor = BtnClipAutoColor.IsChecked == true }); };
+        InitClipMatch();
         foreach (var (box, field) in new[]
                  {
                      (TxtClipCurveShadows, GradeField.CurveShadows), (TxtClipCurveMids, GradeField.CurveMids), (TxtClipCurveHighlights, GradeField.CurveHighlights),
@@ -60,6 +61,7 @@ internal partial class EditorView
     private void ShowClipGrade(ClipEffects effects)
     {
         BtnClipAutoColor.IsChecked = effects.AutoColor;
+        ShowClipMatch(effects);
         TxtClipCurveShadows.Text = effects.CurveShadows.ToString("0.##", Strings.Culture);
         TxtClipCurveMids.Text = effects.CurveMids.ToString("0.##", Strings.Culture);
         TxtClipCurveHighlights.Text = effects.CurveHighlights.ToString("0.##", Strings.Culture);

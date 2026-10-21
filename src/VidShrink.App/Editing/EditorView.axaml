@@ -332,6 +332,12 @@
             </StackPanel>
             <ToggleButton x:Name="BtnClipAutoColor" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.clip.auto-color}" AutomationProperties.Name="{loc:Text editor.clip.auto-color}"/>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <Button x:Name="BtnClipMatchReference" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.match.reference}" AutomationProperties.Name="{loc:Text editor.clip.match.reference}"/>
+              <Button x:Name="BtnClipMatchApply" Theme="{StaticResource GhostButton}" IsEnabled="False" Content="{loc:Text editor.clip.match.apply}" AutomationProperties.Name="{loc:Text editor.clip.match.apply}"/>
+              <Button x:Name="BtnClipMatchClear" Theme="{StaticResource GhostButton}" IsEnabled="False" Content="{loc:Text editor.clip.match.clear}" AutomationProperties.Name="{loc:Text editor.clip.match.clear}"/>
+              <SarilanMetin x:Name="TxtClipMatch" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
               <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.curve-shadows}"/>
               <TextBox x:Name="TxtClipCurveShadows" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.curve-shadows}"/>
               <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.curve-mids}"/>
@@ -368,6 +374,7 @@
               <ComboBox x:Name="CmbClipEase" MinWidth="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.keys.ease}"/>
               <Button x:Name="BtnClipKeyVolume" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.keys.add-volume}" AutomationProperties.Name="{loc:Text editor.clip.keys.add-volume}"/>
               <Button x:Name="BtnClipKeyCrop" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.keys.add-crop}" AutomationProperties.Name="{loc:Text editor.clip.keys.add-crop}"/>
+              <Button x:Name="BtnClipKeyTransform" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.keys.add-transform}" AutomationProperties.Name="{loc:Text editor.clip.keys.add-transform}"/>
               <Button x:Name="BtnClipKeysClear" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.clip.keys.clear}" AutomationProperties.Name="{loc:Text editor.clip.keys.clear}"/>
               <SarilanMetin x:Name="TxtClipKeys" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
             </StackPanel>

@@ -419,6 +419,8 @@ public sealed class EditProject
         }
 
         ClipGrade.Write(writer, effects);
+        ClipMotion.Write(writer, effects);
+        ClipMatch.Write(writer, effects);
         if (effects.HasFit)
         {
             writer.WriteNumber("fitNum", effects.FitNum);
@@ -562,7 +564,7 @@ public sealed class EditProject
                 BlurHeight = BlurNumber(blur, "height"),
             };
 
-        return ClipGrade.Read(e, effects).Normalized();
+        return ClipGrade.Read(e, ClipMatch.Read(e, ClipMotion.Read(e, effects))).Normalized();
     }
 
     private static double BlurNumber(JsonElement blur, string name)

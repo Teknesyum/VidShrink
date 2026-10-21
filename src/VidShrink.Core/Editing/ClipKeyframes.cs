@@ -20,12 +20,16 @@ public interface IClipKeyframe<TSelf> where TSelf : struct, IClipKeyframe<TSelf>
 
     TSelf At(long offset);
 
+    TSelf WithEase(KeyframeEase ease);
+
     static abstract TSelf Blend(TSelf from, TSelf to, double amount, long offset);
 }
 
 public readonly record struct VolumeKey(long Offset, double Db, KeyframeEase Ease = KeyframeEase.Linear) : IClipKeyframe<VolumeKey>
 {
     public VolumeKey At(long offset) => this with { Offset = offset };
+
+    public VolumeKey WithEase(KeyframeEase ease) => this with { Ease = ease };
 
     public static VolumeKey Blend(VolumeKey from, VolumeKey to, double amount, long offset)
         => new(offset, from.Db + (to.Db - from.Db) * amount, from.Ease);
@@ -34,6 +38,8 @@ public readonly record struct VolumeKey(long Offset, double Db, KeyframeEase Eas
 public readonly record struct CropKey(long Offset, double Left, double Top, double Right, double Bottom, KeyframeEase Ease = KeyframeEase.Linear) : IClipKeyframe<CropKey>
 {
     public CropKey At(long offset) => this with { Offset = offset };
+
+    public CropKey WithEase(KeyframeEase ease) => this with { Ease = ease };
 
     public static CropKey Blend(CropKey from, CropKey to, double amount, long offset)
         => new(offset,
@@ -120,6 +126,26 @@ public sealed class KeyframeTrack<T> : IReadOnlyList<T>, IEquatable<KeyframeTrac
 
     public KeyframeTrack<T> Scaled(double factor)
         => _keys.Length == 0 || factor == 1 ? this : new KeyframeTrack<T>(_keys.Select(k => k.At((long)Math.Round(k.Offset * factor, MidpointRounding.AwayFromZero))));
+
+    public KeyframeTrack<T> Mirrored(long length)
+    {
+        if (_keys.Length == 0) return this;
+        var mirrored = new T[_keys.Length];
+        for (var i = 0; i < _keys.Length; i++)
+        {
+            var ease = Mirror(_keys[(i + _keys.Length - 1) % _keys.Length].Ease);
+            mirrored[i] = _keys[i].At(Math.Max(0, length - _keys[i].Offset)).WithEase(ease);
+        }
+
+        return new KeyframeTrack<T>(mirrored);
+    }
+
+    public static KeyframeEase Mirror(KeyframeEase ease) => ease switch
+    {
+        KeyframeEase.EaseIn => KeyframeEase.EaseOut,
+        KeyframeEase.EaseOut => KeyframeEase.EaseIn,
+        _ => ease,
+    };
 
     public string Expression(Func<T, double> pick, string time)
     {

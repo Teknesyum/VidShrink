@@ -33,6 +33,7 @@ internal partial class EditorView
         };
         _showingFrame = true;
 
+        BtnClipKeyTransform.Click += (_, _) => AddTransformKey();
         foreach (var (box, field) in new[] { (TxtClipScale, TransformField.Scale), (TxtClipOffsetX, TransformField.OffsetX), (TxtClipOffsetY, TransformField.OffsetY), (TxtClipAngle, TransformField.Angle) })
         {
             box.LostFocus += (_, _) => CommitClipTransform(box, field);
@@ -63,6 +64,14 @@ internal partial class EditorView
         TxtClipOffsetX.Text = (effects.OffsetX * 100).ToString("0.#", Strings.Culture);
         TxtClipOffsetY.Text = (effects.OffsetY * 100).ToString("0.#", Strings.Culture);
         TxtClipAngle.Text = effects.Angle.ToString("0.#", Strings.Culture);
+    }
+
+    internal bool AddTransformKey()
+    {
+        if (!_showingClip) return false;
+        var offset = KeyOffset();
+        var ease = SelectedEase;
+        return SetClipEffects(e => e with { TransformKeys = e.TransformKeys.With(new TransformKey(offset, e.Scale, e.OffsetX, e.OffsetY, e.Angle, ease)) });
     }
 
     private void CommitClipTransform(TextBox box, TransformField field)

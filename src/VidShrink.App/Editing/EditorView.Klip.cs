@@ -61,7 +61,7 @@ internal partial class EditorView
         CmbClipEase.SelectedIndex = 0;
         BtnClipKeyVolume.Click += (_, _) => AddVolumeKey();
         BtnClipKeyCrop.Click += (_, _) => AddCropKey();
-        BtnClipKeysClear.Click += (_, _) => { if (_showingClip) SetClipEffects(e => e with { VolumeKeys = KeyframeTrack<VolumeKey>.Empty, CropKeys = KeyframeTrack<CropKey>.Empty }); };
+        BtnClipKeysClear.Click += (_, _) => { if (_showingClip) SetClipEffects(e => e with { VolumeKeys = KeyframeTrack<VolumeKey>.Empty, CropKeys = KeyframeTrack<CropKey>.Empty, TransformKeys = KeyframeTrack<TransformKey>.Empty }); };
 
         Timeline.SelectionChanged += ShowClipPanel;
         Timeline.TextSelectionChanged += ShowClipPanel;
@@ -435,7 +435,7 @@ internal partial class EditorView
         TxtClipLutMix.IsEnabled = lut is not null;
         BtnClipLutRemove.IsEnabled = lut is not null;
         TxtClipLabel.Text = model.Clips[index].Label;
-        TxtClipKeys.Text = string.Format(Strings.Culture, Strings.Get("editor.clip.keys.count"), effects.VolumeKeys.Count, effects.CropKeys.Count);
+        TxtClipKeys.Text = string.Format(Strings.Culture, Strings.Get("editor.clip.keys.count"), effects.VolumeKeys.Count, effects.CropKeys.Count, effects.TransformKeys.Count);
         BtnClipKeyCrop.IsEnabled = !effects.HasFit;
         BtnClipKeysClear.IsEnabled = effects.HasKeyframes;
         var transition = model.Clips[index].Transition;

@@ -113,7 +113,11 @@ public sealed record EditClip
         return Math.Min(CeilDiv(consumed * 100, Hundredths), TimelineLength - 1);
     }
 
-    internal EditClip WithMotion(decimal speed, bool reversed) => new(SourceStart, SourceEnd, speed, reversed) { Effects = Effects.ScaledKeys((double)Speed / (double)speed), Source = Source, Label = Label, Group = Group, Transition = Transition, Smooth = Smooth };
+    internal EditClip WithMotion(decimal speed, bool reversed)
+    {
+        var clip = new EditClip(SourceStart, SourceEnd, speed, reversed) { Effects = Effects.ScaledKeys((double)Speed / (double)speed), Source = Source, Label = Label, Group = Group, Transition = Transition, Smooth = Smooth };
+        return reversed == Reversed ? clip : clip with { Effects = clip.Effects.MirroredKeys(clip.TimelineLength) };
+    }
 
     internal EditClip WithRange(long sourceStart, long sourceEnd)
     {
