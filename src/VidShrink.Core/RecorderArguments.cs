@@ -375,6 +375,10 @@ public sealed record RecorderRequest
     /// </summary>
     public string? Device { get; init; }
 
+    public CameraMode? DeviceMode { get; init; }
+
+    public string? FramePath { get; init; }
+
     public string? PreviewPath { get; init; }
 }
 
@@ -959,6 +963,8 @@ public static class RecorderArguments
         errors.AddRange(PreviewErrors(request));
         errors.AddRange(MaskErrors(request));
         errors.AddRange(DeviceErrors(request));
+        errors.AddRange(DeviceModeErrors(request));
+        errors.AddRange(FrameErrors(request));
 
         if (request.Target == RecorderTargetKind.Window)
             errors.AddRange(WindowErrors(request));
@@ -982,6 +988,48 @@ public static class RecorderArguments
             yield return nameError;
         else if (request.Webcam is { } cam && string.Equals(cam.Device, request.Device, StringComparison.OrdinalIgnoreCase))
             yield return "The webcam overlay cannot use the device that is already the main picture.";
+    }
+
+    private static IEnumerable<string> DeviceModeErrors(RecorderRequest request)
+    {
+        if (request.DeviceMode is not { } mode) yield break;
+        if (request.Target != RecorderTargetKind.Device)
+            yield return "A device resolution is only used when a camera or capture card is the main picture.";
+        else if (request.Platform != RecorderPlatform.Windows)
+            yield return "A device resolution is read from DirectShow and is only available on Windows.";
+        if (!mode.IsValid)
+            yield return "A device resolution needs a positive width, height and frame rate.";
+    }
+
+    public const int DeviceFrameFps = 1;
+
+    public static bool KeepsDeviceFrame(RecorderRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        return request.Target == RecorderTargetKind.Device && request.MaxMegabytes is null;
+    }
+
+    private static IEnumerable<string> FrameErrors(RecorderRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.FramePath)) yield break;
+        if (request.Target != RecorderTargetKind.Device)
+            yield return "The last frame file is only kept when a camera or capture card is the main picture.";
+        if (!string.Equals(Path.GetExtension(request.FramePath), ".png", StringComparison.OrdinalIgnoreCase))
+            yield return "The last frame file must be a .png file.";
+        if (request.MaxMegabytes is not null)
+            yield return "The last frame file cannot be kept with a size limit: ffmpeg keeps that output open after -fs closes the recording.";
+    }
+
+    public static IReadOnlyList<string> FrameArgs(RecorderRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        if (string.IsNullOrWhiteSpace(request.FramePath)) return Array.Empty<string>();
+
+        var a = new List<string> { "-map", "0:v", "-vf", "fps=" + Number(DeviceFrameFps), "-an" };
+        if (request.MaxDuration is { } limit)
+            a.AddRange(new[] { "-t", limit.TotalSeconds.ToString("0.###", CultureInfo.InvariantCulture) });
+        a.AddRange(new[] { "-f", "image2", "-update", "1", request.FramePath! });
+        return a;
     }
 
     /// <summary>
@@ -1009,20 +1057,23 @@ public static class RecorderArguments
     public const int MacCameraFps = 30;
 
     /// <summary>
-    /// DirectShow video girdisi: kamera katmani da ana goruntu de buradan kurulur. Kare hizi
-    /// yazilmaz; aygitin desteklemedigi hiz istenince dshow girdiyi hic acmiyor.
+    /// DirectShow video girdisi: kamera katmani da ana goruntu de buradan kurulur. Boyut ve kare
+    /// hizi yalniz aygitin kendi bildirdigi kip (<see cref="CameraMode"/>) secilince yazilir;
+    /// aygitin desteklemedigi hiz istenince dshow girdiyi hic acmiyor.
     /// </summary>
-    public static IReadOnlyList<string> DirectShowVideoInput(string device)
-        => new[] { "-f", "dshow", "-rtbufsize", WebcamBufferSize, "-i", "video=" + device };
+    public static IReadOnlyList<string> DirectShowVideoInput(string device, CameraMode? mode = null)
+        => mode is null
+            ? new[] { "-f", "dshow", "-rtbufsize", WebcamBufferSize, "-i", "video=" + device }
+            : new[] { "-f", "dshow", "-rtbufsize", WebcamBufferSize, "-video_size", mode.Size, "-framerate", mode.FrameRateArgument, "-i", "video=" + device };
 
     /// <summary>
     /// Kamera ya da yakalama karti girdisi, sistemin aygit demuxer'iyla: Windows'ta dshow,
     /// macOS'ta avfoundation (yalniz video, <c>:none</c>), Linux'ta v4l2 aygit dosyasi. Kamera
     /// katmani da ana goruntu de buradan kurulur.
     /// </summary>
-    public static IReadOnlyList<string> CameraInput(RecorderPlatform platform, string device) => platform switch
+    public static IReadOnlyList<string> CameraInput(RecorderPlatform platform, string device, CameraMode? mode = null) => platform switch
     {
-        RecorderPlatform.Windows => DirectShowVideoInput(device),
+        RecorderPlatform.Windows => DirectShowVideoInput(device, mode),
         RecorderPlatform.MacOs => new[] { "-f", "avfoundation", "-framerate", Number(MacCameraFps), "-i", device + ":none" },
         RecorderPlatform.Linux => new[] { "-f", "v4l2", "-i", device },
         _ => throw new InvalidOperationException($"Unknown recorder platform: {platform}.")
@@ -1052,6 +1103,8 @@ public static class RecorderArguments
         if (request.Platform != RecorderPlatform.Windows && LoopbackAudio.Uses(request.Audio?.Inputs))
             errors.Add("System audio loopback capture is only available on Windows.");
 
+        errors.AddRange(DeviceModeErrors(request));
+        errors.AddRange(FrameErrors(request));
         if (request.Container != RecorderContainer.Gif) errors.AddRange(AudioCodecErrors(request));
         return errors;
     }
@@ -1956,6 +2009,7 @@ public static class RecorderArguments
 
         a.Add(outputPath);
         a.AddRange(PreviewArgs(request));
+        a.AddRange(FrameArgs(request));
         return a;
     }
 
@@ -2108,7 +2162,8 @@ public static class RecorderArguments
             Audio = null,
             Webcam = null,
             MaxDuration = null,
-            Split = null
+            Split = null,
+            FramePath = null
         };
         var errors = Validate(probe, "snapshot.mp4");
         if (errors.Count > 0) throw new InvalidOperationException(string.Join(Environment.NewLine, errors));
@@ -2249,7 +2304,7 @@ public static class RecorderArguments
 
     private static IReadOnlyList<string> Input(RecorderRequest request) => request.Platform switch
     {
-        _ when request.Target == RecorderTargetKind.Device => CameraInput(request.Platform, request.Device!),
+        _ when request.Target == RecorderTargetKind.Device => CameraInput(request.Platform, request.Device!, request.DeviceMode),
         RecorderPlatform.Windows => WindowsInput(request),
         RecorderPlatform.MacOs => MacInput(request),
         RecorderPlatform.Linux => LinuxInput(request),

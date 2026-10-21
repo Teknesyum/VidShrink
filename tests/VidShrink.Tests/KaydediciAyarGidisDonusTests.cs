@@ -24,6 +24,9 @@ namespace VidShrink.Tests;
 /// <para>
 /// 2026-10-17: <c>HdrToSdr</c> yaninda goc isareti <c>hdrToSdrDefaultOn</c> yazilir; iki anahtar sayilir.
 /// </para>
+/// <para>
+/// 2026-10-20: <c>DeviceMode</c> <c>CameraMode</c> bicimiyle okunur, gecersiz metin bos doner; sabit kip <c>Kisitli</c>'da.
+/// </para>
 /// </summary>
 public sealed class KaydediciAyarGidisDonusTests
 {
@@ -43,7 +46,8 @@ public sealed class KaydediciAyarGidisDonusTests
         ["Hotkeys"] = "2:F1,2:F2,2:F3,2:F4,2:F5,2:F6,2:F7,2:F8,2:F9",
         ["PrompterStep"] = 5,
         ["PrompterLook"] = new PrompterLook(Mirror: true, Line: false, Size: 0),
-        ["ScheduleAt"] = new DateTime(2026, 10, 12, 14, 30, 0)
+        ["ScheduleAt"] = new DateTime(2026, 10, 12, 14, 30, 0),
+        ["DeviceMode"] = "1280x720@29.97"
     };
 
     private static readonly Dictionary<string, int> CokAnahtarli = new()

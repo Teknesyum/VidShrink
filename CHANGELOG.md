@@ -11,8 +11,6 @@ made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md
 
 ### Added
 
-- Recorder: a reassignable hotkey (Ctrl+F3 by default) cycles the drawing ink while the drawing layer is open.
-
 ### Fixed
 
 - Changing the colour matrix (Convert's BT.601/709/2020 choice and Shrink's colour space

@@ -36,6 +36,7 @@ public sealed record CliRecordSettings
     public string? SystemAudioName { get; init; }
     public string? WebcamName { get; init; }
     public string? DeviceName { get; init; }
+    public CameraMode? DeviceMode { get; init; }
     public WebcamShape WebcamShape { get; init; } = WebcamShape.Rectangle;
     public bool WebcamMirror { get; init; }
     public double WebcamX { get; init; } = 1;
@@ -138,6 +139,7 @@ public sealed record CliRecordSettings
                 SystemAudioName = (string?)root["systemAudioName"],
                 WebcamName = (string?)root["webcamName"],
                 DeviceName = (string?)root["deviceName"],
+                DeviceMode = CameraMode.Parse((string?)root["deviceMode"]),
                 WebcamShape = Enum.TryParse<WebcamShape>((string?)root["webcamShape"], true, out var shape) && Enum.IsDefined(shape) ? shape : settings.WebcamShape,
                 WebcamMirror = (bool?)root["webcamMirror"] ?? settings.WebcamMirror,
                 WebcamX = camX,
@@ -333,6 +335,7 @@ public static class CliRecord
             Audio = audio,
             Webcam = webcam,
             Device = saved.Target == RecorderTargetKind.Device ? saved.DeviceName : null,
+            DeviceMode = saved.Target == RecorderTargetKind.Device && machine.Platform == RecorderPlatform.Windows ? saved.DeviceMode : null,
             Container = saved.Container,
             ScreenIndex = saved.Target == RecorderTargetKind.Screen ? saved.ScreenIndex : 0,
             PrivacyMasks = saved.Target == RecorderTargetKind.Device ? Array.Empty<RecorderRegion>() : saved.PrivacyMasks,

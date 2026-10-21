@@ -38,7 +38,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (EKA-P8): EKA-06 Aygıt kaynağı. [Tablo](piyasa/2026-10-13/kaydedici-yakalama-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Core/RecorderArguments.cs, src/VidShrink.Ffmpeg/CaptureDevices.cs, src/VidShrink.App/Recorder/RecorderView.Hedef.cs, src/VidShrink.App/Recorder/RecorderView.Kamera.cs
 - Plan: Hedef türlerine (`RecorderArguments.cs:24`) "aygıt" eklenir: web kamerası ya da yakalama kartı ekran girdisinin yerine ana görüntü olur. Windows'ta kamera girdisi zaten DirectShow ile kuruluyor (`RecorderArguments.cs:1203`); aynı kurucu ana girdi için yeniden kullanılır. Ölçü `tests/VidShrink.Tests/KaydediciHedefTests.cs` ve `KaydediciKameraTests.cs` yanına yazılır; gerçek deneme takılı bir kamerayla Windows'ta elle yapılır.
-- Durum (18 Ekim 2026, main): hedef türlerine "aygıt" girdi; kamera ya da yakalama kartı ana görüntü olur (`yan/kamera-ana-kaynak`). Açık: takılı gerçek kamerayla elle deneme, aygıtın çözünürlük seçimi, kayıt sırasında anlık kare.
+- Durum (20 Ekim 2026, `worktree-agent-later-69`): aygıt hedefi, çözünürlük/kare hızı seçimi (`-list_options` yoklaması, `-video_size`/`-framerate`) ve kayıt sürerken anlık kare (kayıt ffmpeg'inin saniyede bir yenilenen ikinci çıktısı) bitti; OBS Virtual Camera ile otomatik kayıt ve anlık kare ölçüldü (`KaydediciAygitKipiTests`). Açık: fiziksel bir kamera ya da yakalama kartıyla arayüzden elle deneme; bu makinede takılı fiziksel aygıt yok, yalnız sanal kameralar var.
 
 ## 70. Kamera Katmanı Windows Dışında
 

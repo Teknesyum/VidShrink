@@ -222,6 +222,7 @@ internal partial class RecorderView
             Audio = audio,
             Webcam = audioOnly ? null : ChosenWebcam(),
             Device = device ? ChosenDevice : null,
+            DeviceMode = device && CapturePlatform == RecorderPlatform.Windows ? ChosenDeviceMode : null,
             Container = _settings.Container,
             AudioCodec = ChosenAudioCodec(_settings.Container),
             ScreenIndex = ScreenFor(target, region),
@@ -348,6 +349,7 @@ internal partial class RecorderView
     {
         FollowGameScreen();
         if (BuildRequest(pushToTalk: ChkPushToTalk.IsChecked == true) is not { } request) return null;
+        if (RecorderArguments.KeepsDeviceFrame(request)) request = request with { FramePath = FrameLocation() };
         StoreChoices();
         return (request, _settings.OutputPath(DateTime.Now));
     }
