@@ -453,7 +453,7 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 - Satırlar (AYR-P11): AYR-12 Arayüz Ölçeği Ya Da Yazı Boyutu; AYR-13 Yüksek Karşıtlık Desteği. [Tablo](piyasa/2026-10-13/ayarlar-kabuk-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.App/Themes/Theme.axaml, src/VidShrink.App/Themes/PaletteCatalog.cs, src/VidShrink.App/Themes/Palette/, src/VidShrink.App/MainWindow.axaml
-- Yapılan: `HighContrast` paleti (AAA testi `YuksekKarsitlikVeYaziOlcegiTests`), Ayarlar'da yazı boyutu %100/%125/%150 (`FontScale`), %150 varsayılan boyutta beş dilde kusursuz (`YuzdeElliYazidaVarsayilanBoyuttaKesikCakismaTasmaYok`). Kural istisnası açılmadı.
+- Yapılan: `HighContrast` paleti (AAA testi `YuksekKarsitlikVeYaziOlcegiTests`), Ayarlar'da yazı boyutu %100/%125/%150 (`FontScale`), %150 varsayılan boyutta beş dilde kusursuz (`YuzdeElliYazidaVarsayilanBoyuttaKesikCakismaTasmaYok`). Yazı boyutu varsayılan hedef boyutun yanına oturdu, hedef boyutun ipucu bilgi rozetine taşındı; Ayarlar 1920x1040'ta kaydırmasız kalır (`KaydirmasizSekmeTests`). Kural istisnası açılmadı.
 - Kalan: %150 küçük kipte ve en dar pencerede, %125 hiçbir boyutta ölçülmedi; yazı boyutu yeniden başlatınca uygulanıyor, çalışırken değil.
 - Plan: `YerlesimDenetimiTests`'in küçük kip ve en dar kollarına `yazi: 150` kolu eklenir, çıkan kusurlar belirteç ve yerleşimle düzeltilir. Çalışırken uygulama için `FontScale.Apply` sonrası açık pencerelerin yeniden ölçülmesi denenir.
 

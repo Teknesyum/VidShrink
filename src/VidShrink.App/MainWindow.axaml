@@ -2044,15 +2044,6 @@
                           </DataTemplate>
                         </ComboBox.ItemTemplate>
                       </ComboBox>
-                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
-                        <SarilanMetin Text="{loc:Text settings-tab.text-size.label}" Theme="{StaticResource Label}"/>
-                        <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.text-size.label}">
-                          <ToolTip.Tip>
-                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.text-size.hint}"/>
-                          </ToolTip.Tip>
-                        </Button>
-                      </Grid>
-                      <ComboBox x:Name="CmbTextSize" auto:AutomationProperties.Name="{loc:Text settings-tab.text-size.label}" HorizontalAlignment="Stretch"/>
                       <CheckBox x:Name="ChkReduceMotion" Theme="{StaticResource CheckStyle}" HorizontalAlignment="Left" Content="{loc:Text settings-tab.reduce-motion.label}">
                         <ToolTip.Tip>
                           <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.reduce-motion.hint}"/>
@@ -2083,14 +2074,33 @@
                     </StackPanel>
                   </Grid>
 
-                  <StackPanel Spacing="{StaticResource SpaceSm}">
-                    <SarilanMetin Text="{loc:Text settings-tab.default-target.label}" Theme="{StaticResource Label}"/>
-                    <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
-                      <TextBox x:Name="TxtDefaultTargetMb" auto:AutomationProperties.Name="{loc:Text settings-tab.default-target.label}" Width="{StaticResource FieldWidthSm}" TextAlignment="Center"/>
-                      <SarilanMetin Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                  <Grid x:Name="TargetTextSizeRow" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource SpaceLg}">
+                    <StackPanel Spacing="{StaticResource SpaceSm}">
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                        <SarilanMetin Text="{loc:Text settings-tab.default-target.label}" Theme="{StaticResource Label}"/>
+                        <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.default-target.label}">
+                          <ToolTip.Tip>
+                            <SarilanMetin Theme="{StaticResource TipText}" Text="{loc:Text settings-tab.default-target.hint}"/>
+                          </ToolTip.Tip>
+                        </Button>
+                      </Grid>
+                      <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+                        <TextBox x:Name="TxtDefaultTargetMb" auto:AutomationProperties.Name="{loc:Text settings-tab.default-target.label}" Width="{StaticResource FieldWidthSm}" TextAlignment="Center"/>
+                        <SarilanMetin Text="{loc:Text main.unit.mb}" Theme="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+                      </StackPanel>
                     </StackPanel>
-                    <SarilanMetin Theme="{StaticResource Hint}" TextWrapping="Wrap" Text="{loc:Text settings-tab.default-target.hint}"/>
-                  </StackPanel>
+                    <StackPanel Grid.Column="1" Spacing="{StaticResource SpaceSm}">
+                      <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Left">
+                        <SarilanMetin Text="{loc:Text settings-tab.text-size.label}" Theme="{StaticResource Label}"/>
+                        <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.text-size.label}">
+                          <ToolTip.Tip>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.text-size.hint}"/>
+                          </ToolTip.Tip>
+                        </Button>
+                      </Grid>
+                      <ComboBox x:Name="CmbTextSize" auto:AutomationProperties.Name="{loc:Text settings-tab.text-size.label}" HorizontalAlignment="Stretch"/>
+                    </StackPanel>
+                  </Grid>
 
                   <CheckBox x:Name="ChkAdvancedDefaultOpen" Theme="{StaticResource CheckStyle}" HorizontalAlignment="Left" Content="{loc:Text settings-tab.advanced-default-open.label}">
                     <ToolTip.Tip>
