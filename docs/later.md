@@ -218,6 +218,8 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · DZB-P12 · Düzenleyici · iş büyük · öncelik 1 · karar sahibin
 
+Karar (21 Ekim 2026, sahip): evet; 109 ölçümünden sonra başlar.
+
 - Satırlar (DZB-P12): DZB-02 İkinci video izi; DZB-29 Yeşil perde. [Tablo](piyasa/2026-10-13/duzenleyici-kurgu-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Core/Editing/EditTimeline.cs, src/VidShrink.Core/Editing/EditExport.cs, src/VidShrink.Core/Editing/EdlPreview.cs, src/VidShrink.Core/Editing/EditProject.cs, src/VidShrink.App/Editing/EditorTimeline.cs, src/VidShrink.App/Editing/EditorView.Klip.cs, tests/VidShrink.Tests/
 - Sahibin kararı: Düzenleyici tek şeritten çıkıp üstte ikinci bir video izi (resim içinde resim) alsın mı?
@@ -268,15 +270,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Sahibin kararı: İmleç kayda yakılmak yerine ayrı veri olarak tutulsun mu; EKB-P9'da kayıt sonrası yol seçilmeden bu paket başlamaz.
 - Plan: Kayıt imleçsiz alınır, imleç izi EKB-P9'un yan dosyasından okunur. İz yumuşatılır, imleç seçilen boyutta yeniden çizilip `overlay` ile bindirilir; hızlı geçişlere kare karıştırma (`tmix`) ile bulanıklık eklenir. Yumuşatma saf fonksiyon olarak, imlecin karedeki yeri lavfi ile ölçülür.
 
-## 117. Taşınabilir Kip Ve Güncelleme Kanalı
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · AYR-P8 · Ayarlar Ve Kabuk · iş büyük · öncelik 1 · karar sahibin
-
-- Satırlar (AYR-P8): AYR-05 Taşınabilir Kip; AYR-09 Güncelleme Kanalı Seçimi. [Tablo](piyasa/2026-10-13/ayarlar-kabuk-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/UpdateCheck.cs, src/VidShrink.App/MainWindow.axaml, .github/workflows/, docs/kurulum.md
-- Sahibin kararı: Yayına iki yeni biçim eklensin mi: ayarını yanında taşıyan kurulumsuz paket ve gönüllülere açık ön sürüm kanalı?
-- Plan: Önce AYR-05: exe'nin yanındaki bir işaret dosyası ayar ve günlük yolunu uygulama klasörüne çevirir; bu kipte güncellemenin nasıl davranacağı sahibin kararına göre kurulur. Sonra AYR-09: Güncelleme kartına kararlı ve ön sürüm seçimi eklenir, denetim seçilen kanalın yayınlarına bakar. İki satır dağıtım tablosundaki DAG-10 ve DAG-24 ile aynı iştir; orada DAG-24 kendi paketinde, DAG-10 ise DAG-11 ve DAG-20 ile aynı pakette duruyor, birleştirmede bu paketlerle tek işe indirilmelidir. Doğrulama: işaret dosyasıyla ayar yolunun testi ve kanal seçiminin sürüm karşılaştırma testi.
-
 ## 118. Flathub Ve AppImage Paketleri
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · DAG-P8 · Dağıtım Ve Otomasyon · iş büyük · öncelik 1 · karar sahibin
@@ -293,15 +286,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Satırlar (SIK-P10): SIK-14 Çıktının gerçek kalite puanı. [Tablo](piyasa/2026-10-13/kucult-dogrulanmis.md)
 - Yapıldı (18 Ekim 2026): Gelişmiş'te varsayılan kapalı "kaliteyi ölç" kutusu; iş bitince `Ffmpeg/OutputQualityCheck` VMAF, yoksa SSIM, yoksa PSNR ölçüp puanı ve bandı sonuç satırına yazıyor, iptal edilebilir.
 - Kalan: toplu iş ve kabuk kuyruğu penceresi (`ShrinkJobWindow`) ölçmüyor, puan iş kaydına yazılmıyor; ölçüm çubuğu yüzde göstermiyor; bant eşikleri (VMAF 93/85/70) `tools/VidShrink.Bench` ile ölçülmedi; arayüz puanının CLI `--vmaf` puanıyla aynı olduğunu ölçen test yok.
-
-## 123. VVC Kodlama Desteği
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · SIK-P12 · Küçült · iş orta · öncelik 2 · karar sahibin
-
-- Satırlar (SIK-P12): SIK-16 VVC (H.266) kodlama. [Tablo](piyasa/2026-10-13/kucult-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/PlanParser.cs, src/VidShrink.Core/FfmpegArguments.cs, src/VidShrink.Core/PlanCalculator.cs, src/VidShrink.App/MainWindow.axaml (kodek seçimi), src/VidShrink.App/Locales/
-- Sahibin kararı: libvvenc içeren bir ffmpeg derlemesi dağıtılsın mı ve oynatma desteği bu kadar darken VVC kodek listesine girsin mi?
-- Plan: Önce dağıtılan ffmpeg'de libvvenc (VVC kodlayan açık kaynak kitaplık) var mı diye yoklanır; yoksa iş derleme kararında bekler. Varsa kodek izin listesine eklenir (`src/VidShrink.Core/PlanParser.cs:13`), hız ön ayarları ve boyut verimi ölçülerek yazılır, kodek seçiminde çoğu aygıtta oynamadığı uyarısıyla gösterilir. Doğrulama: argüman testi ve ölçüm aracıyla hedef boyut bandının tuttuğunun ölçülmesi. Dönüştür sekmesindeki DON-33 ile aynı iştir.
 
 ## 126. Kayıtta Bildirim Ve Simge Gizleme
 
@@ -338,15 +322,6 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Dokunacağı yer: src/VidShrink.App/MainWindow.KapanistaGuncelleme.cs, src/VidShrink.Core/UpdateCheck.cs, src/VidShrink.Core/UpdateHealth.cs
 - Sahibin kararı: macOS'ta otomatik güncelleme varsayılan olarak açılsın mı
 - Plan: Elle Yükle'nin kullandığı paket takası, `MacUpdate.CanSwap` doğruysa kapanış yoluna da bağlanır: sahne açılış bittikten sonra sessiz iner, çıkışta takas edilir. Her düşüş `UpdateHealth` sayacına yazılır; sayılmayan sessiz yol eklenmez. Düz kurulumda ve salt okunur yola taşınmış pakette kapalı kalır; Sparkle eklenmez. Birim testleri ve gerçek Mac'te bir sürüm atlamasıyla doğrulanır.
-
-## 133. Linux'ta Kendini Güncelleme
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · PLT-P6 · Platform Eşitliği · iş orta · öncelik 2 · karar sahibin
-
-- Satırlar (PLT-P6): PLT-20 Linux'ta kendini güncelleme. [Tablo](piyasa/2026-10-13/platform-esitligi-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/UpdateCheck.cs, src/VidShrink.Core/InPlaceUpdate.cs, src/VidShrink.App/YerindeGuncelleme.cs, .github/workflows/release.yml, docs/kurulum.md
-- Sahibin kararı: Linux'ta bilerek kapalı tutulan uygulama içi güncelleme açılsın mı
-- Plan: Kullanıcıya ait `~/.local/share/vidshrink` kurulumunda yerinde takas açılır; yazılamayan yolda kapalı kalır ve bugünkü gibi yalnız haber verilir. Linux için güncelleme paketi bugün üretilmiyor (release.yml:492-500); ya yayına Linux paketi eklenir ya da uygulama arşivi kullanılır. DAG-25 ile aynı iş, DAG paketlerinde yeri yok; DAG-P8 (Flatpak ya da AppImage) onaylanırsa güncellemeyi mağaza üstlenir ve bu paket yalnız betikle kurulanlara kalır. Takas, geri alma ve düşüş sayımı testle ölçülür.
 
 ## 134. VideoToolbox Hızlı Kip Kapısı
 
@@ -396,6 +371,8 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 ## 139. Çok İz Üstüne Gelenler
 
 13 Ekim 2026 · "bulduklarını later a eklersin" · DZB-P15 · Düzenleyici · iş büyük · öncelik 2 · karar sahibin
+
+Karar (21 Ekim 2026, sahip): evet; 109 ölçümünden sonra başlar. 139'da ses ekleri ve iz denetimleri evet, boşluklu çizelge hayır.
 
 - Satırlar (DZB-P15): DZB-10 Sesi videodan ayırma; DZB-46 Otomatik müzik kısma; DZB-47 Seslendirme kaydı; DZB-06 İz denetimleri; DZB-07 Boşluklu çizelge. [Tablo](piyasa/2026-10-13/duzenleyici-kurgu-dogrulanmis.md)
 - Dokunacağı yer: src/VidShrink.Core/Editing/EditTimeline.cs, src/VidShrink.Core/Editing/EditExport.cs, src/VidShrink.Core/Editing/EditProject.cs, src/VidShrink.Core/AudioCaptureArguments.cs, src/VidShrink.App/Editing/EditorTimeline.cs, src/VidShrink.App/Editing/EditorView.axaml, tests/VidShrink.Tests/
@@ -474,11 +451,3 @@ Gerekçe, sayılar ve kanıt: [plan-pazar-eksikleri.md](plan-pazar-eksikleri.md)
 - Sahibin kararı: ücretli Apple geliştirici üyeliği alınsın mı; alınırsa dmg yayımlanır ve Homebrew için kendi tap depomuz açılır.
 - Plan: `macos-app-bundle.sh` ad-hoc imza yerine Developer ID ile imzalar ve paketi noterlemeye gönderir (noterleme: Apple'ın paketi tarayıp onay damgası vermesi); libmpv ve öteki kitaplıklar da imzalanır. İmzalı paketten sürükle bırak dmg üretilir ve yayına eklenir. Homebrew ana dizini en az 75 yıldız, sahibin kendi başvurusunda 225 yıldız arıyor ve bizde 12 var; bu yüzden cask (Homebrew'un hazır uygulama tarifi) kendi tap depomuzda (projeye ait Homebrew paket deposu) yayımlanır ve `release.yml` her sürümde sürüm ile sha256'yı tazeler. Doğrulama: CI'da Gatekeeper ve damga denetimi, temiz Mac'te tarayıcıdan indirip çift tıkla açma elle.
 
-## 152. Betik Ve Eklenti Arabirimi
-
-13 Ekim 2026 · "bulduklarını later a eklersin" · DAG-P12 · Dağıtım Ve Otomasyon · iş büyük · öncelik 2 · karar sahibin
-
-- Satırlar (DAG-P12): DAG-36 Betik ve eklenti arabirimi. [Tablo](piyasa/2026-10-13/dagitim-otomasyon-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/, src/VidShrink.App/, yeni docs/ sayfası
-- Sahibin kararı: uygulamaya betik motoru (yeni bağımlılık) eklensin ve sürümler arası korunacak bir eklenti arabirimi sözü verilsin mi.
-- Plan: DAG-P4'ten önce başlanmaz: dış süreçten gelen komut kanalı, eklenti isteklerinin kumanda ve otomasyon kısmını bağımlılık eklemeden karşılar. Evet denirse ilk adım dar tutulur: kullanıcı klasöründeki betikler oynatıcı ve kuyruk olaylarına abone olur ve komut kanalındaki komutları çağırır; arayüze parça ekleyen eklenti sonraya kalır. Betik dili ve motoru kararın parçasıdır. Doğrulama: örnek betikle olay ve komut testi, betik hatasının uygulamayı düşürmediğinin testi.
