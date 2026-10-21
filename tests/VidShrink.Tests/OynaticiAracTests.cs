@@ -897,7 +897,7 @@ public sealed class OynaticiAracTests : IDisposable
                 body.AppendLine($"[{dil}] {araclar.Header}: {string.Join(" | ", satirlar.Select(s => s.Header))}");
                 Assert.Equal(8, satirlar.Count);
                 Assert.Equal(new object?[] { ToolsOptions.Clip, ToolsOptions.Gif, ToolsOptions.Frames, ToolsOptions.Sheet, ToolsOptions.OpenUrl, ToolsOptions.PasteUrl, Keymap.Info, ToolsOptions.MiniMode }, satirlar.Select(s => s.Tag));
-                Assert.Equal(menu.Count - 5, menu.IndexOf(araclar));
+                Assert.Equal(menu.Count - 6, menu.IndexOf(araclar));
                 Assert.All(satirlar, satir => Assert.NotNull(satir.Tag));
             }
 
