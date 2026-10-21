@@ -9,6 +9,8 @@ made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md
 
 ## [Unreleased]
 
+## [0.0.2] - 2026-10-21
+
 ### Added
 
 ### Changed
