@@ -68,6 +68,12 @@ dosyası ayarları ve günlüğü yanındaki `data` klasöründe tutar. Taşına
 güncellemez, kısayol eklemez, kayıt defterine yazmaz; yeni sürüm çıkınca güncelleme düğmesi
 indirme sayfasını açar.
 
+**Çevrimdışı.** `VidShrinkPlayer-Offline-win-x64.zip` (ya da `-win-arm64`) internet olmadan
+kurar: açın ve o klasördeki `VidShrinkPlayer-Setup.exe`'yi çalıştırın. Uygulamayı, FFmpeg'i ve
+libmpv'yi taşır; her araç kurucuya sabitlenmiş sha256 ile denetlenir, tutmayan indirilir.
+FFmpeg ve libmpv lisans metinleri ve kaynak bağlantıları arşivin `licenses` klasöründe ve
+yayında yanında (`offline-<rid>-*.txt`). x64 için yaklaşık 310 MB; çevrimiçi kurucu 12 MB.
+
 ### macOS Ve Linux'a Kurulum
 
 ```bash
@@ -538,8 +544,9 @@ onu sürdürüyor.
 
 [AGPL-3.0-or-later](LICENSE). Telif hakkı (C) 2026 Teknesyum.
 
-FFmpeg ve libmpv kendi lisansları altında ayrı programlardır; VidShrink Player ikisini de
-yeniden dağıtmaz ve içine GPL kodu bağlamaz ([`docs/kurulum.tr.md`](docs/kurulum.tr.md)).
+FFmpeg ve libmpv kendi lisansları altında ayrı programlardır; VidShrink Player içine GPL kodu
+bağlamaz ([`docs/kurulum.tr.md`](docs/kurulum.tr.md)). Onları yalnız çevrimdışı arşiv, değiştirmeden,
+lisans metinleri ve kaynak bağlantılarıyla birlikte yeniden dağıtır.
 
 Kaynak ağacının içinde dağıtılan üçüncü taraf malzeme — simge takımının kesildiği Fluent UI
 System Icons (MIT) — [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md) dosyasında.

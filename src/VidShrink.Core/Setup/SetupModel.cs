@@ -103,6 +103,42 @@ public sealed record FfmpegPin(string Url, IReadOnlyList<PinnedEntry> Entries)
         string.Equals(architecture, "arm64", StringComparison.OrdinalIgnoreCase) ? Arm64 : X64;
 }
 
+public sealed record OfflineBundle(string Directory, string Tag, string Rid)
+{
+    public const string MarkerFileName = "vidshrink-offline.txt";
+
+    public const string ToolsFolder = "tools";
+
+    public string ToolsDirectory => Path.Combine(Directory, ToolsFolder);
+
+    public static string ArchiveName(string rid) => $"VidShrinkPlayer-Offline-{rid}.zip";
+
+    public static OfflineBundle? Read(string? directory)
+    {
+        if (string.IsNullOrEmpty(directory)) return null;
+        var marker = Path.Combine(directory, MarkerFileName);
+        if (!File.Exists(marker)) return null;
+        string? tag = null, rid = null;
+        foreach (var line in File.ReadAllLines(marker))
+        {
+            var split = line.IndexOf('=');
+            if (split <= 0) continue;
+            var key = line[..split].Trim();
+            var value = line[(split + 1)..].Trim();
+            if (key == "tag") tag = value;
+            else if (key == "rid") rid = value;
+        }
+        if (string.IsNullOrEmpty(tag) || string.IsNullOrEmpty(rid))
+            throw new SetupException(SetupText.Get("setup.offline.marker-broken", marker));
+        return new OfflineBundle(Path.GetFullPath(directory), tag, rid);
+    }
+
+    public SetupOptions Apply(SetupOptions options) =>
+        options.AssetSource is not null || options.Tag is not null
+            ? options
+            : options with { AssetSource = Directory, Tag = Tag, OfflineTools = ToolsDirectory, OfflineRid = Rid };
+}
+
 public sealed record SetupOptions
 {
     public const string DefaultClassesRoot = @"Software\Classes";
@@ -130,6 +166,10 @@ public sealed record SetupOptions
     public string? Tag { get; init; }
 
     public bool ForceFfmpegDownload { get; init; }
+
+    public string? OfflineTools { get; init; }
+
+    public string? OfflineRid { get; init; }
 
     public LibMpvPin? LibMpv { get; init; }
 

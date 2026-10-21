@@ -66,6 +66,13 @@ installing: unzip it anywhere, a USB stick included, and start `VidShrink.App.ex
 it. A portable copy does not update itself, adds no shortcuts and writes nothing to the
 registry; when a new version is out, the update button opens the download page.
 
+**Offline.** `VidShrinkPlayer-Offline-win-x64.zip` (or `-win-arm64`) installs without an
+internet connection: unzip it and run `VidShrinkPlayer-Setup.exe` from that folder. It carries
+the application, FFmpeg and libmpv; every tool is checked against the sha256 pinned in the
+installer, and one that does not match is downloaded instead. The FFmpeg and libmpv licence
+texts and source links are in its `licenses` folder and beside it in the release
+(`offline-<rid>-*.txt`). About 310 MB for x64, against 12 MB for the online installer.
+
 ### Install On macOS And Linux
 
 ```bash
@@ -533,8 +540,9 @@ keeps it going.
 
 [AGPL-3.0-or-later](LICENSE). Copyright (C) 2026 Teknesyum.
 
-FFmpeg and libmpv are separate programs under their own licences; VidShrink Player
-redistributes neither and links no GPL code into itself ([`docs/kurulum.md`](docs/kurulum.md)).
+FFmpeg and libmpv are separate programs under their own licences; VidShrink Player links no
+GPL code into itself ([`docs/kurulum.md`](docs/kurulum.md)). Only the offline archive
+redistributes them, unmodified, with their licence texts and source links.
 
 Third-party material distributed inside the source tree — the Fluent UI System Icons the
 icon set is cut from (MIT) — is listed in [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).

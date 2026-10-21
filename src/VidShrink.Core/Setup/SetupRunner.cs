@@ -53,6 +53,8 @@ public static class SetupRunner
         host.Log(SetupText.Get("setup.preparing"));
         var decision = host.Architecture();
         var rid = RuntimeIdentifier(decision, host.Log);
+        if (options.OfflineRid is { } bundleRid && !string.Equals(bundleRid, rid, StringComparison.OrdinalIgnoreCase))
+            throw new SetupException(SetupText.Get("setup.offline.rid-mismatch", bundleRid, rid, OfflineBundle.ArchiveName(rid)));
         var libMpvPin = options.LibMpv ?? LibMpvPin.For(decision.Architecture);
         var ffmpegPin = options.Ffmpeg ?? FfmpegPin.For(decision.Architecture);
         var root = Path.GetFullPath(options.InstallRoot).TrimEnd(Path.DirectorySeparatorChar);
@@ -73,14 +75,15 @@ public static class SetupRunner
             var checksumsName = $"checksums-{rid}.txt";
 
             var existingLibMpv = Path.Combine(root, "tools", "libmpv", libMpvPin.FileName);
-            var libMpvTask = Task.Run(() => SetupDownloads.PrepareLibMpvAsync(client, libMpvPin, existingLibMpv, work, host.Log, cancellationToken), cancellationToken);
+            var libMpvTask = Task.Run(() => SetupDownloads.PrepareLibMpvAsync(client, libMpvPin, existingLibMpv, work, host.Log, cancellationToken, options.OfflineTools), cancellationToken);
             var vulkanTask = libMpvPin.Vulkan is { } vulkanPin
-                ? Task.Run(() => SetupDownloads.PrepareVulkanLoaderAsync(client, vulkanPin, Path.GetDirectoryName(existingLibMpv), work, cancellationToken), cancellationToken)
+                ? Task.Run(() => SetupDownloads.PrepareVulkanLoaderAsync(client, vulkanPin, Path.GetDirectoryName(existingLibMpv), work, cancellationToken, options.OfflineTools, host.Log), cancellationToken)
                 : null;
             var ffmpegTask = ffmpeg is null || ffprobe is null
-                ? Task.Run(() => SetupDownloads.FetchFfmpegAsync(ffmpegPin, work, cancellationToken), cancellationToken)
+                ? Task.Run(() => SetupDownloads.FetchFfmpegAsync(ffmpegPin, work, cancellationToken, options.OfflineTools, host.Log), cancellationToken)
                 : null;
-            if (ffmpegTask is not null) host.Log(SetupText.Get("setup.ffmpeg.downloading"));
+            if (options.OfflineTools is not null) host.Log(SetupText.Get("setup.offline.using", options.OfflineTools));
+            else if (ffmpegTask is not null) host.Log(SetupText.Get("setup.ffmpeg.downloading"));
 
             host.Step(10, 18, SetupText.Get("setup.step.release"));
             host.Log(SetupText.Get("setup.release.searching"));

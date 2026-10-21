@@ -8,8 +8,10 @@ name: release
 # and what the shortcuts point at. That archive is also what the manifest's "launcher"
 # array points at, so an installed launcher can replace itself.
 #
-# ffmpeg is not part of any archive. It is GPLv3 and VidShrink is AGPL-3.0-or-later; the installer
-# fetches it onto the user's machine under its own licence. See README.
+# ffmpeg and libmpv are not part of the application archives. They are GPL and VidShrink is
+# AGPL-3.0-or-later; the installer fetches them onto the user's machine under their own licences.
+# The offline job adds VidShrinkPlayer-Offline-<rid>.zip for Windows, which carries both, pinned by
+# sha256, with their licence texts and source links. See README.
 #
 # The asset names and the manifest format are defined in .github/workflows/manifest.md.
 # The updater reads that file, not this one.
@@ -531,8 +533,165 @@ jobs:
           path: assets/
           if-no-files-found: error
 
-  release:
+  offline:
     needs: [version, publish]
+    if: ${{ !cancelled() && needs.publish.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: win-x64
+            ffmpeg-url: https://github.com/GyanD/codexffmpeg/releases/download/9.0/ffmpeg-9.0-full_build.zip
+            ffmpeg-dir: ffmpeg-9.0-full_build
+            ffmpeg-sha256: 05f4251bce9293c2ab492cb17ca7724a0ffd0d06c881ba2ee83b82a89c2fc740
+            ffprobe-sha256: 51e0780cd881f83749b029ed716cbb841c2eac6289f418050f2f2961b158896b
+            ffmpeg-source: https://ffmpeg.org/releases/ffmpeg-9.0.tar.xz
+            ffmpeg-build: https://github.com/GyanD/codexffmpeg/releases/tag/9.0
+            libmpv-url: https://github.com/Teknesyum/VidShrink-Player/releases/download/deps-libmpv-20260903/libmpv-2-x86_64-20260903.zip
+            libmpv-zip-sha256: 1fc71846bd6e63d280e4f52d212f6f80695339e98632698930cf4ffe9f4bdbad
+            libmpv-sha256: 673e6397920ab64a9c5b3a618f7f16d38854efe72b58665f1f84e4e873b763a4
+            vulkan-url: https://github.com/Teknesyum/VidShrink-Player/releases/download/deps-libmpv-20260903/vulkan-1-x86_64-1.4.357.0.zip
+            vulkan-zip-sha256: 38a05198c4bb467bf81dc17731a5a9f7f79147e80fdae638a18da23f4d9a8ae9
+            vulkan-sha256: cd862090370454630b31b174e3d4eb474fda38ea034998d1fe1767b0c99a8696
+          - rid: win-arm64
+            ffmpeg-url: https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-08-31-13-27/ffmpeg-n9.0.1-11-ge47273f4d9-winarm64-gpl-9.0.zip
+            ffmpeg-dir: ffmpeg-n9.0.1-11-ge47273f4d9-winarm64-gpl-9.0
+            ffmpeg-sha256: a169b9d26b2380be66211022525c9ac16affc923ba05b561024e57c5ed4281f9
+            ffprobe-sha256: 6b0b738a2df0186811f240a7036cd1279c0a08991981adecceefe6a2c2b2236c
+            ffmpeg-source: https://github.com/FFmpeg/FFmpeg/tree/e47273f4d9
+            ffmpeg-build: https://github.com/BtbN/FFmpeg-Builds/releases/tag/autobuild-2026-08-31-13-27
+            libmpv-url: https://github.com/Teknesyum/VidShrink-Player/releases/download/deps-libmpv-20260903/libmpv-2-aarch64-20260903.zip
+            libmpv-zip-sha256: a0dfcf27fa8468e4c52170779b27cec3a6bf2be57eac2e021ec6d39d36228156
+            libmpv-sha256: 3bfc5a042cc6ebe45ace74992dbc135ee84e3e1b33afac070f8902a2d64a22e9
+            vulkan-url: https://github.com/Teknesyum/VidShrink-Player/releases/download/deps-libmpv-20260903/vulkan-1-aarch64-1.4.357.0.zip
+            vulkan-zip-sha256: 2495aea7ef927005cb34609a74a379537f9a154beb9f308b2fefd13c5b72c38b
+            vulkan-sha256: cc5dd0bec8a7afef013c61ddd511d31500a3b3a45c229150a9ae73ead708ab76
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: assets-${{ matrix.rid }}
+          path: release
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: assets-win-x64
+          path: setup
+
+      - name: Assemble VidShrinkPlayer-Offline-${{ matrix.rid }}.zip
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RID: ${{ matrix.rid }}
+          TAG: ${{ needs.version.outputs.tag }}
+          FFMPEG_URL: ${{ matrix.ffmpeg-url }}
+          FFMPEG_DIR: ${{ matrix.ffmpeg-dir }}
+          FFMPEG_SHA256: ${{ matrix.ffmpeg-sha256 }}
+          FFPROBE_SHA256: ${{ matrix.ffprobe-sha256 }}
+          FFMPEG_SOURCE: ${{ matrix.ffmpeg-source }}
+          FFMPEG_BUILD: ${{ matrix.ffmpeg-build }}
+          LIBMPV_URL: ${{ matrix.libmpv-url }}
+          LIBMPV_ZIP_SHA256: ${{ matrix.libmpv-zip-sha256 }}
+          LIBMPV_SHA256: ${{ matrix.libmpv-sha256 }}
+          VULKAN_URL: ${{ matrix.vulkan-url }}
+          VULKAN_ZIP_SHA256: ${{ matrix.vulkan-zip-sha256 }}
+          VULKAN_SHA256: ${{ matrix.vulkan-sha256 }}
+          MPV_COMMIT: 69e63f425a
+        run: |
+          set -euo pipefail
+          check() {
+            echo "$2  $1" | sha256sum -c -
+          }
+          entry() {
+            unzip -Z1 "$1" | grep -E "$2" | head -1 || true
+          }
+          b=bundle
+          mkdir -p "$b/tools/ffmpeg" "$b/tools/libmpv" "$b/licenses" dl out
+
+          cp setup/VidShrinkPlayer-Setup.exe "$b/"
+          for f in "vidshrink-$RID.zip" "vidshrink-launcher-$RID.zip" "checksums-$RID.txt"; do
+            cp "release/$f" "$b/"
+          done
+          ( cd "$b" && grep -E "  (vidshrink-$RID\.zip|vidshrink-launcher-$RID\.zip)$" "checksums-$RID.txt" | sha256sum -c - )
+          printf 'tag=%s\nrid=%s\n' "$TAG" "$RID" > "$b/vidshrink-offline.txt"
+
+          curl -fsSL --retry 3 -o dl/ffmpeg.zip "$FFMPEG_URL"
+          unzip -q -j dl/ffmpeg.zip "$FFMPEG_DIR/bin/ffmpeg.exe" "$FFMPEG_DIR/bin/ffprobe.exe" -d "$b/tools/ffmpeg"
+          check "$b/tools/ffmpeg/ffmpeg.exe" "$FFMPEG_SHA256"
+          check "$b/tools/ffmpeg/ffprobe.exe" "$FFPROBE_SHA256"
+          license=$(entry dl/ffmpeg.zip "^$FFMPEG_DIR/(LICENSE|COPYING)[^/]*$")
+          if [ -z "$license" ]; then
+            echo "ffmpeg arsivinde lisans metni yok: $FFMPEG_URL" >&2
+            exit 1
+          fi
+          unzip -p dl/ffmpeg.zip "$license" > "$b/licenses/ffmpeg-LICENSE.txt"
+          grep -q "GNU GENERAL PUBLIC LICENSE" "$b/licenses/ffmpeg-LICENSE.txt"
+          rm dl/ffmpeg.zip
+
+          curl -fsSL --retry 3 -o dl/libmpv.zip "$LIBMPV_URL"
+          check dl/libmpv.zip "$LIBMPV_ZIP_SHA256"
+          dll=$(entry dl/libmpv.zip '(^|/)libmpv-2\.dll$')
+          test -n "$dll"
+          unzip -p dl/libmpv.zip "$dll" > "$b/tools/libmpv/libmpv-2.dll"
+          check "$b/tools/libmpv/libmpv-2.dll" "$LIBMPV_SHA256"
+
+          curl -fsSL --retry 3 -o dl/vulkan.zip "$VULKAN_URL"
+          check dl/vulkan.zip "$VULKAN_ZIP_SHA256"
+          unzip -p dl/vulkan.zip "$(entry dl/vulkan.zip '(^|/)vulkan-1\.dll$')" > "$b/tools/libmpv/vulkan-1.dll"
+          check "$b/tools/libmpv/vulkan-1.dll" "$VULKAN_SHA256"
+          unzip -p dl/vulkan.zip "$(entry dl/vulkan.zip '(^|/)VulkanRT-License\.txt$')" > "$b/tools/libmpv/VulkanRT-License.txt"
+          cp "$b/tools/libmpv/VulkanRT-License.txt" "$b/licenses/vulkan-loader-LICENSE.txt"
+
+          mpv=$(gh api "repos/mpv-player/mpv/commits/$MPV_COMMIT" --jq .sha)
+          gh api -H "Accept: application/vnd.github.raw" "repos/mpv-player/mpv/contents/LICENSE.GPL?ref=$mpv" > "$b/licenses/libmpv-LICENSE.GPL.txt"
+          gh api -H "Accept: application/vnd.github.raw" "repos/mpv-player/mpv/contents/Copyright?ref=$mpv" > "$b/licenses/libmpv-Copyright.txt"
+          grep -q "GNU GENERAL PUBLIC LICENSE" "$b/licenses/libmpv-LICENSE.GPL.txt"
+
+          {
+            echo "VidShrink Player $TAG offline installer ($RID)"
+            echo
+            echo "VidShrink Player is AGPL-3.0-or-later. This archive also carries two separate programs,"
+            echo "unmodified, under their own licences. They are not linked into VidShrink Player."
+            echo
+            echo "FFmpeg (tools/ffmpeg/ffmpeg.exe, tools/ffmpeg/ffprobe.exe): GPL-3.0-or-later build."
+            echo "  Licence text: licenses/ffmpeg-LICENSE.txt"
+            echo "  Binary as published by the builder: $FFMPEG_URL"
+            echo "  Build: $FFMPEG_BUILD"
+            echo "  Source: $FFMPEG_SOURCE"
+            echo
+            echo "libmpv (tools/libmpv/libmpv-2.dll): mpv $MPV_COMMIT ($mpv), GPL-2.0-or-later build."
+            echo "  Licence text: licenses/libmpv-LICENSE.GPL.txt, copyright notes: licenses/libmpv-Copyright.txt"
+            echo "  Binary: $LIBMPV_URL"
+            echo "  Build: https://github.com/shinchiro/mpv-winbuild-cmake/releases/tag/20260903"
+            echo "  Source: https://github.com/mpv-player/mpv/tree/$mpv"
+            echo
+            echo "Khronos Vulkan Loader (tools/libmpv/vulkan-1.dll): Apache-2.0."
+            echo "  Licence text: licenses/vulkan-loader-LICENSE.txt"
+            echo "  Binary: $VULKAN_URL"
+            echo
+            echo "Every file above is checked against a sha256 pinned in VidShrinkPlayer-Setup.exe"
+            echo "before it is installed; a file that does not match is downloaded instead."
+          } > "$b/licenses/THIRD-PARTY-NOTICES.txt"
+
+          ( cd "$b" && zip -qr -X "$GITHUB_WORKSPACE/out/VidShrinkPlayer-Offline-$RID.zip" . )
+          for f in ffmpeg-LICENSE.txt libmpv-LICENSE.GPL.txt libmpv-Copyright.txt vulkan-loader-LICENSE.txt THIRD-PARTY-NOTICES.txt; do
+            cp "$b/licenses/$f" "out/offline-$RID-$f"
+          done
+          ( cd out && sha256sum -- * > "../checksums-offline-$RID.txt" )
+          mv "checksums-offline-$RID.txt" out/
+          cat "out/checksums-offline-$RID.txt"
+          ls -l out
+          unzip -l "out/VidShrinkPlayer-Offline-$RID.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: assets-offline-${{ matrix.rid }}
+          path: out/
+          if-no-files-found: error
+          compression-level: 0
+
+  release:
+    needs: [version, publish, offline]
     if: ${{ !cancelled() && needs.publish.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -564,6 +723,7 @@ jobs:
       - name: Publish it
         env:
           GH_TOKEN: ${{ github.token }}
+          OFFLINE: ${{ needs.offline.result }}
         run: |
           set -euo pipefail
           tag="${{ needs.version.outputs.tag }}"
@@ -571,6 +731,12 @@ jobs:
           for rid in win-x64 win-arm64 linux-x64 linux-arm64 osx-x64 osx-arm64; do
             gh release view "$tag" --json assets --jq ".assets[].name" | grep -qx "manifest-$rid.json"
           done
+          if [ "$OFFLINE" = "success" ]; then
+            for rid in win-x64 win-arm64; do
+              gh release view "$tag" --json assets --jq ".assets[].name" | grep -qx "VidShrinkPlayer-Offline-$rid.zip"
+              gh release view "$tag" --json assets --jq ".assets[].name" | grep -qx "offline-$rid-ffmpeg-LICENSE.txt"
+            done
+          fi
           test "$(gh release view "$tag" --json isDraft --jq .isDraft)" = "false"
 
   # winget: the published release goes to microsoft/winget-pkgs as a pull request from the
@@ -843,7 +1009,7 @@ jobs:
   # asset, and the desktop stayed on 0.4.5 until 0.5.2 landed. This job turns that silence
   # into a push.
   alarm:
-    needs: [version, test, shell-extension, publish, release]
+    needs: [version, test, shell-extension, publish, offline, release]
     if: ${{ !cancelled() && contains(needs.*.result, 'failure') }}
     runs-on: ubuntu-latest
     timeout-minutes: 5

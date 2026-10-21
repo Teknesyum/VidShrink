@@ -112,12 +112,19 @@ public static class SetupDownloads
     }
 
     public static async Task<(string Path, bool Reused)> PrepareLibMpvAsync(
-        HttpClient client, LibMpvPin pin, string? existing, string workRoot, Action<string> log, CancellationToken cancellationToken)
+        HttpClient client, LibMpvPin pin, string? existing, string workRoot, Action<string> log, CancellationToken cancellationToken,
+        string? offline = null)
     {
         if (existing is not null && File.Exists(existing) &&
             string.Equals(UpdateCheck.HashFile(existing), pin.DllSha256, StringComparison.OrdinalIgnoreCase))
         {
             return (existing, true);
+        }
+
+        if (offline is not null &&
+            await TryOfflineAsync(Path.Combine(offline, "libmpv", pin.FileName), pin.DllSha256, Path.Combine(workRoot, "offline-libmpv"), log, cancellationToken) is { } bundled)
+        {
+            return (bundled, false);
         }
 
         if (pin.ZipUrl is not null && await TryZipAsync(client, pin, workRoot, log, cancellationToken) is { } zipped)
@@ -174,7 +181,8 @@ public static class SetupDownloads
     /// <c>vulkan-1.dll</c> varsa yeniden indirilmez. Zip ve DLL sağlaması tutmazsa kurulum durur.
     /// </summary>
     public static async Task<PreparedVulkanLoader> PrepareVulkanLoaderAsync(
-        HttpClient client, VulkanLoaderPin pin, string? existingDirectory, string workRoot, CancellationToken cancellationToken)
+        HttpClient client, VulkanLoaderPin pin, string? existingDirectory, string workRoot, CancellationToken cancellationToken,
+        string? offline = null, Action<string>? log = null)
     {
         if (existingDirectory is not null)
         {
@@ -184,6 +192,23 @@ public static class SetupDownloads
             {
                 var license = Path.Combine(existingDirectory, VulkanLoaderPin.LicenseFileName);
                 return new PreparedVulkanLoader(installed, File.Exists(license) ? license : null, true);
+            }
+        }
+
+        if (offline is not null)
+        {
+            var folder = Path.Combine(offline, "libmpv");
+            var target = Path.Combine(workRoot, "offline-vulkan");
+            if (await TryOfflineAsync(Path.Combine(folder, VulkanLoaderPin.FileName), pin.DllSha256, target, log ?? (_ => { }), cancellationToken) is { } bundled)
+            {
+                var bundledLicense = Path.Combine(folder, VulkanLoaderPin.LicenseFileName);
+                string? copied = null;
+                if (File.Exists(bundledLicense))
+                {
+                    copied = Path.Combine(target, VulkanLoaderPin.LicenseFileName);
+                    File.Copy(bundledLicense, copied, overwrite: true);
+                }
+                return new PreparedVulkanLoader(bundled, copied, false);
             }
         }
 
@@ -262,8 +287,21 @@ public static class SetupDownloads
     }
 
     public static async Task<IReadOnlyDictionary<string, string>> FetchFfmpegAsync(
-        FfmpegPin pin, string workRoot, CancellationToken cancellationToken)
+        FfmpegPin pin, string workRoot, CancellationToken cancellationToken, string? offline = null, Action<string>? log = null)
     {
+        if (offline is not null)
+        {
+            var bundled = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var entry in pin.Entries)
+            {
+                var local = await TryOfflineAsync(Path.Combine(offline, "ffmpeg", entry.FileName), entry.Sha256,
+                    Path.Combine(workRoot, "offline-ffmpeg"), log ?? (_ => { }), cancellationToken);
+                if (local is null) break;
+                bundled[entry.FileName] = local;
+            }
+            if (bundled.Count == pin.Entries.Count) return bundled;
+        }
+
         IRangeSource source = pin.Url.StartsWith("http", StringComparison.OrdinalIgnoreCase)
             ? new HttpRangeSource(pin.Url, UserAgent)
             : new FileRangeSource(pin.Url);
@@ -287,6 +325,22 @@ public static class SetupDownloads
         }));
 
         return results.ToDictionary(r => r.FileName, r => r.target, StringComparer.OrdinalIgnoreCase);
+    }
+
+    public static async Task<string?> TryOfflineAsync(
+        string source, string expectedSha256, string targetDirectory, Action<string> log, CancellationToken cancellationToken)
+    {
+        if (!File.Exists(source))
+        {
+            log(SetupText.Get("setup.offline.missing", source));
+            return null;
+        }
+        Directory.CreateDirectory(targetDirectory);
+        var copied = await CopyHashedAsync(source, Path.Combine(targetDirectory, Path.GetFileName(source)), cancellationToken);
+        if (string.Equals(copied.Sha256, expectedSha256, StringComparison.OrdinalIgnoreCase)) return copied.Path;
+        log(SetupText.Get("setup.offline.mismatch", Path.GetFileName(source), expectedSha256, copied.Sha256));
+        File.Delete(copied.Path);
+        return null;
     }
 
     private static async Task<FetchedFile> CopyHashedAsync(string path, string destination, CancellationToken cancellationToken)

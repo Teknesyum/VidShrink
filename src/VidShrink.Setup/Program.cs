@@ -146,6 +146,7 @@ internal static partial class Program
             }
         }
 
+        var bundle = OfflineBundle.Read(AppContext.BaseDirectory);
         var options = new SetupOptions
         {
             InstallRoot = installRoot ?? Path.Combine(localAppData, "Programs", AppIdentity.FolderName),
@@ -163,6 +164,7 @@ internal static partial class Program
             RemoveSettings = removeSettings,
             SettingsFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), UpdateSettings.FolderName)
         };
+        if (bundle is not null && !uninstall) options = bundle.Apply(options);
         return (options, uninstall, timings);
     }
 
