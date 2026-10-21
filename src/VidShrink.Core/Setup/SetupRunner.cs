@@ -160,6 +160,7 @@ public static class SetupRunner
                         Place(license, Path.Combine(toolsLibMpv, VulkanLoaderPin.LicenseFileName), move: true);
                 }
 
+                RootUninstaller.Place(root, host.SetupExecutable);
                 if (!File.Exists(Path.Combine(root, LauncherUpdate.ExecutableName))) throw new SetupException(SetupText.Get("setup.launcher.missing"));
                 if (!File.Exists(Path.Combine(appDirectory, AppExecutable))) throw new SetupException(SetupText.Get("setup.app.missing"));
             }
@@ -231,11 +232,14 @@ public static class SetupRunner
         {
             var (desktop, startMenu) = ShortcutPaths(options, host);
             RemoveShortcut(shortcuts, Path.Combine(desktop, AppIdentity.ShortcutName), root);
-            if (RemoveShortcut(shortcuts, Path.Combine(startMenu, AppIdentity.ShortcutName), root) &&
-                Directory.Exists(startMenu) && !Directory.EnumerateFileSystemEntries(startMenu).Any())
+            var removed = false;
+            if (Directory.Exists(startMenu))
             {
-                Directory.Delete(startMenu);
+                foreach (var link in Directory.GetFiles(startMenu, "*.lnk"))
+                    removed |= RemoveShortcut(shortcuts, link, root);
             }
+            if (removed && Directory.Exists(startMenu) && !Directory.EnumerateFileSystemEntries(startMenu).Any())
+                Directory.Delete(startMenu);
         }
 
         UnregisterApp(options, host, root);
@@ -342,7 +346,13 @@ public static class SetupRunner
         Directory.CreateDirectory(startMenu);
         shortcuts.Write(Path.Combine(desktop, AppIdentity.ShortcutName), installedExe, root, installedExe + ",0");
         shortcuts.Write(Path.Combine(startMenu, AppIdentity.ShortcutName), installedExe, root, installedExe + ",0");
+        var uninstaller = RootUninstaller.PathIn(root);
+        if (File.Exists(uninstaller))
+            shortcuts.Write(UninstallShortcut(startMenu), uninstaller, root, uninstaller + ",0");
     }
+
+    public static string UninstallShortcut(string startMenu) =>
+        Path.Combine(startMenu, SetupText.Get("setup.uninstaller.shortcut") + ".lnk");
 
     private static bool RemoveShortcut(IShortcutWriter shortcuts, string path, string root)
     {

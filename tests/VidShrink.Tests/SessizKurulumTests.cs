@@ -13,7 +13,7 @@ namespace VidShrink.Tests;
 /// Kayıtlar yalnız test anahtarının altına (<c>Uninstall</c>, <c>Environment</c>) yazılır; gerçek HKCU ve gerçek PATH okunmaz.
 /// </summary>
 [SupportedOSPlatform("windows")]
-public sealed class SessizKurulumTests : IDisposable
+public sealed partial class SessizKurulumTests : IDisposable
 {
     private const string Rid = "win-x64";
 
@@ -409,7 +409,9 @@ public sealed class SessizKurulumTests : IDisposable
         return (options, host);
     }
 
-    private string FakeRelease(params string[] locales)
+    private string FakeRelease(params string[] locales) => FakeRelease(false, locales);
+
+    private string FakeRelease(bool uninstallerInArchive, params string[] locales)
     {
         var release = Path.Combine(_work, "yayin-" + Guid.NewGuid().ToString("n")[..6]);
         Directory.CreateDirectory(release);
@@ -419,7 +421,8 @@ public sealed class SessizKurulumTests : IDisposable
             .. locales.Select(language => ($"Locales/{language}/main.json",
                 File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.App", "Locales", language, "main.json"))))]);
         var launcher = Path.Combine(release, UpdateCheck.LauncherArchiveAssetName(Rid));
-        Zip(launcher, (AppIdentity.LauncherExecutable, "baslatici"));
+        if (uninstallerInArchive) Zip(launcher, (AppIdentity.LauncherExecutable, "baslatici"), (RootUninstaller.FileName, "arsivdeki kaldirici"));
+        else Zip(launcher, (AppIdentity.LauncherExecutable, "baslatici"));
         File.WriteAllText(Path.Combine(release, $"checksums-{Rid}.txt"),
             $"{UpdateCheck.HashFile(app)}  {Path.GetFileName(app)}\n{UpdateCheck.HashFile(launcher)}  {Path.GetFileName(launcher)}\n");
 

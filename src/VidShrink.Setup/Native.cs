@@ -38,6 +38,12 @@ internal static class Native
 
     public const int SW_HIDE = 0;
     public const int SW_SHOW = 5;
+    public const uint MB_OK = 0x0;
+    public const uint MB_YESNO = 0x4;
+    public const uint MB_ICONERROR = 0x10;
+    public const uint MB_ICONQUESTION = 0x20;
+    public const uint MB_DEFBUTTON2 = 0x100;
+    public const int IDYES = 6;
     public const int IDC_ARROW = 32512;
     public const int IDC_HAND = 32649;
     public const uint SWP_NOZORDER = 0x0004;
@@ -283,6 +289,9 @@ internal static class Native
 
     [DllImport("kernel32.dll")]
     public static extern IntPtr GetConsoleWindow();
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    public static extern int MessageBoxW(IntPtr owner, string text, string caption, uint type);
 
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
