@@ -18,7 +18,7 @@ public static class AudioLevel
 {
     public const int SampleRate = 8000;
 
-    public const int WindowSamples = 400;
+    public const int WindowSamples = 200;
 
     public const double WindowSeconds = (double)WindowSamples / SampleRate;
 
@@ -30,7 +30,13 @@ public static class AudioLevel
 
     public const double FallDbPerSecond = 30;
 
-    public const string DirectShowBufferMs = "50";
+    public const double AttackSeconds = 0.02;
+
+    public const double ReleaseSeconds = 0.09;
+
+    public const double SettledFraction = 0.0005;
+
+    public const string DirectShowBufferMs = "25";
 
     public static double Db(int peak)
         => peak <= 0 ? double.NegativeInfinity : 20 * Math.Log10(Math.Min(peak, 32768) / 32768.0);
@@ -54,6 +60,14 @@ public static class AudioLevel
         if (held <= HoldSeconds) return previous with { HeldSeconds = held };
 
         return new AudioLevelHold(Math.Max(measured, previous.Db - FallDbPerSecond * elapsed), held);
+    }
+
+    public static double Smooth(double shown, double target, double elapsedSeconds)
+    {
+        var elapsed = Math.Max(0, elapsedSeconds);
+        var tau = target >= shown ? AttackSeconds : ReleaseSeconds;
+        var next = target + (shown - target) * Math.Exp(-elapsed / tau);
+        return Math.Abs(next - target) < SettledFraction / 4 ? target : next;
     }
 
     public static IReadOnlyList<string> Arguments(AudioCaptureDevice device)

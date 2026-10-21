@@ -6,7 +6,7 @@ dshow. Düzenek `tools/kaydedici-ses-seviyesi/olc.ps1`; ham satırlar aşağıda
 ## Seçilen Yol
 
 Cihaz başına ayrı, kısa ömürlü bir ffmpeg süreci: girdiyi tek kanal 8 kHz ham örneğe (`s16le`) çevirip
-standart çıktıya yazar, tepe değeri C# tarafında 400 örneklik (50 ms) pencerelerde hesaplanır
+standart çıktıya yazar, tepe değeri C# tarafında 200 örneklik (25 ms) pencerelerde (ilk sürümde 400 örnek, 50 ms; akıcılık turunda yarıya indi) hesaplanır
 (`Core/AudioLevel`, `Ffmpeg/AudioLevelSource`).
 
 Neden bu yol:
@@ -71,3 +71,24 @@ geri alındı.
 | M6 | `RefreshLevels`: aynı cihaz korumasını kaldırmak | 7/30 |
 
 M5 yalnız canlı kolda (lavfi `sine`) görünür; koşumdan sonra artık ffmpeg süreci kalmadığı elle bakıldı.
+
+## Çubuk Akıcılığı
+
+Kök neden: pencere 400 örnek (50 ms) ve dshow tamponu 50 ms olduğundan kaynak saniyede 20 değer veriyordu
+(`AudioLevel.WindowSamples`), çubuk de değeri yalnız o anda yazıyordu (`RecorderView.SesSeviyesi.cs` `ShowLevel`).
+Temanın `ProgressBar` değer geçişi (`MotionFast`, doğrusal) her güncellemede yeniden başlıyordu.
+
+Sonrası: pencere 200 örnek, dshow tamponu 25 ms; çubuk değeri hedef olarak saklar, `RequestAnimationFrame` kare
+döngüsü `AudioLevel.Smooth` ile her karede hedefe yaklaştırır (yükseliş 20 ms, düşüş 90 ms zaman sabiti). Döngü yalnız
+çubuk görünür ve hareketliyken çalışır; çubuğun kendi geçişi kaldırıldı. `reduced-motion` pencerede yumuşatma yok.
+Ölçüm `KaydediciSesSeviyesiTests.CubukGuncellemeSikligiOlculur` ve `KaynakGuncellemeSikligiOlculur`:
+
+```
+CUBUK once: kaynak 20/sn, deger degisimi 20/sn
+CUBUK sonra: kaynak 40/sn, deger degisimi 60/sn (cizim 60/sn)
+KAYNAK once  pencere=400 adet=69  sure=2,831s hiz=23,7/sn
+KAYNAK sonra pencere=200 adet=143 sure=2,968s hiz=47,5/sn
+```
+
+Kaynak hızı lavfi `-re` başlangıç patlamasıyla nominalin (20 ve 40) üstünde okunur. dshow tamponunun 25 ms'de gerçek
+cihazda kabul edildiği bu makinede ölçülmedi (gerçek mikrofon açılmaz).

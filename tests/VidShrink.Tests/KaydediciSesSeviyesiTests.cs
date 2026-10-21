@@ -57,7 +57,7 @@ public sealed class KaydediciSesSeviyesiTests
         public void Dispose() => Kapandi = true;
     }
 
-    private static T Kur<T>(Func<RecorderView, Window, List<SahteKaynak>, T> olc, bool hareketsiz = false, bool kaynakVar = true, bool gecisli = false)
+    private static T Kur<T>(Func<RecorderView, Window, List<SahteKaynak>, T> olc, bool hareketsiz = false, bool kaynakVar = true, bool yumusak = false)
     {
         using var ayar = new KaydediciAyarTests.OzelAyar();
         return AppHost.Run(() =>
@@ -79,11 +79,7 @@ public sealed class KaydediciSesSeviyesiTests
             pencere.Content = view;
             pencere.Show();
             Dispatcher.UIThread.RunJobs();
-            if (!gecisli)
-            {
-                view.BarMicrophoneLevel.Transitions = null;
-                view.BarSystemAudioLevel.Transitions = null;
-            }
+            view.LevelSmoothing = yumusak;
             try
             {
                 return olc(view, pencere, acilan);
@@ -137,7 +133,7 @@ public sealed class KaydediciSesSeviyesiTests
     [Fact]
     public void TepeHemenYukselirTutulurSonraSabitHizlaDuser()
     {
-        var adim = AudioLevel.WindowSeconds;
+        const double adim = 0.05;
         var durum = AudioLevel.Advance(AudioLevelHold.Silent, -6, adim);
         Assert.Equal(-6, durum.Db);
         Assert.Equal(0, durum.HeldSeconds);
@@ -427,17 +423,95 @@ public sealed class KaydediciSesSeviyesiTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void HareketAzaltilmisPenceredeCubukCanlandirilmaz(bool hareketsiz)
+    public void CubugunKendiDegerGecisiYokKareDongusuSurer(bool hareketsiz)
     {
-        var gecis = Kur((view, _, _) =>
+        var o = Kur((view, _, acilan) =>
         {
             view.RefreshAudioBoxes();
             Sec(view, view.CmbMicrophone, 1);
-            return view.BarMicrophoneLevel.Transitions?.Count ?? 0;
-        }, hareketsiz, gecisli: true);
+            acilan[0].Ver(-6);
+            var hemen = view.LevelValue(AudioSourceRole.Microphone);
+            var gecis = view.BarMicrophoneLevel.Transitions?.Count ?? 0;
+            view.TickLevels(1);
+            return (gecis, hemen, sonra: view.LevelValue(AudioSourceRole.Microphone));
+        }, hareketsiz, yumusak: true);
 
-        if (hareketsiz) Assert.Equal(0, gecis);
-        else Assert.True(gecis > 0, "hareket acikken cubugun gecisi olmali; yoksa bu kol hicbir seyi olcmuyor");
+        Assert.Equal(0, o.gecis);
+        Assert.Equal(0.9, Math.Round(o.sonra, 6));
+        if (hareketsiz) Assert.Equal(0.9, Math.Round(o.hemen, 6));
+        else Assert.Equal(0, o.hemen);
+    }
+
+    [Fact]
+    public void YumusatmaTepeyiHizliYukseltirYavasDusurur()
+    {
+        const double kare = 1.0 / 60;
+        var yukselen = 0d;
+        var kareYukselis = 0;
+        while (yukselen < 0.9 * 0.95) { yukselen = AudioLevel.Smooth(yukselen, 0.9, kare); kareYukselis++; }
+
+        var dusen = 0.9;
+        var kareDusus = 0;
+        while (dusen > 0.9 * 0.05) { dusen = AudioLevel.Smooth(dusen, 0, kare); kareDusus++; }
+
+        _output.WriteLine($"YUMUSATMA yukselis(%95)={kareYukselis} kare dusus(%95)={kareDusus} kare");
+        Assert.True(kareYukselis <= 6, $"yukselis {kareYukselis} kare");
+        Assert.True(kareDusus >= 3 * kareYukselis, $"dusus {kareDusus} yukselis {kareYukselis}");
+        Assert.Equal(0.4, AudioLevel.Smooth(0.4, 0.4, kare));
+        Assert.Equal(0.7, AudioLevel.Smooth(0.2, 0.7, 10));
+        Assert.Equal(0.2, AudioLevel.Smooth(0.2, 0.7, 0));
+        Assert.Equal(0.7, AudioLevel.Smooth(0.7, 0.1, -1));
+    }
+
+    [Fact]
+    public void CubukGuncellemeSikligiOlculur()
+    {
+        const double kare = 1.0 / 60;
+        const double saniye = 4;
+
+        int Olc(double kaynakAdimi, bool yumusak)
+        {
+            var degisen = 0;
+            Kur((view, _, acilan) =>
+            {
+                view.RefreshAudioBoxes();
+                Sec(view, view.CmbMicrophone, 1);
+                var kaynak = acilan[0];
+                var son = view.LevelValue(AudioSourceRole.Microphone);
+                var sonrakiVeri = 0.0;
+                var bitis = (int)Math.Round(saniye / kare);
+                for (var i = 0; i < bitis; i++)
+                {
+                    var an = i * kare;
+                    while (sonrakiVeri <= an)
+                    {
+                        kaynak.Ver(-50 + 49 * Math.Min(1, an / saniye));
+                        sonrakiVeri += kaynakAdimi;
+                        if (!yumusak && view.LevelValue(AudioSourceRole.Microphone) != son)
+                        {
+                            degisen++;
+                            son = view.LevelValue(AudioSourceRole.Microphone);
+                        }
+                    }
+
+                    if (!yumusak) continue;
+                    view.TickLevels(kare);
+                    var simdi = view.LevelValue(AudioSourceRole.Microphone);
+                    if (simdi != son) degisen++;
+                    son = simdi;
+                }
+
+                return 0;
+            }, yumusak: yumusak);
+            return (int)Math.Round(degisen / saniye);
+        }
+
+        var eski = Olc(0.050, false);
+        var yeni = Olc(AudioLevel.WindowSeconds, true);
+        _output.WriteLine($"CUBUK once: kaynak 20/sn, deger degisimi {eski}/sn");
+        _output.WriteLine($"CUBUK sonra: kaynak {1 / AudioLevel.WindowSeconds:0}/sn, deger degisimi {yeni}/sn (cizim 60/sn)");
+        Assert.InRange(eski, 18, 21);
+        Assert.InRange(yeni, 56, 60);
     }
 
     [Theory]
@@ -632,6 +706,31 @@ public sealed class KaydediciSesSeviyesiTests
         try { kalan = Process.GetProcessById(pid); } catch (ArgumentException) { }
         Assert.True(kalan is null || kalan.HasExited || !kalan.ProcessName.Contains("ffmpeg", StringComparison.OrdinalIgnoreCase), $"ffmpeg {pid} hala kosuyor");
         kalan?.Dispose();
+    }
+
+    [FfmpegFact]
+    public async Task KaynakGuncellemeSikligiOlculur()
+    {
+        var girdi = new[] { "-re", "-f", "lavfi", "-i", "sine=frequency=440:sample_rate=8000" };
+        var zamanlar = new List<long>();
+        var kaynak = AudioLevelSource.Start(ToolLocator.Ffmpeg, AudioLevel.Arguments(girdi));
+        try
+        {
+            kaynak.Level += _ => { lock (zamanlar) zamanlar.Add(Stopwatch.GetTimestamp()); };
+            await Task.Delay(TimeSpan.FromSeconds(3));
+        }
+        finally
+        {
+            kaynak.Dispose();
+        }
+
+        long[] t;
+        lock (zamanlar) t = zamanlar.ToArray();
+        Assert.True(t.Length > 10, $"cok az pencere: {t.Length}");
+        var sure = Stopwatch.GetElapsedTime(t[1], t[^1]).TotalSeconds;
+        var hiz = (t.Length - 2) / sure;
+        _output.WriteLine($"KAYNAK pencere={AudioLevel.WindowSamples} adet={t.Length} sure={sure:0.000}s hiz={hiz:0.0}/sn");
+        Assert.InRange(hiz, 0.8 / AudioLevel.WindowSeconds, 1.3 / AudioLevel.WindowSeconds);
     }
 
     [FfmpegFact]

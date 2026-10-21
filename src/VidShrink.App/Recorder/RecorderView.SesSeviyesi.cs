@@ -34,6 +34,12 @@ internal partial class RecorderView
         public IAudioLevelSource? Source { get; set; }
 
         public AudioLevelHold Hold { get; set; } = AudioLevelHold.Silent;
+
+        public double Target { get; set; }
+
+        public double Shown { get; set; }
+
+        public bool Settled => Math.Abs(Shown - Target) < AudioLevel.SettledFraction;
     }
 
     private LevelSlot[] _levels = Array.Empty<LevelSlot>();
@@ -43,6 +49,13 @@ internal partial class RecorderView
     private bool _levelsPaused;
 
     private Window? _levelWindow;
+
+    private bool _levelFrameQueued;
+
+    private TimeSpan? _levelFrameAt;
+
+    /// <summary>Doğruyken çubuk her ekran karesinde hedefe yaklaşır; yanlışken değer gelir gelmez yazılır (ölçüm).</summary>
+    internal bool LevelSmoothing { get; set; } = true;
 
     /// <summary>Okuyucuyu açan kapı; ölçüm sahte kaynak verir.</summary>
     internal Func<AudioCaptureDevice, IAudioLevelSource?> OpenLevelSource { get; set; } = AudioLevelSource.Open;
@@ -54,6 +67,7 @@ internal partial class RecorderView
             new LevelSlot(AudioSourceRole.Microphone, BarMicrophoneLevel),
             new LevelSlot(AudioSourceRole.SystemAudio, BarSystemAudioLevel)
         };
+        foreach (var slot in _levels) slot.Bar.Transitions = null;
         CmbMicrophone.SelectionChanged += (_, _) => RefreshLevels();
         CmbSystemAudio.SelectionChanged += (_, _) => RefreshLevels();
     }
@@ -129,16 +143,68 @@ internal partial class RecorderView
         slot.Source = null;
         slot.Device = null;
         slot.Hold = AudioLevelHold.Silent;
+        slot.Target = 0;
+        slot.Shown = 0;
         slot.Bar.Value = 0;
         slot.Bar.IsVisible = false;
         source?.Dispose();
     }
 
-    private static void ShowLevel(LevelSlot slot, IAudioLevelSource source, double db)
+    private void ShowLevel(LevelSlot slot, IAudioLevelSource source, double db)
     {
         if (!ReferenceEquals(slot.Source, source)) return;
         slot.Hold = AudioLevel.Advance(slot.Hold, db, AudioLevel.WindowSeconds);
-        slot.Bar.Value = AudioLevel.Fraction(slot.Hold.Db);
+        slot.Target = AudioLevel.Fraction(slot.Hold.Db);
+        if (!SmoothLevels())
+        {
+            slot.Shown = slot.Target;
+            slot.Bar.Value = slot.Target;
+            return;
+        }
+
+        if (!slot.Settled) QueueLevelFrame();
+    }
+
+    private bool SmoothLevels() => LevelSmoothing && _levelWindow?.Classes.Contains("reduced-motion") != true;
+
+    private void QueueLevelFrame()
+    {
+        if (_levelFrameQueued || TopLevel.GetTopLevel(this) is not { } top) return;
+        _levelFrameQueued = true;
+        top.RequestAnimationFrame(OnLevelFrame);
+    }
+
+    private void OnLevelFrame(TimeSpan now)
+    {
+        _levelFrameQueued = false;
+        var elapsed = _levelFrameAt is { } before ? Math.Min((now - before).TotalSeconds, LevelFrameCapSeconds) : LevelFrameFirstSeconds;
+        _levelFrameAt = now;
+        if (!TickLevels(elapsed))
+        {
+            _levelFrameAt = null;
+            return;
+        }
+
+        QueueLevelFrame();
+    }
+
+    private const double LevelFrameCapSeconds = 0.1;
+
+    private const double LevelFrameFirstSeconds = 1.0 / 60;
+
+    /// <summary>Görünür çubukları hedefe yaklaştırır; hâlâ hareket eden çubuk varsa doğru döner.</summary>
+    internal bool TickLevels(double elapsedSeconds)
+    {
+        var moving = false;
+        foreach (var slot in _levels)
+        {
+            if (!slot.Bar.IsVisible || slot.Settled) continue;
+            slot.Shown = AudioLevel.Smooth(slot.Shown, slot.Target, elapsedSeconds);
+            slot.Bar.Value = slot.Shown;
+            moving |= !slot.Settled;
+        }
+
+        return moving;
     }
 
     private static void EndLevel(LevelSlot slot, IAudioLevelSource source)
