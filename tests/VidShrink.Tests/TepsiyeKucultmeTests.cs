@@ -42,6 +42,34 @@ public sealed class TepsiyeKucultmeTests
     }
 
     [Fact]
+    public void TepsidenDonusAcilisYolunuIkinciKezKosmaz()
+    {
+        var klasor = Path.Combine(TestPaths.OutputRoot, "tepsiye-kucultme", "tek-acilis");
+        if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
+        Directory.CreateDirectory(klasor);
+        var sayilar = AppHost.Run(() =>
+        {
+            var pencere = new MainWindow { SettingsPathOverride = Path.Combine(klasor, "settings.json"), Tepsi = new SahteTepsi() };
+            try
+            {
+                pencere.FindControl<CheckBox>("ChkMinimizeToTray")!.IsChecked = true;
+                pencere.Show();
+                var ilk = pencere.AcilisSayisi;
+                pencere.WindowState = WindowState.Normal;
+                pencere.WindowState = WindowState.Minimized;
+                pencere.TepsidenGeriGetir();
+                pencere.WindowState = WindowState.Minimized;
+                pencere.TepsidenGeriGetir();
+                return (ilk, son: pencere.AcilisSayisi);
+            }
+            finally { pencere.Close(); }
+        });
+
+        Assert.Equal(1, sayilar.ilk);
+        Assert.Equal(1, sayilar.son);
+    }
+
+    [Fact]
     public void AcikSecenekleKucultmeGizlerTiklamaGeriGetirir()
     {
         var klasor = Path.Combine(TestPaths.OutputRoot, "tepsiye-kucultme", "acik");

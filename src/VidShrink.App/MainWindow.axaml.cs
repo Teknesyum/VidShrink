@@ -405,6 +405,7 @@ public partial class MainWindow : Window
         if (string.IsNullOrEmpty(executable)) return;
         if (!Integration.DefaultAppSuggestionBar.Wanted(executable, ShellIntegration.DefaultPlayerExtensions, SettingsPathOverride)) return;
         if (AppliedNotice.Parent is not Panel host) return;
+        if (host.Children.OfType<Integration.DefaultAppSuggestionBar>().Any()) return;
 
         host.Children.Add(new Integration.DefaultAppSuggestionBar(SettingsPathOverride));
     }
@@ -668,8 +669,12 @@ public partial class MainWindow : Window
     private static void Watch(AvaloniaObject target, AvaloniaProperty property, Action handler)
         => target.PropertyChanged += (_, args) => { if (args.Property == property) handler(); };
 
+    internal int AcilisSayisi { get; private set; }
+
     private async void OnWindowLoaded(object? sender, EventArgs e)
     {
+        Opened -= OnWindowLoaded;
+        AcilisSayisi++;
         try
         {
             AcilisIzi.Yaz("pencere-yuklendi");
