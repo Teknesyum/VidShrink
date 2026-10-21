@@ -223,3 +223,21 @@ internal sealed class MusicCommand : IEditCommand
 
     public void Revert(List<EditClip> clips) => _set(_before);
 }
+
+internal sealed class LayersCommand : IEditCommand
+{
+    private readonly Action<IReadOnlyList<VideoLayer>> _set;
+    private readonly IReadOnlyList<VideoLayer> _before;
+    private readonly IReadOnlyList<VideoLayer> _after;
+
+    public LayersCommand(Action<IReadOnlyList<VideoLayer>> set, IReadOnlyList<VideoLayer> before, IReadOnlyList<VideoLayer> after)
+    {
+        _set = set;
+        _before = before;
+        _after = after;
+    }
+
+    public void Apply(List<EditClip> clips) => _set(_after);
+
+    public void Revert(List<EditClip> clips) => _set(_before);
+}

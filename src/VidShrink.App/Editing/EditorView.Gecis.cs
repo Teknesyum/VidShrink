@@ -42,7 +42,38 @@ internal partial class EditorView
         var ready = new Dictionary<int, string>();
         foreach (var index in TransitionPreview.Pending(model))
             if (BlendJob(model, index) is { } job && _blends.TryGetValue(job.Key, out var path) && File.Exists(path)) ready[index] = path;
-        return new EdlPreview(SourcePaths, model, ready.Count == 0 ? null : ready);
+        var patches = new List<EdlPatch>();
+        foreach (var span in LayerPreview.Pending(model))
+            if (LayerJob(model, span) is { } job && _blends.TryGetValue(job.Key, out var path) && File.Exists(path)) patches.Add(new EdlPatch(span.Clip, span.From, span.To, path));
+        return new EdlPreview(SourcePaths, model, ready.Count == 0 ? null : ready, patches.Count == 0 ? null : patches);
+    }
+
+    private (string Key, IReadOnlyList<string> Arguments)? LayerJob(EditTimeline model, LayerSpan span)
+    {
+        var paths = SourcePaths;
+        var source = model.Clips[span.Clip].Source;
+        if (source >= paths.Count) return null;
+        if (BlendInfo(paths[0]) is not { } first || BlendInfo(paths[source]) is not { } own) return null;
+        var infos = paths.Select((path, s) => s == source ? own : BlendInfo(path) ?? first).ToArray();
+        var draft = LayerPreview.Arguments(model, span, paths, infos, PreviewCanvas(model, first), first.Fps, first.HasAudio, Math.Max(_audioTrack, 0), "-");
+        return Finished(draft);
+    }
+
+    private IEnumerable<(string Key, IReadOnlyList<string> Arguments)?> PreviewJobs(EditTimeline model)
+    {
+        foreach (var index in TransitionPreview.Pending(model)) yield return BlendJob(model, index);
+        foreach (var span in LayerPreview.Pending(model)) yield return LayerJob(model, span);
+    }
+
+    private static (int Width, int Height) PreviewCanvas(EditTimeline model, MediaInfo first)
+        => ClipFilters.Canvas(model, first)
+           ?? (Math.Max(2, ClipFilters.DisplayWidth(first.Width, first.ParNum, first.ParDen) / 2 * 2), Math.Max(2, first.Height / 2 * 2));
+
+    private (string Key, IReadOnlyList<string> Arguments) Finished(IReadOnlyList<string> draft)
+    {
+        var key = TransitionPreview.Key(draft);
+        var output = Path.Combine(BlendFolder, TransitionPreview.FileName(key));
+        return (key, draft.Take(draft.Count - 1).Append(output).ToArray());
     }
 
     private (string Key, IReadOnlyList<string> Arguments)? BlendJob(EditTimeline model, int index)
@@ -53,12 +84,8 @@ internal partial class EditorView
         if (outgoing >= paths.Count || incoming >= paths.Count) return null;
         if (BlendInfo(paths[0]) is not { } first || BlendInfo(paths[outgoing]) is not { } a || BlendInfo(paths[incoming]) is not { } b) return null;
         var infos = paths.Select((path, s) => s == outgoing ? a : s == incoming ? b : BlendInfo(path) ?? first).ToArray();
-        var canvas = ClipFilters.Canvas(model, first)
-            ?? (Math.Max(2, ClipFilters.DisplayWidth(first.Width, first.ParNum, first.ParDen) / 2 * 2), Math.Max(2, first.Height / 2 * 2));
-        var draft = TransitionPreview.Arguments(model, index, paths, infos, canvas, first.Fps, first.HasAudio, Math.Max(_audioTrack, 0), "-");
-        var key = TransitionPreview.Key(draft);
-        var output = Path.Combine(BlendFolder, TransitionPreview.FileName(key));
-        return (key, draft.Take(draft.Count - 1).Append(output).ToArray());
+        var draft = TransitionPreview.Arguments(model, index, paths, infos, PreviewCanvas(model, first), first.Fps, first.HasAudio, Math.Max(_audioTrack, 0), "-");
+        return Finished(draft);
     }
 
     private MediaInfo? BlendInfo(string path)
@@ -71,7 +98,7 @@ internal partial class EditorView
 
     private void QueueBlends(EditTimeline model)
     {
-        var missing = TransitionPreview.Pending(model).Any(index => BlendJob(model, index) is not { } job || !_blends.ContainsKey(job.Key));
+        var missing = PreviewJobs(model).Any(job => job is not { } known || !_blends.ContainsKey(known.Key));
         if (!missing) return;
         _blendWork?.Cancel();
         var work = new CancellationTokenSource();
@@ -105,10 +132,10 @@ internal partial class EditorView
         }
 
         var runner = BlendRunner ?? FfmpegRunner.RunAsync;
-        foreach (var index in TransitionPreview.Pending(model))
+        foreach (var pending in PreviewJobs(model).ToList())
         {
             if (ct.IsCancellationRequested || !ReferenceEquals(_model, model)) return;
-            if (BlendJob(model, index) is not { } job || _blends.ContainsKey(job.Key)) continue;
+            if (pending is not { } job || _blends.ContainsKey(job.Key)) continue;
             var output = job.Arguments[^1];
             try
             {

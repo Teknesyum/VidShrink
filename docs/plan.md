@@ -1,13 +1,15 @@
-# Düzenleyici — Otomatik Sessizlik ve Siyah Kare Kesme
+# Düzenleyici — V2 İzi (Resim İçinde Resim) ve Yeşil Perde
 
-Tek düğme kaynağı tarar (`silencedetect` ve/veya `blackdetect`), bulunan aralıklar çizelgede
-kesilecek diye boyanır; eşik (dB), en kısa süre (sn), kenar payı (sn) değişince önizleme
-yeniden taranmadan tazelenir (eşik ve tür değişimi yeniden tarama ister). "Aralıkları kes"
-tek geri alma adımıyla klipleri böler ve o kaynak aralıklarını siler.
+Later 110 (DZB-02 + DZB-29). Çizelgeye V2 izi gelir: her üst klip başlangıcını, boyunu ve yerini
+taşır, teslim `overlay` ile bindirir. Yeşil perde aynı klipte tek seçenek: `chromakey`
+(`RecorderArguments.GreenScreenKey`) bindirmeden önce. Canlı önizleme 109'un yolu: kısa ön-işleme
+ve `edl://` parçası.
 
 | Parça | Dosyalar | İş |
 | --- | --- | --- |
-| Çekirdek | yeni `Core/Editing/SilenceCut.cs` | argüman (`-threads 2`, `-progress pipe:1`, yalnız gereken akış), saf ayrıştırıcı (`silence_*`, `black_*`, `out_time_us`), saf plan (birleştir → en kısa → kenar payı, dosya kenarında pay yok), BelowNormal + iptalli süreç; aralıklar `IdleSpan` |
-| Model | `Core/Editing/EditTimeline.cs`, `EditClip.cs`, `EditCommands.cs` | `RemoveSource` tek adım (hız/ters/solma korunur, hepsini silmez), `SourceToTimeline` önizleme eşlemesi, `InsertCommand` |
-| Arayüz | `EditorView.axaml`, yeni `EditorView.Sessizlik.cs`, `EditorView.axaml.cs`, `EditorTimeline.cs`, `EditorPlayhead.cs`, `Locales/*/editor.json` | panel, ilerleme + iptal, çizelgede `NeonPinkFill` boyası, 42 dil |
-| Test | yeni `DuzenleyiciSessizlikTests.cs`, `tests/.../AGENTS.md`, `docs/olcumler/duzenleyici-sessizlik-kesme.md` | pimli stderr, her kolun olumsuz kontrolü, canlı ≤6 sn lavfi ±0,1 sn, ≥3 mutasyon |
+| Model | yeni `Core/Editing/VideoLayer.cs`, `EditTimeline.cs`, `EditCommands.cs` | katman kaydı (yol, süre, kırpım, başlangıç, boy, yer, yeşil perde), ekle/taşı/güncelle/sil tek adım, `ToOutput` |
+| Teslim | `EditExport.cs` | katman Tam kipi zorlar; Full ve Merge'de `-ss/-t -i`, `scale`, `chromakey`, `overlay=eof_action=pass`, metnin altında |
+| Proje | `EditProject.cs`, `Otio.cs` | `layers` yaz/oku, `Restore` katmanla |
+| Önizleme | `EdlPreview.cs`, yeni `Core/Editing/LayerPreview.cs` | klip parçasını bindirme aralığında bölen yama, yamanın ön-işleme argümanı |
+| Arayüz | yeni `EditorTimeline.Katman.cs`, yeni `EditorView.Katman.cs`, `EditorTimeline.cs`, `EditorView.Gecis.cs`, `EditorView.Teslim.cs`, `EditorView.Proje.cs`, `EditorView.axaml`, `Locales/*/editor.json` | V2 şeridi, sürükle, menü (ekle, boy, yer, yeşil perde, sil), yama kuyruğu, 42 dil |
+| Test | yeni `DuzenleyiciV2IzTests.cs`, `BiciminTests.cs` pinleri, `test-katalogu.md`, `docs/olcumler/v2-izi.md` | argüman, yama, gidiş-dönüş, geri al, teslim karesinde bölge ölçümü, mutasyon |

@@ -87,6 +87,8 @@ public sealed class EditProject
 
     public IReadOnlyList<string> MissingLuts { get; private init; } = Array.Empty<string>();
 
+    public IReadOnlyList<VideoLayer> Layers { get; private init; } = Array.Empty<VideoLayer>();
+
     /// <summary>
     /// <paramref name="extraSources"/> cizelgenin ek kaynaklariyla ayni sirada ve ayni sayida olmalidir.
     /// </summary>
@@ -101,7 +103,7 @@ public sealed class EditProject
         var duration = timeline.SourceDuration ?? timeline.Clips.Where(c => c.Source == 0).Select(c => c.SourceEnd).DefaultIfEmpty(1).Max();
         var extras = stamps.Select((stamp, i) => new ExtraSource(stamp, timeline.ExtraSources[i])).ToArray();
         return new EditProject(source, duration, timeline.Clips.ToArray(), timeline.Texts.ToArray(), exportMode, extras, Sorted(markers ?? Array.Empty<EditMarker>()),
-            audioTrack, timeline.Music, timeline.Frame);
+            audioTrack, timeline.Music, timeline.Frame) { Layers = timeline.Layers.ToArray() };
     }
 
     /// <summary>
@@ -131,7 +133,7 @@ public sealed class EditProject
 
         if (Clips.Count == 0) return null;
         var timeline = new EditTimeline(Array.Empty<EditClip>(), SourceDuration, extraSources: ExtraSources.Select(extra => extra.Duration));
-        timeline.Restore(Clips, Texts, Music, Frame);
+        timeline.Restore(Clips, Texts, Music, Frame, Layers);
         var mode = Enum.TryParse<Editing.ExportMode>(ExportMode, ignoreCase: false, out var parsed) && Enum.IsDefined(parsed) ? parsed : Editing.ExportMode.Smart;
         return new EditProjectJob(ExtraSources.Select(extra => extra.Stamp.Path).Prepend(Source.Path).ToArray(), timeline, mode, AudioTrack);
     }
@@ -214,6 +216,27 @@ public sealed class EditProject
                 writer.WriteEndObject();
             }
 
+            if (Layers.Count > 0)
+            {
+                writer.WriteStartArray("layers");
+                foreach (var layer in Layers)
+                {
+                    writer.WriteStartObject();
+                    writer.WriteString("path", layer.Path);
+                    writer.WriteNumber("duration", layer.Duration);
+                    writer.WriteNumber("start", layer.Start);
+                    writer.WriteNumber("sourceStart", layer.SourceStart);
+                    writer.WriteNumber("sourceEnd", layer.SourceEnd);
+                    writer.WriteNumber("scale", layer.Scale);
+                    writer.WriteNumber("x", layer.X);
+                    writer.WriteNumber("y", layer.Y);
+                    if (layer.ChromaKey) writer.WriteBoolean("chromaKey", true);
+                    writer.WriteEndObject();
+                }
+
+                writer.WriteEndArray();
+            }
+
             writer.WriteEndObject();
         }
 
@@ -264,7 +287,14 @@ public sealed class EditProject
             var frame = root.TryGetProperty("frame", out var box) && box.ValueKind == JsonValueKind.Object
                 ? new EditFrame(box.GetProperty("num").GetInt32(), box.GetProperty("den").GetInt32())
                 : EditFrame.Source;
-            var project = new EditProject(stamp, duration, clips, texts, mode, extras, markers, track, music, frame) { MissingLuts = missing.Distinct(StringComparer.Ordinal).ToArray() };
+            var videoLayers = root.TryGetProperty("layers", out var tops) && tops.ValueKind == JsonValueKind.Array
+                ? tops.EnumerateArray().Select(ReadLayer).ToArray()
+                : Array.Empty<VideoLayer>();
+            var project = new EditProject(stamp, duration, clips, texts, mode, extras, markers, track, music, frame)
+            {
+                MissingLuts = missing.Distinct(StringComparer.Ordinal).ToArray(),
+                Layers = videoLayers
+            };
             return project.FitsIn(duration) ? project : null;
         }
         catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException or FormatException or ArgumentException or OverflowException)
@@ -567,6 +597,21 @@ public sealed class EditProject
 
     private static double BlurNumber(JsonElement blur, string name)
         => blur.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.Number ? value.GetDouble() : 0;
+
+    private static VideoLayer ReadLayer(JsonElement item)
+    {
+        var layer = new VideoLayer(item.GetProperty("path").GetString() ?? "", item.GetProperty("duration").GetInt64(), item.GetProperty("start").GetInt64())
+        {
+            SourceStart = item.TryGetProperty("sourceStart", out var from) ? from.GetInt64() : 0,
+            Scale = item.TryGetProperty("scale", out var scale) ? scale.GetDouble() : VideoLayer.DefaultScale,
+            X = item.TryGetProperty("x", out var x) ? x.GetDouble() : VideoLayer.DefaultX,
+            Y = item.TryGetProperty("y", out var y) ? y.GetDouble() : VideoLayer.DefaultY,
+            ChromaKey = item.TryGetProperty("chromaKey", out var key) && key.GetBoolean()
+        };
+        if (item.TryGetProperty("sourceEnd", out var to)) layer = layer with { SourceEnd = to.GetInt64() };
+        layer.Validate();
+        return layer;
+    }
 
     private static KeyframeEase Ease(JsonElement key)
         => KeyframeEaseKeys.Parse(key.TryGetProperty("ease", out var ease) ? ease.GetString() : null);

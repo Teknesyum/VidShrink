@@ -13,6 +13,8 @@ public sealed record EdlPart(int Index, EditClip Clip, long TimelineStart, long 
 
     public bool IsBlend => Blend is not null;
 
+    public int Ratio { get; init; } = 2;
+
     public long HeadConsumed => Consumed(Head);
 
     public long TailConsumed => Tail == 0 ? Clip.SourceLength : Consumed(Clip.TimelineLength - Tail);
@@ -21,7 +23,7 @@ public sealed record EdlPart(int Index, EditClip Clip, long TimelineStart, long 
 
     public long EdlEnd => EdlStart + EdlLength;
 
-    public long TimelineLength => IsBlend ? 2 * Clip.TimelineLength : Clip.TimelineLength - Head - Tail;
+    public long TimelineLength => IsBlend ? Ratio * Clip.TimelineLength : Clip.TimelineLength - Head - Tail;
 
     public long TimelineEnd => TimelineStart + TimelineLength;
 
@@ -31,6 +33,8 @@ public sealed record EdlPart(int Index, EditClip Clip, long TimelineStart, long 
 
     private long Consumed(long offset) => offset * (long)(Clip.Speed * 100) / 100;
 }
+
+public sealed record EdlPatch(int Clip, long From, long To, string Path);
 
 public sealed class EdlPreview
 {
@@ -44,7 +48,8 @@ public sealed class EdlPreview
     }
 
     /// <summary>Cok kaynakli onizleme: her parca kendi kaynaginin yolundan okunur; yollar kaynak sirasiyla verilir.</summary>
-    public EdlPreview(IReadOnlyList<string> sourcePaths, EditTimeline timeline, IReadOnlyDictionary<int, string>? blends = null)
+    public EdlPreview(IReadOnlyList<string> sourcePaths, EditTimeline timeline, IReadOnlyDictionary<int, string>? blends = null,
+        IReadOnlyList<EdlPatch>? patches = null)
     {
         ArgumentNullException.ThrowIfNull(sourcePaths);
         ArgumentNullException.ThrowIfNull(timeline);
@@ -72,9 +77,23 @@ public sealed class EdlPreview
                 edlStart += blend.EdlLength;
             }
 
-            var part = new EdlPart(parts.Count, clip, timelineStart + head, edlStart) { Head = head, Tail = tail };
-            if (part.EdlLength > 0 && part.TimelineLength > 0)
+            var length = clip.TimelineLength;
+            var cursor = head;
+            foreach (var patch in PatchesOf(patches, i, head, length - tail))
             {
+                Plain(cursor, patch.From);
+                var piece = new EdlPart(parts.Count, new EditClip(0, patch.To - patch.From), timelineStart + patch.From, edlStart) { Blend = patch.Path, Ratio = 1 };
+                parts.Add(piece);
+                edlStart += piece.EdlLength;
+                cursor = patch.To;
+            }
+
+            Plain(cursor, length - tail);
+
+            void Plain(long from, long to)
+            {
+                var part = new EdlPart(parts.Count, clip, timelineStart + from, edlStart) { Head = from, Tail = length - to };
+                if (to <= from || part.EdlLength <= 0 || part.TimelineLength <= 0) return;
                 parts.Add(part);
                 edlStart += part.EdlLength;
             }
@@ -144,7 +163,7 @@ public sealed class EdlPreview
 
         var part = PartAtTimeline(time);
         var offset = Math.Clamp(time - part.TimelineStart, 0, part.TimelineLength - 1);
-        if (part.IsBlend) return part.EdlStart + offset / 2;
+        if (part.IsBlend) return part.EdlStart + offset / part.Ratio;
         var source = part.Clip.ToSource(part.Head + offset);
         return Math.Clamp(part.EdlStart + (source - part.SourceFrom), part.EdlStart, part.EdlEnd - 1);
     }
@@ -155,13 +174,25 @@ public sealed class EdlPreview
 
         var part = PartAtEdl(edlTime);
         var within = Math.Clamp(edlTime - part.EdlStart, 0, part.EdlLength - 1);
-        if (part.IsBlend) return part.TimelineStart + 2 * within;
+        if (part.IsBlend) return part.TimelineStart + part.Ratio * within;
         var source = part.SourceFrom + within;
         return part.TimelineStart + Math.Clamp(part.Clip.ToOffset(source) - part.Head, 0, part.TimelineLength - 1);
     }
 
     private string Entry(EdlPart part)
         => Escape(part.Blend ?? SourcePaths[part.Clip.Source]) + "," + Seconds(part.SourceFrom) + "," + Seconds(part.EdlLength);
+
+    private static IEnumerable<EdlPatch> PatchesOf(IReadOnlyList<EdlPatch>? patches, int clip, long from, long to)
+    {
+        if (patches is null) yield break;
+        var cursor = from;
+        foreach (var patch in patches.Where(p => p.Clip == clip && !string.IsNullOrEmpty(p.Path)).OrderBy(p => p.From))
+        {
+            if (patch.From < cursor || patch.To > to || patch.To <= patch.From) continue;
+            yield return patch;
+            cursor = patch.To;
+        }
+    }
 
     private static long BlendLength(EditTimeline timeline, IReadOnlyDictionary<int, string>? blends, int index)
         => blends is not null && blends.TryGetValue(index, out var path) && !string.IsNullOrEmpty(path) ? timeline.TransitionLength(index) : 0;

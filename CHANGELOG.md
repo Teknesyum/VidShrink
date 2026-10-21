@@ -14,6 +14,9 @@ made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md
 - Editor preview now shows transitions. The few seconds where two clips overlap are rendered
   in the background into a small file in the app's cache folder; until it is ready the preview
   plays a plain cut as before. The files are removed when the editor closes or the app exits.
+- The editor has a second video track, V2, for picture-in-picture. Add a video from the
+  timeline menu, drag it along the track, and pick its size, corner and green-screen removal.
+  Export lays it over the main video under any text; the preview shows it after a short render.
 
 ## [0.0.1]
 

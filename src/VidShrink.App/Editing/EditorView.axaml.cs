@@ -66,6 +66,7 @@ internal partial class EditorView : UserControl
         InitProject();
         InitSources();
         InitMusic();
+        InitLayers();
         InitStills();
         InitClipboard();
 
