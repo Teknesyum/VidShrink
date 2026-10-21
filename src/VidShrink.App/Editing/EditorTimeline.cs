@@ -362,6 +362,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         _model = model;
         ResetTexts();
         EndMusic();
+        ResetAudio();
         _selected = -1;
         _all = false;
         _set.Clear();
@@ -545,6 +546,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         context.DrawRectangle(Paint("Surface"), null, new Rect(0, VideoTop, width, VideoHeight));
         context.DrawRectangle(Paint("PanelSurface"), null, new Rect(0, AudioTop, width, AudioHeight));
         context.DrawRectangle(Paint("PanelSurface"), null, new Rect(0, MusicTop, width, MusicHeight));
+        context.DrawRectangle(Paint("PanelSurface"), null, new Rect(0, AudioLaneTop, width, AudioLaneHeight));
         context.DrawRectangle(Paint("PanelSurface"), null, new Rect(0, StripTop, width, StripHeight));
 
         var line = new Pen(Paint("HeaderRestBorder"), Metric("EditorClipBorder"));
@@ -554,11 +556,13 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         context.DrawLine(line, new Point(0, VideoTop), new Point(width, VideoTop));
         context.DrawLine(line, new Point(0, AudioTop), new Point(width, AudioTop));
         context.DrawLine(line, new Point(0, MusicTop), new Point(width, MusicTop));
+        context.DrawLine(line, new Point(0, AudioLaneTop), new Point(width, AudioLaneTop));
 
-        DrawHeaderIcon(context, null, TextTop, TextHeight, TextTrackName);
-        DrawHeaderIcon(context, "IconPlayer", VideoTop, VideoHeight, VideoTrackName);
-        DrawHeaderIcon(context, "IconVolume", AudioTop, AudioHeight, AudioTrackName);
-        DrawHeaderIcon(context, "IconVolume", MusicTop, MusicHeight, MusicTrackName);
+        DrawTrackHeader(context, EditTrack.Text, null, TextTop, TextHeight, TextTrackName);
+        DrawTrackHeader(context, EditTrack.Video, "IconPlayer", VideoTop, VideoHeight, VideoTrackName);
+        DrawTrackHeader(context, EditTrack.Video, "IconVolume", AudioTop, AudioHeight, AudioTrackName);
+        DrawTrackHeader(context, EditTrack.Music, "IconVolume", MusicTop, MusicHeight, MusicTrackName);
+        DrawTrackHeader(context, EditTrack.Audio, "IconVolume", AudioLaneTop, AudioLaneHeight, EditTracks.Name(EditTrack.Audio));
 
         WaveformBucketsDrawn = 0;
         if (_model is null || _ppt <= 0) return;
@@ -567,6 +571,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         DrawRuler(context);
         DrawTexts(context);
         DrawMusic(context);
+        DrawAudioClips(context);
         if (_peaks is { IsEmpty: false } || _extraPeaks.Values.Any(p => !p.IsEmpty)) DrawWaveform(context);
         else DrawAudioMirror(context);
     }
@@ -577,11 +582,17 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         if (_model is null) return;
         var point = e.GetCurrentPoint(this);
         var position = point.Position;
-        if (position.X < HeaderWidth) return;
+        if (PressHeader(position)) return;
         Focus();
 
         if (point.Properties.IsRightButtonPressed)
         {
+            if (OnAudioLane(position))
+            {
+                SelectedAudio = AudioAt(position.X);
+                return;
+            }
+
             if (OnTextRow(position))
             {
                 SelectedText = TextAt(position.X);
@@ -608,6 +619,20 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         _dragging = false;
         var mods = e.KeyModifiers;
         var plain = (mods & (KeyModifiers.Control | KeyModifiers.Meta | KeyModifiers.Shift)) == 0;
+        if (LockedAt(position))
+        {
+            _pressIndex = -1;
+            return;
+        }
+
+        if (PressAudio(position, plain))
+        {
+            _pressIndex = -1;
+            SelectedText = -1;
+            return;
+        }
+
+        SelectedAudio = -1;
         if (PressText(position, plain))
         {
             _pressIndex = -1;
@@ -692,6 +717,13 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
             return;
         }
 
+        if (_audioPress >= 0)
+        {
+            AutoScroll(position.X);
+            DragAudio(position.X);
+            return;
+        }
+
         if (_pressIndex < 0)
         {
             UpdateCursor(position);
@@ -734,6 +766,11 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
             DragMusic(position.X);
             CommitMusic();
         }
+        else if (_audioPress >= 0)
+        {
+            DragAudio(position.X);
+            CommitAudio();
+        }
         else if (_dragging && _pressIndex >= 0 && _dropIndex >= 0 && _dropIndex != _pressIndex)
         {
             var from = _pressIndex;
@@ -753,13 +790,14 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         EndTrim();
         EndText();
         EndMusic();
+        EndAudio();
         EndDrag();
     }
 
     protected override void OnPointerExited(PointerEventArgs e)
     {
         base.OnPointerExited(e);
-        if (_trimIndex < 0 && _textPress < 0) SetCursor(StandardCursorType.Arrow);
+        if (_trimIndex < 0 && _textPress < 0 && _audioPress < 0) SetCursor(StandardCursorType.Arrow);
     }
 
     internal bool EdgeAt(Point position, out int index, out bool head)
@@ -784,6 +822,18 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
 
     private void UpdateCursor(Point position)
     {
+        if (LockedAt(position))
+        {
+            SetCursor(StandardCursorType.Arrow);
+            return;
+        }
+
+        if (_model is not null && position.X >= HeaderWidth && OnAudioLane(position))
+        {
+            UpdateAudioCursor(position);
+            return;
+        }
+
         if (_model is not null && position.X >= HeaderWidth && OnMusicRow(position))
         {
             UpdateMusicCursor(position);
@@ -815,7 +865,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
 
     internal bool Razor(double x)
     {
-        if (_model is not { } model) return false;
+        if (_model is not { } model || model.IsLocked(EditTrack.Video)) return false;
         var time = XToTime(x);
         var at = SnapTarget(time) ?? RoundToFrame(time);
         if (at <= 0 || at >= model.Duration || !model.Split(at)) return false;
@@ -1242,7 +1292,7 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
         return peaks.Slice(Math.Max(0, start), end, clip.Reversed, Math.Max(1, buckets));
     }
 
-    private void DrawHeaderIcon(DrawingContext context, string? key, double top, double height, string name)
+    private void DrawHeaderIcon(DrawingContext context, string? key, double top, double height, string name, string paint = "TextBody")
     {
         var pad = Metric("EditorClipPadding");
         var side = Math.Min(height - pad * 2, Metric("TargetMinSize"));
@@ -1255,11 +1305,11 @@ internal sealed partial class EditorTimeline : Panel, ICustomHitTest
             var x = pad - box.X * scale;
             var y = top + (height - box.Height * scale) / 2 - box.Y * scale;
             using (context.PushTransform(Matrix.CreateScale(scale, scale) * Matrix.CreateTranslation(x, y)))
-                context.DrawGeometry(Paint("TextBody"), null, icon);
+                context.DrawGeometry(Paint(paint), null, icon);
             textX = pad + side + Metric("SpaceXs");
         }
 
-        var label = new FormattedText(name, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface(EditorTokens.Font(this, "FontMono")), Metric("FontSizeSm"), Paint("TextBody"));
+        var label = new FormattedText(name, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface(EditorTokens.Font(this, "FontMono")), Metric("FontSizeSm"), Paint(paint));
         var fit = HeaderLabelScale(label.Height, height);
         using (context.PushTransform(Matrix.CreateScale(fit, fit) * Matrix.CreateTranslation(textX, top + (height - label.Height * fit) / 2)))
             context.DrawText(label, default);

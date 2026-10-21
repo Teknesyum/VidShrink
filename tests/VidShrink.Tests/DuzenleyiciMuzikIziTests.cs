@@ -283,7 +283,7 @@ public sealed class DuzenleyiciMuzikIziTests
                 var bosNokta = new Point(cizelge.TimeToX(S(45)), y);
                 Bas(cizelge, Isaretci(), bosNokta);
                 var bostaBasili = cizelge.MusicDragging;
-                return (cizelge.TracksBottom, cizelge.MusicTop, cizelge.MusicBottom, cizelge.AudioHeight, cizelge.MusicHeight, cizelge.StripTop,
+                return (cizelge.TracksBottom, cizelge.MusicTop, cizelge.MusicBottom, cizelge.AudioHeight, cizelge.MusicHeight, A3Ust: cizelge.AudioLaneTop,
                     Aralik: EditorTokens.Size(cizelge, "EditorTrackGap"), ici, oncesi, sonrasi, basili, hayalet, birakti, tasinan, bostaBasili, bostaTasinan,
                     Satir: cizelge.OnMusicRow(new Point(cizelge.TimeToX(S(1)), y)), Ust: cizelge.OnMusicRow(new Point(cizelge.TimeToX(S(1)), cizelge.MusicTop - 1)));
             }
@@ -296,7 +296,7 @@ public sealed class DuzenleyiciMuzikIziTests
         Assert.Equal(s.TracksBottom + s.Aralik, s.MusicTop, 6);
         Assert.Equal(s.AudioHeight, s.MusicHeight, 6);
         Assert.Equal(s.MusicTop + s.MusicHeight, s.MusicBottom, 6);
-        Assert.Equal(s.MusicBottom + s.Aralik, s.StripTop, 6);
+        Assert.Equal(s.MusicBottom + s.Aralik, s.A3Ust, 6);
         Assert.True(s.Satir);
         Assert.False(s.Ust);
         Assert.True(s.ici);

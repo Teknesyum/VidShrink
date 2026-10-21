@@ -310,8 +310,8 @@ public static class EditExport
         var transitionsForced = mode != ExportMode.Full && effective != ExportMode.Full && !timeline.HasText && !timeline.HasEffects && settings.IsDefault
             && timeline.HasTransitions;
         var musicForced = mode != ExportMode.Full && effective != ExportMode.Full && !timeline.HasText && !timeline.HasEffects && settings.IsDefault
-            && !timeline.HasTransitions && timeline.HasMusic;
-        if (timeline.HasText || timeline.HasEffects || !settings.IsDefault || timeline.HasTransitions || timeline.HasMusic) effective = ExportMode.Full;
+            && !timeline.HasTransitions && (timeline.HasMusic || timeline.HasAudioClips);
+        if (timeline.HasText || timeline.HasEffects || !settings.IsDefault || timeline.HasTransitions || timeline.HasMusic || timeline.HasAudioClips) effective = ExportMode.Full;
 
         var limit = ReverseLimitSeconds(info, memoryBudgetBytes);
         var over = ReverseOverLimit(timeline, info, memoryBudgetBytes);
@@ -330,6 +330,7 @@ public static class EditExport
             ? CarriedSubtitles(whole, outputPath)
             : Array.Empty<(int Position, SourceStream Stream)>();
         if (subtitles.Count > 0) plan = WithSubtitles(plan, timeline, whole, subtitles, outputPath, workDirectory);
+        if (timeline.HasAudioClips) plan = WithAudioClips(plan, timeline.AudioClips, settings, outputPath);
         if (timeline.Music is { } music) plan = WithMusic(plan, music, settings, outputPath);
         if (settings.AudioOnly && effective == ExportMode.Full) languages = languages.Take(1).ToArray();
         if (dropMetadata)
@@ -389,6 +390,47 @@ public static class EditExport
         return plan with { Steps = plan.Steps.Take(plan.Steps.Count - 1).Append(last with { Args = args }).ToArray() };
     }
 
+    private static ExportPlan WithAudioClips(ExportPlan plan, IReadOnlyList<EditAudioClip> clips, EditExportSettings settings, string output)
+    {
+        var last = plan.Steps[^1];
+        var args = last.Args.ToList();
+        var first = args.Count(a => a == "-i");
+        var input = args.LastIndexOf("-i") + 2;
+        args.InsertRange(input, clips.SelectMany(c => new[] { "-i", c.Path }));
+        var graphAt = args.IndexOf("-filter_complex") + 1;
+        if (graphAt <= 0) throw new InvalidOperationException("Ses izi yalniz suzgec grafigi kuran adima eklenir");
+        var duration = Number(last.DurationSeconds);
+        var chain = new StringBuilder();
+        for (var i = 0; i < clips.Count; i++)
+            chain.Append(';').Append(AudioClipChain(clips[i], first + i, duration)).Append("[ac").Append(i.ToString(CultureInfo.InvariantCulture)).Append(']');
+        var labels = string.Concat(Enumerable.Range(0, clips.Count).Select(i => "[ac" + i.ToString(CultureInfo.InvariantCulture) + "]"));
+        var mapped = MapIndex(args, "[aout]");
+        if (mapped >= 0)
+        {
+            args[graphAt] = args[graphAt].Replace("[aout]", "[abed]", StringComparison.Ordinal);
+            chain.Append(";[abed]").Append(MergeAudioFormat).Append("[abase];[abase]").Append(labels).Append("amix=inputs=")
+                .Append((clips.Count + 1).ToString(CultureInfo.InvariantCulture)).Append(":duration=first:dropout_transition=0:normalize=0[aout]");
+        }
+        else
+        {
+            chain.Append(';').Append(labels).Append("amix=inputs=").Append(clips.Count.ToString(CultureInfo.InvariantCulture))
+                .Append(":duration=first:dropout_transition=0:normalize=0[aout]");
+            var video = MapIndex(args, "[vout]");
+            args.InsertRange(video >= 0 ? video + 1 : graphAt + 1, new[] { "-map", "[aout]" });
+            args.InsertRange(args.Count - 1, new[] { "-c:a", settings.AudioOnly ? EditExportSettings.AudioOnlyCodec(output) : AudioCodec, "-b:a", settings.AudioBitrate });
+        }
+
+        args[graphAt] += chain.ToString();
+        return plan with { Steps = plan.Steps.Take(plan.Steps.Count - 1).Append(last with { Args = args }).ToArray() };
+    }
+
+    public static string AudioClipChain(EditAudioClip clip, int input, string duration)
+        => "[" + input.ToString(CultureInfo.InvariantCulture) + ":a:0]atrim=start=" + Number(EditTime.ToSeconds(clip.In))
+           + ":end=" + Number(EditTime.ToSeconds(clip.Out)) + ",asetpts=PTS-STARTPTS,volume="
+           + clip.LevelDb.ToString("0.0", CultureInfo.InvariantCulture) + "dB," + MergeAudioFormat
+           + ",adelay=" + Math.Round(EditTime.ToSeconds(clip.Start) * 1000).ToString(CultureInfo.InvariantCulture) + ":all=1"
+           + ",apad,atrim=duration=" + duration + ",asetpts=PTS-STARTPTS";
+
     public const string DuckThreshold = "0.01";
     public const string DuckRatio = "20";
     public const string DuckAttackMs = "20";
@@ -438,6 +480,7 @@ public static class EditExport
             {
                 var merged = Merge(timeline, WithTrack(sources, audioTrack, out var track), used, mode, outputPath, workDirectory, memoryBudgetBytes, dropMetadata,
                     settings ?? EditExportSettings.Default, track);
+                if (timeline.HasAudioClips) merged = WithAudioClips(merged, timeline.AudioClips, settings ?? EditExportSettings.Default, outputPath);
                 plan = timeline.Music is { } music ? WithMusic(merged, music, settings ?? EditExportSettings.Default, outputPath) : merged;
             }
 

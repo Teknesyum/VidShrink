@@ -573,7 +573,7 @@ internal partial class EditorView
     {
         if (reopened) _overlayId = 0;
         if (Preview.Engine is not { } engine || _driver is not { } driver || _model is not { } model) return;
-        if (!model.HasText)
+        if (!model.HasText || !model.Visible(EditTrack.Text))
         {
             if (_overlayId != 0) engine.RemoveOverlay(_overlayId);
             _overlayId = 0;

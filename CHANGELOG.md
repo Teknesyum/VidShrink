@@ -11,6 +11,7 @@ made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md
 
 ### Added
 
+- Editor sound and track controls: a clip's sound can be detached to its own A3 track, moved, trimmed, leveled and removed; voiceover is recorded from the recorder's microphone straight onto A3 at the playhead; each track header now offers mute, solo, hide (text) and lock, saved in the project and honored on export.
 - Editor preview now shows transitions. The few seconds where two clips overlap are rendered
   in the background into a small file in the app's cache folder; until it is ready the preview
   plays a plain cut as before. The files are removed when the editor closes or the app exits.
