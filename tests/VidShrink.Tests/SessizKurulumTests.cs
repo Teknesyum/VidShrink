@@ -13,7 +13,7 @@ namespace VidShrink.Tests;
 /// Kayıtlar yalnız test anahtarının altına (<c>Uninstall</c>, <c>Environment</c>) yazılır; gerçek HKCU ve gerçek PATH okunmaz.
 /// </summary>
 [SupportedOSPlatform("windows")]
-public sealed class SessizKurulumTests : IDisposable
+public sealed partial class SessizKurulumTests : IDisposable
 {
     private const string Rid = "win-x64";
 
@@ -336,7 +336,7 @@ public sealed class SessizKurulumTests : IDisposable
         return (options, host);
     }
 
-    private string FakeRelease()
+    private string FakeRelease(bool uninstallerInArchive = false)
     {
         var release = Path.Combine(_work, "yayin-" + Guid.NewGuid().ToString("n")[..6]);
         Directory.CreateDirectory(release);
@@ -344,7 +344,8 @@ public sealed class SessizKurulumTests : IDisposable
         var app = Path.Combine(release, UpdateCheck.ArchiveAssetName(Rid));
         Zip(app, (AppIdentity.AppExecutable, "uygulama"), ("alt/veri.txt", "veri"));
         var launcher = Path.Combine(release, UpdateCheck.LauncherArchiveAssetName(Rid));
-        Zip(launcher, (AppIdentity.LauncherExecutable, "baslatici"));
+        if (uninstallerInArchive) Zip(launcher, (AppIdentity.LauncherExecutable, "baslatici"), (RootUninstaller.FileName, "arsivdeki kaldirici"));
+        else Zip(launcher, (AppIdentity.LauncherExecutable, "baslatici"));
         File.WriteAllText(Path.Combine(release, $"checksums-{Rid}.txt"),
             $"{UpdateCheck.HashFile(app)}  {Path.GetFileName(app)}\n{UpdateCheck.HashFile(launcher)}  {Path.GetFileName(launcher)}\n");
 

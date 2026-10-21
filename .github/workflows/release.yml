@@ -392,13 +392,22 @@ jobs:
         # runs an x64 console program under emulation, and the program reads the machine's own
         # architecture (RuntimeInformation.OSArchitecture is Arm64 even under emulation), so a
         # single VidShrinkPlayer-Setup.exe installs the win-arm64 release on an arm64 machine.
-        if: matrix.rid == 'win-x64'
+        #
+        # The same binary also sits at the install root as "Uninstall VidShrink Player.exe", so a
+        # user who opens the install folder finds an uninstaller there. Seeing its own name it
+        # relays to the setup copy under %LOCALAPPDATA% (or a copy of itself in %TEMP%) and exits,
+        # because a running exe cannot delete its own folder. It travels in the launcher archive of
+        # both Windows targets and is listed in the manifest's "shell" array: those rows are copied
+        # straight into the install root on every update, and an install that lacks the file
+        # receives it on its next update, older clients included.
+        if: startsWith(matrix.rid, 'win-')
         run: |
           dotnet publish src/VidShrink.Setup/VidShrink.Setup.csproj \
             -c Release \
             -p:Version=${{ needs.version.outputs.version }} \
             -p:SourceRevisionId=${{ needs.version.outputs.commit }} \
             -o publish-setup
+          cp publish-setup/VidShrinkPlayer-Setup.exe "publish-launcher/Uninstall VidShrink Player.exe"
 
       # The Windows 11 shell extension is a native COM DLL and is built for x64 only, so it
       # travels in the win-x64 launcher archive alone. On win-arm64 the launcher archive
@@ -467,7 +476,7 @@ jobs:
               --out launcher-manifest.json
             jq --slurpfile launcher launcher-manifest.json \
               '.launcher = ($launcher[0].files | map(select(.path == "VidShrinkPlayer.exe")))
-               | .shell = ($launcher[0].files | map(select(.path | startswith("shell/"))))' \
+               | .shell = ($launcher[0].files | map(select((.path | startswith("shell/")) or .path == "Uninstall VidShrink Player.exe")))' \
               publish/${{ matrix.rid }}/manifest.json > merged-manifest.json
             mv merged-manifest.json publish/${{ matrix.rid }}/manifest.json
             jq -r '.launcher[] | "manifest launcher: \(.path) \(.size)"' publish/${{ matrix.rid }}/manifest.json
@@ -509,7 +518,7 @@ jobs:
             rm -rf pkg
             checksummed="$checksummed vidshrink-update-${{ matrix.rid }}.zip"
           fi
-          if [ -f publish-setup/VidShrinkPlayer-Setup.exe ]; then
+          if [ "${{ matrix.rid }}" = win-x64 ] && [ -f publish-setup/VidShrinkPlayer-Setup.exe ]; then
             cp publish-setup/VidShrinkPlayer-Setup.exe assets/VidShrinkPlayer-Setup.exe
             checksummed="$checksummed VidShrinkPlayer-Setup.exe"
           fi

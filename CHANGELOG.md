@@ -7,6 +7,16 @@ All notable changes to VidShrink Player are recorded here. The format follows
 The history of the program under its old name, VidShrink, up to 1.2.24 and the changes
 made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md).
 
+## [Unreleased]
+
+### Added
+
+- The install folder now holds `Uninstall VidShrink Player.exe`. Opening it asks once and
+  then removes the program the same way Settings > Apps does; afterwards nothing is left in
+  the install folder. The Start menu gets a matching "Uninstall VidShrink Player" shortcut,
+  which the uninstall also deletes. Installs that lack the file receive it with their next
+  update.
+
 ## [0.0.1]
 
 ### Changed

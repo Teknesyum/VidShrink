@@ -72,6 +72,7 @@ UTF-8, BOM yok, iki boşluk girintili, sonunda tek satır sonu var.
 | `rid` | metin | `win-x64`, `osx-arm64`, `osx-x64`, `linux-x64` |
 | `files` | dizi | Yayın klasöründeki her dosya için bir nesne |
 | `launcher` | dizi | Kurulum kökündeki başlatıcı için bir nesne. İsteğe bağlı; yalnız `win-x64` taşır |
+| `shell` | dizi | Kurulum köküne düz kopyalanan dosyalar: `shell/` klasörü ve kökteki kaldırıcı `Uninstall VidShrink Player.exe`. Başlatıcı arşivinden iner; eksik dosya bir sonraki güncellemede yerine konur. İsteğe bağlı |
 
 `files` içindeki her nesnenin üç alanı vardır, hepsi zorunludur:
 

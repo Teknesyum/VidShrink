@@ -12,6 +12,7 @@ internal static partial class Program
     {
         Console.OutputEncoding = new UTF8Encoding(false);
         var ownConsole = GetConsoleProcessList(new uint[2], 2) == 1;
+        if (RootUninstaller.IsRootUninstaller(Environment.ProcessPath)) return RelayUninstall(ownConsole);
         var silent = SetupLaunch.IsSilent(args);
         if (silent && ownConsole) Native.ShowWindow(Native.GetConsoleWindow(), Native.SW_HIDE);
         try
@@ -36,6 +37,38 @@ internal static partial class Program
                 Console.WriteLine(SetupText.Get("setup.console.press-enter"));
                 Console.ReadLine();
             }
+            return 1;
+        }
+    }
+
+    private static int RelayUninstall(bool ownConsole)
+    {
+        if (ownConsole) Native.ShowWindow(Native.GetConsoleWindow(), Native.SW_HIDE);
+        SetupText.Use(ShellRegistration.ResolveLanguage("auto", UserLocaleName));
+        try
+        {
+            var self = Environment.ProcessPath!;
+            var root = Path.GetDirectoryName(Path.GetFullPath(self))!;
+            var localAppData = LocalAppData();
+            if (!SetupRunner.UnderPrograms(root, localAppData))
+            {
+                Native.MessageBoxW(IntPtr.Zero, SetupText.Get("setup.uninstall.outside-programs", root), AppIdentity.Name, Native.MB_OK | Native.MB_ICONERROR);
+                return 1;
+            }
+            var answer = Native.MessageBoxW(IntPtr.Zero, SetupText.Get("setup.uninstaller.confirm"), AppIdentity.Name,
+                Native.MB_YESNO | Native.MB_ICONQUESTION | Native.MB_DEFBUTTON2);
+            if (answer != Native.IDYES) return 0;
+            var target = RootUninstaller.RelayTarget(localAppData, Path.GetTempPath(), self);
+            Process.Start(new ProcessStartInfo(target, RootUninstaller.CommandLine(root))
+            {
+                UseShellExecute = true,
+                WorkingDirectory = Path.GetDirectoryName(target)
+            })?.Dispose();
+            return 0;
+        }
+        catch (Exception exception)
+        {
+            Native.MessageBoxW(IntPtr.Zero, SetupLaunch.FailureMessage(exception), AppIdentity.Name, Native.MB_OK | Native.MB_ICONERROR);
             return 1;
         }
     }

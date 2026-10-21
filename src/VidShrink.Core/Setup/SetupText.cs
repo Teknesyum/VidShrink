@@ -126,6 +126,12 @@ public static class SetupText
         ["setup.uninstall.outside-programs"] = (
             @"Kurulum klasörü LocalAppData\Programs altında değil, silinmedi: {0}",
             @"The install folder is not under LocalAppData\Programs, so it was not deleted: {0}"),
+        ["setup.uninstaller.shortcut"] = (
+            AppIdentity.Name + "'ı kaldır",
+            "Uninstall " + AppIdentity.Name),
+        ["setup.uninstaller.confirm"] = (
+            AppIdentity.Name + " bu bilgisayardan kaldırılsın mı?\n\nKurulum klasörü, kısayollar ve sağ tık menüsü silinir. Ayarlarınız kalır.",
+            "Remove " + AppIdentity.Name + " from this computer?\n\nThe install folder, the shortcuts and the context menu are deleted. Your settings are kept."),
         ["setup.shell.no-package"] = (
             "Bu yayın Windows 11 kabuk paketini taşımıyor; klasik menü yazıldı.",
             "This release does not carry the Windows 11 shell package; the classic menu was written."),
