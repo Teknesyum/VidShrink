@@ -14,7 +14,7 @@ public enum ElleDenetimDurumu
 }
 
 /// <summary>Elle denetimin sonucu; Hakkında'daki "son denetim" satırı bundan yazılır.</summary>
-public sealed record ElleDenetimSonucu(ElleDenetimDurumu Durum, string? Surum, DateTimeOffset Zaman);
+public sealed record ElleDenetimSonucu(ElleDenetimDurumu Durum, string? Surum, DateTimeOffset Zaman, string? Sebep = null);
 
 /// <summary>
 /// AYR-47: otomatik güncelleme açıkken de koşan "şimdi denetle". Yalnız yayın manifestini
@@ -59,6 +59,6 @@ public static class ElleDenetim
     private static ElleDenetimSonucu Dus(string? ayarYolu, DateTimeOffset simdi, string sebep)
     {
         UpdateHealth.RecordFailure(ayarYolu, simdi, "elle-denetim " + sebep);
-        return new ElleDenetimSonucu(ElleDenetimDurumu.Dustu, null, simdi);
+        return new ElleDenetimSonucu(ElleDenetimDurumu.Dustu, null, simdi, sebep);
     }
 }

@@ -233,6 +233,7 @@ public partial class MainWindow : Window
                 strip.SizeChanged += (_, _) => AlignTabsToTitle();
         });
         LoadTitleBarLogo();
+        SurumDugmesiniKur();
         AlignTabsToTitle();
         TrackChrome();
         TrackNoticeLayer();

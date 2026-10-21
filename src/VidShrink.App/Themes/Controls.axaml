@@ -588,6 +588,37 @@
         </Style>
       </ControlTheme>
 
+      <ControlTheme x:Key="TitleBarVersionButton" TargetType="Button">
+        <Setter Property="FocusAdorner" Value="{StaticResource DuzenOdakHalkasi}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextBody}"/>
+        <Setter Property="FontFamily" Value="{StaticResource FontSans}"/>
+        <Setter Property="FontSize" Value="{StaticResource VersionButtonFontSize}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="{StaticResource VersionButtonPadding}"/>
+        <Setter Property="MinHeight" Value="{StaticResource TargetMinSize}"/>
+        <Setter Property="MinWidth" Value="{StaticResource TargetMinSize}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Template">
+          <ControlTemplate TargetType="Button">
+            <ContentPresenter Name="PART_ContentPresenter"
+                              Background="{TemplateBinding Background}"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Padding="{TemplateBinding Padding}"
+                              Foreground="{TemplateBinding Foreground}"
+                              VerticalContentAlignment="Center"/>
+          </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover">
+          <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+        </Style>
+        <Style Selector="^:focus-visible">
+          <Setter Property="Foreground" Value="{StaticResource NeonBlue}"/>
+        </Style>
+      </ControlTheme>
+
       <ControlTheme x:Key="InfoButton" TargetType="Button">
         <Setter Property="FocusAdorner" Value="{StaticResource DuzenOdakHalkasi}"/>
         <Setter Property="Width" Value="{StaticResource TargetMinSize}"/>
