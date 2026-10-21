@@ -95,6 +95,7 @@ internal partial class RecorderView
         ChkClickSound.IsChecked = _settings.ClickSound;
         ChkShowKeys.IsChecked = _settings.ShowKeys;
         ChkMagnifier.IsChecked = _settings.ShowMagnifier;
+        ChkZoomTrack.IsChecked = _settings.ZoomTrack;
         ChkLivePreview.IsChecked = _settings.LivePreview;
         ChkHideIcons.IsChecked = _settings.HideDesktopIcons && DesktopIconsSupported;
         TxtWindowTitle.Text = _settings.WindowTitle ?? string.Empty;
@@ -375,6 +376,7 @@ internal partial class RecorderView
         _settings.ClickSound = ChkClickSound.IsChecked ?? false;
         _settings.ShowKeys = ChkShowKeys.IsChecked ?? false;
         _settings.ShowMagnifier = ChkMagnifier.IsChecked ?? false;
+        _settings.ZoomTrack = ChkZoomTrack.IsChecked ?? false;
         _settings.LivePreview = ChkLivePreview.IsChecked ?? false;
         if (DesktopIconsSupported) _settings.HideDesktopIcons = ChkHideIcons.IsChecked ?? false;
         _settings.WindowTitle = string.IsNullOrWhiteSpace(TxtWindowTitle.Text) ? null : TxtWindowTitle.Text;

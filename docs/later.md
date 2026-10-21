@@ -221,23 +221,24 @@ Karar (21 Ekim 2026, sahip): evet; 109 ölçümünden sonra başlar.
 - Sahibin kararı: Wayland için PipeWire portalını konuşan bir yardımcı ikili ya da yeni bağımlılık eklensin mi, yoksa yalnız açık bir uyarıyla yetinilsin mi.
 - Plan: Wayland oturumunda (`RecorderWindowsX11.cs:22` bunu zaten anlıyor) ekran, kullanıcının onay verdiği portal üzerinden istenir ve gelen PipeWire akışı bir yardımcıyla ffmpeg'e boru olarak verilir; ffmpeg'in kendi PipeWire girişi yok. Karar "yalnız uyarı" çıkarsa iş küçülür: ekran ve bölge kaydı için de pencere seçicideki gibi açık hata gösterilir. Deneme Wayland ile açılan gerçek bir Linux masaüstünde elle yapılır.
 
-## 114. Otomatik Ve Canlı Yakınlaştırma
+## 114. Otomatik Yakınlaştırma: Düzenleyici Ve Yumuşak Kaydırma
 
-13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P9 · Kaydedici · iş büyük · öncelik 1 · karar sahibin
+13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P9 · Kaydedici · iş orta · öncelik 1 · karar verildi: kayıttan sonra
 
 - Satırlar (EKB-P9): EKB-01 Otomatik yakınlaştırma; EKB-13 Canlı yakınlaştırma. [Tablo](piyasa/2026-10-13/kaydedici-sunum-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.App/Recorder/RecorderInput.cs, src/VidShrink.App/Recorder/RecorderMagnifier.cs, src/VidShrink.Core/, src/VidShrink.App/Editing/, src/VidShrink.App/Locales/
-- Sahibin kararı: Yakınlaştırma kayıttan sonra mı üretilsin (imleç ve tıklama verisi videodan ayrı kaydedilir), kayıt sırasında canlı mı; ikisinden biri seçilir.
-- Plan: Kayıt sonrası yol seçilirse fare kancası imleç konumunu ve tıklamaları zaman damgasıyla yan dosyaya yazar; kayıt bitince bu izden yakınlaşma bölgeleri çıkarılır ve `zoompan` ya da zamana bağlı `crop` ile `scale` zinciriyle yeni dosya üretilir, bölgeler düzenleyicide elle düzeltilir. Canlı yol seçilirse büyüteç merceği yerine kadrajın tamamı kısayolla yaklaşır. İz dosyası ve bölge planı saf fonksiyon olarak test edilir, çıktı karesi lavfi ile ölçülür.
+- Yapılan (21 Ekim 2026, `worktree-agent-later-114-115`): "Otomatik yakınlaştırma için imleci kaydet" kutusu (Büyüteç'in yanındaki oktan) açıkken imleç 30 Hz'de, tık ve tuşlar kancadan `<kayıt>.pointer.json`'a yazılır (`Core/PointerTrack.cs`, `Core/PointerSampler.cs`). Saat kaydın `Captured` süresine hizalı, duraklama sayılmaz. Sonuç panelindeki "Otomatik yakınlaştırma" düğmesi bölgeleri önerir (`Core/AutoZoom.cs`), kutularla seçilir, 1,5×–3× düzeyiyle `zoompan` `-zoom` dosyası üretir (`Ffmpeg/AutoZoomer.cs`). Ölçüm `docs/olcumler/imlec-ornekleme.md`.
+- Kalan: bölgeyi düzenleyicide zaman çizelgesinde sürükleyerek başlangıç, bitiş ve merkez düzeltme; yan yana bölgeler arasında yakınlaşmayı bırakmadan yumuşak kaydırma; geçmişten ve "at" akışından kayıt silinince yan dosyanın da silinmesi; `zoompan`'ın tamsayı yuvarlamasından gelebilecek titremenin ölçülmesi (gerekirse `crop`+`scale` zinciri).
+- Dokunacağı yer: src/VidShrink.App/Editing/, src/VidShrink.Core/AutoZoom.cs, src/VidShrink.App/Recorder/RecorderView.Gecmis*.cs, src/VidShrink.App/Locales/
+- Plan: Düzenleyici `-zoom` yerine bölge listesini `pointer.json` yanında taşır, önizleme aynı filtreyi uygular. Kaydırma iki bölge merkezi arasında `st/ld` rampasıyla ara değer üretir. Titreme lavfi kutusunun karedeki yerinin kare kare oynamasıyla ölçülür.
 
 ## 115. İmleç Cilası Ve Hareket Bulanıklığı
 
-13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P10 · Kaydedici · iş büyük · öncelik 1 · karar sahibin
+13 Ekim 2026 · "bulduklarını later a eklersin" · EKB-P10 · Kaydedici · iş büyük · öncelik 1 · karar verildi: imleç ayrı veri
 
 - Satırlar (EKB-P10): EKB-03 İmleç cilası; EKB-31 Hareket bulanıklığı. [Tablo](piyasa/2026-10-13/kaydedici-sunum-dogrulanmis.md)
-- Dokunacağı yer: src/VidShrink.Core/RecorderArguments.cs, src/VidShrink.App/Recorder/RecorderInput.cs, src/VidShrink.Core/, src/VidShrink.App/Editing/, src/VidShrink.App/Locales/
-- Sahibin kararı: İmleç kayda yakılmak yerine ayrı veri olarak tutulsun mu; EKB-P9'da kayıt sonrası yol seçilmeden bu paket başlamaz.
-- Plan: Kayıt imleçsiz alınır, imleç izi EKB-P9'un yan dosyasından okunur. İz yumuşatılır, imleç seçilen boyutta yeniden çizilip `overlay` ile bindirilir; hızlı geçişlere kare karıştırma (`tmix`) ile bulanıklık eklenir. Yumuşatma saf fonksiyon olarak, imlecin karedeki yeri lavfi ile ölçülür.
+- Hazır olan: 114'ün iz dosyası imleci 30 Hz'de kaydın saatine hizalı tutuyor (`PointerTrack.PositionAt`). İmleç henüz kayda yakılıyor.
+- Dokunacağı yer: src/VidShrink.Core/RecorderArguments.cs, src/VidShrink.App/Recorder/RecorderView.Yakinlastirma.cs, src/VidShrink.Core/, src/VidShrink.App/Editing/, src/VidShrink.App/Locales/
+- Plan: İz açıkken kayıt `-draw_mouse 0` ile alınır, imleç şekli (`GetCursorInfo`/`CopyIcon`) iz dosyasına eklenir. İz yumuşatılır, imleç seçilen boyutta yeniden çizilip `overlay` ile bindirilir; yakınlaştırma uygulanırken imleç aynı dönüşümle taşınır. Hızlı geçişlere kare karıştırma (`tmix`) ile bulanıklık eklenir. İmleç gömülmediği için iz dosyası kaybolursa imleçsiz kayıt kalır; bu yüzden imleç bindirmesi dışa aktarmada varsayılan açık olur. Yumuşatma saf fonksiyon olarak, imlecin karedeki yeri lavfi ile ölçülür.
 
 ## 118. Flathub Ve AppImage Paketleri
 

@@ -10,7 +10,7 @@ internal partial class RecorderView
     private IInputHooks? _inputHooks;
     private IClickSound? _clickSound;
     private KeyTracker _keys = new();
-    private (bool WantsClicks, bool ShowKeys, PointerStyle Style, bool ShortcutsOnly, KeyCaptionStyle Caption) _inputMode;
+    private (bool WantsClicks, bool ShowKeys, PointerStyle Style, bool ShortcutsOnly, KeyCaptionStyle Caption, bool Tracking) _inputMode;
 
     /// <summary>
     /// Tıklama halkası, tıklama sesi, tuş gösterimi ve imleç büyüteci düşük seviye Win32
@@ -24,7 +24,7 @@ internal partial class RecorderView
     private void HideUnavailableInputOptions()
     {
         if (InputEffectsAvailable ?? OperatingSystem.IsWindows()) return;
-        ChkShowClicks.IsVisible = ChkClickSound.IsVisible = ChkShowKeys.IsVisible = ChkMagnifier.IsVisible = false;
+        ChkShowClicks.IsVisible = ChkClickSound.IsVisible = ChkShowKeys.IsVisible = ChkMagnifier.IsVisible = BtnZoomTrack.IsVisible = false;
     }
 
     private static bool RealDesktop
@@ -71,6 +71,7 @@ internal partial class RecorderView
         ChkClickSound.IsVisible = HooksAvailable;
         ChkShowKeys.IsVisible = HooksAvailable;
         ChkMagnifier.IsVisible = HooksAvailable;
+        BtnZoomTrack.IsVisible = HooksAvailable;
         RefreshPointerChoices();
         if (!_pointerGateWired)
         {
@@ -111,8 +112,9 @@ internal partial class RecorderView
         if (lens && !Magnifier.Running) Magnifier.Start();
         else if (!lens && Magnifier.Running) Magnifier.Stop();
 
-        var wanted = recording && (WantsClicks || WantsPointer || ShowKeysOn);
-        var mode = (WantsClicks, ShowKeys: ShowKeysOn, CurrentPointerStyle, _settings.KeysShortcutsOnly, _settings.KeyCaption);
+        var tracking = _track is not null;
+        var wanted = recording && (WantsClicks || WantsPointer || ShowKeysOn || tracking);
+        var mode = (WantsClicks, ShowKeys: ShowKeysOn, CurrentPointerStyle, _settings.KeysShortcutsOnly, _settings.KeyCaption, tracking);
         if (wanted == InputActive && (!wanted || mode == _inputMode)) return;
 
         if (InputActive)
@@ -127,7 +129,7 @@ internal partial class RecorderView
         _keys = new KeyTracker(mode.KeysShortcutsOnly);
         InputOverlay.Style(mode.CurrentPointerStyle);
         InputOverlay.CaptionStyle(mode.KeyCaption);
-        InputHooks.Start(mode.WantsClicks, WantsPointer, mode.ShowKeys, OnInputClick, OnInputMove, OnInputKey);
+        InputHooks.Start(mode.WantsClicks || tracking, WantsPointer, mode.ShowKeys || tracking, OnInputClick, OnInputMove, OnInputKey);
         _inputMode = mode;
         InputActive = true;
     }
@@ -135,6 +137,7 @@ internal partial class RecorderView
     internal void OnInputClick(PixelPoint point, PointerButton button)
     {
         if (!InputActive) return;
+        _track?.Click(point.X, point.Y, (int)button);
         if (ClickSoundOn) ClickSound.Play();
         if (ShowClicksOn &&(_frameRegion is not { } region || region.Contains(point))) InputOverlay.Ring(point, button);
     }
@@ -147,7 +150,9 @@ internal partial class RecorderView
 
     internal void OnInputKey(uint virtualKey, bool down)
     {
-        if (!InputActive || !ShowKeysOn) return;
+        if (!InputActive) return;
+        if (down && _track is { } track && !KeyText.IsModifier(virtualKey)) track.Key();
+        if (!ShowKeysOn) return;
         if (_keys.Feed(virtualKey, down) is not { } text) return;
         InputOverlay.Keys(text, _frameRegion ?? CaptionFallback());
     }

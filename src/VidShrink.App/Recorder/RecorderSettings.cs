@@ -103,6 +103,8 @@ internal sealed partial class RecorderSettings
 
     internal bool ShowMagnifier { get; set; }
 
+    internal bool ZoomTrack { get; set; }
+
     internal bool CursorHighlight { get; set; }
 
     internal bool Spotlight { get; set; }
@@ -350,6 +352,7 @@ internal sealed partial class RecorderSettings
             if (Enum.TryParse<KeyCaptionHold>((string?)root["keyCaptionHold"], true, out var captionHold) && Enum.IsDefined(captionHold)) caption = caption with { Hold = captionHold };
             settings.KeyCaption = caption;
             settings.ShowMagnifier = (bool?)root["showMagnifier"] ?? false;
+            settings.ZoomTrack = (bool?)root["zoomTrack"] ?? false;
             settings.CursorHighlight = (bool?)root["cursorHighlight"] ?? false;
             settings.Spotlight = (bool?)root["spotlight"] ?? false;
             if (Enum.TryParse<PointerRingSize>((string?)root["pointerSize"], true, out var pointerSize) && Enum.IsDefined(pointerSize)) settings.PointerSize = pointerSize;
@@ -493,6 +496,7 @@ internal sealed partial class RecorderSettings
                 writer.WriteString("keyCaptionSize", KeyCaption.Size.ToString());
                 writer.WriteString("keyCaptionHold", KeyCaption.Hold.ToString());
                 writer.WriteBoolean("showMagnifier", ShowMagnifier);
+                writer.WriteBoolean("zoomTrack", ZoomTrack);
                 writer.WriteBoolean("cursorHighlight", CursorHighlight);
                 writer.WriteBoolean("spotlight", Spotlight);
                 writer.WriteString("pointerSize", PointerSize.ToString());

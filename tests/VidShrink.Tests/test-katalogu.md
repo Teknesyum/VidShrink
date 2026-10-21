@@ -108,6 +108,7 @@
   (yansımayla her `RecorderSettings` özelliği diske gidip aynı döner; kapalı kümeli ayar `Kisitli` tablosunda),
   `KaydediciArkaPlanTests` (kamera arka planı `backgroundkey`/`chromakey`, lavfi bileşik karesinin pikseli),
   `BoslukKirpmaTests` (`freezedetect` + `trim/concat`, 6 sn kayıt 3,8 sn olur, donuksuz kayda dokunulmaz),
+  `OtomatikYakinlastirmaTests` (later 114: iz dosyası gidip gelir, bozuk dosya boş döner; kaydedici saati `Captured`a hizalar, duraklamayı saymaz; yakın tıklar birleşir, `zoompan` argümanı bölge, ölçek ve `-threads` taşır; lavfi kutusu bölgede 2× büyür, dışında yerinde kalır; sonuç panelinde seçilen bölgeler uygulanır; `[KayitFact]` gdigrab kaydında kutu açıkken `pointer.json` yazılır, kapalıyken yazılmaz; kanıt `.calisma/worktree-agent-later-114-115/`; mutasyon: birleşmede yakınlık şartı kalkınca kırmızı),
   `KaydediciOnizlemeTests` (ikinci çıkış `image2 -update 1` 320 px jpg, boyut sınırıyla red, bozuk kare eski resmi korur),
   `KaydediciTamponTests` (2 sn `segment_wrap` parçaları, 4 sn tampon 9 sn döner, kaydedilen ≤6,5 sn; F11 sahte `IReplayBuffer`),
   `KayitBolmeTests` (`[KayitFact]`, gdigrab 5 sn sınır + 2 sn bölme ≥2 parça toplamı 5 sn, bölmesiz tek parça, 1 ms kapanış `_partial`;
