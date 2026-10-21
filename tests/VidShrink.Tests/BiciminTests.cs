@@ -1346,6 +1346,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-21, later 99+103 birlesmesi: medya denetimi anahtari; toplam 4293 + 7 = 4300, en 413 + 1 = 414, gezilen 93525 + 43 = 93568.</para>
     /// <para>2026-10-21, later 138 birlesmesi: adli liste anahtarlari; toplam 4300 + 22 = 4322, en 414 + 1 = 415, gezilen 93568 + 645 = 94213.</para>
     /// <para>2026-10-21, later 114+115 birlesmesi: <c>recorder.output.zoom*</c> anahtarlari; toplam 4322 + 12 = 4334, en 415 + 1 = 416, tr 137 + 1 = 138, gezilen 94213 + 430 = 94643.</para>
+    /// <para>2026-10-21, later 139 birlesmesi: ses ekleri ve iz denetimi anahtarlari; toplam 4334 + 152 = 4486, en 416 + 5 = 421, tr 138 + 4 = 142, gezilen 94643 + 774 = 95417.</para>
     /// <para>2026-10-21, later 140 vekil kopya: dokuz <c>editor.proxy.*</c> anahtari 42 dile eklendi; <c>editor.proxy.failed</c> en, fr, hu, nl ve ro dillerinde kola giriyor: olculen toplam 4079, en 394, tr 132.</para>
     /// <para>2026-10-20, yazi boyutu (later 147): iki yeni anahtar (<c>settings-tab.text-size.label</c>, <c>.hint</c>); yalniz <c>settings-tab.text-size.label</c> pt dilinde kola giriyor ("Tamanho do texto"), KOL dokumunden ve SAYIM satirindan olculdu, en ve tr girmiyor: toplam 4074 + 1 = 4075, en 393, tr 132.</para>
     /// <para>2026-10-21, yeni pencerede ac (later 137): yeni <c>player.menu.new-window</c> 4 dilde kola giriyor (de, en, it, nl), KOL dokumunden ve SAYIM satirindan olculdu, tr girmiyor: toplam 4074 + 4 = 4078, en 393 + 1 = 394, tr 132.</para>
@@ -1354,6 +1355,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-20, Windows ortam denetimi anahtari (later 99): bir yeni anahtar (<c>player.view.media-controls</c>) 42 dilde; de, en, es, fr, hu, nl, pt kola giriyor (KOL dokumu), tr girmiyor: toplam 4074 + 7 = 4081, en 393 + 1 = 394, tr 132.</para>
     /// <para>2026-10-21, adli oynatma listeleri (later 138, OYB-09): on bes yeni <c>player.playlists.*</c> anahtari 42 dilde, dusen yok; es, fr, pt, ro ve hu basta olmak uzere 22 kol (en ve sw yalniz <c>.import-failed</c>), KOL dokumunden ve SAYIM satirindan olculdu: toplam 4074 + 22 = 4096, en 393 + 1 = 394, tr 132.</para>
     /// <para>2026-10-21, otomatik yakinlastirma (later 114 ilk yarisi): on yeni anahtar (<c>recorder.option.zoom-track</c>, <c>.zoom-track-hint</c>, <c>recorder.output.zoom*</c>) 42 dilde; 12 kol (en, nb, pl, sv, tr <c>zoom-track</c>; es, fr, pt, ro <c>zoom-level</c>; hu, ro <c>zoom-failed</c>; it <c>zoom-running</c>), KOL dokumunden ve SAYIM satirindan olculdu: toplam 4074 + 12 = 4086, en 393 + 1 = 394, tr 132 + 1 = 133.</para>
+    /// <para>2026-10-21, Later 139: on sekiz editor.sound / editor.track anahtari 42 dile girdi; 152 yeni KOL satirinin 127'si "A3" iz adini tasiyan uc anahtardan (editor.sound, .detached, .narrate.placed), 25'i dile ozgu yazimdan; toplam 4074'ten 4226'ya, en 393'ten 398'e, tr 132'den 136'ya cikti.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1379,9 +1381,9 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(4334, toplam);
-        Assert.Equal(416, dilBasina["en"]);
-        Assert.Equal(138, dilBasina["tr"]);
+        Assert.Equal(4486, toplam);
+        Assert.Equal(421, dilBasina["en"]);
+        Assert.Equal(142, dilBasina["tr"]);
     }
 
     /// <summary>
@@ -1703,6 +1705,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-21, V2 izi (later 110): on bes yeni anahtar 42 dilde, dusen yok: 89698 + 15 x 43 = 90343. <c>kayip</c> 0.</para>
     /// <para>2026-10-20, later 99: <c>player.view.media-controls</c> 42 dilde, dusen yok; olculen gezilen 89698 + 43 = 89741.</para>
     /// <para>2026-10-21, otomatik yakinlastirma (later 114 ilk yarisi): on yeni kaydedici anahtari 42 dilde, dusen yok; olculen gezilen 89698 + 10 x 43 = 90128. <c>kayip</c> 0.</para>
+    /// <para>2026-10-21, Later 139: on sekiz ses izi ve iz denetimi anahtari 42 dile girdi; gezilen 90472.</para>
     /// <para>2026-10-18, ad yer tutucusu: uygulama adi cevirilerde {app} oldu, ekli adlar tur adiyla kuruldu; cs shell.menu.open "ve VidShrinku" yerine "v aplikaci {app}" oldugu icin kol sayimindan dustu: olculen toplam 4069, en 393, tr 132.</para>
     /// <para>2026-10-16, later 44 (etiket ve Onar): on sekiz yeni anahtar; olculen toplam 3781 + 2 = 3783 (lt main.convert.tags.cover.none, ro main.convert.tags.year), en 364, tr 123, gezilen 80453 + 774 = 81227.</para>
     /// <para>2026-10-15, uzun iste oncelik ve bitis sesi (later 76): dort yeni anahtar (<c>settings-tab.encode-priority.above-normal</c>, <c>settings-tab.finish-sound-file.choose</c>, <c>.hint</c>, <c>.reset</c>) 42 dilde, dusen yok; olculen gezilen 78604 + 172 = 78776.</para>
@@ -1745,7 +1748,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(94643, gezilen);
+        Assert.Equal(95417, gezilen);
         Assert.Empty(kayip);
     }
 

@@ -68,6 +68,7 @@ internal partial class EditorView : UserControl
         InitSources();
         InitMusic();
         InitLayers();
+        InitSound();
         InitStills();
         InitClipboard();
         InitProxy();
@@ -392,6 +393,7 @@ internal partial class EditorView : UserControl
             await driver.OpenAsync().ConfigureAwait(true);
             if (!ReferenceEquals(_driver, driver)) return;
             ApplyAudioTrack(engine);
+            ApplyTrackSound(engine);
             RefreshOverlay(reopened: true);
             Preview.RefreshDuration();
             await driver.SeekAsync(Math.Clamp(at, 0, model.Duration)).ConfigureAwait(true);

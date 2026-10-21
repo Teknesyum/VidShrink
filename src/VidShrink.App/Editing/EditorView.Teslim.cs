@@ -226,9 +226,8 @@ internal partial class EditorView
     {
         if (_model is not { Clips.Count: > 0 } model || _source is null || Exporting) return false;
         var sources = SourcePaths;
-        var snapshot = new EditTimeline(model.Clips.ToArray(), texts: model.Texts.ToArray(), frame: model.Frame, layers: model.Layers.ToArray());
-        snapshot.SetMusic(model.Music);
-        var key = SaveKey(snapshot);
+        var snapshot = model.ForExport();
+        var key = SaveKey(model);
         _pendingPlan = null;
         _exported = null;
         _savedKey = null;
@@ -463,7 +462,8 @@ internal partial class EditorView
         => string.Join(";", model.Clips.Select(c => $"{c.Source}:{c.SourceStart}-{c.SourceEnd}-{c.Speed}-{c.Reversed}-{c.Effects}-{c.Transition}-{c.Smooth}"))
            + "|" + string.Join(";", model.Texts.Select(t => $"{t.Start}-{t.End}-{t.Size}-{t.Color}-{t.Bold}-{t.Italic}-{t.FontName}-{t.FadeIn}-{t.FadeOut}-{t.MotionIn}:{t.MotionInLength}-{t.MotionOut}:{t.MotionOutLength}-{t.Outline}:{t.Shadow}:{t.Box}-"
                + string.Join(",", t.Keyframes.Select(k => $"{k.Offset}:{k.X}:{k.Y}")) + "-" + t.Text.Length + ":" + t.Text))
-           + "|" + model.Music + "|" + model.Frame + "|" + string.Join(";", model.Layers);
+           + "|" + model.Music + "|" + model.Frame + "|" + string.Join(";", model.Layers)
+           + "|" + string.Join(";", model.AudioClips) + "|" + string.Join(";", model.TrackStates.OrderBy(t => t.Key).Select(t => t.Key + ":" + t.Value));
 
     private async Task<string?> PickOutputAsync()
     {

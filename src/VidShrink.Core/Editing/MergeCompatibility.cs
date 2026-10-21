@@ -66,7 +66,7 @@ public static class MergeCompatibility
         EditExportSettings settings, int audioTrack)
     {
         if (mode == ExportMode.Full) return MergeDecision.FullRequested;
-        if (timeline.HasText || timeline.HasEffects || timeline.HasTransitions || timeline.HasMusic || timeline.HasLayers || timeline.Clips.Any(EditExport.NeedsReencode))
+        if (timeline.HasText || timeline.HasEffects || timeline.HasTransitions || timeline.HasMusic || timeline.HasLayers || timeline.HasAudioClips || timeline.Clips.Any(EditExport.NeedsReencode))
             return MergeDecision.Edits;
         if (!settings.IsDefault) return MergeDecision.Settings;
         if (audioTrack != EditAudioTrack.All && audioTrack != EditAudioTrack.First) return MergeDecision.AudioTrack;

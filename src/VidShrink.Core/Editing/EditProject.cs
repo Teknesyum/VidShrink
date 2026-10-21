@@ -89,6 +89,16 @@ public sealed class EditProject
 
     public IReadOnlyList<VideoLayer> Layers { get; private init; } = Array.Empty<VideoLayer>();
 
+    public IReadOnlyList<EditAudioClip> AudioClips { get; private init; } = Array.Empty<EditAudioClip>();
+
+    public IReadOnlyDictionary<EditTrack, EditTrackState> Tracks { get; private init; } = new Dictionary<EditTrack, EditTrackState>();
+
+    public void ApplyTracks(EditTimeline timeline)
+    {
+        ArgumentNullException.ThrowIfNull(timeline);
+        foreach (var track in EditTracks.All) timeline.SetTrack(track, Tracks.TryGetValue(track, out var state) ? state : default);
+    }
+
     /// <summary>
     /// <paramref name="extraSources"/> cizelgenin ek kaynaklariyla ayni sirada ve ayni sayida olmalidir.
     /// </summary>
@@ -103,7 +113,12 @@ public sealed class EditProject
         var duration = timeline.SourceDuration ?? timeline.Clips.Where(c => c.Source == 0).Select(c => c.SourceEnd).DefaultIfEmpty(1).Max();
         var extras = stamps.Select((stamp, i) => new ExtraSource(stamp, timeline.ExtraSources[i])).ToArray();
         return new EditProject(source, duration, timeline.Clips.ToArray(), timeline.Texts.ToArray(), exportMode, extras, Sorted(markers ?? Array.Empty<EditMarker>()),
-            audioTrack, timeline.Music, timeline.Frame) { Layers = timeline.Layers.ToArray() };
+            audioTrack, timeline.Music, timeline.Frame)
+        {
+            Layers = timeline.Layers.ToArray(),
+            AudioClips = timeline.AudioClips.ToArray(),
+            Tracks = timeline.TrackStates.ToDictionary(pair => pair.Key, pair => pair.Value)
+        };
     }
 
     /// <summary>
@@ -133,7 +148,8 @@ public sealed class EditProject
 
         if (Clips.Count == 0) return null;
         var timeline = new EditTimeline(Array.Empty<EditClip>(), SourceDuration, extraSources: ExtraSources.Select(extra => extra.Duration));
-        timeline.Restore(Clips, Texts, Music, Frame, Layers);
+        timeline.Restore(Clips, Texts, Music, Frame, Layers, AudioClips);
+        ApplyTracks(timeline);
         var mode = Enum.TryParse<Editing.ExportMode>(ExportMode, ignoreCase: false, out var parsed) && Enum.IsDefined(parsed) ? parsed : Editing.ExportMode.Smart;
         return new EditProjectJob(ExtraSources.Select(extra => extra.Stamp.Path).Prepend(Source.Path).ToArray(), timeline, mode, AudioTrack);
     }
@@ -205,6 +221,41 @@ public sealed class EditProject
                     writer.WriteNumber("duckDb", music.DuckDb);
                     writer.WriteNumber("duckRelease", music.DuckReleaseMs);
                 }
+                writer.WriteEndObject();
+            }
+
+            if (AudioClips.Count > 0)
+            {
+                writer.WriteStartArray("audioClips");
+                foreach (var clip in AudioClips)
+                {
+                    writer.WriteStartObject();
+                    writer.WriteString("path", clip.Path);
+                    writer.WriteNumber("duration", clip.Duration);
+                    writer.WriteNumber("in", clip.In);
+                    writer.WriteNumber("out", clip.Out);
+                    writer.WriteNumber("start", clip.Start);
+                    writer.WriteNumber("level", clip.LevelDb);
+                    if (clip.Kind != EditAudioKind.Detached) writer.WriteString("kind", clip.Kind.ToString());
+                    writer.WriteEndObject();
+                }
+
+                writer.WriteEndArray();
+            }
+
+            if (Tracks.Any(pair => !pair.Value.IsDefault))
+            {
+                writer.WriteStartObject("tracks");
+                foreach (var (track, state) in Tracks.Where(pair => !pair.Value.IsDefault).OrderBy(pair => pair.Key))
+                {
+                    writer.WriteStartObject(EditTracks.Name(track));
+                    if (state.Muted) writer.WriteBoolean("muted", true);
+                    if (state.Hidden) writer.WriteBoolean("hidden", true);
+                    if (state.Locked) writer.WriteBoolean("locked", true);
+                    if (state.Solo) writer.WriteBoolean("solo", true);
+                    writer.WriteEndObject();
+                }
+
                 writer.WriteEndObject();
             }
 
@@ -290,10 +341,14 @@ public sealed class EditProject
             var videoLayers = root.TryGetProperty("layers", out var tops) && tops.ValueKind == JsonValueKind.Array
                 ? tops.EnumerateArray().Select(ReadLayer).ToArray()
                 : Array.Empty<VideoLayer>();
+            var audio = root.TryGetProperty("audioClips", out var pieces) ? pieces.EnumerateArray().Select(ReadAudioClip).ToArray() : Array.Empty<EditAudioClip>();
+            var tracks = root.TryGetProperty("tracks", out var lanes) && lanes.ValueKind == JsonValueKind.Object ? ReadTracks(lanes) : new Dictionary<EditTrack, EditTrackState>();
             var project = new EditProject(stamp, duration, clips, texts, mode, extras, markers, track, music, frame)
             {
                 MissingLuts = missing.Distinct(StringComparer.Ordinal).ToArray(),
-                Layers = videoLayers
+                Layers = videoLayers,
+                AudioClips = audio,
+                Tracks = tracks
             };
             return project.FitsIn(duration) ? project : null;
         }
@@ -301,6 +356,27 @@ public sealed class EditProject
         {
             return null;
         }
+    }
+
+    internal static EditAudioClip ReadAudioClip(JsonElement item)
+        => new(item.GetProperty("path").GetString() ?? "", item.GetProperty("duration").GetInt64(), item.GetProperty("in").GetInt64(),
+            item.GetProperty("out").GetInt64(), item.GetProperty("start").GetInt64(), item.TryGetProperty("level", out var db) ? db.GetDouble() : 0,
+            item.TryGetProperty("kind", out var kind) && Enum.TryParse<EditAudioKind>(kind.GetString(), ignoreCase: false, out var parsed) && Enum.IsDefined(parsed)
+                ? parsed
+                : EditAudioKind.Detached);
+
+    internal static Dictionary<EditTrack, EditTrackState> ReadTracks(JsonElement lanes)
+    {
+        var tracks = new Dictionary<EditTrack, EditTrackState>();
+        foreach (var lane in lanes.EnumerateObject())
+        {
+            if (EditTracks.Parse(lane.Name) is not { } track || lane.Value.ValueKind != JsonValueKind.Object) continue;
+            bool Flag(string name) => lane.Value.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.True;
+            var state = EditTracks.Normalized(track, new EditTrackState(Flag("muted"), Flag("hidden"), Flag("locked"), Flag("solo")));
+            if (!state.IsDefault) tracks[track] = state;
+        }
+
+        return tracks;
     }
 
     internal static EditMarker ReadMarker(JsonElement item)
