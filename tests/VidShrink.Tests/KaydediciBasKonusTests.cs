@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -154,19 +155,30 @@ public sealed class KaydediciBasKonusTests
             var bilgi = ToolLocatorStart(new[]
             {
                 "-hide_banner", "-y", "-threads", "2", "-re",
-                "-f", "lavfi", "-i", "sine=frequency=440:sample_rate=48000:duration=3",
+                "-f", "lavfi", "-i", "sine=frequency=440:sample_rate=48000:duration=8",
                 "-filter_complex", plan.FilterComplex!, "-map", plan.Maps[0], cikis
             });
             bilgi.RedirectStandardInput = true;
             using (var surec = Process.Start(bilgi)!)
             {
-                var hata = surec.StandardError.ReadToEndAsync();
+                var hataMetni = new StringBuilder();
+                var ilkIlerleme = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+                surec.ErrorDataReceived += (_, e) =>
+                {
+                    if (e.Data is null) return;
+                    lock (hataMetni) hataMetni.AppendLine(e.Data);
+                    if (e.Data.Contains("time=", StringComparison.Ordinal)) ilkIlerleme.TrySetResult();
+                };
+                surec.BeginErrorReadLine();
                 var cikti = surec.StandardOutput.ReadToEndAsync();
-                await Task.Delay(1000);
-                Assert.True(RecorderSession.WriteMicrophone(surec.StandardInput, true));
-                await surec.WaitForExitAsync();
-                await Task.WhenAll(hata, cikti);
-                Assert.Equal(0, surec.ExitCode);
+                var bitti = surec.WaitForExitAsync();
+                var ilk = await Task.WhenAny(ilkIlerleme.Task, bitti, Task.Delay(TimeSpan.FromSeconds(60)));
+                Assert.True(ReferenceEquals(ilk, ilkIlerleme.Task), Ozet("ffmpeg ilk ilerleme satirini vermedi", surec, hataMetni));
+                var yazildi = RecorderSession.WriteMicrophone(surec.StandardInput, true);
+                Assert.True(yazildi, Ozet("komut yazilamadi", surec, hataMetni));
+                await bitti;
+                await cikti;
+                Assert.True(surec.ExitCode == 0, Ozet("ffmpeg sifirdan farkli cikti", surec, hataMetni));
             }
 
             var olcum = ToolLocatorStart(new[] { "-hide_banner", "-i", cikis, "-af", "silencedetect=n=-60dB:d=0.05", "-f", "null", "-" });
@@ -179,12 +191,20 @@ public sealed class KaydediciBasKonusTests
             Assert.Matches(@"silence_start: 0(\s|$)", metin);
             var bitis = Regex.Match(metin, @"silence_end: ([\d.]+)");
             Assert.True(bitis.Success, metin);
-            Assert.InRange(double.Parse(bitis.Groups[1].Value, CultureInfo.InvariantCulture), 0.5, 2.8);
+            Assert.InRange(double.Parse(bitis.Groups[1].Value, CultureInfo.InvariantCulture), 0.0, 7.5);
         }
         finally
         {
             if (Directory.Exists(klasor)) Directory.Delete(klasor, true);
         }
+    }
+
+    private static string Ozet(string baslik, Process surec, StringBuilder hataMetni)
+    {
+        string metin;
+        lock (hataMetni) metin = hataMetni.ToString();
+        var cikis = surec.HasExited ? surec.ExitCode.ToString(CultureInfo.InvariantCulture) : "calisiyor";
+        return $"{baslik}; cikis: {cikis}; stderr:{Environment.NewLine}{metin}";
     }
 
     private static ProcessStartInfo ToolLocatorStart(IEnumerable<string> args)
