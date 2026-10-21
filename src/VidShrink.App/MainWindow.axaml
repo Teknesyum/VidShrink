@@ -2089,7 +2089,7 @@
                         <SarilanMetin Text="{loc:Text settings-tab.default-target.label}" Theme="{StaticResource Label}"/>
                         <Button Grid.Column="1" Theme="{StaticResource InfoButtonBesideLabel}" auto:AutomationProperties.Name="{loc:Text settings-tab.default-target.label}">
                           <ToolTip.Tip>
-                            <SarilanMetin Theme="{StaticResource TipText}" Text="{loc:Text settings-tab.default-target.hint}"/>
+                            <SarilanMetin Theme="{StaticResource TipText}" loc:Bullets.Text="{loc:Text settings-tab.default-target.hint}"/>
                           </ToolTip.Tip>
                         </Button>
                       </Grid>
