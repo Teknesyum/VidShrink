@@ -1344,12 +1344,14 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-21, later 126 birlesmesi: masaustu simgesi anahtarlari; toplam 4259 + 2 = 4261, gezilen 92751 + 129 = 92880.</para>
     /// <para>2026-10-21, later 110 birlesmesi: V2 izi anahtarlari; toplam 4261 + 32 = 4293, en 410 + 3 = 413, gezilen 92880 + 645 = 93525.</para>
     /// <para>2026-10-21, later 99+103 birlesmesi: medya denetimi anahtari; toplam 4293 + 7 = 4300, en 413 + 1 = 414, gezilen 93525 + 43 = 93568.</para>
+    /// <para>2026-10-21, later 138 birlesmesi: adli liste anahtarlari; toplam 4300 + 22 = 4322, en 414 + 1 = 415, gezilen 93568 + 645 = 94213.</para>
     /// <para>2026-10-21, later 140 vekil kopya: dokuz <c>editor.proxy.*</c> anahtari 42 dile eklendi; <c>editor.proxy.failed</c> en, fr, hu, nl ve ro dillerinde kola giriyor: olculen toplam 4079, en 394, tr 132.</para>
     /// <para>2026-10-20, yazi boyutu (later 147): iki yeni anahtar (<c>settings-tab.text-size.label</c>, <c>.hint</c>); yalniz <c>settings-tab.text-size.label</c> pt dilinde kola giriyor ("Tamanho do texto"), KOL dokumunden ve SAYIM satirindan olculdu, en ve tr girmiyor: toplam 4074 + 1 = 4075, en 393, tr 132.</para>
     /// <para>2026-10-21, yeni pencerede ac (later 137): yeni <c>player.menu.new-window</c> 4 dilde kola giriyor (de, en, it, nl), KOL dokumunden ve SAYIM satirindan olculdu, tr girmiyor: toplam 4074 + 4 = 4078, en 393 + 1 = 394, tr 132.</para>
     /// <para>2026-10-21, kayitta masaustu simgelerini gizleme (later 126): uc yeni <c>recorder.option.hide-desktop-icons*</c> anahtarindan yalniz etiket pt ve ro dillerinde kola giriyor, KOL dokumunden ve SAYIM satirindan olculdu, en ve tr girmiyor: toplam 4074 + 2 = 4076, en 393, tr 132.</para>
     /// <para>2026-10-21, V2 izi (later 110): on bes yeni <c>editor.layer*</c> ve <c>editor.export.layers-full</c> anahtari 42 dilde; 32 kol (en 3: <c>.add</c>, <c>.remove</c>, <c>.to-playhead</c>; tr girmiyor), KOL dokumunden ve SAYIM satirindan olculdu: toplam 4074 + 32 = 4106, en 393 + 3 = 396, tr 132.</para>
     /// <para>2026-10-20, Windows ortam denetimi anahtari (later 99): bir yeni anahtar (<c>player.view.media-controls</c>) 42 dilde; de, en, es, fr, hu, nl, pt kola giriyor (KOL dokumu), tr girmiyor: toplam 4074 + 7 = 4081, en 393 + 1 = 394, tr 132.</para>
+    /// <para>2026-10-21, adli oynatma listeleri (later 138, OYB-09): on bes yeni <c>player.playlists.*</c> anahtari 42 dilde, dusen yok; es, fr, pt, ro ve hu basta olmak uzere 22 kol (en ve sw yalniz <c>.import-failed</c>), KOL dokumunden ve SAYIM satirindan olculdu: toplam 4074 + 22 = 4096, en 393 + 1 = 394, tr 132.</para>
     /// </summary>
     [Fact]
     public void KolDegistirenAnahtarlarSayilir()
@@ -1375,8 +1377,8 @@ public sealed class BaslikKapsamiTests
         foreach (var (dil, sayi) in dilBasina) _cikti.WriteLine($"SAYIM\t{dil}\t{sayi}");
         _cikti.WriteLine($"SAYIM\ttoplam\t{toplam}");
 
-        Assert.Equal(4300, toplam);
-        Assert.Equal(414, dilBasina["en"]);
+        Assert.Equal(4322, toplam);
+        Assert.Equal(415, dilBasina["en"]);
         Assert.Equal(137, dilBasina["tr"]);
     }
 
@@ -1712,6 +1714,7 @@ public sealed class BaslikKapsamiTests
     /// <para>2026-10-18, bulaniklik ve bolge gizleme (later 88, DZB-28): bes yeni anahtar yalniz en ve tr'de, dusen yok: 86645 + 5 x 2 = 86655. <c>kayip</c> 0.</para>
     /// <para>2026-10-20, murekkep kisayolu (later 42): yeni <c>recorder.hotkeys.ink</c> 42 dilde, dusen yok: 89698 + 43 = 89741. <c>kayip</c> 0.</para>
     /// <para>2026-10-21, yeni pencerede ac (later 137): tek yeni anahtar (<c>player.menu.new-window</c>) 42 dilde ve zh_Hans takma adinda, dusen yok: 89698 + 43 = 89741. <c>kayip</c> 0.</para>
+    /// <para>2026-10-21, adli oynatma listeleri (later 138, OYB-09): on bes yeni <c>player.playlists.*</c> anahtari 42 dilde, dusen yok: 89698 + 15 x 43 = 90343. <c>kayip</c> 0.</para>
     /// </summary>
     [Fact]
     public void AdVeBirimYazimiCumleOrtasindaDaKorunur()
@@ -1739,7 +1742,7 @@ public sealed class BaslikKapsamiTests
         _cikti.WriteLine($"SAYIM	gezilen	{gezilen}");
         _cikti.WriteLine($"SAYIM	kayip	{kayip.Count}");
 
-        Assert.Equal(93568, gezilen);
+        Assert.Equal(94213, gezilen);
         Assert.Empty(kayip);
     }
 

@@ -484,7 +484,7 @@ public sealed class KeymapTests
                 var akis = view.BuildMenu();
                 var tumu = akis.Items.OfType<MenuItem>().ToList();
                 var menu = OynaticiGirdiTestsMenuSatirlari.EylemSatirlari(akis).ToList();
-                var ekler = tumu.Where(item => item.Tag is null).Select(item => item.Header as string).ToList();
+                var ekler = tumu.Where(item => item.Tag is not PlayerAction).Select(item => item.Header as string).ToList();
                 body.AppendLine($"[{dil}] menu {menu.Count} satir, ek satirlar: {string.Join(" | ", ekler)}");
                 Assert.Equal(OynaticiGirdiTestsMenuSatirlari.EkBasliklar(), ekler);
                 Assert.Equal(Keymap.MenuActions.Count, menu.Count);

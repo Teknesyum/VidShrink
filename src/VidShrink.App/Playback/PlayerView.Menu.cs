@@ -39,6 +39,7 @@ internal partial class PlayerView
         flyout.Items.Add(OpenFolderRow());
         flyout.Items.Add(RecentMenu());
         flyout.Items.Add(FavoritesMenu());
+        flyout.Items.Add(PlaylistsRow());
         flyout.Items.Add(SettingsMenu());
         return flyout;
     }

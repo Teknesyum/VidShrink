@@ -324,13 +324,15 @@ public sealed class OynaticiListeKaydetTests
                 try
                 {
                     var ogeler = dolu.BuildItemMenu(Path.Combine(klasor, "d2.mp4")).Items;
-                    var satir = ogeler.OfType<MenuItem>().Last();
+                    var satir = ogeler.OfType<MenuItem>().Single(oge => (string?)oge.Tag == "save");
                     Assert.Equal("save", satir.Tag);
                     Assert.Equal(Strings.Get("player.list.save"), satir.Header);
                     Assert.NotEqual("player.list.save", satir.Header);
                     Assert.True(satir.IsEnabled, "dolu listede kaydet satiri pasif");
-                    Assert.Equal("sort", Assert.IsType<MenuItem>(ogeler[^2]).Tag);
-                    Assert.IsType<Separator>(ogeler[^3]);
+                    Assert.Equal("playlists", Assert.IsType<MenuItem>(ogeler[^1]).Tag);
+                    Assert.Same(satir, ogeler[^2]);
+                    Assert.Equal("sort", Assert.IsType<MenuItem>(ogeler[^3]).Tag);
+                    Assert.IsType<Separator>(ogeler[^4]);
                 }
                 finally
                 {

@@ -41,6 +41,7 @@ internal partial class PlayerView
         flyout.Items.Add(new Separator());
         flyout.Items.Add(SortMenu(list.Count > 1));
         flyout.Items.Add(SavePlaylistRow());
+        flyout.Items.Add(PlaylistsRow());
         return flyout;
     }
 
