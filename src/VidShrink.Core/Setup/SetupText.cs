@@ -168,6 +168,21 @@ public static class SetupText
         ["setup.asset.missing-launcher"] = (
             "Yayın {0} bu varlığı taşımıyor: {1}. Başlatıcısız kurulum yapılmaz; başlatıcıyı da içeren bir yayın çıkana kadar bekleyin.",
             "Release {0} does not carry this asset: {1}. There is no install without the launcher; wait for a release that also ships it."),
+        ["setup.offline.using"] = (
+            "Çevrimdışı arşiv: araçlar {0} klasöründen kuruluyor.",
+            "Offline archive: installing the tools from {0}."),
+        ["setup.offline.missing"] = (
+            "Çevrimdışı arşivde dosya yok, indirmeye geçiliyor: {0}",
+            "The offline archive lacks a file; downloading it instead: {0}"),
+        ["setup.offline.mismatch"] = (
+            "Çevrimdışı arşivdeki {0} sağlaması tutmuyor (beklenen {1}, bulunan {2}); indirmeye geçiliyor.",
+            "The checksum of {0} in the offline archive does not match (expected {1}, found {2}); downloading it instead."),
+        ["setup.offline.rid-mismatch"] = (
+            "Bu çevrimdışı arşiv {0} için; bu bilgisayar {1}. {2} arşivini indirin.",
+            "This offline archive is for {0}; this computer is {1}. Download {2} instead."),
+        ["setup.offline.marker-broken"] = (
+            "Çevrimdışı arşivin işaret dosyası okunamadı: {0}. Arşivi yeniden indirin.",
+            "The marker file of the offline archive could not be read: {0}. Download the archive again."),
         ["setup.libmpv.no-tar"] = (
             "libmpv arşivini açmak için {0} gerekli; bu Windows'ta yok.",
             "Extracting the libmpv archive needs {0}; it is missing on this Windows."),

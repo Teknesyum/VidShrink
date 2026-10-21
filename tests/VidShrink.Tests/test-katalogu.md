@@ -9,6 +9,12 @@
 - `OynaticiParcaTests.cs` — ffmpeg'in ürettiği 2 ses + 1 gömülü altyazılı mkv: `aid`/`sid`, gecikme, boyut,
   konum geri okunur; cp1254 .srt `sub-text`'te bozulmaz, cp1252 negatif kontrolü bozar. Kısayol, menü ve
   altyazı bırakma PlayerView üstünden. Kanıt `.calisma/dalga2/`.
+- `CevrimdisiKurulumTests.cs` — çevrimdışı arşiv: `vidshrink-offline.txt` işaretinin etiket ve hedef okuması (açık
+  `--tag` ezilmez, bozuk işaret hata verir); kaynak adresler yokken araçların arşivden kurulması ve arşivin yerinde
+  kalması; sha256'sı tutmayan libmpv ile eksik ffprobe'un indirmeye düşmesi; tutmayan ve kaynağı olmayan aracın açık
+  hatası; başka mimarinin arşivinin reddi; `release.yml` `offline` matrisinin kurucu pinleriyle, lisans yollarıyla ve
+  README'lerle eşitliği. Kayıt defterine ve kullanıcı klasörüne yazmaz; çıktı `.calisma/test-ciktilari/cevrimdisi-kurulum/`.
+  Mutasyon: `TryOfflineAsync`'te sha karşılaştırması kaldırılınca iki test kırmızı.
 - `OynaticiKurulumTests.cs` — libmpv konum sırası, kurucu sabitleri CI ile aynı, açılamayan motor atılır.
   Vulkan yükleyici sabitleri Core/betik/CI'da aynı; eksik giriş noktalı kitaplık (yamalı `msimg32.dll` kopyası)
   kutu açmadan 0x7F döner ve iş parçacığının hata kipi geri gelir (geri yüklemeyi kaldırmak kırmızı).
