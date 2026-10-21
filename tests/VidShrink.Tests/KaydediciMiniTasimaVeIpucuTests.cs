@@ -46,6 +46,28 @@ public sealed class KaydediciMiniTasimaVeIpucuTests
     }
 
     [Fact]
+    public void IpucuBeklemesiBelirtecKadarVeVarsayilandanBirSaniyeUzun()
+    {
+        var (belirtec, varsayilan, okunanlar) = AppHost.Run(() =>
+        {
+            var mini = KaydediciMiniDuzenTests.Kur("tr", KaydediciMiniDuzenTests.Durum.Kayit);
+            try
+            {
+                var b = (int)Application.Current!.FindResource("RecorderMiniTipDelay")!;
+                var v = (int)ToolTip.ShowDelayProperty.GetMetadata(typeof(Button)).DefaultValue!;
+                var dugmeler = mini.MiniStrip.GetVisualDescendants().OfType<Button>().Where(x => ToolTip.GetTip(x) is not null);
+                return (b, v, dugmeler.Select(x => ToolTip.GetShowDelay(x)).ToList());
+            }
+            finally { mini.Close(); }
+        });
+
+        _output.WriteLine($"varsayilan ShowDelay {varsayilan}, belirtec {belirtec}");
+        Assert.Equal(varsayilan + 1000, belirtec);
+        Assert.True(okunanlar.Count >= 4);
+        Assert.All(okunanlar, d => Assert.Equal(belirtec, d));
+    }
+
+    [Fact]
     public void IpucuAcikkenSayacIlerleseDeAcikKalir()
     {
         var (once, sonra, metin) = AppHost.Run(() =>
