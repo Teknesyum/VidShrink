@@ -80,6 +80,7 @@
               <ComboBox x:Name="CmbProjectFrame" MinWidth="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" ToolTip.Tip="{loc:Text editor.frame.tip}" AutomationProperties.Name="{loc:Text editor.frame}"/>
               <Button x:Name="BtnAddSource" Theme="{StaticResource GhostButton}" Content="{loc:Text editor.source.add}"/>
               <ToggleButton x:Name="BtnMedia" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.media.open}" AutomationProperties.Name="{loc:Text editor.media.open}"/>
+              <ToggleButton x:Name="BtnSlides" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.slides.open}" AutomationProperties.Name="{loc:Text editor.slides.open}"/>
               <Button x:Name="BtnAddText" Theme="{StaticResource GhostButton}" MinWidth="{StaticResource EditorToolButtonSize}" Content="T" AutomationProperties.Name="{loc:Text editor.text.add}"/>
               <ToggleButton x:Name="BtnSilence" Theme="{StaticResource EditorToolButton}" AutomationProperties.Name="{loc:Text editor.silence.open}" ToolTip.Tip="{loc:Text editor.silence.open}">
                 <Path Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" Stretch="Uniform" Data="{StaticResource IconVolumeMute}" Fill="{Binding $parent[ToggleButton].Foreground}"/>
@@ -278,6 +279,7 @@
               <TextBox x:Name="TxtClipOffsetY" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.offset-y}"/>
               <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.angle}"/>
               <TextBox x:Name="TxtClipAngle" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.angle}"/>
+              <ToggleButton x:Name="BtnClipMove" Theme="{StaticResource EditorToolButton}" Content="{loc:Text editor.clip.move}" ToolTip.Tip="{loc:Text editor.clip.move.tip}" AutomationProperties.Name="{loc:Text editor.clip.move}"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
               <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.volume}"/>
@@ -396,6 +398,57 @@
                 <ComboBoxItem Content="{loc:Text editor.media.overwrite}"/>
               </ComboBox>
             </StackPanel>
+          </WrapPanel>
+          <WrapPanel x:Name="StillPanel" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.still.panel}">
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.text.color}"/>
+              <TextBox x:Name="TxtStillColor" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" FontFamily="{StaticResource FontMono}" AutomationProperties.Name="{loc:Text editor.text.color}"/>
+              <Border x:Name="StillSwatch" Width="{StaticResource IconSizeMd}" Height="{StaticResource IconSizeMd}" VerticalAlignment="Center" CornerRadius="{StaticResource RadiusChip}" BorderThickness="{StaticResource BorderThin}" BorderBrush="{StaticResource HeaderRestBorder}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.still.hue}"/>
+              <Slider x:Name="SldStillHue" Width="{StaticResource FieldWidthSm}" Minimum="0" Maximum="360" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.still.hue}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.still.saturation}"/>
+              <Slider x:Name="SldStillSaturation" Width="{StaticResource FieldWidthSm}" Minimum="0" Maximum="100" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.still.saturation}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.still.lightness}"/>
+              <Slider x:Name="SldStillLightness" Width="{StaticResource FieldWidthSm}" Minimum="0" Maximum="100" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.still.lightness}"/>
+            </StackPanel>
+            <Button x:Name="BtnStillAddColor" Theme="{StaticResource GhostButton}" VerticalAlignment="Center" Content="{loc:Text editor.still.add-color}" AutomationProperties.Name="{loc:Text editor.still.add-color}"/>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.still.image-seconds}"/>
+              <TextBox x:Name="TxtStillImageSeconds" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.still.image-seconds}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.still.freeze-seconds}"/>
+              <TextBox x:Name="TxtStillFreezeSeconds" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.still.freeze-seconds}"/>
+            </StackPanel>
+          </WrapPanel>
+          <WrapPanel x:Name="SlidePanel" Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.slides.open}">
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <Button x:Name="BtnSlidePick" Theme="{StaticResource GhostButton}" VerticalAlignment="Center" Content="{loc:Text editor.slides.pick}" AutomationProperties.Name="{loc:Text editor.slides.pick}"/>
+              <SarilanMetin x:Name="TxtSlideCount" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.slides.seconds}"/>
+              <TextBox x:Name="TxtSlideSeconds" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.slides.seconds}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <SarilanMetin Theme="{StaticResource Hint}" VerticalAlignment="Center" Text="{loc:Text editor.clip.transition}"/>
+              <ComboBox x:Name="CmbSlideTransition" MinWidth="{StaticResource FieldWidthSm}" VerticalAlignment="Center" AutomationProperties.Name="{loc:Text editor.clip.transition}"/>
+              <TextBox x:Name="TxtSlideTransition" Width="{StaticResource NumberBoxWidth}" VerticalAlignment="Center" ToolTip.Tip="{loc:Text editor.clip.transition.duration}" AutomationProperties.Name="{loc:Text editor.clip.transition.duration}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpaceSm}">
+              <Button x:Name="BtnSlideMusic" Theme="{StaticResource GhostButton}" VerticalAlignment="Center" Content="{loc:Text editor.music.add}" AutomationProperties.Name="{loc:Text editor.music.add}"/>
+              <SarilanMetin x:Name="TxtSlideMusic" Theme="{StaticResource Hint}" VerticalAlignment="Center" MaxWidth="{StaticResource FieldWidth}"/>
+              <Button x:Name="BtnSlideMusicClear" Theme="{StaticResource GhostButton}" VerticalAlignment="Center" Content="{loc:Text editor.music.remove}" AutomationProperties.Name="{loc:Text editor.music.remove}"/>
+              <CheckBox x:Name="ChkSlideFit" Theme="{StaticResource CheckStyle}" VerticalAlignment="Center" Content="{loc:Text editor.slides.fit}"/>
+            </StackPanel>
+            <Button x:Name="BtnSlideBuild" Theme="{StaticResource GhostButton}" VerticalAlignment="Center" Content="{loc:Text editor.slides.build}" AutomationProperties.Name="{loc:Text editor.slides.build}"/>
+            <SarilanMetin x:Name="TxtSlideStatus" Theme="{StaticResource Hint}" VerticalAlignment="Center"/>
           </WrapPanel>
           <StackPanel x:Name="SilencePanel" Spacing="{StaticResource SpaceSm}" IsVisible="False" AutomationProperties.Name="{loc:Text editor.silence.panel}">
             <WrapPanel Orientation="Horizontal" ItemSpacing="{StaticResource SpaceMd}" LineSpacing="{StaticResource SpaceSm}">
@@ -521,8 +574,10 @@
                   <MenuItem x:Name="MnuColorClip" Header="{loc:Text editor.still.color}">
                     <MenuItem x:Name="MnuColorBlack" Header="{loc:Text editor.still.black}"/>
                     <MenuItem x:Name="MnuColorWhite" Header="{loc:Text editor.still.white}"/>
+                    <MenuItem x:Name="MnuColorPick" Header="{loc:Text editor.still.pick-color}"/>
                   </MenuItem>
                   <MenuItem x:Name="MnuFreeze" Header="{loc:Text editor.still.freeze}"/>
+                  <MenuItem x:Name="MnuStillSettings" Header="{loc:Text editor.still.settings}"/>
                   <MenuItem x:Name="MnuProjectSave" Header="{loc:Text editor.project.save}"/>
                   <MenuItem x:Name="MnuProjectOpen" Header="{loc:Text editor.project.open}"/>
                   <MenuItem x:Name="MnuBatchExport" Header="{loc:Text editor.batch.open}"/>

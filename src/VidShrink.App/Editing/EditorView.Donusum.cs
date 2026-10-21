@@ -39,6 +39,8 @@ internal partial class EditorView
             box.LostFocus += (_, _) => CommitClipTransform(box, field);
             box.KeyDown += (_, e) => CommitOnEnter(e, KeyModifiers.None, () => CommitClipTransform(box, field));
         }
+
+        InitClipMove();
     }
 
     internal bool SetFrame(EditFrame frame)

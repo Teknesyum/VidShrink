@@ -171,7 +171,7 @@ internal partial class EditorView
 
     /// <summary>
     /// Birakilan ya da secilen dosyalar: cizelge aciksa hepsi sona eklenir, kapaliysa resim olmayan ilki acilir ve
-    /// kalani eklenir; resimler ara videoya cevrilir.
+    /// kalani eklenir; hepsi resimse ilki ara videoya cevrilip kaynak olarak acilir.
     /// </summary>
     internal async Task TakeFilesAsync(IReadOnlyList<string> files)
     {
@@ -180,6 +180,11 @@ internal partial class EditorView
         {
             await OpenSourceAsync(first).ConfigureAwait(true);
             rest = files.Where(file => !ReferenceEquals(file, first)).ToArray();
+        }
+        else if (_model is null && files.Count > 0)
+        {
+            if (!await OpenImageAsync(files[0]).ConfigureAwait(true)) return;
+            rest = files.Skip(1).ToArray();
         }
 
         foreach (var file in rest) await AddSourceAsync(file).ConfigureAwait(true);

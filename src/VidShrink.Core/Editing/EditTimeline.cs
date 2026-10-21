@@ -5,7 +5,7 @@
 /// komutun kendisini tersine ya da yeniden uygular; liste kopyalanmaz. Zamanlar
 /// <see cref="EditTime"/> tick'idir. Surec acmaz, dosya okumaz.
 /// </summary>
-public sealed class EditTimeline
+public sealed partial class EditTimeline
 {
     private readonly List<EditClip> _clips;
     private readonly List<TextLayer> _texts;
