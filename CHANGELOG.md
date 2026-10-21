@@ -9,8 +9,6 @@ made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md
 
 ## [Unreleased]
 
-### Added
-
 ### Fixed
 
 - Changing the colour matrix (Convert's BT.601/709/2020 choice and Shrink's colour space
@@ -19,6 +17,9 @@ made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md
 - Recorder: on several monitors the drawing layer opens on the right screen. Without a capture area it covers the
   screen under the pointer instead of always the primary one; an area spanning monitors with different scaling is
   trimmed to one monitor so the layer is not sized with the wrong scale.
+- The installers (setup program, silent install and `Install-VidShrink.ps1`) now write the
+  Windows 11 context menu labels in the install language, so the first menu no longer shows the
+  built-in English names until the app is opened once. Uninstall removes them.
 
 ## [0.0.1]
 

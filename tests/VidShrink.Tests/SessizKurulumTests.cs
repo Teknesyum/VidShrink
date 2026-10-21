@@ -68,6 +68,79 @@ public sealed class SessizKurulumTests : IDisposable
         Assert.False(File.Exists(copy));
     }
 
+    /// <summary>
+    /// Kurulum Windows 11 eklentisinin okuduğu <c>ShellLabels</c>'ı kurulumun dilinde yazar
+    /// (later 81): uygulama hiç açılmadan eklenti yerleşik İngilizce adlara düşmez. Uygulama aynı
+    /// dilde yenileme yaptığında bir şey yazmaz (aynı değer adları, aynı yazıcı), başka dilde
+    /// yazar. Kaldırma anahtarı siler; gerçek <c>ShellLabels</c> dokunulmadan kalır.
+    /// </summary>
+    [Fact]
+    public async Task KurulumEklentiEtiketleriniKurulumDilindeYazar()
+    {
+        if (!OperatingSystem.IsWindows()) return;
+        var (options, host) = Setup(FakeRelease("fr"));
+        options = options with { ClassesRoot = $@"{_testKey}\Software", MenuLanguage = "fr" };
+        var labelsKey = ShellRegistration.ShellLabelsKey(options.ClassesRoot);
+        var realBefore = LabelValues(VidShrink.App.ShellMenu.LabelKey);
+
+        await SetupRunner.InstallAsync(options, host, CancellationToken.None);
+
+        var written = LabelValues(labelsKey);
+        var catalog = FrenchCatalog();
+        Assert.Equal(catalog["shell.menu.open"], written[ShellRegistration.OpenLabelName]);
+        Assert.Equal(catalog["shell.menu.enqueue"], written[ShellRegistration.EnqueueLabelName]);
+        Assert.Equal(catalog["shell.menu.shrink"], written[ShellRegistration.ShrinkLabelName]);
+        Assert.NotEqual(SetupText.GetIn("en", "shell.menu.shrink"), written[ShellRegistration.ShrinkLabelName]);
+        foreach (var target in ShellIntegration.QuickShrinkMenu)
+        {
+            Assert.Equal(catalog[target.LabelKey], written[target.ShellLabelName]);
+            Assert.NotEqual(target.Fallback, written[target.ShellLabelName]);
+        }
+        Assert.Equal(3 + ShellIntegration.QuickShrinkMenu.Count, written.Count);
+
+        var language = VidShrink.App.Localization.Strings.Language;
+        int same, other;
+        VidShrink.App.ShellMenu.TestRoot = _testKey;
+        try
+        {
+            VidShrink.App.Localization.Strings.Use("fr");
+            same = VidShrink.App.ShellMenu.Relabel(VidShrink.App.ShellMenu.ShrinkMenuKey, catalog["shell.menu.shrink"])
+                + VidShrink.App.ShellMenu.Relabel(VidShrink.App.ShellMenu.MenuKey, catalog["shell.menu.open"])
+                + VidShrink.App.ShellMenu.Relabel(VidShrink.App.ShellMenu.EnqueueMenuKey, catalog["shell.menu.enqueue"]);
+            VidShrink.App.Localization.Strings.Use("tr");
+            other = VidShrink.App.ShellMenu.Relabel(VidShrink.App.ShellMenu.ShrinkMenuKey, VidShrink.App.Localization.Strings.Get("shell.menu.shrink"));
+        }
+        finally
+        {
+            VidShrink.App.ShellMenu.TestRoot = null;
+            VidShrink.App.Localization.Strings.Use(language);
+        }
+        Assert.Equal(0, same);
+        Assert.True(other > 0);
+
+        await SetupRunner.UninstallAsync(options, host, CancellationToken.None);
+
+        using (var gone = Registry.CurrentUser.OpenSubKey(labelsKey)) Assert.Null(gone);
+        Assert.Equal(realBefore, LabelValues(VidShrink.App.ShellMenu.LabelKey));
+    }
+
+    private static Dictionary<string, string> FrenchCatalog()
+    {
+        using var document = System.Text.Json.JsonDocument.Parse(
+            File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.App", "Locales", "fr", "main.json")));
+        return document.RootElement.EnumerateObject()
+            .Where(p => p.Value.ValueKind == System.Text.Json.JsonValueKind.String)
+            .ToDictionary(p => p.Name, p => p.Value.GetString()!.Replace("{app}", AppIdentity.Name, StringComparison.Ordinal));
+    }
+
+    private static Dictionary<string, string?> LabelValues(string path)
+    {
+        using var key = Registry.CurrentUser.OpenSubKey(path);
+        return key is null
+            ? new Dictionary<string, string?>()
+            : key.GetValueNames().ToDictionary(n => n, n => key.GetValue(n) as string);
+    }
+
     [Fact]
     public async Task KayitKapaliykenAnahtarYazilmiyor()
     {
@@ -336,13 +409,15 @@ public sealed class SessizKurulumTests : IDisposable
         return (options, host);
     }
 
-    private string FakeRelease()
+    private string FakeRelease(params string[] locales)
     {
         var release = Path.Combine(_work, "yayin-" + Guid.NewGuid().ToString("n")[..6]);
         Directory.CreateDirectory(release);
 
         var app = Path.Combine(release, UpdateCheck.ArchiveAssetName(Rid));
-        Zip(app, (AppIdentity.AppExecutable, "uygulama"), ("alt/veri.txt", "veri"));
+        Zip(app, [(AppIdentity.AppExecutable, "uygulama"), ("alt/veri.txt", "veri"),
+            .. locales.Select(language => ($"Locales/{language}/main.json",
+                File.ReadAllText(Path.Combine(TipSources.Root, "src", "VidShrink.App", "Locales", language, "main.json"))))]);
         var launcher = Path.Combine(release, UpdateCheck.LauncherArchiveAssetName(Rid));
         Zip(launcher, (AppIdentity.LauncherExecutable, "baslatici"));
         File.WriteAllText(Path.Combine(release, $"checksums-{Rid}.txt"),

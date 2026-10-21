@@ -146,6 +146,42 @@ public static class ShellRegistration
     public static string SoftwareRoot(string classesRoot) =>
         SetupOptions.IsDefaultClassesRoot(classesRoot) ? "Software" : classesRoot.TrimEnd('\\');
 
+    public const string OpenLabelName = "open";
+
+    public const string ShrinkLabelName = "shrink";
+
+    public const string EnqueueLabelName = "enqueue";
+
+    /// <summary>
+    /// Windows 11 kabuk eklentisinin etiketleri okuduğu anahtar; <paramref name="softwareRoot"/>
+    /// <c>HKEY_CURRENT_USER</c> altında görecelidir. Varsayılan kökte eklentinin sabit yolu çıkar.
+    /// </summary>
+    public static string ShellLabelsKey(string softwareRoot) =>
+        softwareRoot.TrimEnd('\\') + @"\" + AppIdentity.RegistryVendorPath + @"\ShellLabels";
+
+    /// <summary>Alt menü girdilerinin eklentiye bırakılan değer adları ve etiketleri, <see cref="ShellIntegration.QuickShrinkMenu"/> sırasıyla.</summary>
+    public static IEnumerable<(string Name, string Label)> TargetLabelValues(IReadOnlyList<string> targetLabels) =>
+        ShellIntegration.QuickShrinkMenu.Select((target, i) => (target.ShellLabelName, targetLabels[i]));
+
+    /// <summary>
+    /// Etiketleri eklentinin okuduğu anahtara yazar. Kurucu da uygulama da bu yoldan geçer;
+    /// <paramref name="onlyChanged"/> açıkken aynı değer yeniden yazılmaz. Yazılan değer sayısını döner.
+    /// </summary>
+    [SupportedOSPlatform("windows")]
+    public static int WriteShellLabels(string labelsKey, IEnumerable<(string Name, string Label)> labels, bool onlyChanged = false)
+    {
+        using var key = Registry.CurrentUser.CreateSubKey(labelsKey);
+        var written = 0;
+        foreach (var (name, label) in labels)
+        {
+            if (onlyChanged && key.GetValue(name) as string == label) continue;
+            key.SetValue(name, label, RegistryValueKind.String);
+            written++;
+        }
+
+        return written;
+    }
+
     public static string RenderPackageManifest(string template)
     {
         var verbs = ShellIntegration.MediaExtensions.Select(extension =>
@@ -178,6 +214,14 @@ public static class ShellRegistration
         var targetLabels = ShellIntegration.QuickShrinkMenu
             .Select(target => TargetLabel(target, language, localesFolder)).ToArray();
         var user = Registry.CurrentUser;
+
+        WriteShellLabels(ShellLabelsKey(SoftwareRoot(classesRoot)),
+        [
+            (OpenLabelName, openLabel),
+            (EnqueueLabelName, enqueueLabel),
+            (ShrinkLabelName, shrinkLabel),
+            .. TargetLabelValues(targetLabels)
+        ]);
 
         foreach (var extension in OpenMenuExtensions)
         {
@@ -231,6 +275,7 @@ public static class ShellRegistration
         RequireWriteAllowed(classesRoot);
         var associationsPath = classesRoot.TrimEnd('\\') + @"\SystemFileAssociations";
         var user = Registry.CurrentUser;
+        user.DeleteSubKeyTree(ShellLabelsKey(SoftwareRoot(classesRoot)), false);
         using var associations = user.OpenSubKey(associationsPath);
         if (associations is null) return 0;
 

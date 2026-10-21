@@ -156,8 +156,8 @@ public class KabukMenusuTests
         Assert.Contains("RegGetValueW(HKEY_CURRENT_USER, LabelKey", extension);
         Assert.Contains("ShellLabels", extension);
         Assert.Contains("ShellLabels", Code());
-        Assert.Contains("WriteLabel(\"open\", label);", Code());
-        Assert.Contains("WriteLabel(\"shrink\", label);", Code());
+        Assert.Contains("WriteLabel(Core.Setup.ShellRegistration.OpenLabelName, label);", Code());
+        Assert.Contains("WriteLabel(Core.Setup.ShellRegistration.ShrinkLabelName, label);", Code());
     }
 
     /// <summary>Her girdi ikonu taşıyor: açma, sıraya ekleme, küçültme başlığı ve her hedef.</summary>
