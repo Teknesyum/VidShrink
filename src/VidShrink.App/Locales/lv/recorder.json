@@ -178,6 +178,7 @@
   "recorder.hotkeys.unsupported": "Šis taustiņš nevar būt globāla saīsne. Izmantojiet funkciju taustiņu vai burtu vai ciparu kopā ar Ctrl vai Alt.",
   "recorder.hotkeys.chapter": "Atzīmēt nodaļu",
   "recorder.hotkeys.draw": "Zīmēt uz ekrāna",
+  "recorder.hotkeys.ink": "Nākamā zīmēšanas krāsa",
   "recorder.hotkeys.unassigned": "(taustiņš nav piešķirts)",
   "recorder.sketch.tools": "Ierakstīšanas laikā zīmē uz ekrāna. P pildspalva, A bultiņa, B rāmis, N numurs, T teksts; Ctrl+Z atsauc, Delete notīra, Esc izdzēš un aizver. Vēlreiz nospiediet saīsni, lai zīmējums paliktu uz ekrāna un pele pāriet zemāk esošajai lietotnei.",
   "recorder.sketch.toolbar": "Zīmēšanas rīki",

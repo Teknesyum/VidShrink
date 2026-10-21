@@ -178,6 +178,7 @@
   "recorder.hotkeys.unsupported": "এই কী গ্লোবাল শর্টকাট হতে পারে না। একটি ফাংশন কী ব্যবহার করুন, অথবা Ctrl বা Alt-এর সঙ্গে একটি অক্ষর বা অঙ্ক।",
   "recorder.hotkeys.chapter": "অধ্যায় চিহ্নিত করুন",
   "recorder.hotkeys.draw": "স্ক্রিনে আঁকুন",
+  "recorder.hotkeys.ink": "আঁকার পরের রং",
   "recorder.hotkeys.unassigned": "(কোনো কী নির্ধারিত নেই)",
   "recorder.sketch.tools": "রেকর্ডিং চলাকালীন স্ক্রিনে আঁকে। P কলম, A তীর, B বাক্স, N সংখ্যা, T লেখা; Ctrl+Z পূর্বাবস্থায় ফেরায়, Delete মুছে দেয়, Esc মুছে বন্ধ করে। আঁকা স্ক্রিনে রেখে মাউস নিচের অ্যাপে দিতে শর্টকাটটি আবার চাপুন।",
   "recorder.sketch.toolbar": "আঁকার সরঞ্জাম",

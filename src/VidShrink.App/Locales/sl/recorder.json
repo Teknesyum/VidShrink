@@ -178,6 +178,7 @@
   "recorder.hotkeys.unsupported": "Ta tipka ne more biti splošna bližnjica. Uporabite funkcijsko tipko ali črko oziroma številko s Ctrl ali Alt.",
   "recorder.hotkeys.chapter": "Označi poglavje",
   "recorder.hotkeys.draw": "Riši na zaslon",
+  "recorder.hotkeys.ink": "Naslednja barva risanja",
   "recorder.hotkeys.unassigned": "(tipka ni dodeljena)",
   "recorder.sketch.tools": "Med snemanjem riše na zaslon. P pero, A puščica, B okvir, N številka, T besedilo; Ctrl+Z razveljavi, Delete počisti, Esc izbriše in zapre. Ponovno pritisnite bližnjico, da risba ostane na zaslonu, miška pa preide na aplikacijo pod njo.",
   "recorder.sketch.toolbar": "Orodja za risanje",

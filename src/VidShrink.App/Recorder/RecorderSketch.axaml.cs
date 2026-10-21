@@ -21,6 +21,8 @@ internal interface ISketchLayer
     /// <summary>Kapalıysa <paramref name="area"/> üstünde çizim kipinde açar; açıksa çizim kipine girer ya da çıkar.</summary>
     void Toggle(PixelRect area);
 
+    void NextInk();
+
     void Close();
 }
 
@@ -50,6 +52,8 @@ internal sealed class RecorderSketchHost : ISketchLayer
         if (_window!.Drawing) _window.LeaveDraw();
         else _window.EnterDraw();
     }
+
+    public void NextInk() => _window?.Sketch.NextInk();
 
     public void Close()
     {
@@ -125,7 +129,7 @@ internal sealed partial class RecorderSketch : Window
     internal void Place(PixelRect area)
     {
         _area = area;
-        var scaling = (Screens.ScreenFromPoint(area.Center) ?? Screens.Primary)?.Scaling ?? 1;
+        var scaling = SketchArea.ScalingOf(area, Screens.All.Select(s => new SketchScreen(s.Bounds, s.Scaling)).ToList());
         Position = area.Position;
         Width = area.Width / scaling;
         Height = area.Height / scaling;

@@ -178,6 +178,7 @@
   "recorder.hotkeys.unsupported": "Ten klawisz nie może być skrótem globalnym. Użyj klawisza funkcyjnego albo litery lub cyfry z Ctrl lub Alt.",
   "recorder.hotkeys.chapter": "Oznacz rozdział",
   "recorder.hotkeys.draw": "Rysuj na ekranie",
+  "recorder.hotkeys.ink": "Następny kolor rysowania",
   "recorder.hotkeys.unassigned": "(nie przypisano klawisza)",
   "recorder.sketch.tools": "Rysuje na ekranie podczas nagrywania. P pióro, A strzałka, B ramka, N numer, T tekst; Ctrl+Z cofa, Delete czyści, Esc usuwa i zamyka. Naciśnij skrót ponownie, aby zostawić rysunek na ekranie i przekazać mysz aplikacji pod spodem.",
   "recorder.sketch.toolbar": "Narzędzia rysowania",

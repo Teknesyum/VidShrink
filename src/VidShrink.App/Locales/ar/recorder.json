@@ -178,6 +178,7 @@
   "recorder.hotkeys.unsupported": "لا يمكن أن يكون هذا المفتاح اختصارًا عامًا. استخدم مفتاح وظيفة، أو حرفًا أو رقمًا مع Ctrl أو Alt.",
   "recorder.hotkeys.chapter": "وضع علامة فصل",
   "recorder.hotkeys.draw": "الرسم على الشاشة",
+  "recorder.hotkeys.ink": "لون الرسم التالي",
   "recorder.hotkeys.unassigned": "(لم يُعيَّن مفتاح)",
   "recorder.sketch.tools": "يرسم على الشاشة أثناء التسجيل. P قلم، A سهم، B مربع، N رقم، T نص؛ Ctrl+Z يتراجع، Delete يمسح، Esc يمحو ويغلق. اضغط الاختصار مرة أخرى لإبقاء الرسم على الشاشة وتمرير الماوس إلى التطبيق الذي تحته.",
   "recorder.sketch.toolbar": "أدوات الرسم",

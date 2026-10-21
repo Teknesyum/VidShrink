@@ -79,13 +79,13 @@ public sealed class KaydediciBasKonusTests
         Assert.Equal(bag, RecorderHotkeys.Of(alti, HotkeyAction.PushToTalk));
         var cakisan = RecorderHotkeys.Read("0:F1,0:F2,0:F3,0:F4,2:F5,0:F6");
         Assert.NotNull(cakisan);
-        Assert.Equal(new[] { Key.F1, Key.F2, Key.F3, Key.F4, Key.F5, Key.F6, Key.None, Key.F2 }, cakisan!.Select(b => b.Key));
+        Assert.Equal(new[] { Key.F1, Key.F2, Key.F3, Key.F4, Key.F5, Key.F6, Key.None, Key.F2, Key.F3 }, cakisan!.Select(b => b.Key));
         Assert.Equal(KeyModifiers.Control, RecorderHotkeys.Of(cakisan, HotkeyAction.ReplaySave).Modifiers);
         Assert.False(RecorderHotkeys.IsAssigned(RecorderHotkeys.Of(cakisan, HotkeyAction.PushToTalk)));
         Assert.Equal<HotkeyBinding>(cakisan, RecorderHotkeys.Read(RecorderHotkeys.Write(cakisan))!);
 
         var yazim = RecorderHotkeys.Write(RecorderHotkeys.All);
-        Assert.EndsWith(",2:F5,2:F2", yazim);
+        Assert.EndsWith(",2:F5,2:F2,2:F3", yazim);
         Assert.Equal<HotkeyBinding>(RecorderHotkeys.All, RecorderHotkeys.Read(yazim)!);
     }
 
@@ -283,7 +283,7 @@ public sealed class KaydediciBasKonusTests
         });
 
         Assert.DoesNotContain(kayitli, b => b.Key == Key.None);
-        Assert.Equal(7, kayitli.Count);
+        Assert.Equal(8, kayitli.Count);
         Assert.Contains(kayitli, b => b.Action == HotkeyAction.ReplaySave && b.Key == Key.F5 && b.Modifiers == KeyModifiers.Control);
     }
 

@@ -178,6 +178,7 @@
   "recorder.hotkeys.unsupported": "Bu tuş genel kısayol olamaz. Bir işlev tuşu ya da Ctrl veya Alt ile birlikte bir harf ya da rakam kullanın.",
   "recorder.hotkeys.chapter": "Bölüm işareti koy",
   "recorder.hotkeys.draw": "Ekrana çiz",
+  "recorder.hotkeys.ink": "Sonraki çizim rengi",
   "recorder.hotkeys.unassigned": "(tuş atanmadı)",
   "recorder.sketch.tools": "Kayıt sürerken ekrana çizer. P kalem, A ok, B kutu, N numara, T yazı; Ctrl+Z geri alır, Delete temizler, Esc siler ve kapatır. Kısayola yeniden basınca çizimler ekranda kalır, fare alttaki uygulamaya geçer.",
   "recorder.sketch.toolbar": "Çizim Araçları",

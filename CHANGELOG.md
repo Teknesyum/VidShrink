@@ -9,11 +9,18 @@ made after it, is in [`docs/CHANGELOG-VidShrink.md`](docs/CHANGELOG-VidShrink.md
 
 ## [Unreleased]
 
+### Added
+
+- Recorder: a reassignable hotkey (Ctrl+F3 by default) cycles the drawing ink while the drawing layer is open.
+
 ### Fixed
 
 - Changing the colour matrix (Convert's BT.601/709/2020 choice and Shrink's colour space
   filter) now resamples colour with Lanczos instead of bilinear, so sharp colour edges stay
   cleaner.
+- Recorder: on several monitors the drawing layer opens on the right screen. Without a capture area it covers the
+  screen under the pointer instead of always the primary one; an area spanning monitors with different scaling is
+  trimmed to one monitor so the layer is not sized with the wrong scale.
 
 ## [0.0.1]
 

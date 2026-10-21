@@ -178,6 +178,7 @@
   "recorder.hotkeys.unsupported": "מקש זה אינו יכול לשמש קיצור דרך גלובלי. השתמש במקש פונקציה, או באות או ספרה יחד עם Ctrl או Alt.",
   "recorder.hotkeys.chapter": "סמן פרק",
   "recorder.hotkeys.draw": "ציור על המסך",
+  "recorder.hotkeys.ink": "צבע הציור הבא",
   "recorder.hotkeys.unassigned": "(לא הוקצה מקש)",
   "recorder.sketch.tools": "מצייר על המסך בזמן ההקלטה. P עט, A חץ, B תיבה, N מספר, T טקסט; Ctrl+Z מבטל, Delete מנקה, Esc מוחק וסוגר. לחצו שוב על הקיצור כדי להשאיר את הציור על המסך ולהעביר את העכבר ליישום שמתחת.",
   "recorder.sketch.toolbar": "כלי ציור",

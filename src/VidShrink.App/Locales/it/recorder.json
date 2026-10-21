@@ -178,6 +178,7 @@
   "recorder.hotkeys.unsupported": "Questo tasto non può essere una scorciatoia globale. Usa un tasto funzione, oppure una lettera o una cifra con Ctrl o Alt.",
   "recorder.hotkeys.chapter": "Segna un capitolo",
   "recorder.hotkeys.draw": "Disegna sullo schermo",
+  "recorder.hotkeys.ink": "Colore di disegno successivo",
   "recorder.hotkeys.unassigned": "(nessun tasto assegnato)",
   "recorder.sketch.tools": "Disegna sullo schermo durante la registrazione. P penna, A freccia, B riquadro, N numero, T testo; Ctrl+Z annulla, Delete cancella tutto, Esc cancella e chiude. Premi di nuovo la scorciatoia per lasciare il disegno sullo schermo e passare il mouse all'app sottostante.",
   "recorder.sketch.toolbar": "Strumenti di disegno",

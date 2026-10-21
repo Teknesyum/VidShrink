@@ -178,6 +178,7 @@
   "recorder.hotkeys.unsupported": "Diese Taste kann kein globales Tastenkürzel sein. Verwenden Sie eine Funktionstaste oder einen Buchstaben bzw. eine Ziffer mit Strg oder Alt.",
   "recorder.hotkeys.chapter": "Kapitel markieren",
   "recorder.hotkeys.draw": "Auf den Bildschirm zeichnen",
+  "recorder.hotkeys.ink": "Nächste Zeichenfarbe",
   "recorder.hotkeys.unassigned": "(keine Taste zugewiesen)",
   "recorder.sketch.tools": "Zeichnet während der Aufnahme auf den Bildschirm. P Stift, A Pfeil, B Rahmen, N Nummer, T Text; Strg+Z macht rückgängig, Entf löscht alles, Esc löscht und schließt. Drücken Sie das Kürzel erneut, um die Zeichnung auf dem Bildschirm zu behalten und die Maus an die darunterliegende App zu übergeben.",
   "recorder.sketch.toolbar": "Zeichenwerkzeuge",
